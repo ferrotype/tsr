@@ -271,6 +271,26 @@ def declared_ports() -> dict[str, set[str]]:
     return declared
 
 
+def annotated_homes() -> dict[str, list[str]]:
+    """Go operation id -> the Rust files whose `port:` annotations claim it.
+
+    `rust_home` carries the LEDGER's claim, which PORTS.toml records per source
+    FILE, so a package the ledger does not map reports an empty home even when
+    the port exists -- all 40 `internal/diagnosticwriter` rows did, while
+    crates/tsr_compiler/src/diagnostic_writer/ carried explicit annotations for
+    ten of them. This is the other source, kept beside the ledger's rather than
+    merged into it: a ledger claim and an author's annotation are different
+    kinds of evidence and a reader should be able to tell which one answered.
+    """
+    homes: dict[str, set[str]] = {}
+    for path in sorted((ROOT / "crates").rglob("*.rs")):
+        text = path.read_text(errors="replace")
+        rel = str(path.relative_to(ROOT))
+        for operation, _name in _PORT_ANNOTATION.findall(text):
+            homes.setdefault(operation, set()).add(rel)
+    return {operation: sorted(files) for operation, files in homes.items()}
+
+
 def classify(
     entry: dict,
     symbol: str,
@@ -804,6 +824,7 @@ def build() -> dict:
     rows: list[dict] = []
     index = workspace_symbol_index()
     ports = declared_ports()
+    homes = annotated_homes()
     gaps = witnessed_gaps()
     missing_ids = unmapped_ids()
     entries = {e["go"]: e for e in ledger()}
@@ -860,6 +881,7 @@ def build() -> dict:
                 "ledger_phase": entry.get("phase"),
                 "ledger_crate": entry.get("crate"),
                 "rust_home": list(entry.get("rust") or []),
+                "annotated_home": homes.get(identity, []),
                 "actual_home": KNOWN_HOMES.get(package),
                 # File-level producer metrics from the ledger. Context, not an
                 # operation-level coverage claim; see classify().

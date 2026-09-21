@@ -1525,6 +1525,27 @@ class PortAnnotationTests(unittest.TestCase):
         self.assertEqual(row["disposition"], "missing")
 
 
+    def test_an_annotated_home_is_recorded_beside_the_ledger_claim(self):
+        # PORTS.toml records a Rust home per source FILE, so a package the
+        # ledger does not map reports an empty home even where the port exists:
+        # all 40 internal/diagnosticwriter rows did, while
+        # crates/tsr_compiler/src/diagnostic_writer/ carried explicit
+        # `port:` annotations. The two sources stay separate on the row,
+        # because a ledger claim and an author's annotation are different
+        # kinds of evidence.
+        homes = scope.annotated_homes()
+        self.assertIn(
+            "crates/tsr_compiler/src/diagnostic_writer/mod.rs",
+            homes.get("tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.File", []),
+        )
+        rows = json.loads((ROOT / "data/phase1/scope.json").read_text())["operations"]
+        annotated = [r for r in rows
+                     if r["go_package"] == "internal/diagnosticwriter" and r.get("annotated_home")]
+        self.assertTrue(annotated)
+        for row in annotated:
+            self.assertEqual(row["rust_home"], [], "the ledger still claims nothing here")
+
+
 class ConfigRosterTests(unittest.TestCase):
     def test_the_committed_config_ledger_validates(self):
         cases = json.loads((ROOT / "data/phase1/cases.json").read_text())
