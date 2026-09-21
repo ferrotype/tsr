@@ -21299,6 +21299,18 @@
   "version": 2,
   "witnesses": [
     {
+      "artifact": "crates/tsr_compiler/src/boundary_tests.rs",
+      "freshness": "gated on every `cargo test`; the three tests are also enumerated in data/s07/program-helper-tests.json.",
+      "id": "rust-contract/tsr-tsoptions-boundary",
+      "kind": "rust_gated",
+      "operations": [
+        "tsc/internal/tsoptions/tsconfigparsing.go:GetParsedCommandLineOfConfigFile"
+      ],
+      "producer": "none: there is no Go observation file. The expectations are derived from the pinned source, like witness/s07-helper-tests-pattern.",
+      "rust_gate": "crates/tsr_compiler/src/boundary_tests.rs runs under `cargo test -p tsr_compiler --lib boundary_tests::`; its fixture drives tsr_tsoptions::get_parsed_command_line_of_config_file at :47 and the three tests assert the project-reference rejection, the enabled-mapper rejection with retained disabled diagnostics, and normal loading with empty references and mappers",
+      "witnesses": "The Rust counterpart of the pinned `GetParsedCommandLineOfConfigFile` is driven and its result asserted. This is NOT a Go-versus-Rust comparison -- there is no frozen Go row -- so it gates the Rust implementation against expectations read from the pinned source, which is the same category as witness/s07-helper-tests-pattern. Cite it as that and not as parity."
+    },
+    {
       "artifact": "data/s04/e4-probes.json",
       "freshness": "gated on every `cargo xtask run e4`",
       "id": "witness/s04-e4-probes",
@@ -21371,6 +21383,52 @@
       "witnesses": "The pinned regular-expression scanner is the only in-scope caller of the spelling suggestions: upstream/tsc/internal/scanner/regexp.go:985, :993, :997 and :1086 all call core.GetSpellingSuggestionForStrings, which delegates to the unexported getSpellingSuggestion and through it to levenshteinWithMax. The Rust counterparts are crates/tsr_scanner/src/spelling.rs:18, :28 and its levenshtein_with_max, so the differential comparison over the frozen regexp cases exercises the same chain on both sides. The suggestion text is part of the compared diagnostic, not a separate assertion, so a wrong edit-distance weight changes the bytes. NOTE: the Rust home is tsr_scanner::spelling, not tsr_core, which is why a by-name search of tsr_core missed it."
     },
     {
+      "artifact": "data/s07/config-mapper-observations.json",
+      "freshness": "gated on every `cargo test`; also in data/s07/program-helper-tests.json.",
+      "id": "witness/s07-config-mappers-rust",
+      "kind": "rust_gated",
+      "operations": [
+        "tsc/internal/tsoptions/contentmappers.go:resolveContentMapperManifest"
+      ],
+      "producer": "scripts/s07_config_mappers.py (`go test ./internal/tsoptions` through a copied adapter)",
+      "rust_gate": "crates/tsr_module/tests/config_mappers.rs:77 `original_go_mapper_validation_and_manifests` runs under `cargo test -p tsr_module --test config_mappers`, calls tsr_module::resolve_content_mapper_manifest through the validator's resolver callback, and asserts the whole row -- mapper package, extensions, options, resolved package directory and every manifest field -- for all 15 requests",
+      "witnesses": "15 content-mapper requests. 4 of the 15 rows resolve a real manifest under /home/project/node_modules/mapper with populated Name/Version/Exec/CompilerOptions/DynamicConfig, which is what makes the manifest resolution genuinely exercised rather than merely reachable -- checked against the frozen rows, because the earlier survey flagged it as unconfirmed. ASYMMETRY the record must state: Go reaches the validator through the pinned `ParseJsonSourceFileConfigFileContent` and reads `ParsedCommandLine.ContentMappers`, while Rust hand-assembles `parse_config_file_text_to_json` + `find_property` + `convert_json_option` + `validate_content_mappers`. This is therefore NOT a same-entry-point comparison, and `ParsedCommandLine.ContentMappers` is deliberately NOT claimed here: nothing on the Rust side corresponds to that accessor on this path. The 274-row `json` half of the same file exercises only `core.go:StringifyJson`, which belongs to the leaves step and is already covered."
+    },
+    {
+      "artifact": "data/s07/config-resolver-observations.json",
+      "freshness": "gated on every `cargo test`; also in data/s07/program-helper-tests.json.",
+      "id": "witness/s07-config-resolver-rust",
+      "kind": "rust_gated",
+      "operations": [
+        "tsc/internal/module/resolver.go:ResolveConfig",
+        "tsc/internal/module/resolver.go:Resolver.resolveConfig"
+      ],
+      "producer": "scripts/s07_config_resolver.py (`go test ./internal/module` through an in-package adapter)",
+      "rust_gate": "crates/tsr_module/tests/config_resolver.rs:6 `original_go_config_resolution` runs under `cargo test -p tsr_module --test config_resolver` and asserts the whole reconstructed ResolvedModule equal -- resolved file name, original path, extension, both ts-extension flags, the full PackageId, the external-library flag, the alternate result and the diagnostics -- for all 22 requests",
+      "witnesses": "22 config-resolution requests through the pinned `ResolveConfig`, which unconditionally builds a NodeNext resolver at resolver.go:2082 and delegates to `Resolver.resolveConfig` at :2083. Unlike the trace witness, this one does compare the resolution result."
+    },
+    {
+      "artifact": "data/s07/config-observations.json",
+      "freshness": "gated on every `cargo test`; also in data/s07/program-helper-tests.json, and its producer's drift check is CHECKS[4] of `cargo xtask run program`.",
+      "id": "witness/s07-config-source-rust",
+      "kind": "rust_gated",
+      "operations": [
+        "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.CompilerOptions",
+        "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.FileNames",
+        "tsc/internal/tsoptions/parsinghelpers.go:mergeCompilerOptions",
+        "tsc/internal/tsoptions/parsinghelpers.go:parseJsonToStringKey",
+        "tsc/internal/tsoptions/tsconfigparsing.go:NewTsconfigSourceFileFromFilePath",
+        "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent",
+        "tsc/internal/tsoptions/tsconfigparsing.go:directoryOfCombinedPath",
+        "tsc/internal/tsoptions/tsconfigparsing.go:handleOptionConfigDirTemplateSubstitution",
+        "tsc/internal/tsoptions/tsconfigparsing.go:parseConfig",
+        "tsc/internal/tsoptions/tsconfigparsing.go:parseJsonConfigFileContentWorker"
+      ],
+      "producer": "scripts/s07_config.py (`go test ./internal/testrunner` through a copied adapter)",
+      "rust_gate": "crates/tsr_compiler/tests/config_source_parity.rs:4 `source_config_values_ranges_inheritance_and_globs` runs under `cargo test -p tsr_compiler --test config_source_parity`, calls tools/s07/config/rust_observation.rs for each of the 25 requests and asserts each whole row equal",
+      "witnesses": "25 config-source requests through the pinned `ParseJsonSourceFileConfigFileContent`, covering the extends chain (`extends`), extends circularity (`cycle`) and include-glob extension priority (`glob-priority`). Each transitive operation was confirmed to be on a path some frozen request actually takes, not merely reachable. `handleOptionConfigDirTemplateSubstitution` is the interesting one: a case-sensitive scan for `${configDir}` over the 25 finds nothing, which looks like a no-op, but `source-16` carries `${CONFIGDIR}` and `${confIgDir}` with a Turkish dotted capital I, and the pinned guard lowercases while the pinned replacement does not -- so both substitution branches are taken and produce the untouched string, which is what the frozen row records. NOT claimed: `ParsedCommandLine.FileNames` and `.CompilerOptions` are read here as accessors on the Go side and as the `root_file_names` and `options` fields on the Rust side, so they are claimed as accessors only. The `units`/`settings` arm of the Rust driver is dead with respect to THIS dataset -- no frozen request carries `units` -- but is live on the separate full-evidence path driven by tools/s07/config/fixture_export_test.go, so the dead-arm observation is scoped to the dataset and is not a reason to remove the code."
+    },
+    {
       "artifact": "data/s07/helper-tests.json",
       "freshness": "gated on every `cargo xtask run program`",
       "id": "witness/s07-helper-tests-go-sort",
@@ -21398,6 +21456,62 @@
       "producer": "program",
       "rust_gate": "scripts/s07_helpers.py runs `cargo test --package tsr_core --lib pattern::tests::`",
       "witnesses": "A frozen inventory of tsr_core pattern unit tests, enforced by a producer. It gates the Rust implementation directly. It is not a Go-versus-Rust comparison: the group's `checker` is null, so its expectations were derived from the pinned source rather than regenerated."
+    },
+    {
+      "artifact": "data/s07/module-trace-observations.json",
+      "freshness": "gated on every `cargo test`; also enumerated in data/s07/program-helper-tests.json and run individually by `cargo xtask run program`.",
+      "id": "witness/s07-module-trace-rust",
+      "kind": "rust_gated",
+      "operations": [
+        "tsc/internal/module/resolver.go:NewResolver",
+        "tsc/internal/module/resolver.go:Resolver.GetPackageScopeForPath",
+        "tsc/internal/module/resolver.go:Resolver.ResolveModuleName",
+        "tsc/internal/module/resolver.go:Resolver.ResolveTypeReferenceDirective",
+        "tsc/internal/module/resolver.go:resolutionState.getPackageScopeForPath"
+      ],
+      "producer": "scripts/s07_module_trace.py (`go test ./internal/module` through an in-package adapter)",
+      "rust_gate": "crates/tsr_module/src/trace_tests.rs:15 `independent_go_trace_callbacks_and_typed_arguments` runs under `cargo test -p tsr_module --lib` and asserts callback by callback, then the whole row, then the total row count, over 25 rows and 292 trace callbacks",
+      "witnesses": "The resolver's trace callback stream -- code plus typed arguments -- and package-scope cache identity, for 25 operations expanded from 3 request recipes. SCOPE, which a citation of this witness must not overstate: the resolution RESULT is discarded on both sides (Go `_, traces = ...`, Rust `.unwrap();`), so this witnesses the trace stream, not resolved file names, extensions or package ids. `GetAutomaticTypeDirectiveNames` was claimed and refuted: it appears once, takes no tracer, contains no write call in its pinned body, and its frozen row is structurally forced to `{\"traces\":[]}` -- it can distinguish no two implementations. `packagejson.InfoCacheEntry`'s methods are also not claimed: the adapter reads `PackageDirectory` and `Contents` as fields."
+    },
+    {
+      "artifact": "data/s07/packagejson-observations.json",
+      "freshness": "gated on every `cargo test`; the frozen inputs are compiled into the test with include_str!. The producer's own drift check is CHECKS[1] of `cargo xtask run program`.",
+      "id": "witness/s07-packagejson-rust",
+      "kind": "rust_gated",
+      "operations": [
+        "tsc/internal/packagejson/expected.go:Expected.ActualJSONType",
+        "tsc/internal/packagejson/expected.go:Expected.GetValue",
+        "tsc/internal/packagejson/expected.go:Expected.IsPresent",
+        "tsc/internal/packagejson/expected.go:Expected.UnmarshalJSON",
+        "tsc/internal/packagejson/exportsorimports.go:ExportsOrImports.AsArray",
+        "tsc/internal/packagejson/exportsorimports.go:ExportsOrImports.AsObject",
+        "tsc/internal/packagejson/exportsorimports.go:ExportsOrImports.IsConditions",
+        "tsc/internal/packagejson/exportsorimports.go:ExportsOrImports.IsImports",
+        "tsc/internal/packagejson/exportsorimports.go:ExportsOrImports.IsSubpaths",
+        "tsc/internal/packagejson/exportsorimports.go:ExportsOrImports.UnmarshalJSONFrom",
+        "tsc/internal/packagejson/exportsorimports.go:ExportsOrImports.initObjectKind",
+        "tsc/internal/packagejson/jsonvalue.go:JSONValue.AsArray",
+        "tsc/internal/packagejson/jsonvalue.go:JSONValue.AsObject",
+        "tsc/internal/packagejson/jsonvalue.go:JSONValue.IsFalsy",
+        "tsc/internal/packagejson/jsonvalue.go:JSONValue.UnmarshalJSONFrom",
+        "tsc/internal/packagejson/jsonvalue.go:unmarshalJSONValueV2",
+        "tsc/internal/packagejson/packagejson.go:Parse"
+      ],
+      "producer": "scripts/s07_packagejson.py (`go test ./internal/packagejson` through an in-package adapter)",
+      "rust_gate": "crates/tsr_module/src/package_json.rs:550 `parsed_fields_match_original_go` runs under `cargo test -p tsr_module --lib` and asserts, for all 243 rows, `parseable`, every named field's {present, valid, null, actual, value} including the nested contentMapper, and `exports`/`imports`/`typesVersions` with object key order and object classification",
+      "witnesses": "243 rows (79 explicit boundary cases plus 164 unique package bodies selected from the Go loader corpus), observed through the pinned `Parse` and asserted field for field by Rust. Verified call site by call site against the pinned bodies rather than inferred. Two qualifications the record must carry. (1) `Expected.IsPresent` is called and compared, but both sides compute it as `actual_type != \"\"` (expected.go:40, crates/tsr_module/src/package_json.rs:20), so it adds no discrimination beyond `ActualJSONType`. (2) `Expected.GetValue` runs on all 228 parseable rows via packagejson.go:137, but its second return is discarded by `_` there, so only its value return is gated. NOT claimed, because the adapter reads them as FIELDS rather than calling the method: `Expected.IsValid`, `Expected.ExpectedJSONType`, `JSONValue.IsPresent`, `JSONValueType.String`. Also not claimed: the four DependencyFields methods -- the dependency FIELDS are observed and asserted, which is not the same thing -- and all of cache.go, which `Parse` never constructs. `jsonvalue.go:unmarshalJSONValue` was claimed and refuted: it has zero callers anywhere in the pin."
+    },
+    {
+      "artifact": "data/s07/program-observations.json",
+      "freshness": "gated on every `cargo test`; both consumers are also in data/s07/program-helper-tests.json.",
+      "id": "witness/s07-parsed-command-line-rust",
+      "kind": "rust_gated",
+      "operations": [
+        "tsc/internal/tsoptions/parsedcommandline.go:NewParsedCommandLine"
+      ],
+      "producer": "scripts/s07_program.py and scripts/s07_verify_options.py (`go test ./internal/compiler` through copied adapters)",
+      "rust_gate": "crates/tsr_compiler/src/tests.rs:15 `actual_go_loader_observations` and crates/tsr_compiler/tests/verify_options.rs:7 `option_diagnostics_locations_paths_and_output_conflicts_match_go` both run under `cargo test -p tsr_compiler` and both construct the config through tsr_tsoptions::ParsedCommandLine::new before asserting their rows (48 and 103 respectively)",
+      "witnesses": "The construction of a ParsedCommandLine from options and roots, which both adapters do unconditionally before doing anything else: Go at tools/s07/program/export_test.go:168 and tools/s07/verify-options/export_test.go:11, Rust at tools/s07/program/rust_observation.rs:56. SCOPE: only the construction is claimed. Everything these two datasets go on to compare -- the loader closure, include reasons, option diagnostics -- belongs to internal/compiler, which is not F3a's package and whose Phase 1 boundary F4a decides."
     },
     {
       "artifact": "data/s07/path-observations.json",
@@ -21550,6 +21664,27 @@
       ],
       "producer": "program",
       "witnesses": "Frozen native semver observations. NOT Rust coverage: scripts/s07_semver.py runs `go test ./internal/semver` against a copied adapter and never executes Rust."
+    },
+    {
+      "artifact": "data/s08/p5/errors/observations.json",
+      "freshness": "gated on every `cargo test`; the frozen inputs are compiled into the test with include_str!. Unlike the S07 family this test is NOT in data/s07/program-helper-tests.json, so `cargo test` is its only gate.",
+      "id": "witness/s08-p5-errors-rust",
+      "kind": "rust_gated",
+      "operations": [
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.File",
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:FormatDiagnosticWithColorAndContext",
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:FormatDiagnosticsWithColorAndContext",
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:WriteErrorSummaryText",
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:WriteFlattenedDiagnosticMessage",
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:WriteFormatDiagnostic",
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:WriteFormatDiagnostics",
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:WriteLocation",
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:getErrorSummary",
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:writeCodeSnippet"
+      ],
+      "producer": "scripts/s08_p5_errors.py (`tools/s08/p5/error_oracle_test.go` against the pinned diagnosticwriter)",
+      "rust_gate": "crates/tsr_compiler/tests/diagnostic_writer.rs:10 `native_plain_pretty_and_error_baseline_bytes_match` runs under `cargo test -p tsr_compiler --test diagnostic_writer` and asserts the whole case object equal for all 24 cases, covering all five outputs (plain_hex, pretty_hex, summary_hex, errors_plain, errors_pretty)",
+      "witnesses": "24 synthetic cases over the pinned formatter: all four categories, global and file errors, message chains, related information, zero-width and multiline ranges, CRLF/CR-only/Unicode separators, astral characters, custom sources, relative paths and the library-location regexp. Every claimed operation was checked against the pinned body AND against the frozen bytes for evidence its branch is actually taken, not merely that it sits on the path. Three operations were deliberately EXCLUDED after that check: `WrapASTDiagnostics` and `ToDiagnostics` are a Go-only wrapper layer (Rust passes `&[&Diagnostic]` straight in, so nothing on the Rust side corresponds), and `CompareASTDiagnostics` is skipped by Rust, which sorts with `tsr_ast::compare_diagnostics`, a port of the different `ast/diagnostic.go:CompareDiagnostics`. Asymmetries that remain inside the claimed set: `WriteFormatDiagnostics` and `FormatDiagnosticsWithColorAndContext` are one Rust function taking a `pretty` flag, as are `WriteErrorSummaryText` and `getErrorSummary`; `WriteLocation` takes an injected writer in Go and selects internally in Rust; `writeCodeSnippet` takes a length in Go and an end in Rust, and Rust adds two bounds guards the pin does not have, which NO fixture reaches. The content-mapper span-translation arms of `ASTDiagnostic.File` and `resolve` are not reached by any of the 24, because the oracle's source files carry no mapper info; Rust refuses that path rather than implementing it."
     }
   ]
 }

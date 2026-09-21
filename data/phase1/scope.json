@@ -1,10 +1,10 @@
 {
   "counts": {
-    "covered": 204,
+    "covered": 251,
     "equivalent_rust": 8,
-    "implemented_untested": 3265,
+    "implemented_untested": 3245,
     "later_phase": 18,
-    "missing": 1300
+    "missing": 1273
   },
   "dispositions": [
     "covered",
@@ -165937,9 +165937,11 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s08-p5-errors-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s08-p5-errors-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/core",
@@ -165950,7 +165952,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/diagnosticwriter",
       "go_source": "tsc/internal/diagnosticwriter/diagnosticwriter.go",
       "id": "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.File",
@@ -165963,7 +165965,7 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [],
@@ -166243,9 +166245,11 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s08-p5-errors-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s08-p5-errors-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/core",
@@ -166256,7 +166260,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/diagnosticwriter",
       "go_source": "tsc/internal/diagnosticwriter/diagnosticwriter.go",
       "id": "tsc/internal/diagnosticwriter/diagnosticwriter.go:FormatDiagnosticWithColorAndContext",
@@ -166269,7 +166273,7 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [],
@@ -166345,9 +166349,11 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s08-p5-errors-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s08-p5-errors-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/core",
@@ -166358,7 +166364,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/diagnosticwriter",
       "go_source": "tsc/internal/diagnosticwriter/diagnosticwriter.go",
       "id": "tsc/internal/diagnosticwriter/diagnosticwriter.go:FormatDiagnosticsWithColorAndContext",
@@ -166371,7 +166377,7 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [],
@@ -166549,9 +166555,11 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s08-p5-errors-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s08-p5-errors-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/core",
@@ -166562,7 +166570,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/diagnosticwriter",
       "go_source": "tsc/internal/diagnosticwriter/diagnosticwriter.go",
       "id": "tsc/internal/diagnosticwriter/diagnosticwriter.go:WriteErrorSummaryText",
@@ -166575,7 +166583,7 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [],
@@ -166617,9 +166625,11 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s08-p5-errors-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s08-p5-errors-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/core",
@@ -166630,7 +166640,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/diagnosticwriter",
       "go_source": "tsc/internal/diagnosticwriter/diagnosticwriter.go",
       "id": "tsc/internal/diagnosticwriter/diagnosticwriter.go:WriteFlattenedDiagnosticMessage",
@@ -166643,7 +166653,7 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [],
@@ -166651,9 +166661,11 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s08-p5-errors-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s08-p5-errors-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/core",
@@ -166664,7 +166676,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/diagnosticwriter",
       "go_source": "tsc/internal/diagnosticwriter/diagnosticwriter.go",
       "id": "tsc/internal/diagnosticwriter/diagnosticwriter.go:WriteFormatDiagnostic",
@@ -166677,7 +166689,7 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [],
@@ -166685,9 +166697,11 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s08-p5-errors-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s08-p5-errors-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/core",
@@ -166698,7 +166712,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/diagnosticwriter",
       "go_source": "tsc/internal/diagnosticwriter/diagnosticwriter.go",
       "id": "tsc/internal/diagnosticwriter/diagnosticwriter.go:WriteFormatDiagnostics",
@@ -166711,7 +166725,7 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [],
@@ -166719,9 +166733,11 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s08-p5-errors-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s08-p5-errors-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/core",
@@ -166732,7 +166748,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/diagnosticwriter",
       "go_source": "tsc/internal/diagnosticwriter/diagnosticwriter.go",
       "id": "tsc/internal/diagnosticwriter/diagnosticwriter.go:WriteLocation",
@@ -166745,7 +166761,7 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [],
@@ -166855,9 +166871,11 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s08-p5-errors-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s08-p5-errors-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/core",
@@ -166868,7 +166886,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/diagnosticwriter",
       "go_source": "tsc/internal/diagnosticwriter/diagnosticwriter.go",
       "id": "tsc/internal/diagnosticwriter/diagnosticwriter.go:getErrorSummary",
@@ -166881,7 +166899,7 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [],
@@ -167161,9 +167179,11 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s08-p5-errors-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s08-p5-errors-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/core",
@@ -167174,7 +167194,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/diagnosticwriter",
       "go_source": "tsc/internal/diagnosticwriter/diagnosticwriter.go",
       "id": "tsc/internal/diagnosticwriter/diagnosticwriter.go:writeCodeSnippet",
@@ -167187,7 +167207,7 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [],
@@ -170106,9 +170126,11 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): witness/s07-module-trace-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-module-trace-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -170123,7 +170145,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:NewResolver",
@@ -170136,7 +170158,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -170192,9 +170214,11 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-config-resolver-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-config-resolver-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -170209,7 +170233,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:ResolveConfig",
@@ -170222,7 +170246,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -170321,9 +170345,11 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): witness/s07-module-trace-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-module-trace-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -170338,7 +170364,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:Resolver.GetPackageScopeForPath",
@@ -170351,7 +170377,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -170407,9 +170433,11 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): witness/s07-module-trace-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-module-trace-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -170424,7 +170452,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:Resolver.ResolveModuleName",
@@ -170437,7 +170465,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -170493,9 +170521,11 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): witness/s07-module-trace-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-module-trace-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -170510,7 +170540,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:Resolver.ResolveTypeReferenceDirective",
@@ -170523,7 +170553,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -170665,9 +170695,11 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-config-resolver-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-config-resolver-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -170682,7 +170714,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:Resolver.resolveConfig",
@@ -170695,7 +170727,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -171611,9 +171643,11 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): witness/s07-module-trace-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-module-trace-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -171628,7 +171662,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.getPackageScopeForPath",
@@ -171641,7 +171675,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -174906,9 +174940,11 @@
     },
     {
       "actual_home": "tsr_module::package_json / tsr_module::package_maps",
-      "basis": "unmapped and absent from the actual home for this package (tsr_module::package_json / tsr_module::package_maps)",
+      "basis": "witnessed by 1 exact link(s): witness/s07-packagejson-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-packagejson-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -174922,7 +174958,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/packagejson",
       "go_source": "tsc/internal/packagejson/expected.go",
       "id": "tsc/internal/packagejson/expected.go:Expected.ActualJSONType",
@@ -174935,7 +174971,7 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -174984,9 +175020,11 @@
     },
     {
       "actual_home": "tsr_module::package_json / tsr_module::package_maps",
-      "basis": "unmapped and absent from the actual home for this package (tsr_module::package_json / tsr_module::package_maps)",
+      "basis": "witnessed by 1 exact link(s): witness/s07-packagejson-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-packagejson-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -175000,7 +175038,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/packagejson",
       "go_source": "tsc/internal/packagejson/expected.go",
       "id": "tsc/internal/packagejson/expected.go:Expected.GetValue",
@@ -175013,7 +175051,7 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -175023,9 +175061,11 @@
     },
     {
       "actual_home": "tsr_module::package_json / tsr_module::package_maps",
-      "basis": "unmapped and absent from the actual home for this package (tsr_module::package_json / tsr_module::package_maps)",
+      "basis": "witnessed by 1 exact link(s): witness/s07-packagejson-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-packagejson-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -175039,7 +175079,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/packagejson",
       "go_source": "tsc/internal/packagejson/expected.go",
       "id": "tsc/internal/packagejson/expected.go:Expected.IsPresent",
@@ -175052,7 +175092,7 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -175101,9 +175141,11 @@
     },
     {
       "actual_home": "tsr_module::package_json / tsr_module::package_maps",
-      "basis": "unmapped and absent from the actual home for this package (tsr_module::package_json / tsr_module::package_maps)",
+      "basis": "witnessed by 1 exact link(s): witness/s07-packagejson-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-packagejson-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -175117,7 +175159,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/packagejson",
       "go_source": "tsc/internal/packagejson/expected.go",
       "id": "tsc/internal/packagejson/expected.go:Expected.UnmarshalJSON",
@@ -175130,7 +175172,7 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -175179,9 +175221,11 @@
     },
     {
       "actual_home": "tsr_module::package_json / tsr_module::package_maps",
-      "basis": "unmapped and absent from the actual home for this package (tsr_module::package_json / tsr_module::package_maps)",
+      "basis": "witnessed by 1 exact link(s): witness/s07-packagejson-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-packagejson-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -175195,7 +175239,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/packagejson",
       "go_source": "tsc/internal/packagejson/exportsorimports.go",
       "id": "tsc/internal/packagejson/exportsorimports.go:ExportsOrImports.AsArray",
@@ -175208,7 +175252,7 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -175218,9 +175262,11 @@
     },
     {
       "actual_home": "tsr_module::package_json / tsr_module::package_maps",
-      "basis": "unmapped and absent from the actual home for this package (tsr_module::package_json / tsr_module::package_maps)",
+      "basis": "witnessed by 1 exact link(s): witness/s07-packagejson-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-packagejson-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -175234,7 +175280,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/packagejson",
       "go_source": "tsc/internal/packagejson/exportsorimports.go",
       "id": "tsc/internal/packagejson/exportsorimports.go:ExportsOrImports.AsObject",
@@ -175247,7 +175293,7 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -175257,9 +175303,11 @@
     },
     {
       "actual_home": "tsr_module::package_json / tsr_module::package_maps",
-      "basis": "unmapped and absent from the actual home for this package (tsr_module::package_json / tsr_module::package_maps)",
+      "basis": "witnessed by 1 exact link(s): witness/s07-packagejson-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-packagejson-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -175273,7 +175321,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/packagejson",
       "go_source": "tsc/internal/packagejson/exportsorimports.go",
       "id": "tsc/internal/packagejson/exportsorimports.go:ExportsOrImports.IsConditions",
@@ -175286,7 +175334,7 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -175296,9 +175344,11 @@
     },
     {
       "actual_home": "tsr_module::package_json / tsr_module::package_maps",
-      "basis": "unmapped and absent from the actual home for this package (tsr_module::package_json / tsr_module::package_maps)",
+      "basis": "witnessed by 1 exact link(s): witness/s07-packagejson-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-packagejson-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -175312,7 +175362,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/packagejson",
       "go_source": "tsc/internal/packagejson/exportsorimports.go",
       "id": "tsc/internal/packagejson/exportsorimports.go:ExportsOrImports.IsImports",
@@ -175325,7 +175375,7 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -175335,9 +175385,11 @@
     },
     {
       "actual_home": "tsr_module::package_json / tsr_module::package_maps",
-      "basis": "unmapped and absent from the actual home for this package (tsr_module::package_json / tsr_module::package_maps)",
+      "basis": "witnessed by 1 exact link(s): witness/s07-packagejson-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-packagejson-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -175351,7 +175403,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/packagejson",
       "go_source": "tsc/internal/packagejson/exportsorimports.go",
       "id": "tsc/internal/packagejson/exportsorimports.go:ExportsOrImports.IsSubpaths",
@@ -175364,7 +175416,7 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -175374,9 +175426,11 @@
     },
     {
       "actual_home": "tsr_module::package_json / tsr_module::package_maps",
-      "basis": "unmapped and absent from the actual home for this package (tsr_module::package_json / tsr_module::package_maps)",
+      "basis": "witnessed by 1 exact link(s): witness/s07-packagejson-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-packagejson-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -175390,7 +175444,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/packagejson",
       "go_source": "tsc/internal/packagejson/exportsorimports.go",
       "id": "tsc/internal/packagejson/exportsorimports.go:ExportsOrImports.UnmarshalJSONFrom",
@@ -175403,7 +175457,7 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -175413,9 +175467,11 @@
     },
     {
       "actual_home": "tsr_module::package_json / tsr_module::package_maps",
-      "basis": "unmapped and absent from the actual home for this package (tsr_module::package_json / tsr_module::package_maps)",
+      "basis": "witnessed by 1 exact link(s): witness/s07-packagejson-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-packagejson-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -175429,7 +175485,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/packagejson",
       "go_source": "tsc/internal/packagejson/exportsorimports.go",
       "id": "tsc/internal/packagejson/exportsorimports.go:ExportsOrImports.initObjectKind",
@@ -175442,7 +175498,7 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -175452,9 +175508,11 @@
     },
     {
       "actual_home": "tsr_module::package_json / tsr_module::package_maps",
-      "basis": "unmapped and absent from the actual home for this package (tsr_module::package_json / tsr_module::package_maps)",
+      "basis": "witnessed by 1 exact link(s): witness/s07-packagejson-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-packagejson-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -175468,7 +175526,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/packagejson",
       "go_source": "tsc/internal/packagejson/jsonvalue.go",
       "id": "tsc/internal/packagejson/jsonvalue.go:JSONValue.AsArray",
@@ -175481,7 +175539,7 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -175491,9 +175549,11 @@
     },
     {
       "actual_home": "tsr_module::package_json / tsr_module::package_maps",
-      "basis": "unmapped and absent from the actual home for this package (tsr_module::package_json / tsr_module::package_maps)",
+      "basis": "witnessed by 1 exact link(s): witness/s07-packagejson-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-packagejson-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -175507,7 +175567,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/packagejson",
       "go_source": "tsc/internal/packagejson/jsonvalue.go",
       "id": "tsc/internal/packagejson/jsonvalue.go:JSONValue.AsObject",
@@ -175520,7 +175580,7 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -175569,9 +175629,11 @@
     },
     {
       "actual_home": "tsr_module::package_json / tsr_module::package_maps",
-      "basis": "unmapped and absent from the actual home for this package (tsr_module::package_json / tsr_module::package_maps)",
+      "basis": "witnessed by 1 exact link(s): witness/s07-packagejson-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-packagejson-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -175585,7 +175647,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/packagejson",
       "go_source": "tsc/internal/packagejson/jsonvalue.go",
       "id": "tsc/internal/packagejson/jsonvalue.go:JSONValue.IsFalsy",
@@ -175598,7 +175660,7 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -175647,9 +175709,11 @@
     },
     {
       "actual_home": "tsr_module::package_json / tsr_module::package_maps",
-      "basis": "unmapped and absent from the actual home for this package (tsr_module::package_json / tsr_module::package_maps)",
+      "basis": "witnessed by 1 exact link(s): witness/s07-packagejson-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-packagejson-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -175663,7 +175727,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/packagejson",
       "go_source": "tsc/internal/packagejson/jsonvalue.go",
       "id": "tsc/internal/packagejson/jsonvalue.go:JSONValue.UnmarshalJSONFrom",
@@ -175676,7 +175740,7 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -175764,9 +175828,11 @@
     },
     {
       "actual_home": "tsr_module::package_json / tsr_module::package_maps",
-      "basis": "unmapped and absent from the actual home for this package (tsr_module::package_json / tsr_module::package_maps)",
+      "basis": "witnessed by 1 exact link(s): witness/s07-packagejson-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-packagejson-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -175780,7 +175846,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/packagejson",
       "go_source": "tsc/internal/packagejson/jsonvalue.go",
       "id": "tsc/internal/packagejson/jsonvalue.go:unmarshalJSONValueV2",
@@ -175793,7 +175859,7 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -175920,9 +175986,11 @@
     },
     {
       "actual_home": "tsr_module::package_json / tsr_module::package_maps",
-      "basis": "unmapped; `parse` matches an unrelated generic Rust helper, which is not evidence",
+      "basis": "witnessed by 1 exact link(s): witness/s07-packagejson-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-packagejson-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -175936,7 +176004,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/packagejson",
       "go_source": "tsc/internal/packagejson/packagejson.go",
       "id": "tsc/internal/packagejson/packagejson.go:Parse",
@@ -175949,7 +176017,7 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -228616,9 +228684,11 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-config-mappers-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-config-mappers-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -228648,7 +228718,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/tsoptions",
       "go_source": "tsc/internal/tsoptions/contentmappers.go",
       "id": "tsc/internal/tsoptions/contentmappers.go:resolveContentMapperManifest",
@@ -228661,7 +228731,7 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -229985,9 +230055,11 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-parsed-command-line-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-parsed-command-line-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -230017,7 +230089,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/tsoptions",
       "go_source": "tsc/internal/tsoptions/parsedcommandline.go",
       "id": "tsc/internal/tsoptions/parsedcommandline.go:NewParsedCommandLine",
@@ -230030,7 +230102,7 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -230097,9 +230169,11 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): witness/s07-config-source-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-config-source-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -230129,7 +230203,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/tsoptions",
       "go_source": "tsc/internal/tsoptions/parsedcommandline.go",
       "id": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.CompilerOptions",
@@ -230142,7 +230216,7 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -230377,9 +230451,11 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): witness/s07-config-source-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-config-source-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -230409,7 +230485,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/tsoptions",
       "go_source": "tsc/internal/tsoptions/parsedcommandline.go",
       "id": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.FileNames",
@@ -230422,7 +230498,7 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -232985,9 +233061,11 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-config-source-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-config-source-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -233017,7 +233095,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/tsoptions",
       "go_source": "tsc/internal/tsoptions/parsinghelpers.go",
       "id": "tsc/internal/tsoptions/parsinghelpers.go:mergeCompilerOptions",
@@ -233030,7 +233108,7 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -233159,9 +233237,11 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): witness/s07-config-source-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-config-source-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -233191,7 +233271,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/tsoptions",
       "go_source": "tsc/internal/tsoptions/parsinghelpers.go",
       "id": "tsc/internal/tsoptions/parsinghelpers.go:parseJsonToStringKey",
@@ -233204,7 +233284,7 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -234859,9 +234939,11 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): rust-contract/tsr-tsoptions-boundary",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "rust-contract/tsr-tsoptions-boundary"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -234891,7 +234973,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/tsoptions",
       "go_source": "tsc/internal/tsoptions/tsconfigparsing.go",
       "id": "tsc/internal/tsoptions/tsconfigparsing.go:GetParsedCommandLineOfConfigFile",
@@ -234904,7 +234986,7 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -235184,9 +235266,11 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-config-source-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-config-source-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -235216,7 +235300,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/tsoptions",
       "go_source": "tsc/internal/tsoptions/tsconfigparsing.go",
       "id": "tsc/internal/tsoptions/tsconfigparsing.go:NewTsconfigSourceFileFromFilePath",
@@ -235229,7 +235313,7 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -235444,9 +235528,11 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-config-source-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-config-source-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -235476,7 +235562,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/tsoptions",
       "go_source": "tsc/internal/tsoptions/tsconfigparsing.go",
       "id": "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent",
@@ -235489,7 +235575,7 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -236679,9 +236765,11 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): witness/s07-config-source-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-config-source-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -236711,7 +236799,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/tsoptions",
       "go_source": "tsc/internal/tsoptions/tsconfigparsing.go",
       "id": "tsc/internal/tsoptions/tsconfigparsing.go:directoryOfCombinedPath",
@@ -236724,7 +236812,7 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -237524,9 +237612,11 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-config-source-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-config-source-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -237556,7 +237646,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/tsoptions",
       "go_source": "tsc/internal/tsoptions/tsconfigparsing.go",
       "id": "tsc/internal/tsoptions/tsconfigparsing.go:handleOptionConfigDirTemplateSubstitution",
@@ -237569,7 +237659,7 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -238109,9 +238199,11 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-config-source-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-config-source-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -238141,7 +238233,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/tsoptions",
       "go_source": "tsc/internal/tsoptions/tsconfigparsing.go",
       "id": "tsc/internal/tsoptions/tsconfigparsing.go:parseConfig",
@@ -238154,7 +238246,7 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -238174,9 +238266,11 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): witness/s07-config-source-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-config-source-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -238206,7 +238300,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/tsoptions",
       "go_source": "tsc/internal/tsoptions/tsconfigparsing.go",
       "id": "tsc/internal/tsoptions/tsconfigparsing.go:parseJsonConfigFileContentWorker",
@@ -238219,7 +238313,7 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
