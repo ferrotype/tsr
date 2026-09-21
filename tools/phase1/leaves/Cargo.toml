@@ -15,7 +15,7 @@ tsr_json = { path = "../../../crates/tsr_json", version = "0.1.0" }
 phase1_harness = { version = "0.1.0", path = "../harness" }
 serde_json = { version = "1", features = ["preserve_order"] }
 tsr_bundled = { version = "0.1.0", path = "../../../crates/tsr_bundled", features = ["test-support"] }
-tsr_core = { version = "0.1.0", path = "../../../crates/tsr_core" }
+tsr_core = { version = "0.1.0", path = "../../../crates/tsr_core", features = ["go-slice-compat"] }
 tsr_diagnostics = { version = "0.1.0", path = "../../../crates/tsr_diagnostics" }
 tsr_jsnum = { version = "0.1.0", path = "../../../crates/tsr_jsnum" }
 tsr_jsstring = { version = "0.1.0", path = "../../../crates/tsr_jsstring" }

@@ -9,6 +9,13 @@ for current coverage.
 
 Requires **Rust 1.96 or newer**.
 
+The default-off `go-slice-compat` feature exposes `SharedSlice`, the slice-header
+helpers and `MultiMap`. These preserve Go's mutable backing aliases and pinned
+allocation-growth behavior for explicit compatibility contracts. Ordinary
+compiler consumers use owned or borrowed containers instead. The Phase 1 leaf
+harness enables the feature; production builds are checked separately without
+it by `python3 scripts/check_production_features.py`.
+
 Licensed under Apache-2.0. See [LICENSE](LICENSE) and [NOTICE](NOTICE) for
 license and attribution information.
 

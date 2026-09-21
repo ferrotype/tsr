@@ -1,10 +1,13 @@
-//! Slice-header compatibility helpers; see docs/PHASE1-aliasing-audit.md.
+//! Core helpers; slice-header compatibility requires `go-slice-compat`.
+//! See docs/PHASE1-aliasing-audit.md for the explicit sharing contracts.
 //! Identity-returning operations intentionally retain mutable backing. Ordinary
 //! production transforms should use borrows/owned results and an explicit
 //! changed flag where those preserve their caller contract.
+#[cfg(feature = "go-slice-compat")]
 use crate::slices::{GoSliceElement, SharedSlice};
 
 /// port: tsc/internal/core/core.go:Filter
+#[cfg(feature = "go-slice-compat")]
 pub fn filter<T: GoSliceElement>(
     slice: &SharedSlice<T>,
     mut f: impl FnMut(&T) -> bool,
@@ -23,6 +26,7 @@ pub fn filter<T: GoSliceElement>(
     slice.clone()
 }
 /// port: tsc/internal/core/core.go:Map
+#[cfg(feature = "go-slice-compat")]
 pub fn map<T: Clone, U>(slice: &SharedSlice<T>, mut f: impl FnMut(&T) -> U) -> SharedSlice<U> {
     if slice.is_nil() {
         SharedSlice::default()
@@ -31,6 +35,7 @@ pub fn map<T: Clone, U>(slice: &SharedSlice<T>, mut f: impl FnMut(&T) -> U) -> S
     }
 }
 /// port: tsc/internal/core/core.go:MapIndex
+#[cfg(feature = "go-slice-compat")]
 pub fn map_index<T: Clone, U>(
     slice: &SharedSlice<T>,
     mut f: impl FnMut(&T, usize) -> U,
@@ -42,6 +47,7 @@ pub fn map_index<T: Clone, U>(
     }
 }
 /// port: tsc/internal/core/core.go:MapFiltered
+#[cfg(feature = "go-slice-compat")]
 pub fn map_filtered<T: Clone, U: GoSliceElement>(
     slice: &SharedSlice<T>,
     mut f: impl FnMut(&T) -> Option<U>,
@@ -55,6 +61,7 @@ pub fn map_filtered<T: Clone, U: GoSliceElement>(
     result
 }
 /// port: tsc/internal/core/core.go:FlatMap
+#[cfg(feature = "go-slice-compat")]
 pub fn flat_map<T: Clone, U: GoSliceElement>(
     slice: &SharedSlice<T>,
     mut f: impl FnMut(&T) -> Vec<U>,
@@ -66,6 +73,7 @@ pub fn flat_map<T: Clone, U: GoSliceElement>(
     result
 }
 /// port: tsc/internal/core/core.go:Flatten
+#[cfg(feature = "go-slice-compat")]
 pub fn flatten<T: GoSliceElement>(slices: &[SharedSlice<T>]) -> SharedSlice<T> {
     let mut result = SharedSlice::default();
     for slice in slices {
@@ -74,6 +82,7 @@ pub fn flatten<T: GoSliceElement>(slices: &[SharedSlice<T>]) -> SharedSlice<T> {
     result
 }
 /// port: tsc/internal/core/core.go:Concatenate
+#[cfg(feature = "go-slice-compat")]
 pub fn concatenate<T: GoSliceElement>(
     left: &SharedSlice<T>,
     right: &SharedSlice<T>,
@@ -90,6 +99,7 @@ pub fn concatenate<T: GoSliceElement>(
     }
 }
 /// port: tsc/internal/core/core.go:Deduplicate
+#[cfg(feature = "go-slice-compat")]
 pub fn deduplicate<T: GoSliceElement + Eq>(slice: &SharedSlice<T>) -> SharedSlice<T> {
     let values = slice.read();
     for (i, value) in values.iter().enumerate() {
@@ -106,6 +116,7 @@ pub fn deduplicate<T: GoSliceElement + Eq>(slice: &SharedSlice<T>) -> SharedSlic
     slice.clone()
 }
 /// port: tsc/internal/core/core.go:AppendIfUnique
+#[cfg(feature = "go-slice-compat")]
 pub fn append_if_unique<T: GoSliceElement + Eq>(
     slice: &SharedSlice<T>,
     value: T,
@@ -118,6 +129,7 @@ pub fn append_if_unique<T: GoSliceElement + Eq>(
     result
 }
 /// port: tsc/internal/core/core.go:SameMap
+#[cfg(feature = "go-slice-compat")]
 pub fn same_map<T: Clone + Eq>(
     slice: &SharedSlice<T>,
     mut f: impl FnMut(&T) -> T,

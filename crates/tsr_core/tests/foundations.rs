@@ -1,4 +1,6 @@
-use tsr_core::{helpers, slices::SharedSlice, CompilerOptions};
+#[cfg(feature = "go-slice-compat")]
+use tsr_core::slices::SharedSlice;
+use tsr_core::{helpers, CompilerOptions};
 use tsr_jsstring::JsString;
 
 #[test]
@@ -70,6 +72,7 @@ fn option_clone_isolates_all_nine_formerly_shared_fields() {
 }
 
 #[test]
+#[cfg(feature = "go-slice-compat")]
 fn callback_can_change_a_later_element_through_an_alias() {
     let source = SharedSlice::from_vec(vec![1, 2, 3]);
     let mut alias = source.clone();
@@ -103,6 +106,7 @@ fn memoize_retries_a_panicking_initializer_and_retains_success() {
 }
 
 #[test]
+#[cfg(feature = "go-slice-compat")]
 fn shared_slice_value_comparison_does_not_turn_nan_into_equal() {
     let a = SharedSlice::from_vec(vec![f64::NAN]);
     assert_ne!(a, a.clone());

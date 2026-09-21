@@ -152,6 +152,9 @@ jobs:
       - name: Workspace build
         if: ${{ !cancelled() && steps.validate.outcome == 'success' }}
         run: cargo xtask run workspace
+      - name: Production build without Go slice compatibility
+        if: ${{ !cancelled() && steps.validate.outcome == 'success' }}
+        run: python3 scripts/check_production_features.py
       - name: Generated crate contracts
         if: ${{ !cancelled() && steps.validate.outcome == 'success' }}
         run: cargo test -p tsr_diagnostics --all-targets --all-features --locked

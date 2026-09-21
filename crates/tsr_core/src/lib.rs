@@ -209,4 +209,5 @@ pub use text_change::{apply_bulk_edits, TextChange, UnappliableEdits};
 pub mod helpers;
 mod names;
 mod ranges;
+#[cfg(feature = "go-slice-compat")]
 pub mod slices;

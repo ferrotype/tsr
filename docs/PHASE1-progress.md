@@ -1605,3 +1605,37 @@ moves 35 Rust mapping anchors only. Authenticated native source/loader replay
 preserves byte-identical selected cases and checker obligations. Historical
 correctness/performance captures are not re-certified; no benchmark or full
 checker corpus was run.
+
+### F1b compatibility feature boundary — 2026-09-21
+
+`tsr_core/go-slice-compat` is disabled by default. It gates `SharedSlice`, all
+ten shared-slice helpers, and the whole `MultiMap` implementation. The leaf
+harness enables it explicitly; ordinary borrowed helpers and the options-clone
+isolation test remain available in the default build. The API behavior and the
+approved options exception are unchanged.
+
+CI now checks production packages separately with
+`python3 scripts/check_production_features.py`. All 33 packages under `crates/`
+compile with their default features, and the guard verifies that the actual
+`tsr_core` artifact does not enable compatibility. Two real miniature-workspace
+tests prove that a harness's feature unification cannot hide accidental API use,
+and that a production dependency enabling the feature is rejected even when its
+code compiles.
+
+Fresh leaf and config captures are byte-identical to the aliasing audit's Rust
+observation documents: **229 match / one approved difference** for leaves and
+**176 match / 299 missing / 9 different** for config. No expectations or
+comparison rules changed. Archive `data/phase1/captures/f1b-feature-guard.tar.gz`
+contains 46 JSON files (507,423 bytes) and replays after extraction. SHA-256:
+
+- archive: `5235a094619f69b7444ac6ab08d62919c75481d9836af3c1e8f3c7131dced991`
+- leaf provenance: `0ca7bf2f4ebc8c4d50040da80e39f541381c6035c4ee8663eb8580ac564bdb92`
+- config provenance: `305abfb6cf0f5e4669871edc423b2b2ca1cf1f8f056c8b9de783fc9b867d89cb`
+
+Validation: 21 core tests with default features and 23 with compatibility;
+targeted core/leaf clippy with all targets/features and warnings denied; fmt;
+163 Phase 1 Python tests and the two production-feature tests; publication
+policy and Phase 1 inventory checks. The S07 mapping update moves 14 Rust
+anchors only; replay of authenticated native observations preserves identical
+selected cases and checker obligations. Historical benchmark and correctness
+evidence is not re-certified.

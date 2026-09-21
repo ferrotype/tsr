@@ -124,6 +124,21 @@ caller-supplied closure.
 
 ## Evidence
 
+The retained compatibility surface is now behind `tsr_core/go-slice-compat`,
+disabled by default. It includes `SharedSlice`, all ten helpers taking it, and
+the whole shared-backed `MultiMap` (not just `retain_values`). The leaf driver
+explicitly enables it. Ordinary helpers and option-isolation tests remain
+available without the feature.
+
+CI runs `scripts/check_production_features.py` separately from workspace builds.
+It selects all workspace packages under `crates/`, checks their normal production
+targets, and rejects any `tsr_core` artifact enabling the feature. Cargo unifies
+normal dependency features, so an all-features/workspace build alone cannot
+enforce this separation. Real miniature-workspace regressions cover both an
+accidental API use masked by a harness dependency and a production dependency
+that enables the feature without using the API. This guard does not claim to
+prevent an external downstream crate from opting in explicitly.
+
 The previous 230/230 capture is historical. The corrected tree must report
 229 exact leaf matches and one approved ownership difference, with no missing
 or failed leaf cases. The comparator continues to report that difference and
