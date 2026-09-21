@@ -145,3 +145,22 @@ fn live_keys_borrow_mutate_and_move_nonclone_values_in_order() {
     let values = map.into_values().map(|v| v.0).collect::<Vec<_>>();
     assert_eq!(values, [111, 13]);
 }
+
+#[test]
+fn ordered_equality_consumption_and_value_mutation_do_not_reorder_keys() {
+    let mut map: OrderedMap<&str, String> = [("b", "first".into()), ("a", "second".into())]
+        .into_iter()
+        .collect();
+    let reversed: OrderedMap<&str, String> = [("a", "second".into()), ("b", "first".into())]
+        .into_iter()
+        .collect();
+    assert_ne!(map, reversed);
+    assert_eq!(map, map.clone());
+    map.for_each_value_mut(|key, value| value.push_str(key));
+    let mut owned = map.into_iter();
+    assert_eq!(owned.len(), 2);
+    assert_eq!(owned.next(), Some(("b", "firstb".into())));
+    assert_eq!(owned.len(), 1);
+    assert_eq!(owned.next(), Some(("a", "seconda".into())));
+    assert_eq!(owned.next(), None);
+}

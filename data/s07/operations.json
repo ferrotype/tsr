@@ -31942,7 +31942,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_core/src/collections/ordered_map.rs",
-          "line": 232
+          "line": 316
         }
       ],
       "source_sha256": "7ce14cc18c13e72e40206d06bf08509ac55715efc0ef184e731701b18e10f8b3",
@@ -31970,7 +31970,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_core/src/collections/ordered_map.rs",
-          "line": 129
+          "line": 213
         }
       ],
       "source_sha256": "7ce14cc18c13e72e40206d06bf08509ac55715efc0ef184e731701b18e10f8b3",
@@ -31984,7 +31984,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_core/src/collections/ordered_map.rs",
-          "line": 109
+          "line": 193
         }
       ],
       "source_sha256": "7ce14cc18c13e72e40206d06bf08509ac55715efc0ef184e731701b18e10f8b3",
@@ -31998,7 +31998,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_core/src/collections/ordered_map.rs",
-          "line": 77
+          "line": 141
         }
       ],
       "source_sha256": "7ce14cc18c13e72e40206d06bf08509ac55715efc0ef184e731701b18e10f8b3",
@@ -32012,7 +32012,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_core/src/collections/ordered_map.rs",
-          "line": 222
+          "line": 306
         }
       ],
       "source_sha256": "7ce14cc18c13e72e40206d06bf08509ac55715efc0ef184e731701b18e10f8b3",
@@ -32026,7 +32026,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_core/src/collections/ordered_map.rs",
-          "line": 93
+          "line": 157
         }
       ],
       "source_sha256": "7ce14cc18c13e72e40206d06bf08509ac55715efc0ef184e731701b18e10f8b3",
@@ -32040,7 +32040,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_core/src/collections/ordered_map.rs",
-          "line": 58
+          "line": 122
         }
       ],
       "source_sha256": "7ce14cc18c13e72e40206d06bf08509ac55715efc0ef184e731701b18e10f8b3",
@@ -32054,7 +32054,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_core/src/collections/ordered_map.rs",
-          "line": 178
+          "line": 262
         }
       ],
       "source_sha256": "7ce14cc18c13e72e40206d06bf08509ac55715efc0ef184e731701b18e10f8b3",
@@ -32068,7 +32068,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_core/src/collections/ordered_map.rs",
-          "line": 49
+          "line": 113
         }
       ],
       "source_sha256": "7ce14cc18c13e72e40206d06bf08509ac55715efc0ef184e731701b18e10f8b3",
@@ -32082,7 +32082,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_core/src/collections/ordered_map.rs",
-          "line": 114
+          "line": 198
         }
       ],
       "source_sha256": "7ce14cc18c13e72e40206d06bf08509ac55715efc0ef184e731701b18e10f8b3",
@@ -32110,7 +32110,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_core/src/collections/ordered_map.rs",
-          "line": 233
+          "line": 317
         }
       ],
       "source_sha256": "7ce14cc18c13e72e40206d06bf08509ac55715efc0ef184e731701b18e10f8b3",
@@ -33657,7 +33657,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_tsoptions/src/config_json.rs",
-          "line": 22
+          "line": 7
         }
       ],
       "source_sha256": "e94ac393477052b119bdd175c3cd5d20d7ce01cefd7b06f0334c80b2e915f814",
@@ -33919,8 +33919,13 @@
       "end_line": 21,
       "file": "tsc/internal/json/json.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_json/src/lib.rs",
+          "line": 158
+        }
+      ],
       "source_sha256": "702dd64fda7d0942b9b461cd290fcb3fae5c32f1ade5d3a61e980c389c149a5d",
       "start_line": 14
     },
@@ -33928,8 +33933,13 @@
       "end_line": 47,
       "file": "tsc/internal/json/json.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_json/src/lib.rs",
+          "line": 176
+        }
+      ],
       "source_sha256": "702dd64fda7d0942b9b461cd290fcb3fae5c32f1ade5d3a61e980c389c149a5d",
       "start_line": 41
     },

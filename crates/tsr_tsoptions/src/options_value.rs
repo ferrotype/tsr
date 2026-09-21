@@ -3,11 +3,11 @@ use crate::ConfigValue as V;
 use tsr_core::CompilerOptions;
 use tsr_jsstring::JsString;
 pub fn compiler_options_value(options: &CompilerOptions) -> V {
-    let mut values = Vec::new();
+    let mut values = tsr_core::collections::OrderedMap::default();
     macro_rules! field {
         ($field:ident,$key:literal,$value:expr) => {
             if options.$field != Default::default() {
-                values.push((JsString::from_bytes($key.as_slice()), $value));
+                values.insert(JsString::from_bytes($key.as_slice()), $value);
             }
         };
     }

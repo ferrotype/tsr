@@ -145,7 +145,10 @@ pub fn convert_config_file_to_object(
                 }
             }
         }
-        return (ConfigValue::Object(Vec::new()), errors);
+        return (
+            ConfigValue::Object(tsr_core::collections::OrderedMap::default()),
+            errors,
+        );
     }
     convert_value(config, expression, root_options, &mut notifier)
 }
@@ -250,7 +253,7 @@ fn convert_object(
     let NodeDataRead::ObjectLiteralExpression(data) = read.data() else {
         unreachable!("object payload")
     };
-    let mut result = ConfigValue::Object(Vec::new());
+    let mut result = ConfigValue::Object(tsr_core::collections::OrderedMap::default());
     let mut errors = Vec::new();
     if let Some(list) = data.properties() {
         let list = view.list(list).expect("JSON properties");

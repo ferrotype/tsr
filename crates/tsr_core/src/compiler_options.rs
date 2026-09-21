@@ -57,7 +57,7 @@ impl NewLineKind {
 }
 pub type ResolutionMode = ModuleKind;
 
-pub type PathMappings = Vec<(JsString, Option<Vec<JsString>>)>;
+pub type PathMappings = crate::collections::OrderedMap<JsString, Option<Vec<JsString>>>;
 
 /// Slices preserve nil versus nonnil empty; paths preserve insertion order.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
@@ -351,7 +351,7 @@ impl CompilerOptions {
     }
     /// port: tsc/internal/core/compileroptions.go:CompilerOptions.GetPathsBasePath
     pub fn paths_base_path<'a>(&'a self, current_directory: &'a [u8]) -> &'a [u8] {
-        if self.paths.as_ref().is_none_or(Vec::is_empty) {
+        if self.paths.as_ref().is_none_or(PathMappings::is_empty) {
             b""
         } else if !self.paths_base_path.is_empty() {
             self.paths_base_path.as_bytes()

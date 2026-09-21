@@ -72,21 +72,21 @@ impl Resolver {
     ) -> Result<Option<ResolvedModule>, Error> {
         let mut best = None;
         let mut longest = -1;
-        for (index, (key, _)) in paths.iter().enumerate() {
+        for (key, substitutions) in paths {
             let pattern = Pattern::parse(key.as_bytes());
             if !pattern.is_valid() {
                 continue;
             }
             if pattern.star_index == -1 && pattern.matches(name) {
-                best = Some((index, pattern));
+                best = Some((substitutions, pattern));
                 break;
             }
             if pattern.star_index > longest && pattern.matches(name) {
                 longest = pattern.star_index;
-                best = Some((index, pattern));
+                best = Some((substitutions, pattern));
             }
         }
-        let Some((index, pattern)) = best else {
+        let Some((substitutions, pattern)) = best else {
             return Ok(None);
         };
         trace!(
@@ -96,7 +96,7 @@ impl Resolver {
             pattern.text.as_ref()
         );
         let matched = pattern.matched_text(name);
-        for substitution in paths[index].1.iter().flatten() {
+        for substitution in substitutions.iter().flatten() {
             let replacement = replace_first(substitution.as_bytes(), matched);
             let candidate = path::resolve(base, &[&replacement]);
             trace!(

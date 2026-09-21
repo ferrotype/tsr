@@ -189,12 +189,12 @@ fn decode_value(value: &Value) -> Result<ConfigValue, String> {
         }
         "object" => {
             let items = payload.and_then(Value::as_array).ok_or("object payload")?;
-            let mut entries = Vec::with_capacity(items.len());
+            let mut entries = tsr_core::collections::OrderedMap::with_capacity(items.len());
             for item in items {
                 let pair = item.as_array().ok_or("object entry")?;
                 let key = pair.first().and_then(Value::as_str).ok_or("entry key")?;
                 let nested = decode_value(pair.get(1).ok_or("entry value")?)?;
-                entries.push((JsString::from_bytes(key.as_bytes()), nested));
+                entries.insert(JsString::from_bytes(key.as_bytes()), nested);
             }
             Ok(ConfigValue::Object(entries))
         }
@@ -417,8 +417,8 @@ fn describe_parsed(
                 parsed
                     .raw
                     .as_object()
-                    .unwrap_or_default()
-                    .iter()
+                    .into_iter()
+                    .flatten()
                     .map(|(key, _)| Value::String(text(key.as_bytes())))
                     .collect(),
             ),
@@ -434,8 +434,8 @@ fn describe_parsed(
                 parsed
                     .raw
                     .as_object()
-                    .unwrap_or_default()
-                    .iter()
+                    .into_iter()
+                    .flatten()
                     .map(|(key, _)| Value::String(text(key.as_bytes())))
                     .collect(),
             ),

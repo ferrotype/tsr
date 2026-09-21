@@ -608,6 +608,64 @@ Include both repeated-symbol suppression sites and nested success/error scope
 restoration. `TypeParameterNames::snapshot` explicitly initializes each scoped
 field; do not replace that with a derived clone over unreviewed new storage.
 
+##### JSON encoder continuation review — 2026-09-21
+
+The first typed-write increment does not complete F1b. Its next encoder batch
+uses the token contract exposed by pinned `internal/json/json.go` and consumed
+by `OrderedMap.MarshalJSONTo`. The underlying authority is the exact
+`go-json-experiment/json` revision in `upstream/tsc/go.mod`, including its
+`jsontext` state and error behavior. Apply the review input as follows:
+
+1. **Build the token state machine before extending streaming.** Route typed
+   scalar, array and object encoding through the same primitives as explicit
+   tokens. Track object name/value position, container kind, depth, output
+   offset and JSON pointer; preserve the native stream's top-level-value rules.
+   A rejected token must leave state unchanged, as `WriteToken` specifies.
+   Separate that failure from an I/O failure after output was written. Retain
+   the existing typed convenience API over these primitives. Mixed-type
+   structs already work through `&dyn Encode` (the leaf driver's `Sample`
+   exercises this); the benefit is direct sequential member writes without a
+   temporary member vector or a second formatting/state implementation.
+2. **Use an object-local decoded-name store, not unqualified output offsets.**
+   The current `HashSet<Vec<u8>>` copies every repaired name. Pinned
+   `jsontext.objectNamespace` also copies names, but into a shared unquoted-name
+   buffer with offsets, switching to a map for large objects. Start from that
+   bounded-small-object strategy and collision-safe lookup for larger objects.
+   Output-buffer offsets alone do not survive streaming flushes, and raw
+   spellings such as `"a"` and `"\u0061"` must compare as the same name. Check
+   duplicates after UTF-8 repair, nested namespace isolation, raw escapes,
+   buffer growth and flushes. Avoid claiming a protocol performance win before
+   measuring an actual consumer.
+3. **Move stack checks off scalar writes when restructuring recursive encoding.**
+   The current `value()` checks stack space for every scalar and Option layer.
+   A growth guard must enclose recursive container traversal, not just the
+   opening-token function (whose grown stack would end before child visits).
+   Keep the 10,000-container boundary and the 512 KiB-stack regression; exercise
+   nested objects as well as arrays and custom `Encode` implementations.
+   Custom `Encode` wrappers may recurse without entering a JSON container:
+   retain guarded dispatch for that path or explicitly establish its recursion
+   contract before removing the existing protection. Iterative token writes
+   themselves do not require recursive stack growth.
+4. **Implement native error information with the state machine.** Rust's present
+   `Display` exposes enum names and lacks native cause/name/offset/pointer
+   information. Changing four strings is not equivalent to the pinned error
+   contract. Capture those fields in the codec, project only language-specific
+   type names at the probe boundary, and compare nested failures, retained
+   output and retry behavior with the prepared native traces. The current
+   top-level float projection does not certify nested or streaming errors.
+5. **Expose exact signed and unsigned integer writes.** Add typed `u64` encoding
+   and integer token constructors; never route integers through `f64`. Cover
+   `i64::MIN`, `i64::MAX`, `u64::MAX` and the binary64 precision boundary with
+   native observations, including integers in mixed-type objects. The current
+   public API only supplies `i64` and floating-point number writes.
+
+Implement and check these together before widening the decoder or future
+protocol callers. Run affected Rust tests and the prepared leaves/config
+comparisons, retaining named gaps for raw values, streaming or error paths
+until their actual observations match. Re-record captures if any authenticated
+input changes, including package assets; do not edit recorded fingerprints to
+make previous observations current.
+
 ### F2 — filesystems, paths and the two kinds of matching
 
 Keep immutable program snapshots separate from live mutable filesystems.

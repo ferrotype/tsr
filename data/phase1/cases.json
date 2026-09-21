@@ -28649,10 +28649,7 @@
       "family": "leaves",
       "host_applicability": "any",
       "id": "leaves/json/marshal-float-edge-values",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/json/json.go:Marshal"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operations": [
         "tsc/internal/json/json.go:Marshal"
@@ -28691,10 +28688,7 @@
       "family": "leaves",
       "host_applicability": "any",
       "id": "leaves/json/marshal-map-deterministic",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/json/json.go:Deterministic"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operations": [
         "tsc/internal/json/json.go:Deterministic"
@@ -28803,10 +28797,7 @@
       "family": "leaves",
       "host_applicability": "any",
       "id": "leaves/json/marshal-string-invalid-utf8-byte",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/json/json.go:Marshal"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operations": [
         "tsc/internal/json/json.go:Marshal"
@@ -28817,10 +28808,7 @@
       "family": "leaves",
       "host_applicability": "any",
       "id": "leaves/json/marshal-struct-missing-null-empty",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/json/json.go:Marshal"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operations": [
         "tsc/internal/json/json.go:Marshal"

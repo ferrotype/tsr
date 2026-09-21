@@ -434,6 +434,7 @@ dependencies = [
  "tsr_core",
  "tsr_diagnostics",
  "tsr_jsnum",
+ "tsr_json",
  "tsr_jsstring",
  "tsr_module",
  "tsr_semver",
@@ -931,6 +932,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "tsr_json"
+version = "0.1.0"
+dependencies = [
+ "stacker",
+ "tsr_core",
+ "tsr_jsnum",
+ "tsr_jsstring",
+]
+
+[[package]]
 name = "tsr_jsstring"
 version = "0.1.0"
 dependencies = [
@@ -1100,6 +1111,7 @@ dependencies = [
  "tsr_core",
  "tsr_diagnostics",
  "tsr_jsnum",
+ "tsr_json",
  "tsr_jsstring",
  "tsr_parser",
  "tsr_scanner",

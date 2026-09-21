@@ -1,0 +1,22 @@
+[package]
+name = "tsr_json"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = ["crates-io"]
+description = "Byte-preserving typed JSON encoding for tsr"
+repository.workspace = true
+keywords.workspace = true
+categories.workspace = true
+readme = "README.md"
+include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/licenses/**"]
+
+[dependencies]
+stacker = "=0.1.25"
+tsr_core = { path = "../tsr_core", version = "0.1.0" }
+tsr_jsnum = { path = "../tsr_jsnum", version = "0.1.0" }
+tsr_jsstring = { path = "../tsr_jsstring", version = "0.1.0" }
+
+[lints]
+workspace = true
