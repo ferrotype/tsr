@@ -2,9 +2,9 @@
   "counts": {
     "covered": 255,
     "equivalent_rust": 8,
-    "implemented_untested": 3240,
+    "implemented_untested": 3232,
     "later_phase": 18,
-    "missing": 1274
+    "missing": 1282
   },
   "dispositions": [
     "covered",
@@ -17109,7 +17109,7 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input, but `clone_node` is defined at crates/tsr_ast/src/clone.rs; needs a behavioral witness to become covered",
+      "basis": "unmapped in the audit input; `clone_node` exists in Rust but its own annotation names a different operation (tsc/internal/ast/ast.go:Node.Clone), so the name match is not evidence",
       "basis_kind": "rule",
       "cases": [],
       "depends_on": [
@@ -17127,7 +17127,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "missing",
       "go_package": "internal/ast",
       "go_source": "tsc/internal/ast/ast.go",
       "id": "tsc/internal/ast/ast.go:cloneNode",
@@ -17622,7 +17622,7 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped; `visit` matches an unrelated generic Rust helper, which is not evidence",
+      "basis": "unmapped in the audit input; `visit` exists in Rust but its own annotation names a different operation (tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.visit), so the name match is not evidence",
       "basis_kind": "rule",
       "cases": [],
       "depends_on": [
@@ -17736,7 +17736,7 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input, but `visit_modifiers` is defined at crates/tsr_ast/src/visitor.rs; needs a behavioral witness to become covered",
+      "basis": "unmapped in the audit input; `visit_modifiers` exists in Rust but its own annotation names a different operation (tsc/internal/ast/visitor.go:NodeVisitor.VisitModifiers), so the name match is not evidence",
       "basis_kind": "rule",
       "cases": [],
       "depends_on": [
@@ -17754,7 +17754,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "missing",
       "go_package": "internal/ast",
       "go_source": "tsc/internal/ast/ast.go",
       "id": "tsc/internal/ast/ast.go:visitModifiers",
@@ -17850,7 +17850,7 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input, but `visit_nodes` is defined at crates/tsr_ast/src/visitor.rs; needs a behavioral witness to become covered",
+      "basis": "unmapped in the audit input; `visit_nodes` exists in Rust but its own annotation names a different operation (tsc/internal/ast/visitor.go:NodeVisitor.VisitNodes), so the name match is not evidence",
       "basis_kind": "rule",
       "cases": [],
       "depends_on": [
@@ -17868,7 +17868,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "missing",
       "go_package": "internal/ast",
       "go_source": "tsc/internal/ast/ast.go",
       "id": "tsc/internal/ast/ast.go:visitNodes",
@@ -104939,7 +104939,7 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input, but `is_deprecated_declaration` is defined at crates/tsr_checker/src/signature_jsdoc.rs; needs a behavioral witness to become covered",
+      "basis": "unmapped in the audit input; `is_deprecated_declaration` exists in Rust but its own annotation names a different operation (tsc/internal/ast/utilities.go:IsDeprecatedDeclarationWithCachedFlags), so the name match is not evidence",
       "basis_kind": "rule",
       "cases": [],
       "depends_on": [
@@ -104957,7 +104957,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "missing",
       "go_package": "internal/ast",
       "go_source": "tsc/internal/ast/utilities.go",
       "id": "tsc/internal/ast/utilities.go:IsDeprecatedDeclaration",
@@ -130526,7 +130526,7 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input, but `is_signed_numeric_literal` is defined at crates/tsr_ast/src/utilities.rs; needs a behavioral witness to become covered",
+      "basis": "unmapped in the audit input; `is_signed_numeric_literal` exists in Rust but its own annotation names a different operation (tsc/internal/ast/utilities.go:IsSignedNumericLiteral), so the name match is not evidence",
       "basis_kind": "rule",
       "cases": [],
       "depends_on": [
@@ -130542,7 +130542,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "missing",
       "go_package": "internal/binder",
       "go_source": "tsc/internal/binder/binder.go",
       "id": "tsc/internal/binder/binder.go:isSignedNumericLiteral",
@@ -175817,8 +175817,8 @@
       "membership": "full",
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "nothing: no caller exists at the pin",
+        "state": "exempt:unused_at_pin",
         "step": "config"
       },
       "rust_home": [
@@ -221696,8 +221696,8 @@
       "membership": "full",
       "membership_reason": "the baseline renderer the 309 outputs go through",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through its own",
+        "state": "exempt:go_test_harness",
         "step": "config"
       },
       "rust_home": [],
@@ -221726,8 +221726,8 @@
       "membership": "full",
       "membership_reason": "the baseline renderer the 309 outputs go through",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through its own",
+        "state": "exempt:go_test_harness",
         "step": "config"
       },
       "rust_home": [],
@@ -221756,8 +221756,8 @@
       "membership": "full",
       "membership_reason": "the baseline renderer the 309 outputs go through",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through its own",
+        "state": "exempt:go_test_harness",
         "step": "config"
       },
       "rust_home": [],
@@ -221786,8 +221786,8 @@
       "membership": "full",
       "membership_reason": "the baseline renderer the 309 outputs go through",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through its own",
+        "state": "exempt:go_test_harness",
         "step": "config"
       },
       "rust_home": [],
@@ -221816,8 +221816,8 @@
       "membership": "full",
       "membership_reason": "the baseline renderer the 309 outputs go through",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through its own",
+        "state": "exempt:go_test_harness",
         "step": "config"
       },
       "rust_home": [],
@@ -221846,8 +221846,8 @@
       "membership": "full",
       "membership_reason": "the baseline renderer the 309 outputs go through",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through its own",
+        "state": "exempt:go_test_harness",
         "step": "config"
       },
       "rust_home": [],
@@ -221876,8 +221876,8 @@
       "membership": "full",
       "membership_reason": "the baseline renderer the 309 outputs go through",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through its own",
+        "state": "exempt:go_test_harness",
         "step": "config"
       },
       "rust_home": [],
@@ -221902,8 +221902,8 @@
       "membership": "full",
       "membership_reason": "fixture loading used by the config tests",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "no step: upstream's test harness keeps it; this port loads its own inputs from data/phase1/requests/",
+        "state": "exempt:go_test_harness",
         "step": "config"
       },
       "rust_home": [],
@@ -221928,8 +221928,8 @@
       "membership": "full",
       "membership_reason": "fixture loading used by the config tests",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "no step: upstream's test harness keeps it; this port loads its own inputs from data/phase1/requests/",
+        "state": "exempt:go_test_harness",
         "step": "config"
       },
       "rust_home": [],
@@ -221954,8 +221954,8 @@
       "membership": "full",
       "membership_reason": "fixture loading used by the config tests",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "no step: upstream's test harness keeps it; this port loads its own inputs from data/phase1/requests/",
+        "state": "exempt:go_test_harness",
         "step": "config"
       },
       "rust_home": [],
@@ -221980,8 +221980,8 @@
       "membership": "full",
       "membership_reason": "fixture loading used by the config tests",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "no step: upstream's test harness keeps it; this port loads its own inputs from data/phase1/requests/",
+        "state": "exempt:go_test_harness",
         "step": "config"
       },
       "rust_home": [],
@@ -222006,8 +222006,8 @@
       "membership": "full",
       "membership_reason": "fixture loading used by the config tests",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "no step: upstream's test harness keeps it; this port loads its own inputs from data/phase1/requests/",
+        "state": "exempt:go_test_harness",
         "step": "config"
       },
       "rust_home": [],
@@ -222032,8 +222032,8 @@
       "membership": "full",
       "membership_reason": "fixture loading used by the config tests",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "no step: upstream's test harness keeps it; this port loads its own inputs from data/phase1/requests/",
+        "state": "exempt:go_test_harness",
         "step": "config"
       },
       "rust_home": [],
@@ -222058,8 +222058,8 @@
       "membership": "full",
       "membership_reason": "fixture loading used by the config tests",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "no step: upstream's test harness keeps it; this port loads its own inputs from data/phase1/requests/",
+        "state": "exempt:go_test_harness",
         "step": "config"
       },
       "rust_home": [],
@@ -222084,8 +222084,8 @@
       "membership": "full",
       "membership_reason": "fixture loading used by the config tests",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "no step: upstream's test harness keeps it; this port loads its own inputs from data/phase1/requests/",
+        "state": "exempt:go_test_harness",
         "step": "config"
       },
       "rust_home": [],
@@ -222110,8 +222110,8 @@
       "membership": "full",
       "membership_reason": "fixture loading used by the config tests",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "no step: upstream's test harness keeps it; this port loads its own inputs from data/phase1/requests/",
+        "state": "exempt:go_test_harness",
         "step": "config"
       },
       "rust_home": [],
@@ -222136,8 +222136,8 @@
       "membership": "full",
       "membership_reason": "fixture loading used by the config tests",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "no step: upstream's test harness keeps it; this port loads its own inputs from data/phase1/requests/",
+        "state": "exempt:go_test_harness",
         "step": "config"
       },
       "rust_home": [],
@@ -228785,8 +228785,8 @@
       "membership": "full",
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, internal/execute/incremental, which owns the snapshot comparison these answer",
+        "state": "exempt:later_step",
         "step": "config"
       },
       "rust_home": [
@@ -228840,8 +228840,8 @@
       "membership": "full",
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, internal/execute/incremental, which owns the snapshot comparison these answer",
+        "state": "exempt:later_step",
         "step": "config"
       },
       "rust_home": [
@@ -228895,8 +228895,8 @@
       "membership": "full",
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, internal/execute/incremental, which owns the snapshot comparison these answer",
+        "state": "exempt:later_step",
         "step": "config"
       },
       "rust_home": [
@@ -228950,8 +228950,8 @@
       "membership": "full",
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, internal/execute/incremental, plus optionsHaveChanges, exempted here, which is its one in-package caller",
+        "state": "exempt:later_step",
         "step": "config"
       },
       "rust_home": [
@@ -229005,8 +229005,8 @@
       "membership": "full",
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, internal/execute/incremental, transitively: the three CompilerOptionsAffect* wrappers are its only callers and all three are exempted to that owner",
+        "state": "exempt:later_step",
         "step": "config"
       },
       "rust_home": [
@@ -229223,8 +229223,8 @@
       "membership": "full",
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, internal/execute/tsctests, the CLI test harness that materialises every lib file in its virtual sys",
+        "state": "exempt:later_step",
         "step": "config"
       },
       "rust_home": [
@@ -229883,8 +229883,8 @@
       "membership": "full",
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "nothing: no caller exists at the pin, so no caller fixes the contract",
+        "state": "exempt:unused_at_pin",
         "step": "config"
       },
       "rust_home": [
@@ -230046,8 +230046,8 @@
       "membership": "full",
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, internal/execute/build, whose graph generation is the one consumer",
+        "state": "exempt:later_step",
         "step": "config"
       },
       "rust_home": [],
@@ -230945,8 +230945,8 @@
       "membership": "full",
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, internal/execute/build, whose up-to-date checks and clean pass are the only consumers",
+        "state": "exempt:later_step",
         "step": "config"
       },
       "rust_home": [
@@ -231001,8 +231001,8 @@
       "membership": "full",
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 5, internal/project",
+        "state": "exempt:later_step",
         "step": "config"
       },
       "rust_home": [
@@ -231225,8 +231225,8 @@
       "membership": "full",
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 5 internal/project and phase 4 internal/execute, plus PossiblyMatchesFileName, exempted here, which is its one in-package caller",
+        "state": "exempt:later_step",
         "step": "config"
       },
       "rust_home": [
@@ -231281,8 +231281,8 @@
       "membership": "full",
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 5 internal/project and phase 4 internal/execute; both are watch/registry fast paths",
+        "state": "exempt:later_step",
         "step": "config"
       },
       "rust_home": [
@@ -231393,8 +231393,8 @@
       "membership": "full",
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4 internal/execute (watch and build re-resolution) and phase 5 internal/project",
+        "state": "exempt:later_step",
         "step": "config"
       },
       "rust_home": [
@@ -231897,8 +231897,8 @@
       "membership": "full",
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "transitively phase 5 / phase 4 through PossiblyMatchesFileName; it has no caller of its own",
+        "state": "exempt:later_step",
         "step": "config"
       },
       "rust_home": [
@@ -231953,8 +231953,8 @@
       "membership": "full",
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 5, internal/project",
+        "state": "exempt:later_step",
         "step": "config"
       },
       "rust_home": [
@@ -233121,7 +233121,7 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input, but `parse_compiler_options` is defined at crates/tsr_tsoptions/src/parse_options.rs; needs a behavioral witness to become covered",
+      "basis": "unmapped in the audit input; `parse_compiler_options` exists in Rust but its own annotation names a different operation (tsc/internal/tsoptions/parsinghelpers.go:ParseCompilerOptions), so the name match is not evidence",
       "basis_kind": "rule",
       "cases": [],
       "depends_on": [
@@ -233153,7 +233153,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "missing",
       "go_package": "internal/tsoptions",
       "go_source": "tsc/internal/tsoptions/parsinghelpers.go",
       "id": "tsc/internal/tsoptions/parsinghelpers.go:parseCompilerOptions",
@@ -233921,8 +233921,8 @@
       "membership": "full",
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, internal/execute, which ports the --showConfig CLI path",
+        "state": "exempt:later_step",
         "step": "config"
       },
       "rust_home": [],
@@ -233974,8 +233974,8 @@
       "membership": "full",
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, internal/execute, with ConvertToTSConfig, the only entry point that reaches it",
+        "state": "exempt:later_step",
         "step": "config"
       },
       "rust_home": [],
@@ -234027,8 +234027,8 @@
       "membership": "full",
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, internal/execute, with ConvertToTSConfig, the only entry point that reaches it",
+        "state": "exempt:later_step",
         "step": "config"
       },
       "rust_home": [],
@@ -234080,8 +234080,8 @@
       "membership": "full",
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, internal/execute, with ConvertToTSConfig, the only entry point that reaches it",
+        "state": "exempt:later_step",
         "step": "config"
       },
       "rust_home": [],
@@ -234133,8 +234133,8 @@
       "membership": "full",
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, internal/execute, with ConvertToTSConfig, the only entry point that reaches it",
+        "state": "exempt:later_step",
         "step": "config"
       },
       "rust_home": [],
@@ -234186,8 +234186,8 @@
       "membership": "full",
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, internal/execute, with ConvertToTSConfig, the only entry point that reaches it",
+        "state": "exempt:later_step",
         "step": "config"
       },
       "rust_home": [],
@@ -234239,8 +234239,8 @@
       "membership": "full",
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, internal/execute, with ConvertToTSConfig, the only entry point that reaches it",
+        "state": "exempt:later_step",
         "step": "config"
       },
       "rust_home": [],
@@ -234292,8 +234292,8 @@
       "membership": "full",
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, internal/execute, with ConvertToTSConfig, the only entry point that reaches it",
+        "state": "exempt:later_step",
         "step": "config"
       },
       "rust_home": [],
@@ -234345,8 +234345,8 @@
       "membership": "full",
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, internal/execute, with ConvertToTSConfig, the only entry point that reaches it",
+        "state": "exempt:later_step",
         "step": "config"
       },
       "rust_home": [],
@@ -234593,8 +234593,8 @@
       "membership": "full",
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 5, internal/project, whose extended-config cache is the one consumer",
+        "state": "exempt:later_step",
         "step": "config"
       },
       "rust_home": [
@@ -237939,7 +237939,7 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input, but `is_double_quoted_string` is defined at crates/tsr_parser/src/json.rs; needs a behavioral witness to become covered",
+      "basis": "unmapped in the audit input; `is_double_quoted_string` exists in Rust but its own annotation names a different operation (tsc/internal/parser/parser.go:isDoubleQuotedString), so the name match is not evidence",
       "basis_kind": "rule",
       "cases": [],
       "depends_on": [
@@ -237971,7 +237971,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "missing",
       "go_package": "internal/tsoptions",
       "go_source": "tsc/internal/tsoptions/tsconfigparsing.go",
       "id": "tsc/internal/tsoptions/tsconfigparsing.go:isDoubleQuotedString",
@@ -238637,8 +238637,8 @@
       "membership": "full",
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "nothing: no caller and no interface obligation exist at the pin",
+        "state": "exempt:unused_at_pin",
         "step": "config"
       },
       "rust_home": [
@@ -239325,8 +239325,8 @@
       "membership": "full",
       "membership_reason": "the pinned config test host",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "nothing: no caller exists at the pin",
+        "state": "exempt:unused_at_pin",
         "step": "config"
       },
       "rust_home": [],
@@ -242445,14 +242445,14 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input, but `try_get_extension_from_path` is defined at crates/tsr_checker/src/external_resolution.rs; needs a behavioral witness to become covered",
+      "basis": "unmapped in the audit input; `try_get_extension_from_path` exists in Rust but its own annotation names a different operation (tsc/internal/tspath/extension.go:TryGetExtensionFromPath), so the name match is not evidence",
       "basis_kind": "rule",
       "cases": [],
       "depends_on": [
         "internal/stringutil"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "missing",
       "go_package": "internal/tspath",
       "go_source": "tsc/internal/tspath/path.go",
       "id": "tsc/internal/tspath/path.go:tryGetExtensionFromPath",

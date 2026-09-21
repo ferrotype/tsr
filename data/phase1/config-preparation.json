@@ -1,8 +1,12 @@
 {
-  "accounted_operations": 52,
+  "accounted_operations": 97,
   "complete": false,
-  "exempt_by_category": {},
-  "exempt_operations": 0,
+  "exempt_by_category": {
+    "go_test_harness": 17,
+    "later_step": 24,
+    "unused_at_pin": 4
+  },
+  "exempt_operations": 45,
   "gap_problems": [],
   "outputs": {
     "complete": true,
@@ -1227,13 +1231,6 @@
     },
     {
       "disposition": "missing",
-      "operation": "tsc/internal/packagejson/jsonvalue.go:unmarshalJSONValue",
-      "rust_home": [
-        "crates/tsr_module/src/package_json.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
       "operation": "tsc/internal/packagejson/packagejson.go:DependencyFields.GetRuntimeDependencyNames",
       "rust_home": [
         "crates/tsr_module/src/package_json.rs"
@@ -1252,91 +1249,6 @@
       "rust_home": [
         "crates/tsr_module/src/package_json.rs"
       ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/testutil/baseline/baseline.go:DiffText",
-      "rust_home": []
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/testutil/baseline/baseline.go:Run",
-      "rust_home": []
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/testutil/baseline/baseline.go:writeComparison",
-      "rust_home": []
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/testutil/baseline/testmain.go:Track",
-      "rust_home": []
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/testutil/baseline/testmain.go:doWriteRecordedBaselines",
-      "rust_home": []
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/testutil/baseline/testmain.go:recordBaseline",
-      "rust_home": []
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/testutil/baseline/testmain.go:writeRecordedBaselines",
-      "rust_home": []
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/testutil/filefixture/filefixture.go:FromFile",
-      "rust_home": []
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/testutil/filefixture/filefixture.go:FromString",
-      "rust_home": []
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/testutil/filefixture/filefixture.go:fromFile.Name",
-      "rust_home": []
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/testutil/filefixture/filefixture.go:fromFile.Path",
-      "rust_home": []
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/testutil/filefixture/filefixture.go:fromFile.ReadFile",
-      "rust_home": []
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/testutil/filefixture/filefixture.go:fromFile.SkipIfNotExist",
-      "rust_home": []
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/testutil/filefixture/filefixture.go:fromString.Name",
-      "rust_home": []
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/testutil/filefixture/filefixture.go:fromString.Path",
-      "rust_home": []
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/testutil/filefixture/filefixture.go:fromString.ReadFile",
-      "rust_home": []
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/testutil/filefixture/filefixture.go:fromString.SkipIfNotExist",
-      "rust_home": []
     },
     {
       "disposition": "missing",
@@ -1473,41 +1385,6 @@
     },
     {
       "disposition": "missing",
-      "operation": "tsc/internal/tsoptions/declscompiler.go:CompilerOptionsAffectDeclarationPath",
-      "rust_home": [
-        "crates/tsr_tsoptions/src/option_declarations_generated.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/tsoptions/declscompiler.go:CompilerOptionsAffectEmit",
-      "rust_home": [
-        "crates/tsr_tsoptions/src/option_declarations_generated.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/tsoptions/declscompiler.go:CompilerOptionsAffectSemanticDiagnostics",
-      "rust_home": [
-        "crates/tsr_tsoptions/src/option_declarations_generated.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/tsoptions/declscompiler.go:ForEachCompilerOptionValue",
-      "rust_home": [
-        "crates/tsr_tsoptions/src/option_declarations_generated.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/tsoptions/declscompiler.go:optionsHaveChanges",
-      "rust_home": [
-        "crates/tsr_tsoptions/src/option_declarations_generated.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
       "operation": "tsc/internal/tsoptions/diagnostics.go:getParseCommandLineWorkerDiagnostics",
       "rust_home": []
     },
@@ -1521,13 +1398,6 @@
     {
       "disposition": "implemented_untested",
       "operation": "tsc/internal/tsoptions/enummaps.go:GetLibFileName",
-      "rust_home": [
-        "crates/tsr_tsoptions/src/lib.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/tsoptions/enummaps.go:TargetToLibMap",
       "rust_home": [
         "crates/tsr_tsoptions/src/lib.rs"
       ]
@@ -1610,13 +1480,6 @@
       ]
     },
     {
-      "disposition": "missing",
-      "operation": "tsc/internal/tsoptions/namemap.go:NameMap.GetFromShort",
-      "rust_home": [
-        "crates/tsr_tsoptions/src/option_declarations.rs"
-      ]
-    },
-    {
       "disposition": "implemented_untested",
       "operation": "tsc/internal/tsoptions/namemap.go:NameMap.GetOptionDeclarationFromName",
       "rust_home": [
@@ -1626,11 +1489,6 @@
     {
       "disposition": "missing",
       "operation": "tsc/internal/tsoptions/parsedbuildcommandline.go:ParsedBuildCommandLine.Locale",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/tsoptions/parsedbuildcommandline.go:ParsedBuildCommandLine.ResolvedProjectPaths",
       "rust_home": []
     },
     {
@@ -1731,22 +1589,6 @@
     },
     {
       "disposition": "missing",
-      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.GetOutputFileNames",
-      "rust_home": [
-        "crates/tsr_tsoptions/src/config_specs.rs",
-        "crates/tsr_tsoptions/src/lib.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.LiteralFileNames",
-      "rust_home": [
-        "crates/tsr_tsoptions/src/config_specs.rs",
-        "crates/tsr_tsoptions/src/lib.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
       "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.Locale",
       "rust_home": [
         "crates/tsr_tsoptions/src/config_specs.rs",
@@ -1771,31 +1613,7 @@
     },
     {
       "disposition": "missing",
-      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.PossiblyMatchesDirectoryName",
-      "rust_home": [
-        "crates/tsr_tsoptions/src/config_specs.rs",
-        "crates/tsr_tsoptions/src/lib.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.PossiblyMatchesFileName",
-      "rust_home": [
-        "crates/tsr_tsoptions/src/config_specs.rs",
-        "crates/tsr_tsoptions/src/lib.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
       "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.ProjectReferences",
-      "rust_home": [
-        "crates/tsr_tsoptions/src/config_specs.rs",
-        "crates/tsr_tsoptions/src/lib.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.ReloadFileNamesOfParsedCommandLine",
       "rust_home": [
         "crates/tsr_tsoptions/src/config_specs.rs",
         "crates/tsr_tsoptions/src/lib.rs"
@@ -1860,22 +1678,6 @@
     {
       "disposition": "missing",
       "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.WildcardDirectories",
-      "rust_home": [
-        "crates/tsr_tsoptions/src/config_specs.rs",
-        "crates/tsr_tsoptions/src/lib.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.WildcardDirectoryGlobs",
-      "rust_home": [
-        "crates/tsr_tsoptions/src/config_specs.rs",
-        "crates/tsr_tsoptions/src/lib.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.WithFileNames",
       "rust_home": [
         "crates/tsr_tsoptions/src/config_specs.rs",
         "crates/tsr_tsoptions/src/lib.rs"
@@ -2066,7 +1868,7 @@
       ]
     },
     {
-      "disposition": "implemented_untested",
+      "disposition": "missing",
       "operation": "tsc/internal/tsoptions/parsinghelpers.go:parseCompilerOptions",
       "rust_home": [
         "crates/tsr_tsoptions/src/config_mappers.rs",
@@ -2187,51 +1989,6 @@
     },
     {
       "disposition": "missing",
-      "operation": "tsc/internal/tsoptions/showconfig.go:ConvertToTSConfig",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/tsoptions/showconfig.go:addImpliedOptions",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/tsoptions/showconfig.go:anyDependencyProvided",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/tsoptions/showconfig.go:computeFn",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/tsoptions/showconfig.go:filterSameAsDefaultInclude",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/tsoptions/showconfig.go:getNameOfCompilerOptionValue",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/tsoptions/showconfig.go:serializeCompilerOptions",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/tsoptions/showconfig.go:serializeEnumValue",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/tsoptions/showconfig.go:serializeImpliedOptionValue",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
       "operation": "tsc/internal/tsoptions/tsconfigparsing.go:CommandLineOptionNameMap.Get",
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -2267,23 +2024,6 @@
     {
       "disposition": "missing",
       "operation": "tsc/internal/tsoptions/tsconfigparsing.go:CreateDiagnosticAtReferenceSyntax",
-      "rust_home": [
-        "crates/tsr_compiler/src/include_reason.rs",
-        "crates/tsr_tsoptions/src/config_files.rs",
-        "crates/tsr_tsoptions/src/config_mappers.rs",
-        "crates/tsr_tsoptions/src/config_parse.rs",
-        "crates/tsr_tsoptions/src/config_read.rs",
-        "crates/tsr_tsoptions/src/config_specs.rs",
-        "crates/tsr_tsoptions/src/config_substitution.rs",
-        "crates/tsr_tsoptions/src/config_syntax.rs",
-        "crates/tsr_tsoptions/src/config_text.rs",
-        "crates/tsr_tsoptions/src/convert_options.rs",
-        "crates/tsr_tsoptions/src/lib.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:ExtendedConfigCacheEntry.ExtendedFileNames",
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
         "crates/tsr_tsoptions/src/config_files.rs",
@@ -3081,7 +2821,7 @@
       ]
     },
     {
-      "disposition": "implemented_untested",
+      "disposition": "missing",
       "operation": "tsc/internal/tsoptions/tsconfigparsing.go:isDoubleQuotedString",
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -3217,23 +2957,6 @@
       ]
     },
     {
-      "disposition": "missing",
-      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:resolverHost.Trace",
-      "rust_home": [
-        "crates/tsr_compiler/src/include_reason.rs",
-        "crates/tsr_tsoptions/src/config_files.rs",
-        "crates/tsr_tsoptions/src/config_mappers.rs",
-        "crates/tsr_tsoptions/src/config_parse.rs",
-        "crates/tsr_tsoptions/src/config_read.rs",
-        "crates/tsr_tsoptions/src/config_specs.rs",
-        "crates/tsr_tsoptions/src/config_substitution.rs",
-        "crates/tsr_tsoptions/src/config_syntax.rs",
-        "crates/tsr_tsoptions/src/config_text.rs",
-        "crates/tsr_tsoptions/src/convert_options.rs",
-        "crates/tsr_tsoptions/src/lib.rs"
-      ]
-    },
-    {
       "disposition": "implemented_untested",
       "operation": "tsc/internal/tsoptions/tsconfigparsing.go:setContentMapperDiagnosticLocation",
       "rust_home": [
@@ -3351,11 +3074,6 @@
         "crates/tsr_tsoptions/src/convert_options.rs",
         "crates/tsr_tsoptions/src/lib.rs"
       ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:fixRoot",
-      "rust_home": []
     },
     {
       "disposition": "missing",

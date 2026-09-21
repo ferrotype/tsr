@@ -1491,6 +1491,77 @@ class FilesystemPreparationTests(unittest.TestCase):
         self.assertTrue(any(case["id"] in problem for problem in report["gap_problems"]))
 
 
+class PortAnnotationTests(unittest.TestCase):
+    """A Rust function's own `port:` annotation outranks the name it happens to have."""
+
+    def test_a_port_annotation_naming_another_operation_is_not_evidence(self):
+        # Two Go packages carry `isDoubleQuotedString` and they are NOT the same
+        # function: internal/parser's tests the single-quote token flag,
+        # internal/tsoptions' does not. The Rust port declares itself the port
+        # of the parser's, and the by-name rule attributed it to tsoptions'.
+        ports = scope.declared_ports()
+        self.assertEqual(
+            ports.get("is_double_quoted_string"),
+            {"tsc/internal/parser/parser.go:isDoubleQuotedString"},
+        )
+        index = {"is_double_quoted_string": ["crates/tsr_parser/src/json.rs"]}
+        disposition, basis = scope.classify(
+            {}, "isDoubleQuotedString", False, index, [], ports,
+            "tsc/internal/tsoptions/tsconfigparsing.go:isDoubleQuotedString")
+        self.assertEqual(disposition, "missing")
+        self.assertIn("names a different operation", basis)
+
+    def test_the_operation_its_annotation_does_name_still_matches(self):
+        ports = scope.declared_ports()
+        index = {"is_double_quoted_string": ["crates/tsr_parser/src/json.rs"]}
+        disposition, _basis = scope.classify(
+            {}, "isDoubleQuotedString", False, index, [], ports,
+            "tsc/internal/parser/parser.go:isDoubleQuotedString")
+        self.assertEqual(disposition, "implemented_untested")
+
+    def test_the_committed_scope_carries_the_correction(self):
+        row = next(r for r in json.loads((ROOT / "data/phase1/scope.json").read_text())["operations"]
+                   if r["id"] == "tsc/internal/tsoptions/tsconfigparsing.go:isDoubleQuotedString")
+        self.assertEqual(row["disposition"], "missing")
+
+
+class ConfigRosterTests(unittest.TestCase):
+    def test_the_committed_config_ledger_validates(self):
+        cases = json.loads((ROOT / "data/phase1/cases.json").read_text())
+        scope_doc = json.loads((ROOT / "data/phase1/scope.json").read_text())
+        self.assertEqual(scope.roster_problems(scope_doc, cases, "config"), [])
+
+    def test_every_exemption_category_is_declared(self):
+        for entry in scope.leaf_roster("config")["exemptions"]:
+            self.assertIn(entry["category"], scope.ROSTER_CATEGORIES, entry["operation"])
+
+    def test_the_new_harness_category_is_defined_and_used(self):
+        self.assertIn("go_test_harness", scope.ROSTER_CATEGORIES)
+        used = {e["category"] for e in scope.leaf_roster("config")["exemptions"]}
+        self.assertIn("go_test_harness", used)
+
+    def test_an_exemption_for_an_operation_with_a_prepared_case_is_refused(self):
+        cases = json.loads((ROOT / "data/phase1/cases.json").read_text())
+        scope_doc = json.loads((ROOT / "data/phase1/scope.json").read_text())
+        prepared = scope.prepared_links(cases)
+        config_packages = scope.STEP_PACKAGES["config"]
+        owned = {row["id"] for row in scope_doc["operations"]
+                 if row["go_package"] in config_packages}
+        claimed = next(op for op in sorted(prepared) if op in owned)
+        roster = scope.leaf_roster("config")
+        roster["exemptions"].append({
+            "operation": claimed, "category": "unused_at_pin",
+            "owner": "nothing", "evidence": "fabricated for this test",
+        })
+        original = scope.leaf_roster
+        scope.leaf_roster = lambda step="leaves": roster if step == "config" else original(step)
+        try:
+            problems = scope.roster_problems(scope_doc, cases, "config")
+        finally:
+            scope.leaf_roster = original
+        self.assertTrue(any(claimed in problem for problem in problems), problems)
+
+
 class ConfigOutputPreparationTests(unittest.TestCase):
     """F3a's 167 reference outputs, and the two merge defects the gate caught.
 

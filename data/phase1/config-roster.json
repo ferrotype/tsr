@@ -1,7 +1,278 @@
 {
-  "version": 1,
+  "exemptions": [
+    {
+      "category": "unused_at_pin",
+      "evidence": "upstream/tsc/internal/packagejson/jsonvalue.go:92. A bare-name search over the whole pinned tree returns EXACTLY ONE occurrence, the definition itself -- verified in this session, and distinct from unmarshalJSONValueV2 at :125, which has three occurrences and IS reached (from jsonvalue.go:89 and exportsorimports.go:26). This operation was originally CLAIMED as witnessed by data/s07/packagejson-observations.json and the claim was REFUTED during verification: no request can reach code nothing calls. || RUST: Absent. crates/tsr_module/src/package_json.rs implements the decode through one path, matching the V2 generic the pin actually uses.",
+      "operation": "tsc/internal/packagejson/jsonvalue.go:unmarshalJSONValue",
+      "owner": "nothing: no caller exists at the pin"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/baseline.go:31-39. no test-file caller anywhere; its non-test callers are internal/execute/tsctests/runner.go:159, :169, :178 (destination_phase 4) and internal/testutil/tsbaseline/js_emit_baseline.go:127, which F4a's syntactic comparisons own. || RUST: Absent, intentionally. The port's baseline comparisons are performed by scripts/phase1_capture.py::compare and by Rust tests that assert against frozen rows; nothing in crates/ or tools/ writes, tracks or diffs a baseline file the way this package does. What the port must reproduce is the 309 reference OUTPUTS, and data/phase1/config-baselines.json plus the probes in tools/phase1/config/ do exactly that.",
+      "operation": "tsc/internal/testutil/baseline/baseline.go:DiffText",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through its own"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/baseline.go:23-29. the entry point the pinned config tests call. F3a's own probes deliberately do NOT call it: it writes under repo.TestDataPath()/baselines/local, inside the pinned submodule, and t.Errorf's on any difference, which would abort a capture instead of recording a `different` row. || RUST: Absent, intentionally. The port's baseline comparisons are performed by scripts/phase1_capture.py::compare and by Rust tests that assert against frozen rows; nothing in crates/ or tools/ writes, tracks or diffs a baseline file the way this package does. What the port must reproduce is the 309 reference OUTPUTS, and data/phase1/config-baselines.json plus the probes in tools/phase1/config/ do exactly that.",
+      "operation": "tsc/internal/testutil/baseline/baseline.go:Run",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through its own"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/baseline.go:41-80. reached only from Run at :28. || RUST: Absent, intentionally. The port's baseline comparisons are performed by scripts/phase1_capture.py::compare and by Rust tests that assert against frozen rows; nothing in crates/ or tools/ writes, tracks or diffs a baseline file the way this package does. What the port must reproduce is the 309 reference OUTPUTS, and data/phase1/config-baselines.json plus the probes in tools/phase1/config/ do exactly that.",
+      "operation": "tsc/internal/testutil/baseline/baseline.go:writeComparison",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through its own"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/testmain.go:35-62. reached from internal/tsoptions/testmain_test.go:12, and inert unless TSGO_BASELINE_TRACKING_DIR is set (:25, :38-40). || RUST: Absent, intentionally. The port's baseline comparisons are performed by scripts/phase1_capture.py::compare and by Rust tests that assert against frozen rows; nothing in crates/ or tools/ writes, tracks or diffs a baseline file the way this package does. What the port must reproduce is the 309 reference OUTPUTS, and data/phase1/config-baselines.json plus the probes in tools/phase1/config/ do exactly that.",
+      "operation": "tsc/internal/testutil/baseline/testmain.go:Track",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through its own"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/testmain.go:89-103. reached only from writeRecordedBaselines at :83, behind the same environment gate. || RUST: Absent, intentionally. The port's baseline comparisons are performed by scripts/phase1_capture.py::compare and by Rust tests that assert against frozen rows; nothing in crates/ or tools/ writes, tracks or diffs a baseline file the way this package does. What the port must reproduce is the 309 reference OUTPUTS, and data/phase1/config-baselines.json plus the probes in tools/phase1/config/ do exactly that.",
+      "operation": "tsc/internal/testutil/baseline/testmain.go:doWriteRecordedBaselines",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through its own"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/testmain.go:66-75. reached only from Run at baseline.go:27, and a no-op unless the tracking directory is set. || RUST: Absent, intentionally. The port's baseline comparisons are performed by scripts/phase1_capture.py::compare and by Rust tests that assert against frozen rows; nothing in crates/ or tools/ writes, tracks or diffs a baseline file the way this package does. What the port must reproduce is the 309 reference OUTPUTS, and data/phase1/config-baselines.json plus the probes in tools/phase1/config/ do exactly that.",
+      "operation": "tsc/internal/testutil/baseline/testmain.go:recordBaseline",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through its own"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/testmain.go:78-87. reached only from the closure Track returns at :60, which is a NO-OP closure whenever TSGO_BASELINE_TRACKING_DIR is unset -- so an ordinary run never reaches it. || RUST: Absent, intentionally. The port's baseline comparisons are performed by scripts/phase1_capture.py::compare and by Rust tests that assert against frozen rows; nothing in crates/ or tools/ writes, tracks or diffs a baseline file the way this package does. What the port must reproduce is the 309 reference OUTPUTS, and data/phase1/config-baselines.json plus the probes in tools/phase1/config/ do exactly that.",
+      "operation": "tsc/internal/testutil/baseline/testmain.go:writeRecordedBaselines",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through its own"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/filefixture/filefixture.go:22-32. a sync.OnceValues-cached file fixture. Reached from internal/packagejson/packagejson_test.go:20-21 (a package-level var) and internal/tsoptions/commandlineparser_test.go:493 inside createSubScenario. || RUST: Absent, intentionally. F3a's probes take their inputs from frozen request files under data/phase1/requests/, hashed into the capture's provenance, rather than from a fixture loader; there is no Rust counterpart to load and none is owed.",
+      "operation": "tsc/internal/testutil/filefixture/filefixture.go:FromFile",
+      "owner": "no step: upstream's test harness keeps it; this port loads its own inputs from data/phase1/requests/"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/filefixture/filefixture.go:61-67. reached from internal/testutil/fixtures/benchfixtures.go:11, a package-level var in the parser/binder/ast test binaries -- not from any F3a package. || RUST: Absent, intentionally. F3a's probes take their inputs from frozen request files under data/phase1/requests/, hashed into the capture's provenance, rather than from a fixture loader; there is no Rust counterpart to load and none is owed.",
+      "operation": "tsc/internal/testutil/filefixture/filefixture.go:FromString",
+      "owner": "no step: upstream's test harness keeps it; this port loads its own inputs from data/phase1/requests/"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/filefixture/filefixture.go:34. reached only inside Benchmark functions: packagejson_test.go:29, :40, :51, :52, parser_test.go:26, binder_test.go:17, ast/utilities_bench_test.go:16 -- so `go test` without -bench never runs it. || RUST: Absent, intentionally. F3a's probes take their inputs from frozen request files under data/phase1/requests/, hashed into the capture's provenance, rather than from a fixture loader; there is no Rust counterpart to load and none is owed.",
+      "operation": "tsc/internal/testutil/filefixture/filefixture.go:fromFile.Name",
+      "owner": "no step: upstream's test harness keeps it; this port loads its own inputs from data/phase1/requests/"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/filefixture/filefixture.go:35. reached only from parser_test.go:29, binder_test.go:20 and ast/utilities_bench_test.go:19, all Benchmark functions; NO F3a test touches it. || RUST: Absent, intentionally. F3a's probes take their inputs from frozen request files under data/phase1/requests/, hashed into the capture's provenance, rather than from a fixture loader; there is no Rust counterpart to load and none is owed.",
+      "operation": "tsc/internal/testutil/filefixture/filefixture.go:fromFile.Path",
+      "owner": "no step: upstream's test harness keeps it; this port loads its own inputs from data/phase1/requests/"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/filefixture/filefixture.go:45-53. reached from internal/tsoptions/commandlineparser_test.go:276 and :366, ordinary t.Run tests; it is why the five extraScenarios use the nil-baseline variant, because it hard-fails when the TypeScript fixture is absent. || RUST: Absent, intentionally. F3a's probes take their inputs from frozen request files under data/phase1/requests/, hashed into the capture's provenance, rather than from a fixture loader; there is no Rust counterpart to load and none is owed.",
+      "operation": "tsc/internal/testutil/filefixture/filefixture.go:fromFile.ReadFile",
+      "owner": "no step: upstream's test harness keeps it; this port loads its own inputs from data/phase1/requests/"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/filefixture/filefixture.go:37-43. reached only inside Benchmark functions: packagejson_test.go:26, parser_test.go:27, binder_test.go:18, ast/utilities_bench_test.go:17. || RUST: Absent, intentionally. F3a's probes take their inputs from frozen request files under data/phase1/requests/, hashed into the capture's provenance, rather than from a fixture loader; there is no Rust counterpart to load and none is owed.",
+      "operation": "tsc/internal/testutil/filefixture/filefixture.go:fromFile.SkipIfNotExist",
+      "owner": "no step: upstream's test harness keeps it; this port loads its own inputs from data/phase1/requests/"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/filefixture/filefixture.go:69. reachable only through fixtures.BenchFixtures[0], the single FromString entry, iterated in three Benchmark functions. || RUST: Absent, intentionally. F3a's probes take their inputs from frozen request files under data/phase1/requests/, hashed into the capture's provenance, rather than from a fixture loader; there is no Rust counterpart to load and none is owed.",
+      "operation": "tsc/internal/testutil/filefixture/filefixture.go:fromString.Name",
+      "owner": "no step: upstream's test harness keeps it; this port loads its own inputs from data/phase1/requests/"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/filefixture/filefixture.go:70. reachable only through fixtures.BenchFixtures[0], in Benchmark functions. || RUST: Absent, intentionally. F3a's probes take their inputs from frozen request files under data/phase1/requests/, hashed into the capture's provenance, rather than from a fixture loader; there is no Rust counterpart to load and none is owed.",
+      "operation": "tsc/internal/testutil/filefixture/filefixture.go:fromString.Path",
+      "owner": "no step: upstream's test harness keeps it; this port loads its own inputs from data/phase1/requests/"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/filefixture/filefixture.go:74. reachable only through fixtures.BenchFixtures[0], in Benchmark functions. || RUST: Absent, intentionally. F3a's probes take their inputs from frozen request files under data/phase1/requests/, hashed into the capture's provenance, rather than from a fixture loader; there is no Rust counterpart to load and none is owed.",
+      "operation": "tsc/internal/testutil/filefixture/filefixture.go:fromString.ReadFile",
+      "owner": "no step: upstream's test harness keeps it; this port loads its own inputs from data/phase1/requests/"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/filefixture/filefixture.go:72. reachable only through fixtures.BenchFixtures[0], in Benchmark functions. || RUST: Absent, intentionally. F3a's probes take their inputs from frozen request files under data/phase1/requests/, hashed into the capture's provenance, rather than from a fixture loader; there is no Rust counterpart to load and none is owed.",
+      "operation": "tsc/internal/testutil/filefixture/filefixture.go:fromString.SkipIfNotExist",
+      "owner": "no step: upstream's test harness keeps it; this port loads its own inputs from data/phase1/requests/"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/tsoptions/declscompiler.go:1259. A bare-name search over the whole pinned tree returns exactly one caller, upstream/tsc/internal/execute/incremental/programtosnapshot.go:84, and data/phase1/scope.json puts that package at destination_phase 4 (\"incremental build state\"). No method value; no internal/compiler caller. || RUST: Absent. No incremental snapshot comparison exists in crates/; the option-affects tables have no Rust counterpart.",
+      "operation": "tsc/internal/tsoptions/declscompiler.go:CompilerOptionsAffectDeclarationPath",
+      "owner": "phase 4, internal/execute/incremental, which owns the snapshot comparison these answer"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/tsoptions/declscompiler.go:1268. A bare-name search over the whole pinned tree returns exactly one caller, upstream/tsc/internal/execute/incremental/programtosnapshot.go:209, and data/phase1/scope.json puts that package at destination_phase 4 (\"incremental build state\"). No method value; no internal/compiler caller. || RUST: Absent. No incremental snapshot comparison exists in crates/; the option-affects tables have no Rust counterpart.",
+      "operation": "tsc/internal/tsoptions/declscompiler.go:CompilerOptionsAffectEmit",
+      "owner": "phase 4, internal/execute/incremental, which owns the snapshot comparison these answer"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/tsoptions/declscompiler.go:1250. A bare-name search over the whole pinned tree returns exactly one caller, upstream/tsc/internal/execute/incremental/programtosnapshot.go:75, and data/phase1/scope.json puts that package at destination_phase 4 (\"incremental build state\"). No method value; no internal/compiler caller. || RUST: Absent. No incremental snapshot comparison exists in crates/; the option-affects tables have no Rust counterpart.",
+      "operation": "tsc/internal/tsoptions/declscompiler.go:CompilerOptionsAffectSemanticDiagnostics",
+      "owner": "phase 4, internal/execute/incremental, which owns the snapshot comparison these answer"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/tsoptions/declscompiler.go:1234. A bare-name search returns two callers: upstream/tsc/internal/execute/incremental/snapshottobuildinfo.go:292, outside this step and data/phase1/scope.json puts that package at destination_phase 4, and declscompiler.go:1221, inside optionsHaveChanges, which is itself exempted to the same owner. Read literally, the later_step rule's \"every non-test caller at the pin is outside this step's packages\" FAILS here: this operation's caller is in-step. It survives only on the transitive reading data/phase1/filesystem-roster.json already applies to nativepath/realpath_windows.go:openMetadata -- \"an unexported helper with exactly one caller ... it cannot outlive its caller's exemption\". Flagged as a reviewer decision, not asserted: if the reading is rejected this operation stays on F3a's roster, and it does NOT become unused_at_pin, because a caller does exist. || RUST: Absent.",
+      "operation": "tsc/internal/tsoptions/declscompiler.go:ForEachCompilerOptionValue",
+      "owner": "phase 4, internal/execute/incremental, plus optionsHaveChanges, exempted here, which is its one in-package caller"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/tsoptions/declscompiler.go:1213. A bare-name search over the whole pinned tree returns exactly three callers, declscompiler.go:1254, :1263 and :1269 -- ZERO external -- and each is one of the three CompilerOptionsAffect* wrappers exempted here. Read literally, the later_step rule's \"every non-test caller at the pin is outside this step's packages\" FAILS here: this operation's caller is in-step. It survives only on the transitive reading data/phase1/filesystem-roster.json already applies to nativepath/realpath_windows.go:openMetadata -- \"an unexported helper with exactly one caller ... it cannot outlive its caller's exemption\". Flagged as a reviewer decision, not asserted: if the reading is rejected this operation stays on F3a's roster, and it does NOT become unused_at_pin, because a caller does exist. || RUST: Absent.",
+      "operation": "tsc/internal/tsoptions/declscompiler.go:optionsHaveChanges",
+      "owner": "phase 4, internal/execute/incremental, transitively: the three CompilerOptionsAffect* wrappers are its only callers and all three are exempted to that owner"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/tsoptions/enummaps.go:222-224, an accessor handing out the package-level map declared at :199-220. A bare-name search over the whole pinned tree returns EXACTLY ONE call site: upstream/tsc/internal/execute/tsctests/sys.go:152. data/phase1/scope.json puts that package at destination_phase 4 (\"CLI test harness\"). This does NOT drop the target-to-lib mapping itself: GetDefaultLibFileName at :226-232 reads the same package var directly at :227 and stays with F3a. What leaves is only the whole-map accessor, whose single purpose is bulk enumeration by a phase-4 harness. ONE JUDGEMENT TO WEIGH: sys.go is not a _test.go file, so the rule's \"non-test caller\" test passes on the letter, but the package exists only to run tests; a reviewer reading it as test code lands on unused_at_pin instead (occurrence count 2). Either category removes it; they differ in what they assert. || RUST: The mapping is ported, the accessor is not. crates/tsr_tsoptions/src/lib.rs:132-149 ports GetDefaultLibFileName as default_lib_file_name, a match with the same fourteen arms, so there is no map object to hand out.",
+      "operation": "tsc/internal/tsoptions/enummaps.go:TargetToLibMap",
+      "owner": "phase 4, internal/execute/tsctests, the CLI test harness that materialises every lib file in its virtual sys"
+    },
+    {
+      "category": "unused_at_pin",
+      "evidence": "upstream/tsc/internal/tsoptions/namemap.go:39-46. A BARE-NAME search over the entire pinned tree -- bare, so a method value `nm.GetFromShort` or `(*NameMap).GetFromShort` would appear -- returns EXACTLY ONE occurrence, the definition itself. Nothing outside upstream/tsc references it either. It is not merely unreached but redundant: the sibling GetOptionDeclarationFromName at :47-58 performs the same short-name translation inline against the same shortOptionNames map at :51-55 before falling back, and that is the method the parser actually uses. || RUST: Absent, and correctly so. crates/tsr_tsoptions/src/option_declarations.rs:82-104 ports GetOptionDeclarationFromName as find_declaration(options, name, allow_short), which at :93-99 tries short_name under the flag and recurses on the resolved full name -- the same fused shape. No short-name-only lookup exists.",
+      "operation": "tsc/internal/tsoptions/namemap.go:NameMap.GetFromShort",
+      "owner": "nothing: no caller exists at the pin, so no caller fixes the contract"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/tsoptions/parsedbuildcommandline.go:29-38, a sync.Once-cached map of Projects through core.ResolveConfigFileNameOfProjectReference. A bare-name search over the whole pinned tree returns EXACTLY ONE call site: internal/execute/build/orchestrator.go:221, whose receiver type is confirmed at orchestrator.go:29 (`Command *tsoptions.ParsedBuildCommandLine`). data/phase1/scope.json puts that package at destination_phase 4 (\"build scheduling\"). No method value, no test caller, no internal/compiler caller. This does NOT exempt build-option PARSING: ParseBuildCommandLine is F3a's own work and parseBuildOptions is one of the four baseline groups. What leaves is the post-parse project-path resolution the build orchestrator asks for. || RUST: Absent, and already recorded by this step's own harness at tools/phase1/config/src/commandline.rs:46-49: with no ParsedBuildCommandLine there is no ResolvedProjectPaths.",
+      "operation": "tsc/internal/tsoptions/parsedbuildcommandline.go:ParsedBuildCommandLine.ResolvedProjectPaths",
+      "owner": "phase 4, internal/execute/build, whose graph generation is the one consumer"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/tsoptions/parsedcommandline.go:211-251, an iter.Seq[string] over js, sourcemap, dts and declaration-map outputs. A bare-name search returns five non-test callers, all in internal/execute/build/buildtask.go:295, :525, :787, :802 and :829, and data/phase1/scope.json puts that package at destination_phase 4 (\"build scheduling\"). The other hits are tests. No internal/compiler caller -- verified separately, because the sibling getOutputDeclarationAndSourceFileNames DOES have one and the two are not exempted together. || RUST: Absent; internal/outputpaths, which computes the individual names, is itself destination_phase 3.",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.GetOutputFileNames",
+      "owner": "phase 4, internal/execute/build, whose up-to-date checks and clean pass are the only consumers"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/tsoptions/parsedcommandline.go:298-304, returning the prefix of FileNames that came from `files` rather than include globs. A bare-name search returns exactly one non-test caller: internal/project/configfileregistrybuilder.go:241. data/phase1/scope.json puts internal/project at destination_phase 5. The only other hit is this step's own test at parsedcommandline_test.go:133. || RUST: Partial and unreachable. crates/tsr_tsoptions/src/lib.rs:210 stores literal_file_names_len, so the port keeps the datum, but no accessor slices root_file_names by it.",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.LiteralFileNames",
+      "owner": "phase 5, internal/project"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/tsoptions/parsedcommandline.go:433-447. A bare-name search returns three call sites. Two are outside this step: internal/project/configfileregistrybuilder.go:607 and internal/execute/watcher.go:396. One is INSIDE it: parsedcommandline.go:419, in the content-mapper branch of PossiblyMatchesFileName, which is itself exempted to the same two owners and is the only entry point that reaches this. Read literally, the later_step rule's \"every non-test caller at the pin is outside this step's packages\" FAILS here: this operation's caller is in-step. It survives only on the transitive reading data/phase1/filesystem-roster.json already applies to nativepath/realpath_windows.go:openMetadata -- \"an unexported helper with exactly one caller ... it cannot outlive its caller's exemption\". Flagged as a reviewer decision, not asserted: if the reading is rejected this operation stays on F3a's roster, and it does NOT become unused_at_pin, because a caller does exist. || RUST: Absent; no directory-name predicate exists on crates/tsr_tsoptions/src/lib.rs:213's ParsedCommandLine.",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.PossiblyMatchesDirectoryName",
+      "owner": "phase 5 internal/project and phase 4 internal/execute, plus PossiblyMatchesFileName, exempted here, which is its one in-package caller"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/tsoptions/parsedcommandline.go:401-430. A bare-name search returns three non-test callers, all outside this step: internal/project/configfileregistrybuilder.go:604, internal/execute/watcher.go:312 and :393, each guarded by `w.config.ConfigFile != nil`. The remaining hits are this step's own tests plus two t.Run subtest NAMES at :17 and :170, which are string literals and not callers. No method value; no internal/compiler caller. || RUST: Absent; no possibly_matches construct exists in crates/ or tools/.",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.PossiblyMatchesFileName",
+      "owner": "phase 5 internal/project and phase 4 internal/execute; both are watch/registry fast paths"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/tsoptions/parsedcommandline.go:465-487, which re-runs getFileNamesFromConfigSpecs against a supplied vfs.FS. A bare-name search returns four non-test callers, all outside this step: internal/project/configfileregistrybuilder.go:152, internal/execute/watcher.go:417 and :472, internal/execute/build/orchestrator.go:437. data/phase1/scope.json puts internal/project at destination_phase 5 and internal/execute and internal/execute/build at 4. No method value. The remaining two hits are this step's own tests (parsedcommandline_test.go:110, :162), which the rule excludes by its own terms. No internal/compiler caller, so F4a's boundary is not implicated. || RUST: Absent. crates/tsr_tsoptions/src/lib.rs:213-311 gives ParsedCommandLine two methods, config_file_parsing_diagnostics and new; there is no reload and no re-resolution.",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.ReloadFileNamesOfParsedCommandLine",
+      "owner": "phase 4 internal/execute (watch and build re-resolution) and phase 5 internal/project"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/tsoptions/parsedcommandline.go:276-296, which lazily compiles one glob.Glob per wildcard directory. A bare-name search over the whole pinned tree returns EXACTLY ONE call site: parsedcommandline.go:423, inside PossiblyMatchesFileName. Nothing outside internal/tsoptions references it at all. Read literally, the later_step rule's \"every non-test caller at the pin is outside this step's packages\" FAILS here: this operation's caller is in-step. It survives only on the transitive reading data/phase1/filesystem-roster.json already applies to nativepath/realpath_windows.go:openMetadata -- \"an unexported helper with exactly one caller ... it cannot outlive its caller's exemption\". Flagged as a reviewer decision, not asserted: if the reading is rejected this operation stays on F3a's roster, and it does NOT become unused_at_pin, because a caller does exist. || RUST: Absent. crates/tsr_tsoptions/src/glob.rs holds the glob grammar but no compiled-glob-per-wildcard-directory cache, and tools/phase1/filesystem/src/matchfiles.rs:29 already records the input it would need, ParsedCommandLine::wildcard_directories, as absent.",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.WildcardDirectoryGlobs",
+      "owner": "transitively phase 5 / phase 4 through PossiblyMatchesFileName; it has no caller of its own"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/tsoptions/parsedcommandline.go:93-107, a copy-with-substituted-FileNames that deliberately preserves ConfigFile, Errors, Raw, the cached wildcardDirectories, includeGlobs and literalFileNamesLen. Exactly one non-test caller: internal/project/project.go:357. data/phase1/scope.json puts internal/project at destination_phase 5. The only other hit is this step's own test at parsedcommandline_test.go:232. || RUST: Absent. crates/tsr_tsoptions/src/lib.rs:197-212 makes every field pub so a caller could build the copy by hand, but the identity-preserving constructor and its cache-carrying semantics have no counterpart.",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.WithFileNames",
+      "owner": "phase 5, internal/project"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/tsoptions/showconfig.go:64-138. A BARE-NAME search over the whole pinned tree returns exactly two lines outside the definition: the doc comment at :62 and one call site, upstream/tsc/internal/execute/tsc.go:406. No method value, no paren-less reference, nothing outside upstream/tsc. Following the chain to its root: every function in showconfig.go is reachable only from ConvertToTSConfig at :64, whose sole caller tree-wide is upstream/tsc/internal/execute/tsc.go:406, and data/phase1/scope.json puts that package at destination_phase 4 (\"CLI execution\"). The step's carve-out does not bite: it covers config and command-line PARSING and the diagnostic rendering the 309 baselines go through, and data/phase1/config-baselines.json's four groups are matchFiles, parseBuildOptions, parseCommandLine and tsconfigParsing -- none of them showConfig. This file serializes a ParsedCommandLine back out; it parses nothing and renders no baseline. || RUST: Absent. No convert_to_tsconfig, TSConfig struct or serialize_compiler_options exists anywhere in crates/ or tools/; crates/tsr_tsoptions/src/lib.rs:213 gives ParsedCommandLine two methods, neither of which serializes.",
+      "operation": "tsc/internal/tsoptions/showconfig.go:ConvertToTSConfig",
+      "owner": "phase 4, internal/execute, which ports the --showConfig CLI path"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/tsoptions/showconfig.go:300-348. A bare-name search over the whole pinned tree returns no reference outside showconfig.go -- not a call, not a method value -- so its entire caller set is showconfig.go:96, inside ConvertToTSConfig. Following the chain to its root: every function in showconfig.go is reachable only from ConvertToTSConfig at :64, whose sole caller tree-wide is upstream/tsc/internal/execute/tsc.go:406, and data/phase1/scope.json puts that package at destination_phase 4 (\"CLI execution\"). The step's carve-out does not bite: it covers config and command-line PARSING and the diagnostic rendering the 309 baselines go through, and data/phase1/config-baselines.json's four groups are matchFiles, parseBuildOptions, parseCommandLine and tsconfigParsing -- none of them showConfig. This file serializes a ParsedCommandLine back out; it parses nothing and renders no baseline. || RUST: Absent. No convert_to_tsconfig, TSConfig struct or serialize_compiler_options exists anywhere in crates/ or tools/; crates/tsr_tsoptions/src/lib.rs:213 gives ParsedCommandLine two methods, neither of which serializes. Read literally, the later_step rule's \"every non-test caller at the pin is outside this step's packages\" FAILS here: this operation's caller is in-step. It survives only on the transitive reading data/phase1/filesystem-roster.json already applies to nativepath/realpath_windows.go:openMetadata -- \"an unexported helper with exactly one caller ... it cannot outlive its caller's exemption\". Flagged as a reviewer decision, not asserted: if the reading is rejected this operation stays on F3a's roster, and it does NOT become unused_at_pin, because a caller does exist.",
+      "operation": "tsc/internal/tsoptions/showconfig.go:addImpliedOptions",
+      "owner": "phase 4, internal/execute, with ConvertToTSConfig, the only entry point that reaches it"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/tsoptions/showconfig.go:352-360. A bare-name search over the whole pinned tree returns no reference outside showconfig.go -- not a call, not a method value -- so its entire caller set is showconfig.go:328, inside addImpliedOptions. Following the chain to its root: every function in showconfig.go is reachable only from ConvertToTSConfig at :64, whose sole caller tree-wide is upstream/tsc/internal/execute/tsc.go:406, and data/phase1/scope.json puts that package at destination_phase 4 (\"CLI execution\"). The step's carve-out does not bite: it covers config and command-line PARSING and the diagnostic rendering the 309 baselines go through, and data/phase1/config-baselines.json's four groups are matchFiles, parseBuildOptions, parseCommandLine and tsconfigParsing -- none of them showConfig. This file serializes a ParsedCommandLine back out; it parses nothing and renders no baseline. || RUST: Absent. No convert_to_tsconfig, TSConfig struct or serialize_compiler_options exists anywhere in crates/ or tools/; crates/tsr_tsoptions/src/lib.rs:213 gives ParsedCommandLine two methods, neither of which serializes. Read literally, the later_step rule's \"every non-test caller at the pin is outside this step's packages\" FAILS here: this operation's caller is in-step. It survives only on the transitive reading data/phase1/filesystem-roster.json already applies to nativepath/realpath_windows.go:openMetadata -- \"an unexported helper with exactly one caller ... it cannot outlive its caller's exemption\". Flagged as a reviewer decision, not asserted: if the reading is rejected this operation stays on F3a's roster, and it does NOT become unused_at_pin, because a caller does exist.",
+      "operation": "tsc/internal/tsoptions/showconfig.go:anyDependencyProvided",
+      "owner": "phase 4, internal/execute, with ConvertToTSConfig, the only entry point that reaches it"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/tsoptions/showconfig.go:15. A bare-name search over the whole pinned tree returns no reference outside showconfig.go -- not a call, not a method value -- so its entire caller set is showconfig.go:36-49 (fourteen uses in the impliedOptions package-var initializer), inside the impliedOptions table. Following the chain to its root: every function in showconfig.go is reachable only from ConvertToTSConfig at :64, whose sole caller tree-wide is upstream/tsc/internal/execute/tsc.go:406, and data/phase1/scope.json puts that package at destination_phase 4 (\"CLI execution\"). The step's carve-out does not bite: it covers config and command-line PARSING and the diagnostic rendering the 309 baselines go through, and data/phase1/config-baselines.json's four groups are matchFiles, parseBuildOptions, parseCommandLine and tsconfigParsing -- none of them showConfig. This file serializes a ParsedCommandLine back out; it parses nothing and renders no baseline. || RUST: Absent. No convert_to_tsconfig, TSConfig struct or serialize_compiler_options exists anywhere in crates/ or tools/; crates/tsr_tsoptions/src/lib.rs:213 gives ParsedCommandLine two methods, neither of which serializes. Read literally, the later_step rule's \"every non-test caller at the pin is outside this step's packages\" FAILS here: this operation's caller is in-step. It survives only on the transitive reading data/phase1/filesystem-roster.json already applies to nativepath/realpath_windows.go:openMetadata -- \"an unexported helper with exactly one caller ... it cannot outlive its caller's exemption\". Flagged as a reviewer decision, not asserted: if the reading is rejected this operation stays on F3a's roster, and it does NOT become unused_at_pin, because a caller does exist.",
+      "operation": "tsc/internal/tsoptions/showconfig.go:computeFn",
+      "owner": "phase 4, internal/execute, with ConvertToTSConfig, the only entry point that reaches it"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/tsoptions/showconfig.go:141-149. A bare-name search over the whole pinned tree returns no reference outside showconfig.go -- not a call, not a method value -- so its entire caller set is showconfig.go:124, inside ConvertToTSConfig. Following the chain to its root: every function in showconfig.go is reachable only from ConvertToTSConfig at :64, whose sole caller tree-wide is upstream/tsc/internal/execute/tsc.go:406, and data/phase1/scope.json puts that package at destination_phase 4 (\"CLI execution\"). The step's carve-out does not bite: it covers config and command-line PARSING and the diagnostic rendering the 309 baselines go through, and data/phase1/config-baselines.json's four groups are matchFiles, parseBuildOptions, parseCommandLine and tsconfigParsing -- none of them showConfig. This file serializes a ParsedCommandLine back out; it parses nothing and renders no baseline. || RUST: Absent. No convert_to_tsconfig, TSConfig struct or serialize_compiler_options exists anywhere in crates/ or tools/; crates/tsr_tsoptions/src/lib.rs:213 gives ParsedCommandLine two methods, neither of which serializes. Read literally, the later_step rule's \"every non-test caller at the pin is outside this step's packages\" FAILS here: this operation's caller is in-step. It survives only on the transitive reading data/phase1/filesystem-roster.json already applies to nativepath/realpath_windows.go:openMetadata -- \"an unexported helper with exactly one caller ... it cannot outlive its caller's exemption\". Flagged as a reviewer decision, not asserted: if the reading is rejected this operation stays on F3a's roster, and it does NOT become unused_at_pin, because a caller does exist.",
+      "operation": "tsc/internal/tsoptions/showconfig.go:filterSameAsDefaultInclude",
+      "owner": "phase 4, internal/execute, with ConvertToTSConfig, the only entry point that reaches it"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/tsoptions/showconfig.go:153-160. A bare-name search over the whole pinned tree returns no reference outside showconfig.go -- not a call, not a method value -- so its entire caller set is showconfig.go:232 and :294, inside serializeCompilerOptions and serializeEnumValue. Following the chain to its root: every function in showconfig.go is reachable only from ConvertToTSConfig at :64, whose sole caller tree-wide is upstream/tsc/internal/execute/tsc.go:406, and data/phase1/scope.json puts that package at destination_phase 4 (\"CLI execution\"). The step's carve-out does not bite: it covers config and command-line PARSING and the diagnostic rendering the 309 baselines go through, and data/phase1/config-baselines.json's four groups are matchFiles, parseBuildOptions, parseCommandLine and tsconfigParsing -- none of them showConfig. This file serializes a ParsedCommandLine back out; it parses nothing and renders no baseline. || RUST: Absent. No convert_to_tsconfig, TSConfig struct or serialize_compiler_options exists anywhere in crates/ or tools/; crates/tsr_tsoptions/src/lib.rs:213 gives ParsedCommandLine two methods, neither of which serializes. Read literally, the later_step rule's \"every non-test caller at the pin is outside this step's packages\" FAILS here: this operation's caller is in-step. It survives only on the transitive reading data/phase1/filesystem-roster.json already applies to nativepath/realpath_windows.go:openMetadata -- \"an unexported helper with exactly one caller ... it cannot outlive its caller's exemption\". Flagged as a reviewer decision, not asserted: if the reading is rejected this operation stays on F3a's roster, and it does NOT become unused_at_pin, because a caller does exist.",
+      "operation": "tsc/internal/tsoptions/showconfig.go:getNameOfCompilerOptionValue",
+      "owner": "phase 4, internal/execute, with ConvertToTSConfig, the only entry point that reaches it"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/tsoptions/showconfig.go:165-276. A bare-name search over the whole pinned tree returns no reference outside showconfig.go -- not a call, not a method value -- so its entire caller set is showconfig.go:83, inside ConvertToTSConfig. Following the chain to its root: every function in showconfig.go is reachable only from ConvertToTSConfig at :64, whose sole caller tree-wide is upstream/tsc/internal/execute/tsc.go:406, and data/phase1/scope.json puts that package at destination_phase 4 (\"CLI execution\"). The step's carve-out does not bite: it covers config and command-line PARSING and the diagnostic rendering the 309 baselines go through, and data/phase1/config-baselines.json's four groups are matchFiles, parseBuildOptions, parseCommandLine and tsconfigParsing -- none of them showConfig. This file serializes a ParsedCommandLine back out; it parses nothing and renders no baseline. || RUST: Absent. No convert_to_tsconfig, TSConfig struct or serialize_compiler_options exists anywhere in crates/ or tools/; crates/tsr_tsoptions/src/lib.rs:213 gives ParsedCommandLine two methods, neither of which serializes. Read literally, the later_step rule's \"every non-test caller at the pin is outside this step's packages\" FAILS here: this operation's caller is in-step. It survives only on the transitive reading data/phase1/filesystem-roster.json already applies to nativepath/realpath_windows.go:openMetadata -- \"an unexported helper with exactly one caller ... it cannot outlive its caller's exemption\". Flagged as a reviewer decision, not asserted: if the reading is rejected this operation stays on F3a's roster, and it does NOT become unused_at_pin, because a caller does exist.",
+      "operation": "tsc/internal/tsoptions/showconfig.go:serializeCompilerOptions",
+      "owner": "phase 4, internal/execute, with ConvertToTSConfig, the only entry point that reaches it"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/tsoptions/showconfig.go:280-295. A bare-name search over the whole pinned tree returns no reference outside showconfig.go -- not a call, not a method value -- so its entire caller set is showconfig.go:201 and :371, inside serializeCompilerOptions and serializeImpliedOptionValue. Following the chain to its root: every function in showconfig.go is reachable only from ConvertToTSConfig at :64, whose sole caller tree-wide is upstream/tsc/internal/execute/tsc.go:406, and data/phase1/scope.json puts that package at destination_phase 4 (\"CLI execution\"). The step's carve-out does not bite: it covers config and command-line PARSING and the diagnostic rendering the 309 baselines go through, and data/phase1/config-baselines.json's four groups are matchFiles, parseBuildOptions, parseCommandLine and tsconfigParsing -- none of them showConfig. This file serializes a ParsedCommandLine back out; it parses nothing and renders no baseline. || RUST: Absent. No convert_to_tsconfig, TSConfig struct or serialize_compiler_options exists anywhere in crates/ or tools/; crates/tsr_tsoptions/src/lib.rs:213 gives ParsedCommandLine two methods, neither of which serializes. Read literally, the later_step rule's \"every non-test caller at the pin is outside this step's packages\" FAILS here: this operation's caller is in-step. It survives only on the transitive reading data/phase1/filesystem-roster.json already applies to nativepath/realpath_windows.go:openMetadata -- \"an unexported helper with exactly one caller ... it cannot outlive its caller's exemption\". Flagged as a reviewer decision, not asserted: if the reading is rejected this operation stays on F3a's roster, and it does NOT become unused_at_pin, because a caller does exist.",
+      "operation": "tsc/internal/tsoptions/showconfig.go:serializeEnumValue",
+      "owner": "phase 4, internal/execute, with ConvertToTSConfig, the only entry point that reaches it"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/tsoptions/showconfig.go:365-389. A bare-name search over the whole pinned tree returns no reference outside showconfig.go -- not a call, not a method value -- so its entire caller set is showconfig.go:342, inside addImpliedOptions. Following the chain to its root: every function in showconfig.go is reachable only from ConvertToTSConfig at :64, whose sole caller tree-wide is upstream/tsc/internal/execute/tsc.go:406, and data/phase1/scope.json puts that package at destination_phase 4 (\"CLI execution\"). The step's carve-out does not bite: it covers config and command-line PARSING and the diagnostic rendering the 309 baselines go through, and data/phase1/config-baselines.json's four groups are matchFiles, parseBuildOptions, parseCommandLine and tsconfigParsing -- none of them showConfig. This file serializes a ParsedCommandLine back out; it parses nothing and renders no baseline. || RUST: Absent. No convert_to_tsconfig, TSConfig struct or serialize_compiler_options exists anywhere in crates/ or tools/; crates/tsr_tsoptions/src/lib.rs:213 gives ParsedCommandLine two methods, neither of which serializes. Read literally, the later_step rule's \"every non-test caller at the pin is outside this step's packages\" FAILS here: this operation's caller is in-step. It survives only on the transitive reading data/phase1/filesystem-roster.json already applies to nativepath/realpath_windows.go:openMetadata -- \"an unexported helper with exactly one caller ... it cannot outlive its caller's exemption\". Flagged as a reviewer decision, not asserted: if the reading is rejected this operation stays on F3a's roster, and it does NOT become unused_at_pin, because a caller does exist.",
+      "operation": "tsc/internal/tsoptions/showconfig.go:serializeImpliedOptionValue",
+      "owner": "phase 4, internal/execute, with ConvertToTSConfig, the only entry point that reaches it"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/tsoptions/tsconfigparsing.go:163-168, a nil-guarded read of e.extendedResult.ExtendedSourceFiles. A bare-name search over the whole pinned tree returns EXACTLY ONE call site: internal/project/extendedconfigcache.go:43, inside a function whose signature names the receiver type explicitly at :41. data/phase1/scope.json puts internal/project at destination_phase 5. No method value, no test caller, no internal/compiler caller. The extends chain itself stays with F3a: ParseExtendedConfig, which fills extendedResult, is a separate roster operation and tsconfigParsing is one of the four baseline groups. What leaves is only the accessor the project system's invalidation hash reads. || RUST: The datum is ported, the entry type is not. crates/tsr_tsoptions/src/config_syntax.rs:11 declares extended_source_files and config_parse.rs:443, :505-506, :521-522 populate and dedup it, but there is no ExtendedConfigCacheEntry type at all.",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:ExtendedConfigCacheEntry.ExtendedFileNames",
+      "owner": "phase 5, internal/project, whose extended-config cache is the one consumer"
+    },
+    {
+      "category": "unused_at_pin",
+      "evidence": "upstream/tsc/internal/tsoptions/tsconfigparsing.go:724, `func (r *resolverHost) Trace(msg string) {}` -- an empty body. A bare-name search for Trace over internal/tsoptions returns exactly one line in the whole package: that definition. The resolverHost type occurs four times and nowhere else in the tree: declared at :720-722, constructed at :578, consumed at :579 by module.ResolveConfig. That single consumer does not want a Trace: module.ResolutionHost, at upstream/tsc/internal/module/types.go:14-17, declares only FS() and GetCurrentDirectory(), both already supplied by the embedded ParseConfigHost at tsconfigparsing.go:715-718. internal/module traces through its own unexported tracer (resolver.go:46-59, write at :55, gated at :201-206) and never calls a Trace method on the host. THE CLAIMED CATEGORY WAS go_runtime AND IT DOES NOT FIT: that category is \"a Go language mechanism -- scheduling, sync, arenas, vet markers\", and a vestigial empty interface stub is none of those. The likely history is a leftover from an earlier module.ResolutionHost that did require Trace. || RUST: Absent and nothing is owed; crates/tsr_tsoptions/src/config_host.rs defines the port's ParseConfigHost in 18 lines with no trace member, and crates/tsr_module carries no host-supplied trace sink.",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:resolverHost.Trace",
+      "owner": "nothing: no caller and no interface obligation exist at the pin"
+    },
+    {
+      "category": "unused_at_pin",
+      "evidence": "upstream/tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:10-18, which strips a root prefix and returns \".\" when the path IS the root. A bare-name search over the whole pinned tree returns EXACTLY ONE occurrence, the definition itself -- verified in this session. The rest of the package is prepared by real cases (config/host/*), so this is not a blanket exemption of a test-support package but the one operation in it that nothing calls. || RUST: Absent, and no counterpart is owed: nothing in crates/ strips a root prefix this way, because the host construction the port uses takes an already-absolute current directory.",
+      "operation": "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:fixRoot",
+      "owner": "nothing: no caller exists at the pin"
+    }
+  ],
   "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
   "purpose": "Operations removed from F3a's config roster, each with the category, the owner that does have it, and the evidence read at the pin. An entry here is a claim that this step owes no prepared case for the operation, so it is validated like any other claim: see roster_problems in scripts/phase1_scope.py.",
   "rule": "The caller rule governs generic helpers and Go machinery. It does NOT override an operation the plan names as this step's own work -- option semantics, config and command-line parsing, package JSON, module resolution and the diagnostic rendering the 309 baselines go through are F3a's, however few callers they have. The `unused_at_pin` category records that there is no caller at all, with the occurrence count that says so. `later_step` is decided by the pinned callers: when every non-test caller is outside this step, the step that ports those callers owns the operation. Note that a Go method VALUE, written `(*T).Method`, is a caller that a search for `.Method(` does not find.",
-  "exemptions": []
+  "version": 1
 }

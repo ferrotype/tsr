@@ -241,12 +241,44 @@ def workspace_symbol_index() -> dict[str, list[str]]:
     return index
 
 
+# `/// port: tsc/internal/<pkg>/<file>.go:<Symbol>` immediately above a `fn`.
+# The annotation is the author's own statement of which Go operation the
+# function ports, and it is stronger evidence than the name it happens to have.
+_PORT_ANNOTATION = re.compile(
+    r"port:\s*(tsc/[^\s`]+\.go:[A-Za-z0-9_.]+)[^\n]*\n(?:\s*//[^\n]*\n)*?\s*"
+    r"(?:pub(?:\([^)]*\))?\s+)?(?:const\s+|async\s+|unsafe\s+|extern\s+\"[^\"]*\"\s+)*"
+    r"fn\s+([a-z0-9_]+)"
+)
+
+
+def declared_ports() -> dict[str, set[str]]:
+    """Rust fn name -> the Go operation ids its own `port:` annotations name.
+
+    A by-name match is a guess; a `port:` annotation is a claim. Where the two
+    disagree the annotation wins, and the guess must not be reported as
+    evidence. Two Go packages can carry a function of the same name with
+    DIFFERENT behavior -- `isDoubleQuotedString` exists in both
+    `internal/parser` (which tests the single-quote token flag) and
+    `internal/tsoptions` (which does not) -- and the by-name rule attributed the
+    Rust port of the first to the second, which is the over-attribution this
+    whole scope exists to avoid.
+    """
+    declared: dict[str, set[str]] = {}
+    for path in sorted((ROOT / "crates").rglob("*.rs")):
+        text = path.read_text(errors="replace")
+        for operation, name in _PORT_ANNOTATION.findall(text):
+            declared.setdefault(name, set()).add(operation)
+    return declared
+
+
 def classify(
     entry: dict,
     symbol: str,
     mapped: bool,
     index: dict[str, list[str]],
     coverage: list[str],
+    ports: dict[str, set[str]] | None = None,
+    identity: str = "",
 ) -> tuple[str, str]:
     """Return (disposition, basis). Basis records how the disposition was reached.
 
@@ -261,6 +293,7 @@ def classify(
     """
     status = entry.get("status")
     verify = entry.get("verify") or []
+    ports = ports or {}
 
     if status == "out-of-scope":
         return "later_phase", "ledger marks the source file out of scope for the port"
@@ -288,6 +321,16 @@ def classify(
 
     candidate = snake(symbol)
     locations = index.get(candidate, [])
+    # A same-named Rust function that declares itself the port of a DIFFERENT
+    # Go operation is not evidence for this one. Without this the rule reads a
+    # `port:` annotation as agreement merely because the names coincide.
+    claimed = ports.get(candidate, set())
+    if locations and claimed and identity not in claimed:
+        return (
+            "missing",
+            f"unmapped in the audit input; `{candidate}` exists in Rust but its own annotation "
+            f"names a different operation ({sorted(claimed)[0]}), so the name match is not evidence",
+        )
     if locations and candidate not in GENERIC_NAMES and len(candidate) >= 6:
         shown = ", ".join(locations[:2]) + (" ..." if len(locations) > 2 else "")
         return (
@@ -551,6 +594,21 @@ ROSTER_CATEGORIES = {
     "equivalent_rust": "the Go contract is reproduced exactly by a Rust language or standard library construct",
     "unused_at_pin": "exported but called by nothing at the pin, tests included, so no caller fixes the contract",
     "build_variant": "belongs to a build configuration this port does not produce, so no build reaches it",
+    # Added by F3a. The six categories above all describe an operation with no
+    # caller-visible compiler contract, or one another step owns. None of them
+    # describes upstream's own test harness, which F3a is the first step to
+    # roster: `internal/testutil/baseline` writes, tracks and diffs baseline
+    # FILES, and `internal/testutil/filefixture` loads fixture inputs. The port
+    # must reproduce the 309 reference outputs, and it does; it must not
+    # reproduce the bookkeeping, because its comparisons are driven by
+    # scripts/phase1*.py and by Rust tests that assert against frozen rows.
+    # Bending `build_tooling` to cover this would have been the wrong kind of
+    # convenience: that category says the port generates the same artifact
+    # elsewhere, and there is no artifact here.
+    "go_test_harness": "upstream's own test harness -- baseline file bookkeeping, fixture loading, "
+                       "run tracking -- which exists to run the pinned tests; this port reproduces "
+                       "the baselines, not the bookkeeping, because its comparisons run through its "
+                       "own harness",
 }
 
 def leaf_roster(step: str = "leaves") -> dict:
@@ -745,6 +803,7 @@ def leaf_preparation(scope: dict, cases: dict, step: str = "leaves") -> dict:
 def build() -> dict:
     rows: list[dict] = []
     index = workspace_symbol_index()
+    ports = declared_ports()
     gaps = witnessed_gaps()
     missing_ids = unmapped_ids()
     entries = {e["go"]: e for e in ledger()}
@@ -766,7 +825,7 @@ def build() -> dict:
         mapped = identity not in missing_ids
         linked = case_links.get(identity, [])
         witnessing = gaps.get(identity, [])
-        disposition, basis = classify(entry, symbol, mapped, index, linked)
+        disposition, basis = classify(entry, symbol, mapped, index, linked, ports, identity)
         if witnessing and disposition != "covered":
             disposition = "missing"
             basis = (
