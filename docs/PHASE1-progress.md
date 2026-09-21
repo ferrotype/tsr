@@ -13,7 +13,7 @@ moved pin invalidates it.
 | F0 — inventory, manifests and executable setup | **incomplete**: implementing and verifying the approved matchFiles test renderer, and connecting existing evidence to operation ids |
 | F1a — foundation leaf tests | **complete**: `leaves_prepared: true`; 225 leaf cases frozen, all 460 inventoried leaf operations prepared, witnessed or exempted by the reviewed ledger, and both divergences triaged |
 | F2a — filesystem, path and matching tests | **pending Linux observation**: `filesystem_prepared: false`; 359 cases, 314 of 316 roster operations accounted for; all 142 baselines prepared (68 exact, 74 owner-approved exceptions). The Linux realpath case must observe `Realpath` and `ignoringEINTR`. |
-| F3a — config, command-line and resolution tests | not started |
+| F3a — config, command-line and resolution tests | **in progress**: `config_prepared: false`; all 309 reference outputs are now prepared (F2a's 142 plus F3a's 167, all 167 exact); 97 of 402 roster operations accounted for |
 | F4a — syntax, binder and utility coverage | not started |
 | F5a — integration checks and the stage A review | not started |
 
@@ -533,6 +533,202 @@ comparison that survives it. It must carry the original file's hash, and it is
 refused if the index also records that rendering as verified — **an exception is
 not a pass.** The outputs keep their original files and are counted in their own
 bucket.
+
+## F3a — config, command-line and resolution preparation
+
+**All 309 reference outputs are prepared.** F2a carried the 142 `config/matchFiles`
+outputs (68 exact, 74 owner-approved exceptions); F3a adds the other 167, and all
+167 reproduce the frozen bytes exactly. That completes the plan's byte-baseline
+denominator, which had stood at 142 since F2a.
+
+| Group | Outputs | Producer | Result |
+| --- | ---: | --- | --- |
+| `tsoptions/commandLineParsing/parseCommandLine` | 53 | pinned `formatNewBaseline` | 53 exact |
+| `tsoptions/commandLineParsing/parseBuildOptions` | 27 | pinned `formatNewBaselineBuild` | 27 exact |
+| `config/tsconfigParsing` | 87 | carried assembly over pinned calls | 87 exact |
+| `config/matchFiles` (F2a) | 142 | carried renderer | 68 exact, 74 excepted |
+| **total** | **309** | | |
+
+These 167 are `rendering_verified: true` in `data/phase1/config-baselines.json`,
+so `exception_problems` refuses an exception on any of them: the only passing
+state is all 167 reproduced exactly.
+
+### What is carried, and what is not
+
+The two command-line groups carry nothing. `formatNewBaseline`
+(`commandlineparser_test.go:334`) and `formatNewBaselineBuild` (`:456`) are pure
+functions of the sections handed to them, so the probe compiles into the pinned
+`tsoptions_test` package and calls them; for the eight outputs that need a
+synthesised option declaration it calls the pinned
+`createVerifyNullForNonNullIncluded` rather than restating it.
+
+`tsconfigParsing` is the group the plan warned about. Its primary renderer,
+`baselineParseConfigWith`, ends in `baseline.Run`, and its secondary renderer is
+inline in a test body. Neither can be called as-is: `baseline.Run` writes under
+the pinned submodule and calls `t.Errorf` on any difference, so a Rust
+divergence would abort the capture instead of recording a `different` row — the
+comparison would destroy the evidence it exists to produce. Both assemblies are
+therefore carried, which the plan authorises for exactly this case. What is
+carried is the section sequencing; every value in it comes from a pinned call
+(`printFS`, `json.MarshalIndentWrite`, `FormatDiagnosticsWithColorAndContext`,
+`ParseConfigFileTextToJson`, `writeJsonReadableText`), the host is
+`tsoptionstest.NewVFSParseConfigHost`, and both entry points are the pinned
+`getParsedWithJsonApi` and `getParsedWithJsonSourceFileApi`.
+
+### Where the inputs come from
+
+The 80 command-line outputs recover their argument vector from the baseline's own
+`Args::` section, which is an input section. The recovery is proved rather than
+assumed: each row re-renders the vector with the pinned writer's rule and refuses
+the row unless it equals the line it read. All 80 round trip.
+
+71 of the 87 `tsconfigParsing` outputs read their inputs from the pinned
+package-level tables, so nothing is transcribed. The other 16 belong to
+`TestParseTypeAcquisition`, whose table is a function-local and unreachable from
+an overlay; those recover their config text from the baseline's own `Fs::` and
+`configFileName::` sections, with the rest of the input shape taken from the
+pinned literal, which is constant across all eight cases. A wrong recovery cannot
+pass silently, because `Fs::` is rendered back out of the reconstructed host.
+
+### Mutation checks
+
+Every group reproduced on its first run, which by itself means nothing, so each
+was mutation checked and every blast radius was compared against what the corpus
+predicts:
+
+| mutation | outputs broken | the corpus says |
+| --- | ---: | --- |
+| drop the last argument | 79 of 80 | 1 output has an empty `Args::` vector |
+| drop the synthesised declarations | 8 | 8 outputs name `--optionName` |
+| blank the `Errors::` section | 39 | 39 outputs carry an error |
+| join file names with `;` | 3 | 3 outputs have two file names |
+| `Errors::` newline `\r\n` → `\n` | 17 | 17 outputs' error text carries a CRLF |
+| never emit `TypeAcquisition::` | 38 | 38 outputs carry that section |
+| drop a recovered file entry | 16 | 16 outputs are recovered |
+| drop the multi-input block separator | 6 | 6 outputs have two blocks |
+
+The file-name join is a coverage fact as much as a control: only 3 of the 80
+command-line outputs carry more than one file name, so that join is weakly
+exercised.
+
+One prediction was wrong and the probe was not. The first count for the newline
+mutation said 23; it had run past the block boundary into the next block's `Fs::`
+section, which `printFS` also writes with CRLFs. Bounded to its own block, the
+corpus says 17, which is what broke.
+
+### Existing evidence, connected
+
+47 operations move from a rule-guessed disposition to rust-gated, through eight
+witness records verified operation by operation against the pinned bodies. The
+verification refuted four claims, which is the part worth keeping:
+
+* `jsonvalue.go:unmarshalJSONValue` has zero callers anywhere in the pin. Dead
+  code, not evidence — and now a roster exemption.
+* `resolver.go:GetAutomaticTypeDirectiveNames` is called by the trace adapter,
+  but takes no tracer, contains no write call in its pinned body, and its frozen
+  row is structurally forced to `{"traces":[]}`. It witnesses "does not panic".
+* `diagnosticwriter.go:WrapASTDiagnostics` and `ToDiagnostics` are a Go-only
+  wrapper layer; Rust passes `&[&Diagnostic]` straight in, so nothing
+  corresponds. `CompareASTDiagnostics` is skipped by Rust, which sorts with a
+  port of the different `ast/diagnostic.go:CompareDiagnostics`.
+
+The field-versus-method trap cost several more: the packagejson adapter reads
+`e.Valid`, `e.Null` and `v.Type` as FIELDS, so `Expected.IsValid`,
+`Expected.ExpectedJSONType`, `JSONValue.IsPresent` and `JSONValueType.String` are
+not exercised, and the dependency FIELDS being asserted is not the
+`DependencyFields` methods running.
+
+Each record states the asymmetries a later citation must not gloss over: the
+module-trace dataset discards the resolution result on both sides and witnesses
+the callback stream only; the config-mappers comparison is not same-entry-point;
+four pinned diagnosticwriter operations are two Rust functions with a `pretty`
+flag; and `boundary_tests` has no Go row at all, so it gates Rust against
+expectations read from the pinned source rather than proving parity.
+
+Two facts came out of checking rather than assuming. The config-mappers manifest
+resolution really is exercised — 4 of the 15 frozen rows resolve a manifest with
+populated fields — which the survey had left unconfirmed. And
+`handleOptionConfigDirTemplateSubstitution` looked like a no-op until a
+case-insensitive scan found `source-16`, which carries `${CONFIGDIR}` and a
+Turkish dotted capital I: the pinned guard lowercases and the pinned replacement
+does not, so both branches run and produce the untouched string, which is
+exactly what the frozen row records.
+
+### The config roster
+
+45 exemptions: 24 `later_step`, 17 `go_test_harness`, 4 `unused_at_pin`. Every
+entry carries the caller set read at the pin, with a bare-name search each time —
+the F1a lesson that a Go method VALUE is a caller a `.Method(` search does not
+find.
+
+**Four candidates were disqualified and stay on the roster.**
+`parsedcommandline.go`'s output-path cluster is reached from `internal/compiler`,
+three of the four only through a chain no direct search shows.
+`CommonSourceDirectory` has no direct caller at all — it is reached by interface
+dispatch through `outputpaths.OutputPathsHost` — and
+`checkSourceFilesBelongToPath` only as a method value. Since `internal/compiler`
+is `membership: "partial"` and F4a decides its boundary, none is exemptible here.
+
+**Twelve of the 24 need a transitive reading** of the caller rule and say so in
+their own evidence: their callers are in-step but are themselves exempt, the
+eight `showconfig.go` helpers reachable only from `ConvertToTSConfig`. The
+precedent is F2a's own `openMetadata` entry. If a reviewer rejects the reading,
+those twelve return to the roster and none becomes `unused_at_pin`.
+
+**`go_test_harness` is a new category** and wants the owner's review. None of the
+six existing categories describes upstream's own test harness, and bending
+`build_tooling` would have been the wrong kind of convenience: that category says
+the port generates the same artifact elsewhere, and there is no artifact here.
+The port must reproduce the 309 reference outputs, and it does; it must not
+reproduce the file bookkeeping, because its comparisons run through
+`scripts/phase1*.py` and Rust tests that assert against frozen rows.
+
+### A name-match rule that was wrong
+
+`isDoubleQuotedString` was `implemented_untested` on the strength of a Rust
+function of the same name — which carries `/// port:
+tsc/internal/parser/parser.go:isDoubleQuotedString` and performs the single-quote
+token-flag test the `tsoptions` copy does not. Two Go packages, two different
+functions, one name.
+
+The row was not corrected; the rule was. A Rust function that declares itself the
+port of a different operation is no longer read as evidence for this one. 3,773
+Rust functions carry such an annotation, and the rule reclassified nine rows
+across `ast`, `binder`, `tspath` and `tsoptions`, each an exported/unexported or
+cross-package name collision.
+
+### Defects the gate caught in its own author's work
+
+* `output_preparation` kept the first native row it saw per case, so a probe that
+  DECLINES a case shadowed the probe that observed it, and all 87
+  `tsconfigParsing` outputs reported "no corresponding native observation" while
+  the observations sat right there.
+* It then read a probe's observations once per GROUP, so a probe serving two
+  groups presented every row twice and tripped the two-observers conflict on its
+  own duplicate.
+* Eight roster exemptions named operations that do not exist —
+  `parsedcommandline.go:GetOutputFileNames` where the scope carries
+  `ParsedCommandLine.GetOutputFileNames`. An exemption for an operation nobody
+  can find is not an exemption.
+* The regression asserting 167 observations and 167 declines broke when a third
+  probe joined the family. That was arithmetic, not the property it guarded; it
+  now asserts that every output is observed by exactly one probe.
+
+### The parse-config host
+
+`internal/tsoptions/tsoptionstest` is not a `_test.go` file — it ships in the
+module and other packages import it — so it has a real caller-visible contract:
+it is how every pinned config test, and every F3a probe, turns a
+`{path -> content}` map into a `ParseConfigHost`. 11 cases: 8 match, 1 different,
+2 `not_implemented`.
+
+The divergence: the pinned filesystem REFUSES a path that is not absolute, by
+panicking, while `tsr_vfs` resolves it against the current directory and answers.
+Its attribution is deliberate — the cause is in the filesystem the factory
+builds, not the factory, so the symlink-normalization case that first surfaced it
+was split and the refusal has its own case saying where the behavior actually
+lives. The refusal is recorded as a flag, not as the pin's panic wording: what
+the host does is the contract, how it phrases its own panic is not.
 
 ## F0 checklist
 
