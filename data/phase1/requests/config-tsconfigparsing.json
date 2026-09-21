@@ -1,0 +1,788 @@
+{
+  "family": "config",
+  "requests": [
+    {
+      "api": "json",
+      "baseline": "config/tsconfigParsing/Convert correctly format tsconfig.json to typeAcquisition  with json api.js",
+      "case": "config/tsconfigparsing/convert-correctly-format-tsconfig-json-to-typeacquisition-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "recovered",
+      "subject": "tsconfigParsingBaseline",
+      "title": "Convert correctly format tsconfig.json to typeAcquisition "
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/tsconfigParsing/Convert correctly format tsconfig.json to typeAcquisition  with jsonSourceFile api.js",
+      "case": "config/tsconfigparsing/convert-correctly-format-tsconfig-json-to-typeacquisition-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "recovered",
+      "subject": "tsconfigParsingBaseline",
+      "title": "Convert correctly format tsconfig.json to typeAcquisition "
+    },
+    {
+      "api": "json",
+      "baseline": "config/tsconfigParsing/Convert default jsconfig.json to typeAcquisition  with json api.js",
+      "case": "config/tsconfigparsing/convert-default-jsconfig-json-to-typeacquisition-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "recovered",
+      "subject": "tsconfigParsingBaseline",
+      "title": "Convert default jsconfig.json to typeAcquisition "
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/tsconfigParsing/Convert default jsconfig.json to typeAcquisition  with jsonSourceFile api.js",
+      "case": "config/tsconfigparsing/convert-default-jsconfig-json-to-typeacquisition-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "recovered",
+      "subject": "tsconfigParsingBaseline",
+      "title": "Convert default jsconfig.json to typeAcquisition "
+    },
+    {
+      "api": "json",
+      "baseline": "config/tsconfigParsing/Convert default tsconfig.json to typeAcquisition  with json api.js",
+      "case": "config/tsconfigparsing/convert-default-tsconfig-json-to-typeacquisition-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "recovered",
+      "subject": "tsconfigParsingBaseline",
+      "title": "Convert default tsconfig.json to typeAcquisition "
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/tsconfigParsing/Convert default tsconfig.json to typeAcquisition  with jsonSourceFile api.js",
+      "case": "config/tsconfigparsing/convert-default-tsconfig-json-to-typeacquisition-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "recovered",
+      "subject": "tsconfigParsingBaseline",
+      "title": "Convert default tsconfig.json to typeAcquisition "
+    },
+    {
+      "api": "json",
+      "baseline": "config/tsconfigParsing/Convert incorrect format jsconfig.json to typeAcquisition  with json api.js",
+      "case": "config/tsconfigparsing/convert-incorrect-format-jsconfig-json-to-typeacquisition-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "recovered",
+      "subject": "tsconfigParsingBaseline",
+      "title": "Convert incorrect format jsconfig.json to typeAcquisition "
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/tsconfigParsing/Convert incorrect format jsconfig.json to typeAcquisition  with jsonSourceFile api.js",
+      "case": "config/tsconfigparsing/convert-incorrect-format-jsconfig-json-to-typeacquisition-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "recovered",
+      "subject": "tsconfigParsingBaseline",
+      "title": "Convert incorrect format jsconfig.json to typeAcquisition "
+    },
+    {
+      "api": "json",
+      "baseline": "config/tsconfigParsing/Convert incorrect format tsconfig.json to typeAcquisition  with json api.js",
+      "case": "config/tsconfigparsing/convert-incorrect-format-tsconfig-json-to-typeacquisition-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "recovered",
+      "subject": "tsconfigParsingBaseline",
+      "title": "Convert incorrect format tsconfig.json to typeAcquisition "
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/tsconfigParsing/Convert incorrect format tsconfig.json to typeAcquisition  with jsonSourceFile api.js",
+      "case": "config/tsconfigparsing/convert-incorrect-format-tsconfig-json-to-typeacquisition-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "recovered",
+      "subject": "tsconfigParsingBaseline",
+      "title": "Convert incorrect format tsconfig.json to typeAcquisition "
+    },
+    {
+      "api": "json",
+      "baseline": "config/tsconfigParsing/Convert jsconfig.json to typeAcquisition  with json api.js",
+      "case": "config/tsconfigparsing/convert-jsconfig-json-to-typeacquisition-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "recovered",
+      "subject": "tsconfigParsingBaseline",
+      "title": "Convert jsconfig.json to typeAcquisition "
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/tsconfigParsing/Convert jsconfig.json to typeAcquisition  with jsonSourceFile api.js",
+      "case": "config/tsconfigparsing/convert-jsconfig-json-to-typeacquisition-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "recovered",
+      "subject": "tsconfigParsingBaseline",
+      "title": "Convert jsconfig.json to typeAcquisition "
+    },
+    {
+      "api": "json",
+      "baseline": "config/tsconfigParsing/Convert jsconfig.json with only enable property to typeAcquisition  with json api.js",
+      "case": "config/tsconfigparsing/convert-jsconfig-json-with-only-enable-property-to-typeacquisition-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "recovered",
+      "subject": "tsconfigParsingBaseline",
+      "title": "Convert jsconfig.json with only enable property to typeAcquisition "
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/tsconfigParsing/Convert jsconfig.json with only enable property to typeAcquisition  with jsonSourceFile api.js",
+      "case": "config/tsconfigparsing/convert-jsconfig-json-with-only-enable-property-to-typeacquisition-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "recovered",
+      "subject": "tsconfigParsingBaseline",
+      "title": "Convert jsconfig.json with only enable property to typeAcquisition "
+    },
+    {
+      "api": "json",
+      "baseline": "config/tsconfigParsing/Convert tsconfig.json with only enable property to typeAcquisition  with json api.js",
+      "case": "config/tsconfigparsing/convert-tsconfig-json-with-only-enable-property-to-typeacquisition-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "recovered",
+      "subject": "tsconfigParsingBaseline",
+      "title": "Convert tsconfig.json with only enable property to typeAcquisition "
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/tsconfigParsing/Convert tsconfig.json with only enable property to typeAcquisition  with jsonSourceFile api.js",
+      "case": "config/tsconfigparsing/convert-tsconfig-json-with-only-enable-property-to-typeacquisition-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "recovered",
+      "subject": "tsconfigParsingBaseline",
+      "title": "Convert tsconfig.json with only enable property to typeAcquisition "
+    },
+    {
+      "api": "json",
+      "baseline": "config/tsconfigParsing/allow dotted files and folders when explicitly requested with json api.js",
+      "case": "config/tsconfigparsing/allow-dotted-files-and-folders-when-explicitly-requested-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "allow dotted files and folders when explicitly requested"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/tsconfigParsing/allow dotted files and folders when explicitly requested with jsonSourceFile api.js",
+      "case": "config/tsconfigparsing/allow-dotted-files-and-folders-when-explicitly-requested-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "allow dotted files and folders when explicitly requested"
+    },
+    {
+      "api": "json",
+      "baseline": "config/tsconfigParsing/does not generate errors for empty files list when one or more references are provided with json api.js",
+      "case": "config/tsconfigparsing/does-not-generate-errors-for-empty-files-list-when-one-or-more-references-are-provided-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "does not generate errors for empty files list when one or more references are provided"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/tsconfigParsing/does not generate errors for empty files list when one or more references are provided with jsonSourceFile api.js",
+      "case": "config/tsconfigparsing/does-not-generate-errors-for-empty-files-list-when-one-or-more-references-are-provided-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "does not generate errors for empty files list when one or more references are provided"
+    },
+    {
+      "api": "json",
+      "baseline": "config/tsconfigParsing/exclude declarationDir unless overridden with json api.js",
+      "case": "config/tsconfigparsing/exclude-declarationdir-unless-overridden-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "exclude declarationDir unless overridden"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/tsconfigParsing/exclude declarationDir unless overridden with jsonSourceFile api.js",
+      "case": "config/tsconfigparsing/exclude-declarationdir-unless-overridden-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "exclude declarationDir unless overridden"
+    },
+    {
+      "api": "json",
+      "baseline": "config/tsconfigParsing/exclude outDir unless overridden with json api.js",
+      "case": "config/tsconfigparsing/exclude-outdir-unless-overridden-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "exclude outDir unless overridden"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/tsconfigParsing/exclude outDir unless overridden with jsonSourceFile api.js",
+      "case": "config/tsconfigparsing/exclude-outdir-unless-overridden-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "exclude outDir unless overridden"
+    },
+    {
+      "api": "json",
+      "baseline": "config/tsconfigParsing/generates errors for directory with no .ts files with json api.js",
+      "case": "config/tsconfigparsing/generates-errors-for-directory-with-no-ts-files-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "generates errors for directory with no .ts files"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/tsconfigParsing/generates errors for directory with no .ts files with jsonSourceFile api.js",
+      "case": "config/tsconfigparsing/generates-errors-for-directory-with-no-ts-files-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "generates errors for directory with no .ts files"
+    },
+    {
+      "api": "json",
+      "baseline": "config/tsconfigParsing/generates errors for empty directory with json api.js",
+      "case": "config/tsconfigparsing/generates-errors-for-empty-directory-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "generates errors for empty directory"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/tsconfigParsing/generates errors for empty directory with jsonSourceFile api.js",
+      "case": "config/tsconfigparsing/generates-errors-for-empty-directory-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "generates errors for empty directory"
+    },
+    {
+      "api": "json",
+      "baseline": "config/tsconfigParsing/generates errors for empty files list when no references are provided with json api.js",
+      "case": "config/tsconfigparsing/generates-errors-for-empty-files-list-when-no-references-are-provided-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "generates errors for empty files list when no references are provided"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/tsconfigParsing/generates errors for empty files list when no references are provided with jsonSourceFile api.js",
+      "case": "config/tsconfigparsing/generates-errors-for-empty-files-list-when-no-references-are-provided-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "generates errors for empty files list when no references are provided"
+    },
+    {
+      "api": "json",
+      "baseline": "config/tsconfigParsing/generates errors for empty files list with json api.js",
+      "case": "config/tsconfigparsing/generates-errors-for-empty-files-list-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "generates errors for empty files list"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/tsconfigParsing/generates errors for empty files list with jsonSourceFile api.js",
+      "case": "config/tsconfigparsing/generates-errors-for-empty-files-list-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "generates errors for empty files list"
+    },
+    {
+      "api": "json",
+      "baseline": "config/tsconfigParsing/generates errors for empty include with json api.js",
+      "case": "config/tsconfigparsing/generates-errors-for-empty-include-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "generates errors for empty include"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/tsconfigParsing/generates errors for empty include with jsonSourceFile api.js",
+      "case": "config/tsconfigparsing/generates-errors-for-empty-include-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "generates errors for empty include"
+    },
+    {
+      "api": "json",
+      "baseline": "config/tsconfigParsing/generates errors for include with parent directory after recursive wildcard with json api.js",
+      "case": "config/tsconfigparsing/generates-errors-for-include-with-parent-directory-after-recursive-wildcard-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "generates errors for include with parent directory after recursive wildcard"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/tsconfigParsing/generates errors for include with parent directory after recursive wildcard with jsonSourceFile api.js",
+      "case": "config/tsconfigparsing/generates-errors-for-include-with-parent-directory-after-recursive-wildcard-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "generates errors for include with parent directory after recursive wildcard"
+    },
+    {
+      "api": "json",
+      "baseline": "config/tsconfigParsing/generates errors for includes with outDir with json api.js",
+      "case": "config/tsconfigparsing/generates-errors-for-includes-with-outdir-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "generates errors for includes with outDir"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/tsconfigParsing/generates errors for includes with outDir with jsonSourceFile api.js",
+      "case": "config/tsconfigparsing/generates-errors-for-includes-with-outdir-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "generates errors for includes with outDir"
+    },
+    {
+      "api": "json",
+      "baseline": "config/tsconfigParsing/generates errors when commandline option is in tsconfig with json api.js",
+      "case": "config/tsconfigparsing/generates-errors-when-commandline-option-is-in-tsconfig-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "generates errors when commandline option is in tsconfig"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/tsconfigParsing/generates errors when commandline option is in tsconfig with jsonSourceFile api.js",
+      "case": "config/tsconfigparsing/generates-errors-when-commandline-option-is-in-tsconfig-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "generates errors when commandline option is in tsconfig"
+    },
+    {
+      "api": "json",
+      "baseline": "config/tsconfigParsing/generates errors when files is not string with json api.js",
+      "case": "config/tsconfigparsing/generates-errors-when-files-is-not-string-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "generates errors when files is not string"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/tsconfigParsing/generates errors when files is not string with jsonSourceFile api.js",
+      "case": "config/tsconfigparsing/generates-errors-when-files-is-not-string-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "generates errors when files is not string"
+    },
+    {
+      "api": "json",
+      "baseline": "config/tsconfigParsing/generates errors when include is not string with json api.js",
+      "case": "config/tsconfigparsing/generates-errors-when-include-is-not-string-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "generates errors when include is not string"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/tsconfigParsing/generates errors when include is not string with jsonSourceFile api.js",
+      "case": "config/tsconfigparsing/generates-errors-when-include-is-not-string-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "generates errors when include is not string"
+    },
+    {
+      "api": "json",
+      "baseline": "config/tsconfigParsing/handles empty types array with json api.js",
+      "case": "config/tsconfigparsing/handles-empty-types-array-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "handles empty types array"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/tsconfigParsing/handles empty types array with jsonSourceFile api.js",
+      "case": "config/tsconfigparsing/handles-empty-types-array-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "handles empty types array"
+    },
+    {
+      "api": "jsonParse",
+      "baseline": "config/tsconfigParsing/handles escaped characters in strings correctly jsonParse.js",
+      "case": "config/tsconfigparsing/handles-escaped-characters-in-strings-correctly-jsonparse",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "handles escaped characters in strings correctly"
+    },
+    {
+      "api": "json",
+      "baseline": "config/tsconfigParsing/ignore dotted files and folders with json api.js",
+      "case": "config/tsconfigparsing/ignore-dotted-files-and-folders-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "ignore dotted files and folders"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/tsconfigParsing/ignore dotted files and folders with jsonSourceFile api.js",
+      "case": "config/tsconfigparsing/ignore-dotted-files-and-folders-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "ignore dotted files and folders"
+    },
+    {
+      "api": "json",
+      "baseline": "config/tsconfigParsing/implicitly exclude common package folders with json api.js",
+      "case": "config/tsconfigparsing/implicitly-exclude-common-package-folders-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "implicitly exclude common package folders"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/tsconfigParsing/implicitly exclude common package folders with jsonSourceFile api.js",
+      "case": "config/tsconfigparsing/implicitly-exclude-common-package-folders-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "implicitly exclude common package folders"
+    },
+    {
+      "api": "json",
+      "baseline": "config/tsconfigParsing/issue 1267 scenario - extended files not picked up with json api.js",
+      "case": "config/tsconfigparsing/issue-1267-scenario-extended-files-not-picked-up-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "issue 1267 scenario - extended files not picked up"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/tsconfigParsing/issue 1267 scenario - extended files not picked up with jsonSourceFile api.js",
+      "case": "config/tsconfigparsing/issue-1267-scenario-extended-files-not-picked-up-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "issue 1267 scenario - extended files not picked up"
+    },
+    {
+      "api": "jsonParse",
+      "baseline": "config/tsconfigParsing/keeps string content untouched jsonParse.js",
+      "case": "config/tsconfigparsing/keeps-string-content-untouched-jsonparse",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "keeps string content untouched"
+    },
+    {
+      "api": "json",
+      "baseline": "config/tsconfigParsing/null overrides in extended tsconfig - array fields with json api.js",
+      "case": "config/tsconfigparsing/null-overrides-in-extended-tsconfig-array-fields-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "null overrides in extended tsconfig - array fields"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/tsconfigParsing/null overrides in extended tsconfig - array fields with jsonSourceFile api.js",
+      "case": "config/tsconfigparsing/null-overrides-in-extended-tsconfig-array-fields-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "null overrides in extended tsconfig - array fields"
+    },
+    {
+      "api": "json",
+      "baseline": "config/tsconfigParsing/null overrides in extended tsconfig - mixed field types with json api.js",
+      "case": "config/tsconfigparsing/null-overrides-in-extended-tsconfig-mixed-field-types-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "null overrides in extended tsconfig - mixed field types"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/tsconfigParsing/null overrides in extended tsconfig - mixed field types with jsonSourceFile api.js",
+      "case": "config/tsconfigparsing/null-overrides-in-extended-tsconfig-mixed-field-types-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "null overrides in extended tsconfig - mixed field types"
+    },
+    {
+      "api": "json",
+      "baseline": "config/tsconfigParsing/null overrides in extended tsconfig - string fields with json api.js",
+      "case": "config/tsconfigparsing/null-overrides-in-extended-tsconfig-string-fields-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "null overrides in extended tsconfig - string fields"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/tsconfigParsing/null overrides in extended tsconfig - string fields with jsonSourceFile api.js",
+      "case": "config/tsconfigparsing/null-overrides-in-extended-tsconfig-string-fields-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "null overrides in extended tsconfig - string fields"
+    },
+    {
+      "api": "json",
+      "baseline": "config/tsconfigParsing/null overrides in middle level of extends chain with json api.js",
+      "case": "config/tsconfigparsing/null-overrides-in-middle-level-of-extends-chain-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "null overrides in middle level of extends chain"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/tsconfigParsing/null overrides in middle level of extends chain with jsonSourceFile api.js",
+      "case": "config/tsconfigparsing/null-overrides-in-middle-level-of-extends-chain-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "null overrides in middle level of extends chain"
+    },
+    {
+      "api": "json",
+      "baseline": "config/tsconfigParsing/null overrides with multiple extends levels with json api.js",
+      "case": "config/tsconfigparsing/null-overrides-with-multiple-extends-levels-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "null overrides with multiple extends levels"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/tsconfigParsing/null overrides with multiple extends levels with jsonSourceFile api.js",
+      "case": "config/tsconfigparsing/null-overrides-with-multiple-extends-levels-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "null overrides with multiple extends levels"
+    },
+    {
+      "api": "json",
+      "baseline": "config/tsconfigParsing/parses tsconfig with compilerOptions, files, include, and exclude with json api.js",
+      "case": "config/tsconfigparsing/parses-tsconfig-with-compileroptions-files-include-and-exclude-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "parses tsconfig with compilerOptions, files, include, and exclude"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/tsconfigParsing/parses tsconfig with compilerOptions, files, include, and exclude with jsonSourceFile api.js",
+      "case": "config/tsconfigparsing/parses-tsconfig-with-compileroptions-files-include-and-exclude-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "parses tsconfig with compilerOptions, files, include, and exclude"
+    },
+    {
+      "api": "json",
+      "baseline": "config/tsconfigParsing/parses tsconfig with extends and configDir with json api.js",
+      "case": "config/tsconfigparsing/parses-tsconfig-with-extends-and-configdir-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "parses tsconfig with extends and configDir"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/tsconfigParsing/parses tsconfig with extends and configDir with jsonSourceFile api.js",
+      "case": "config/tsconfigparsing/parses-tsconfig-with-extends-and-configdir-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "parses tsconfig with extends and configDir"
+    },
+    {
+      "api": "json",
+      "baseline": "config/tsconfigParsing/parses tsconfig with extends, files, include and other options with json api.js",
+      "case": "config/tsconfigparsing/parses-tsconfig-with-extends-files-include-and-other-options-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "parses tsconfig with extends, files, include and other options"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/tsconfigParsing/parses tsconfig with extends, files, include and other options with jsonSourceFile api.js",
+      "case": "config/tsconfigparsing/parses-tsconfig-with-extends-files-include-and-other-options-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "parses tsconfig with extends, files, include and other options"
+    },
+    {
+      "api": "json",
+      "baseline": "config/tsconfigParsing/reports error for an unknown option with json api.js",
+      "case": "config/tsconfigparsing/reports-error-for-an-unknown-option-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "reports error for an unknown option"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/tsconfigParsing/reports error for an unknown option with jsonSourceFile api.js",
+      "case": "config/tsconfigparsing/reports-error-for-an-unknown-option-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "reports error for an unknown option"
+    },
+    {
+      "api": "json",
+      "baseline": "config/tsconfigParsing/reports errors for incorrectly cased option names with json api.js",
+      "case": "config/tsconfigparsing/reports-errors-for-incorrectly-cased-option-names-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "reports errors for incorrectly cased option names"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/tsconfigParsing/reports errors for incorrectly cased option names with jsonSourceFile api.js",
+      "case": "config/tsconfigparsing/reports-errors-for-incorrectly-cased-option-names-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "reports errors for incorrectly cased option names"
+    },
+    {
+      "api": "json",
+      "baseline": "config/tsconfigParsing/reports errors for wrong type option and invalid enum value with json api.js",
+      "case": "config/tsconfigparsing/reports-errors-for-wrong-type-option-and-invalid-enum-value-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "reports errors for wrong type option and invalid enum value"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/tsconfigParsing/reports errors for wrong type option and invalid enum value with jsonSourceFile api.js",
+      "case": "config/tsconfigparsing/reports-errors-for-wrong-type-option-and-invalid-enum-value-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "reports errors for wrong type option and invalid enum value"
+    },
+    {
+      "api": "json",
+      "baseline": "config/tsconfigParsing/reports spelling suggestion for an unknown option with json api.js",
+      "case": "config/tsconfigparsing/reports-spelling-suggestion-for-an-unknown-option-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "reports spelling suggestion for an unknown option"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/tsconfigParsing/reports spelling suggestion for an unknown option with jsonSourceFile api.js",
+      "case": "config/tsconfigparsing/reports-spelling-suggestion-for-an-unknown-option-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "reports spelling suggestion for an unknown option"
+    },
+    {
+      "api": "jsonParse",
+      "baseline": "config/tsconfigParsing/returns config object without comments jsonParse.js",
+      "case": "config/tsconfigparsing/returns-config-object-without-comments-jsonparse",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "returns config object without comments"
+    },
+    {
+      "api": "jsonParse",
+      "baseline": "config/tsconfigParsing/returns empty config for file with comments only jsonParse.js",
+      "case": "config/tsconfigparsing/returns-empty-config-for-file-with-comments-only-jsonparse",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "returns empty config for file with comments only"
+    },
+    {
+      "api": "jsonParse",
+      "baseline": "config/tsconfigParsing/returns empty config for file with only whitespaces jsonParse.js",
+      "case": "config/tsconfigparsing/returns-empty-config-for-file-with-only-whitespaces-jsonparse",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "returns empty config for file with only whitespaces"
+    },
+    {
+      "api": "jsonParse",
+      "baseline": "config/tsconfigParsing/returns empty config when config is empty object jsonParse.js",
+      "case": "config/tsconfigparsing/returns-empty-config-when-config-is-empty-object-jsonparse",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "returns empty config when config is empty object"
+    },
+    {
+      "api": "json",
+      "baseline": "config/tsconfigParsing/returns error when tsconfig have excludes with json api.js",
+      "case": "config/tsconfigparsing/returns-error-when-tsconfig-have-excludes-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "returns error when tsconfig have excludes"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/tsconfigParsing/returns error when tsconfig have excludes with jsonSourceFile api.js",
+      "case": "config/tsconfigparsing/returns-error-when-tsconfig-have-excludes-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "returns error when tsconfig have excludes"
+    },
+    {
+      "api": "jsonParse",
+      "baseline": "config/tsconfigParsing/returns object when users correctly specify library jsonParse.js",
+      "case": "config/tsconfigparsing/returns-object-when-users-correctly-specify-library-jsonparse",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "returns object when users correctly specify library"
+    },
+    {
+      "api": "json",
+      "baseline": "config/tsconfigParsing/with outDir from base tsconfig with json api.js",
+      "case": "config/tsconfigparsing/with-outdir-from-base-tsconfig-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "with outDir from base tsconfig"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/tsconfigParsing/with outDir from base tsconfig with jsonSourceFile api.js",
+      "case": "config/tsconfigparsing/with-outdir-from-base-tsconfig-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "source": "table",
+      "subject": "tsconfigParsingBaseline",
+      "title": "with outDir from base tsconfig"
+    }
+  ]
+}

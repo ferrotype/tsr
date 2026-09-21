@@ -1843,8 +1843,530 @@
       },
       "operation": "tsoptions.parseBuildOptionsBaseline",
       "result": "observed"
+    },
+    {
+      "case": "config/tsconfigparsing/convert-correctly-format-tsconfig-json-to-typeacquisition-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/convert-correctly-format-tsconfig-json-to-typeacquisition-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/convert-default-jsconfig-json-to-typeacquisition-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/convert-default-jsconfig-json-to-typeacquisition-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/convert-default-tsconfig-json-to-typeacquisition-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/convert-default-tsconfig-json-to-typeacquisition-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/convert-incorrect-format-jsconfig-json-to-typeacquisition-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/convert-incorrect-format-jsconfig-json-to-typeacquisition-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/convert-incorrect-format-tsconfig-json-to-typeacquisition-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/convert-incorrect-format-tsconfig-json-to-typeacquisition-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/convert-jsconfig-json-to-typeacquisition-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/convert-jsconfig-json-to-typeacquisition-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/convert-jsconfig-json-with-only-enable-property-to-typeacquisition-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/convert-jsconfig-json-with-only-enable-property-to-typeacquisition-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/convert-tsconfig-json-with-only-enable-property-to-typeacquisition-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/convert-tsconfig-json-with-only-enable-property-to-typeacquisition-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/allow-dotted-files-and-folders-when-explicitly-requested-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/allow-dotted-files-and-folders-when-explicitly-requested-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/does-not-generate-errors-for-empty-files-list-when-one-or-more-references-are-provided-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/does-not-generate-errors-for-empty-files-list-when-one-or-more-references-are-provided-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/exclude-declarationdir-unless-overridden-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/exclude-declarationdir-unless-overridden-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/exclude-outdir-unless-overridden-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/exclude-outdir-unless-overridden-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/generates-errors-for-directory-with-no-ts-files-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/generates-errors-for-directory-with-no-ts-files-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/generates-errors-for-empty-directory-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/generates-errors-for-empty-directory-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/generates-errors-for-empty-files-list-when-no-references-are-provided-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/generates-errors-for-empty-files-list-when-no-references-are-provided-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/generates-errors-for-empty-files-list-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/generates-errors-for-empty-files-list-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/generates-errors-for-empty-include-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/generates-errors-for-empty-include-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/generates-errors-for-include-with-parent-directory-after-recursive-wildcard-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/generates-errors-for-include-with-parent-directory-after-recursive-wildcard-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/generates-errors-for-includes-with-outdir-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/generates-errors-for-includes-with-outdir-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/generates-errors-when-commandline-option-is-in-tsconfig-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/generates-errors-when-commandline-option-is-in-tsconfig-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/generates-errors-when-files-is-not-string-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/generates-errors-when-files-is-not-string-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/generates-errors-when-include-is-not-string-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/generates-errors-when-include-is-not-string-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/handles-empty-types-array-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/handles-empty-types-array-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/handles-escaped-characters-in-strings-correctly-jsonparse",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/ignore-dotted-files-and-folders-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/ignore-dotted-files-and-folders-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/implicitly-exclude-common-package-folders-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/implicitly-exclude-common-package-folders-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/issue-1267-scenario-extended-files-not-picked-up-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/issue-1267-scenario-extended-files-not-picked-up-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/keeps-string-content-untouched-jsonparse",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/null-overrides-in-extended-tsconfig-array-fields-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/null-overrides-in-extended-tsconfig-array-fields-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/null-overrides-in-extended-tsconfig-mixed-field-types-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/null-overrides-in-extended-tsconfig-mixed-field-types-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/null-overrides-in-extended-tsconfig-string-fields-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/null-overrides-in-extended-tsconfig-string-fields-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/null-overrides-in-middle-level-of-extends-chain-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/null-overrides-in-middle-level-of-extends-chain-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/null-overrides-with-multiple-extends-levels-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/null-overrides-with-multiple-extends-levels-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/parses-tsconfig-with-compileroptions-files-include-and-exclude-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/parses-tsconfig-with-compileroptions-files-include-and-exclude-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/parses-tsconfig-with-extends-and-configdir-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/parses-tsconfig-with-extends-and-configdir-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/parses-tsconfig-with-extends-files-include-and-other-options-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/parses-tsconfig-with-extends-files-include-and-other-options-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/reports-error-for-an-unknown-option-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/reports-error-for-an-unknown-option-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/reports-errors-for-incorrectly-cased-option-names-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/reports-errors-for-incorrectly-cased-option-names-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/reports-errors-for-wrong-type-option-and-invalid-enum-value-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/reports-errors-for-wrong-type-option-and-invalid-enum-value-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/reports-spelling-suggestion-for-an-unknown-option-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/reports-spelling-suggestion-for-an-unknown-option-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/returns-config-object-without-comments-jsonparse",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/returns-empty-config-for-file-with-comments-only-jsonparse",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/returns-empty-config-for-file-with-only-whitespaces-jsonparse",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/returns-empty-config-when-config-is-empty-object-jsonparse",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/returns-error-when-tsconfig-have-excludes-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/returns-error-when-tsconfig-have-excludes-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/returns-object-when-users-correctly-specify-library-jsonparse",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/with-outdir-from-base-tsconfig-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/with-outdir-from-base-tsconfig-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
     }
   ],
-  "request_sha256": "71edd3e545303cfe3b95aa4c20a912d5f5066adca7d74d6755b4770c54d09b0a",
+  "request_sha256": "505cc1087569d9f25b294f8dc226f5baf8862ae0ff8d3c00e8082000ab047106",
   "version": 1
 }

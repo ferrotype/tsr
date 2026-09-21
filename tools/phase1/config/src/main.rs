@@ -22,6 +22,7 @@ use serde_json::{json, Map, Value};
 #[allow(dead_code)]
 mod api;
 mod commandline;
+mod tsconfigparsing;
 
 use api::Outcome;
 
@@ -29,7 +30,10 @@ use api::Outcome;
 type GroupHandler = fn(&Value) -> Option<Outcome>;
 
 /// Group modules, tried in order. The first to claim a request answers it.
-const GROUPS: &[(&str, GroupHandler)] = &[("commandline", commandline::observe)];
+const GROUPS: &[(&str, GroupHandler)] = &[
+    ("commandline", commandline::observe),
+    ("tsconfigparsing", tsconfigparsing::observe),
+];
 
 fn observe(request: &Value) -> Map<String, Value> {
     let mut row = Map::new();

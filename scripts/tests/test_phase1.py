@@ -1491,6 +1491,77 @@ class FilesystemPreparationTests(unittest.TestCase):
         self.assertTrue(any(case["id"] in problem for problem in report["gap_problems"]))
 
 
+class ConfigOutputPreparationTests(unittest.TestCase):
+    """F3a's 167 reference outputs, and the two merge defects the gate caught.
+
+    These outputs are `rendering_verified: true` in the index, so
+    `exception_problems` refuses an exception on any of them: the only passing
+    state is all 167 reproduced exactly.
+    """
+
+    def setUp(self):
+        self.cases = json.loads((ROOT / "data/phase1/cases.json").read_text())
+        self.scope = json.loads((ROOT / "data/phase1/scope.json").read_text())
+
+    def test_all_167_config_outputs_reproduce_exactly(self):
+        report = baselines.output_preparation(self.cases, "config")
+        self.assertEqual(report["problems"], [])
+        self.assertEqual(report["total_outputs"], 167)
+        self.assertEqual(report["exact_outputs"], 167)
+        self.assertEqual(report["excepted_outputs"], 0)
+
+    def test_the_three_groups_partition_the_309(self):
+        config = baselines.output_preparation(self.cases, "config")
+        filesystem = baselines.output_preparation(self.cases, "filesystem")
+        self.assertEqual(config["total_outputs"] + filesystem["total_outputs"], baselines.TOTAL)
+
+    def test_a_declining_probe_cannot_shadow_the_observing_one(self):
+        # Every probe answers the whole family schedule and declines what it
+        # does not serve, so each output has one observing row and several
+        # declines. Keeping the first row seen let the alphabetically earlier
+        # `commandline` probe's decline hide the `tsconfigparsing` probe's real
+        # observation, and all 87 reported "no corresponding native observation".
+        directory = ROOT / "data/phase1/native/config"
+        declines = observed = 0
+        for probe in ("commandline", "tsconfigparsing"):
+            rows = json.loads((directory / probe / "observations.json").read_text())
+            for row in rows["observations"]:
+                if row["result"] == "observed":
+                    observed += 1
+                elif row["result"] == "native_unavailable":
+                    declines += 1
+        self.assertEqual(observed, 167, "each output is observed by exactly one probe")
+        self.assertEqual(declines, 167, "and declined by exactly one other")
+        self.assertEqual(baselines.output_preparation(self.cases, "config")["problems"], [])
+
+    def test_one_probe_serving_two_groups_is_read_once(self):
+        # `commandline` renders both parseCommandLine and parseBuildOptions.
+        # Reading its observations once per group presented every row twice and
+        # tripped the two-observers conflict on the probe's own duplicate.
+        groups = baselines.STEP_OUTPUT_GROUPS["config"][2]
+        probes = [probe for _group, probe in groups]
+        self.assertGreater(len(probes), len(set(probes)), "a probe does serve two groups here")
+        self.assertEqual(baselines.output_preparation(self.cases, "config")["problems"], [])
+
+    def test_a_group_whose_rendering_regressed_is_refused(self):
+        case = next(c for c in self.cases["cases"]
+                    if c.get("baseline", "").startswith("tsoptions/commandLineParsing/"))
+        case["last_result"] = "not_run"
+        report = baselines.output_preparation(self.cases, "config")
+        self.assertFalse(report["complete"])
+        self.assertTrue(any(case["baseline"] in problem for problem in report["problems"]))
+
+    def test_config_outputs_gate_the_step(self):
+        stripped = dict(self.cases)
+        stripped["cases"] = [
+            c for c in self.cases["cases"]
+            if not (c.get("baseline") and c.get("family") == "config")
+        ]
+        report = scope.leaf_preparation(self.scope, stripped, "config")
+        self.assertFalse(report["complete"])
+        self.assertEqual(len(report["outputs"]["problems"]), 167)
+
+
 class RosterLedgerTests(unittest.TestCase):
     """The F1a roster shrinks only through a ledger that itself has to validate.
 

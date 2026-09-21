@@ -267,6 +267,7 @@ FAMILIES = {
     "config": {
         "requests": [
             "data/phase1/requests/config-commandline.json",
+            "data/phase1/requests/config-tsconfigparsing.json",
         ],
         "native_probes": [
             # The 53 + 27 `tsoptions/commandLineParsing` outputs. It compiles
@@ -281,6 +282,15 @@ FAMILIES = {
             {"name": "commandline", "package": "tsoptions",
              "probe": "tools/phase1/config/commandline_probe_test.go",
              "test": "TestPhase1ConfigCommandLine",
+             "trimpath": False},
+            # The 87 `config/tsconfigParsing` outputs. Same package and the
+            # same -trimpath reason. This one carries the two section
+            # assemblies, because the pinned primary renderer ends in
+            # `baseline.Run` -- which writes into the pin and fails the test on
+            # any difference -- and the secondary one is inline in a test body.
+            {"name": "tsconfigparsing", "package": "tsoptions",
+             "probe": "tools/phase1/config/tsconfigparsing_probe_test.go",
+             "test": "TestPhase1ConfigTsconfigParsing",
              "trimpath": False},
         ],
         "rust_package": "phase1_config",

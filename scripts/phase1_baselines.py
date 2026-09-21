@@ -372,6 +372,7 @@ STEP_OUTPUT_GROUPS: dict[str, tuple[str, str, tuple[tuple[str, str], ...]]] = {
     "config": ("config", "config", (
         ("parseCommandLine", "commandline"),
         ("parseBuildOptions", "commandline"),
+        ("tsconfigParsing", "tsconfigparsing"),
     )),
 }
 
@@ -408,19 +409,34 @@ def output_preparation(cases: dict, step: str) -> dict:
         if recorded.get("pin") != pin():
             problems.append(f"{step} native observations disagree with the pin")
             recorded = None
-    for group, probe in sorted({(g, p) for g, p in groups}):
+    # One probe may serve several groups -- `commandline` renders both the
+    # parseCommandLine and the parseBuildOptions outputs -- so read each
+    # distinct probe once. Reading it per group would present every row twice
+    # and make the two-observers conflict below fire on its own duplicate.
+    for probe in sorted({p for _group, p in groups}):
         if recorded is None:
             break
         native = directory / probe / "observations.json"
         declared = recorded.get("native_probes", {}).get(probe, {})
         if not native.is_file():
-            problems.append(f"{group} has no frozen native observations")
+            problems.append(f"probe {probe} has no frozen native observations")
             continue
         if digest(native.read_bytes()) != declared.get("observations_sha256"):
-            problems.append(f"{group} native observations disagree with their digest")
+            problems.append(f"probe {probe} native observations disagree with their digest")
             continue
         for row in json.loads(native.read_text())["observations"]:
-            if row["case"] in rows:
+            # Every probe sees the whole family schedule and declines the cases
+            # it does not serve, so a case has one observing row and N-1
+            # declines. Keeping the first row seen would let an alphabetically
+            # earlier probe's decline shadow the real observation -- which is
+            # how this was first written, and the gate caught it. An observed
+            # row wins; two observing probes for one output is a conflict.
+            existing = rows.get(row["case"])
+            if row.get("result") != "observed":
+                rows.setdefault(row["case"], row)
+                continue
+            if existing is not None and existing.get("result") == "observed":
+                problems.append(f"{row['case']}: two native probes both observed this output")
                 continue
             rows[row["case"]] = row
     by_output: dict[str, list[dict]] = {}
