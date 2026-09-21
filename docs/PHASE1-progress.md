@@ -1799,11 +1799,11 @@ The continuation implements the missing cached, wrapping, tracking, recording
 and live OS filesystems, plus the F3b configuration work required by
 `matchFiles`. It does not close unrelated F3b work. F1b's prepared leaf scope
 remains 229 exact matches and the existing owner-approved options-clone
-exception; that decision is not extended to filesystem aliasing.
+exception. The separate filesystem held-entry approval is recorded below.
 
 | Family/group | Current result |
 |---|---|
-| Full filesystem family | 355 match, 3 different, 1 native unavailable; no missing operation or harness failure |
+| Full filesystem family | 355 match, 1 approved difference, 2 unapproved differences, 1 native unavailable; no missing operation or harness failure |
 | cachedvfs | 32/32 match, including the earlier root-length panic difference |
 | wrapvfs / tracking | 28/28 match |
 | vfsmock | 10/10 match |
@@ -1880,12 +1880,15 @@ resolution, identical OS file identity, and unchanged forwarding of their own
 native executable path. The amendment is recorded in the case contract and
 both probes; prior archives are preserved.
 
-**Remaining strict F2b boundaries.** The three unwaived differences are still
-`glob/match-group-branch-buffer` (foreign Go dynamic element),
-`vfstest/from-map-rejects-malformed-maps` (foreign dynamic map value), and
-`vfstest/snapshot-mutation-leak-control` (a held Go timestamp aliases mutable
-backing; Rust retains an owned value). No change hides or approves them. The
-Linux-only procfs case is `native_unavailable`, leaving its two operation
+**Remaining strict F2b boundaries.** The two unapproved differences are
+`glob/match-group-branch-buffer` (foreign Go dynamic element) and
+`vfstest/from-map-rejects-malformed-maps` (foreign dynamic map value). The owner
+approved `vfstest/snapshot-mutation-leak-control` on 2026-09-22: previously held
+Rust entry values remain independent of live timestamp updates, consistent
+with the compiler-options ownership choice. The exact scope is recorded in
+[the ownership audit](PHASE1-aliasing-audit.md#filesystem-held-entry-snapshots-approved-follow-up).
+Its raw result remains `different`; no observation or comparator is changed.
+The Linux-only procfs case is `native_unavailable`, leaving its two operation
 preparation entries pending. Thus all prepared missing adapters now execute,
 but strict F2b parity is not declared complete.
 
