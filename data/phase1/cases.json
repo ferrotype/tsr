@@ -961,6 +961,280 @@
       "operations": []
     },
     {
+      "expected_contract": "the factory builds a case-sensitive host over the declared map: the three declared paths are files, their directory is a directory, an undeclared path is neither, and the host reports the current directory it was given",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/host/from-map",
+      "last_result": "match",
+      "native_authority": "tools/phase1/config/tsoptionstest_probe_test.go against the pinned tsoptionstest package",
+      "operation_actions": {
+        "current_directory": [
+          "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:VfsParseConfigHost.GetCurrentDirectory"
+        ],
+        "fs": [
+          "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:VfsParseConfigHost.FS"
+        ],
+        "new_host": [
+          "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:NewVFSParseConfigHost"
+        ]
+      },
+      "operations": [
+        "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:NewVFSParseConfigHost",
+        "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:VfsParseConfigHost.FS",
+        "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:VfsParseConfigHost.GetCurrentDirectory"
+      ]
+    },
+    {
+      "expected_contract": "the same map built with useCaseSensitiveFileNames false: a differently cased spelling of a declared path resolves to the declared one, and the host reports case insensitivity",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/host/from-map-case-insensitive",
+      "last_result": "match",
+      "native_authority": "tools/phase1/config/tsoptionstest_probe_test.go against the pinned tsoptionstest package",
+      "operation_actions": {
+        "current_directory": [
+          "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:VfsParseConfigHost.GetCurrentDirectory"
+        ],
+        "fs": [
+          "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:VfsParseConfigHost.FS"
+        ],
+        "new_host": [
+          "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:NewVFSParseConfigHost"
+        ]
+      },
+      "operations": [
+        "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:NewVFSParseConfigHost",
+        "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:VfsParseConfigHost.FS",
+        "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:VfsParseConfigHost.GetCurrentDirectory"
+      ]
+    },
+    {
+      "expected_contract": "the control for the case above: with useCaseSensitiveFileNames true the same differently cased spellings must not resolve, which is what makes the insensitive case evidence rather than a coincidence",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/host/from-map-case-sensitive-control",
+      "last_result": "match",
+      "native_authority": "tools/phase1/config/tsoptionstest_probe_test.go against the pinned tsoptionstest package",
+      "operation_actions": {
+        "current_directory": [
+          "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:VfsParseConfigHost.GetCurrentDirectory"
+        ],
+        "fs": [
+          "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:VfsParseConfigHost.FS"
+        ],
+        "new_host": [
+          "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:NewVFSParseConfigHost"
+        ]
+      },
+      "operations": [
+        "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:NewVFSParseConfigHost",
+        "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:VfsParseConfigHost.FS",
+        "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:VfsParseConfigHost.GetCurrentDirectory"
+      ]
+    },
+    {
+      "expected_contract": "the factory over an empty map still answers: nothing exists, and the current directory is reported unchanged",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/host/from-map-empty",
+      "last_result": "match",
+      "native_authority": "tools/phase1/config/tsoptionstest_probe_test.go against the pinned tsoptionstest package",
+      "operation_actions": {
+        "current_directory": [
+          "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:VfsParseConfigHost.GetCurrentDirectory"
+        ],
+        "fs": [
+          "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:VfsParseConfigHost.FS"
+        ],
+        "new_host": [
+          "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:NewVFSParseConfigHost"
+        ]
+      },
+      "operations": [
+        "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:NewVFSParseConfigHost",
+        "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:VfsParseConfigHost.FS",
+        "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:VfsParseConfigHost.GetCurrentDirectory"
+      ]
+    },
+    {
+      "expected_contract": "the one-shot helper derives the config file name from the current directory, builds the source file and parses: the file names and diagnostics are the parse's own",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/host/parsed-command-line",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/tsoptions/tsoptionstest/parsedcommandline.go:GetParsedCommandLine"
+      ],
+      "native_authority": "tools/phase1/config/tsoptionstest_probe_test.go against the pinned tsoptionstest package",
+      "operation_actions": {
+        "get_parsed_command_line": [
+          "tsc/internal/tsoptions/tsoptionstest/parsedcommandline.go:GetParsedCommandLine"
+        ]
+      },
+      "operations": [
+        "tsc/internal/tsoptions/tsoptionstest/parsedcommandline.go:GetParsedCommandLine"
+      ]
+    },
+    {
+      "expected_contract": "the same helper over a config naming an unknown option, so the diagnostics the parse produced travel with the result rather than being dropped",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/host/parsed-command-line-errors",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/tsoptions/tsoptionstest/parsedcommandline.go:GetParsedCommandLine"
+      ],
+      "native_authority": "tools/phase1/config/tsoptionstest_probe_test.go against the pinned tsoptionstest package",
+      "operation_actions": {
+        "get_parsed_command_line": [
+          "tsc/internal/tsoptions/tsoptionstest/parsedcommandline.go:GetParsedCommandLine"
+        ]
+      },
+      "operations": [
+        "tsc/internal/tsoptions/tsoptionstest/parsedcommandline.go:GetParsedCommandLine"
+      ]
+    },
+    {
+      "expected_contract": "a non-absolute path handed to the host the factory built. This is a property of the FILESYSTEM the factory builds, not of the factory itself -- the pinned factory calls vfstest.FromMap, and that filesystem refuses a path that is not absolute -- but it is recorded here because every F3a probe reaches a filesystem through this factory, so it is the boundary at which a caller meets the refusal.",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/host/relative-path-refusal",
+      "last_result": "different",
+      "native_authority": "tools/phase1/config/tsoptionstest_probe_test.go against the pinned tsoptionstest package",
+      "operation_actions": {
+        "current_directory": [
+          "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:VfsParseConfigHost.GetCurrentDirectory"
+        ],
+        "fs": [
+          "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:VfsParseConfigHost.FS"
+        ],
+        "new_host": [
+          "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:NewVFSParseConfigHost"
+        ],
+        "new_host_with_symlinks": [
+          "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:NewVFSParseConfigHostWithSymlinks"
+        ]
+      },
+      "operations": [
+        "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:NewVFSParseConfigHost",
+        "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:NewVFSParseConfigHostWithSymlinks",
+        "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:VfsParseConfigHost.FS",
+        "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:VfsParseConfigHost.GetCurrentDirectory"
+      ]
+    },
+    {
+      "expected_contract": "a symlink declared with absolute paths on both sides: reading through the link returns the target's content and the link resolves to the target",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/host/symlinks-absolute",
+      "last_result": "match",
+      "native_authority": "tools/phase1/config/tsoptionstest_probe_test.go against the pinned tsoptionstest package",
+      "operation_actions": {
+        "current_directory": [
+          "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:VfsParseConfigHost.GetCurrentDirectory"
+        ],
+        "fs": [
+          "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:VfsParseConfigHost.FS"
+        ],
+        "new_host": [
+          "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:NewVFSParseConfigHost"
+        ],
+        "new_host_with_symlinks": [
+          "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:NewVFSParseConfigHostWithSymlinks"
+        ]
+      },
+      "operations": [
+        "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:NewVFSParseConfigHost",
+        "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:NewVFSParseConfigHostWithSymlinks",
+        "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:VfsParseConfigHost.FS",
+        "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:VfsParseConfigHost.GetCurrentDirectory"
+      ]
+    },
+    {
+      "expected_contract": "a symlink whose declared sides contain . and .. segments, so the normalization the factory performs is the difference between a reachable entry and an unreachable one",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/host/symlinks-dotted",
+      "last_result": "match",
+      "native_authority": "tools/phase1/config/tsoptionstest_probe_test.go against the pinned tsoptionstest package",
+      "operation_actions": {
+        "current_directory": [
+          "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:VfsParseConfigHost.GetCurrentDirectory"
+        ],
+        "fs": [
+          "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:VfsParseConfigHost.FS"
+        ],
+        "new_host": [
+          "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:NewVFSParseConfigHost"
+        ],
+        "new_host_with_symlinks": [
+          "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:NewVFSParseConfigHostWithSymlinks"
+        ]
+      },
+      "operations": [
+        "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:NewVFSParseConfigHost",
+        "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:NewVFSParseConfigHostWithSymlinks",
+        "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:VfsParseConfigHost.FS",
+        "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:VfsParseConfigHost.GetCurrentDirectory"
+      ]
+    },
+    {
+      "expected_contract": "an empty symlink map takes the pinned delegation branch to the plain factory, so the host is indistinguishable from the one the plain factory builds",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/host/symlinks-empty-delegates",
+      "last_result": "match",
+      "native_authority": "tools/phase1/config/tsoptionstest_probe_test.go against the pinned tsoptionstest package",
+      "operation_actions": {
+        "current_directory": [
+          "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:VfsParseConfigHost.GetCurrentDirectory"
+        ],
+        "fs": [
+          "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:VfsParseConfigHost.FS"
+        ],
+        "new_host": [
+          "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:NewVFSParseConfigHost"
+        ],
+        "new_host_with_symlinks": [
+          "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:NewVFSParseConfigHostWithSymlinks"
+        ]
+      },
+      "operations": [
+        "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:NewVFSParseConfigHost",
+        "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:NewVFSParseConfigHostWithSymlinks",
+        "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:VfsParseConfigHost.FS",
+        "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:VfsParseConfigHost.GetCurrentDirectory"
+      ]
+    },
+    {
+      "expected_contract": "a symlink declared with relative paths: the factory normalizes both sides against the current directory before building the entry, so the link is reachable at its absolute spelling",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/host/symlinks-relative",
+      "last_result": "match",
+      "native_authority": "tools/phase1/config/tsoptionstest_probe_test.go against the pinned tsoptionstest package",
+      "operation_actions": {
+        "current_directory": [
+          "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:VfsParseConfigHost.GetCurrentDirectory"
+        ],
+        "fs": [
+          "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:VfsParseConfigHost.FS"
+        ],
+        "new_host": [
+          "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:NewVFSParseConfigHost"
+        ],
+        "new_host_with_symlinks": [
+          "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:NewVFSParseConfigHostWithSymlinks"
+        ]
+      },
+      "operations": [
+        "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:NewVFSParseConfigHost",
+        "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:NewVFSParseConfigHostWithSymlinks",
+        "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:VfsParseConfigHost.FS",
+        "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:VfsParseConfigHost.GetCurrentDirectory"
+      ]
+    },
+    {
       "baseline": "config/tsconfigParsing/allow dotted files and folders when explicitly requested with json api.js",
       "coverage_operations": [],
       "expected_contract": "the frozen config/tsconfigParsing/allow dotted files and folders when explicitly requested baseline for the json entry point, rebuilt from the pinned package-level input table and reproduced byte for byte",

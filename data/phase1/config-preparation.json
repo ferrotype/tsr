@@ -1,5 +1,5 @@
 {
-  "accounted_operations": 47,
+  "accounted_operations": 52,
   "complete": false,
   "exempt_by_category": {},
   "exempt_operations": 0,
@@ -3354,31 +3354,6 @@
     },
     {
       "disposition": "implemented_untested",
-      "operation": "tsc/internal/tsoptions/tsoptionstest/parsedcommandline.go:GetParsedCommandLine",
-      "rust_home": []
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:NewVFSParseConfigHost",
-      "rust_home": []
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:NewVFSParseConfigHostWithSymlinks",
-      "rust_home": []
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:VfsParseConfigHost.FS",
-      "rust_home": []
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:VfsParseConfigHost.GetCurrentDirectory",
-      "rust_home": []
-    },
-    {
-      "disposition": "implemented_untested",
       "operation": "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:fixRoot",
       "rust_home": []
     },
@@ -3399,7 +3374,7 @@
     }
   ],
   "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
-  "prepared_operations": 0,
+  "prepared_operations": 5,
   "roster_problems": [],
   "step": "config",
   "total_operations": 402,

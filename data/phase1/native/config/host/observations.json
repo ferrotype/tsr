@@ -1,0 +1,1356 @@
+{
+  "go": "go1.27.1",
+  "goarch": "arm64",
+  "goos": "darwin",
+  "observations": [
+    {
+      "case": "config/commandline/handles-did-you-mean-for-misspelt-flags",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/handles-may-only-be-used-with-build-flags",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/parse-lib-option-with-extra-comma",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/parse-lib-option-with-trailing-white-space",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/parse-empty-options-of-jsx",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/parse-empty-options-of-lib",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/parse-empty-options-of-module",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/parse-empty-options-of-moduleresolution",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/parse-empty-options-of-newline",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/parse-empty-options-of-target",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/parse-empty-string-of-lib",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/parse-explicit-boolean-flag-value",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/parse-immediately-following-command-line-argument-of-lib",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/parse-implicit-boolean-flag-value",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/parse-invalid-option-of-library-flags",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/parse-multiple-compiler-flags-with-input-files-at-the-end",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/parse-multiple-compiler-flags-with-input-files-in-the-middle",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/parse-multiple-library-compiler-flags",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/parse-multiple-options-of-library-flags",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/parse-non-boolean-argument-after-boolean-flag",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/parse-single-option-of-library-flag",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/allows-setting-option-type-boolean-to-false",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/allows-tsconfig-only-option-to-be-set-to-null",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/errors-on-invalid-excludedirectories",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/errors-on-invalid-excludefiles",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/errors-on-missing-argument-to-fallbackpolling",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/option-of-type-boolean-allows-setting-it-to-null",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/option-of-type-boolean-errors-if-its-followed-by-another-option",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/option-of-type-boolean-errors-if-its-last-option",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/option-of-type-boolean-errors-if-non-null-value-is-passed",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/option-of-type-list-allows-setting-it-to-null",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/option-of-type-list-errors-if-its-followed-by-another-option",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/option-of-type-list-errors-if-its-last-option",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/option-of-type-list-errors-if-non-null-value-is-passed",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/option-of-type-number-allows-setting-it-to-null",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/option-of-type-number-errors-if-its-followed-by-another-option",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/option-of-type-number-errors-if-its-last-option",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/option-of-type-number-errors-if-non-null-value-is-passed",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/option-of-type-object-allows-setting-it-to-null",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/option-of-type-object-errors-if-its-followed-by-another-option",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/option-of-type-object-errors-if-its-last-option",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/option-of-type-string-allows-setting-it-to-null",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/option-of-type-string-errors-if-its-followed-by-another-option",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/option-of-type-string-errors-if-its-last-option",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/option-of-type-string-errors-if-non-null-value-is-passed",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/parse-excludedirectories",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/parse-excludefiles",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/parse-fallbackpolling",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/parse-incremental",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/parse-synchronouswatchdirectory",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/parse-tsbuildinfofile",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/parse-watchdirectory",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandline/parse-watchfile",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/buildoptions/clean-and-force-together-is-invalid",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/buildoptions/clean-and-verbose-together-is-invalid",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/buildoptions/clean-and-watch-together-is-invalid",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/buildoptions/singlethreaded-and-builders-together",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/buildoptions/watch-and-dry-together-is-invalid",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/buildoptions/parse-multiple-flags-with-input-projects-at-the-end",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/buildoptions/parse-multiple-flags-with-input-projects-in-the-beginning",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/buildoptions/parse-multiple-flags-with-input-projects-in-the-middle",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/buildoptions/parse-multiple-options",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/buildoptions/parse-option-with-invalid-option",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/buildoptions/errors-on-invalid-excludedirectories",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/buildoptions/errors-on-invalid-excludefiles",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/buildoptions/errors-on-missing-argument",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/buildoptions/parse-builders",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/buildoptions/parse-excludefiles",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/buildoptions/parse-fallbackpolling",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/buildoptions/parse-synchronouswatchdirectory",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/buildoptions/parse-watchdirectory",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/buildoptions/parse-watchfile",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/buildoptions/parse-build-with-incremental",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/buildoptions/parse-build-with-locale-en-us",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/buildoptions/parse-build-with-tsbuildinfofile",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/buildoptions/parse-build-without-any-options",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/buildoptions/reports-error-when-builders-is-0",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/buildoptions/reports-error-when-builders-is-invalid-type",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/buildoptions/reports-error-when-builders-is-negative",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/buildoptions/reports-other-common-may-not-be-used-with-build-flags",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/convert-correctly-format-tsconfig-json-to-typeacquisition-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/convert-correctly-format-tsconfig-json-to-typeacquisition-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/convert-default-jsconfig-json-to-typeacquisition-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/convert-default-jsconfig-json-to-typeacquisition-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/convert-default-tsconfig-json-to-typeacquisition-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/convert-default-tsconfig-json-to-typeacquisition-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/convert-incorrect-format-jsconfig-json-to-typeacquisition-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/convert-incorrect-format-jsconfig-json-to-typeacquisition-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/convert-incorrect-format-tsconfig-json-to-typeacquisition-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/convert-incorrect-format-tsconfig-json-to-typeacquisition-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/convert-jsconfig-json-to-typeacquisition-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/convert-jsconfig-json-to-typeacquisition-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/convert-jsconfig-json-with-only-enable-property-to-typeacquisition-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/convert-jsconfig-json-with-only-enable-property-to-typeacquisition-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/convert-tsconfig-json-with-only-enable-property-to-typeacquisition-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/convert-tsconfig-json-with-only-enable-property-to-typeacquisition-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/allow-dotted-files-and-folders-when-explicitly-requested-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/allow-dotted-files-and-folders-when-explicitly-requested-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/does-not-generate-errors-for-empty-files-list-when-one-or-more-references-are-provided-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/does-not-generate-errors-for-empty-files-list-when-one-or-more-references-are-provided-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/exclude-declarationdir-unless-overridden-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/exclude-declarationdir-unless-overridden-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/exclude-outdir-unless-overridden-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/exclude-outdir-unless-overridden-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/generates-errors-for-directory-with-no-ts-files-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/generates-errors-for-directory-with-no-ts-files-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/generates-errors-for-empty-directory-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/generates-errors-for-empty-directory-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/generates-errors-for-empty-files-list-when-no-references-are-provided-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/generates-errors-for-empty-files-list-when-no-references-are-provided-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/generates-errors-for-empty-files-list-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/generates-errors-for-empty-files-list-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/generates-errors-for-empty-include-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/generates-errors-for-empty-include-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/generates-errors-for-include-with-parent-directory-after-recursive-wildcard-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/generates-errors-for-include-with-parent-directory-after-recursive-wildcard-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/generates-errors-for-includes-with-outdir-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/generates-errors-for-includes-with-outdir-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/generates-errors-when-commandline-option-is-in-tsconfig-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/generates-errors-when-commandline-option-is-in-tsconfig-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/generates-errors-when-files-is-not-string-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/generates-errors-when-files-is-not-string-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/generates-errors-when-include-is-not-string-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/generates-errors-when-include-is-not-string-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/handles-empty-types-array-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/handles-empty-types-array-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/handles-escaped-characters-in-strings-correctly-jsonparse",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/ignore-dotted-files-and-folders-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/ignore-dotted-files-and-folders-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/implicitly-exclude-common-package-folders-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/implicitly-exclude-common-package-folders-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/issue-1267-scenario-extended-files-not-picked-up-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/issue-1267-scenario-extended-files-not-picked-up-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/keeps-string-content-untouched-jsonparse",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/null-overrides-in-extended-tsconfig-array-fields-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/null-overrides-in-extended-tsconfig-array-fields-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/null-overrides-in-extended-tsconfig-mixed-field-types-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/null-overrides-in-extended-tsconfig-mixed-field-types-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/null-overrides-in-extended-tsconfig-string-fields-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/null-overrides-in-extended-tsconfig-string-fields-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/null-overrides-in-middle-level-of-extends-chain-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/null-overrides-in-middle-level-of-extends-chain-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/null-overrides-with-multiple-extends-levels-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/null-overrides-with-multiple-extends-levels-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/parses-tsconfig-with-compileroptions-files-include-and-exclude-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/parses-tsconfig-with-compileroptions-files-include-and-exclude-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/parses-tsconfig-with-extends-and-configdir-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/parses-tsconfig-with-extends-and-configdir-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/parses-tsconfig-with-extends-files-include-and-other-options-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/parses-tsconfig-with-extends-files-include-and-other-options-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/reports-error-for-an-unknown-option-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/reports-error-for-an-unknown-option-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/reports-errors-for-incorrectly-cased-option-names-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/reports-errors-for-incorrectly-cased-option-names-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/reports-errors-for-wrong-type-option-and-invalid-enum-value-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/reports-errors-for-wrong-type-option-and-invalid-enum-value-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/reports-spelling-suggestion-for-an-unknown-option-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/reports-spelling-suggestion-for-an-unknown-option-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/returns-config-object-without-comments-jsonparse",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/returns-empty-config-for-file-with-comments-only-jsonparse",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/returns-empty-config-for-file-with-only-whitespaces-jsonparse",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/returns-empty-config-when-config-is-empty-object-jsonparse",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/returns-error-when-tsconfig-have-excludes-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/returns-error-when-tsconfig-have-excludes-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/returns-object-when-users-correctly-specify-library-jsonparse",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/with-outdir-from-base-tsconfig-json-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/tsconfigparsing/with-outdir-from-base-tsconfig-jsonsourcefile-api",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/host/from-map",
+      "observation": {
+        "current_directory": "/project",
+        "ordered": [
+          {
+            "content": "{\"compilerOptions\":{\"strict\":true}}",
+            "directory_exists": false,
+            "file_exists": true,
+            "path": "/project/tsconfig.json",
+            "realpath": "/project/tsconfig.json",
+            "refused": false
+          },
+          {
+            "content": null,
+            "directory_exists": true,
+            "file_exists": false,
+            "path": "/project/src",
+            "realpath": "/project/src",
+            "refused": false
+          },
+          {
+            "content": "export const a = 1;\n",
+            "directory_exists": false,
+            "file_exists": true,
+            "path": "/project/src/a.ts",
+            "realpath": "/project/src/a.ts",
+            "refused": false
+          },
+          {
+            "content": null,
+            "directory_exists": false,
+            "file_exists": false,
+            "path": "/project/src/missing.ts",
+            "realpath": "/project/src/missing.ts",
+            "refused": false
+          },
+          {
+            "content": null,
+            "directory_exists": true,
+            "file_exists": false,
+            "path": "/project",
+            "realpath": "/project",
+            "refused": false
+          }
+        ],
+        "use_case_sensitive_file_names": true
+      },
+      "operation": "tsoptionstest.parseConfigHost",
+      "result": "observed"
+    },
+    {
+      "case": "config/host/from-map-case-insensitive",
+      "observation": {
+        "current_directory": "/project",
+        "ordered": [
+          {
+            "content": "{\"compilerOptions\":{\"strict\":true}}",
+            "directory_exists": false,
+            "file_exists": true,
+            "path": "/PROJECT/TSCONFIG.JSON",
+            "realpath": "/project/tsconfig.json",
+            "refused": false
+          },
+          {
+            "content": "export const a = 1;\n",
+            "directory_exists": false,
+            "file_exists": true,
+            "path": "/project/SRC/A.ts",
+            "realpath": "/project/src/a.ts",
+            "refused": false
+          },
+          {
+            "content": "export const a = 1;\n",
+            "directory_exists": false,
+            "file_exists": true,
+            "path": "/project/src/a.ts",
+            "realpath": "/project/src/a.ts",
+            "refused": false
+          }
+        ],
+        "use_case_sensitive_file_names": false
+      },
+      "operation": "tsoptionstest.parseConfigHost",
+      "result": "observed"
+    },
+    {
+      "case": "config/host/from-map-case-sensitive-control",
+      "observation": {
+        "current_directory": "/project",
+        "ordered": [
+          {
+            "content": null,
+            "directory_exists": false,
+            "file_exists": false,
+            "path": "/PROJECT/TSCONFIG.JSON",
+            "realpath": "/PROJECT/TSCONFIG.JSON",
+            "refused": false
+          },
+          {
+            "content": null,
+            "directory_exists": false,
+            "file_exists": false,
+            "path": "/project/SRC/A.ts",
+            "realpath": "/project/SRC/A.ts",
+            "refused": false
+          },
+          {
+            "content": "export const a = 1;\n",
+            "directory_exists": false,
+            "file_exists": true,
+            "path": "/project/src/a.ts",
+            "realpath": "/project/src/a.ts",
+            "refused": false
+          }
+        ],
+        "use_case_sensitive_file_names": true
+      },
+      "operation": "tsoptionstest.parseConfigHost",
+      "result": "observed"
+    },
+    {
+      "case": "config/host/from-map-empty",
+      "observation": {
+        "current_directory": "/project",
+        "ordered": [
+          {
+            "content": null,
+            "directory_exists": false,
+            "file_exists": false,
+            "path": "/project",
+            "realpath": "/project",
+            "refused": false
+          },
+          {
+            "content": null,
+            "directory_exists": false,
+            "file_exists": false,
+            "path": "/project/tsconfig.json",
+            "realpath": "/project/tsconfig.json",
+            "refused": false
+          }
+        ],
+        "use_case_sensitive_file_names": true
+      },
+      "operation": "tsoptionstest.parseConfigHost",
+      "result": "observed"
+    },
+    {
+      "case": "config/host/parsed-command-line",
+      "observation": {
+        "config_file_name": "/project/tsconfig.json",
+        "error_codes": [],
+        "file_names": [
+          "/project/src/a.ts",
+          "/project/src/b.ts"
+        ],
+        "has_config_file": true
+      },
+      "operation": "tsoptionstest.parseConfigHost",
+      "result": "observed"
+    },
+    {
+      "case": "config/host/parsed-command-line-errors",
+      "observation": {
+        "config_file_name": "/project/tsconfig.json",
+        "error_codes": [
+          5025
+        ],
+        "file_names": [
+          "/project/src/a.ts"
+        ],
+        "has_config_file": true
+      },
+      "operation": "tsoptionstest.parseConfigHost",
+      "result": "observed"
+    },
+    {
+      "case": "config/host/relative-path-refusal",
+      "observation": {
+        "current_directory": "/project",
+        "ordered": [
+          {
+            "path": "link.ts",
+            "refused": true
+          },
+          {
+            "path": "./src/b.ts",
+            "refused": true
+          },
+          {
+            "content": "export const b = 2;\n",
+            "directory_exists": false,
+            "file_exists": true,
+            "path": "/project/src/b.ts",
+            "realpath": "/project/src/b.ts",
+            "refused": false
+          }
+        ],
+        "symlinks": [
+          {
+            "declared_link": "link.ts",
+            "declared_target": "src/b.ts",
+            "normalized_link": "/project/link.ts",
+            "normalized_target": "/project/src/b.ts"
+          }
+        ],
+        "use_case_sensitive_file_names": true
+      },
+      "operation": "tsoptionstest.parseConfigHost",
+      "result": "observed"
+    },
+    {
+      "case": "config/host/symlinks-absolute",
+      "observation": {
+        "current_directory": "/project",
+        "ordered": [
+          {
+            "content": "export const a = 1;\n",
+            "directory_exists": false,
+            "file_exists": true,
+            "path": "/project/link.ts",
+            "realpath": "/project/src/a.ts",
+            "refused": false
+          },
+          {
+            "content": "export const a = 1;\n",
+            "directory_exists": false,
+            "file_exists": true,
+            "path": "/project/src/a.ts",
+            "realpath": "/project/src/a.ts",
+            "refused": false
+          }
+        ],
+        "symlinks": [
+          {
+            "declared_link": "/project/link.ts",
+            "declared_target": "/project/src/a.ts",
+            "normalized_link": "/project/link.ts",
+            "normalized_target": "/project/src/a.ts"
+          }
+        ],
+        "use_case_sensitive_file_names": true
+      },
+      "operation": "tsoptionstest.parseConfigHost",
+      "result": "observed"
+    },
+    {
+      "case": "config/host/symlinks-dotted",
+      "observation": {
+        "current_directory": "/project",
+        "ordered": [
+          {
+            "content": "export const a = 1;\n",
+            "directory_exists": false,
+            "file_exists": true,
+            "path": "/project/link.ts",
+            "realpath": "/project/src/a.ts",
+            "refused": false
+          },
+          {
+            "content": "export const a = 1;\n",
+            "directory_exists": false,
+            "file_exists": true,
+            "path": "/project/nested/../link.ts",
+            "realpath": "/project/src/a.ts",
+            "refused": false
+          }
+        ],
+        "symlinks": [
+          {
+            "declared_link": "/project/./nested/../link.ts",
+            "declared_target": "/project/src/../src/a.ts",
+            "normalized_link": "/project/link.ts",
+            "normalized_target": "/project/src/a.ts"
+          }
+        ],
+        "use_case_sensitive_file_names": true
+      },
+      "operation": "tsoptionstest.parseConfigHost",
+      "result": "observed"
+    },
+    {
+      "case": "config/host/symlinks-empty-delegates",
+      "observation": {
+        "current_directory": "/project",
+        "ordered": [
+          {
+            "content": "{\"compilerOptions\":{\"strict\":true}}",
+            "directory_exists": false,
+            "file_exists": true,
+            "path": "/project/tsconfig.json",
+            "realpath": "/project/tsconfig.json",
+            "refused": false
+          },
+          {
+            "content": "export const a = 1;\n",
+            "directory_exists": false,
+            "file_exists": true,
+            "path": "/project/src/a.ts",
+            "realpath": "/project/src/a.ts",
+            "refused": false
+          }
+        ],
+        "symlinks": [],
+        "use_case_sensitive_file_names": true
+      },
+      "operation": "tsoptionstest.parseConfigHost",
+      "result": "observed"
+    },
+    {
+      "case": "config/host/symlinks-relative",
+      "observation": {
+        "current_directory": "/project",
+        "ordered": [
+          {
+            "content": "export const b = 2;\n",
+            "directory_exists": false,
+            "file_exists": true,
+            "path": "/project/link.ts",
+            "realpath": "/project/src/b.ts",
+            "refused": false
+          },
+          {
+            "content": "export const b = 2;\n",
+            "directory_exists": false,
+            "file_exists": true,
+            "path": "/project/src/b.ts",
+            "realpath": "/project/src/b.ts",
+            "refused": false
+          }
+        ],
+        "symlinks": [
+          {
+            "declared_link": "link.ts",
+            "declared_target": "src/b.ts",
+            "normalized_link": "/project/link.ts",
+            "normalized_target": "/project/src/b.ts"
+          }
+        ],
+        "use_case_sensitive_file_names": true
+      },
+      "operation": "tsoptionstest.parseConfigHost",
+      "result": "observed"
+    }
+  ],
+  "request_sha256": "227f28d614f1acb6e61557864e15c80ac4ac2611fab15f620b6800a98e9feea6",
+  "version": 1
+}

@@ -2620,8 +2620,74 @@
       },
       "operation": "tsoptions.tsconfigParsingBaseline",
       "result": "observed"
+    },
+    {
+      "case": "config/host/from-map",
+      "operation": "tsoptionstest.parseConfigHost",
+      "reason": "operation is not served by the tsconfigParsing baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/host/from-map-case-insensitive",
+      "operation": "tsoptionstest.parseConfigHost",
+      "reason": "operation is not served by the tsconfigParsing baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/host/from-map-case-sensitive-control",
+      "operation": "tsoptionstest.parseConfigHost",
+      "reason": "operation is not served by the tsconfigParsing baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/host/from-map-empty",
+      "operation": "tsoptionstest.parseConfigHost",
+      "reason": "operation is not served by the tsconfigParsing baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/host/parsed-command-line",
+      "operation": "tsoptionstest.parseConfigHost",
+      "reason": "operation is not served by the tsconfigParsing baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/host/parsed-command-line-errors",
+      "operation": "tsoptionstest.parseConfigHost",
+      "reason": "operation is not served by the tsconfigParsing baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/host/relative-path-refusal",
+      "operation": "tsoptionstest.parseConfigHost",
+      "reason": "operation is not served by the tsconfigParsing baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/host/symlinks-absolute",
+      "operation": "tsoptionstest.parseConfigHost",
+      "reason": "operation is not served by the tsconfigParsing baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/host/symlinks-dotted",
+      "operation": "tsoptionstest.parseConfigHost",
+      "reason": "operation is not served by the tsconfigParsing baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/host/symlinks-empty-delegates",
+      "operation": "tsoptionstest.parseConfigHost",
+      "reason": "operation is not served by the tsconfigParsing baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/host/symlinks-relative",
+      "operation": "tsoptionstest.parseConfigHost",
+      "reason": "operation is not served by the tsconfigParsing baseline probe",
+      "result": "native_unavailable"
     }
   ],
-  "request_sha256": "505cc1087569d9f25b294f8dc226f5baf8862ae0ff8d3c00e8082000ab047106",
+  "request_sha256": "227f28d614f1acb6e61557864e15c80ac4ac2611fab15f620b6800a98e9feea6",
   "version": 1
 }

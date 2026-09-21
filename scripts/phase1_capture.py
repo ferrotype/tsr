@@ -268,6 +268,7 @@ FAMILIES = {
         "requests": [
             "data/phase1/requests/config-commandline.json",
             "data/phase1/requests/config-tsconfigparsing.json",
+            "data/phase1/requests/config-host.json",
         ],
         "native_probes": [
             # The 53 + 27 `tsoptions/commandLineParsing` outputs. It compiles
@@ -292,6 +293,12 @@ FAMILIES = {
              "probe": "tools/phase1/config/tsconfigparsing_probe_test.go",
              "test": "TestPhase1ConfigTsconfigParsing",
              "trimpath": False},
+            # The pinned parse-config host factory. Its own package, so its own
+            # overlay; it links neither `internal/repo` nor
+            # `internal/testutil/baseline`, so it keeps -trimpath.
+            {"name": "host", "package": "tsoptions/tsoptionstest",
+             "probe": "tools/phase1/config/tsoptionstest_probe_test.go",
+             "test": "TestPhase1ConfigHost"},
         ],
         "rust_package": "phase1_config",
         "rust_target_kind": "bin",

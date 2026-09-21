@@ -1,10 +1,10 @@
 {
   "counts": {
-    "covered": 251,
+    "covered": 255,
     "equivalent_rust": 8,
-    "implemented_untested": 3245,
+    "implemented_untested": 3240,
     "later_phase": 18,
-    "missing": 1273
+    "missing": 1274
   },
   "dispositions": [
     "covered",
@@ -239113,9 +239113,12 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "a prepared case runs and reports the Rust entry point absent: config/host/parsed-command-line, config/host/parsed-command-line-errors; witnessed by 2 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/host/parsed-command-line",
+        "config/host/parsed-command-line-errors"
+      ],
       "depends_on": [
         "internal/tsoptions",
         "internal/tspath",
@@ -239123,7 +239126,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "missing",
       "go_package": "internal/tsoptions/tsoptionstest",
       "go_source": "tsc/internal/tsoptions/tsoptionstest/parsedcommandline.go",
       "id": "tsc/internal/tsoptions/tsoptionstest/parsedcommandline.go:GetParsedCommandLine",
@@ -239136,7 +239139,7 @@
       "membership_reason": "the pinned config test host",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [],
@@ -239144,9 +239147,18 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 8 exact link(s): config/host/from-map, config/host/from-map-case-insensitive, config/host/from-map-case-sensitive-control",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/host/from-map",
+        "config/host/from-map-case-insensitive",
+        "config/host/from-map-case-sensitive-control",
+        "config/host/from-map-empty",
+        "config/host/symlinks-absolute",
+        "config/host/symlinks-dotted",
+        "config/host/symlinks-empty-delegates",
+        "config/host/symlinks-relative"
+      ],
       "depends_on": [
         "internal/tsoptions",
         "internal/tspath",
@@ -239154,7 +239166,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/tsoptions/tsoptionstest",
       "go_source": "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go",
       "id": "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:NewVFSParseConfigHost",
@@ -239167,7 +239179,7 @@
       "membership_reason": "the pinned config test host",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [],
@@ -239175,9 +239187,14 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 4 exact link(s): config/host/symlinks-absolute, config/host/symlinks-dotted, config/host/symlinks-empty-delegates",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/host/symlinks-absolute",
+        "config/host/symlinks-dotted",
+        "config/host/symlinks-empty-delegates",
+        "config/host/symlinks-relative"
+      ],
       "depends_on": [
         "internal/tsoptions",
         "internal/tspath",
@@ -239185,7 +239202,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/tsoptions/tsoptionstest",
       "go_source": "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go",
       "id": "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:NewVFSParseConfigHostWithSymlinks",
@@ -239198,7 +239215,7 @@
       "membership_reason": "the pinned config test host",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [],
@@ -239206,9 +239223,18 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 8 exact link(s): config/host/from-map, config/host/from-map-case-insensitive, config/host/from-map-case-sensitive-control",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/host/from-map",
+        "config/host/from-map-case-insensitive",
+        "config/host/from-map-case-sensitive-control",
+        "config/host/from-map-empty",
+        "config/host/symlinks-absolute",
+        "config/host/symlinks-dotted",
+        "config/host/symlinks-empty-delegates",
+        "config/host/symlinks-relative"
+      ],
       "depends_on": [
         "internal/tsoptions",
         "internal/tspath",
@@ -239216,7 +239242,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/tsoptions/tsoptionstest",
       "go_source": "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go",
       "id": "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:VfsParseConfigHost.FS",
@@ -239229,7 +239255,7 @@
       "membership_reason": "the pinned config test host",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [],
@@ -239237,9 +239263,18 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 8 exact link(s): config/host/from-map, config/host/from-map-case-insensitive, config/host/from-map-case-sensitive-control",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/host/from-map",
+        "config/host/from-map-case-insensitive",
+        "config/host/from-map-case-sensitive-control",
+        "config/host/from-map-empty",
+        "config/host/symlinks-absolute",
+        "config/host/symlinks-dotted",
+        "config/host/symlinks-empty-delegates",
+        "config/host/symlinks-relative"
+      ],
       "depends_on": [
         "internal/tsoptions",
         "internal/tspath",
@@ -239247,7 +239282,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/tsoptions/tsoptionstest",
       "go_source": "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go",
       "id": "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:VfsParseConfigHost.GetCurrentDirectory",
@@ -239260,7 +239295,7 @@
       "membership_reason": "the pinned config test host",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [],
