@@ -31938,8 +31938,13 @@
       "end_line": 37,
       "file": "tsc/internal/collections/ordered_map.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_core/src/collections/ordered_map.rs",
+          "line": 206
+        }
+      ],
       "source_sha256": "7ce14cc18c13e72e40206d06bf08509ac55715efc0ef184e731701b18e10f8b3",
       "start_line": 34
     },
@@ -31947,8 +31952,13 @@
       "end_line": 206,
       "file": "tsc/internal/collections/ordered_map.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_core/src/collections/ordered_map.rs",
+          "line": 20
+        }
+      ],
       "source_sha256": "7ce14cc18c13e72e40206d06bf08509ac55715efc0ef184e731701b18e10f8b3",
       "start_line": 199
     },
@@ -31956,8 +31966,13 @@
       "end_line": 125,
       "file": "tsc/internal/collections/ordered_map.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_core/src/collections/ordered_map.rs",
+          "line": 111
+        }
+      ],
       "source_sha256": "7ce14cc18c13e72e40206d06bf08509ac55715efc0ef184e731701b18e10f8b3",
       "start_line": 102
     },
@@ -31965,8 +31980,13 @@
       "end_line": 179,
       "file": "tsc/internal/collections/ordered_map.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_core/src/collections/ordered_map.rs",
+          "line": 101
+        }
+      ],
       "source_sha256": "7ce14cc18c13e72e40206d06bf08509ac55715efc0ef184e731701b18e10f8b3",
       "start_line": 164
     },
@@ -31974,8 +31994,13 @@
       "end_line": 75,
       "file": "tsc/internal/collections/ordered_map.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_core/src/collections/ordered_map.rs",
+          "line": 77
+        }
+      ],
       "source_sha256": "7ce14cc18c13e72e40206d06bf08509ac55715efc0ef184e731701b18e10f8b3",
       "start_line": 72
     },
@@ -31983,8 +32008,13 @@
       "end_line": 80,
       "file": "tsc/internal/collections/ordered_map.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_core/src/collections/ordered_map.rs",
+          "line": 196
+        }
+      ],
       "source_sha256": "7ce14cc18c13e72e40206d06bf08509ac55715efc0ef184e731701b18e10f8b3",
       "start_line": 78
     },
@@ -31992,8 +32022,13 @@
       "end_line": 99,
       "file": "tsc/internal/collections/ordered_map.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_core/src/collections/ordered_map.rs",
+          "line": 85
+        }
+      ],
       "source_sha256": "7ce14cc18c13e72e40206d06bf08509ac55715efc0ef184e731701b18e10f8b3",
       "start_line": 96
     },
@@ -32001,8 +32036,13 @@
       "end_line": 143,
       "file": "tsc/internal/collections/ordered_map.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_core/src/collections/ordered_map.rs",
+          "line": 58
+        }
+      ],
       "source_sha256": "7ce14cc18c13e72e40206d06bf08509ac55715efc0ef184e731701b18e10f8b3",
       "start_line": 129
     },
@@ -32010,8 +32050,13 @@
       "end_line": 69,
       "file": "tsc/internal/collections/ordered_map.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_core/src/collections/ordered_map.rs",
+          "line": 160
+        }
+      ],
       "source_sha256": "7ce14cc18c13e72e40206d06bf08509ac55715efc0ef184e731701b18e10f8b3",
       "start_line": 60
     },
@@ -32019,8 +32064,13 @@
       "end_line": 196,
       "file": "tsc/internal/collections/ordered_map.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_core/src/collections/ordered_map.rs",
+          "line": 49
+        }
+      ],
       "source_sha256": "7ce14cc18c13e72e40206d06bf08509ac55715efc0ef184e731701b18e10f8b3",
       "start_line": 190
     },
@@ -32028,8 +32078,13 @@
       "end_line": 161,
       "file": "tsc/internal/collections/ordered_map.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_core/src/collections/ordered_map.rs",
+          "line": 106
+        }
+      ],
       "source_sha256": "7ce14cc18c13e72e40206d06bf08509ac55715efc0ef184e731701b18e10f8b3",
       "start_line": 147
     },
@@ -32037,8 +32092,13 @@
       "end_line": 213,
       "file": "tsc/internal/collections/ordered_map.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_core/src/collections/ordered_map.rs",
+          "line": 21
+        }
+      ],
       "source_sha256": "7ce14cc18c13e72e40206d06bf08509ac55715efc0ef184e731701b18e10f8b3",
       "start_line": 208
     },
@@ -32046,8 +32106,13 @@
       "end_line": 44,
       "file": "tsc/internal/collections/ordered_map.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_core/src/collections/ordered_map.rs",
+          "line": 207
+        }
+      ],
       "source_sha256": "7ce14cc18c13e72e40206d06bf08509ac55715efc0ef184e731701b18e10f8b3",
       "start_line": 39
     },
@@ -33717,7 +33782,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_core/src/lib.rs",
-          "line": 154
+          "line": 155
         }
       ],
       "source_sha256": "dad1b4d0bb8fbd4a1c3c686a6a4fff940cfac17551c7c5ca564c33273e2277e4",
@@ -33731,7 +33796,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_core/src/lib.rs",
-          "line": 167
+          "line": 168
         }
       ],
       "source_sha256": "dad1b4d0bb8fbd4a1c3c686a6a4fff940cfac17551c7c5ca564c33273e2277e4",
@@ -33745,7 +33810,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_core/src/lib.rs",
-          "line": 162
+          "line": 163
         }
       ],
       "source_sha256": "dad1b4d0bb8fbd4a1c3c686a6a4fff940cfac17551c7c5ca564c33273e2277e4",

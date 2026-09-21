@@ -1,10 +1,10 @@
 {
   "counts": {
-    "covered": 421,
+    "covered": 455,
     "equivalent_rust": 8,
     "implemented_untested": 3164,
     "later_phase": 18,
-    "missing": 1184
+    "missing": 1150
   },
   "dispositions": [
     "covered",
@@ -137137,8 +137137,84 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/cow-map-empty-scope-write-discarded; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/cow.rs"
+      ],
+      "basis": "witnessed by 3 exact link(s): leaves/core-collections/cow-map-empty-scope-write-discarded, leaves/core-collections/cow-map-nested-scopes-restore-level-by-level, leaves/core-collections/cow-map-scope-write-not-visible-to-parent",
+      "basis_kind": "rule",
+      "cases": [
+        "leaves/core-collections/cow-map-empty-scope-write-discarded",
+        "leaves/core-collections/cow-map-nested-scopes-restore-level-by-level",
+        "leaves/core-collections/cow-map-scope-write-not-visible-to-parent"
+      ],
+      "depends_on": [
+        "internal/json"
+      ],
+      "destination_phase": 1,
+      "disposition": "covered",
+      "go_package": "internal/collections",
+      "go_source": "tsc/internal/collections/cow.go",
+      "id": "tsc/internal/collections/cow.go:CopyOnWriteMap.EnterScope",
+      "ledger_crate": "tsr_collections",
+      "ledger_phase": 1,
+      "ledger_status": "in-progress",
+      "ledger_verification": [],
+      "mapped_in_ledger": false,
+      "membership": "full",
+      "membership_reason": "ordered maps/sets and copy-on-write scopes",
+      "roster": {
+        "owner": null,
+        "state": "prepared",
+        "step": "leaves"
+      },
+      "rust_home": [
+        "crates/tsr_core/src/collections/cow.rs"
+      ],
+      "symbol": "CopyOnWriteMap.EnterScope"
+    },
+    {
+      "actual_home": "tsr_core and consumer-local collections",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/cow.rs"
+      ],
+      "basis": "witnessed by 3 exact link(s): leaves/core-collections/cow-map-empty-scope-write-discarded, leaves/core-collections/cow-map-nested-scopes-restore-level-by-level, leaves/core-collections/cow-map-scope-write-not-visible-to-parent",
+      "basis_kind": "rule",
+      "cases": [
+        "leaves/core-collections/cow-map-empty-scope-write-discarded",
+        "leaves/core-collections/cow-map-nested-scopes-restore-level-by-level",
+        "leaves/core-collections/cow-map-scope-write-not-visible-to-parent"
+      ],
+      "depends_on": [
+        "internal/json"
+      ],
+      "destination_phase": 1,
+      "disposition": "covered",
+      "go_package": "internal/collections",
+      "go_source": "tsc/internal/collections/cow.go",
+      "id": "tsc/internal/collections/cow.go:CopyOnWriteMap.Get",
+      "ledger_crate": "tsr_collections",
+      "ledger_phase": 1,
+      "ledger_status": "in-progress",
+      "ledger_verification": [],
+      "mapped_in_ledger": false,
+      "membership": "full",
+      "membership_reason": "ordered maps/sets and copy-on-write scopes",
+      "roster": {
+        "owner": null,
+        "state": "prepared",
+        "step": "leaves"
+      },
+      "rust_home": [
+        "crates/tsr_core/src/collections/cow.rs"
+      ],
+      "symbol": "CopyOnWriteMap.Get"
+    },
+    {
+      "actual_home": "tsr_core and consumer-local collections",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/cow.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core-collections/cow-map-empty-scope-write-discarded",
       "basis_kind": "rule",
       "cases": [
         "leaves/core-collections/cow-map-empty-scope-write-discarded"
@@ -137147,13 +137223,13 @@
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/cow.go",
-      "id": "tsc/internal/collections/cow.go:CopyOnWriteMap.EnterScope",
+      "id": "tsc/internal/collections/cow.go:CopyOnWriteMap.Has",
       "ledger_crate": "tsr_collections",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "in-progress",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
@@ -137163,86 +137239,34 @@
         "state": "prepared",
         "step": "leaves"
       },
-      "rust_home": [],
-      "symbol": "CopyOnWriteMap.EnterScope"
-    },
-    {
-      "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
-      "basis_kind": "rule",
-      "cases": [],
-      "depends_on": [
-        "internal/json"
+      "rust_home": [
+        "crates/tsr_core/src/collections/cow.rs"
       ],
-      "destination_phase": 1,
-      "disposition": "missing",
-      "go_package": "internal/collections",
-      "go_source": "tsc/internal/collections/cow.go",
-      "id": "tsc/internal/collections/cow.go:CopyOnWriteMap.Get",
-      "ledger_crate": "tsr_collections",
-      "ledger_phase": 1,
-      "ledger_status": "planned",
-      "ledger_verification": [],
-      "mapped_in_ledger": false,
-      "membership": "full",
-      "membership_reason": "ordered maps/sets and copy-on-write scopes",
-      "roster": {
-        "owner": null,
-        "state": "pending",
-        "step": "leaves"
-      },
-      "rust_home": [],
-      "symbol": "CopyOnWriteMap.Get"
-    },
-    {
-      "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
-      "basis_kind": "rule",
-      "cases": [],
-      "depends_on": [
-        "internal/json"
-      ],
-      "destination_phase": 1,
-      "disposition": "missing",
-      "go_package": "internal/collections",
-      "go_source": "tsc/internal/collections/cow.go",
-      "id": "tsc/internal/collections/cow.go:CopyOnWriteMap.Has",
-      "ledger_crate": "tsr_collections",
-      "ledger_phase": 1,
-      "ledger_status": "planned",
-      "ledger_verification": [],
-      "mapped_in_ledger": false,
-      "membership": "full",
-      "membership_reason": "ordered maps/sets and copy-on-write scopes",
-      "roster": {
-        "owner": null,
-        "state": "pending",
-        "step": "leaves"
-      },
-      "rust_home": [],
       "symbol": "CopyOnWriteMap.Has"
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/cow-map-scope-write-not-visible-to-parent; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/cow.rs"
+      ],
+      "basis": "witnessed by 3 exact link(s): leaves/core-collections/cow-map-empty-scope-write-discarded, leaves/core-collections/cow-map-nested-scopes-restore-level-by-level, leaves/core-collections/cow-map-scope-write-not-visible-to-parent",
       "basis_kind": "rule",
       "cases": [
+        "leaves/core-collections/cow-map-empty-scope-write-discarded",
+        "leaves/core-collections/cow-map-nested-scopes-restore-level-by-level",
         "leaves/core-collections/cow-map-scope-write-not-visible-to-parent"
       ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/cow.go",
       "id": "tsc/internal/collections/cow.go:CopyOnWriteMap.Set",
       "ledger_crate": "tsr_collections",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "in-progress",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
@@ -137252,13 +137276,17 @@
         "state": "prepared",
         "step": "leaves"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_core/src/collections/cow.rs"
+      ],
       "symbol": "CopyOnWriteMap.Set"
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/cow-map-nested-scopes-restore-level-by-level; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/cow.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core-collections/cow-map-nested-scopes-restore-level-by-level",
       "basis_kind": "rule",
       "cases": [
         "leaves/core-collections/cow-map-nested-scopes-restore-level-by-level"
@@ -137267,13 +137295,13 @@
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/cow.go",
       "id": "tsc/internal/collections/cow.go:CopyOnWriteMap.ensureOwned",
       "ledger_crate": "tsr_collections",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "in-progress",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
@@ -137283,42 +137311,17 @@
         "state": "prepared",
         "step": "leaves"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_core/src/collections/cow.rs"
+      ],
       "symbol": "CopyOnWriteMap.ensureOwned"
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
-      "basis_kind": "rule",
-      "cases": [],
-      "depends_on": [
-        "internal/json"
+      "annotated_home": [
+        "crates/tsr_core/src/collections/cow.rs"
       ],
-      "destination_phase": 1,
-      "disposition": "missing",
-      "go_package": "internal/collections",
-      "go_source": "tsc/internal/collections/cow.go",
-      "id": "tsc/internal/collections/cow.go:CopyOnWriteSet.Add",
-      "ledger_crate": "tsr_collections",
-      "ledger_phase": 1,
-      "ledger_status": "planned",
-      "ledger_verification": [],
-      "mapped_in_ledger": false,
-      "membership": "full",
-      "membership_reason": "ordered maps/sets and copy-on-write scopes",
-      "roster": {
-        "owner": null,
-        "state": "pending",
-        "step": "leaves"
-      },
-      "rust_home": [],
-      "symbol": "CopyOnWriteSet.Add"
-    },
-    {
-      "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/cow-set-scope-fork; witnessed by 1 prepared case(s)",
+      "basis": "witnessed by 1 exact link(s): leaves/core-collections/cow-set-scope-fork",
       "basis_kind": "rule",
       "cases": [
         "leaves/core-collections/cow-set-scope-fork"
@@ -137327,13 +137330,13 @@
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/cow.go",
-      "id": "tsc/internal/collections/cow.go:CopyOnWriteSet.EnterScope",
+      "id": "tsc/internal/collections/cow.go:CopyOnWriteSet.Add",
       "ledger_crate": "tsr_collections",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "in-progress",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
@@ -137343,36 +137346,79 @@
         "state": "prepared",
         "step": "leaves"
       },
-      "rust_home": [],
-      "symbol": "CopyOnWriteSet.EnterScope"
+      "rust_home": [
+        "crates/tsr_core/src/collections/cow.rs"
+      ],
+      "symbol": "CopyOnWriteSet.Add"
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/cow.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core-collections/cow-set-scope-fork",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core-collections/cow-set-scope-fork"
+      ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/cow.go",
-      "id": "tsc/internal/collections/cow.go:CopyOnWriteSet.Has",
+      "id": "tsc/internal/collections/cow.go:CopyOnWriteSet.EnterScope",
       "ledger_crate": "tsr_collections",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "in-progress",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_core/src/collections/cow.rs"
+      ],
+      "symbol": "CopyOnWriteSet.EnterScope"
+    },
+    {
+      "actual_home": "tsr_core and consumer-local collections",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/cow.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core-collections/cow-set-scope-fork",
+      "basis_kind": "rule",
+      "cases": [
+        "leaves/core-collections/cow-set-scope-fork"
+      ],
+      "depends_on": [
+        "internal/json"
+      ],
+      "destination_phase": 1,
+      "disposition": "covered",
+      "go_package": "internal/collections",
+      "go_source": "tsc/internal/collections/cow.go",
+      "id": "tsc/internal/collections/cow.go:CopyOnWriteSet.Has",
+      "ledger_crate": "tsr_collections",
+      "ledger_phase": 1,
+      "ledger_status": "in-progress",
+      "ledger_verification": [],
+      "mapped_in_ledger": false,
+      "membership": "full",
+      "membership_reason": "ordered maps/sets and copy-on-write scopes",
+      "roster": {
+        "owner": null,
+        "state": "prepared",
+        "step": "leaves"
+      },
+      "rust_home": [
+        "crates/tsr_core/src/collections/cow.rs"
+      ],
       "symbol": "CopyOnWriteSet.Has"
     },
     {
@@ -137702,8 +137748,10 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/ordered-map-diff-callback-sequence; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/ordered_map.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core-collections/ordered-map-diff-callback-sequence",
       "basis_kind": "rule",
       "cases": [
         "leaves/core-collections/ordered-map-diff-callback-sequence"
@@ -137712,13 +137760,13 @@
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/ordered_map.go",
       "id": "tsc/internal/collections/ordered_map.go:DiffOrderedMaps",
       "ledger_crate": "tsr_collections",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "in-progress",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
@@ -137728,28 +137776,33 @@
         "state": "prepared",
         "step": "leaves"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_core/src/collections/ordered_map.rs"
+      ],
       "symbol": "DiffOrderedMaps"
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/ordered-map-diff-func-uses-the-callback; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/ordered_map.rs"
+      ],
+      "basis": "witnessed by 2 exact link(s): leaves/core-collections/ordered-map-diff-callback-sequence, leaves/core-collections/ordered-map-diff-func-uses-the-callback",
       "basis_kind": "rule",
       "cases": [
+        "leaves/core-collections/ordered-map-diff-callback-sequence",
         "leaves/core-collections/ordered-map-diff-func-uses-the-callback"
       ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/ordered_map.go",
       "id": "tsc/internal/collections/ordered_map.go:DiffOrderedMapsFunc",
       "ledger_crate": "tsr_collections",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "in-progress",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
@@ -137759,13 +137812,17 @@
         "state": "prepared",
         "step": "leaves"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_core/src/collections/ordered_map.rs"
+      ],
       "symbol": "DiffOrderedMapsFunc"
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/ordered-map-from-list-repeated-keys; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/ordered_map.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core-collections/ordered-map-from-list-repeated-keys",
       "basis_kind": "rule",
       "cases": [
         "leaves/core-collections/ordered-map-from-list-repeated-keys"
@@ -137774,13 +137831,13 @@
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/ordered_map.go",
       "id": "tsc/internal/collections/ordered_map.go:NewOrderedMapFromList",
       "ledger_crate": "tsr_collections",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "in-progress",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
@@ -137790,13 +137847,17 @@
         "state": "prepared",
         "step": "leaves"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_core/src/collections/ordered_map.rs"
+      ],
       "symbol": "NewOrderedMapFromList"
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/ordered-map-size-hint; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/ordered_map.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core-collections/ordered-map-size-hint",
       "basis_kind": "rule",
       "cases": [
         "leaves/core-collections/ordered-map-size-hint"
@@ -137805,13 +137866,13 @@
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/ordered_map.go",
       "id": "tsc/internal/collections/ordered_map.go:NewOrderedMapWithSizeHint",
       "ledger_crate": "tsr_collections",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "in-progress",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
@@ -137821,28 +137882,33 @@
         "state": "prepared",
         "step": "leaves"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_core/src/collections/ordered_map.rs"
+      ],
       "symbol": "NewOrderedMapWithSizeHint"
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/ordered-map-clear-reuse; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/ordered_map.rs"
+      ],
+      "basis": "witnessed by 2 exact link(s): leaves/core-collections/ordered-map-clear-reuse, leaves/core-collections/ordered-map-empty-nil",
       "basis_kind": "rule",
       "cases": [
-        "leaves/core-collections/ordered-map-clear-reuse"
+        "leaves/core-collections/ordered-map-clear-reuse",
+        "leaves/core-collections/ordered-map-empty-nil"
       ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/ordered_map.go",
       "id": "tsc/internal/collections/ordered_map.go:OrderedMap.Clear",
       "ledger_crate": "tsr_collections",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "in-progress",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
@@ -137852,29 +137918,35 @@
         "state": "prepared",
         "step": "leaves"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_core/src/collections/ordered_map.rs"
+      ],
       "symbol": "OrderedMap.Clear"
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/ordered-map-clone-isolation, leaves/core-collections/ordered-map-clone-write-back; witnessed by 2 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/ordered_map.rs"
+      ],
+      "basis": "witnessed by 4 exact link(s): leaves/core-collections/ordered-map-clone-isolation, leaves/core-collections/ordered-map-clone-tolerates-nil, leaves/core-collections/ordered-map-clone-write-back",
       "basis_kind": "rule",
       "cases": [
         "leaves/core-collections/ordered-map-clone-isolation",
-        "leaves/core-collections/ordered-map-clone-write-back"
+        "leaves/core-collections/ordered-map-clone-tolerates-nil",
+        "leaves/core-collections/ordered-map-clone-write-back",
+        "leaves/core-collections/ordered-map-empty-nil"
       ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/ordered_map.go",
       "id": "tsc/internal/collections/ordered_map.go:OrderedMap.Clone",
       "ledger_crate": "tsr_collections",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "in-progress",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
@@ -137884,15 +137956,20 @@
         "state": "prepared",
         "step": "leaves"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_core/src/collections/ordered_map.rs"
+      ],
       "symbol": "OrderedMap.Clone"
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/ordered-map-delete-reinsert, leaves/core-collections/ordered-map-double-delete; witnessed by 2 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/ordered_map.rs"
+      ],
+      "basis": "witnessed by 3 exact link(s): leaves/core-collections/ordered-map-clone-isolation, leaves/core-collections/ordered-map-delete-reinsert, leaves/core-collections/ordered-map-double-delete",
       "basis_kind": "rule",
       "cases": [
+        "leaves/core-collections/ordered-map-clone-isolation",
         "leaves/core-collections/ordered-map-delete-reinsert",
         "leaves/core-collections/ordered-map-double-delete"
       ],
@@ -137900,13 +137977,13 @@
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/ordered_map.go",
       "id": "tsc/internal/collections/ordered_map.go:OrderedMap.Delete",
       "ledger_crate": "tsr_collections",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "in-progress",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
@@ -137916,42 +137993,62 @@
         "state": "prepared",
         "step": "leaves"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_core/src/collections/ordered_map.rs"
+      ],
       "symbol": "OrderedMap.Delete"
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/ordered_map.rs"
+      ],
+      "basis": "witnessed by 11 exact link(s): leaves/core-collections/ordered-map-clear-reuse, leaves/core-collections/ordered-map-clone-isolation, leaves/core-collections/ordered-map-clone-write-back",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core-collections/ordered-map-clear-reuse",
+        "leaves/core-collections/ordered-map-clone-isolation",
+        "leaves/core-collections/ordered-map-clone-write-back",
+        "leaves/core-collections/ordered-map-delete-reinsert",
+        "leaves/core-collections/ordered-map-diff-callback-sequence",
+        "leaves/core-collections/ordered-map-diff-func-uses-the-callback",
+        "leaves/core-collections/ordered-map-double-delete",
+        "leaves/core-collections/ordered-map-early-stop",
+        "leaves/core-collections/ordered-map-empty-nil",
+        "leaves/core-collections/ordered-map-insert-overwrite",
+        "leaves/core-collections/ordered-map-size-hint"
+      ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/ordered_map.go",
       "id": "tsc/internal/collections/ordered_map.go:OrderedMap.Entries",
       "ledger_crate": "tsr_collections",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "in-progress",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_core/src/collections/ordered_map.rs"
+      ],
       "symbol": "OrderedMap.Entries"
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/ordered-map-entry-at-bounds; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/ordered_map.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core-collections/ordered-map-entry-at-bounds",
       "basis_kind": "rule",
       "cases": [
         "leaves/core-collections/ordered-map-entry-at-bounds"
@@ -137960,13 +138057,13 @@
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/ordered_map.go",
       "id": "tsc/internal/collections/ordered_map.go:OrderedMap.EntryAt",
       "ledger_crate": "tsr_collections",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "in-progress",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
@@ -137976,42 +138073,55 @@
         "state": "prepared",
         "step": "leaves"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_core/src/collections/ordered_map.rs"
+      ],
       "symbol": "OrderedMap.EntryAt"
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/ordered_map.rs"
+      ],
+      "basis": "witnessed by 4 exact link(s): leaves/core-collections/ordered-map-diff-callback-sequence, leaves/core-collections/ordered-map-diff-func-uses-the-callback, leaves/core-collections/ordered-map-empty-nil",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core-collections/ordered-map-diff-callback-sequence",
+        "leaves/core-collections/ordered-map-diff-func-uses-the-callback",
+        "leaves/core-collections/ordered-map-empty-nil",
+        "leaves/core-collections/ordered-map-get-or-zero-hides-absence"
+      ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/ordered_map.go",
       "id": "tsc/internal/collections/ordered_map.go:OrderedMap.Get",
       "ledger_crate": "tsr_collections",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "in-progress",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_core/src/collections/ordered_map.rs"
+      ],
       "symbol": "OrderedMap.Get"
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/ordered-map-get-or-zero-hides-absence; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/ordered_map.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core-collections/ordered-map-get-or-zero-hides-absence",
       "basis_kind": "rule",
       "cases": [
         "leaves/core-collections/ordered-map-get-or-zero-hides-absence"
@@ -138020,13 +138130,13 @@
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/ordered_map.go",
       "id": "tsc/internal/collections/ordered_map.go:OrderedMap.GetOrZero",
       "ledger_crate": "tsr_collections",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "in-progress",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
@@ -138036,57 +138146,32 @@
         "state": "prepared",
         "step": "leaves"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_core/src/collections/ordered_map.rs"
+      ],
       "symbol": "OrderedMap.GetOrZero"
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/ordered_map.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core-collections/ordered-map-empty-nil",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core-collections/ordered-map-empty-nil"
+      ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/ordered_map.go",
       "id": "tsc/internal/collections/ordered_map.go:OrderedMap.Has",
       "ledger_crate": "tsr_collections",
       "ledger_phase": 1,
-      "ledger_status": "planned",
-      "ledger_verification": [],
-      "mapped_in_ledger": false,
-      "membership": "full",
-      "membership_reason": "ordered maps/sets and copy-on-write scopes",
-      "roster": {
-        "owner": null,
-        "state": "pending",
-        "step": "leaves"
-      },
-      "rust_home": [],
-      "symbol": "OrderedMap.Has"
-    },
-    {
-      "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/ordered-map-early-stop; witnessed by 1 prepared case(s)",
-      "basis_kind": "rule",
-      "cases": [
-        "leaves/core-collections/ordered-map-early-stop"
-      ],
-      "depends_on": [
-        "internal/json"
-      ],
-      "destination_phase": 1,
-      "disposition": "missing",
-      "go_package": "internal/collections",
-      "go_source": "tsc/internal/collections/ordered_map.go",
-      "id": "tsc/internal/collections/ordered_map.go:OrderedMap.Keys",
-      "ledger_crate": "tsr_collections",
-      "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "in-progress",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
@@ -138096,15 +138181,55 @@
         "state": "prepared",
         "step": "leaves"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_core/src/collections/ordered_map.rs"
+      ],
+      "symbol": "OrderedMap.Has"
+    },
+    {
+      "actual_home": "tsr_core and consumer-local collections",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/ordered_map.rs"
+      ],
+      "basis": "witnessed by 3 exact link(s): leaves/core-collections/ordered-map-early-stop, leaves/core-collections/ordered-map-empty-nil, leaves/core-collections/ordered-map-from-list-repeated-keys",
+      "basis_kind": "rule",
+      "cases": [
+        "leaves/core-collections/ordered-map-early-stop",
+        "leaves/core-collections/ordered-map-empty-nil",
+        "leaves/core-collections/ordered-map-from-list-repeated-keys"
+      ],
+      "depends_on": [
+        "internal/json"
+      ],
+      "destination_phase": 1,
+      "disposition": "covered",
+      "go_package": "internal/collections",
+      "go_source": "tsc/internal/collections/ordered_map.go",
+      "id": "tsc/internal/collections/ordered_map.go:OrderedMap.Keys",
+      "ledger_crate": "tsr_collections",
+      "ledger_phase": 1,
+      "ledger_status": "in-progress",
+      "ledger_verification": [],
+      "mapped_in_ledger": false,
+      "membership": "full",
+      "membership_reason": "ordered maps/sets and copy-on-write scopes",
+      "roster": {
+        "owner": null,
+        "state": "prepared",
+        "step": "leaves"
+      },
+      "rust_home": [
+        "crates/tsr_core/src/collections/ordered_map.rs"
+      ],
       "symbol": "OrderedMap.Keys"
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
       "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/ordered-map-marshal-member-order; witnessed by 1 prepared case(s)",
+      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/ordered-map-marshal-integer-keys, leaves/core-collections/ordered-map-marshal-member-order; witnessed by 2 prepared case(s)",
       "basis_kind": "rule",
       "cases": [
+        "leaves/core-collections/ordered-map-marshal-integer-keys",
         "leaves/core-collections/ordered-map-marshal-member-order"
       ],
       "depends_on": [
@@ -138117,7 +138242,7 @@
       "id": "tsc/internal/collections/ordered_map.go:OrderedMap.MarshalJSONTo",
       "ledger_crate": "tsr_collections",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "in-progress",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
@@ -138127,28 +138252,40 @@
         "state": "prepared",
         "step": "leaves"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_core/src/collections/ordered_map.rs"
+      ],
       "symbol": "OrderedMap.MarshalJSONTo"
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/ordered-map-insert-overwrite; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/ordered_map.rs"
+      ],
+      "basis": "witnessed by 9 exact link(s): leaves/core-collections/ordered-map-clear-reuse, leaves/core-collections/ordered-map-clone-isolation, leaves/core-collections/ordered-map-clone-write-back",
       "basis_kind": "rule",
       "cases": [
-        "leaves/core-collections/ordered-map-insert-overwrite"
+        "leaves/core-collections/ordered-map-clear-reuse",
+        "leaves/core-collections/ordered-map-clone-isolation",
+        "leaves/core-collections/ordered-map-clone-write-back",
+        "leaves/core-collections/ordered-map-delete-reinsert",
+        "leaves/core-collections/ordered-map-double-delete",
+        "leaves/core-collections/ordered-map-early-stop",
+        "leaves/core-collections/ordered-map-from-list-repeated-keys",
+        "leaves/core-collections/ordered-map-insert-overwrite",
+        "leaves/core-collections/ordered-map-size-hint"
       ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/ordered_map.go",
       "id": "tsc/internal/collections/ordered_map.go:OrderedMap.Set",
       "ledger_crate": "tsr_collections",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "in-progress",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
@@ -138158,28 +138295,35 @@
         "state": "prepared",
         "step": "leaves"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_core/src/collections/ordered_map.rs"
+      ],
       "symbol": "OrderedMap.Set"
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/ordered-map-empty-nil; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/ordered_map.rs"
+      ],
+      "basis": "witnessed by 4 exact link(s): leaves/core-collections/ordered-map-clear-reuse, leaves/core-collections/ordered-map-double-delete, leaves/core-collections/ordered-map-empty-nil",
       "basis_kind": "rule",
       "cases": [
-        "leaves/core-collections/ordered-map-empty-nil"
+        "leaves/core-collections/ordered-map-clear-reuse",
+        "leaves/core-collections/ordered-map-double-delete",
+        "leaves/core-collections/ordered-map-empty-nil",
+        "leaves/core-collections/ordered-map-size-hint"
       ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/ordered_map.go",
       "id": "tsc/internal/collections/ordered_map.go:OrderedMap.Size",
       "ledger_crate": "tsr_collections",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "in-progress",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
@@ -138189,7 +138333,9 @@
         "state": "prepared",
         "step": "leaves"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_core/src/collections/ordered_map.rs"
+      ],
       "symbol": "OrderedMap.Size"
     },
     {
@@ -138212,7 +138358,7 @@
       "id": "tsc/internal/collections/ordered_map.go:OrderedMap.UnmarshalJSONFrom",
       "ledger_crate": "tsr_collections",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "in-progress",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
@@ -138222,13 +138368,17 @@
         "state": "prepared",
         "step": "leaves"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_core/src/collections/ordered_map.rs"
+      ],
       "symbol": "OrderedMap.UnmarshalJSONFrom"
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/ordered-map-values-follow-insertion, leaves/core-collections/ordered-map-values-see-appended-key; witnessed by 2 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/ordered_map.rs"
+      ],
+      "basis": "witnessed by 2 exact link(s): leaves/core-collections/ordered-map-values-follow-insertion, leaves/core-collections/ordered-map-values-see-appended-key",
       "basis_kind": "rule",
       "cases": [
         "leaves/core-collections/ordered-map-values-follow-insertion",
@@ -138238,13 +138388,13 @@
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/ordered_map.go",
       "id": "tsc/internal/collections/ordered_map.go:OrderedMap.Values",
       "ledger_crate": "tsr_collections",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "in-progress",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
@@ -138254,13 +138404,17 @@
         "state": "prepared",
         "step": "leaves"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_core/src/collections/ordered_map.rs"
+      ],
       "symbol": "OrderedMap.Values"
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/ordered-map-clone-tolerates-nil; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/ordered_map.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core-collections/ordered-map-clone-tolerates-nil",
       "basis_kind": "rule",
       "cases": [
         "leaves/core-collections/ordered-map-clone-tolerates-nil"
@@ -138269,13 +138423,13 @@
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/ordered_map.go",
       "id": "tsc/internal/collections/ordered_map.go:OrderedMap.clone",
       "ledger_crate": "tsr_collections",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "in-progress",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
@@ -138285,36 +138439,45 @@
         "state": "prepared",
         "step": "leaves"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_core/src/collections/ordered_map.rs"
+      ],
       "symbol": "OrderedMap.clone"
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/ordered_map.rs"
+      ],
+      "basis": "witnessed by 2 exact link(s): leaves/core-collections/ordered-map-size-hint, leaves/core-collections/ordered-set-size-hint-early-stop",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core-collections/ordered-map-size-hint",
+        "leaves/core-collections/ordered-set-size-hint-early-stop"
+      ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/ordered_map.go",
       "id": "tsc/internal/collections/ordered_map.go:newMapWithSizeHint",
       "ledger_crate": "tsr_collections",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "in-progress",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_core/src/collections/ordered_map.rs"
+      ],
       "symbol": "newMapWithSizeHint"
     },
     {
@@ -138333,7 +138496,7 @@
       "id": "tsc/internal/collections/ordered_map.go:noCopy.Lock",
       "ledger_crate": "tsr_collections",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "in-progress",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
@@ -138343,7 +138506,9 @@
         "state": "exempt:go_runtime",
         "step": "leaves"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_core/src/collections/ordered_map.rs"
+      ],
       "symbol": "noCopy.Lock"
     },
     {
@@ -138362,7 +138527,7 @@
       "id": "tsc/internal/collections/ordered_map.go:noCopy.Unlock",
       "ledger_crate": "tsr_collections",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "in-progress",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
@@ -138372,17 +138537,17 @@
         "state": "exempt:go_runtime",
         "step": "leaves"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_core/src/collections/ordered_map.rs"
+      ],
       "symbol": "noCopy.Unlock"
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
       "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/ordered-map-marshal-integer-keys; witnessed by 1 prepared case(s)",
+      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
       "basis_kind": "rule",
-      "cases": [
-        "leaves/core-collections/ordered-map-marshal-integer-keys"
-      ],
+      "cases": [],
       "depends_on": [
         "internal/json"
       ],
@@ -138393,234 +138558,27 @@
       "id": "tsc/internal/collections/ordered_map.go:resolveKeyName",
       "ledger_crate": "tsr_collections",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "in-progress",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
         "owner": null,
-        "state": "prepared",
+        "state": "pending",
         "step": "leaves"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_core/src/collections/ordered_map.rs"
+      ],
       "symbol": "resolveKeyName"
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
-      "basis_kind": "rule",
-      "cases": [],
-      "depends_on": [
-        "internal/json"
+      "annotated_home": [
+        "crates/tsr_core/src/collections/ordered_set.rs"
       ],
-      "destination_phase": 1,
-      "disposition": "missing",
-      "go_package": "internal/collections",
-      "go_source": "tsc/internal/collections/ordered_set.go",
-      "id": "tsc/internal/collections/ordered_set.go:NewOrderedSetWithSizeHint",
-      "ledger_crate": "tsr_collections",
-      "ledger_phase": 1,
-      "ledger_status": "planned",
-      "ledger_verification": [],
-      "mapped_in_ledger": false,
-      "membership": "full",
-      "membership_reason": "ordered maps/sets and copy-on-write scopes",
-      "roster": {
-        "owner": null,
-        "state": "pending",
-        "step": "leaves"
-      },
-      "rust_home": [],
-      "symbol": "NewOrderedSetWithSizeHint"
-    },
-    {
-      "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/ordered-set-insertion-order; witnessed by 1 prepared case(s)",
-      "basis_kind": "rule",
-      "cases": [
-        "leaves/core-collections/ordered-set-insertion-order"
-      ],
-      "depends_on": [
-        "internal/json"
-      ],
-      "destination_phase": 1,
-      "disposition": "missing",
-      "go_package": "internal/collections",
-      "go_source": "tsc/internal/collections/ordered_set.go",
-      "id": "tsc/internal/collections/ordered_set.go:OrderedSet.Add",
-      "ledger_crate": "tsr_collections",
-      "ledger_phase": 1,
-      "ledger_status": "planned",
-      "ledger_verification": [],
-      "mapped_in_ledger": false,
-      "membership": "full",
-      "membership_reason": "ordered maps/sets and copy-on-write scopes",
-      "roster": {
-        "owner": null,
-        "state": "prepared",
-        "step": "leaves"
-      },
-      "rust_home": [],
-      "symbol": "OrderedSet.Add"
-    },
-    {
-      "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
-      "basis_kind": "rule",
-      "cases": [],
-      "depends_on": [
-        "internal/json"
-      ],
-      "destination_phase": 1,
-      "disposition": "missing",
-      "go_package": "internal/collections",
-      "go_source": "tsc/internal/collections/ordered_set.go",
-      "id": "tsc/internal/collections/ordered_set.go:OrderedSet.Clear",
-      "ledger_crate": "tsr_collections",
-      "ledger_phase": 1,
-      "ledger_status": "planned",
-      "ledger_verification": [],
-      "mapped_in_ledger": false,
-      "membership": "full",
-      "membership_reason": "ordered maps/sets and copy-on-write scopes",
-      "roster": {
-        "owner": null,
-        "state": "pending",
-        "step": "leaves"
-      },
-      "rust_home": [],
-      "symbol": "OrderedSet.Clear"
-    },
-    {
-      "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/ordered-set-clone-clear-isolation; witnessed by 1 prepared case(s)",
-      "basis_kind": "rule",
-      "cases": [
-        "leaves/core-collections/ordered-set-clone-clear-isolation"
-      ],
-      "depends_on": [
-        "internal/json"
-      ],
-      "destination_phase": 1,
-      "disposition": "missing",
-      "go_package": "internal/collections",
-      "go_source": "tsc/internal/collections/ordered_set.go",
-      "id": "tsc/internal/collections/ordered_set.go:OrderedSet.Clone",
-      "ledger_crate": "tsr_collections",
-      "ledger_phase": 1,
-      "ledger_status": "planned",
-      "ledger_verification": [],
-      "mapped_in_ledger": false,
-      "membership": "full",
-      "membership_reason": "ordered maps/sets and copy-on-write scopes",
-      "roster": {
-        "owner": null,
-        "state": "prepared",
-        "step": "leaves"
-      },
-      "rust_home": [],
-      "symbol": "OrderedSet.Clone"
-    },
-    {
-      "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/ordered-set-delete-reinsert; witnessed by 1 prepared case(s)",
-      "basis_kind": "rule",
-      "cases": [
-        "leaves/core-collections/ordered-set-delete-reinsert"
-      ],
-      "depends_on": [
-        "internal/json"
-      ],
-      "destination_phase": 1,
-      "disposition": "missing",
-      "go_package": "internal/collections",
-      "go_source": "tsc/internal/collections/ordered_set.go",
-      "id": "tsc/internal/collections/ordered_set.go:OrderedSet.Delete",
-      "ledger_crate": "tsr_collections",
-      "ledger_phase": 1,
-      "ledger_status": "planned",
-      "ledger_verification": [],
-      "mapped_in_ledger": false,
-      "membership": "full",
-      "membership_reason": "ordered maps/sets and copy-on-write scopes",
-      "roster": {
-        "owner": null,
-        "state": "prepared",
-        "step": "leaves"
-      },
-      "rust_home": [],
-      "symbol": "OrderedSet.Delete"
-    },
-    {
-      "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
-      "basis_kind": "rule",
-      "cases": [],
-      "depends_on": [
-        "internal/json"
-      ],
-      "destination_phase": 1,
-      "disposition": "missing",
-      "go_package": "internal/collections",
-      "go_source": "tsc/internal/collections/ordered_set.go",
-      "id": "tsc/internal/collections/ordered_set.go:OrderedSet.Has",
-      "ledger_crate": "tsr_collections",
-      "ledger_phase": 1,
-      "ledger_status": "planned",
-      "ledger_verification": [],
-      "mapped_in_ledger": false,
-      "membership": "full",
-      "membership_reason": "ordered maps/sets and copy-on-write scopes",
-      "roster": {
-        "owner": null,
-        "state": "pending",
-        "step": "leaves"
-      },
-      "rust_home": [],
-      "symbol": "OrderedSet.Has"
-    },
-    {
-      "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/ordered-set-empty-nil; witnessed by 1 prepared case(s)",
-      "basis_kind": "rule",
-      "cases": [
-        "leaves/core-collections/ordered-set-empty-nil"
-      ],
-      "depends_on": [
-        "internal/json"
-      ],
-      "destination_phase": 1,
-      "disposition": "missing",
-      "go_package": "internal/collections",
-      "go_source": "tsc/internal/collections/ordered_set.go",
-      "id": "tsc/internal/collections/ordered_set.go:OrderedSet.Size",
-      "ledger_crate": "tsr_collections",
-      "ledger_phase": 1,
-      "ledger_status": "planned",
-      "ledger_verification": [],
-      "mapped_in_ledger": false,
-      "membership": "full",
-      "membership_reason": "ordered maps/sets and copy-on-write scopes",
-      "roster": {
-        "owner": null,
-        "state": "prepared",
-        "step": "leaves"
-      },
-      "rust_home": [],
-      "symbol": "OrderedSet.Size"
-    },
-    {
-      "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/ordered-set-size-hint-early-stop; witnessed by 1 prepared case(s)",
+      "basis": "witnessed by 1 exact link(s): leaves/core-collections/ordered-set-size-hint-early-stop",
       "basis_kind": "rule",
       "cases": [
         "leaves/core-collections/ordered-set-size-hint-early-stop"
@@ -138629,13 +138587,13 @@
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/ordered_set.go",
-      "id": "tsc/internal/collections/ordered_set.go:OrderedSet.Values",
+      "id": "tsc/internal/collections/ordered_set.go:NewOrderedSetWithSizeHint",
       "ledger_crate": "tsr_collections",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "in-progress",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
@@ -138645,7 +138603,271 @@
         "state": "prepared",
         "step": "leaves"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_core/src/collections/ordered_set.rs"
+      ],
+      "symbol": "NewOrderedSetWithSizeHint"
+    },
+    {
+      "actual_home": "tsr_core and consumer-local collections",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/ordered_set.rs"
+      ],
+      "basis": "witnessed by 5 exact link(s): leaves/core-collections/ordered-set-clone-clear-isolation, leaves/core-collections/ordered-set-delete-reinsert, leaves/core-collections/ordered-set-empty-nil",
+      "basis_kind": "rule",
+      "cases": [
+        "leaves/core-collections/ordered-set-clone-clear-isolation",
+        "leaves/core-collections/ordered-set-delete-reinsert",
+        "leaves/core-collections/ordered-set-empty-nil",
+        "leaves/core-collections/ordered-set-insertion-order",
+        "leaves/core-collections/ordered-set-size-hint-early-stop"
+      ],
+      "depends_on": [
+        "internal/json"
+      ],
+      "destination_phase": 1,
+      "disposition": "covered",
+      "go_package": "internal/collections",
+      "go_source": "tsc/internal/collections/ordered_set.go",
+      "id": "tsc/internal/collections/ordered_set.go:OrderedSet.Add",
+      "ledger_crate": "tsr_collections",
+      "ledger_phase": 1,
+      "ledger_status": "in-progress",
+      "ledger_verification": [],
+      "mapped_in_ledger": false,
+      "membership": "full",
+      "membership_reason": "ordered maps/sets and copy-on-write scopes",
+      "roster": {
+        "owner": null,
+        "state": "prepared",
+        "step": "leaves"
+      },
+      "rust_home": [
+        "crates/tsr_core/src/collections/ordered_set.rs"
+      ],
+      "symbol": "OrderedSet.Add"
+    },
+    {
+      "actual_home": "tsr_core and consumer-local collections",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/ordered_set.rs"
+      ],
+      "basis": "witnessed by 2 exact link(s): leaves/core-collections/ordered-set-clone-clear-isolation, leaves/core-collections/ordered-set-empty-nil",
+      "basis_kind": "rule",
+      "cases": [
+        "leaves/core-collections/ordered-set-clone-clear-isolation",
+        "leaves/core-collections/ordered-set-empty-nil"
+      ],
+      "depends_on": [
+        "internal/json"
+      ],
+      "destination_phase": 1,
+      "disposition": "covered",
+      "go_package": "internal/collections",
+      "go_source": "tsc/internal/collections/ordered_set.go",
+      "id": "tsc/internal/collections/ordered_set.go:OrderedSet.Clear",
+      "ledger_crate": "tsr_collections",
+      "ledger_phase": 1,
+      "ledger_status": "in-progress",
+      "ledger_verification": [],
+      "mapped_in_ledger": false,
+      "membership": "full",
+      "membership_reason": "ordered maps/sets and copy-on-write scopes",
+      "roster": {
+        "owner": null,
+        "state": "prepared",
+        "step": "leaves"
+      },
+      "rust_home": [
+        "crates/tsr_core/src/collections/ordered_set.rs"
+      ],
+      "symbol": "OrderedSet.Clear"
+    },
+    {
+      "actual_home": "tsr_core and consumer-local collections",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/ordered_set.rs"
+      ],
+      "basis": "witnessed by 2 exact link(s): leaves/core-collections/ordered-set-clone-clear-isolation, leaves/core-collections/ordered-set-empty-nil",
+      "basis_kind": "rule",
+      "cases": [
+        "leaves/core-collections/ordered-set-clone-clear-isolation",
+        "leaves/core-collections/ordered-set-empty-nil"
+      ],
+      "depends_on": [
+        "internal/json"
+      ],
+      "destination_phase": 1,
+      "disposition": "covered",
+      "go_package": "internal/collections",
+      "go_source": "tsc/internal/collections/ordered_set.go",
+      "id": "tsc/internal/collections/ordered_set.go:OrderedSet.Clone",
+      "ledger_crate": "tsr_collections",
+      "ledger_phase": 1,
+      "ledger_status": "in-progress",
+      "ledger_verification": [],
+      "mapped_in_ledger": false,
+      "membership": "full",
+      "membership_reason": "ordered maps/sets and copy-on-write scopes",
+      "roster": {
+        "owner": null,
+        "state": "prepared",
+        "step": "leaves"
+      },
+      "rust_home": [
+        "crates/tsr_core/src/collections/ordered_set.rs"
+      ],
+      "symbol": "OrderedSet.Clone"
+    },
+    {
+      "actual_home": "tsr_core and consumer-local collections",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/ordered_set.rs"
+      ],
+      "basis": "witnessed by 3 exact link(s): leaves/core-collections/ordered-set-clone-clear-isolation, leaves/core-collections/ordered-set-delete-reinsert, leaves/core-collections/ordered-set-empty-nil",
+      "basis_kind": "rule",
+      "cases": [
+        "leaves/core-collections/ordered-set-clone-clear-isolation",
+        "leaves/core-collections/ordered-set-delete-reinsert",
+        "leaves/core-collections/ordered-set-empty-nil"
+      ],
+      "depends_on": [
+        "internal/json"
+      ],
+      "destination_phase": 1,
+      "disposition": "covered",
+      "go_package": "internal/collections",
+      "go_source": "tsc/internal/collections/ordered_set.go",
+      "id": "tsc/internal/collections/ordered_set.go:OrderedSet.Delete",
+      "ledger_crate": "tsr_collections",
+      "ledger_phase": 1,
+      "ledger_status": "in-progress",
+      "ledger_verification": [],
+      "mapped_in_ledger": false,
+      "membership": "full",
+      "membership_reason": "ordered maps/sets and copy-on-write scopes",
+      "roster": {
+        "owner": null,
+        "state": "prepared",
+        "step": "leaves"
+      },
+      "rust_home": [
+        "crates/tsr_core/src/collections/ordered_set.rs"
+      ],
+      "symbol": "OrderedSet.Delete"
+    },
+    {
+      "actual_home": "tsr_core and consumer-local collections",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/ordered_set.rs"
+      ],
+      "basis": "witnessed by 2 exact link(s): leaves/core-collections/ordered-set-empty-nil, leaves/core-collections/ordered-set-insertion-order",
+      "basis_kind": "rule",
+      "cases": [
+        "leaves/core-collections/ordered-set-empty-nil",
+        "leaves/core-collections/ordered-set-insertion-order"
+      ],
+      "depends_on": [
+        "internal/json"
+      ],
+      "destination_phase": 1,
+      "disposition": "covered",
+      "go_package": "internal/collections",
+      "go_source": "tsc/internal/collections/ordered_set.go",
+      "id": "tsc/internal/collections/ordered_set.go:OrderedSet.Has",
+      "ledger_crate": "tsr_collections",
+      "ledger_phase": 1,
+      "ledger_status": "in-progress",
+      "ledger_verification": [],
+      "mapped_in_ledger": false,
+      "membership": "full",
+      "membership_reason": "ordered maps/sets and copy-on-write scopes",
+      "roster": {
+        "owner": null,
+        "state": "prepared",
+        "step": "leaves"
+      },
+      "rust_home": [
+        "crates/tsr_core/src/collections/ordered_set.rs"
+      ],
+      "symbol": "OrderedSet.Has"
+    },
+    {
+      "actual_home": "tsr_core and consumer-local collections",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/ordered_set.rs"
+      ],
+      "basis": "witnessed by 5 exact link(s): leaves/core-collections/ordered-set-clone-clear-isolation, leaves/core-collections/ordered-set-delete-reinsert, leaves/core-collections/ordered-set-empty-nil",
+      "basis_kind": "rule",
+      "cases": [
+        "leaves/core-collections/ordered-set-clone-clear-isolation",
+        "leaves/core-collections/ordered-set-delete-reinsert",
+        "leaves/core-collections/ordered-set-empty-nil",
+        "leaves/core-collections/ordered-set-insertion-order",
+        "leaves/core-collections/ordered-set-size-hint-early-stop"
+      ],
+      "depends_on": [
+        "internal/json"
+      ],
+      "destination_phase": 1,
+      "disposition": "covered",
+      "go_package": "internal/collections",
+      "go_source": "tsc/internal/collections/ordered_set.go",
+      "id": "tsc/internal/collections/ordered_set.go:OrderedSet.Size",
+      "ledger_crate": "tsr_collections",
+      "ledger_phase": 1,
+      "ledger_status": "in-progress",
+      "ledger_verification": [],
+      "mapped_in_ledger": false,
+      "membership": "full",
+      "membership_reason": "ordered maps/sets and copy-on-write scopes",
+      "roster": {
+        "owner": null,
+        "state": "prepared",
+        "step": "leaves"
+      },
+      "rust_home": [
+        "crates/tsr_core/src/collections/ordered_set.rs"
+      ],
+      "symbol": "OrderedSet.Size"
+    },
+    {
+      "actual_home": "tsr_core and consumer-local collections",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/ordered_set.rs"
+      ],
+      "basis": "witnessed by 5 exact link(s): leaves/core-collections/ordered-set-clone-clear-isolation, leaves/core-collections/ordered-set-delete-reinsert, leaves/core-collections/ordered-set-empty-nil",
+      "basis_kind": "rule",
+      "cases": [
+        "leaves/core-collections/ordered-set-clone-clear-isolation",
+        "leaves/core-collections/ordered-set-delete-reinsert",
+        "leaves/core-collections/ordered-set-empty-nil",
+        "leaves/core-collections/ordered-set-insertion-order",
+        "leaves/core-collections/ordered-set-size-hint-early-stop"
+      ],
+      "depends_on": [
+        "internal/json"
+      ],
+      "destination_phase": 1,
+      "disposition": "covered",
+      "go_package": "internal/collections",
+      "go_source": "tsc/internal/collections/ordered_set.go",
+      "id": "tsc/internal/collections/ordered_set.go:OrderedSet.Values",
+      "ledger_crate": "tsr_collections",
+      "ledger_phase": 1,
+      "ledger_status": "in-progress",
+      "ledger_verification": [],
+      "mapped_in_ledger": false,
+      "membership": "full",
+      "membership_reason": "ordered maps/sets and copy-on-write scopes",
+      "roster": {
+        "owner": null,
+        "state": "prepared",
+        "step": "leaves"
+      },
+      "rust_home": [
+        "crates/tsr_core/src/collections/ordered_set.rs"
+      ],
       "symbol": "OrderedSet.Values"
     },
     {

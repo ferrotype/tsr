@@ -1188,3 +1188,72 @@ python3 scripts/phase1.py inventory --write
 
 Go 1.27.1 was placed on `PATH`. Only this leaf family was captured; no full
 compiler corpus or performance measurement was needed for the attribution fix.
+
+### F1b first implementation batch: ordered and scoped collections — 2026-09-21
+
+F1b is **in progress**, not complete. The first batch implements the non-JSON
+`OrderedMap`/`OrderedSet` operations and the copy-on-write map/set in
+`tsr_core::collections`. It uses the existing core dependency rather than adding
+a crate. `PORTS.toml` records the actual Rust files as in progress, and the Phase
+1 inventory records those homes. Its generated `tsr_collections` planned-crate
+classification is retained; changing the package-wide crate map and regenerating
+upstream provenance remains part of the final F1b inventory update.
+
+Representation choices:
+
+- Ordered maps hold a key deque and a hash table. Overwrite preserves position;
+  delete/reinsert appends; first/last deletion avoids shifting all keys. Borrowed
+  iterators serve ordinary reads. An explicit mutable visitor rereads the current
+  index and length after each callback, preserving Go's append and deletion-shift
+  behavior without cloning the whole collection. Diff notifications retain the
+  native order. Diff callbacks borrow both operands, matching the non-mutating
+  watcher/project consumers at the pin.
+- Nil Go receivers are represented by `Option`; the leaf adapter translates
+  nil-tolerant operations and required-receiver failures. This is not a nullable
+  production object or a new promise that every Rust method accepts nil.
+- Copy-on-write maps retain an optional `Arc<HashMap>`: empty scopes allocate
+  nothing, reads borrow, and the first shared write clones entries. Rust values
+  representing shared Go objects must themselves preserve identity, such as an
+  `Arc` or an ID; cloning the container does not turn owned mutable values into
+  shared objects. Exclusive scope guards restore on normal exit and unwind.
+  Owned snapshots let the checker's existing serialization callback borrow the
+  whole builder. Its three naming tables now share storage on entry instead of
+  cloning every table eagerly, and retain the existing fast hasher. Normal and
+  `Result`-error exits restore the saved names. Checker panic retirement is
+  unchanged. No performance ratio is claimed.
+
+The complete 225-case capture is **100 match, 124 not_implemented, 1 different**,
+with zero unavailability, harness failures or unrun cases. All 26 new matches
+were previously missing: 17 ordered-map traces, five ordered-set traces and four
+scope traces. Every native observation is byte-identical to the starting
+capture, and no previously observed Rust row changed. The five ordered-map JSON
+cases still name the missing marshal/unmarshal operation; their adapter metadata
+now points to the pending integration in the production collection. The options
+clone's shallow-sharing difference remains visible and unapproved.
+
+Replay inputs and observations are archived in
+`data/phase1/captures/leaves-f1b-collections.tar.gz` (27 JSON files, 247,047 bytes;
+no binaries or upstream export). Capture provenance SHA-256:
+`2bdef100b467260ab222e10a1ad8f04c73b10658491615b8915e0b13036a09b6`.
+The capture binds 506 input files. Results were installed only through
+`phase1.py record`, followed by `inventory --write`.
+
+Validation: all 17 core tests pass in debug and release, including copy counts,
+unwind restoration, shared value identity, live mutation and deque wraparound.
+A checker regression covers nested name scopes and an error followed by a
+sibling scope; all **208** frozen P5 display queries still match pinned Go.
+Targeted clippy passes with warnings denied. The Phase 1 Python suite passes
+**161 tests and 17 subtests**. No generator/dependency inputs changed, and no
+full compiler corpus or performance capture was run.
+
+The S07 operation inventory gains 13 ordered-map source mappings and moves three
+TextRange marker anchors by one line. All other operation data is unchanged.
+Replaying authenticated existing syntax/loader observations leaves subset and
+checker-obligation bytes unchanged; only the operation digest and its review
+chain change. Historical producer freshness and outcomes are not rewritten.
+
+Next work remains the other collection/core/text helpers, ordered-map JSON plus
+the shared JSON layer, locale matching and generated translations, diagnostic
+formatting, bundled access, and the explicit options-clone disposition. The
+case manifest retains the exact outstanding IDs; this batch does not claim
+F1b's full-family or consumer-integration exit.

@@ -4,13 +4,14 @@ use super::{names::NameAccess, NodeBuilder};
 use crate::{Error, MapperId, SignatureId, TypeId};
 use tsr_arena::{NodeId, SymbolId};
 use tsr_ast::{FactoryMethods, JsString, SymbolTable, SymbolTableId, SyntaxKind as K};
+use tsr_core::collections::{CopyOnWriteMap, CopyOnWriteSet};
 use tsr_nodebuilder::flags as nf;
 
-#[derive(Default)]
+#[derive(Clone, Default)]
 pub(super) struct TypeParameterNames {
-    names: crate::types::Map<TypeId, NodeId>,
-    text: crate::types::Set<JsString>,
-    next: crate::types::Map<JsString, usize>,
+    names: CopyOnWriteMap<TypeId, NodeId, crate::types::FastState>,
+    text: CopyOnWriteSet<JsString, crate::types::FastState>,
+    next: CopyOnWriteMap<JsString, usize, crate::types::FastState>,
 }
 
 struct ScopeUndo {
@@ -65,11 +66,10 @@ impl NodeBuilder<'_> {
     ) -> Result<T, Error> {
         let enclosing = self.enclosing;
         let old_mapper = self.mapper;
-        let names = TypeParameterNames {
-            names: self.type_parameter_names.names.clone(),
-            text: self.type_parameter_names.text.clone(),
-            next: self.type_parameter_names.next.clone(),
-        };
+        // The callback needs the whole builder, so retain an owned snapshot
+        // instead of holding guards that borrow its fields. Restoring it below
+        // matches Go's cloneNodeBuilderContext; each table copies only on write.
+        let names = self.type_parameter_names.clone();
         let mut undos = Vec::new();
         if mapper.is_some() {
             self.mapper = mapper;
@@ -309,5 +309,60 @@ impl NodeBuilder<'_> {
             self.type_parameter_names.text.insert(name);
         }
         Ok(node)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::{CheckerOptions, CheckerState};
+    use tsr_arena::{CheckerIdentity, Counters, Generation};
+
+    #[test]
+    fn serialization_names_restore_after_nested_success_and_failure() {
+        let counters = Counters::new();
+        let identity = CheckerIdentity::new(Generation::new(&counters), &counters);
+        let mut checker =
+            CheckerState::new(&identity, &counters, CheckerOptions::default()).unwrap();
+        let ty = checker.builtins.number_type;
+        let mut builder = NodeBuilder::new(&mut checker, 0);
+        let name = JsString::from_bytes(b"T".as_slice());
+        let parent = builder.ast.new_identifier(name.clone());
+        let child = builder
+            .ast
+            .new_identifier(JsString::from_bytes(b"T_1".as_slice()));
+        builder.type_parameter_names.names.insert(ty, parent);
+        builder.type_parameter_names.next.insert(name.clone(), 1);
+
+        let result = builder.with_serialization_scope(None, &[], &[], &[], None, |builder| {
+            assert_eq!(builder.type_parameter_names.names.get(&ty), Some(&parent));
+            builder.type_parameter_names.names.insert(ty, child);
+            builder.type_parameter_names.text.insert(name.clone());
+            builder.type_parameter_names.next.insert(name.clone(), 2);
+            builder.with_serialization_scope(None, &[], &[], &[], None, |builder| {
+                builder.type_parameter_names.names.insert(ty, parent);
+                builder.type_parameter_names.next.insert(name.clone(), 3);
+                Ok(())
+            })?;
+            assert_eq!(builder.type_parameter_names.names.get(&ty), Some(&child));
+            assert_eq!(builder.type_parameter_names.next.get(&name), Some(&2));
+            Err::<(), _>(Error::MissingLink("test scope failure"))
+        });
+        assert!(matches!(
+            result,
+            Err(Error::MissingLink("test scope failure"))
+        ));
+
+        // A later sibling inherits the parent, even after the previous callback
+        // failed. Read-only siblings leave that same state in place.
+        builder
+            .with_serialization_scope(None, &[], &[], &[], None, |builder| {
+                assert_eq!(builder.type_parameter_names.names.get(&ty), Some(&parent));
+                assert_eq!(builder.type_parameter_names.next.get(&name), Some(&1));
+                assert!(!builder.type_parameter_names.text.contains(&name));
+                Ok(())
+            })
+            .unwrap();
+        assert_eq!(builder.type_parameter_names.names.get(&ty), Some(&parent));
     }
 }
