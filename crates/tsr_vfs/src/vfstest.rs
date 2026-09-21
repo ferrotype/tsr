@@ -35,7 +35,7 @@ pub enum InputFile {
     /// Copied; its modification time is replaced by the clock's.
     File(MapFile),
 }
-/// port: tsc/internal/vfs/vfstest/vfstest.go:Symlink
+/// Source operation: tsc/internal/vfs/vfstest/vfstest.go:Symlink
 pub fn symlink(target: &[u8]) -> MapFile {
     MapFile {
         data: target.into(),
@@ -62,7 +62,7 @@ pub struct TestFs {
 /// # Panics
 /// With the pinned sentences, on a non-rooted or non-normalised path, on mixed
 /// path styles, and on two paths with one canonical form.
-/// port: tsc/internal/vfs/vfstest/vfstest.go:FromMapWithClock
+/// Source operation: tsc/internal/vfs/vfstest/vfstest.go:FromMapWithClock
 pub fn from_map_with_clock(
     input: &BTreeMap<Vec<u8>, InputFile>,
     case_sensitive: bool,
@@ -105,14 +105,14 @@ pub fn from_map_with_clock(
     assert!(!(posix && windows), "mixed posix and windows paths");
     convert_map_fs(&MapFs(files), case_sensitive, Some(clock))
 }
-/// port: tsc/internal/vfs/vfstest/vfstest.go:FromMap
+/// Source operation: tsc/internal/vfs/vfstest/vfstest.go:FromMap
 pub fn from_map(input: &BTreeMap<Vec<u8>, InputFile>, case_sensitive: bool) -> TestFs {
     from_map_with_clock(input, case_sensitive, Arc::new(SystemClock))
 }
 /// # Panics
 /// On two inputs with one canonical path, and when an intermediate directory
 /// cannot be created.
-/// port: tsc/internal/vfs/vfstest/vfstest.go:convertMapFS
+/// Source operation: tsc/internal/vfs/vfstest/vfstest.go:convertMapFS
 pub fn convert_map_fs(
     input: &MapFs,
     case_sensitive: bool,
@@ -161,7 +161,7 @@ pub fn convert_map_fs(
     fs
 }
 /// Compares element by element, so a directory's children sort right after it.
-/// port: tsc/internal/vfs/vfstest/vfstest.go:comparePathsByParts
+/// Source operation: tsc/internal/vfs/vfstest/vfstest.go:comparePathsByParts
 pub fn compare_paths_by_parts(mut a: &[u8], mut b: &[u8]) -> std::cmp::Ordering {
     loop {
         let (Some(a_end), Some(b_end)) = (
@@ -181,7 +181,7 @@ pub fn compare_paths_by_parts(mut a: &[u8], mut b: &[u8]) -> std::cmp::Ordering 
 ///
 /// # Panics
 /// When `offset` is past the end, as the pinned slice does.
-/// port: tsc/internal/vfs/vfstest/vfstest.go:splitPath
+/// Source operation: tsc/internal/vfs/vfstest/vfstest.go:splitPath
 pub fn split_path(text: &[u8], offset: usize) -> (&[u8], &[u8]) {
     assert!(
         offset <= text.len(),
@@ -193,14 +193,14 @@ pub fn split_path(text: &[u8], offset: usize) -> (&[u8], &[u8]) {
         None => (text, b""),
     }
 }
-/// port: tsc/internal/vfs/vfstest/vfstest.go:dirName
+/// Source operation: tsc/internal/vfs/vfstest/vfstest.go:dirName
 pub fn dir_name(p: &[u8]) -> &[u8] {
     match p.iter().rposition(|&c| c == b'/') {
         Some(index) => p[..=index].strip_suffix(b"/").unwrap_or(&p[..=index]),
         None => b"",
     }
 }
-/// port: tsc/internal/vfs/vfstest/vfstest.go:baseName
+/// Source operation: tsc/internal/vfs/vfstest/vfstest.go:baseName
 pub fn base_name(p: &[u8]) -> &[u8] {
     match p.iter().rposition(|&c| c == b'/') {
         Some(index) => &p[index + 1..],
@@ -221,7 +221,7 @@ impl TestFs {
     pub fn use_case_sensitive_file_names(&self) -> bool {
         self.case_sensitive
     }
-    /// port: tsc/internal/vfs/vfstest/vfstest.go:MapFS.getCanonicalPath
+    /// Source operation: tsc/internal/vfs/vfstest/vfstest.go:MapFS.getCanonicalPath
     pub fn canonical(&self, p: &[u8]) -> Vec<u8> {
         path::canonical(p, self.case_sensitive).into_owned()
     }
@@ -235,13 +235,13 @@ impl TestFs {
             .write()
             .unwrap_or_else(std::sync::PoisonError::into_inner)
     }
-    /// port: tsc/internal/vfs/vfstest/vfstest.go:MapFS.getFollowingSymlinks
+    /// Source operation: tsc/internal/vfs/vfstest/vfstest.go:MapFS.getFollowingSymlinks
     pub fn get_following_symlinks(&self, canonical: &[u8]) -> Resolved {
         Self::follow(&self.read(), canonical, b"", b"")
     }
     /// `from` and `to` name the link being followed; a miss while following one
     /// is a broken link and not a missing file.
-    /// port: tsc/internal/vfs/vfstest/vfstest.go:MapFS.getFollowingSymlinksWorker
+    /// Source operation: tsc/internal/vfs/vfstest/vfstest.go:MapFS.getFollowingSymlinksWorker
     pub fn get_following_symlinks_worker(
         &self,
         canonical: &[u8],
@@ -286,7 +286,7 @@ impl TestFs {
         }
         panic!("stack overflow: symbolic link cycle");
     }
-    /// port: tsc/internal/vfs/vfstest/vfstest.go:MapFS.set
+    /// Source operation: tsc/internal/vfs/vfstest/vfstest.go:MapFS.set
     pub fn set(&self, canonical: &[u8], file: MapFile) {
         self.write()
             .files
@@ -297,7 +297,7 @@ impl TestFs {
     ///
     /// # Panics
     /// On an empty path.
-    /// port: tsc/internal/vfs/vfstest/vfstest.go:MapFS.setEntry
+    /// Source operation: tsc/internal/vfs/vfstest/vfstest.go:MapFS.setEntry
     pub fn set_entry_public(&self, realpath: &[u8], canonical: &[u8], file: MapFile) {
         self.set_entry(&mut self.write(), realpath, canonical, file);
     }
@@ -314,12 +314,12 @@ impl TestFs {
         }
         state.files.0.insert(canonical.to_vec(), Arc::new(file));
     }
-    /// port: tsc/internal/vfs/vfstest/vfstest.go:MapFS.open
+    /// Source operation: tsc/internal/vfs/vfstest/vfstest.go:MapFS.open
     pub fn open_canonical(&self, canonical: &[u8]) -> Result<Handle, IoError> {
         self.read().files.open(canonical)
     }
     /// A missing path is not an error. A directory takes everything beneath it.
-    /// port: tsc/internal/vfs/vfstest/vfstest.go:MapFS.remove
+    /// Source operation: tsc/internal/vfs/vfstest/vfstest.go:MapFS.remove
     pub fn remove_canonical(&self, p: &[u8]) {
         let mut state = self.write();
         let canonical = self.canonical(p);
@@ -333,18 +333,18 @@ impl TestFs {
             state.symlinks.retain(|name, _| !name.starts_with(&prefix));
         }
     }
-    /// port: tsc/internal/vfs/vfstest/vfstest.go:MapFS.Remove
+    /// Source operation: tsc/internal/vfs/vfstest/vfstest.go:MapFS.Remove
     pub fn remove(&self, p: &[u8]) -> Result<(), IoError> {
         self.remove_canonical(p);
         Ok(())
     }
     /// # Panics
     /// On an empty path.
-    /// port: tsc/internal/vfs/vfstest/vfstest.go:MapFS.MkdirAll
+    /// Source operation: tsc/internal/vfs/vfstest/vfstest.go:MapFS.MkdirAll
     pub fn mkdir_all(&self, p: &[u8], perm: u32) -> Result<(), IoError> {
         self.mkdir_all_locked(&mut self.write(), p, perm)
     }
-    /// port: tsc/internal/vfs/vfstest/vfstest.go:MapFS.mkdirAll
+    /// Source operation: tsc/internal/vfs/vfstest/vfstest.go:MapFS.mkdirAll
     fn mkdir_all_locked(&self, state: &mut State, p: &[u8], perm: u32) -> Result<(), IoError> {
         assert!(!p.is_empty(), "empty path");
         let not_directory = |at: &[u8]| {
@@ -403,15 +403,15 @@ impl TestFs {
         }
         Ok(())
     }
-    /// port: tsc/internal/vfs/vfstest/vfstest.go:MapFS.AddSymlink
+    /// Source operation: tsc/internal/vfs/vfstest/vfstest.go:MapFS.AddSymlink
     pub fn add_symlink(&self, p: &[u8], target: &[u8]) {
         self.set_entry(&mut self.write(), p, &self.canonical(p), symlink(target));
     }
-    /// port: tsc/internal/vfs/vfstest/vfstest.go:MapFS.WriteFile
+    /// Source operation: tsc/internal/vfs/vfstest/vfstest.go:MapFS.WriteFile
     pub fn write_file(&self, p: &[u8], data: &[u8], perm: u32) -> Result<(), IoError> {
         self.put(p, data, perm, "write", false)
     }
-    /// port: tsc/internal/vfs/vfstest/vfstest.go:MapFS.AppendFile
+    /// Source operation: tsc/internal/vfs/vfstest/vfstest.go:MapFS.AppendFile
     pub fn append_file(&self, p: &[u8], data: &[u8], perm: u32) -> Result<(), IoError> {
         self.put(p, data, perm, "append", true)
     }
@@ -479,7 +479,7 @@ impl TestFs {
     }
     /// The access time is accepted and ignored. The entry is replaced, not
     /// assigned through; see the module note.
-    /// port: tsc/internal/vfs/vfstest/vfstest.go:MapFS.Chtimes
+    /// Source operation: tsc/internal/vfs/vfstest/vfstest.go:MapFS.Chtimes
     pub fn chtimes(&self, p: &[u8], _a_time: Time, m_time: Time) -> Result<(), IoError> {
         let mut state = self.write();
         let canonical = self.canonical(p);
@@ -493,7 +493,7 @@ impl TestFs {
         state.files.0.insert(canonical, Arc::new(file));
         Ok(())
     }
-    /// port: tsc/internal/vfs/vfstest/vfstest.go:MapFS.Realpath
+    /// Source operation: tsc/internal/vfs/vfstest/vfstest.go:MapFS.Realpath
     pub fn realpath(&self, name: &[u8]) -> Result<Vec<u8>, IoError> {
         let (file, _) = self
             .get_following_symlinks(&self.canonical(name))
@@ -503,7 +503,7 @@ impl TestFs {
             _ => panic!("interface conversion: stored entry has no wrapper"),
         }
     }
-    /// port: tsc/internal/vfs/vfstest/vfstest.go:MapFS.GetTargetOfSymlink
+    /// Source operation: tsc/internal/vfs/vfstest/vfstest.go:MapFS.GetTargetOfSymlink
     pub fn get_target_of_symlink(&self, p: &[u8]) -> Option<Vec<u8>> {
         let file = self.get_file_info(p)?;
         file.mode
@@ -511,13 +511,13 @@ impl TestFs {
             .then(|| [b"/".as_slice(), &file.data].concat())
     }
     /// The zero time for a missing entry.
-    /// port: tsc/internal/vfs/vfstest/vfstest.go:MapFS.GetModTime
+    /// Source operation: tsc/internal/vfs/vfstest/vfstest.go:MapFS.GetModTime
     pub fn get_mod_time(&self, p: &[u8]) -> Time {
         self.get_file_info(p)
             .map_or(Time::ZERO, |file| file.mod_time)
     }
     /// The stored entry itself, without following links.
-    /// port: tsc/internal/vfs/vfstest/vfstest.go:MapFS.GetFileInfo
+    /// Source operation: tsc/internal/vfs/vfstest/vfstest.go:MapFS.GetFileInfo
     pub fn get_file_info(&self, p: &[u8]) -> Option<Arc<MapFile>> {
         self.read()
             .files
@@ -525,7 +525,7 @@ impl TestFs {
             .cloned()
     }
     /// Every entry with its spelled, rooted path, children right after parents.
-    /// port: tsc/internal/vfs/vfstest/vfstest.go:MapFS.Entries
+    /// Source operation: tsc/internal/vfs/vfstest/vfstest.go:MapFS.Entries
     pub fn entries(&self) -> Vec<(Vec<u8>, Arc<MapFile>)> {
         let state = self.read();
         let mut keys: Vec<&Vec<u8>> = state.files.0.keys().collect();
@@ -549,7 +549,7 @@ impl TestFs {
 /// The entry's metadata with the wrapper removed: the spelled base name and the
 /// caller's original `sys`. `None` for an entry that has no wrapper, which is a
 /// directory `MapFs` synthesized.
-/// port: tsc/internal/vfs/vfstest/vfstest.go:convertInfo
+/// Source operation: tsc/internal/vfs/vfstest/vfstest.go:convertInfo
 pub fn convert_info(info: &Info) -> Option<Info> {
     let Sys::Wrapper { original, realpath } = &info.sys else {
         return None;
@@ -565,7 +565,7 @@ impl Fs for TestFs {
     ///
     /// # Panics
     /// On a synthesized directory other than the root.
-    /// port: tsc/internal/vfs/vfstest/vfstest.go:MapFS.Open
+    /// Source operation: tsc/internal/vfs/vfstest/vfstest.go:MapFS.Open
     fn open(&self, name: &[u8]) -> Result<Handle, IoError> {
         let state = self.read();
         let canonical = match Self::follow(&state, &self.canonical(name), b"", b"") {

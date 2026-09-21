@@ -124,16 +124,16 @@ mod tests {
     use super::*;
 
     #[test]
-    fn usage_gap_cannot_claim_an_implemented_operation_is_absent() {
+    fn usage_names_are_observed_from_the_production_table() {
         let row = observe(&json!({
             "case": "identity-control", "subject": "vfsmatch.Usage", "dialect": "vfsmatch",
-            "operation": "tsc/internal/vfs/vfsmatch/vfsmatch.go:IsImplicitGlob",
+            "operation": "tsc/internal/vfs/vfsmatch/stringer_generated.go:Usage.String",
+            "actions": [{"op": "usage_string", "value": 1}, {"op": "usage_string", "value": -128}],
         }));
-        assert_eq!(row["result"], "not_implemented");
-        assert_eq!(
-            row["missing_operation"]["operation"],
-            "tsc/internal/vfs/vfsmatch/stringer_generated.go:Usage.String"
-        );
+        assert_eq!(row["result"], "observed");
+        let rows = &row["observation"]["ordered"];
+        assert_eq!(rows[0]["result"], "Directories");
+        assert_eq!(rows[1]["result"], "Usage(-128)");
     }
 
     #[test]
