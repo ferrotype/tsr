@@ -82,9 +82,12 @@ impl Common {
         let add = |result: &mut Entries, name: &[u8], mode: iofs::FileMode, link: bool| {
             let name = JsString::from_bytes(name);
             if mode.is_dir() {
-                result.directories.push(name.clone());
+                result
+                    .directories
+                    .get_or_insert_with(Vec::new)
+                    .push(name.clone());
             } else if mode.is_regular() {
-                result.files.push(name.clone());
+                result.files.get_or_insert_with(Vec::new).push(name.clone());
             } else {
                 return false;
             }

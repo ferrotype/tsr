@@ -538,12 +538,15 @@ impl FileSystem for BundledFs {
             if rest.is_empty() {
                 entries
                     .directories
+                    .get_or_insert_with(Vec::new)
                     .push(JsString::from_bytes(b"libs".as_slice()));
             } else if rest == b"libs" {
-                entries.files = LIBRARIES
-                    .iter()
-                    .map(|(name, _)| JsString::from_bytes(name.as_bytes()))
-                    .collect();
+                entries.files = Some(
+                    LIBRARIES
+                        .iter()
+                        .map(|(name, _)| JsString::from_bytes(name.as_bytes()))
+                        .collect(),
+                );
             }
             return Ok(entries);
         }

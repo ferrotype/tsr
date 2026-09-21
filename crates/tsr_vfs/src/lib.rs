@@ -6,28 +6,44 @@ use std::{
         Arc,
     },
 };
+pub mod cached;
+mod io_adapter;
 pub mod iofs;
 pub mod iovfs;
+pub mod os;
+pub mod recording;
+pub mod tracking;
 pub mod vfstest;
 mod walk;
+pub mod wrapped;
 use tsr_jsstring::{JsString, SourceText};
 use tsr_tspath as path;
-pub use walk::{WalkCallback, WalkControl, WalkEntry};
+pub use walk::{OwnedWalkCallback, WalkCallback, WalkControl, WalkEntry};
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Error {
     Unsupported(&'static str),
     OutsideScope,
     InvalidPath,
     SymlinkCycle,
     Io(std::io::ErrorKind),
+    /// Live adapters preserve the source error's path and wrapping chain.
+    Detailed(Arc<iofs::IoError>),
 }
 impl std::fmt::Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{self:?}")
+        match self {
+            Self::Detailed(error) => error.fmt(f),
+            _ => write!(f, "{self:?}"),
+        }
     }
 }
 impl std::error::Error for Error {}
+impl From<iofs::IoError> for Error {
+    fn from(error: iofs::IoError) -> Self {
+        Self::Detailed(Arc::new(error))
+    }
+}
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct SnapshotId(u64);
 static NEXT_SNAPSHOT: AtomicU64 = AtomicU64::new(1);
@@ -59,10 +75,24 @@ impl FileContent {
         }
     }
 }
+/// The source VFS read contract keeps the content and success bit independent.
+/// Compiler callers normally use `read_file`; transparent wrappers use this
+/// representation so an unsuccessful read's supplied content is not discarded.
+#[derive(Clone, Debug)]
+pub struct ReadResult {
+    pub content: FileContent,
+    pub found: bool,
+}
+impl ReadResult {
+    pub fn into_file(self) -> Option<FileContent> {
+        self.found.then_some(self.content)
+    }
+}
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Entries {
-    pub files: Vec<JsString>,
-    pub directories: Vec<JsString>,
+    /// None is a nil Go slice; Some(empty) retains an explicitly empty list.
+    pub files: Option<Vec<JsString>>,
+    pub directories: Option<Vec<JsString>>,
     pub symlinks: Option<BTreeSet<JsString>>,
 }
 /// What `stat` answers. Hosts that have no name, time or mode to report leave
@@ -75,6 +105,7 @@ pub struct FileInfo {
     pub name: JsString,
     pub mod_time: iofs::Time,
     pub mode: iofs::FileMode,
+    pub sys: iofs::Sys,
 }
 impl FileInfo {
     pub fn basic(directory: bool, size: u64) -> Self {
@@ -89,6 +120,7 @@ impl FileInfo {
             name: JsString::default(),
             mod_time: iofs::Time::ZERO,
             mode,
+            sys: iofs::Sys::Nil,
         }
     }
 }
@@ -98,6 +130,13 @@ pub trait FileSystem: Send + Sync {
     fn use_case_sensitive_file_names(&self) -> bool;
     fn snapshot_id(&self) -> Option<SnapshotId>;
     fn read_file(&self, path: &[u8]) -> Result<Option<FileContent>, Error>;
+    fn read_file_result(&self, path: &[u8]) -> Result<ReadResult, Error> {
+        let file = self.read_file(path)?;
+        Ok(ReadResult {
+            found: file.is_some(),
+            content: file.unwrap_or_else(|| FileContent::loaded(Arc::<[u8]>::from([]))),
+        })
+    }
     fn stat(&self, path: &[u8]) -> Result<Option<FileInfo>, Error>;
     fn entries(&self, path: &[u8]) -> Result<Entries, Error>;
     fn realpath(&self, path: &[u8]) -> Result<JsString, Error>;
@@ -116,6 +155,10 @@ pub trait FileSystem: Send + Sync {
     }
     fn walk_dir(&self, root: &[u8], visit: &mut WalkCallback<'_>) -> Result<(), Error> {
         walk::walk(self, root, visit)
+    }
+    /// Retaining adapters override this; ordinary hosts use the same walk.
+    fn walk_dir_owned(&self, root: &[u8], visit: OwnedWalkCallback) -> Result<(), Error> {
+        self.walk_dir(root, &mut |path, entry, error| visit(path, entry, error))
     }
     fn write_file(&self, _path: &[u8], _data: &[u8]) -> Result<(), Error> {
         Err(Error::Unsupported("immutable filesystem write"))
@@ -307,14 +350,21 @@ impl FileSystem for MemorySnapshot {
                     result.symlinks.as_mut().unwrap().insert(basename.clone());
                 }
                 if info.directory {
-                    result.directories.push(basename);
+                    result
+                        .directories
+                        .get_or_insert_with(Vec::new)
+                        .push(basename);
                 } else {
-                    result.files.push(basename);
+                    result.files.get_or_insert_with(Vec::new).push(basename);
                 }
             }
         }
-        result.files.sort();
-        result.directories.sort();
+        if let Some(files) = &mut result.files {
+            files.sort();
+        }
+        if let Some(directories) = &mut result.directories {
+            directories.sort();
+        }
         Ok(result)
     }
     fn realpath(&self, name: &[u8]) -> Result<JsString, Error> {
@@ -324,5 +374,3 @@ impl FileSystem for MemorySnapshot {
             .map_or_else(|| JsString::from_bytes(resolved), |e| e.name.clone()))
     }
 }
-
-pub mod os;

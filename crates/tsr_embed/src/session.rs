@@ -53,7 +53,7 @@ impl Session {
 
     pub fn checker(&self) -> Result<&Arc<CheckerOwner>, Error> {
         if let Some(result) = self.checker.get() {
-            return result.as_ref().map_err(|error| *error);
+            return result.as_ref().map_err(Clone::clone);
         }
         // Acquire before entering OnceLock: a host callback that reenters the
         // same session receives Reentry instead of waiting on its own cell.
@@ -68,7 +68,7 @@ impl Session {
                 .map(Arc::new)
             })
             .as_ref()
-            .map_err(|error| *error)
+            .map_err(Clone::clone)
     }
 
     /// Queries borrow this scope; mutable checker storage never escapes it.

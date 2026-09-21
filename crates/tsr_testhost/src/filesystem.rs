@@ -142,11 +142,16 @@ impl Host {
             }
             "getAccessibleEntries" => {
                 let entries = self.snapshot.entries(bytes).map_err(io)?;
-                let files: Result<Vec<_>, _> =
-                    entries.files.iter().map(|s| utf8(s.as_bytes())).collect();
+                let files: Result<Vec<_>, _> = entries
+                    .files
+                    .iter()
+                    .flatten()
+                    .map(|s| utf8(s.as_bytes()))
+                    .collect();
                 let directories: Result<Vec<_>, _> = entries
                     .directories
                     .iter()
+                    .flatten()
                     .map(|s| utf8(s.as_bytes()))
                     .collect();
                 Ok(json!({"files":files?,"directories":directories?}))

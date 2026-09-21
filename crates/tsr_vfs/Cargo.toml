@@ -13,8 +13,12 @@ readme = "README.md"
 include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/licenses/**"]
 
 [dependencies]
+tsr_core = { version = "0.1.0", path = "../tsr_core" }
 tsr_tspath = { version = "0.1.0", path = "../tsr_tspath" }
 tsr_jsstring = { version = "0.1.0", path = "../tsr_jsstring" }
 
 [lints]
 workspace = true
+
+[target.'cfg(unix)'.dependencies]
+rustix = { version = "1.1", features = ["fs"] }

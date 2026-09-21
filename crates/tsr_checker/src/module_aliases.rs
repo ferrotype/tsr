@@ -133,7 +133,7 @@ impl CheckerState {
         let mut flags = self.symbol(symbol)?.flags();
         let mut seen = crate::types::Set::default();
         while self.symbol(symbol)?.flags() & sf::ALIAS != 0 {
-            let Some(&target) = self.module_aliases.targets.get(&symbol) else {
+            let Some(target) = self.module_aliases.targets.get(&symbol).cloned() else {
                 return Ok(None);
             };
             let target = self.get_export_symbol_of_value_symbol_if_exported(target?)?;
@@ -262,7 +262,7 @@ impl CheckerState {
         if self.symbol(symbol)?.flags() & sf::ALIAS == 0 {
             return Err(tsr_arena::Error::InvalidGraph.into());
         }
-        if let Some(&target) = self.module_aliases.targets.get(&symbol) {
+        if let Some(target) = self.module_aliases.targets.get(&symbol).cloned() {
             return target;
         }
         if !self.push_source_resolution(symbol, TypeSystemPropertyName::AliasTarget) {
@@ -325,7 +325,7 @@ impl CheckerState {
             }
             Err(error) => Err(error),
         };
-        self.module_aliases.targets.insert(symbol, target);
+        self.module_aliases.targets.insert(symbol, target.clone());
         target
     }
     pub(crate) fn local_type_only_alias_declaration(

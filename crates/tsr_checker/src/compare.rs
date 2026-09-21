@@ -7,7 +7,6 @@
 //! type kinds not stored yet are named failures, never a guessed order.
 
 use crate::{object_flags, type_flags, CheckerState, Error, LiteralValue, TypeId, TypeKind};
-use std::cell::Cell;
 use std::cmp::Ordering;
 use tsr_arena::{NodeId, SymbolId};
 
@@ -18,17 +17,17 @@ fn ordering(value: i64) -> Ordering {
 impl CheckerState {
     /// Sorts types with the ported comparator; the first comparator error wins.
     pub(crate) fn sort_types(&self, types: &mut [TypeId]) -> Result<(), Error> {
-        let failure: Cell<Option<Error>> = Cell::new(None);
+        let mut failure = None;
         types.sort_by(|a, b| match self.compare_types(*a, *b) {
             Ok(order) => order,
             Err(error) => {
-                if failure.get().is_none() {
-                    failure.set(Some(error));
+                if failure.is_none() {
+                    failure = Some(error);
                 }
                 Ordering::Equal
             }
         });
-        failure.get().map_or(Ok(()), Err)
+        failure.map_or(Ok(()), Err)
     }
 
     // port: tsc/internal/checker/utilities.go:Checker.sortSymbols
@@ -50,14 +49,14 @@ impl CheckerState {
             };
             keyed.push((key, symbol));
         }
-        let failure: Cell<Option<Error>> = Cell::new(None);
+        let mut failure = None;
         keyed.sort_by(|a, b| {
             a.0.cmp(&b.0)
                 .then_with(|| match self.compare_symbols(Some(a.1), Some(b.1)) {
                     Ok(order) => order,
                     Err(error) => {
-                        if failure.get().is_none() {
-                            failure.set(Some(error));
+                        if failure.is_none() {
+                            failure = Some(error);
                         }
                         Ordering::Equal
                     }
@@ -66,7 +65,7 @@ impl CheckerState {
         for (slot, (_, symbol)) in symbols.iter_mut().zip(keyed) {
             *slot = symbol;
         }
-        failure.get().map_or(Ok(()), Err)
+        failure.map_or(Ok(()), Err)
     }
 
     // port: tsc/internal/checker/utilities.go:CompareTypes

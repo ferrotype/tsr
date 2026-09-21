@@ -51,7 +51,7 @@ pub(crate) struct EnumEvaluation {
     pub has_external_references: bool,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 pub(crate) enum EnumComputation {
     Computing,
     Complete,
@@ -342,13 +342,13 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.computeEnumMemberValues
     pub(crate) fn compute_enum_member_values(&mut self, declaration: NodeId) -> Result<(), Error> {
-        match self.enums.computed.try_get(declaration).copied().flatten() {
+        match self.enums.computed.try_get(declaration).cloned().flatten() {
             Some(EnumComputation::Computing | EnumComputation::Complete) => return Ok(()),
             Some(EnumComputation::Failed(error)) => return Err(error),
             None => {}
         }
         *self.enums.computed.get_or_default(declaration) = Some(EnumComputation::Computing);
-        let result = (|| {
+        let result: Result<(), Error> = (|| {
             let mut auto = Some(Number::new(0.0));
             let mut previous = None;
             for member in self.source_list(declaration, self.node(declaration)?.member_list())? {
@@ -362,9 +362,9 @@ impl CheckerState {
             }
             Ok(())
         })();
-        *self.enums.computed.get_or_default(declaration) = Some(match result {
+        *self.enums.computed.get_or_default(declaration) = Some(match &result {
             Ok(()) => EnumComputation::Complete,
-            Err(error) => EnumComputation::Failed(error),
+            Err(error) => EnumComputation::Failed(error.clone()),
         });
         result
     }

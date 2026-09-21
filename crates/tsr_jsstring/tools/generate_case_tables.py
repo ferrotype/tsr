@@ -42,7 +42,7 @@ def generate():
         f"// Upstream: {pin}",
         f"// js_case_generated.go SHA-256: {hashlib.sha256(path.read_bytes()).hexdigest()}",
         "// JS casing: Unicode 15.1.0 (including Final_Sigma and derived properties).",
-        f"// LowerFirstChar: {simple['go']} unicode.ToLower, Unicode {simple['unicode']}.",
+        f"// LowerFirstChar: {simple['go']} unicode.ToLower/ToUpper, Unicode {simple['unicode']}.",
         "#![allow(clippy::unreadable_literal)] // Preserve upstream code-point notation.",
         "pub(crate) type Mapping = (i32, &'static str, &'static str, Option<&'static str>);",
         "#[rustfmt::skip]",
@@ -87,12 +87,13 @@ def generate():
         lines += ["#[rustfmt::skip]", f"pub(crate) static {rust_name}: &[(i32, i32, i32)] = &["]
         lines += [f"    (0x{lo:X}, 0x{hi:X}, {stride})," for lo, hi, stride in ranges]
         lines.append("];")
-    lines += ["#[rustfmt::skip]", "pub(crate) static SIMPLE_LOWER: &[(i32, i32)] = &["]
-    rows = simple["lower"]
-    if [r[0] for r in rows] != sorted({r[0] for r in rows}):
-        raise ValueError("simple lowercase keys must be sorted and unique")
-    lines += [f"    (0x{key:X}, 0x{value:X})," for key, value in rows]
-    lines.append("];")
+    for direction in ["lower", "upper"]:
+        lines += ["#[rustfmt::skip]", f"pub(crate) static SIMPLE_{direction.upper()}: &[(i32, i32)] = &["]
+        rows = simple[direction]
+        if [r[0] for r in rows] != sorted({r[0] for r in rows}):
+            raise ValueError(f"simple {direction}case keys must be sorted and unique")
+        lines += [f"    (0x{key:X}, 0x{value:X})," for key, value in rows]
+        lines.append("];")
     return '\n'.join(lines) + '\n'
 
 

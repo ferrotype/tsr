@@ -54,11 +54,13 @@ impl std::ops::BitOr for FileMode {
 }
 
 /// Go's `fs.FileInfo.Sys`: an opaque value the pin tests by dynamic type.
-#[derive(Clone, Debug, Default, PartialEq, Eq)]
+#[derive(Clone, Debug, Default)]
 pub enum Sys {
     #[default]
     Nil,
     Int(i64),
+    /// Native stat metadata stays opaque and retains its identity when cloned.
+    Native(Arc<std::fs::Metadata>),
     /// The test filesystem's wrapper: the entry's spelled path and the value
     /// the caller originally supplied.
     Wrapper {
@@ -67,10 +69,38 @@ pub enum Sys {
     },
 }
 
+impl PartialEq for Sys {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (Self::Nil, Self::Nil) => true,
+            (Self::Int(a), Self::Int(b)) => a == b,
+            (Self::Native(a), Self::Native(b)) => Arc::ptr_eq(a, b),
+            (
+                Self::Wrapper {
+                    original: a,
+                    realpath: ap,
+                },
+                Self::Wrapper {
+                    original: b,
+                    realpath: bp,
+                },
+            ) => a == b && ap == bp,
+            _ => false,
+        }
+    }
+}
+impl Eq for Sys {}
+
 /// The sentinel errors of `io/fs` plus the shapes the pin wraps them in.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum IoError {
     NotExist,
+    Os {
+        kind: std::io::ErrorKind,
+        code: Option<i32>,
+        message: String,
+    },
+    Permission,
     Invalid,
     Eof,
     /// `&fs.PathError{Op, Path, Err}`.
@@ -92,6 +122,24 @@ pub enum IoError {
     },
 }
 impl IoError {
+    /// Error category retained by the compiler-facing VFS boundary. The I/O
+    /// API continues to expose the complete path/wrapper error.
+    pub fn kind(&self) -> std::io::ErrorKind {
+        use std::io::ErrorKind;
+        match self {
+            Self::Os { kind, .. } => *kind,
+            Self::NotExist => ErrorKind::NotFound,
+            Self::Permission => ErrorKind::PermissionDenied,
+            Self::Invalid => ErrorKind::InvalidInput,
+            Self::Eof => ErrorKind::UnexpectedEof,
+            Self::Path { source, .. }
+            | Self::Message {
+                source: Some(source),
+                ..
+            } => source.kind(),
+            Self::BrokenSymlink { .. } | Self::Message { source: None, .. } => ErrorKind::Other,
+        }
+    }
     pub fn path(op: &'static str, path: &[u8], source: Self) -> Self {
         Self::Path {
             op,
@@ -108,7 +156,11 @@ impl IoError {
     /// `errors.Is(err, fs.ErrNotExist)`.
     pub fn is_not_exist(&self) -> bool {
         match self {
-            Self::NotExist => true,
+            Self::NotExist
+            | Self::Os {
+                kind: std::io::ErrorKind::NotFound,
+                ..
+            } => true,
             Self::Path { source, .. }
             | Self::Message {
                 source: Some(source),
@@ -133,7 +185,9 @@ impl IoError {
 impl fmt::Display for IoError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
+            Self::Os { message, .. } => f.write_str(message),
             Self::NotExist => f.write_str("file does not exist"),
+            Self::Permission => f.write_str("permission denied"),
             Self::Invalid => f.write_str("invalid argument"),
             Self::Eof => f.write_str("EOF"),
             Self::Path { op, path, source } => {
@@ -252,6 +306,26 @@ impl Handle {
 /// Source type: io/fs.FS
 pub trait Fs: Send + Sync {
     fn open(&self, name: &[u8]) -> Result<Handle, IoError>;
+    fn stat(&self, name: &[u8]) -> Result<Arc<Info>, IoError> {
+        self.open(name).map(|handle| handle.info)
+    }
+    /// An override implements Go's ReadDirFS contract, including sorted order.
+    fn read_dir(&self, name: &[u8]) -> Result<Vec<Arc<Info>>, IoError> {
+        let mut handle = self.open(name)?;
+        if !handle.is_read_dir_file() {
+            return Err(IoError::path(
+                "readdir",
+                name,
+                IoError::message("not implemented"),
+            ));
+        }
+        let mut entries = handle.read_dir(-1)?;
+        entries.sort_by(|a, b| a.name.cmp(&b.name));
+        Ok(entries)
+    }
+    fn read_file(&self, name: &[u8]) -> Result<Arc<[u8]>, IoError> {
+        self.open(name)?.read_all()
+    }
 }
 
 /// Unrooted, slash-separated, no empty, `.` or `..` element, valid UTF-8. The
@@ -268,26 +342,16 @@ pub fn valid_path(name: &[u8]) -> bool {
 }
 /// Source operation: io/fs.Stat
 pub fn stat(fs: &dyn Fs, name: &[u8]) -> Result<Arc<Info>, IoError> {
-    fs.open(name).map(|handle| handle.info)
+    fs.stat(name)
 }
 /// All entries, sorted by name.
 /// Source operation: io/fs.ReadDir
 pub fn read_dir(fs: &dyn Fs, name: &[u8]) -> Result<Vec<Arc<Info>>, IoError> {
-    let mut handle = fs.open(name)?;
-    if !handle.is_read_dir_file() {
-        return Err(IoError::path(
-            "readdir",
-            name,
-            IoError::message("not implemented"),
-        ));
-    }
-    let mut list = handle.read_dir(-1)?;
-    list.sort_by(|a, b| a.name.cmp(&b.name));
-    Ok(list)
+    fs.read_dir(name)
 }
 /// Source operation: io/fs.ReadFile
 pub fn read_file(fs: &dyn Fs, name: &[u8]) -> Result<Arc<[u8]>, IoError> {
-    fs.open(name)?.read_all()
+    fs.read_file(name)
 }
 
 /// What a walk callback asks for next.
@@ -399,6 +463,43 @@ impl Fs for SubFs {
     }
 }
 
+impl std::fmt::Display for FileMode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        // io/fs.FileMode.String: high bits in source order, then the rwx bits.
+        let mut prefix = false;
+        for (index, letter) in "dalTLDpSugct?".chars().enumerate() {
+            if self.0 & (1 << (31 - index)) != 0 {
+                write!(f, "{letter}")?;
+                prefix = true;
+            }
+        }
+        if !prefix {
+            write!(f, "-")?;
+        }
+        for (index, letter) in "rwxrwxrwx".chars().enumerate() {
+            write!(
+                f,
+                "{}",
+                if self.0 & (1 << (8 - index)) != 0 {
+                    letter
+                } else {
+                    '-'
+                }
+            )?;
+        }
+        Ok(())
+    }
+}
+
+impl From<std::io::Error> for IoError {
+    fn from(error: std::io::Error) -> Self {
+        Self::Os {
+            kind: error.kind(),
+            code: error.raw_os_error(),
+            message: error.to_string(),
+        }
+    }
+}
 #[cfg(test)]
 mod tests {
     use super::IoError;

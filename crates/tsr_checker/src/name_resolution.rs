@@ -14,6 +14,10 @@ use tsr_core::Tristate;
 use tsr_diagnostics::Message;
 
 struct ReadHost<'a>(&'a CheckerState);
+#[allow(
+    clippy::needless_pass_by_value,
+    reason = "Result::map_err owns the failure"
+)]
 fn arena(error: Error) -> tsr_arena::Error {
     match error {
         Error::Arena(error) => error,
@@ -94,7 +98,8 @@ impl Hooks<'_> {
                     // getSymbolFlags' accumulated meanings (or ALL for unknown).
                     if let Some(&known) = self.spelling_alias_flags.get(&candidate) {
                         flags = known;
-                    } else if let Some(&target) = self.state.module_aliases.targets.get(&candidate)
+                    } else if let Some(target) =
+                        self.state.module_aliases.targets.get(&candidate).cloned()
                     {
                         flags = self.state.symbol(target?)?.flags();
                     } else {
@@ -131,7 +136,7 @@ impl Hooks<'_> {
                 0,
             )
             .map(|entry| entry.1);
-            if let Some(error) = failure.get() {
+            if let Some(error) = failure.take() {
                 return Err(error);
             }
             Ok(result)
@@ -140,7 +145,7 @@ impl Hooks<'_> {
     }
     fn capture<T>(&mut self, result: Result<T, Error>) -> Result<T, tsr_arena::Error> {
         result.map_err(|error| {
-            self.failure = Some(error);
+            self.failure = Some(error.clone());
             arena(error)
         })
     }

@@ -57,7 +57,7 @@ struct Parsed {
     raw: ConfigValue,
     options: Option<CompilerOptions>,
     types: TypeAcquisition,
-    source: TsConfigSourceFile,
+    source: Option<TsConfigSourceFile>,
     dependencies: Vec<Arc<TsConfigSourceFile>>,
     errors: Vec<Diagnostic>,
 }
@@ -179,7 +179,7 @@ fn extends_path(
     value: &[u8],
     host: &dyn ParseConfigHost,
     base: &[u8],
-    config: &TsConfigSourceFile,
+    config: Option<&TsConfigSourceFile>,
     node: Option<NodeId>,
 ) -> Result<(Option<JsString>, Vec<Diagnostic>), Error> {
     let value = tsr_tspath::normalize_slashes(value);
@@ -194,7 +194,7 @@ fn extends_path(
                 return Ok((
                     None,
                     vec![diagnostic(
-                        Some(config),
+                        config,
                         node,
                         d::File_0_not_found,
                         vec![JsString::from_bytes(value.into_owned())],
@@ -220,10 +220,7 @@ fn extends_path(
             JsString::from_bytes(value.into_owned()),
         )
     };
-    Ok((
-        None,
-        vec![diagnostic(Some(config), node, message, vec![arg])],
-    ))
+    Ok((None, vec![diagnostic(config, node, message, vec![arg])]))
 }
 /// port: tsc/internal/tsoptions/tsconfigparsing.go:getExtendsConfigPathOrArray
 fn extends_paths(
@@ -231,19 +228,21 @@ fn extends_paths(
     host: &dyn ParseConfigHost,
     base: &[u8],
     name: &[u8],
-    config: &TsConfigSourceFile,
-    property: NodeId,
+    config: Option<&TsConfigSourceFile>,
+    property: Option<NodeId>,
 ) -> Result<(Vec<JsString>, Vec<Diagnostic>), Error> {
     let new_base = if name.is_empty() {
         base.to_vec()
     } else {
         tsr_tspath::directory(&tsr_tspath::combine(base, &[name]))
     };
-    let expression = initializer(config, property);
+    let expression = config
+        .zip(property)
+        .and_then(|(config, property)| initializer(config, property));
     let option = find_declaration(ROOT_OPTIONS, b"extends", false).expect("extends declaration");
     let syntax = OptionSyntax {
-        config: Some(config),
-        property: Some(property),
+        config,
+        property,
         value: expression,
     };
     if let ConfigValue::String(value) = value {
@@ -253,7 +252,9 @@ fn extends_paths(
     let mut paths = Vec::new();
     let mut errors = Vec::new();
     if let ConfigValue::Array(values) = value {
-        let expressions = expression.map_or_else(Vec::new, |node| array_elements(config, node));
+        let expressions = expression
+            .zip(config)
+            .map_or_else(Vec::new, |(node, config)| array_elements(config, node));
         for (index, value_entry) in values.as_deref().unwrap_or_default().iter().enumerate() {
             let expression = expression.map(|_| expressions[index]);
             if let ConfigValue::String(value) = value_entry {
@@ -342,7 +343,7 @@ fn own_config(
             }
         } else if parent == Some("undefined") {
             if option.is_some_and(|option| option.name == "extends") {
-                match extends_paths(&converted, host, base, name, &source, property) {
+                match extends_paths(&converted, host, base, name, Some(&source), Some(property)) {
                     Ok((paths, mut diagnostics)) => {
                         extended = paths;
                         errors.append(&mut diagnostics);
@@ -398,7 +399,7 @@ fn own_config(
             raw,
             options: Some(options),
             types,
-            source,
+            source: Some(source),
             dependencies: Vec::new(),
             errors,
         },
@@ -407,7 +408,8 @@ fn own_config(
 }
 /// port: tsc/internal/tsoptions/tsconfigparsing.go:parseConfig
 fn parse_config(
-    source: TsConfigSourceFile,
+    source: Option<TsConfigSourceFile>,
+    raw: Option<ConfigValue>,
     host: &dyn ParseConfigHost,
     base: &[u8],
     name: &[u8],
@@ -428,7 +430,11 @@ fn parse_config(
             )],
         });
     }
-    let (mut own, extended) = own_config(source, host, &base, name)?;
+    let (mut own, extended) = match (source, raw) {
+        (Some(source), None) => own_config(source, host, &base, name)?,
+        (None, Some(raw)) => own_json_config(raw, host, &base, name)?,
+        _ => unreachable!("one configuration representation"),
+    };
     if extended.is_empty() {
         return Ok(own);
     }
@@ -440,7 +446,9 @@ fn parse_config(
     for path in extended {
         // ParseExtendedConfig returns a source-file record even when ReadFile
         // fails; getExtendedConfig records its name before returning errors.
-        own.source.extended_source_files.push(path.clone());
+        if let Some(source) = &mut own.source {
+            source.extended_source_files.push(path.clone());
+        }
         let resolved = tsr_tspath::to_path(
             path.as_bytes(),
             host.current_directory(),
@@ -467,7 +475,8 @@ fn parse_config(
             continue;
         }
         let mut parsed = parse_config(
-            source,
+            Some(source),
+            None,
             host,
             &tsr_tspath::directory(path.as_bytes()),
             tsr_tspath::base_name(path.as_bytes()),
@@ -501,11 +510,15 @@ fn parse_config(
             }
             merge_compiler_options(&mut options, &extended_options, &parsed.raw);
         }
-        own.source
-            .extended_source_files
-            .extend(parsed.source.extended_source_files.iter().cloned());
-        own.dependencies.append(&mut parsed.dependencies);
-        own.dependencies.push(Arc::new(parsed.source));
+        if let Some(source) = parsed.source {
+            if let Some(own_source) = &mut own.source {
+                own_source
+                    .extended_source_files
+                    .extend(source.extended_source_files.iter().cloned());
+            }
+            own.dependencies.append(&mut parsed.dependencies);
+            own.dependencies.push(Arc::new(source));
+        }
     }
     for (key, value) in inherited.as_object().expect("inherited property map") {
         if key.as_bytes() != b"contentMappers" || own.raw.get(key.as_bytes()).is_none() {
@@ -518,8 +531,10 @@ fn parse_config(
             ConfigValue::Boolean(true),
         );
     }
-    own.source.extended_source_files.sort();
-    own.source.extended_source_files.dedup();
+    if let Some(source) = &mut own.source {
+        source.extended_source_files.sort();
+        source.extended_source_files.dedup();
+    }
     if let Some(own_options) = &own.options {
         merge_compiler_options(&mut options, own_options, &own.raw);
     }
@@ -534,7 +549,8 @@ fn raw_array(raw: &ConfigValue, key: &[u8]) -> Option<Vec<ConfigValue>> {
     }
 }
 fn specs(parsed: &mut Parsed, base: &[u8], name: &[u8]) -> ConfigFileSpecs {
-    let files = raw_array(&parsed.raw, b"files");
+    validated_raw_array(parsed, b"references", "object");
+    let files = validated_raw_array(parsed, b"files", "string");
     let mut includes = raw_array(&parsed.raw, b"include");
     let mut excludes = raw_array(&parsed.raw, b"exclude");
     let mut default_include = false;
@@ -542,20 +558,31 @@ fn specs(parsed: &mut Parsed, base: &[u8], name: &[u8]) -> ConfigFileSpecs {
         && raw_array(&parsed.raw, b"references").is_none_or(|references| references.is_empty())
         && parsed.raw.get(b"extends").is_none_or(ConfigValue::is_null)
     {
-        let node =
-            find_property(&parsed.source, &[b"files"]).and_then(|p| initializer(&parsed.source, p));
+        let node = parsed
+            .source
+            .as_ref()
+            .and_then(|s| find_property(s, &[b"files"]).and_then(|p| initializer(s, p)));
         parsed.errors.push(diagnostic(
-            Some(&parsed.source),
+            parsed.source.as_ref(),
             node,
             d::The_files_list_in_config_file_0_is_empty,
-            vec![JsString::from_bytes(if name.is_empty() {
-                b"tsconfig.json"
-            } else {
-                name
-            })],
+            vec![JsString::from_bytes(
+                if name.is_empty() && parsed.source.is_some() {
+                    b"tsconfig.json"
+                } else {
+                    name
+                },
+            )],
         ));
     }
-    if excludes.is_none() {
+    validated_raw_array(parsed, b"include", "string");
+    validated_raw_array(parsed, b"exclude", "string");
+    let invalid_excludes = parsed.source.is_none()
+        && parsed
+            .raw
+            .get(b"exclude")
+            .is_some_and(|v| !v.is_null() && v.as_array().is_none());
+    if excludes.is_none() && !invalid_excludes {
         if let Some(options) = &parsed.options {
             let mut values = Vec::new();
             for value in [&options.out_dir, &options.declaration_dir] {
@@ -583,9 +610,12 @@ fn specs(parsed: &mut Parsed, base: &[u8], name: &[u8]) -> ConfigFileSpecs {
             .filter_map(ConfigValue::as_string)
         {
             if let Some(message) = crate::spec_diagnostic(value.as_bytes(), disallow) {
-                let node = array_string(&parsed.source, key, value.as_bytes());
+                let node = parsed
+                    .source
+                    .as_ref()
+                    .and_then(|s| array_string(s, key, value.as_bytes()));
                 parsed.errors.push(diagnostic(
-                    Some(&parsed.source),
+                    parsed.source.as_ref(),
                     node,
                     message,
                     vec![value.clone()],
@@ -634,15 +664,17 @@ fn references(parsed: &mut Parsed, base: &[u8]) -> Option<Vec<ProjectReference>>
             continue;
         }
         let node_for = |key: &[u8]| {
-            array_element(&parsed.source, b"references", index).map(|element| {
-                find_property_in_object(&parsed.source, element, &[key])
-                    .and_then(|p| initializer(&parsed.source, p))
-                    .unwrap_or(element)
+            parsed.source.as_ref().and_then(|s| {
+                array_element(s, b"references", index).map(|element| {
+                    find_property_in_object(s, element, &[key])
+                        .and_then(|p| initializer(s, p))
+                        .unwrap_or(element)
+                })
             })
         };
         let Some(path) = value.get(b"path").and_then(ConfigValue::as_string) else {
             parsed.errors.push(diagnostic(
-                Some(&parsed.source),
+                parsed.source.as_ref(),
                 node_for(b"path"),
                 d::Compiler_option_0_requires_a_value_of_type_1,
                 vec![
@@ -654,7 +686,7 @@ fn references(parsed: &mut Parsed, base: &[u8]) -> Option<Vec<ProjectReference>>
         };
         if path.is_empty() {
             parsed.errors.push(diagnostic(
-                Some(&parsed.source),
+                parsed.source.as_ref(),
                 node_for(b"path"),
                 d::Compiler_option_0_cannot_be_given_an_empty_string,
                 vec![JsString::from_bytes(b"reference.path".as_slice())],
@@ -665,7 +697,7 @@ fn references(parsed: &mut Parsed, base: &[u8]) -> Option<Vec<ProjectReference>>
             Some(ConfigValue::Boolean(value)) => *value,
             Some(_) => {
                 parsed.errors.push(diagnostic(
-                    Some(&parsed.source),
+                    parsed.source.as_ref(),
                     node_for(b"circular"),
                     d::Compiler_option_0_requires_a_value_of_type_1,
                     vec![
@@ -697,73 +729,233 @@ pub fn parse_json_source_file_config_file_content(
     name: &[u8],
 ) -> Result<ParsedCommandLine, Error> {
     tsr_parser::on_parser_worker(|| {
-        let base_files = if name.is_empty() {
-            tsr_tspath::normalize(base).into_owned()
-        } else {
-            tsr_tspath::normalize(&tsr_tspath::directory(&tsr_tspath::combine(base, &[name])))
-                .into_owned()
-        };
-        let mut parsed = parse_config(source, host, base, name, &[])?;
-        let options = parsed.options.get_or_insert_default();
-        merge_compiler_options(options, existing, existing_raw);
-        substitute_options(options, &base_files);
-        if !name.is_empty() {
-            options.config_file_path =
-                JsString::from_bytes(tsr_tspath::normalize_slashes(name).into_owned());
-        }
-        let config_specs = specs(&mut parsed, &base_files, name);
-        let options = parsed.options.as_ref().expect("root config options");
-        let containing = if name.is_empty() {
-            tsr_tspath::combine(&base_files, &[b"tsconfig.json"])
-        } else {
-            name.to_vec()
-        };
-        let mapper_values = raw_array(&parsed.raw, b"contentMappers");
-        let mut mappers = crate::config_mappers::validate_content_mappers(
-            mapper_values.as_deref().unwrap_or_default(),
-            Some(&parsed.source),
-            host.fs().use_case_sensitive_file_names(),
-            options.run_external_code.is_true(),
-            &containing,
-            &mut |containing, package| host.resolve_content_mapper(containing, package),
-        )?;
-        parsed.errors.append(&mut mappers.diagnostics);
-        let (file_names, literal_file_names_len) = crate::file_names_from_specs(
-            &config_specs,
-            &base_files,
-            options,
-            host.fs(),
-            mappers.extensions.as_deref().unwrap_or_default(),
-        )?;
-        if file_names.is_empty()
-            && parsed.raw.get(b"files").is_none()
-            && parsed.raw.get(b"references").is_none()
-        {
-            parsed.errors.push(Diagnostic::compiler(d::No_inputs_were_found_in_config_file_0_Specified_include_paths_were_1_and_exclude_paths_were_2,vec![JsString::from_bytes(name),json_specs(&config_specs.include_specs),json_specs(&config_specs.exclude_specs)]));
-        }
-        let project_references = references(&mut parsed, &base_files);
-        let compile_on_save = Some(matches!(
-            parsed.raw.get(b"compileOnSave"),
-            Some(ConfigValue::Boolean(true))
-        ));
-        Ok(ParsedCommandLine {
-            options: parsed.options.expect("root config options"),
-            root_file_names: file_names,
-            config_file: Some(Arc::new(parsed.source)),
-            config_dependencies: parsed.dependencies,
-            errors: parsed.errors,
-            raw: parsed.raw,
-            compile_on_save,
-            config_specs: Some(config_specs),
-            config_base_path: JsString::from_bytes(base_files),
-            config_case_sensitive: host.fs().use_case_sensitive_file_names(),
-            type_acquisition: Some(parsed.types),
-            project_references,
-            literal_file_names_len,
-            content_mappers: mappers.mappers,
-        })
+        let parsed = parse_config(Some(source), None, host, base, name, &[])?;
+        finish_config(parsed, host, base, existing, existing_raw, name)
+    })
+}
+fn finish_config(
+    mut parsed: Parsed,
+    host: &dyn ParseConfigHost,
+    base: &[u8],
+    existing: &CompilerOptions,
+    existing_raw: &ConfigValue,
+    name: &[u8],
+) -> Result<ParsedCommandLine, Error> {
+    let base_files = if name.is_empty() {
+        tsr_tspath::normalize(base).into_owned()
+    } else {
+        tsr_tspath::normalize(&tsr_tspath::directory(&tsr_tspath::combine(base, &[name])))
+            .into_owned()
+    };
+    let options = parsed.options.get_or_insert_default();
+    merge_compiler_options(options, existing, existing_raw);
+    substitute_options(options, &base_files);
+    if !name.is_empty() {
+        options.config_file_path =
+            JsString::from_bytes(tsr_tspath::normalize_slashes(name).into_owned());
+    }
+    let config_specs = specs(&mut parsed, &base_files, name);
+    let containing = if name.is_empty() {
+        tsr_tspath::combine(&base_files, &[b"tsconfig.json"])
+    } else {
+        name.to_vec()
+    };
+    let mapper_values = validated_raw_array(&mut parsed, b"contentMappers", "object");
+    let options = parsed.options.as_ref().expect("root config options");
+    let mut mappers = crate::config_mappers::validate_content_mappers(
+        mapper_values.as_deref().unwrap_or_default(),
+        parsed.source.as_ref(),
+        host.fs().use_case_sensitive_file_names(),
+        options.run_external_code.is_true(),
+        &containing,
+        &mut |containing, package| host.resolve_content_mapper(containing, package),
+    )?;
+    parsed.errors.append(&mut mappers.diagnostics);
+    let (file_names, literal_file_names_len) = crate::file_names_from_specs(
+        &config_specs,
+        &base_files,
+        options,
+        host.fs(),
+        mappers.extensions.as_deref().unwrap_or_default(),
+    )?;
+    if file_names.is_empty()
+        && parsed.raw.get(b"files").is_none()
+        && parsed.raw.get(b"references").is_none()
+    {
+        parsed.errors.push(Diagnostic::compiler(d::No_inputs_were_found_in_config_file_0_Specified_include_paths_were_1_and_exclude_paths_were_2,vec![JsString::from_bytes(name),json_specs(&config_specs.include_specs),json_specs(&config_specs.exclude_specs)]));
+    }
+    let project_references = references(&mut parsed, &base_files);
+    let compile_on_save = Some(matches!(
+        parsed.raw.get(b"compileOnSave"),
+        Some(ConfigValue::Boolean(true))
+    ));
+    Ok(ParsedCommandLine {
+        options: parsed.options.expect("root config options"),
+        root_file_names: file_names,
+        config_file: parsed.source.map(Arc::new),
+        config_dependencies: parsed.dependencies,
+        errors: parsed.errors,
+        raw: parsed.raw,
+        compile_on_save,
+        config_specs: Some(config_specs),
+        config_base_path: JsString::from_bytes(base_files),
+        config_case_sensitive: host.fs().use_case_sensitive_file_names(),
+        type_acquisition: Some(parsed.types),
+        project_references,
+        literal_file_names_len,
+        content_mappers: mappers.mappers,
     })
 }
 fn json_specs(value: &ConfigValue) -> JsString {
     JsString::from_bytes(crate::config_json::stringify_json(value).expect("config spec JSON"))
+}
+
+/// Parse an already-decoded value without inventing source ranges. Config values
+/// carry ordered object members, so no reflection/normalization bridge is needed.
+/// port: tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent
+pub fn parse_json_config_file_content(
+    raw: ConfigValue,
+    host: &dyn ParseConfigHost,
+    base: &[u8],
+    existing: &CompilerOptions,
+    name: &[u8],
+    resolution_stack: &[JsString],
+) -> Result<ParsedCommandLine, Error> {
+    let raw = if raw.as_object().is_some() {
+        raw
+    } else {
+        ConfigValue::Object(tsr_core::collections::OrderedMap::default())
+    };
+    tsr_parser::on_parser_worker(|| {
+        let parsed = parse_config(None, Some(raw), host, base, name, resolution_stack)?;
+        finish_config(parsed, host, base, existing, &ConfigValue::Null, name)
+    })
+}
+/// port: tsc/internal/tsoptions/tsconfigparsing.go:parseOwnConfigOfJson
+fn own_json_config(
+    mut raw: ConfigValue,
+    host: &dyn ParseConfigHost,
+    base: &[u8],
+    name: &[u8],
+) -> Result<(Parsed, Vec<JsString>), Error> {
+    let mut errors = Vec::new();
+    if raw.get(b"excludes").is_some() {
+        errors.push(Diagnostic::compiler(
+            d::Unknown_option_excludes_Did_you_mean_exclude,
+            vec![],
+        ));
+    }
+    let (mut options, mut option_errors) = crate::compiler_options_from_json(
+        raw.get(b"compilerOptions").unwrap_or(&ConfigValue::Null),
+        base,
+        name,
+    );
+    errors.append(&mut option_errors);
+    let (types, mut type_errors) = type_acquisition_from_json(
+        raw.get(b"typeAcquisition").unwrap_or(&ConfigValue::Null),
+        base,
+        name,
+    );
+    errors.append(&mut type_errors);
+    if let Some(value) = raw.get(b"compileOnSave") {
+        let declaration = find_declaration(ROOT_OPTIONS, b"compileOnSave", false)
+            .expect("compileOnSave declaration");
+        let (converted, mut diagnostics) =
+            convert_json_option(declaration, value, base, OptionSyntax::default());
+        let converted = converted.into_owned();
+        errors.append(&mut diagnostics);
+        raw.set(JsString::from_bytes(b"compileOnSave".as_slice()), converted);
+    }
+    let mut extended = Vec::new();
+    if let Some(value) = raw
+        .get(b"extends")
+        .filter(|value| !value.is_null() && !value.as_string().is_some_and(JsString::is_empty))
+    {
+        let (paths, mut diagnostics) = extends_paths(value, host, base, name, None, None)?;
+        extended = paths;
+        errors.append(&mut diagnostics);
+    }
+    if options.paths.is_some() {
+        options.paths_base_path = JsString::from_bytes(base);
+    }
+    Ok((
+        Parsed {
+            raw,
+            options: Some(options),
+            types,
+            source: None,
+            dependencies: Vec::new(),
+            errors,
+        },
+        extended,
+    ))
+}
+/// port: tsc/internal/tsoptions/tsconfigparsing.go:convertTypeAcquisitionFromJsonWorker
+pub fn type_acquisition_from_json(
+    value: &ConfigValue,
+    base: &[u8],
+    name: &[u8],
+) -> (TypeAcquisition, Vec<Diagnostic>) {
+    let mut result = TypeAcquisition::for_config(name);
+    let mut errors = Vec::new();
+    if let Some(values) = value.as_object() {
+        for (key, value) in values {
+            if let Some(declaration) =
+                find_declaration(TYPE_ACQUISITION_OPTIONS, key.as_bytes(), false)
+                    .filter(|d| d.name.as_bytes() == key.as_bytes())
+            {
+                let (value, mut diagnostics) =
+                    convert_json_option(declaration, value, base, OptionSyntax::default());
+                errors.append(&mut diagnostics);
+                result.parse_option(key.as_bytes(), &value);
+            } else {
+                let suggestion = tsr_scanner::get_spelling_suggestion_for_strings(
+                    key.as_bytes(),
+                    TYPE_ACQUISITION_OPTIONS.iter().map(|d| d.name.as_bytes()),
+                );
+                errors.push(match suggestion {
+                    Some(suggestion) => Diagnostic::compiler(
+                        d::Unknown_type_acquisition_option_0_Did_you_mean_1,
+                        vec![key.clone(), JsString::from_bytes(suggestion)],
+                    ),
+                    None => Diagnostic::compiler(
+                        d::Unknown_type_acquisition_option_0,
+                        vec![key.clone()],
+                    ),
+                });
+            }
+        }
+    }
+    (result, errors)
+}
+
+fn validated_raw_array(parsed: &mut Parsed, key: &[u8], element: &str) -> Option<Vec<ConfigValue>> {
+    let value = parsed.raw.get(key)?;
+    if parsed.source.is_none() && !value.is_null() {
+        let invalid = match value.as_array() {
+            Some(values)
+                if values.iter().all(|v| {
+                    if element == "string" {
+                        v.as_string().is_some()
+                    } else {
+                        v.as_object().is_some()
+                    }
+                }) =>
+            {
+                None
+            }
+            Some(_) => Some(element),
+            None => Some("Array"),
+        };
+        if let Some(expected) = invalid {
+            parsed.errors.push(Diagnostic::compiler(
+                d::Compiler_option_0_requires_a_value_of_type_1,
+                vec![
+                    JsString::from_bytes(key),
+                    JsString::from_bytes(expected.as_bytes()),
+                ],
+            ));
+        }
+    }
+    raw_array(&parsed.raw, key)
 }

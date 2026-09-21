@@ -2355,9 +2355,7 @@
       "tsc/internal/core/nodemodules.go:NonRelativeModuleNameForTypingCache",
       "tsc/internal/core/projectreference.go:ResolveConfigFileNameOfProjectReference",
       "tsc/internal/core/projectreference.go:ResolveProjectReferencePath",
-      "tsc/internal/core/semaphore.go:LimitedSemaphore.Acquire",
       "tsc/internal/core/semaphore.go:LimitedSemaphore.TryAcquire",
-      "tsc/internal/core/semaphore.go:NewLimitedSemaphore",
       "tsc/internal/core/semaphore.go:UnlimitedSemaphore.Acquire",
       "tsc/internal/core/semaphore.go:UnlimitedSemaphore.TryAcquire",
       "tsc/internal/core/stack.go:Stack.Len",
@@ -4902,16 +4900,11 @@
       "tsc/internal/modulespecifiers/util.go:stringToRegex"
     ],
     "internal/nativepath": [
-      "tsc/internal/nativepath/eintr_unix.go:ignoringEINTR",
-      "tsc/internal/nativepath/realpath_linux.go:Realpath",
-      "tsc/internal/nativepath/realpath_other.go:Realpath",
-      "tsc/internal/nativepath/symlink_other.go:IsSymlinkOrReparsePoint"
+      "tsc/internal/nativepath/eintr_unix.go:ignoringEINTR"
     ],
     "internal/osutil": [
       "tsc/internal/osutil/os_other.go:args",
-      "tsc/internal/osutil/os_other.go:executable",
-      "tsc/internal/osutil/osutil.go:Args",
-      "tsc/internal/osutil/osutil.go:Executable"
+      "tsc/internal/osutil/os_other.go:executable"
     ],
     "internal/outputpaths": [
       "tsc/internal/outputpaths/commonsourcedirectory.go:GetCommonSourceDirectory",
@@ -7088,7 +7081,6 @@
       "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.SourceToProjectReference",
       "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.TypeAcquisition",
       "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.UseCaseSensitiveFileNames",
-      "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.WildcardDirectories",
       "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.WildcardDirectoryGlobs",
       "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.WithFileNames",
       "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.checkSourceFilesBelongToPath",
@@ -7132,7 +7124,6 @@
       "tsc/internal/tsoptions/tsconfigparsing.go:GetOptionsSyntaxByArrayElementValue",
       "tsc/internal/tsoptions/tsconfigparsing.go:GetTsConfigPropArrayElementValue",
       "tsc/internal/tsoptions/tsconfigparsing.go:ParseExtendedConfig",
-      "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent",
       "tsc/internal/tsoptions/tsconfigparsing.go:canJsonReportNoInputFiles",
       "tsc/internal/tsoptions/tsconfigparsing.go:commandLineOptionsToMap",
       "tsc/internal/tsoptions/tsconfigparsing.go:convertArrayLiteralExpressionToJson",
@@ -7144,7 +7135,6 @@
       "tsc/internal/tsoptions/tsconfigparsing.go:convertPropertyValueToJson",
       "tsc/internal/tsoptions/tsconfigparsing.go:convertToJson",
       "tsc/internal/tsoptions/tsconfigparsing.go:convertToObject",
-      "tsc/internal/tsoptions/tsconfigparsing.go:convertTypeAcquisitionFromJsonWorker",
       "tsc/internal/tsoptions/tsconfigparsing.go:createDiagnosticAtProjectReferenceProperty",
       "tsc/internal/tsoptions/tsconfigparsing.go:directoryOfCombinedPath",
       "tsc/internal/tsoptions/tsconfigparsing.go:getDefaultCompilerOptions",
@@ -7159,7 +7149,6 @@
       "tsc/internal/tsoptions/tsconfigparsing.go:normalizeJsonValue",
       "tsc/internal/tsoptions/tsconfigparsing.go:normalizeNonListOptionValue",
       "tsc/internal/tsoptions/tsconfigparsing.go:parseJsonConfigFileContentWorker",
-      "tsc/internal/tsoptions/tsconfigparsing.go:parseOwnConfigOfJson",
       "tsc/internal/tsoptions/tsconfigparsing.go:readJsonConfigFile",
       "tsc/internal/tsoptions/tsconfigparsing.go:resolverHost.Trace",
       "tsc/internal/tsoptions/tsconfigparsing.go:shouldReportNoInputFiles",
@@ -7167,69 +7156,10 @@
       "tsc/internal/tsoptions/tsconfigparsing.go:tsconfigToSourceFile",
       "tsc/internal/tsoptions/tsconfigparsing.go:validateJsonOptionValue",
       "tsc/internal/tsoptions/tsconfigparsing.go:validateSpecs",
-      "tsc/internal/tsoptions/wildcarddirectories.go:getWildcardDirectories",
-      "tsc/internal/tsoptions/wildcarddirectories.go:getWildcardDirectoryFromSpec",
       "tsc/internal/tsoptions/wildcarddirectories.go:toCanonicalKey"
     ],
     "internal/tspath": [
       "tsc/internal/tspath/path.go:GetRootLength"
-    ],
-    "internal/vfs/cachedvfs": [
-      "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.AppendFile",
-      "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.Chtimes",
-      "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.ClearCache",
-      "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.DirectoryExists",
-      "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.DisableAndClearCache",
-      "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.Enable",
-      "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.FileExists",
-      "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.GetAccessibleEntries",
-      "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.ReadFile",
-      "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.Realpath",
-      "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.Remove",
-      "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.Stat",
-      "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.UseCaseSensitiveFileNames",
-      "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.WalkDir",
-      "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.WriteFile",
-      "tsc/internal/vfs/cachedvfs/cachedvfs.go:From"
-    ],
-    "internal/vfs/osvfs": [
-      "tsc/internal/vfs/osvfs/os.go:FS",
-      "tsc/internal/vfs/osvfs/os.go:GetGlobalTypingsCacheLocation",
-      "tsc/internal/vfs/osvfs/os.go:getLimitedWalkDirFunc",
-      "tsc/internal/vfs/osvfs/os.go:isReparsePoint",
-      "tsc/internal/vfs/osvfs/os.go:limitedWalkDirFunc.walker",
-      "tsc/internal/vfs/osvfs/os.go:osFS.AppendFile",
-      "tsc/internal/vfs/osvfs/os.go:osFS.Chtimes",
-      "tsc/internal/vfs/osvfs/os.go:osFS.DirectoryExists",
-      "tsc/internal/vfs/osvfs/os.go:osFS.FileExists",
-      "tsc/internal/vfs/osvfs/os.go:osFS.GetAccessibleEntries",
-      "tsc/internal/vfs/osvfs/os.go:osFS.ReadFile",
-      "tsc/internal/vfs/osvfs/os.go:osFS.Realpath",
-      "tsc/internal/vfs/osvfs/os.go:osFS.Remove",
-      "tsc/internal/vfs/osvfs/os.go:osFS.Stat",
-      "tsc/internal/vfs/osvfs/os.go:osFS.UseCaseSensitiveFileNames",
-      "tsc/internal/vfs/osvfs/os.go:osFS.WalkDir",
-      "tsc/internal/vfs/osvfs/os.go:osFS.WriteFile",
-      "tsc/internal/vfs/osvfs/os.go:osFS.ensureDirectoryExists",
-      "tsc/internal/vfs/osvfs/os.go:osFS.writeFileEnsuringDir",
-      "tsc/internal/vfs/osvfs/os.go:osFS.writeFileWithFlag",
-      "tsc/internal/vfs/osvfs/os.go:osFSRealpath",
-      "tsc/internal/vfs/osvfs/os.go:putLimitedWalkDirFunc",
-      "tsc/internal/vfs/osvfs/os.go:swapCase"
-    ],
-    "internal/vfs/trackingvfs": [
-      "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.AppendFile",
-      "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.Chtimes",
-      "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.DirectoryExists",
-      "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.FileExists",
-      "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.GetAccessibleEntries",
-      "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.ReadFile",
-      "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.Realpath",
-      "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.Remove",
-      "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.Stat",
-      "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.UseCaseSensitiveFileNames",
-      "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.WalkDir",
-      "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.WriteFile"
     ],
     "internal/vfs/vfsmatch": [
       "tsc/internal/vfs/vfsmatch/vfsmatch.go:ensureTrailingSlash",
@@ -7246,21 +7176,6 @@
       "tsc/internal/vfs/vfsmatch/vfsmatch.go:matchFiles",
       "tsc/internal/vfs/vfsmatch/vfsmatch.go:newGlobMatcher",
       "tsc/internal/vfs/vfsmatch/vfsmatch.go:parseSegments"
-    ],
-    "internal/vfs/wrapvfs": [
-      "tsc/internal/vfs/wrapvfs/wrapvfs.go:Wrap",
-      "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.AppendFile",
-      "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.Chtimes",
-      "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.DirectoryExists",
-      "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.FileExists",
-      "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.GetAccessibleEntries",
-      "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.ReadFile",
-      "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.Realpath",
-      "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.Remove",
-      "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.Stat",
-      "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.UseCaseSensitiveFileNames",
-      "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.WalkDir",
-      "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.WriteFile"
     ]
   }
 }

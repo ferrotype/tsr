@@ -37,6 +37,10 @@ config/diagnostic observations. Re-record the corrected bundled `WalkDir` gap
 identity before changing production. This changes sequencing only: it does not
 declare Phase A complete or weaken any coverage, parity or freshness rule.
 
+**Ordering amendment, 2026-09-22:** the owner also authorized F2b and the
+F3b config entry point, wildcard-directory and renderer prerequisites for
+matchFiles. This does not close F3b or replace the F5a coverage review.
+
 ### Remaining preparation and coverage review
 
 6. **F4a — Syntax/binder tests:** prepare the missing AST, parser/binder,

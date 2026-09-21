@@ -553,20 +553,6 @@ fn parse_source(
 
 type Gap = (&'static str, &'static str, &'static str, &'static str);
 
-const JSON_API: Gap = (
-    "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent",
-    "tsc/internal/tsoptions/tsconfigparsing.go:872-880, which normalizes an arbitrary Go value \
-     with normalizeJsonValue and runs parseJsonConfigFileContentWorker over the resulting ordered \
-     map with no source file, so parseOwnConfigOfJson replaces parseOwnConfigOfJsonSourceFile and \
-     every diagnostic is location-less",
-    "pub fn parse_json_config_file_content(value: &ConfigValue, host: &dyn ParseConfigHost, \
-     base: &[u8], existing: &CompilerOptions, name: &[u8]) -> Result<ParsedCommandLine, Error>, \
-     plus the parseOwnConfigOfJson branch it needs",
-    "crates/tsr_tsoptions/src/config_parse.rs, whose only entry point is \
-     parse_json_source_file_config_file_content (:691) and whose parse_config (:409) always calls \
-     own_config (:284), the jsonSourceFile branch; there is no value-mode branch and no \
-     ConfigValue normalizer (absent)",
-);
 const CONVERT_TO_OBJECT: Gap = (
     "tsc/internal/tsoptions/tsconfigparsing.go:convertToObject",
     "tsc/internal/tsoptions/tsconfigparsing.go:918-925, the circularity branch's converter: unlike \
@@ -663,18 +649,6 @@ const GET_SPELLING_SUGGESTION: Gap = (
      convert_options.rs:304-319 both run tsr_scanner::get_spelling_suggestion_for_strings over \
      COMPILER_OPTIONS, but neither `unknown` nor `unknown_option` is exported from the crate \
      (lib.rs:273-276 re-exports neither), so no caller outside tsr_tsoptions can reach it",
-);
-const GET_WILDCARD_DIRECTORIES: Gap = (
-    "tsc/internal/tsoptions/wildcarddirectories.go:getWildcardDirectories",
-    "tsc/internal/tsoptions/wildcarddirectories.go:10-83, which maps each include spec to a \
-     watched directory and a recursive flag, keeps the first path recorded for a canonical key, \
-     upgrades a non-recursive entry to recursive, and deletes any entry contained by a recursive \
-     one",
-    "pub fn wildcard_directories(include: &[JsString], exclude: &[JsString], cwd: &[u8], \
-     case_sensitive: bool) -> Vec<(JsString, bool)>",
-    "no Rust home: a search of crates/ for `wildcard` finds only diagnostic names and \
-     options.uses_wildcard_types; neither the directory computation nor its \
-     getWildcardDirectoryFromSpec/toCanonicalKey helpers exist (absent)",
 );
 const HAS_FILE_WITH_HIGHER_PRIORITY_EXTENSION: Gap = (
     "tsc/internal/tsoptions/tsconfigparsing.go:hasFileWithHigherPriorityExtension",
@@ -866,7 +840,16 @@ fn answer(request: &Value) -> Result<Outcome, String> {
             observation.insert("read_failed".into(), Value::Bool(false));
             Ok(Outcome::Observed(Value::Object(observation)))
         }
-        "parse_json_api" | "parse_json_api_value" => Ok(missing(JSON_API)),
+        "parse_json_api" | "parse_json_api_value" => {
+            let host=build_host(request);
+            let name=text_of(request,"configFileName").as_bytes();
+            let raw=if action=="parse_json_api_value" { decode_value(&request["value"])? } else {
+                let path=tsr_tspath::to_path(name,&base_of(request),flag(request,"caseSensitive"));
+                parse_config_file_text_to_json(JsString::from_bytes(name),path,SourceText::from_loaded_bytes(text_of(request,"jsonText").as_bytes().to_vec())).value
+            };
+            let parsed=failed(tsr_tsoptions::parse_json_config_file_content(raw,&host,&base_of(request),&CompilerOptions::default(),name,&[]))?;
+            Ok(Outcome::Observed(Value::Object(describe_parsed(request,&parsed)?)))
+        },
         "parse_config_text" => {
             let name = text_of(request, "configFileName").as_bytes().to_vec();
             let path =
@@ -1129,7 +1112,12 @@ fn answer(request: &Value) -> Result<Outcome, String> {
             "build_map" => Ok(missing(COMMAND_LINE_OPTIONS_TO_MAP)),
             other => Err(format!("unknown option_name_map helper {other:?}")),
         },
-        "wildcard_directories" => Ok(missing(GET_WILDCARD_DIRECTORIES)),
+        "wildcard_directories" => {
+            let include=list_of(request,"include").into_iter().map(JsString::from_bytes).collect::<Vec<_>>();let exclude=list_of(request,"exclude").into_iter().map(JsString::from_bytes).collect::<Vec<_>>();
+            let directories=tsr_tsoptions::wildcard_directories(&include,&exclude,text_of(request,"currentDirectory").as_bytes(),flag(request,"caseSensitive"));
+            let mut rows=directories.as_ref().map_or(Vec::new(),|m|m.iter().map(|(p,r)| (text(p.as_bytes()),*r)).collect::<Vec<_>>());rows.sort_by(|a,b|a.0.cmp(&b.0));
+            Ok(Outcome::Observed(json!({"directories":rows,"nil_result":directories.is_none()})))
+        },
         "config_specs" => {
             let specs = config_specs(request);
             match helper {

@@ -1490,7 +1490,13 @@ class FilesystemPreparationTests(unittest.TestCase):
 
     def test_a_gap_without_identity_cannot_prepare_a_step(self):
         case = next(c for c in self.cases["cases"]
-                    if c["family"] == "filesystem" and c.get("missing_operations"))
+                    if c["family"] == "filesystem" and c.get("operations"))
+        # Inject the missing handler: this guard must remain testable when the
+        # production family has no unimplemented operations left.
+        case["last_result"] = "not_implemented"
+        case["missing_operations"] = [case["operations"][0]]
+        report = scope.leaf_preparation(self.scope, self.cases, "filesystem")
+        self.assertEqual(report["gap_problems"], [])
         case.pop("missing_operations")
         report = scope.leaf_preparation(self.scope, self.cases, "filesystem")
         self.assertFalse(report["complete"])
@@ -1912,3 +1918,27 @@ class RosterLedgerTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+class MatchFilesByteComparisonTests(unittest.TestCase):
+    def test_only_the_rendered_envelope_is_compared(self):
+        request = {"subject": "matchFilesBaseline"}
+        rendered = "FileNames::\r\n[\"/a.ts\"]\r\n"
+        native = {"rendered": rendered, "reproduced": False,
+                  "expected_sha256": "historical-only", "native_source": "carried"}
+        rust = {"rendered": rendered}
+        self.assertEqual(capture.comparable_observation(request, native, "native"),
+                         capture.comparable_observation(request, rust, "rust"))
+        self.assertNotEqual(capture.comparable_observation(request, native, "native"),
+                            capture.comparable_observation(request, {"rendered": rendered.rstrip()}, "rust"))
+
+    def test_missing_rendered_bytes_and_inconsistent_digest_are_errors(self):
+        request = {"subject": "matchFilesBaseline"}
+        for observation in ({}, {"rendered": None}, {"rendered": "x", "rendered_bytes": 2},
+                            {"rendered": "x", "rendered_sha256": "0" * 64}):
+            with self.subTest(observation=observation), self.assertRaises(ValueError):
+                capture.comparable_observation(request, observation, "rust")
+
+    def test_other_subjects_do_not_discard_metadata(self):
+        observation = {"rendered": "x", "other": 1}
+        self.assertEqual(capture.comparable_observation({"subject": "other"}, observation, "rust"),
+                         observation)

@@ -67,39 +67,29 @@ impl File {
 }
 
 pub struct DiagnosticWriter<'a> {
-    program: &'a Program,
+    sources: &'a dyn DiagnosticSources,
     pub options: FormattingOptions,
     files: HashMap<(NodeId, bool), Arc<File>>,
 }
 impl<'a> DiagnosticWriter<'a> {
     pub fn new(program: &'a Program, options: FormattingOptions) -> Self {
         Self {
-            program,
+            sources: program,
             options,
             files: HashMap::new(),
         }
     }
     pub fn source(&self, id: NodeId) -> Result<SourceFileRead<'_>> {
-        if let Some(config) = self
-            .program
-            .config()
-            .config_file
-            .iter()
-            .chain(&self.program.config().config_dependencies)
-            .find(|c| c.root == id)
-        {
-            return Ok(config.file.view().source_file(id)?);
+        self.sources.diagnostic_source(id)
+    }
+    /// Formats configuration diagnostics without constructing a program or
+    /// loading/binding its input files. The provider retains every source owner.
+    pub fn from_sources(sources: &'a dyn DiagnosticSources, options: FormattingOptions) -> Self {
+        Self {
+            sources,
+            options,
+            files: HashMap::new(),
         }
-        let index = self
-            .program
-            .owners
-            .node_file_index(id)
-            .ok_or(tsr_arena::Error::WrongOwner)?;
-        Ok(self.program.files()[index]
-            .bound()
-            .view()
-            .ast()
-            .source_file(id)?)
     }
     /// port: tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.File
     /// Original text for external diagnostics, canonical file names, and explicit
@@ -328,4 +318,39 @@ pub fn flattened(d: &Diagnostic, new_line: &[u8]) -> Result<Vec<u8>> {
         );
     }
     Ok(out)
+}
+
+/// A retained source owner for diagnostic display. Resolving a foreign node
+/// must fail; implementations never guess a file from a path or slot number.
+pub trait DiagnosticSources {
+    fn diagnostic_source(&self, id: NodeId) -> Result<SourceFileRead<'_>>;
+}
+impl DiagnosticSources for Program {
+    fn diagnostic_source(&self, id: NodeId) -> Result<SourceFileRead<'_>> {
+        if let Some(config) = self
+            .config()
+            .config_file
+            .iter()
+            .chain(&self.config().config_dependencies)
+            .find(|c| c.root == id)
+        {
+            return Ok(config.file.view().source_file(id)?);
+        }
+        let index = self
+            .owners
+            .node_file_index(id)
+            .ok_or(tsr_arena::Error::WrongOwner)?;
+        Ok(self.files()[index].bound().view().ast().source_file(id)?)
+    }
+}
+impl DiagnosticSources for tsr_tsoptions::ParsedCommandLine {
+    fn diagnostic_source(&self, id: NodeId) -> Result<SourceFileRead<'_>> {
+        let config = self
+            .config_file
+            .iter()
+            .chain(&self.config_dependencies)
+            .find(|config| config.root == id)
+            .ok_or(tsr_arena::Error::WrongOwner)?;
+        Ok(config.file.view().source_file(id)?)
+    }
 }

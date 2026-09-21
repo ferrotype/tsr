@@ -22,9 +22,11 @@
       "rust_home": []
     },
     {
-      "disposition": "missing",
+      "disposition": "implemented_untested",
       "operation": "tsc/internal/nativepath/realpath_linux.go:Realpath",
-      "rust_home": []
+      "rust_home": [
+        "crates/tsr_vfs/src/os/native.rs"
+      ]
     }
   ],
   "pin": "1f70213d4922b434345f639b441681e470c7cfc1",

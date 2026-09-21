@@ -35978,7 +35978,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_tsoptions/src/config_parse.rs",
-          "line": 690
+          "line": 722
         }
       ],
       "source_sha256": "47336cbf405f93504b6d51e867ea75b3cebd48db044d511a15b61f183c4ba5a0",
@@ -36125,8 +36125,13 @@
       "end_line": 962,
       "file": "tsc/internal/tsoptions/tsconfigparsing.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_tsoptions/src/config_parse.rs",
+          "line": 893
+        }
+      ],
       "source_sha256": "47336cbf405f93504b6d51e867ea75b3cebd48db044d511a15b61f183c4ba5a0",
       "start_line": 958
     },
@@ -36239,7 +36244,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_tsoptions/src/config_parse.rs",
-          "line": 228
+          "line": 225
         }
       ],
       "source_sha256": "47336cbf405f93504b6d51e867ea75b3cebd48db044d511a15b61f183c4ba5a0",
@@ -36386,7 +36391,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_tsoptions/src/config_parse.rs",
-          "line": 408
+          "line": 409
         }
       ],
       "source_sha256": "47336cbf405f93504b6d51e867ea75b3cebd48db044d511a15b61f183c4ba5a0",
@@ -36405,8 +36410,13 @@
       "end_line": 994,
       "file": "tsc/internal/tsoptions/tsconfigparsing.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_tsoptions/src/config_parse.rs",
+          "line": 834
+        }
+      ],
       "source_sha256": "47336cbf405f93504b6d51e867ea75b3cebd48db044d511a15b61f183c4ba5a0",
       "start_line": 964
     },
@@ -36418,7 +36428,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_tsoptions/src/config_parse.rs",
-          "line": 283
+          "line": 284
         }
       ],
       "source_sha256": "47336cbf405f93504b6d51e867ea75b3cebd48db044d511a15b61f183c4ba5a0",

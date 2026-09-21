@@ -395,7 +395,13 @@ impl Resolver {
             if !self.host.directory_exists(root.as_bytes())? {
                 continue;
             }
-            for entry in self.host.entries(root.as_bytes())?.directories {
+            for entry in self
+                .host
+                .entries(root.as_bytes())?
+                .directories
+                .into_iter()
+                .flatten()
+            {
                 let normalized = path::normalize(entry.as_bytes());
                 // GetAutomaticTypeDirectiveNames reads the package directly;
                 // it does not populate the resolver's package information cache.

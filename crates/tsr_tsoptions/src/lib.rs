@@ -309,3 +309,10 @@ pub use config_read::{
     get_parsed_command_line_of_config_file, get_parsed_command_line_of_config_file_path,
     ReadConfigResult,
 };
+
+mod wildcard_directories;
+pub use wildcard_directories::{
+    wildcard_directories, wildcard_directory_from_spec, WildcardDirectory,
+};
+
+pub use config_parse::{parse_json_config_file_content, type_acquisition_from_json};

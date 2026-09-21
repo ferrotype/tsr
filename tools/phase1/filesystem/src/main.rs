@@ -21,6 +21,7 @@ use serde_json::{json, Map, Value};
 #[allow(dead_code)]
 use phase1_harness as api;
 mod cachedvfs;
+mod fs_trace;
 mod glob;
 mod iovfs;
 mod matchfiles;
@@ -147,15 +148,13 @@ mod tests {
     }
 
     #[test]
-    fn cached_gap_uses_the_owning_source_not_the_requested_prefix() {
+    fn cached_replay_rejects_a_request_without_its_trace() {
         let row = observe(&json!({
             "case": "filesystem/cachedvfs/identity-control", "subject": "CachedFS",
             "operation": "arbitrary/source.go:From",
         }));
-        assert_eq!(
-            row["missing_operation"]["operation"],
-            "tsc/internal/vfs/cachedvfs/cachedvfs.go:From"
-        );
+        assert_eq!(row["result"], "harness_failed");
+        assert!(row.get("missing_operation").is_none());
     }
 
     #[test]

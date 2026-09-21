@@ -20,7 +20,7 @@ struct ReferenceHost<'a> {
 impl ReferenceHost<'_> {
     fn capture<T>(&self, result: Result<T, Error>) -> Result<T, tsr_arena::Error> {
         result.map_err(|error| {
-            self.failure.set(Some(error));
+            self.failure.set(Some(error.clone()));
             match error {
                 Error::Arena(error) => error,
                 _ => tsr_arena::Error::InvalidGraph,
@@ -194,7 +194,7 @@ impl CheckerState {
         } else {
             resolver.get_referenced_value_declaration(&mut host, &mut hooks, node)
         };
-        match failure.get() {
+        match failure.take() {
             Some(error) => Err(error),
             None => result.map_err(Error::from),
         }

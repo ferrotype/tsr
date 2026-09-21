@@ -61,14 +61,14 @@ impl CheckerState {
 
     // port: tsc/internal/checker/flow.go:Checker.getEffectsSignature
     pub(crate) fn effects_signature(&mut self, node: NodeId) -> Result<Option<SignatureId>, Error> {
-        if let Some(&cached) = self.flow.effects.signatures.get(&node) {
+        if let Some(cached) = self.flow.effects.signatures.get(&node).cloned() {
             return cached;
         }
         // Upstream leaves `links.effectsSignature` nil while resolving, so a
         // reentrant request recomputes; `getExplicitTypeOfSymbol`'s resolving
         // set is what terminates the recursion.
         let result = self.effects_signature_worker(node);
-        self.flow.effects.signatures.insert(node, result);
+        self.flow.effects.signatures.insert(node, result.clone());
         result
     }
 

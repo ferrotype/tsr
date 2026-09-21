@@ -242,7 +242,7 @@ fn error_class(error: &Error) -> &'static str {
         Error::OutsideScope => "outside_scope",
         Error::InvalidPath => "invalid_path",
         Error::SymlinkCycle => "symlink_cycle",
-        Error::Io(_) => "io",
+        Error::Io(_) | Error::Detailed(_) => "io",
     }
 }
 

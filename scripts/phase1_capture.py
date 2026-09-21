@@ -972,6 +972,23 @@ def validate_capture(directory: Path) -> tuple[dict, list[dict], dict[str, dict]
     return provenance, requests, native_rows, {row["case"]: row for row in rust_list}
 
 
+def comparable_observation(request: dict, observation: dict, side: str):
+    """MatchFiles compares the carried test renderer's exact UTF-8 bytes.
+
+    Native-only historical-reproduction metadata remains authenticated in the
+    capture, but is not a compiler observation Rust should reproduce.
+    """
+    if request.get("subject") != "matchFilesBaseline":
+        return observation
+    if not isinstance(observation, dict) or not isinstance(observation.get("rendered"), str):
+        raise ValueError(f"{side} matchFiles observation lacks rendered bytes")
+    rendered = observation["rendered"].encode("utf-8")
+    for key, expected in (("rendered_bytes", len(rendered)), ("rendered_sha256", hashlib.sha256(rendered).hexdigest())):
+        if key in observation and observation[key] != expected:
+            raise ValueError(f"{side} matchFiles {key} disagrees with rendered bytes")
+    return rendered
+
+
 def compare(directory: Path, require_parity: bool = False) -> dict:
     """Compare stored outputs. Runs no child process."""
     directory = Path(directory).resolve()
@@ -979,6 +996,7 @@ def compare(directory: Path, require_parity: bool = False) -> dict:
 
     inventory = load_requests(FAMILIES[provenance["family"]])
     all_cases = [r["case"] for r in inventory["requests"]]
+    request_by_case = {r["case"]: r for r in inventory["requests"]}
     selected = {r["case"] for r in requests}
     unknown = selected - set(all_cases)
     if unknown:
@@ -1019,7 +1037,9 @@ def compare(directory: Path, require_parity: bool = False) -> dict:
         # Canonicalisation preserves array order, and order-sensitive cases are
         # required to put their ordered payload in an array, so this comparison
         # sees order differences without being confused by named-field order.
-        same = canonical(native.get("observation")) == canonical(rust.get("observation"))
+        left = comparable_observation(request_by_case[case], native.get("observation"), "native")
+        right = comparable_observation(request_by_case[case], rust.get("observation"), "rust")
+        same = left == right if isinstance(left, bytes) else canonical(left) == canonical(right)
         rows.append({
             "case": case,
             "result": "match" if same else "different",
