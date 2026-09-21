@@ -1546,17 +1546,27 @@ class PortAnnotationTests(unittest.TestCase):
             self.assertEqual(row["rust_home"], [], "the ledger still claims nothing here")
 
     def test_an_annotated_home_is_a_production_home(self):
-        # A `port:` marker outside a crate's src/ claims a production home for
-        # code that is not one. crates/tsr_compiler/examples/p2/baseline.rs
-        # carries the same marker as the production flattener, so two bodies
-        # answer to one marker and nothing compares them. It is reported, not
-        # silently folded into the home.
         for files in scope.annotated_homes().values():
             for path in files:
                 self.assertIn("/src/", path)
-        outside = scope.annotations_outside_src()
-        self.assertTrue(outside, "the drift this check exists for is present at this pin")
-        self.assertTrue(any(a["file"].endswith("examples/p2/baseline.rs") for a in outside))
+        self.assertEqual(scope.annotations_outside_src(), [])
+
+    def test_example_marker_is_reported_without_claiming_a_production_home(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = root / "crates/demo/examples/probe.rs"
+            source.parent.mkdir(parents=True)
+            source.write_text(
+                "// port: tsc/internal/diagnostics/diagnostics.go:Format\n"
+                "fn format_example() {}\n"
+            )
+            with patch.object(scope, "ROOT", root):
+                self.assertEqual(scope.annotated_homes(), {})
+                self.assertEqual(scope.annotations_outside_src(), [{
+                    "file": "crates/demo/examples/probe.rs",
+                    "rust_fn": "format_example",
+                    "operation": "tsc/internal/diagnostics/diagnostics.go:Format",
+                }])
 
 
 class ConfigRosterTests(unittest.TestCase):

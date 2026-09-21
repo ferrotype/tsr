@@ -21,40 +21,13 @@ pub fn payload(program: &Program, d: &Diagnostic) -> Result<Value> {
         "unnecessary":d.reports_unnecessary,"deprecated":d.reports_deprecated,"skipped_on_no_emit":d.skipped_on_no_emit}),
     )
 }
-// port: tsc/internal/compiler/program.go:SortAndDeduplicateDiagnostics
-// Includes compactAndMergeRelatedInfos. Serialization is outside checker algorithms.
-pub fn sorted(program: &Program, mut values: Vec<Diagnostic>) -> Result<Vec<Diagnostic>> {
+// Program owns program.go:SortAndDeduplicateDiagnostics, including merging
+// related information. This adapter only validates the JSON payload boundary.
+pub fn sorted(program: &Program, values: Vec<Diagnostic>) -> Result<Vec<Diagnostic>> {
     for d in &values {
         let _ = payload(program, d)?;
     }
-    let names = |id| file_name(program, id);
-    tsr_core::sort_like_go(&mut values, &mut |a, b| {
-        tsr_ast::compare_diagnostics(a, b, &names).expect("validated diagnostic owners")
-    });
-    let mut out: Vec<Diagnostic> = Vec::new();
-    let mut input = values.into_iter().peekable();
-    while let Some(mut value) = input.next() {
-        let mut merged = false;
-        while input.peek().is_some_and(|next| {
-            tsr_ast::equal_diagnostics_no_related_info(&value, next, &names)
-                .expect("validated diagnostic owners")
-        }) {
-            merged = true;
-            value
-                .related_information
-                .extend(input.next().expect("peeked diagnostic").related_information);
-        }
-        if merged && !value.related_information.is_empty() {
-            tsr_core::sort_like_go(&mut value.related_information, &mut |a, b| {
-                tsr_ast::compare_diagnostics(a, b, &names).expect("validated diagnostic owners")
-            });
-            value.related_information.dedup_by(|a, b| {
-                tsr_ast::equal_diagnostics(a, b, &names).expect("validated diagnostic owners")
-            });
-        }
-        out.push(value);
-    }
-    Ok(out)
+    Ok(program.sort_and_deduplicate_diagnostics(&values)?)
 }
 pub fn all(program: &Program, op: &mut Operation<'_>) -> Result<Value> {
     all_mode(program, op, false)
