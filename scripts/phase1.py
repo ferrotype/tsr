@@ -268,6 +268,10 @@ def record_results(capture: Path, write: bool) -> dict:
         if case.get("family") != family:
             continue
         named = absent.get(case["id"])
+        # A case preparing an output rather than an operation has no operation
+        # for a gap to name; the driver still reports one, as a logical label.
+        if named and not case.get("operations"):
+            named = None
         if named:
             case["missing_operations"] = [named]
         else:

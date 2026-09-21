@@ -12,7 +12,7 @@ moved pin invalidates it.
 | --- | --- |
 | F0 — inventory, manifests and executable setup | **incomplete**: implementing and verifying the approved matchFiles test renderer, and connecting existing evidence to operation ids |
 | F1a — foundation leaf tests | **complete**: `leaves_prepared: true`; 225 leaf cases frozen, all 460 inventoried leaf operations prepared, witnessed or exempted by the reviewed ledger, and both divergences triaged |
-| F2a — filesystem, path and matching tests | not started |
+| F2a — filesystem, path and matching tests | **complete**: `filesystem_prepared: true`; 359 cases over ten probe groups plus the carried matchFiles renderer; all 316 roster operations prepared, witnessed or exempted; the 309 exact-baseline requirement amended by 74 owner-approved, individually evidenced exceptions |
 | F3a — config, command-line and resolution tests | not started |
 | F4a — syntax, binder and utility coverage | not started |
 | F5a — integration checks and the stage A review | not started |
@@ -322,6 +322,190 @@ more than one that does not.
   genuinely unobservable through the API (`SyncSet.IsEmpty`,
   `CopyOnWriteMap`'s ownership restore). Those claims were narrowed to what the
   rows witness rather than dropped.
+
+## F2a — filesystem, path and matching preparation
+
+**`filesystem_prepared: true`.** All 316 operations on the filesystem roster are
+prepared by a runnable case, witnessed by a rust-gated artifact, or removed by a
+reviewed ledger entry: 301 prepared, 8 witnessed, 7 exempt, none pending.
+
+359 cases across ten probe groups plus the carried matchFiles renderer, every
+one with a native observation from the pinned packages and a classified result.
+
+| Group | Cases | match | not_impl | different |
+| --- | ---: | ---: | ---: | ---: |
+| tspath | 46 | 13 | 30 | 3 |
+| vfsmatch | 22 | 20 | 1 | 1 |
+| cachedvfs | 32 | 1 | 30 | 1 |
+| vfstest | 19 | 0 | 17 | 2 |
+| wrapvfs | 28 | 0 | 28 | 0 |
+| iovfs | 16 | 0 | 16 | 0 |
+| vfsmock | 10 | 0 | 10 | 0 |
+| osvfs | 23 | 0 | 23 | 0 |
+| glob | 10 | 0 | 10 | 0 |
+| symlinks | 11 | 0 | 11 | 0 |
+| matchFiles | 142 | 0 | 142 | 0 |
+| **total** | **359** | **34** | **318** | **7** |
+
+Zero harness failures. The seven `different` rows are real divergences between
+the port and the pin, listed below. The 318 `not_implemented` rows are the
+honest preparation-time answer for a surface the port has barely begun: there is
+no `tsr_glob`, no cached, tracking, wrapping or mock filesystem adapter, no
+symlink cache reachable from outside `tsr_compiler`, and no baseline renderer.
+
+`inventory --check` publishes `filesystem_prepared` alongside `leaves_prepared`,
+and each is false while any operation on that step's roster is neither prepared,
+witnessed nor exempted, or while that step's ledger does not validate.
+
+The roster machinery is no longer written for one step. It is written once over
+`STEP_PACKAGES`, so F2a is held to F1a's bar rather than getting a weaker gate
+by being newer: the same arithmetic, the same exemption categories, the same
+ledger validation, and the same refusal to call a step complete while its ledger
+does not validate. A package may belong to only one step, which is checked at
+import; `roster_problems` with no step named validates every declared step, so a
+step cannot appear without a ledger; and an exemption filed against a step that
+never owned the operation is refused, including one filed against another step's.
+
+### Divergences this step found
+
+Seven cases report `different`, and they are the point of the step rather than a
+failure of it. All were found by comparison, not by inspection.
+
+**`tspath`, three, one root cause.** `crates/tsr_tspath/src/lib.rs:116`
+`base_name` omits the leading `NormalizeSlashes` the pin performs at
+`path.go:877`, so it measures the root on raw bytes: for `//server\share` the
+pin answers `share` and the port answers the empty string. `has_extension`
+inherits it whole, being `base_name` plus a dot search, and answers `false` for
+`//server\share.ts` where the pin answers `true`. Separately, `to_path` routes
+every input through `absolute`, which adds a separator to a bare root and strips
+one from a longer path, where `path.go:725-726` takes `NormalizePath` and does
+neither: `c:` becomes `c:/`.
+
+**`cachedvfs`, one, all nine rows.** `RootLength` rejects a non-absolute path
+where the pin accepts it.
+
+**`vfstest`, two**, on the paired-snapshot publication and the mutation-leak
+control.
+
+**`vfsmatch`, one**, on the base-path comparer.
+
+The live-OS group measured further differences by running real Go and Rust
+programs on this host, which are recorded in its cases rather than as `different`
+rows because the port has no adapter to compare against yet:
+`std::fs::canonicalize` *corrects* case where the pin does not; Go's simple case
+mappings differ from Rust's full ones (U+00DF and U+FB01 are unchanged under
+`unicode.ToUpper`/`ToLower` but not under Rust's); `os.Chtimes` wraps outside
+roughly 1678..2262; and `metadata.is_file()` is not `!stat.IsDir()` — measured
+with a FIFO, where the pin answers `FileExists` true.
+
+One survey claim was corrected by measurement rather than inherited:
+`std::env::current_exe()` does **not** canonicalize on macOS.
+
+### Scope corrections
+
+Two operations were recorded as having a Rust counterpart on the strength of a
+by-name rule, and reading the code refuted both.
+`symlinks/knownsymlinks.go:ProcessResolution` is `implemented_untested` in the
+scope, but `PORTS.toml:5339-5350` maps the file to `status = "planned"` with
+`rust = []` and `crates/tsr_core` has no symlinks module; the only
+implementation is a private re-inlining at
+`crates/tsr_compiler/src/checker_module_specifiers.rs:10-88`, which drops the
+file half of the resolution entirely. Several `tspath` operations were similar:
+`crates/tsr_checker/src/module_specifiers_packages.rs:117` carries no port
+marker and returns `"ajs"` where the pin returns `"a.js"`, never prepending the
+missing dot.
+
+### The `config/matchFiles` renderer, and the amendment it forced
+
+No pinned Go test writes `config/matchFiles`. The only `baseline.Run` calls with
+a `config/` subfolder are `tsconfigparsing_test.go:157` and `:1554`, both writing
+`config/tsconfigParsing`; `vfsmatch_test.go` is list assertions whose own comment
+at :12-13 says its cases are "modeled after" the TypeScript matchFiles tests,
+whose fixture is not in the pin. So 142 frozen outputs existed with no producer,
+which is what the owner approved carrying a renderer for.
+
+The renderer reconstructs each baseline's inputs from the baseline itself, runs
+the pinned parse through both entry points, renders the envelope and compares
+byte for byte. It calls the pinned `printFS` and the pinned
+`getWildcardDirectories` rather than reimplementing them.
+
+**A first pass reported "65 of 142" and that number was wrong twice over.** It
+merged two disjoint populations, and it rested on a claim that did not hold.
+
+The 142 are 71 scenarios through two entry points. All 71 `jsonSourceFile` rows
+rendered; all 71 `json` rows were declined, because `ParsedCommandLine.
+WildcardDirectories()` (`parsedcommandline.go:265`) reads
+`p.ConfigFile.configFileSpecs` and the JSON path leaves `ConfigFile` nil. The
+step recorded that as "the pin cannot reproduce these".
+
+The owner refused that and was right. `tsconfigparsing.go:1328-1373` computes
+`validatedIncludeSpecs` and `validatedExcludeSpecs` **unconditionally**; only
+`:1375-1377` gates the attachment on `sourceFile != nil`. And
+`wildcarddirectories.go:10` takes the specs directly and never needs a
+`ConfigFile`. So the adapter could not render it; the pin could. A test-only
+accessor in an overlay source — never a change to the pin — took all 71 raw-JSON
+rows from declined to rendered.
+
+One honest qualification on that accessor: the pinned worker discards its local
+`configFileSpecs`, so nothing on the returned value holds it and it cannot be
+captured after the fact. The hook therefore **re-derives** the two slices from
+the parse's own result by calling the same pinned unexported functions in the
+same order, restating only the selection control flow. Two checks that it is
+faithful: the section it produces is identical, values and order, to the
+`jsonSourceFile` entry point's — which gets its specs from the real attached
+`configFileSpecs` — in 71 of 71; and swapping include for exclude in the hook
+drops that to 19 of 71, so the check is live. The `outDir`/`declarationDir`
+exclude default is not exercised by this corpus and is therefore unverified.
+
+**The bounded attribution pass then separated the remaining differences**, which
+is what the owner asked for instead of closing them as a category:
+
+| attribution | rows | what it means |
+| --- | ---: | --- |
+| reproduced | 65 | byte for byte |
+| `upstream` | 71 | the frozen bytes and the pinned Go genuinely disagree |
+| `renderer_defect` | 6 | our renderer is wrong and can be fixed |
+| `missing_observation` | 0 | — |
+
+Four causes, established by decomposing *every* difference rather than the first:
+
+- **`raw.compileOnSave`, 71 rows, the sole difference in 65 of them.** Nothing at
+  the pin inserts this member into `raw`: `tsconfigparsing.go:977-981` only
+  converts a value the config declared, and `:1206-1207` only propagates a true
+  one down an extends chain, which no config here uses. The frozen corpus
+  disagrees with itself about it — 0 of the 71 paired `jsonSourceFile` baselines
+  carry it. Its origin is identifiable: `commandLineParser.ts:3509` assigns it
+  unconditionally on the JSON path. Verified constructively, by inserting exactly
+  that member into the rendered text and getting a byte-identical match.
+- **`options.jsx`, 4 rows.** The pin has `JsxEmitReactNative = 2` and
+  `JsxEmitReact = 3` (`compileroptions.go:534-535`), the reverse of TypeScript's
+  numbering. A baseline records `raw.jsx = "react-native"` with `options.jsx = 3`;
+  the pinned parse yields 2.
+- **`Fs::` entry order, 2 rows**, under a case-insensitive host.
+- **`wildcardDirectories` key order, 6 rows — our defect, not upstream.** The
+  order *is* recoverable: `wildcarddirectories.go:36` iterates
+  `for _, file := range include` and inserts in include order, and the pinned Go
+  is a line-for-line port of `commandLineParser.ts:4128-4151`, where the same
+  loop fills a JS object literal whose key order is insertion order. The frozen
+  order is the pin's own insertion order. Our renderer sorted it away.
+
+Two framings of this step's own were wrong and are corrected here: that a
+map-ordered section makes the frozen order unreachable by construction, and that
+the whole `json` population was unrenderable.
+
+### The amendment
+
+`data/phase1/baseline-exceptions.json` records the owner's amendment to the
+requirement that all 309 config reference outputs reproduce exactly. Only
+`upstream` may be excepted, and only individually: `renderer_defect` and
+`missing_observation` name work rather than a fact about the baseline, so
+`exception_problems` refuses them outright. Each entry carries the reason, the
+pinned evidence, what the pin produces, what the baseline records, the
+TypeScript origin where identifiable, and the Go-versus-Rust semantic
+comparison that survives it. It must carry the original file's hash, and it is
+refused if the index also records that rendering as verified — **an exception is
+not a pass.** The outputs keep their original files and are counted in their own
+bucket.
 
 ## F0 checklist
 

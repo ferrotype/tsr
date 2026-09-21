@@ -25,6 +25,7 @@ mod glob;
 mod iovfs;
 mod matchfiles;
 mod osvfs;
+mod symlinks;
 mod tspath;
 mod vfsmatch;
 mod vfsmock;
@@ -43,6 +44,7 @@ const GROUPS: &[(&str, GroupHandler)] = &[
     ("iovfs", iovfs::observe),
     ("matchfiles", matchfiles::observe),
     ("osvfs", osvfs::observe),
+    ("symlinks", symlinks::observe),
     ("tspath", tspath::observe),
     ("vfsmatch", vfsmatch::observe),
     ("vfsmock", vfsmock::observe),

@@ -1,0 +1,821 @@
+{
+  "family": "filesystem",
+  "requests": [
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/home/one",
+          "op": "new",
+          "target": "sensitive"
+        },
+        {
+          "op": "dump",
+          "target": "sensitive"
+        },
+        {
+          "case_sensitive": false,
+          "cwd": "/HOME/TWO",
+          "op": "new",
+          "target": "folding"
+        },
+        {
+          "op": "dump",
+          "target": "folding"
+        },
+        {
+          "op": "process_resolution",
+          "original": "Src/X.ts",
+          "resolved": "Lib/X.ts",
+          "target": "sensitive"
+        },
+        {
+          "op": "process_resolution",
+          "original": "Src/X.ts",
+          "resolved": "Lib/X.ts",
+          "target": "folding"
+        },
+        {
+          "op": "dump",
+          "target": "sensitive"
+        },
+        {
+          "op": "dump",
+          "target": "folding"
+        }
+      ],
+      "case": "filesystem/symlinks/the-constructor-captures-cwd-and-case-sensitivity-for-the-cache-s-lifetime",
+      "discriminates": "A port that takes the current directory and the case rule as per-call arguments instead of capturing them in the constructor. Two caches are built with different configuration and then handed the SAME relative resolution pair; every key, value and set member they record differs, and no per-call-argument port can produce two answers from one input without being told which cache asked. It also catches three renderings of the stored data that a plausible port gets wrong: Files stores the resolved string VERBATIM (\"Lib/X.ts\", not the absolute Path) while its key is the canonical Path; FilesByRealpath is keyed by the canonical realpath Path but holds the original string verbatim; and on the case-insensitive cache KnownDirectoryLink.Real keeps the original casing (\"/HOME/TWO/Lib/\") while KnownDirectoryLink.RealPath is folded (\"/home/two/lib/\"), so a port that stores one field twice is visible.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/symlinks/knownsymlinks.go:NewKnownSymlink",
+      "order_sensitive": true,
+      "subject": "symlinks.KnownSymlinks"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "op": "new",
+          "target": "c"
+        },
+        {
+          "link_present": true,
+          "op": "set_directory",
+          "real": "/p/real/",
+          "real_path": "/p/real/",
+          "symlink": "/p/link",
+          "symlink_path": "/p/link",
+          "target": "c"
+        },
+        {
+          "op": "has_directory",
+          "path": "/p/link",
+          "target": "c"
+        },
+        {
+          "op": "has_directory",
+          "path": "/p/link/",
+          "target": "c"
+        },
+        {
+          "op": "dump",
+          "target": "c"
+        },
+        {
+          "link_present": true,
+          "op": "set_directory",
+          "real": "/p/real/",
+          "real_path": "/p/real/",
+          "symlink": "/p/link/",
+          "symlink_path": "/p/link/",
+          "target": "c"
+        },
+        {
+          "op": "has_directory",
+          "path": "/p/link",
+          "target": "c"
+        },
+        {
+          "op": "has_directory",
+          "path": "/p/link/",
+          "target": "c"
+        },
+        {
+          "op": "dump",
+          "target": "c"
+        },
+        {
+          "op": "has_directory",
+          "path": "/p/other",
+          "target": "c"
+        }
+      ],
+      "case": "filesystem/symlinks/has-directory-appends-the-separator-and-set-directory-does-not",
+      "discriminates": "A port that normalises the key inside SetDirectory, or one whose HasDirectory compares the caller's path as given. HasDirectory appends the trailing separator itself (knownsymlinks.go:32) and SetDirectory does not (:55-63), so a directory stored under a separator-less key is unreachable through HasDirectory forever -- steps 3 and 4 are both false although step 5 shows the entry is there. A port that ensured the separator on either side would answer step 3 true. Steps 6 to 9 then add the same realpath under a second symlink STRING and show the reverse index holding both spellings, catching a port that keys the reverse set by Path (which would collapse the two) or that stores one symlink per realpath.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/symlinks/knownsymlinks.go:KnownSymlinks.HasDirectory",
+      "order_sensitive": true,
+      "subject": "symlinks.KnownSymlinks"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "op": "new",
+          "target": "c"
+        },
+        {
+          "link_present": true,
+          "op": "set_directory",
+          "real": "/p/real1/",
+          "real_path": "/p/real1/",
+          "symlink": "/p/link",
+          "symlink_path": "/p/link/",
+          "target": "c"
+        },
+        {
+          "op": "dump",
+          "target": "c"
+        },
+        {
+          "link_present": true,
+          "op": "set_directory",
+          "real": "/p/real2/",
+          "real_path": "/p/real2/",
+          "symlink": "/p/link",
+          "symlink_path": "/p/link/",
+          "target": "c"
+        },
+        {
+          "op": "dump",
+          "target": "c"
+        },
+        {
+          "link_present": true,
+          "op": "set_directory",
+          "real": "/p/real1/",
+          "real_path": "/p/real1/",
+          "symlink": "/p/other",
+          "symlink_path": "/p/other/",
+          "target": "c"
+        },
+        {
+          "op": "dump",
+          "target": "c"
+        }
+      ],
+      "case": "filesystem/symlinks/the-reverse-directory-index-is-written-once-and-never-corrected",
+      "discriminates": "A port that rebuilds the reverse index when the forward entry is overwritten. SetDirectory consults the forward map before it writes and extends the reverse index ONLY when the symlink key is new (knownsymlinks.go:56-62), so after step 4 the two indexes disagree: Directories says /p/link/ resolves to /p/real2/, DirectoriesByRealpath still files /p/link under /p/real1/ and has no /p/real2/ key at all. A port that re-indexed would show /p/real2/ gaining the member and /p/real1/ losing it; a port that indexed unconditionally would show the member under both. Steps 6 and 7 are the control: a genuinely new symlink key does extend the reverse set, so step 5's stillness is the rule and not a dead index.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/symlinks/knownsymlinks.go:KnownSymlinks.SetDirectory",
+      "order_sensitive": true,
+      "subject": "symlinks.KnownSymlinks"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "op": "new",
+          "target": "c"
+        },
+        {
+          "link_present": false,
+          "op": "set_directory",
+          "real": "",
+          "real_path": "",
+          "symlink": "/p/link",
+          "symlink_path": "/p/link/",
+          "target": "c"
+        },
+        {
+          "op": "has_directory",
+          "path": "/p/link",
+          "target": "c"
+        },
+        {
+          "op": "dump",
+          "target": "c"
+        },
+        {
+          "link_present": true,
+          "op": "set_directory",
+          "real": "/p/real/",
+          "real_path": "/p/real/",
+          "symlink": "/p/link",
+          "symlink_path": "/p/link/",
+          "target": "c"
+        },
+        {
+          "op": "dump",
+          "target": "c"
+        },
+        {
+          "op": "has_directory",
+          "path": "/p/link",
+          "target": "c"
+        },
+        {
+          "link_present": true,
+          "op": "set_directory",
+          "real": "/p/real/",
+          "real_path": "/p/real/",
+          "symlink": "/p/fresh",
+          "symlink_path": "/p/fresh/",
+          "target": "c"
+        },
+        {
+          "op": "dump",
+          "target": "c"
+        }
+      ],
+      "case": "filesystem/symlinks/a-nil-link-is-present-and-blocks-the-reverse-index-forever",
+      "discriminates": "A port that cannot represent a directory entry with no link, or that treats one as absence. SetDirectory stores a nil realDirectory without touching the reverse index, and the guard that protects the reverse index is a key-presence test (knownsymlinks.go:56-62), so the nil entry makes the key present and the real link that arrives later is written to the forward map with no reverse entry ever created. Three wrong ports are caught: one whose HasDirectory tests for a usable link (step 3 would be false); one that skips the forward Store when the link is nil (step 4 would be empty); and one that extends the reverse index whenever it writes a real link (step 6 would show /p/real/ = {\"/p/link\"}). Steps 8 and 9 are the control: the same realpath reached through a fresh symlink key does get a reverse entry.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/symlinks/knownsymlinks.go:KnownSymlinks.SetDirectory",
+      "order_sensitive": true,
+      "subject": "symlinks.KnownSymlinks"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": false,
+          "cwd": "/Home/Proj",
+          "op": "new",
+          "target": "c"
+        },
+        {
+          "op": "set_file",
+          "realpath": "../Real/File.TS",
+          "symlink": "./Link/File.TS",
+          "symlink_path": "/home/proj/link/file.ts",
+          "target": "c"
+        },
+        {
+          "op": "dump",
+          "target": "c"
+        },
+        {
+          "op": "set_file",
+          "realpath": "/Elsewhere/X.ts",
+          "symlink": "/Other/Link.ts",
+          "symlink_path": "/home/proj/link/file.ts",
+          "target": "c"
+        },
+        {
+          "op": "dump",
+          "target": "c"
+        },
+        {
+          "op": "set_file",
+          "realpath": "../Real/File.TS",
+          "symlink": "/p/second",
+          "symlink_path": "/home/proj/second.ts",
+          "target": "c"
+        },
+        {
+          "op": "dump",
+          "target": "c"
+        }
+      ],
+      "case": "filesystem/symlinks/set-file-canonicalises-only-the-reverse-key",
+      "discriminates": "A port that canonicalises the wrong half of SetFile. The forward map stores the realpath argument VERBATIM, while the reverse index is keyed by ToPath(realpath, cwd, caseSensitive) computed from the CACHE's own configuration (knownsymlinks.go:65-72) -- so \"../Real/File.TS\" is both the stored value and the key /home/real/file.ts, and a port that stored the canonical form, or keyed the reverse index by the raw string, or resolved the realpath against something other than the cache's cwd, is caught by step 3 alone. Step 4 then rewrites an existing symlink key with a different realpath: the forward value changes and the reverse index does not learn the new realpath, catching a port that re-indexes. Step 6 is the control -- a second symlink reaching the same realpath joins the existing set rather than replacing it.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/symlinks/knownsymlinks.go:KnownSymlinks.SetFile",
+      "order_sensitive": true,
+      "subject": "symlinks.KnownSymlinks"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "op": "new",
+          "target": "c"
+        },
+        {
+          "op": "process_resolution",
+          "original": "",
+          "resolved": "",
+          "target": "c"
+        },
+        {
+          "op": "process_resolution",
+          "original": "/p/a.ts",
+          "resolved": "",
+          "target": "c"
+        },
+        {
+          "op": "process_resolution",
+          "original": "",
+          "resolved": "/p/b.ts",
+          "target": "c"
+        },
+        {
+          "op": "dump",
+          "target": "c"
+        },
+        {
+          "op": "process_resolution",
+          "original": "/p/src/one.ts",
+          "resolved": "/p/lib/two.ts",
+          "target": "c"
+        },
+        {
+          "op": "dump",
+          "target": "c"
+        },
+        {
+          "op": "process_resolution",
+          "original": "/p/src/two.ts",
+          "resolved": "/p/lib/two.ts",
+          "target": "c"
+        },
+        {
+          "op": "dump",
+          "target": "c"
+        }
+      ],
+      "case": "filesystem/symlinks/process-resolution-records-the-file-even-when-it-guesses-no-directory",
+      "discriminates": "A port that records nothing when the two paths share no trailing components. ProcessResolution calls SetFile unconditionally and only then guesses a directory (knownsymlinks.go:97-98), so step 6 must leave a file entry and an EMPTY directory index. This is the exact shape the current Rust inlining gets wrong: crates/tsr_compiler/src/checker_module_specifiers.rs:65-67 returns as soon as the walk consumed no component, so the file half never runs. It also catches a port that treats one empty argument as 'record the other half': steps 2 to 4 pass an empty original, an empty resolved, and both, and step 5 must show four empty indexes. Steps 8 and 9 are the contrast, the same entry point taking the directory branch, so the empty directory index in step 7 is a decision rather than an unimplemented branch.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/symlinks/knownsymlinks.go:KnownSymlinks.ProcessResolution",
+      "order_sensitive": true,
+      "subject": "symlinks.KnownSymlinks"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/w",
+          "op": "new",
+          "target": "sensitive"
+        },
+        {
+          "case_sensitive": false,
+          "cwd": "/w",
+          "op": "new",
+          "target": "folding"
+        },
+        {
+          "a": "/t/path/file.ts",
+          "b": "/t/path/file.ts",
+          "cwd": "/w",
+          "op": "guess_directory_symlink",
+          "target": "sensitive"
+        },
+        {
+          "a": "/t/path/file1.ts",
+          "b": "/t/path/file2.ts",
+          "cwd": "/w",
+          "op": "guess_directory_symlink",
+          "target": "sensitive"
+        },
+        {
+          "a": "/t/p1/file.ts",
+          "b": "/t/p2/file.ts",
+          "cwd": "/w",
+          "op": "guess_directory_symlink",
+          "target": "sensitive"
+        },
+        {
+          "a": "/t/node_modules/pkg/file.ts",
+          "b": "/t/node_modules/pkg/file.ts",
+          "cwd": "/w",
+          "op": "guess_directory_symlink",
+          "target": "sensitive"
+        },
+        {
+          "a": "/t/node_modules/@scope/pkg/f.ts",
+          "b": "/t/node_modules/@scope/pkg/f.ts",
+          "cwd": "/w",
+          "op": "guess_directory_symlink",
+          "target": "sensitive"
+        },
+        {
+          "a": "rel/x/f.ts",
+          "b": "other/x/f.ts",
+          "cwd": "/z",
+          "op": "guess_directory_symlink",
+          "target": "sensitive"
+        },
+        {
+          "a": "/t/DIR/File.ts",
+          "b": "/t/dir/file.ts",
+          "cwd": "/w",
+          "op": "guess_directory_symlink",
+          "target": "sensitive"
+        },
+        {
+          "a": "/t/DIR/File.ts",
+          "b": "/t/dir/file.ts",
+          "cwd": "/w",
+          "op": "guess_directory_symlink",
+          "target": "folding"
+        },
+        {
+          "a": "/t/NODE_MODULES/pkg/f.ts",
+          "b": "/t/NODE_MODULES/pkg/f.ts",
+          "cwd": "/w",
+          "op": "guess_directory_symlink",
+          "target": "sensitive"
+        },
+        {
+          "a": "/t/NODE_MODULES/pkg/f.ts",
+          "b": "/t/NODE_MODULES/pkg/f.ts",
+          "cwd": "/w",
+          "op": "guess_directory_symlink",
+          "target": "folding"
+        },
+        {
+          "a": "/t/@scope/pkg/f.ts",
+          "b": "/t/@other/pkg/f.ts",
+          "cwd": "/w",
+          "op": "guess_directory_symlink",
+          "target": "sensitive"
+        },
+        {
+          "a": "/t/deep/nest/f.ts",
+          "b": "/other/f.ts",
+          "cwd": "/w",
+          "op": "guess_directory_symlink",
+          "target": "sensitive"
+        }
+      ],
+      "case": "filesystem/symlinks/the-common-ancestor-walk-stops-at-the-package-boundary",
+      "discriminates": "A port that walks the two paths with the wrong stop rule. The loop tests the component BEFORE the last on each side (knownsymlinks.go:119-120), not the last one, so /t/node_modules/pkg/file.ts stops at the package directory rather than at node_modules (step 6) and /t/@scope/pkg/f.ts stops at the scoped package even outside node_modules (step 13). Four more wrong ports are caught: one that returns the popped ancestors when nothing was consumed (step 4 must be two empty strings, not two full paths); one that resolves the relative inputs against the CACHE's cwd instead of the method's third argument (step 8 uses /z while the cache holds /w); one that compares components raw (step 10 must consume DIR against dir on a case-insensitive cache) or folded (step 9 must not); and one that folds the node_modules test the wrong way, since NODE_MODULES is a package boundary only on a case-insensitive cache (steps 11 and 12) and GetPathFromPathComponents gives the ORIGINAL casing back when it is. Step 14 catches a port that requires the two sides to end at equal depth.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/symlinks/knownsymlinks.go:KnownSymlinks.guessDirectorySymlink",
+      "order_sensitive": true,
+      "subject": "symlinks.KnownSymlinks"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/w",
+          "op": "new",
+          "target": "sensitive"
+        },
+        {
+          "case_sensitive": false,
+          "cwd": "/w",
+          "op": "new",
+          "target": "folding"
+        },
+        {
+          "name": "",
+          "op": "is_node_modules_or_scoped_package_directory",
+          "target": "sensitive"
+        },
+        {
+          "name": "",
+          "op": "is_node_modules_or_scoped_package_directory",
+          "target": "folding"
+        },
+        {
+          "name": "node_modules",
+          "op": "is_node_modules_or_scoped_package_directory",
+          "target": "sensitive"
+        },
+        {
+          "name": "node_modules",
+          "op": "is_node_modules_or_scoped_package_directory",
+          "target": "folding"
+        },
+        {
+          "name": "NODE_MODULES",
+          "op": "is_node_modules_or_scoped_package_directory",
+          "target": "sensitive"
+        },
+        {
+          "name": "NODE_MODULES",
+          "op": "is_node_modules_or_scoped_package_directory",
+          "target": "folding"
+        },
+        {
+          "name": "Node_modules",
+          "op": "is_node_modules_or_scoped_package_directory",
+          "target": "sensitive"
+        },
+        {
+          "name": "Node_modules",
+          "op": "is_node_modules_or_scoped_package_directory",
+          "target": "folding"
+        },
+        {
+          "name": "node_modules/",
+          "op": "is_node_modules_or_scoped_package_directory",
+          "target": "sensitive"
+        },
+        {
+          "name": "node_modules/",
+          "op": "is_node_modules_or_scoped_package_directory",
+          "target": "folding"
+        },
+        {
+          "name": "node_modules.bak",
+          "op": "is_node_modules_or_scoped_package_directory",
+          "target": "sensitive"
+        },
+        {
+          "name": "node_modules.bak",
+          "op": "is_node_modules_or_scoped_package_directory",
+          "target": "folding"
+        },
+        {
+          "name": "@",
+          "op": "is_node_modules_or_scoped_package_directory",
+          "target": "sensitive"
+        },
+        {
+          "name": "@",
+          "op": "is_node_modules_or_scoped_package_directory",
+          "target": "folding"
+        },
+        {
+          "name": "@scope",
+          "op": "is_node_modules_or_scoped_package_directory",
+          "target": "sensitive"
+        },
+        {
+          "name": "@scope",
+          "op": "is_node_modules_or_scoped_package_directory",
+          "target": "folding"
+        },
+        {
+          "name": "a@b",
+          "op": "is_node_modules_or_scoped_package_directory",
+          "target": "sensitive"
+        },
+        {
+          "name": "a@b",
+          "op": "is_node_modules_or_scoped_package_directory",
+          "target": "folding"
+        },
+        {
+          "name": "src",
+          "op": "is_node_modules_or_scoped_package_directory",
+          "target": "sensitive"
+        },
+        {
+          "name": "src",
+          "op": "is_node_modules_or_scoped_package_directory",
+          "target": "folding"
+        }
+      ],
+      "case": "filesystem/symlinks/the-package-boundary-test-folds-node-modules-but-not-the-scope-sigil",
+      "discriminates": "A port that gets any of the three observable decisions in this two-line predicate wrong (knownsymlinks.go:132-134). The node_modules test goes through GetCanonicalFileName, so NODE_MODULES and Node_modules are boundaries on a case-insensitive cache and not on a case-sensitive one: each name is asked of both caches and a port with one fixed answer disagrees on one of the two. The test is equality, not a prefix or a substring, so node_modules/ and node_modules.bak are both false on both caches. And the scope test is strings.HasPrefix, so a bare @ is a boundary while a@b is not -- catching a port that used contains, or that required something after the sigil. The empty name is a totality row and NOT a discriminating one, stated plainly: the pin's explicit s != \"\" guard is redundant, because \"\" is neither node_modules nor @-prefixed, and a mutation that deletes the guard from the pinned source survives every case in this group. What the row does pin is that the predicate answers for an empty component instead of failing, which a port that indexed the first byte would not.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/symlinks/knownsymlinks.go:KnownSymlinks.isNodeModulesOrScopedPackageDirectory",
+      "order_sensitive": true,
+      "subject": "symlinks.KnownSymlinks"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "op": "new",
+          "target": "a"
+        },
+        {
+          "modules": [
+            [
+              "/p/m/a.ts",
+              "/p/r/a.ts"
+            ]
+          ],
+          "op": "set_symlinks_from_resolutions",
+          "target": "a",
+          "type_references": [
+            [
+              "/p/t/b.d.ts",
+              "/p/r/b.d.ts"
+            ]
+          ]
+        },
+        {
+          "op": "dump",
+          "target": "a"
+        },
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "op": "new",
+          "target": "b"
+        },
+        {
+          "modules": [],
+          "op": "set_symlinks_from_resolutions",
+          "target": "b",
+          "type_references": [
+            [
+              "/p/t/c.ts",
+              "/p/r/c.ts"
+            ]
+          ]
+        },
+        {
+          "op": "dump",
+          "target": "b"
+        },
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "op": "new",
+          "target": "c"
+        },
+        {
+          "modules": [
+            [
+              "/p/s/x.ts",
+              "/p/m1/x.ts"
+            ]
+          ],
+          "op": "set_symlinks_from_resolutions",
+          "target": "c",
+          "type_references": [
+            [
+              "/p/s/x.ts",
+              "/p/m2/x.ts"
+            ]
+          ]
+        },
+        {
+          "op": "dump",
+          "target": "c"
+        }
+      ],
+      "case": "filesystem/symlinks/resolutions-are-drained-modules-first-with-a-nil-source-file",
+      "discriminates": "A port that drives the two resolution sources in the other order, or that drops one, or that hands the callbacks a source file. The pin calls forEachResolvedModule and only then forEachResolvedTypeReferenceDirective, passing a nil *ast.SourceFile to each (knownsymlinks.go:81-91); both are recorded as the drivers are entered, so an empty module list still shows that its driver ran first (steps 5 and 6). The order is also pinned by the cache state alone, for a port with no callback seam to observe: step 8 feeds the SAME symlink through both sources with different realpaths, and because both reverse indexes are written only on first insertion the surviving reverse entries name the MODULE realpath while the forward entries name the TYPE REFERENCE one. A port that ran type references first would swap them.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/symlinks/knownsymlinks.go:KnownSymlinks.SetSymlinksFromResolutions",
+      "order_sensitive": true,
+      "subject": "symlinks.KnownSymlinks"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "op": "new",
+          "target": "sensitive"
+        },
+        {
+          "op": "process_resolution",
+          "original": "/p/node_modules/.pnpm/lib/x.ts",
+          "resolved": "/p/real/lib/x.ts",
+          "target": "sensitive"
+        },
+        {
+          "op": "dump",
+          "target": "sensitive"
+        },
+        {
+          "op": "process_resolution",
+          "original": "/p/node_modules/pnpm/lib/y.ts",
+          "resolved": "/p/real/lib/y.ts",
+          "target": "sensitive"
+        },
+        {
+          "op": "dump",
+          "target": "sensitive"
+        },
+        {
+          "op": "process_resolution",
+          "original": "/p/.git/lib/z.ts",
+          "resolved": "/p/real2/lib/z.ts",
+          "target": "sensitive"
+        },
+        {
+          "op": "process_resolution",
+          "original": "/p/.#w/lib/q.ts",
+          "resolved": "/p/real3/lib/q.ts",
+          "target": "sensitive"
+        },
+        {
+          "op": "dump",
+          "target": "sensitive"
+        },
+        {
+          "case_sensitive": false,
+          "cwd": "/P",
+          "op": "new",
+          "target": "folding"
+        },
+        {
+          "op": "process_resolution",
+          "original": "/P/NODE_MODULES/.PNPM/LIB/X.ts",
+          "resolved": "/P/REAL/LIB/X.ts",
+          "target": "folding"
+        },
+        {
+          "op": "dump",
+          "target": "folding"
+        },
+        {
+          "case_sensitive": true,
+          "cwd": "/P",
+          "op": "new",
+          "target": "upper"
+        },
+        {
+          "op": "process_resolution",
+          "original": "/P/NODE_MODULES/.PNPM/LIB/X.ts",
+          "resolved": "/P/REAL/LIB/X.ts",
+          "target": "upper"
+        },
+        {
+          "op": "dump",
+          "target": "upper"
+        }
+      ],
+      "case": "filesystem/symlinks/the-ignored-path-test-runs-on-the-canonical-path-and-spares-the-file-half",
+      "discriminates": "A port that applies ContainsIgnoredPath to the wrong string, at the wrong time, or to the wrong half. The pin tests the CANONICALISED symlink path (knownsymlinks.go:100-101), so the same uppercase input is refused by a case-insensitive cache, whose ToPath folds it to /p/node_modules/.pnpm, and accepted by a case-sensitive one, whose /P/NODE_MODULES/.PNPM matches no pattern (steps 10 and 12): a port that tested the raw commonOriginal, or that lower-cased unconditionally, disagrees on one of the two. The test guards only SetDirectory, so every refused step still leaves its file entry -- a port that returned early would lose it. Step 4 is the control for the pattern itself: /p/node_modules/pnpm differs from the refused /p/node_modules/.pnpm by one character and is stored, so the rule is '/node_modules/.' and not 'node_modules'. Steps 6 and 7 cover the other two patterns, /.git and .#.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/symlinks/knownsymlinks.go:KnownSymlinks.ProcessResolution",
+      "order_sensitive": true,
+      "subject": "symlinks.KnownSymlinks"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "op": "new",
+          "target": "c"
+        },
+        {
+          "link_present": true,
+          "op": "store_through_directories",
+          "real": "/p/r/",
+          "real_path": "/p/r/",
+          "symlink_path": "/p/x/",
+          "target": "c"
+        },
+        {
+          "op": "has_directory",
+          "path": "/p/x",
+          "target": "c"
+        },
+        {
+          "op": "store_through_files",
+          "realpath": "/p/r/f.ts",
+          "symlink_path": "/p/f.ts",
+          "target": "c"
+        },
+        {
+          "index": "directories",
+          "op": "store_through_by_realpath",
+          "realpath": "/p/r/",
+          "symlink": "/p/x",
+          "target": "c"
+        },
+        {
+          "index": "files",
+          "op": "store_through_by_realpath",
+          "realpath": "/p/r/f.ts",
+          "symlink": "/p/f.ts",
+          "target": "c"
+        },
+        {
+          "op": "dump",
+          "target": "c"
+        },
+        {
+          "link_present": true,
+          "op": "set_directory",
+          "real": "/p/r2/",
+          "real_path": "/p/r2/",
+          "symlink": "/p/x",
+          "symlink_path": "/p/x/",
+          "target": "c"
+        },
+        {
+          "op": "dump",
+          "target": "c"
+        },
+        {
+          "op": "set_file",
+          "realpath": "/p/r2/f.ts",
+          "symlink": "/p/f.ts",
+          "symlink_path": "/p/f.ts",
+          "target": "c"
+        },
+        {
+          "op": "dump",
+          "target": "c"
+        }
+      ],
+      "case": "filesystem/symlinks/the-four-accessors-hand-back-the-cache-s-own-storage",
+      "discriminates": "A port whose accessors return a snapshot, a clone or a read-only view. All four return a pointer to the cache's own map (knownsymlinks.go:37-53), so a write made through a returned handle is the cache's state: step 3 shows HasDirectory finding a directory that was never passed to SetDirectory, and step 8 shows SetDirectory's own first-insertion guard treating that handle-written key as present, so it overwrites the forward entry and leaves the reverse index alone. A copying accessor answers step 3 false and gains a /p/r2/ reverse entry at step 9; a cloning one loses the handle writes entirely by step 7. Step 10 makes the same point for the file half, where the handle-written key suppresses the reverse write for /p/r2/f.ts.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/symlinks/knownsymlinks.go:KnownSymlinks.Directories",
+      "order_sensitive": true,
+      "subject": "symlinks.KnownSymlinks"
+    }
+  ]
+}

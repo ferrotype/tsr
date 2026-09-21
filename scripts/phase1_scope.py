@@ -413,14 +413,27 @@ def gap_record_problems(cases: dict) -> list[str]:
                     f"{case.get('last_result')!r}"
                 )
             continue
+        claimed = case.get("operations", [])
         missing = case.get("missing_operations")
+        if not claimed:
+            # A case may prepare an OUTPUT rather than an operation -- the
+            # carried baseline renderer is 142 of them -- and then there is no
+            # operation for a gap to name. Claiming one would attribute the
+            # whole parse chain to every baseline, which is the over-attribution
+            # this check exists to prevent, pointed the other way.
+            if missing:
+                problems.append(
+                    f"{case['id']}: claims no operations but names a missing one; a case that "
+                    "prepares an output witnesses no operation gap"
+                )
+            continue
         if not missing:
             problems.append(
                 f"{case['id']}: reports not_implemented without naming which operation the "
                 "driver found absent; run `phase1.py record --write` against a capture"
             )
             continue
-        if not set(missing) <= set(case.get("operations", [])):
+        if not set(missing) <= set(claimed):
             problems.append(
                 f"{case['id']}: names a missing operation the case does not claim to reach"
             )

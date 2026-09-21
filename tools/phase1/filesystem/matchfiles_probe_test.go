@@ -25,7 +25,11 @@ package tsoptions_test
 //     through the overlay's in-package companion,
 //     `matchfiles_inpackage_test.go`, which re-derives the validated specs the
 //     worker computes and discards. Each row records which of the two it used
-//     under `wildcard_source`.
+//     under `wildcard_source`. That section's *key order* is the pinned
+//     calculation's own insertion order, which its `map[string]bool` return
+//     discards; it is recovered from the include specs the calculation was
+//     given, again through the in-package companion, and never from the frozen
+//     `Result`. Each row records how under `wildcard_order_source`.
 //
 // Each case's inputs are recovered from the baseline's own *input* sections --
 // `config:`, `Fs::` and `configFileName::`. The probe never reads `Result` or
@@ -298,11 +302,27 @@ func matchFilesTypeAcquisitionOf(acquisition *core.TypeAcquisition) matchFilesTy
 
 // matchFilesWildcardDirectories renders the pinned
 // `ParsedCommandLine.WildcardDirectories()` map. Its values are TypeScript's
-// stringified `WatchDirectoryFlags`, which this pin has no equivalent of, and
-// its keys are ordered because a Go map has no order to carry.
-func matchFilesWildcardDirectories(directories map[string]bool) *collections.OrderedMap[string, string] {
+// stringified `WatchDirectoryFlags`, which this pin has no equivalent of.
+//
+// Its keys carry an order the Go map cannot. TypeScript's `wildcardDirectories`
+// is an object literal filled by the `for (const file of include)` loop at
+// commandLineParser.ts:4132-4151, so its key order is that loop's insertion
+// order, and the frozen baselines record it; the pinned Go port runs the same
+// loop (wildcarddirectories.go:35-39) but returns a `map[string]bool`, which
+// has no order to return. `order` is that insertion order recovered from the
+// include specs the pinned calculation was given -- not a second calculation of
+// which directories are watched -- by the overlay's in-package
+// `Phase1WildcardDirectoryOrder`. When the recovery declined, `order` is empty
+// and the keys fall back to sorted, which is what this section rendered before
+// the order was recoverable; the row's `wildcard_order_source` records which of
+// the two it was.
+func matchFilesWildcardDirectories(directories map[string]bool, order []string) *collections.OrderedMap[string, string] {
+	keys := order
+	if len(keys) != len(directories) {
+		keys = slices.Sorted(maps.Keys(directories))
+	}
 	rendered := collections.NewOrderedMapWithSizeHint[string, string](len(directories))
-	for _, key := range slices.Sorted(maps.Keys(directories)) {
+	for _, key := range keys {
 		flag := "WatchDirectoryFlags.None"
 		if directories[key] {
 			flag = "WatchDirectoryFlags.Recursive"
@@ -368,7 +388,7 @@ func matchFilesWriteErrors(output io.Writer, diags []diagnosticwriter.Diagnostic
 	}
 }
 
-func matchFilesRender(inputs matchFilesInputs, host *tsoptionstest.VfsParseConfigHost, basePath string, parsed *tsoptions.ParsedCommandLine, wildcards map[string]bool) (string, error) {
+func matchFilesRender(inputs matchFilesInputs, host *tsoptionstest.VfsParseConfigHost, basePath string, parsed *tsoptions.ParsedCommandLine, wildcards map[string]bool, wildcardOrder []string) (string, error) {
 	var out strings.Builder
 	out.WriteString("config:\n")
 	out.WriteString(inputs.configText)
@@ -398,7 +418,7 @@ func matchFilesRender(inputs matchFilesInputs, host *tsoptionstest.VfsParseConfi
 		FileNames:           fileNames,
 		TypeAcquisition:     matchFilesTypeAcquisitionOf(parsed.ParsedConfig.TypeAcquisition),
 		Raw:                 parsed.Raw,
-		WildcardDirectories: matchFilesWildcardDirectories(wildcards),
+		WildcardDirectories: matchFilesWildcardDirectories(wildcards, wildcardOrder),
 		CompileOnSave:       compileOnSave,
 	}
 	out.WriteString("Result\n")
@@ -492,6 +512,10 @@ func matchFilesObserve(request matchFilesRequest) (result string, payload map[st
 	var wildcardSource string
 	var wildcardInclude []string
 	var wildcardExclude []string
+	// How the section's key order was obtained, recorded on every row beside
+	// the calculation's own source.
+	var wildcardOrder []string
+	var wildcardOrderSource string
 	panicked := func() (recovered any) {
 		defer func() {
 			if value := recover(); value != nil {
@@ -538,7 +562,26 @@ func matchFilesObserve(request matchFilesRequest) (result string, payload map[st
 			wildcards = parsed.WildcardDirectories()
 			wildcardSource = "tsoptions.ParsedCommandLine.WildcardDirectories"
 		}
-		rendered, renderErr = matchFilesRender(inputs, host, basePath, parsed, wildcards)
+		// The frozen `wildcardDirectories` records the pinned calculation's own
+		// key insertion order; the Go port returns a map, which discards it.
+		// Recover it from the include specs that calculation was given. On the
+		// raw-JSON path those specs are already in hand above; on the
+		// jsonSourceFile path they are the ones the parse attached to the
+		// config source file, which is what the pinned accessor read
+		// (parsedcommandline.go:258-273).
+		if parsed.ConfigFile != nil {
+			wildcardInclude, wildcardExclude, _ = tsoptions.Phase1ValidatedSpecsFromConfigFile(parsed)
+		}
+		var orderOK bool
+		wildcardOrder, orderOK = tsoptions.Phase1WildcardDirectoryOrder(
+			parsed, wildcardInclude, wildcardExclude, wildcards)
+		wildcardOrderSource = "include specs, via tsoptions.Phase1WildcardDirectoryOrder"
+		if !orderOK {
+			// Not a repair: the section still renders, in the sorted order it
+			// used before, and the row says the recovery declined.
+			wildcardOrderSource = "sorted keys: the include-spec walk did not account for every key"
+		}
+		rendered, renderErr = matchFilesRender(inputs, host, basePath, parsed, wildcards, wildcardOrder)
 		return nil
 	}()
 	if panicked != nil {
@@ -572,13 +615,14 @@ func matchFilesObserve(request matchFilesRequest) (result string, payload map[st
 			"files":                     len(files),
 			"symlinks":                  len(symlinks),
 		},
-		"wildcard_source": wildcardSource,
-		"rendered":        rendered,
-		"rendered_bytes":  len(rendered),
-		"rendered_sha256": matchFilesDigest(rendered),
-		"expected_bytes":  len(expected),
-		"expected_sha256": matchFilesDigest(expected),
-		"reproduced":      rendered == expected,
+		"wildcard_source":       wildcardSource,
+		"wildcard_order_source": wildcardOrderSource,
+		"rendered":              rendered,
+		"rendered_bytes":        len(rendered),
+		"rendered_sha256":       matchFilesDigest(rendered),
+		"expected_bytes":        len(expected),
+		"expected_sha256":       matchFilesDigest(expected),
+		"reproduced":            rendered == expected,
 	}
 	if rendered != expected {
 		observation["first_difference"] = matchFilesFirstDifference(rendered, expected)

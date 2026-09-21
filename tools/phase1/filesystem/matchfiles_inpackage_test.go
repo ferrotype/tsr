@@ -37,7 +37,12 @@ package tsoptions
 // `ParsedCommandLine.Errors`, which the renderer prints, so re-raising them
 // here would double them.
 
-import "reflect"
+import (
+	"reflect"
+
+	"github.com/microsoft/TypeScript/tsc/internal/tspath"
+	"github.com/microsoft/TypeScript/tsc/internal/vfs/vfsmatch"
+)
 
 // phase1ValidatedSpecs restates tsconfigparsing.go:1306-1349 for the
 // `sourceFile == nil` path, reading its inputs off the parse's own result.
@@ -115,4 +120,89 @@ func Phase1WildcardDirectoriesWithoutConfigFile(p *ParsedCommandLine) (directori
 	}
 	include, exclude = phase1ValidatedSpecs(p)
 	return getWildcardDirectories(include, exclude, p.comparePathsOptions), include, exclude, true
+}
+
+// Phase1ValidatedSpecsFromConfigFile is the sibling of the re-derivation above
+// for the entry point that *does* attach a ConfigFile. It reads the specs the
+// pinned parse itself recorded -- `configFileSpecs.validatedIncludeSpecs` and
+// `validatedExcludeSpecs`, attached at tsconfigparsing.go:1375-1377 -- which
+// are the very slices `ParsedCommandLine.WildcardDirectories()` passes to
+// `getWildcardDirectories` (parsedcommandline.go:258-273). Nothing is derived
+// here: this is a read of the pinned parse's own field, and it exists only
+// because the field is unexported.
+func Phase1ValidatedSpecsFromConfigFile(p *ParsedCommandLine) (include []string, exclude []string, ok bool) {
+	if p == nil || p.ConfigFile == nil || p.ConfigFile.configFileSpecs == nil {
+		return nil, nil, false
+	}
+	specs := p.ConfigFile.configFileSpecs
+	return specs.validatedIncludeSpecs, specs.validatedExcludeSpecs, true
+}
+
+// Phase1WildcardDirectoryOrder recovers the order in which the pinned
+// `getWildcardDirectories` inserted the keys of the map it returned.
+//
+// Why the order has to be recovered at all. The pinned function is a
+// line-for-line port of commandLineParser.ts:4113-4160, where
+// `wildcardDirectories` is a JS object literal filled by `for (const file of
+// include)`, so its key order *is* that loop's insertion order and the frozen
+// baselines record it. The Go port fills a `map[string]bool`
+// (wildcarddirectories.go:29) and returns it, and a Go map has no order, so the
+// information the baselines carry is destroyed on the way out. It is not lost,
+// though: it is a function of the include specs the calculation was given, so
+// it can be recovered from them.
+//
+// What this does and does not do. It does not recompute which directories are
+// watched or how: `directories` is the pinned function's own answer and is
+// never added to, removed from or corrected here. The only thing restated is
+// the *iteration* of wildcarddirectories.go:35-39 -- normalize each include
+// spec against the base path, skip the ones the exclude matcher matches, ask
+// which directory it names -- and every step of that is the pinned call
+// (`tspath.NormalizePath`, `tspath.CombinePaths`, `vfsmatch.NewSpecMatcher`,
+// `getWildcardDirectoryFromSpec`). Each spec's directory is emitted the first
+// time it appears and only if the returned map still holds it, which is what
+// makes this a recovery of the pinned key order rather than a second
+// calculation: a spec whose directory the pinned function dropped (a duplicate
+// canonical key resolving to an earlier path at :51-57, or a subpath deleted
+// under a recursive watch at :70-78) contributes nothing.
+//
+// `ok` is false when the walk does not account for every key exactly once. The
+// one shape that would produce that is a key the pinned function deleted and
+// then re-inserted, which in the TypeScript object moves it to the end while
+// this walk would leave it at its first position; no frozen baseline exercises
+// it, and the caller is told rather than quietly given a guess.
+func Phase1WildcardDirectoryOrder(p *ParsedCommandLine, include []string, exclude []string, directories map[string]bool) (order []string, ok bool) {
+	if p == nil || len(directories) == 0 {
+		return nil, len(directories) == 0
+	}
+	comparePathsOptions := p.comparePathsOptions
+	excludeMatcher := vfsmatch.NewSpecMatcher(
+		exclude,
+		comparePathsOptions.CurrentDirectory,
+		vfsmatch.UsageExclude,
+		comparePathsOptions.UseCaseSensitiveFileNames,
+	)
+	order = make([]string, 0, len(directories))
+	emitted := make(map[string]struct{}, len(directories))
+	for _, file := range include {
+		spec := tspath.NormalizePath(tspath.CombinePaths(comparePathsOptions.CurrentDirectory, file))
+		if excludeMatcher != nil && excludeMatcher.MatchString(spec) {
+			continue
+		}
+		match := getWildcardDirectoryFromSpec(spec, comparePathsOptions.UseCaseSensitiveFileNames)
+		if match == nil {
+			continue
+		}
+		if _, kept := directories[match.Path]; !kept {
+			continue
+		}
+		if _, already := emitted[match.Path]; already {
+			continue
+		}
+		emitted[match.Path] = struct{}{}
+		order = append(order, match.Path)
+	}
+	if len(order) != len(directories) {
+		return nil, false
+	}
+	return order, true
 }

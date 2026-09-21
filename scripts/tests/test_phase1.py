@@ -1499,7 +1499,12 @@ class RosterLedgerTests(unittest.TestCase):
 
     def test_exempting_an_operation_that_has_a_prepared_case_is_rejected(self):
         """Two contradictory answers about the same operation is a defect, not a choice."""
-        covered = next(iter(scope.cases_by_operation()))
+        # A leaf one specifically: the ledger under test is the leaves ledger,
+        # and an operation from another step would be refused for the wrong
+        # reason (never on that roster) rather than for the contradiction.
+        leaf = {row["id"] for row in self.scope["operations"]
+                if row["go_package"] in scope.LEAF_PACKAGES}
+        covered = next(o for o in scope.cases_by_operation() if o in leaf)
         problems = self.forge([{
             "operation": covered, "category": "equivalent_rust",
             "owner": "Iterator::filter", "evidence": "upstream/... :1",

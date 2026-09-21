@@ -203,6 +203,7 @@ FAMILIES = {
             "data/phase1/requests/filesystem-wrapvfs.json",
             "data/phase1/requests/filesystem-iovfs.json",
             "data/phase1/requests/filesystem-vfsmock.json",
+            "data/phase1/requests/filesystem-symlinks.json",
             "data/phase1/requests/filesystem-osvfs.json",
             "data/phase1/requests/filesystem-matchfiles.json",
         ],
@@ -234,6 +235,11 @@ FAMILIES = {
             # The live OS group mutates a real filesystem, so it stays inside a
             # per-case temporary root and its cases declare host applicability:
             # one host's results never certify the other.
+            # internal/symlinks is its own Go package, so it needs its own
+            # overlay file: a probe compiled into `tspath` cannot reach it.
+            {"name": "symlinks", "package": "symlinks",
+             "probe": "tools/phase1/filesystem/symlinks_probe_test.go",
+             "test": "TestPhase1FilesystemSymlinks"},
             {"name": "osvfs", "package": "vfs/osvfs",
              "probe": "tools/phase1/filesystem/osvfs_probe_test.go",
              "test": "TestPhase1FilesystemOsvfs"},

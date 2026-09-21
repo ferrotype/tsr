@@ -1,5 +1,48 @@
 {
-  "exemptions": [],
+  "exemptions": [
+    {
+      "category": "build_variant",
+      "evidence": "upstream/tsc/internal/nativepath/realpath_windows.go:13-61, selected by its `_windows` filename suffix, with upstream/tsc/internal/nativepath/realpath_other.go:1 `//go:build !windows && !linux` and realpath_linux.go's `_linux` suffix covering the targets this port does build. The exclusion is decided, not assumed: docs/adr/0002-native-targets-and-the-glibc-floor.md, Decision \u2014 \"Not built: the Windows host layer (named pipes, the Windows watcher and realpath), musl, and every best-effort target\" \u2014 which names Windows realpath explicitly. The same ADR adds \"Windows-style path semantics in `tspath` stay because baselines exercise them\", so the DOS/UNC path grammar F2a must still cover lives in internal/tspath, a different bucket, and is not dropped by this exemption. The port ledger agrees: PORTS.toml:4014-4020 records `kind = \"out-of-scope\"`, `status = \"out-of-scope\"`, `rust = []`. || RUST: Absent, intentionally.",
+      "operation": "tsc/internal/nativepath/realpath_windows.go:Realpath",
+      "owner": "no step: this port produces no Windows build. Upstream's Windows host layer keeps it; this port does not compile it."
+    },
+    {
+      "category": "build_variant",
+      "evidence": "upstream/tsc/internal/nativepath/realpath_windows.go:63-99, an unexported helper with exactly one caller, Realpath at :17, in the same Windows-only file. It cannot outlive its caller's exemption. Same exclusion evidence: docs/adr/0002-native-targets-and-the-glibc-floor.md \u2014 \"Not built: the Windows host layer (named pipes, the Windows watcher and realpath)\" \u2014 and PORTS.toml:4014-4020 `kind = \"out-of-scope\"`. || RUST: Absent, intentionally.",
+      "operation": "tsc/internal/nativepath/realpath_windows.go:openMetadata",
+      "owner": "no step: this port produces no Windows build"
+    },
+    {
+      "category": "build_variant",
+      "evidence": "upstream/tsc/internal/nativepath/symlink_windows.go:8-29, selected by its `_windows` filename suffix against upstream/tsc/internal/nativepath/symlink_other.go:1 `//go:build !windows`; the two are mutually exclusive and only the `other` one is compiled on the four targets docs/adr/0002-native-targets-and-the-glibc-floor.md names. That ADR's \"Not built: the Windows host layer\" covers it, and PORTS.toml:4040-4046 records `kind = \"out-of-scope\"`, `status = \"out-of-scope\"`, `rust = []`. Importantly this does NOT leave the reparse-point CONTRACT untested: the branch it feeds, upstream/tsc/internal/vfs/internal/internal.go:99-108, is exercised host-independently by the GetAccessibleEntries case above, using a probe-supplied filesystem whose ReadDir reports fs.ModeIrregular and whose Stat reports a regular file \u2014 the Windows junction shape, verified reproducible on this host. || RUST: Absent, intentionally.",
+      "operation": "tsc/internal/nativepath/symlink_windows.go:IsSymlinkOrReparsePoint",
+      "owner": "no step: this port produces no Windows build. Its non-Windows counterpart, symlink_other.go:IsSymlinkOrReparsePoint, IS prepared by this step as a case."
+    },
+    {
+      "category": "build_variant",
+      "evidence": "upstream/tsc/internal/osutil/os_android.go is selected by its `_android` filename suffix alone, and its counterpart upstream/tsc/internal/osutil/os_other.go:1 carries `//go:build !android`, so the two are mutually exclusive and only one is ever compiled. This port never compiles the android one: docs/adr/0002-native-targets-and-the-glibc-floor.md, Decision \u2014 \"Four native targets: `aarch64-apple-darwin`, `x86_64-apple-darwin`, `x86_64-unknown-linux-gnu`, `aarch64-unknown-linux-gnu`\" \u2014 Android is not among them, and the same ADR closes with \"Not built: the Windows host layer ..., musl, and every best-effort target.\" The port ledger agrees: PORTS.toml:4066-4072 records os_android.go as `kind = \"out-of-scope\"`, `status = \"out-of-scope\"`, `rust = []`. The scope row's current `later_phase` disposition derives from that same ledger marking (data/phase1/scope.json basis: \"ledger marks the source file out of scope for the port\"), so the disposition is not wrong about the fact, only about the category \u2014 the correct roster category is build_variant, whose own text is \"belongs to a build configuration this port does not produce, so no build reaches it\" (scripts/phase1_scope.py:485). || RUST: Absent, and intentionally so \u2014 there is no Android target to host it.",
+      "operation": "tsc/internal/osutil/os_android.go:args",
+      "owner": "no step: this port produces no Android build. The Termux launcher workaround belongs to upstream's android target, which ADR 0002 excludes."
+    },
+    {
+      "category": "build_variant",
+      "evidence": "upstream/tsc/internal/osutil/os_android.go:21-27, with the pinned comment \"Under Termux, /proc/self/exe identifies Android's linker rather than the executable it loaded.\" Same exclusion evidence as os_android.go:args: docs/adr/0002-native-targets-and-the-glibc-floor.md names four targets, none Android, and PORTS.toml:4066-4072 marks the file out-of-scope. Note this is NOT reachable from the non-android build even under an env var: os_other.go:1 `//go:build !android` excludes the whole file from every target this port builds. || RUST: Absent, intentionally.",
+      "operation": "tsc/internal/osutil/os_android.go:executable",
+      "owner": "no step: this port produces no Android build"
+    },
+    {
+      "category": "generated_assertion",
+      "evidence": "upstream/tsc/internal/vfs/vfsmatch/stringer_generated.go:7-14 \u2014 `func _() { // An \"invalid array index\" compiler error signifies that the constant values have changed. ... var x [1]struct{}; _ = x[UsageFiles-0]; _ = x[UsageDirectories-1]; _ = x[UsageExclude-2] }`. The generator directive is at upstream/tsc/internal/vfs/vfsmatch/vfsmatch.go:15-16. || RUST: None, and none is owed. The construct is a compile-time-only `func _()` whose body is discarded; it produces no value and is never called.",
+      "operation": "tsc/internal/vfs/vfsmatch/stringer_generated.go:_",
+      "owner": "`go tool golang.org/x/tools/cmd/stringer` at build time plus the Go compiler, which is exactly the F1a ledger's `generated_assertion` category (docs/PHASE1-progress.md:158 \u2014 \"Not an operation: the blank-identifier compile-time check `stringer` emits\"). The port's equivalent is the enum declaration itself at crates/tsr_tsoptions/src/glob.rs:8-13: a Rust enum has no discriminant table to drift from, so there is nothing for a generated assertion to guard."
+    },
+    {
+      "category": "unused_at_pin",
+      "evidence": "upstream/tsc/internal/vfs/vfstest/vfstest.go:50-52 `func (c *clockImpl) SinceStart() time.Duration { return time.Since(c.start) }`. `grep -rn SinceStart upstream/tsc/internal/vfs/` returns exactly two lines, both in this file: the interface declaration at :39 and this definition. clockImpl is unexported, is constructed only at :71 and :145, and is assigned only to MapFS.clock, whose sole use is `.Now()`. || RUST: Absent, and correctly so: nothing would call it. Verified by grepping the whole workspace for any clock or elapsed-time construct in crates/tsr_vfs \u2014 there is none.",
+      "operation": "tsc/internal/vfs/vfstest/vfstest.go:clockImpl.SinceStart",
+      "owner": "The vfstest.Clock interface (upstream/tsc/internal/vfs/vfstest/vfstest.go:37-40) requires SinceStart, but MapFS never calls it \u2014 the only clock read in the whole file is `m.clock.Now()`. The callers that DO call SinceStart supply their own Clock implementations and belong to later steps: upstream/tsc/internal/execute/tsctests/sys.go:187-189 (TestSys) and upstream/tsc/internal/execute/tsc/emit_test.go:73, :100, :120, consumed at upstream/tsc/internal/execute/tsc/emit.go:53 `result.times.totalTime = input.Sys.SinceStart()`."
+    }
+  ],
   "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
   "purpose": "Operations removed from F2a's filesystem roster, each with the category, the owner that does have it, and the evidence read at the pin. An entry here is a claim that this step owes no prepared case for the operation, so it is validated like any other claim: see roster_problems in scripts/phase1_scope.py.",
   "rule": "The caller rule governs generic helpers and Go machinery. It does NOT override an operation the plan names as this step's own work. The `unused_at_pin` category records that there is no caller at all, with the occurrence count that says so. `later_step` is decided by the pinned callers: when every non-test caller is outside this step, the step that ports those callers owns the operation. Note that a Go method VALUE, written `(*T).Method`, is a caller that a search for `.Method(` does not find.",
