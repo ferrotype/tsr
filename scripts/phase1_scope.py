@@ -241,12 +241,124 @@ def workspace_symbol_index() -> dict[str, list[str]]:
     return index
 
 
+# `/// port: tsc/internal/<pkg>/<file>.go:<Symbol>` above a `fn`. The annotation
+# is the author's own statement of which Go operation the function ports, and it
+# is stronger evidence than the name it happens to have.
+#
+# The tail is a LOOKAHEAD on purpose. `re.finditer` does not overlap, so a
+# pattern that consumed the `fn` header would swallow every annotation stacked
+# above it and read only the first -- and stacking is how this tree records one
+# Rust function serving two pinned operations, which it does 113 times,
+# including `format` serving both WriteFormatDiagnostics and
+# FormatDiagnosticsWithColorAndContext. A zero-width tail lets each stacked
+# annotation start its own match.
+#
+# The skip group accepts attribute lines as well as comments, because an
+# attribute between the doc comment and the item is ordinary Rust and stopped
+# the earlier pattern dead, and it accepts a macro metavariable in place of a
+# visibility keyword, because this tree declares items that way inside macro
+# bodies.
+_PORT_ANNOTATION = re.compile(
+    r"port:\s*(tsc/[^\s`]+\.go:[A-Za-z0-9_.]+)"
+    # Everything after the operation id is a LOOKAHEAD, so a match consumes only
+    # the annotation itself. re.finditer does not overlap, and this tree stacks
+    # two annotations above one `fn` 113 times to record one Rust function
+    # serving two pinned operations -- `format` serves both
+    # WriteFormatDiagnostics and FormatDiagnosticsWithColorAndContext. A pattern
+    # that consumed the header, or that refused to skip a sibling annotation,
+    # reads exactly one of each pair and silently drops the other.
+    r"(?=[^\n]*\n"
+    # Skip further comment and attribute lines, including sibling annotations.
+    r"(?:[^\S\n]*(?://[^\n]*|#!?\[[^\n]*)\n)*?"
+    # The item header. A macro metavariable stands in for a visibility keyword
+    # inside macro bodies, which this tree also does.
+    r"[^\S\n]*(?:\$[a-z_]+\s+|pub(?:\([^)]*\))?\s+)?"
+    r"(?:const\s+|async\s+|unsafe\s+|extern\s+\"[^\"]*\"\s+)*"
+    r"fn\s+([a-z0-9_]+))"
+)
+# 220 of the 4,306 `port:` lines in crates/ are deliberately not matched. 66 sit
+# above a `let`, and most of the rest above an `if`, a `match` or a match arm:
+# they annotate a STATEMENT inside a body, not the item that ports the
+# operation, so reading them as a function-level declaration would attribute the
+# whole function to whatever a line inside it happens to mirror. 17 more sit
+# above a multi-line `#[allow(...)]`, which the single-line attribute skip does
+# not span; that is a real gap and a small one, left rather than answered with a
+# brace-balanced skip.
+
+
+def declared_ports() -> dict[str, set[str]]:
+    """Rust fn name -> the Go operation ids its own `port:` annotations name.
+
+    A by-name match is a guess; a `port:` annotation is a claim. Where the two
+    disagree the annotation wins, and the guess must not be reported as
+    evidence. Two Go packages can carry a function of the same name with
+    DIFFERENT behavior -- `isDoubleQuotedString` exists in both
+    `internal/parser` (which tests the single-quote token flag) and
+    `internal/tsoptions` (which does not) -- and the by-name rule attributed the
+    Rust port of the first to the second, which is the over-attribution this
+    whole scope exists to avoid.
+    """
+    declared: dict[str, set[str]] = {}
+    for path in sorted((ROOT / "crates").rglob("*.rs")):
+        text = path.read_text(errors="replace")
+        for operation, name in _PORT_ANNOTATION.findall(text):
+            declared.setdefault(name, set()).add(operation)
+    return declared
+
+
+def annotated_homes() -> dict[str, list[str]]:
+    """Go operation id -> the Rust files whose `port:` annotations claim it.
+
+    `rust_home` carries the LEDGER's claim, which PORTS.toml records per source
+    FILE, so a package the ledger does not map reports an empty home even when
+    the port exists -- all 40 `internal/diagnosticwriter` rows did, while
+    crates/tsr_compiler/src/diagnostic_writer/ carried explicit annotations for
+    ten of them. This is the other source, kept beside the ledger's rather than
+    merged into it: a ledger claim and an author's annotation are different
+    kinds of evidence and a reader should be able to tell which one answered.
+    """
+    homes: dict[str, set[str]] = {}
+    for path in sorted((ROOT / "crates").rglob("*.rs")):
+        if "/src/" not in str(path.as_posix()):
+            continue
+        text = path.read_text(errors="replace")
+        rel = str(path.relative_to(ROOT))
+        for operation, _name in _PORT_ANNOTATION.findall(text):
+            homes.setdefault(operation, set()).add(rel)
+    return {operation: sorted(files) for operation, files in homes.items()}
+
+
+def annotations_outside_src() -> list[dict]:
+    """`port:` annotations that do not live in a crate's `src/`.
+
+    A `port:` marker is a claim that this code IS the port of a pinned
+    operation. Outside `src/` it cannot be: an example binary or a test file is
+    not a production home. Every one of these is therefore either a second,
+    independent implementation carrying the production marker -- a drift risk,
+    because two bodies now answer to one marker and nothing compares them -- or
+    a marker that should say it is a re-implementation. Reported rather than
+    refused: these predate this step, and turning someone else's drift into a
+    hard failure here would be the wrong place to do it.
+    """
+    found: list[dict] = []
+    for path in sorted((ROOT / "crates").rglob("*.rs")):
+        if "/src/" in str(path.as_posix()):
+            continue
+        text = path.read_text(errors="replace")
+        rel = str(path.relative_to(ROOT))
+        for operation, name in _PORT_ANNOTATION.findall(text):
+            found.append({"file": rel, "rust_fn": name, "operation": operation})
+    return found
+
+
 def classify(
     entry: dict,
     symbol: str,
     mapped: bool,
     index: dict[str, list[str]],
     coverage: list[str],
+    ports: dict[str, set[str]] | None = None,
+    identity: str = "",
 ) -> tuple[str, str]:
     """Return (disposition, basis). Basis records how the disposition was reached.
 
@@ -261,6 +373,7 @@ def classify(
     """
     status = entry.get("status")
     verify = entry.get("verify") or []
+    ports = ports or {}
 
     if status == "out-of-scope":
         return "later_phase", "ledger marks the source file out of scope for the port"
@@ -288,6 +401,16 @@ def classify(
 
     candidate = snake(symbol)
     locations = index.get(candidate, [])
+    # A same-named Rust function that declares itself the port of a DIFFERENT
+    # Go operation is not evidence for this one. Without this the rule reads a
+    # `port:` annotation as agreement merely because the names coincide.
+    claimed = ports.get(candidate, set())
+    if locations and claimed and identity not in claimed:
+        return (
+            "missing",
+            f"unmapped in the audit input; `{candidate}` exists in Rust but its own annotation "
+            f"names a different operation ({sorted(claimed)[0]}), so the name match is not evidence",
+        )
     if locations and candidate not in GENERIC_NAMES and len(candidate) >= 6:
         shown = ", ".join(locations[:2]) + (" ..." if len(locations) > 2 else "")
         return (
@@ -509,6 +632,18 @@ STEP_PACKAGES: dict[str, frozenset[str]] = {
             "vfs/vfstest", "vfs/vfsmock",
         )
     ),
+    # F3a. `internal/compiler` is deliberately absent: F3a's program-loading
+    # cases drive its loader, but the plan gives F4a the job of enumerating
+    # which of its 340 operations are Phase 1 at all, and a package cannot be
+    # rostered twice. Those cases link compiler operations without claiming to
+    # account for them, and F4a's roster is where that accounting happens.
+    "config": frozenset(
+        "internal/" + name
+        for name in (
+            "tsoptions", "tsoptions/tsoptionstest", "module", "packagejson",
+            "diagnosticwriter", "testutil/baseline", "testutil/filefixture",
+        )
+    ),
 }
 
 # The step a package belongs to, for the per-operation roster field. A package
@@ -539,6 +674,21 @@ ROSTER_CATEGORIES = {
     "equivalent_rust": "the Go contract is reproduced exactly by a Rust language or standard library construct",
     "unused_at_pin": "exported but called by nothing at the pin, tests included, so no caller fixes the contract",
     "build_variant": "belongs to a build configuration this port does not produce, so no build reaches it",
+    # Added by F3a. The six categories above all describe an operation with no
+    # caller-visible compiler contract, or one another step owns. None of them
+    # describes upstream's own test harness, which F3a is the first step to
+    # roster: `internal/testutil/baseline` writes, tracks and diffs baseline
+    # FILES, and `internal/testutil/filefixture` loads fixture inputs. The port
+    # must reproduce the 309 reference outputs, and it does; it must not
+    # reproduce the bookkeeping, because its comparisons are driven by
+    # scripts/phase1*.py and by Rust tests that assert against frozen rows.
+    # Bending `build_tooling` to cover this would have been the wrong kind of
+    # convenience: that category says the port generates the same artifact
+    # elsewhere, and there is no artifact here.
+    "go_test_harness": "upstream's own test harness -- baseline file bookkeeping, fixture loading, "
+                       "run tracking -- which exists to run the pinned tests; this port reproduces "
+                       "the baselines, not the bookkeeping, because its comparisons run through its "
+                       "own harness",
 }
 
 def leaf_roster(step: str = "leaves") -> dict:
@@ -561,8 +711,8 @@ def roster_exemptions(step: str | None = None) -> dict[str, dict]:
 PREPARING_RESULTS = ("match", "different", "not_implemented")
 
 
-def prepared_links(cases: dict) -> dict[str, list[str]]:
-    """Every leaf operation a case or gated witness has actually run for.
+def prepared_links(cases: dict, step: str = "leaves") -> dict[str, list[str]]:
+    """Every operation a step's case or gated witness has actually run for.
 
     Preparation is not coverage: a case reporting `not_implemented` prepares its
     operation -- it runs and classifies the gap -- while covering nothing. The
@@ -572,7 +722,7 @@ def prepared_links(cases: dict) -> dict[str, list[str]]:
     """
     links: dict[str, list[str]] = {}
     for case in cases.get("cases", []):
-        if case.get("family") != "leaves" or case.get("last_result") not in PREPARING_RESULTS:
+        if case.get("family") not in STEP_FAMILIES[step] or case.get("last_result") not in PREPARING_RESULTS:
             continue
         for operation in case.get("operations", []):
             links.setdefault(operation, []).append(case["id"])
@@ -610,7 +760,7 @@ def roster_problems(
     if cases is None:
         path = ROOT / "data/phase1/cases.json"
         cases = json.loads(path.read_text()) if path.is_file() else {}
-    prepared = prepared_links(cases)
+    prepared = prepared_links(cases, step)
     seen: set[str] = set()
     label = path.stem
     for entry in document.get("exemptions", []):
@@ -649,7 +799,11 @@ def roster_problems(
 
 
 # The comparison family whose cases prepare each step's operations.
-STEP_FAMILIES = {"leaves": ("leaves",), "filesystem": ("filesystem", "pilot")}
+STEP_FAMILIES = {
+    "leaves": ("leaves",),
+    "filesystem": ("filesystem", "pilot"),
+    "config": ("config",),
+}
 
 
 def leaf_preparation(scope: dict, cases: dict, step: str = "leaves") -> dict:
@@ -692,11 +846,14 @@ def leaf_preparation(scope: dict, cases: dict, step: str = "leaves") -> dict:
     gap_problems = gap_record_problems({"cases": [
         case for case in cases.get("cases", []) if case.get("family") in families
     ]})
+    # A step that prepares reference outputs as well as operations is held to
+    # both. Written over the shared table so F3a's 80 command-line outputs get
+    # F2a's gate rather than a new one; a step with no outputs reports none.
     outputs = None
-    if step == "filesystem":
-        from phase1_baselines import matchfiles_preparation
+    from phase1_baselines import STEP_OUTPUT_GROUPS, output_preparation
 
-        outputs = matchfiles_preparation(cases)
+    if step in STEP_OUTPUT_GROUPS:
+        outputs = output_preparation(cases, step)
     return {
         "version": 2,
         "step": step,
@@ -726,6 +883,8 @@ def leaf_preparation(scope: dict, cases: dict, step: str = "leaves") -> dict:
 def build() -> dict:
     rows: list[dict] = []
     index = workspace_symbol_index()
+    ports = declared_ports()
+    homes = annotated_homes()
     gaps = witnessed_gaps()
     missing_ids = unmapped_ids()
     entries = {e["go"]: e for e in ledger()}
@@ -747,7 +906,7 @@ def build() -> dict:
         mapped = identity not in missing_ids
         linked = case_links.get(identity, [])
         witnessing = gaps.get(identity, [])
-        disposition, basis = classify(entry, symbol, mapped, index, linked)
+        disposition, basis = classify(entry, symbol, mapped, index, linked, ports, identity)
         if witnessing and disposition != "covered":
             disposition = "missing"
             basis = (
@@ -782,6 +941,7 @@ def build() -> dict:
                 "ledger_phase": entry.get("phase"),
                 "ledger_crate": entry.get("crate"),
                 "rust_home": list(entry.get("rust") or []),
+                "annotated_home": homes.get(identity, []),
                 "actual_home": KNOWN_HOMES.get(package),
                 # File-level producer metrics from the ledger. Context, not an
                 # operation-level coverage claim; see classify().

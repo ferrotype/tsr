@@ -14,7 +14,7 @@ use std::error::Error;
 
 use serde_json::{json, Map, Value};
 
-mod api;
+use phase1_harness as api;
 mod bundled;
 mod collections;
 mod core;
@@ -44,15 +44,6 @@ const GROUPS: &[(&str, GroupHandler)] = &[
 ];
 
 fn observe(request: &Value) -> Map<String, Value> {
-    let mut row = Map::new();
-    let case = request.get("case").and_then(Value::as_str).unwrap_or("");
-    let operation = request
-        .get("operation")
-        .and_then(Value::as_str)
-        .unwrap_or("");
-    row.insert("case".into(), Value::String(case.to_owned()));
-    row.insert("operation".into(), Value::String(operation.to_owned()));
-
     let needs_actions = !matches!(
         api::subject(request),
         "BundledIndex"
@@ -101,43 +92,17 @@ fn observe(request: &Value) -> Map<String, Value> {
         }
         other => other,
     };
-    match claimed {
-        Some(Outcome::Observed(value)) => {
-            row.insert("result".into(), Value::String("observed".into()));
-            row.insert("observation".into(), value);
-        }
-        Some(Outcome::NotImplemented {
-            go_authority,
-            intended_signature,
-            production_home,
-        }) => {
-            row.insert("result".into(), Value::String("not_implemented".into()));
-            row.insert(
-                "missing_operation".into(),
-                json!({
-                    "operation": operation,
-                    "go_authority": go_authority,
-                    "intended_signature": intended_signature,
-                    "production_home": production_home,
-                }),
-            );
-        }
-        Some(Outcome::Failed(error)) => {
-            row.insert("result".into(), Value::String("harness_failed".into()));
-            row.insert("error".into(), Value::String(error));
-        }
-        None => {
-            let subject = api::subject(request);
-            row.insert("result".into(), Value::String("harness_failed".into()));
-            row.insert(
-                "error".into(),
-                Value::String(format!(
-                    "no leaf group claimed subject {subject:?} for case {case:?}"
-                )),
-            );
-        }
-    }
-    row
+    let outcome = claimed.unwrap_or_else(|| {
+        let subject = api::subject(request);
+        let case = request
+            .get("case")
+            .and_then(Value::as_str)
+            .unwrap_or_default();
+        Outcome::Failed(format!(
+            "no leaf group claimed subject {subject:?} for case {case:?}"
+        ))
+    });
+    api::response(request, outcome)
 }
 
 fn run(input: &str, output: &str) -> Result<(), Box<dyn Error>> {
@@ -178,6 +143,85 @@ fn main() -> Result<(), Box<dyn Error>> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn wrapper_gap_names_the_absent_walk_not_the_existing_constructor() {
+        let row = observe(
+            &json!({"case":"identity-control", "subject":"BundledWrapper",
+            "operation":"tsc/internal/bundled/embed.go:wrapFS"}),
+        );
+        assert_eq!(
+            row["missing_operation"]["operation"],
+            "tsc/internal/bundled/embed.go:wrappedFS.WalkDir"
+        );
+    }
+
+    #[test]
+    fn group_gap_refuses_an_unreviewed_operation() {
+        for subject in ["OrderedMap", "locale.parse", "diagnostics.format"] {
+            let row = observe(&json!({"case":"identity-control", "subject":subject,
+                "operation":"tsc/internal/core/text.go:NewTextRange", "actions":[{"op":"probe"}]}));
+            assert_eq!(row["result"], "harness_failed", "{row:?}");
+        }
+    }
+
+    #[test]
+    fn leaves_gaps_are_pinned_and_belong_to_the_case() {
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../data/phase1");
+        let cases: Value =
+            serde_json::from_slice(&std::fs::read(root.join("cases.json")).unwrap()).unwrap();
+        let scope: Value =
+            serde_json::from_slice(&std::fs::read(root.join("scope.json")).unwrap()).unwrap();
+        for entry in std::fs::read_dir(root.join("requests")).unwrap() {
+            let path = entry.unwrap().path();
+            if !path
+                .file_name()
+                .unwrap()
+                .to_string_lossy()
+                .starts_with("leaves-")
+            {
+                continue;
+            }
+            let document: Value = serde_json::from_slice(&std::fs::read(path).unwrap()).unwrap();
+            for request in document["requests"].as_array().unwrap() {
+                let row = observe(request);
+                assert_ne!(row["result"], "harness_failed", "{row:?}");
+                if row["result"] != "not_implemented" {
+                    continue;
+                }
+                let missing = &row["missing_operation"]["operation"];
+                let case = cases["cases"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .find(|c| c["id"] == row["case"])
+                    .unwrap();
+                assert!(
+                    scope["operations"]
+                        .as_array()
+                        .unwrap()
+                        .iter()
+                        .any(|op| op["id"] == *missing),
+                    "{row:?}"
+                );
+                assert!(
+                    case["operations"].as_array().unwrap().contains(missing),
+                    "{row:?}"
+                );
+                // The old snapshot copied wrapFS from the request. Preserve it
+                // as historical evidence; the specific test above pins the correction.
+                if row["case"] != "leaves/bundled/wrapper-dispatch-surface" {
+                    assert!(
+                        case["missing_operations"]
+                            .as_array()
+                            .unwrap()
+                            .contains(missing),
+                        "{row:?}"
+                    );
+                }
+            }
+        }
+    }
 
     #[test]
     fn unknown_and_malformed_actions_are_harness_failures() {

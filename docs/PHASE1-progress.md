@@ -13,7 +13,7 @@ moved pin invalidates it.
 | F0 — inventory, manifests and executable setup | **incomplete**: implementing and verifying the approved matchFiles test renderer, and connecting existing evidence to operation ids |
 | F1a — foundation leaf tests | **complete**: `leaves_prepared: true`; 225 leaf cases frozen, all 460 inventoried leaf operations prepared, witnessed or exempted by the reviewed ledger, and both divergences triaged |
 | F2a — filesystem, path and matching tests | **pending Linux observation**: `filesystem_prepared: false`; 359 cases, 314 of 316 roster operations accounted for; all 142 baselines prepared (68 exact, 74 owner-approved exceptions). The Linux realpath case must observe `Realpath` and `ignoringEINTR`. |
-| F3a — config, command-line and resolution tests | not started |
+| F3a — config, command-line and resolution tests | **complete**: `config_prepared: true`; 484 cases, all 402 roster operations prepared, witnessed or exempted, and all 309 reference outputs prepared (F2a's 142 plus F3a's 167, all 167 exact) |
 | F4a — syntax, binder and utility coverage | not started |
 | F5a — integration checks and the stage A review | not started |
 
@@ -534,6 +534,303 @@ refused if the index also records that rendering as verified — **an exception 
 not a pass.** The outputs keep their original files and are counted in their own
 bucket.
 
+## F3a — config, command-line and resolution preparation
+
+**All 309 reference outputs are prepared.** F2a carried the 142 `config/matchFiles`
+outputs (68 exact, 74 owner-approved exceptions); F3a adds the other 167, and all
+167 reproduce the frozen bytes exactly. That completes the plan's byte-baseline
+denominator, which had stood at 142 since F2a.
+
+| Group | Outputs | Producer | Result |
+| --- | ---: | --- | --- |
+| `tsoptions/commandLineParsing/parseCommandLine` | 53 | pinned `formatNewBaseline` | 53 exact |
+| `tsoptions/commandLineParsing/parseBuildOptions` | 27 | pinned `formatNewBaselineBuild` | 27 exact |
+| `config/tsconfigParsing` | 87 | carried assembly over pinned calls | 87 exact |
+| `config/matchFiles` (F2a) | 142 | carried renderer | 68 exact, 74 excepted |
+| **total** | **309** | | |
+
+These 167 are `rendering_verified: true` in `data/phase1/config-baselines.json`,
+so `exception_problems` refuses an exception on any of them: the only passing
+state is all 167 reproduced exactly.
+
+**`config_prepared: true`.** All 402 operations on the config roster are
+prepared by a runnable case, witnessed by a rust-gated artifact, or removed by a
+reviewed ledger entry: 310 prepared, 47 witnessed, 45 exempt, none pending.
+
+**484 cases: 176 match, 299 not_implemented, 9 different, zero harness failures,
+zero native_unavailable.**
+
+| Group | Cases | match | not_impl | different |
+| --- | ---: | ---: | ---: | ---: |
+| `parseCommandLine` outputs | 53 | 0 | 53 | 0 |
+| `parseBuildOptions` outputs | 27 | 0 | 27 | 0 |
+| `tsconfigParsing` outputs | 87 | 0 | 87 | 0 |
+| parse-config host | 11 | 8 | 2 | 1 |
+| config parsing | 57 | 54 | 3 | 0 |
+| option values | 16 | 14 | 2 | 0 |
+| option declarations | 11 | 7 | 4 | 0 |
+| config text | 7 | 7 | 0 | 0 |
+| file specs | 13 | 12 | 1 | 0 |
+| syntax, JSON, wildcards, name maps, defaults, absolute paths | 26 | 4 | 22 | 0 |
+| the four option parsers | 9 | 0 | 9 | 0 |
+| command-line operations | 70 | 20 | 48 | 2 |
+| module resolution | 59 | 42 | 12 | 5 |
+| package JSON | 16 | 2 | 13 | 1 |
+| diagnostic writer | 18 | 2 | 16 | 0 |
+| **total** | **484** | **176** | **299** | **9** |
+
+The 167 baseline outputs are all `not_implemented` on the Rust side, and not
+for the same reason. The envelope has no Rust producer for any of them: the only
+diagnostic writer in the tree needs a `Program`, which a config parse does not
+produce. On top of that the 80 command-line outputs have no argument-vector
+parser at all, and the 40 `json`-API outputs have no raw-JSON entry point, while
+the 40 `jsonSourceFile` and 7 `jsonParse` outputs do have their parse. Recording
+one undifferentiated result across all 167 would say the port is equally far
+from each, which is false.
+
+### Divergences this step found
+
+| case | what differs |
+| --- | --- |
+| `module/exports/pattern-with-trailer` | **the pin panics.** `matchesPatternWithTrailer` (resolver.go:2062) returns true when the name carries the pattern's prefix AND its suffix, with no length guard, and :721-723 then slices `moduleName[len(before) : len(moduleName)-len(after)]` with no check that the bounds are ordered. Exports key `"./a*a"` and request `pkg/a` reach it with moduleName `"./a"`: starPos 3, slice `"./a"[3:2]`. The port carries the guard the pin lacks. |
+| `module/helpers/parse-node-module-from-path` | **the pin panics** with an index-out-of-range on the `isFolder=false` corner, on a row outside the set upstream's own issue-4373 regression covers. |
+| `packagejson/version-paths-mappings-are-rebuilt-per-retrieval` | `GetVersionPaths` returns the struct BY VALUE (cache.go:28) and `GetPaths` memoises into whichever copy it was called on (:98-120), so the `sync.Once` makes the SELECTION happen once per package while the mapping TABLE is rebuilt once per retrieval. Two reads of one retrieved value share a table; two retrievals do not. Go answers `[true, false]`, the port `[true, true]`. |
+| `commandlineops/list-option-empty-value-for-a-listorelement` | `fixture_options.rs:73` hoists the empty-value return above the `listOrElement` single-element branch. The pin tests them in the other order (commandlineparser.go:353 before :360), so `ParseListTypeOption(extends, "")` answers `[""]` in Go and `[]` in Rust. |
+| `commandlineops/name-map-over-the-build-table` | `option_declarations.rs:93` scans short names with `.iter().find` (first wins) while the full-name scan below it uses `.iter().rev().find` (last wins, matching namemap.go:18-23). In `BUILD_OPTIONS` the short name `d` is declared by `declaration` and by `dry`: the pin answers `dry`, the port `declaration`. |
+| `module/exports/dot-object-classification` | exports-object classification for the `.` subpath. Rust's `object_kind` is production-dead: its only caller is inside `#[cfg(test)]` at package_json.rs:541. |
+| `module/typeref/relative-reference-normalization` | `normalizePathForCJSResolution` is missing from the port's type-reference path. The same file resolves; the trace differs -- which is exactly the trace-only discrepancy the plan asks to be visible. |
+| `module/control/relative-containing-file` | the pin uses the relative containing directory exactly as given; the port's filesystem refuses a relative path outright. |
+| `host/relative-path-refusal` | the pinned test filesystem refuses a non-absolute path, by panicking; `tsr_vfs` resolves it against the current directory and answers. |
+| `module/control/unsupported-module-resolution-kind` | the two sides refuse in shapes that are not comparable: the pin panics, the port returns `Unsupported`. |
+
+### What the adversarial review changed
+
+Three reviewers found 6 blocking and 15 non-blocking issues across the
+integrated groups. The blocking ones were all attribution or evidence defects,
+not comparison failures:
+
+* a case claimed `getPackageId` on a path its single action cannot reach -- the
+  lookup returns at the first typeRoot, and the empty package id in its own
+  frozen row is the proof;
+* two cases recorded a GAP for an operation their own driver text says is
+  present and correct, publishing `missing` on a false basis. What the port
+  actually lacks is the ability to reach a second cache write, because its host
+  and options are both fixed for a resolver's lifetime;
+* a refusal control could not move: the pinned row carries a `panic` key the
+  Rust driver cannot produce for any behaviour, so the regression it claimed to
+  reject would have left the verdict unchanged;
+* a roster exemption asserted a reachability fact the pin contradicts;
+* a contract was one row out and stated its first discriminator backwards.
+
+**The annotation pattern was under-detecting by 9%.** `re.finditer` does not
+overlap, and the pattern consumed the `fn` header, so wherever this tree stacks
+two `port:` annotations above one function -- 113 times, recording one Rust
+function serving two pinned operations -- it read the first and dropped the
+second. `format` serves both `WriteFormatDiagnostics` and
+`FormatDiagnosticsWithColorAndContext`, the call every one of the 87
+`tsconfigParsing` baselines renders its `Errors::` section through, and the
+second was invisible. Two refusals were wrong because of it.
+
+### Limitations
+
+* No case in this step distinguishes the module cache's `LoadOrStore` from the
+  type-reference cache's `Store`, and none can: the port's host and options are
+  fixed at construction, so a second write for one key is unreachable.
+* `internal/module`'s three race regressions: two cannot be reproduced by an
+  ordered single-threaded trace at any level of the pinned API, because
+  `getPackageJsonInfo` short-circuits on a cached nil-`Contents` entry before
+  the `Set`, so only losing `LoadOrStore` produces that state.
+* The `go_test_harness` operations gated on `TSGO_BASELINE_TRACKING_DIR`, and
+  the `filefixture` methods reachable only inside `Benchmark` functions, are not
+  reached by an ordinary `go test`.
+* `crates/tsr_compiler/examples/p2/baseline.rs:61` carries the same `port:`
+  marker as the production flattener on a second, independent implementation.
+  Two bodies answer to one marker and nothing compares them. Reported by
+  `inventory --check` under `port_annotations_outside_src`, not fixed here.
+
+### What is carried, and what is not
+
+The two command-line groups carry nothing. `formatNewBaseline`
+(`commandlineparser_test.go:334`) and `formatNewBaselineBuild` (`:456`) are pure
+functions of the sections handed to them, so the probe compiles into the pinned
+`tsoptions_test` package and calls them; for the eight outputs that need a
+synthesised option declaration it calls the pinned
+`createVerifyNullForNonNullIncluded` rather than restating it.
+
+`tsconfigParsing` is the group the plan warned about. Its primary renderer,
+`baselineParseConfigWith`, ends in `baseline.Run`, and its secondary renderer is
+inline in a test body. Neither can be called as-is: `baseline.Run` writes under
+the pinned submodule and calls `t.Errorf` on any difference, so a Rust
+divergence would abort the capture instead of recording a `different` row — the
+comparison would destroy the evidence it exists to produce. Both assemblies are
+therefore carried, which the plan authorises for exactly this case. What is
+carried is the section sequencing; every value in it comes from a pinned call
+(`printFS`, `json.MarshalIndentWrite`, `FormatDiagnosticsWithColorAndContext`,
+`ParseConfigFileTextToJson`, `writeJsonReadableText`), the host is
+`tsoptionstest.NewVFSParseConfigHost`, and both entry points are the pinned
+`getParsedWithJsonApi` and `getParsedWithJsonSourceFileApi`.
+
+### Where the inputs come from
+
+The 80 command-line outputs recover their argument vector from the baseline's own
+`Args::` section, which is an input section. The recovery is proved rather than
+assumed: each row re-renders the vector with the pinned writer's rule and refuses
+the row unless it equals the line it read. All 80 round trip.
+
+71 of the 87 `tsconfigParsing` outputs read their inputs from the pinned
+package-level tables, so nothing is transcribed. The other 16 belong to
+`TestParseTypeAcquisition`, whose table is a function-local and unreachable from
+an overlay; those recover their config text from the baseline's own `Fs::` and
+`configFileName::` sections, with the rest of the input shape taken from the
+pinned literal, which is constant across all eight cases. A wrong recovery cannot
+pass silently, because `Fs::` is rendered back out of the reconstructed host.
+
+### Mutation checks
+
+Every group reproduced on its first run, which by itself means nothing, so each
+was mutation checked and every blast radius was compared against what the corpus
+predicts:
+
+| mutation | outputs broken | the corpus says |
+| --- | ---: | --- |
+| drop the last argument | 79 of 80 | 1 output has an empty `Args::` vector |
+| drop the synthesised declarations | 8 | 8 outputs name `--optionName` |
+| blank the `Errors::` section | 39 | 39 outputs carry an error |
+| join file names with `;` | 3 | 3 outputs have two file names |
+| `Errors::` newline `\r\n` → `\n` | 17 | 17 outputs' error text carries a CRLF |
+| never emit `TypeAcquisition::` | 38 | 38 outputs carry that section |
+| drop a recovered file entry | 16 | 16 outputs are recovered |
+| drop the multi-input block separator | 6 | 6 outputs have two blocks |
+
+The file-name join is a coverage fact as much as a control: only 3 of the 80
+command-line outputs carry more than one file name, so that join is weakly
+exercised.
+
+One prediction was wrong and the probe was not. The first count for the newline
+mutation said 23; it had run past the block boundary into the next block's `Fs::`
+section, which `printFS` also writes with CRLFs. Bounded to its own block, the
+corpus says 17, which is what broke.
+
+### Existing evidence, connected
+
+47 operations move from a rule-guessed disposition to rust-gated, through eight
+witness records verified operation by operation against the pinned bodies. The
+verification refuted four claims, which is the part worth keeping:
+
+* `jsonvalue.go:unmarshalJSONValue` has zero callers anywhere in the pin. Dead
+  code, not evidence — and now a roster exemption.
+* `resolver.go:GetAutomaticTypeDirectiveNames` is called by the trace adapter,
+  but takes no tracer, contains no write call in its pinned body, and its frozen
+  row is structurally forced to `{"traces":[]}`. It witnesses "does not panic".
+* `diagnosticwriter.go:WrapASTDiagnostics` and `ToDiagnostics` are a Go-only
+  wrapper layer; Rust passes `&[&Diagnostic]` straight in, so nothing
+  corresponds. `CompareASTDiagnostics` is skipped by Rust, which sorts with a
+  port of the different `ast/diagnostic.go:CompareDiagnostics`.
+
+The field-versus-method trap cost several more: the packagejson adapter reads
+`e.Valid`, `e.Null` and `v.Type` as FIELDS, so `Expected.IsValid`,
+`Expected.ExpectedJSONType`, `JSONValue.IsPresent` and `JSONValueType.String` are
+not exercised, and the dependency FIELDS being asserted is not the
+`DependencyFields` methods running.
+
+Each record states the asymmetries a later citation must not gloss over: the
+module-trace dataset discards the resolution result on both sides and witnesses
+the callback stream only; the config-mappers comparison is not same-entry-point;
+four pinned diagnosticwriter operations are two Rust functions with a `pretty`
+flag; and `boundary_tests` has no Go row at all, so it gates Rust against
+expectations read from the pinned source rather than proving parity.
+
+Two facts came out of checking rather than assuming. The config-mappers manifest
+resolution really is exercised — 4 of the 15 frozen rows resolve a manifest with
+populated fields — which the survey had left unconfirmed. And
+`handleOptionConfigDirTemplateSubstitution` looked like a no-op until a
+case-insensitive scan found `source-16`, which carries `${CONFIGDIR}` and a
+Turkish dotted capital I: the pinned guard lowercases and the pinned replacement
+does not, so both branches run and produce the untouched string, which is
+exactly what the frozen row records.
+
+### The config roster
+
+45 exemptions: 24 `later_step`, 17 `go_test_harness`, 4 `unused_at_pin`. Every
+entry carries the caller set read at the pin, with a bare-name search each time —
+the F1a lesson that a Go method VALUE is a caller a `.Method(` search does not
+find.
+
+**Four candidates were disqualified and stay on the roster.**
+`parsedcommandline.go`'s output-path cluster is reached from `internal/compiler`,
+three of the four only through a chain no direct search shows.
+`CommonSourceDirectory` has no direct caller at all — it is reached by interface
+dispatch through `outputpaths.OutputPathsHost` — and
+`checkSourceFilesBelongToPath` only as a method value. Since `internal/compiler`
+is `membership: "partial"` and F4a decides its boundary, none is exemptible here.
+
+**Twelve of the 24 use a transitive reading** of the caller rule, accepted in
+the PR #43 re-review after checking the pinned references. Their callers are
+themselves owned by later phases, as in F2a's `openMetadata` entry. This includes
+the `showconfig.go` helpers whose results are consumed only by
+`ConvertToTSConfig`, the option-change helpers used by incremental execution,
+and the file-match helpers used by watching and the project system. `computeFn`
+runs during package initialization, but only `addImpliedOptions` consumes the
+table it builds. These remain real later-phase work, not `unused_at_pin`.
+An explicitly assigned Phase 1 operation or an additional in-scope caller would
+invalidate this reasoning.
+
+**`go_test_harness` is a new category**, accepted in the same technical review
+for the 17 fixture and baseline-bookkeeping operations. None of the
+six original categories describes upstream's own test harness, and bending
+`build_tooling` would have been the wrong kind of convenience: that category says
+the port generates the same artifact elsewhere, and there is no artifact here.
+The port must reproduce the 309 reference outputs, and it does; it must not
+reproduce the file bookkeeping, because its comparisons run through
+`scripts/phase1*.py` and Rust tests that assert against frozen rows.
+
+### A name-match rule that was wrong
+
+`isDoubleQuotedString` was `implemented_untested` on the strength of a Rust
+function of the same name — which carries `/// port:
+tsc/internal/parser/parser.go:isDoubleQuotedString` and performs the single-quote
+token-flag test the `tsoptions` copy does not. Two Go packages, two different
+functions, one name.
+
+The row was not corrected; the rule was. A Rust function that declares itself the
+port of a different operation is no longer read as evidence for this one. 3,773
+Rust functions carry such an annotation, and the rule reclassified nine rows
+across `ast`, `binder`, `tspath` and `tsoptions`, each an exported/unexported or
+cross-package name collision.
+
+### Defects the gate caught in its own author's work
+
+* `output_preparation` kept the first native row it saw per case, so a probe that
+  DECLINES a case shadowed the probe that observed it, and all 87
+  `tsconfigParsing` outputs reported "no corresponding native observation" while
+  the observations sat right there.
+* It then read a probe's observations once per GROUP, so a probe serving two
+  groups presented every row twice and tripped the two-observers conflict on its
+  own duplicate.
+* Eight roster exemptions named operations that do not exist —
+  `parsedcommandline.go:GetOutputFileNames` where the scope carries
+  `ParsedCommandLine.GetOutputFileNames`. An exemption for an operation nobody
+  can find is not an exemption.
+* The regression asserting 167 observations and 167 declines broke when a third
+  probe joined the family. That was arithmetic, not the property it guarded; it
+  now asserts that every output is observed by exactly one probe.
+
+### The parse-config host
+
+`internal/tsoptions/tsoptionstest` is not a `_test.go` file — it ships in the
+module and other packages import it — so it has a real caller-visible contract:
+it is how every pinned config test, and every F3a probe, turns a
+`{path -> content}` map into a `ParseConfigHost`. 11 cases: 8 match, 1 different,
+2 `not_implemented`.
+
+The divergence: the pinned filesystem REFUSES a path that is not absolute, by
+panicking, while `tsr_vfs` resolves it against the current directory and answers.
+Its attribution is deliberate — the cause is in the filesystem the factory
+builds, not the factory, so the symlink-normalization case that first surfaced it
+was split and the refusal has its own case saying where the behavior actually
+lives. The refusal is recorded as a flag, not as the pin's panic wording: what
+the host does is the contract, how it phrases its own panic is not.
+
 ## F0 checklist
 
 | Requirement | Result |
@@ -806,3 +1103,50 @@ incomplete. F1a–F5a register producers when their declared inventory is ready.
 
 `cargo xtask validate` and `cargo xtask status --check-committed` both pass with
 P1A registered, and S01–S12 are unchanged.
+
+### PR #43 shared harness review
+
+The P2 diagnostic adapter now calls the production formatter and program sorter;
+its canonical P2 schedule returned byte-identical observations before and after.
+All three Phase 1 drivers share `tools/phase1/harness`, including outcome
+serialization, so a missing-operation identity comes from the handler rather
+than the request label. The source closure includes the shared crate transitively.
+The example-marker check now requires no out-of-src markers and retains a
+synthetic regression that proves detection still works.
+
+A Rust-only replay of all 225 leaves, 359 filesystem and 484 config requests
+changed exactly one row: `leaves/bundled/wrapper-dispatch-surface` now identifies
+`wrappedFS.WalkDir` as the missing operation. `wrapFS` merely constructs the
+wrapper (`embed.go:41`), which `BundledFs::new` already implements; the handler
+itself identified walking as the blocker. Every other response is unchanged.
+The old recorded `missing_operations: [wrapFS]` is left untouched as historical
+evidence, not rewritten to look like a new capture. Its attribution needs a
+scoped leaves re-record before it can describe the corrected driver. No native
+observations, frozen reports or acceptance evidence were refreshed for this
+refactor. Cargo dependency changes invalidate affected capture fingerprints
+under the existing rules.
+
+The final PR review also repaired two preparation-layer gaps: an observed row
+could hide another baseline probe's harness failure, and a bare diagnostic-writer
+operation label could leak into `missing_operation` instead of the pinned ID.
+Failure injection now rejects both probe orderings; an identity regression checks
+the canonical writer ID. The current request schedule is unchanged by these
+repairs. The CI publication-policy failure was the omitted private
+`phase1_config` package; both it and `phase1_harness` are now registered.
+
+The removed P2 sorter marker required regenerating `data/s07/operations.json`.
+The accepted subset review records that the sole inventory change is removal of
+that example mapping; the production mapping remains. Replaying existing,
+authenticated syntax and loader captures produced byte-identical selected cases
+and checker obligations. Only the operation-matrix digest and its review chain
+changed, without updating any measured outcome or producer fingerprint.
+
+The second review found that the shared exemption validator still selected
+only direct `leaves` cases. It now selects the preparation families of the step
+being validated, including `pilot` for filesystem. A regression injects a
+conflicting exemption for an unwitnessed direct case in each of the three
+steps, for each of `match`, `different` and `not_implemented`. All six config
+and filesystem subcases failed before the fix and pass afterward. The existing
+rosters contain no such conflicts, so preparation counts and recorded evidence
+are unchanged. The focused Phase 1 suite passed (161 tests, 17 subtests); broad
+compiler tests, native captures and benchmarks were not repeated.

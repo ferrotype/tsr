@@ -390,9 +390,26 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9f7c3e4beb33f85d45ae3e3a1792185706c8e16d043238c593331cc7cd313b50"
 
 [[package]]
+name = "phase1_config"
+version = "0.1.0"
+dependencies = [
+ "phase1_harness",
+ "serde_json",
+ "tsr_ast",
+ "tsr_compiler",
+ "tsr_core",
+ "tsr_jsstring",
+ "tsr_module",
+ "tsr_tsoptions",
+ "tsr_tspath",
+ "tsr_vfs",
+]
+
+[[package]]
 name = "phase1_filesystem"
 version = "0.1.0"
 dependencies = [
+ "phase1_harness",
  "serde_json",
  "tsr_jsstring",
  "tsr_tsoptions",
@@ -401,9 +418,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "phase1_harness"
+version = "0.1.0"
+dependencies = [
+ "serde_json",
+]
+
+[[package]]
 name = "phase1_leaves"
 version = "0.1.0"
 dependencies = [
+ "phase1_harness",
  "serde_json",
  "tsr_bundled",
  "tsr_core",

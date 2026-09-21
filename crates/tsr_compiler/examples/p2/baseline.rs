@@ -14,59 +14,12 @@ fn category(d: &Diagnostic) -> Result<&'static str> {
         _ => Err(Error::Unsupported("baseline unknown diagnostic category")),
     }
 }
-// port: tsc/internal/diagnostics/diagnostics.go:Format
-// Default locale formatting.
-fn message(d: &Diagnostic) -> Result<String> {
-    if d.message.is_none() && !d.message_text.is_empty() {
-        return Ok(utf8(d.message_text.as_bytes())?.into());
-    }
-    let message = d
-        .message
-        .or_else(|| {
-            std::str::from_utf8(d.message_key.as_bytes())
-                .ok()
-                .and_then(tsr_diagnostics::by_key)
-        })
-        .ok_or(Error::Unsupported("baseline unknown diagnostic key"))?;
-    if d.message_args.is_empty() {
-        return Ok(message.text.into());
-    }
-    let text = message.text.as_bytes();
-    let mut output = String::new();
-    let mut i = 0;
-    while i < text.len() {
-        if text[i] == b'{' {
-            if let Some(end) = text[i + 1..].iter().position(|&b| b == b'}') {
-                let end = i + 1 + end;
-                let digits = &text[i + 1..end];
-                if !digits.is_empty() && digits.iter().all(u8::is_ascii_digit) {
-                    let index = utf8(digits)?.parse::<isize>().map_err(|_| {
-                        Error::Protocol("invalid diagnostic formatting placeholder".into())
-                    })?;
-                    let arg = d.message_args.get(index as usize).ok_or_else(|| {
-                        Error::Protocol("invalid diagnostic formatting placeholder".into())
-                    })?;
-                    output.push_str(utf8(arg.as_bytes())?);
-                    i = end + 1;
-                    continue;
-                }
-            }
-        }
-        let ch = message.text[i..].chars().next().expect("nonempty suffix");
-        output.push(ch);
-        i += ch.len_utf8();
-    }
-    Ok(output)
-}
-// port: tsc/internal/diagnosticwriter/diagnosticwriter.go:WriteFlattenedDiagnosticMessage
-fn flattened(d: &Diagnostic, level: usize) -> Result<String> {
-    let mut out = message(d)?;
-    for child in &d.message_chain {
-        out.push_str(NL);
-        out.push_str(&"  ".repeat(level + 1));
-        out.push_str(&flattened(child, level + 1)?);
-    }
-    Ok(out)
+// The production formatter owns diagnostics.go:Format and
+// diagnosticwriter.go:WriteFlattenedDiagnosticMessage. Only the baseline's
+// UTF-8 String boundary and CRLF choice belong to this example.
+fn flattened(d: &Diagnostic) -> Result<String> {
+    let bytes = tsr_compiler::diagnostic_writer::flattened(d, NL.as_bytes())?;
+    Ok(utf8(&bytes)?.to_owned())
 }
 fn remove_prefixes(text: &str) -> String {
     let mut value = text.to_owned();
@@ -118,7 +71,7 @@ fn error_text(
     first: &mut bool,
     d: &Diagnostic,
 ) -> Result<()> {
-    for line in remove_prefixes(&flattened(d, 0)?).split('\n') {
+    for line in remove_prefixes(&flattened(d)?).split('\n') {
         let line = line.strip_suffix('\r').unwrap_or(line);
         if !line.is_empty() {
             append_line(
@@ -162,7 +115,7 @@ fn error_text(
                 "!!! related TS{}{}: {}",
                 related.code,
                 location,
-                flattened(related, 0)?
+                flattened(related)?
             ),
         );
     }
@@ -210,7 +163,7 @@ pub fn render(program: &Program, diagnostics: &[Diagnostic]) -> Result<Value> {
             category(d)?,
             prefix,
             d.code,
-            flattened(d, 0)?,
+            flattened(d)?,
             NL
         ));
     }

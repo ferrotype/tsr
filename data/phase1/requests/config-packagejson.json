@@ -1,0 +1,837 @@
+{
+  "family": "config",
+  "requests": [
+    {
+      "actions": [
+        {
+          "op": "load",
+          "source": "{\"name\":\"p\",\"version\":\"1.0.0\",\"type\":\"module\",\"tsconfig\":\"./t.json\",\"main\":\"./m.js\",\"types\":\"./t.d.ts\",\"typings\":\"./t2.d.ts\",\"dependencies\":{\"a\":\"1\"},\"devDependencies\":{\"b\":\"2\"},\"peerDependencies\":{\"c\":\"3\"},\"optionalDependencies\":{\"d\":\"4\"},\"typescript\":{\"contentMapper\":{\"exec\":[\"x\"],\"compilerOptions\":[\"y\"],\"dynamicConfig\":true}}}"
+        },
+        {
+          "op": "expected_is_valid"
+        },
+        {
+          "op": "load",
+          "source": "{\"name\":1,\"version\":[],\"type\":{},\"tsconfig\":false,\"main\":1.5,\"typings\":true,\"dependencies\":\"s\",\"devDependencies\":1,\"peerDependencies\":[],\"optionalDependencies\":{\"d\":5},\"typescript\":{\"contentMapper\":{\"exec\":\"x\",\"compilerOptions\":[1],\"dynamicConfig\":\"no\"}}}"
+        },
+        {
+          "op": "expected_is_valid"
+        },
+        {
+          "op": "load",
+          "source": "{}"
+        },
+        {
+          "op": "expected_is_valid"
+        },
+        {
+          "op": "load",
+          "source": "{\"name\":\"ok\",\"name\":5,\"dependencies\":{\"a\":\"1\"},\"dependencies\":\"bad\"}"
+        },
+        {
+          "op": "expected_is_valid"
+        },
+        {
+          "op": "load",
+          "source": "{\"name\":null,\"types\":null,\"dependencies\":null,\"typescript\":null}"
+        },
+        {
+          "op": "expected_is_valid"
+        }
+      ],
+      "case": "config/packagejson/expected-validity-survives-a-repeated-field",
+      "discriminates": "A port that recomputes a typed field's validity from its last occurrence. Expected.UnmarshalJSON only ever SETS Valid (expected.go:21-23) -- it never clears it -- so with duplicate names allowed (packagejson.go:134) a field whose second occurrence fails to decode keeps the first occurrence's validity, while a second occurrence spelled `null` replaces the whole struct (expected.go:17-19) and clears it. The fourth and fifth documents separate those two; the first three are the ordinary agreement the difference has to stand against. The reader is the `TypeValidatedField` interface (validated.go:5), which is how resolver.go:1878 reaches it: the concrete type is erased and only the four members remain.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/packagejson/expected.go:Expected.IsValid",
+      "order_sensitive": true,
+      "subject": "packageJson"
+    },
+    {
+      "actions": [
+        {
+          "op": "load",
+          "source": "{}"
+        },
+        {
+          "op": "expected_json_type"
+        },
+        {
+          "op": "load",
+          "source": "{\"name\":1,\"version\":[],\"type\":{},\"tsconfig\":false,\"main\":1.5,\"typings\":true,\"dependencies\":\"s\",\"devDependencies\":1,\"peerDependencies\":[],\"optionalDependencies\":{\"d\":5},\"typescript\":{\"contentMapper\":{\"exec\":\"x\",\"compilerOptions\":[1],\"dynamicConfig\":\"no\"}}}"
+        },
+        {
+          "op": "expected_json_type"
+        }
+      ],
+      "case": "config/packagejson/expected-json-type-is-the-declared-type",
+      "discriminates": "A port that answers `what type is this field?` from the data. ExpectedJSONType reads reflect.TypeFor[T]().Kind() and nothing else (expected.go:51-67), so it is the same answer for an absent field, a well-typed field and a field holding the wrong JSON -- which is exactly what makes resolver.go:1882 able to say `expected string, got number`. Running it over an empty document and over one where every field holds the wrong type, and requiring the two to agree, is the discrimination. The fifteen declared fields cover five of the switch's six arms: string, boolean, array (a slice), object (a map) and the `unknown` default (the two struct instantiations). The numeric arm is unreachable at this pin, because no pinned Expected[T] has a numeric T.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/packagejson/expected.go:Expected.ExpectedJSONType",
+      "order_sensitive": true,
+      "subject": "packageJson"
+    },
+    {
+      "actions": [
+        {
+          "kind": "string",
+          "op": "expected_of"
+        },
+        {
+          "kind": "empty_string",
+          "op": "expected_of"
+        },
+        {
+          "kind": "string_map",
+          "op": "expected_of"
+        },
+        {
+          "kind": "string_slice",
+          "op": "expected_of"
+        },
+        {
+          "kind": "bool",
+          "op": "expected_of"
+        },
+        {
+          "kind": "content_mapper_fields",
+          "op": "expected_of"
+        },
+        {
+          "kind": "string",
+          "op": "nil_receiver_expected_json_type"
+        },
+        {
+          "kind": "string_map",
+          "op": "nil_receiver_expected_json_type"
+        },
+        {
+          "kind": "string_slice",
+          "op": "nil_receiver_expected_json_type"
+        },
+        {
+          "kind": "bool",
+          "op": "nil_receiver_expected_json_type"
+        },
+        {
+          "kind": "content_mapper_fields",
+          "op": "nil_receiver_expected_json_type"
+        }
+      ],
+      "case": "config/packagejson/expected-of-builds-a-present-field-from-no-json",
+      "discriminates": "A port whose constructed field reports the type of the value it was given, or reports absent. ExpectedOf writes the EXPECTED type into actualJSONType (expected.go:74), so a field nothing ever parsed reports as present, valid, not null and carrying the declared type's name -- and for the struct instantiation it reports the literal `unknown`, a string no parse can produce. The unexported field is read directly rather than through ActualJSONType(), which the s07 dataset already witnesses. The five nil-receiver actions pin the mechanism the constructor depends on: ExpectedJSONType touches only its type parameter, so calling it on (*Expected[T])(nil) is defined, and a port that made the answer depend on the receiver could not write this constructor at all.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/packagejson/expected.go:ExpectedOf",
+      "order_sensitive": true,
+      "subject": "packageJson"
+    },
+    {
+      "actions": [
+        {
+          "op": "json_value_type_string",
+          "value": 0
+        },
+        {
+          "op": "json_value_type_string",
+          "value": 1
+        },
+        {
+          "op": "json_value_type_string",
+          "value": 2
+        },
+        {
+          "op": "json_value_type_string",
+          "value": 3
+        },
+        {
+          "op": "json_value_type_string",
+          "value": 4
+        },
+        {
+          "op": "json_value_type_string",
+          "value": 5
+        },
+        {
+          "op": "json_value_type_string",
+          "value": 6
+        },
+        {
+          "op": "json_value_type_string",
+          "value": 7
+        },
+        {
+          "op": "json_value_type_string",
+          "value": 42
+        },
+        {
+          "op": "json_value_type_string",
+          "value": -1
+        },
+        {
+          "op": "json_value_type_string",
+          "value": 127
+        },
+        {
+          "op": "json_value_type_string",
+          "value": -128
+        }
+      ],
+      "case": "config/packagejson/json-value-type-names-every-constant",
+      "discriminates": "A port that names the seven constants but has nowhere to put an out-of-range one. The pinned switch falls through to fmt.Sprintf(\"unknown(%d)\", t) (jsonvalue.go:36-37), and the type is int8, so 7, 42, -1 and the two int8 extremes are all reachable states that have to render. Constant 0 is the other edge: JSONValueTypeNotPresent has no case in the switch either, so `not present` renders as `unknown(0)` and not as a name. That string is what reaches a user through Expected_type_of_0_field_in_package_json_to_be_1_got_2 (cache.go:40), so it is message-visible, not internal.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/packagejson/jsonvalue.go:JSONValueType.String",
+      "order_sensitive": true,
+      "subject": "packageJson"
+    },
+    {
+      "actions": [
+        {
+          "op": "load",
+          "source": "{}"
+        },
+        {
+          "field": "exports",
+          "op": "json_value_is_present"
+        },
+        {
+          "field": "imports",
+          "op": "json_value_is_present"
+        },
+        {
+          "field": "typesVersions",
+          "op": "json_value_is_present"
+        },
+        {
+          "op": "load",
+          "source": "{\"exports\":null,\"imports\":null,\"typesVersions\":null}"
+        },
+        {
+          "field": "exports",
+          "op": "json_value_is_present"
+        },
+        {
+          "field": "imports",
+          "op": "json_value_is_present"
+        },
+        {
+          "field": "typesVersions",
+          "op": "json_value_is_present"
+        },
+        {
+          "op": "load",
+          "source": "{\"exports\":\"./a.js\",\"imports\":{\"#x\":\"./x.js\"},\"typesVersions\":{\"*\":{\"a\":[\"b\"]}}}"
+        },
+        {
+          "field": "exports",
+          "op": "json_value_is_present"
+        },
+        {
+          "field": "imports",
+          "op": "json_value_is_present"
+        },
+        {
+          "field": "typesVersions",
+          "op": "json_value_is_present"
+        },
+        {
+          "op": "load",
+          "source": "{\"exports\":[],\"imports\":0,\"typesVersions\":false}"
+        },
+        {
+          "field": "exports",
+          "op": "json_value_is_present"
+        },
+        {
+          "field": "imports",
+          "op": "json_value_is_present"
+        },
+        {
+          "field": "typesVersions",
+          "op": "json_value_is_present"
+        }
+      ],
+      "case": "config/packagejson/json-value-presence-separates-absent-from-null",
+      "discriminates": "A port that treats an explicit null as absent. The predicate tests against JSONValueTypeNotPresent alone (jsonvalue.go:46-48), so `\"exports\": null` is PRESENT while an omitted `exports` is not -- and that distinction is load-bearing: program.go:2193 refuses a package scope whose Exports is not present, and resolver.go:2172 gates the whole exports walk on it, so a package that spells `\"exports\": null` takes the present branch and then falls out on falsiness rather than never entering. The second document is the discriminating one; the first, third and fourth fix the other four states the type can be in. exports and imports reach the predicate by promotion through ExportsOrImports' embedded JSONValue, which is the shape of the pinned call sites; typesVersions is a bare JSONValue.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/packagejson/jsonvalue.go:JSONValue.IsPresent",
+      "order_sensitive": true,
+      "subject": "packageJson"
+    },
+    {
+      "actions": [
+        {
+          "op": "load",
+          "source": "{\"exports\":\"./a.js\",\"typesVersions\":\"tv\"}"
+        },
+        {
+          "field": "exports",
+          "op": "json_value_as_string"
+        },
+        {
+          "field": "typesVersions",
+          "op": "json_value_as_string"
+        },
+        {
+          "op": "load",
+          "source": "{\"exports\":{},\"typesVersions\":[]}"
+        },
+        {
+          "field": "exports",
+          "op": "json_value_as_string"
+        },
+        {
+          "field": "typesVersions",
+          "op": "json_value_as_string"
+        },
+        {
+          "op": "load",
+          "source": "{}"
+        },
+        {
+          "field": "exports",
+          "op": "json_value_as_string"
+        },
+        {
+          "field": "typesVersions",
+          "op": "json_value_as_string"
+        }
+      ],
+      "case": "config/packagejson/as-string-panics-off-the-string-type",
+      "discriminates": "A port whose string accessor returns an empty string, or an Option, where the pin panics. AsString is a checked accessor: it panics unless Type is exactly JSONValueTypeString (jsonvalue.go:79-84), which is why every pinned call site guards it with an explicit type test first (resolver.go:2253 tests `exports.Type == packagejson.JSONValueTypeString` before the ten AsString calls that follow). An unguarded port would turn a programming error into a silently wrong resolution. The three documents cover the passing case, two wrong types and the absent case, which panics as well -- absence is not a special case here. The panic is recorded as a class, not as its text, because the text embeds the JSONValueType name through %v.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/packagejson/jsonvalue.go:JSONValue.AsString",
+      "order_sensitive": true,
+      "subject": "packageJson"
+    },
+    {
+      "actions": [
+        {
+          "op": "load",
+          "source": "{\"dependencies\":{\"alpha\":\"1\"},\"devDependencies\":{\"beta\":\"2\"},\"peerDependencies\":{\"gamma\":\"3\"},\"optionalDependencies\":{\"delta\":\"4\",\"alpha\":\"9\"}}"
+        },
+        {
+          "name": "alpha",
+          "op": "has_dependency"
+        },
+        {
+          "name": "beta",
+          "op": "has_dependency"
+        },
+        {
+          "name": "gamma",
+          "op": "has_dependency"
+        },
+        {
+          "name": "delta",
+          "op": "has_dependency"
+        },
+        {
+          "name": "epsilon",
+          "op": "has_dependency"
+        },
+        {
+          "name": "",
+          "op": "has_dependency"
+        },
+        {
+          "op": "load",
+          "source": "{\"dependencies\":5,\"devDependencies\":{\"beta\":\"2\"}}"
+        },
+        {
+          "name": "beta",
+          "op": "has_dependency"
+        },
+        {
+          "name": "alpha",
+          "op": "has_dependency"
+        },
+        {
+          "op": "load",
+          "source": "{\"dependencies\":{\"\":\"v\"}}"
+        },
+        {
+          "name": "",
+          "op": "has_dependency"
+        },
+        {
+          "name": "x",
+          "op": "has_dependency"
+        }
+      ],
+      "case": "config/packagejson/has-dependency-spans-all-four-fields",
+      "discriminates": "A port that answers membership from the runtime dependency set, or from `dependencies` alone. HasDependency is the WIDE predicate: it includes devDependencies (packagejson.go:40-44), where GetRuntimeDependencyNames deliberately excludes them, and the two live side by side in the same file. The second document separates the field guard from the lookup -- `\"dependencies\": 5` makes GetValue answer not-ok so the whole field is skipped rather than treated as empty -- and the third pins that the empty name is an ordinary key, not a sentinel for absent.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/packagejson/packagejson.go:DependencyFields.HasDependency",
+      "order_sensitive": true,
+      "subject": "packageJson"
+    },
+    {
+      "actions": [
+        {
+          "op": "load",
+          "source": "{\"dependencies\":{\"a\":\"1\"},\"devDependencies\":{\"b\":\"2\"},\"peerDependencies\":{\"c\":\"3\"},\"optionalDependencies\":{\"d\":\"4\"}}"
+        },
+        {
+          "op": "range_dependencies",
+          "stop_after": -1
+        },
+        {
+          "op": "range_dependencies",
+          "stop_after": 1
+        },
+        {
+          "op": "range_dependencies",
+          "stop_after": 2
+        },
+        {
+          "op": "range_dependencies",
+          "stop_after": 3
+        },
+        {
+          "op": "load",
+          "source": "{\"dependencies\":5,\"devDependencies\":{\"b\":\"2\"},\"optionalDependencies\":{\"d\":\"4\"}}"
+        },
+        {
+          "op": "range_dependencies",
+          "stop_after": -1
+        },
+        {
+          "op": "load",
+          "source": "{\"dependencies\":{\"a\":\"1\",\"z\":\"9\"},\"peerDependencies\":{\"m\":\"5\"}}"
+        },
+        {
+          "op": "range_dependencies",
+          "stop_after": -1
+        },
+        {
+          "op": "load",
+          "source": "{}"
+        },
+        {
+          "op": "range_dependencies",
+          "stop_after": -1
+        }
+      ],
+      "case": "config/packagejson/range-dependencies-walks-the-fields-in-declaration-order",
+      "discriminates": "A port that merges the four fields, or visits them in a different order, or keeps walking after the callback said stop. The pinned walk enters dependencies, devDependencies, peerDependencies and optionalDependencies in that order and returns from the whole function the moment the callback answers false (packagejson.go:58-87), so the same name appearing in two fields is reported twice, once per field, with that field's own version string. The first document holds exactly one entry per field, which is what makes the three stopping actions deterministic: with one entry per field a stop after n lands in a known field. Within a field the names come out of a Go map, so the recorded entries are sorted by (field index, name); the field sequence itself is recorded as observed, because it is the part that is not scheduling. The second document shows an invalid field being skipped rather than emptied, the third has two names in one field so the sorted rendering is exercised, and the fourth is the empty walk.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/packagejson/packagejson.go:DependencyFields.RangeDependencies",
+      "order_sensitive": true,
+      "subject": "packageJson"
+    },
+    {
+      "actions": [
+        {
+          "op": "load",
+          "source": "{\"dependencies\":{\"a\":\"1\",\"shared\":\"1\"},\"devDependencies\":{\"dev\":\"1\"},\"peerDependencies\":{\"p\":\"1\",\"shared\":\"2\"},\"optionalDependencies\":{\"o\":\"1\"}}"
+        },
+        {
+          "op": "runtime_dependency_names"
+        },
+        {
+          "op": "load",
+          "source": "{\"devDependencies\":{\"dev\":\"1\"}}"
+        },
+        {
+          "op": "runtime_dependency_names"
+        },
+        {
+          "op": "load",
+          "source": "{\"dependencies\":\"bad\",\"peerDependencies\":{\"p\":\"1\"}}"
+        },
+        {
+          "op": "runtime_dependency_names"
+        },
+        {
+          "op": "load",
+          "source": "{}"
+        },
+        {
+          "op": "runtime_dependency_names"
+        }
+      ],
+      "case": "config/packagejson/runtime-dependency-names-exclude-devdependencies",
+      "discriminates": "A port that includes devDependencies, or that returns nothing rather than an empty set. The pinned constructor reads dependencies, peerDependencies and optionalDependencies and not devDependencies (packagejson.go:89-108), which is what makes program.go:2248 ask about shipped dependencies rather than about the build. A name in two included fields collapses to one set member, which the first document pins, and devDependencies contributes nothing even when it is the only field present, which the second pins by answering a non-nil set of length zero -- the caller iterates Keys() unconditionally, so an absent set and an empty one are not interchangeable. The set's Keys() is a Go map, so the names are recorded sorted and the length is recorded beside them.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/packagejson/packagejson.go:DependencyFields.GetRuntimeDependencyNames",
+      "order_sensitive": true,
+      "subject": "packageJson"
+    },
+    {
+      "actions": [
+        {
+          "op": "entry_readers",
+          "receiver": "nil"
+        },
+        {
+          "op": "entry_readers",
+          "receiver": "empty_contents"
+        },
+        {
+          "op": "entry_readers",
+          "receiver": "with_contents"
+        },
+        {
+          "op": "entry_readers",
+          "receiver": "with_contents_absent_directory"
+        },
+        {
+          "op": "entry_readers",
+          "receiver": "empty_directory"
+        }
+      ],
+      "case": "config/packagejson/info-cache-entry-readers-guard-a-nil-receiver",
+      "discriminates": "A port whose absent-entry case is a different type from its present one. All three pinned readers are written to be called on a typed nil: Exists tests `p != nil && p.Contents != nil`, GetContents tests both and answers nil, GetDirectory tests the receiver and answers \"\" (cache.go:129-145). That is what lets modulespecifiers/specifiers.go:870 and compiler/program.go:2244 call GetContents on a lookup that missed. The receivers separate the two independent conditions: a nil entry, a live entry whose Contents is nil (Exists false but GetDirectory still answers), a live entry with contents, the same with DirectoryExists false -- which none of the three readers looks at -- and one whose directory is the empty string, so \"\" as an answer does not by itself mean the receiver was nil.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/packagejson/cache.go:InfoCacheEntry.Exists",
+      "order_sensitive": true,
+      "subject": "packageJson"
+    },
+    {
+      "actions": [
+        {
+          "directory": "/repo/pkg",
+          "op": "with_package_directory",
+          "receiver": "with_contents"
+        },
+        {
+          "directory": "/repo/pkg/",
+          "op": "with_package_directory",
+          "receiver": "with_contents"
+        },
+        {
+          "directory": "",
+          "op": "with_package_directory",
+          "receiver": "with_contents"
+        },
+        {
+          "directory": "",
+          "op": "with_package_directory",
+          "receiver": "empty_directory"
+        },
+        {
+          "directory": "/repo/other",
+          "op": "with_package_directory",
+          "receiver": "with_contents_absent_directory"
+        },
+        {
+          "directory": "/repo/pkg",
+          "op": "with_package_directory",
+          "receiver": "nil"
+        },
+        {
+          "op": "with_package_directory_shares_contents"
+        }
+      ],
+      "case": "config/packagejson/with-package-directory-copies-and-does-not-guard-nil",
+      "discriminates": "A port that copies the entry unconditionally, or that deep-copies it, or that nil-guards this method the way its three neighbours are guarded. The pin returns the receiver ITSELF when the directory already matches and a shallow copy otherwise (cache.go:158-167), so callers can compare identity and a change made through one view is visible through the other -- the last action pins that by mutating the copy's Contents and reading the original's. The trailing-separator pair is the case the pin's own comment cites (`node_modules/preact/compat` against the same path with a slash), and the empty-directory receiver shows the match test is a string comparison and not an emptiness test. The nil receiver is the asymmetry: this is the one InfoCacheEntry method that dereferences p before deciding anything, so it panics where Exists, GetContents and GetDirectory answer. The panic is recorded as a class, because the runtime's text names dynamic types and moves with the toolchain.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/packagejson/cache.go:InfoCacheEntry.WithPackageDirectory",
+      "order_sensitive": true,
+      "subject": "packageJson"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "directory": "/repo",
+          "op": "new_info_cache"
+        },
+        {
+          "op": "cache_get",
+          "path": "/repo/a/package.json"
+        },
+        {
+          "exists": true,
+          "label": "A",
+          "op": "cache_set",
+          "path": "/repo/a/package.json"
+        },
+        {
+          "exists": false,
+          "label": "B",
+          "op": "cache_set",
+          "path": "/repo/a/package.json"
+        },
+        {
+          "op": "cache_get",
+          "path": "/repo/a/package.json"
+        },
+        {
+          "op": "cache_get",
+          "path": "a/package.json"
+        },
+        {
+          "op": "cache_get",
+          "path": "/repo/./a/../a/package.json"
+        },
+        {
+          "op": "cache_get",
+          "path": "/REPO/A/package.json"
+        },
+        {
+          "case_sensitive": false,
+          "directory": "/repo",
+          "op": "new_info_cache"
+        },
+        {
+          "op": "cache_get",
+          "path": "/repo/a/package.json"
+        },
+        {
+          "exists": true,
+          "label": "C",
+          "op": "cache_set",
+          "path": "/repo/a/package.json"
+        },
+        {
+          "op": "cache_get",
+          "path": "/REPO/A/PACKAGE.JSON"
+        },
+        {
+          "op": "cache_get",
+          "path": "a/package.json"
+        },
+        {
+          "op": "cache_get",
+          "path": "b/package.json"
+        }
+      ],
+      "case": "config/packagejson/info-cache-keys-normalise-and-the-first-write-wins",
+      "discriminates": "A port whose Set overwrites, or whose key is the caller's raw string. Set is LoadOrStore, not Store (cache.go:190-194): the second write of a key leaves the first entry in place and HANDS THE FIRST ENTRY BACK, so the caller that lost the race still gets a usable entry and the cache never has two identities for one package.json. That return value is the whole contract -- resolver.go:1772 takes the result of a store it did not win and corrects only its directory -- and it is observable single-threaded: the second cache_set returns label A, not B. The key is tspath.ToPath(path, currentDirectory, useCaseSensitiveFileNames), so a relative path, a path with . and .. segments and, in the second cache, a path differing only in case all reach the same entry, while the same case-folded path misses in the case-sensitive cache. Entry identity travels as a label written into PackageDirectory, never as the computed key, which belongs to internal/tspath.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/packagejson/cache.go:InfoCache.Set",
+      "order_sensitive": true,
+      "subject": "packageJson"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "directory": "/repo",
+          "op": "new_info_cache"
+        },
+        {
+          "op": "cache_range",
+          "stop_after": -1
+        },
+        {
+          "exists": true,
+          "label": "A",
+          "op": "cache_set",
+          "path": "/repo/a/package.json"
+        },
+        {
+          "exists": true,
+          "label": "B",
+          "op": "cache_set",
+          "path": "/repo/b/package.json"
+        },
+        {
+          "exists": false,
+          "label": "C",
+          "op": "cache_set",
+          "path": "/repo/c/package.json"
+        },
+        {
+          "op": "cache_range",
+          "stop_after": -1
+        },
+        {
+          "op": "cache_range",
+          "stop_after": 1
+        },
+        {
+          "op": "cache_range",
+          "stop_after": 2
+        },
+        {
+          "exists": true,
+          "label": "D",
+          "op": "cache_set",
+          "path": "/repo/a/package.json"
+        },
+        {
+          "op": "cache_range",
+          "stop_after": -1
+        }
+      ],
+      "case": "config/packagejson/info-cache-range-visits-every-entry",
+      "discriminates": "A port with no way to enumerate the cache at all, or one whose enumeration cannot be stopped. Range forwards straight to sync.Map.Range (cache.go:196-198 over collections/syncmap.go:43-60), so the walk is unordered and a callback answering false ends it. What is deterministic is recorded: an empty cache visits nothing, a cache of three visits three, a stopped walk visits exactly as many as it allowed, and a second Set of an existing key adds no entry because Set is LoadOrStore -- the last walk still sees three, still labelled A. What is not deterministic is not recorded: a stopped walk reports its count and no labels, because which entries it happened to reach is scheduling. The complete walks record their labels sorted.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/packagejson/cache.go:InfoCache.Range",
+      "order_sensitive": true,
+      "subject": "packageJson"
+    },
+    {
+      "actions": [
+        {
+          "op": "load",
+          "source": "{\"typesVersions\":{\"*\":{\"a/*\":[\"types/a/*\"],\"b\":[\"types/b.d.ts\"]}}}"
+        },
+        {
+          "op": "get_version_paths"
+        },
+        {
+          "op": "version_paths_mappings"
+        },
+        {
+          "op": "load",
+          "source": "{\"typesVersions\":{\"<1.0\":{\"x\":[\"x\"]},\"*\":{\"y\":[\"y\"]}}}"
+        },
+        {
+          "op": "get_version_paths"
+        },
+        {
+          "op": "version_paths_mappings"
+        },
+        {
+          "op": "load",
+          "source": "{\"typesVersions\":{\"*\":{\"arr\":[\"ok\",5,\"two\"],\"notarray\":\"s\",\"empty\":[]}}}"
+        },
+        {
+          "op": "get_version_paths"
+        },
+        {
+          "op": "version_paths_mappings"
+        },
+        {
+          "op": "load",
+          "source": "{}"
+        },
+        {
+          "op": "get_version_paths"
+        },
+        {
+          "op": "version_paths_mappings"
+        },
+        {
+          "op": "load",
+          "source": "{\"typesVersions\":\"nope\"}"
+        },
+        {
+          "op": "get_version_paths"
+        },
+        {
+          "op": "version_paths_mappings"
+        },
+        {
+          "op": "load",
+          "source": "{\"typesVersions\":{\"*\":\"nope\"}}"
+        },
+        {
+          "op": "get_version_paths"
+        },
+        {
+          "op": "version_paths_mappings"
+        },
+        {
+          "op": "load",
+          "source": "{\"typesVersions\":{\"bogus range\":{\"a\":[\"b\"]}}}"
+        },
+        {
+          "op": "get_version_paths"
+        },
+        {
+          "op": "version_paths_mappings"
+        }
+      ],
+      "case": "config/packagejson/version-paths-selection-and-mappings",
+      "discriminates": "A port that selects a different typesVersions entry, or that renders the mappings in a different order, or that treats a malformed mapping value differently. Selection stops at the FIRST key whose range matches and returns from inside the loop (cache.go:59-72), so the second document -- where a non-matching range precedes a matching one -- pins both the skip and the order in which keys are tried. GetPaths is where the malformed cases live: a mapping whose value is not an array is dropped from the map entirely, while a non-string ELEMENT inside an array leaves an empty string in its slot, because the slice is pre-sized to the array's length and the loop only continues (cache.go:105-118). The third document holds both, plus an empty array, which is kept as an empty slice rather than dropped. The last four are the four ways the answer is nothing at all: no field, a field that is not an object, a matching entry whose value is not an object (which returns early rather than falling through to the next key) and a key that is not a semver range. The mappings travel as an entry array because pathsJSON is a collections.OrderedMap and the order is part of the answer.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/packagejson/cache.go:PackageJson.GetVersionPaths",
+      "order_sensitive": true,
+      "subject": "packageJson"
+    },
+    {
+      "actions": [
+        {
+          "op": "load",
+          "source": "{\"typesVersions\":{\"*\":{\"a/*\":[\"types/a/*\"],\"b\":[\"types/b.d.ts\"]}}}"
+        },
+        {
+          "op": "get_version_paths"
+        },
+        {
+          "op": "version_paths_identity"
+        },
+        {
+          "op": "load",
+          "source": "{\"typesVersions\":{\"*\":{\"arr\":[\"ok\",5,\"two\"],\"notarray\":\"s\",\"empty\":[]}}}"
+        },
+        {
+          "op": "get_version_paths"
+        },
+        {
+          "op": "version_paths_identity"
+        },
+        {
+          "op": "load",
+          "source": "{}"
+        },
+        {
+          "op": "get_version_paths"
+        },
+        {
+          "op": "version_paths_identity"
+        }
+      ],
+      "case": "config/packagejson/version-paths-mappings-are-rebuilt-per-retrieval",
+      "discriminates": "A port that memoises the built mappings globally. GetVersionPaths returns the PackageJson's VersionPaths struct BY VALUE (cache.go:85), and GetPaths memoises into `v.paths` on whichever copy it was called on (cache.go:102-120). So the sync.Once makes the SELECTION happen once per package while the mapping table is rebuilt once per retrieval: two reads of one retrieved value share a table, two separate retrievals do not. That is an allocation the caller pays per call site -- resolver.go:1144 and :1679 each call GetPaths twice on their own copy -- and a port that hung the table off the shared package state would hand every caller the same one. Recorded as booleans over pointer identity, never as addresses, with the table sizes beside them so a port that differs on identity but agrees on content is distinguishable from one that differs on both. The third document is the control: with no mappings at all both comparisons are nil against nil and must agree.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/packagejson/cache.go:VersionPaths.GetPaths",
+      "order_sensitive": true,
+      "subject": "packageJson"
+    },
+    {
+      "actions": [
+        {
+          "op": "load",
+          "source": "{}"
+        },
+        {
+          "op": "get_version_paths_traced"
+        },
+        {
+          "op": "load",
+          "source": "{\"typesVersions\":\"nope\"}"
+        },
+        {
+          "op": "get_version_paths_traced"
+        },
+        {
+          "op": "load",
+          "source": "{\"typesVersions\":{\"bogus range\":{\"a\":[\"b\"]}}}"
+        },
+        {
+          "op": "get_version_paths_traced"
+        },
+        {
+          "op": "get_version_paths_traced"
+        },
+        {
+          "op": "load",
+          "source": "{\"typesVersions\":{\"*\":\"nope\"}}"
+        },
+        {
+          "op": "get_version_paths_traced"
+        },
+        {
+          "op": "load",
+          "source": "{\"typesVersions\":{\"*\":{\"a/*\":[\"types/a/*\"],\"b\":[\"types/b.d.ts\"]}}}"
+        },
+        {
+          "op": "get_version_paths"
+        },
+        {
+          "op": "get_version_paths_traced"
+        }
+      ],
+      "case": "config/packagejson/version-paths-traces-replay-on-every-traced-call",
+      "discriminates": "A port that emits its typesVersions diagnostics as it computes them. The pin computes once under a sync.Once and APPENDS the diagnostics to a slice on the PackageJson (cache.go:29-79), then replays that slice on every call whose trace callback is non-nil (cache.go:80-84). Two consequences a port has to reproduce: a second traced call emits the same sequence again rather than nothing, and a first call made WITHOUT a tracer still computes, so the later traced call -- the last two actions -- emits the full sequence although the work is long done. The five documents cover every branch that emits: no field, a field of the wrong type (whose third argument is JSONValueType.String, so this is where that renderer becomes message-visible), a key that is not a semver range followed by the no-matching-entry message, and a matching key whose value is not an object, which emits the type message with the subscripted field name typesVersions['*']. Each diagnostic travels as its numeric code plus its rendered arguments; the message text is locale data and is not frozen.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/packagejson/cache.go:PackageJson.GetVersionPaths",
+      "order_sensitive": true,
+      "subject": "packageJson"
+    }
+  ]
+}

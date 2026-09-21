@@ -267,6 +267,7 @@ pub fn observe(request: &Value) -> Option<Outcome> {
         // emulating the traversal in this driver would compare the harness
         // against the pin rather than the port against the pin.
         "BundledWalk" => Some(Outcome::missing(
+            "tsc/internal/bundled/embed.go:wrappedFS.walkDir",
             "tsc/internal/bundled/embed.go:wrappedFS.walkDir, reached through wrappedFS.WalkDir",
             "a walk operation on tsr_vfs::FileSystem, say \
              walk_dir(&self, root: &[u8], visit: &mut dyn FnMut(&[u8], &Entry) -> Walk) -> \
@@ -283,6 +284,7 @@ pub fn observe(request: &Value) -> Option<Outcome> {
         // Reads are exercised separately. This mixed trace also needs the
         // absent walk API and Go-compatible mutation refusal/delegation.
         "BundledWrapper" => Some(Outcome::missing(
+            "tsc/internal/bundled/embed.go:wrappedFS.WalkDir",
             "tsc/internal/bundled/embed.go:wrappedFS.WalkDir and mutating methods",
             "a FileSystem walk operation and bundled mutation refusal/delegation; reads are already exercised by BundledReads and BundledLookup",
             "crates/tsr_bundled/src/lib.rs (FileSystem has no walk method; bundled mutations currently inherit Unsupported defaults)",
@@ -295,6 +297,7 @@ pub fn observe(request: &Value) -> Option<Outcome> {
         // that packaged access is unimplemented: the asset-index case is where
         // checkout-independent access is actually witnessed.
         "BundledSourceDir" => Some(Outcome::missing(
+            "tsc/internal/bundled/bundled.go:TestingLibPath",
             "tsc/internal/bundled/bundled.go:TestingLibPath",
             "none by construction: the Go accessor returns its own source directory from \
              runtime.Caller(0), while crates/tsr_bundled embeds bundled/libs with \

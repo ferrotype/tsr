@@ -264,6 +264,74 @@ FAMILIES = {
         "rust_example": "phase1_filesystem",
         "rust_target": "tools/phase1/filesystem/src/main.rs",
     },
+    "config": {
+        "requests": [
+            "data/phase1/requests/config-commandline.json",
+            "data/phase1/requests/config-tsconfigparsing.json",
+            "data/phase1/requests/config-host.json",
+            "data/phase1/requests/config-commandlineops.json",
+            "data/phase1/requests/config-configparse.json",
+            "data/phase1/requests/config-module.json",
+            "data/phase1/requests/config-packagejson.json",
+            "data/phase1/requests/config-diagwriter.json",
+        ],
+        "native_probes": [
+            # The 53 + 27 `tsoptions/commandLineParsing` outputs. It compiles
+            # into the pinned `tsoptions_test` package so it can call that
+            # package's own `formatNewBaseline` and `formatNewBaselineBuild`
+            # rather than restating their assembly, and the pinned
+            # `createVerifyNullForNonNullIncluded` for the eight outputs that
+            # need a synthesised option declaration. That package links
+            # internal/testutil/baseline, whose init calls repo.TestDataPath(),
+            # and repo panics under -trimpath, so the flag is dropped here as
+            # it is for the F0 pilot's command-line probe.
+            {"name": "commandline", "package": "tsoptions",
+             "probe": "tools/phase1/config/commandline_probe_test.go",
+             "test": "TestPhase1ConfigCommandLine",
+             "trimpath": False},
+            # The 87 `config/tsconfigParsing` outputs. Same package and the
+            # same -trimpath reason. This one carries the two section
+            # assemblies, because the pinned primary renderer ends in
+            # `baseline.Run` -- which writes into the pin and fails the test on
+            # any difference -- and the secondary one is inline in a test body.
+            {"name": "tsconfigparsing", "package": "tsoptions",
+             "probe": "tools/phase1/config/tsconfigparsing_probe_test.go",
+             "test": "TestPhase1ConfigTsconfigParsing",
+             "trimpath": False},
+            # The pinned parse-config host factory. Its own package, so its own
+            # overlay; it links neither `internal/repo` nor
+            # `internal/testutil/baseline`, so it keeps -trimpath.
+            {"name": "host", "package": "tsoptions/tsoptionstest",
+             "probe": "tools/phase1/config/tsoptionstest_probe_test.go",
+             "test": "TestPhase1ConfigHost"},
+            {"name": "diagwriter", "package": "diagnosticwriter",
+             "probe": "tools/phase1/config/diagwriter_probe_test.go",
+             "test": "TestPhase1ConfigDiagnosticWriter"},
+            # internal/packagejson. Its pinned test file imports internal/repo,
+            # which panics under -trimpath, so the flag is dropped here too.
+            {"name": "packagejson", "package": "packagejson",
+             "probe": "tools/phase1/config/packagejson_probe_test.go",
+             "test": "TestPhase1ConfigPackageJson",
+             "trimpath": False},
+            {"name": "module", "package": "module",
+             "probe": "tools/phase1/config/module_probe_test.go",
+             "test": "TestPhase1ConfigModule"},
+            {"name": "configparse", "package": "tsoptions",
+             "probe": "tools/phase1/config/configparse_probe_test.go",
+             "helper": "tools/phase1/config/configparse_inpackage_test.go",
+             "test": "TestPhase1ConfigParse",
+             "trimpath": False},
+            {"name": "commandlineops", "package": "tsoptions",
+             "probe": "tools/phase1/config/commandlineops_probe_test.go",
+             "helper": "tools/phase1/config/commandlineops_inpackage_test.go",
+             "test": "TestPhase1ConfigCommandLineOps",
+             "trimpath": False},
+        ],
+        "rust_package": "phase1_config",
+        "rust_target_kind": "bin",
+        "rust_example": "phase1_config",
+        "rust_target": "tools/phase1/config/src/main.rs",
+    },
 }
 # The six command families the plan names. Only `pilot` is wired at F0; the
 # rest are registered so `inventory --check` can report them as unprepared

@@ -157,6 +157,9 @@ def inventory_check() -> dict:
         "ok": not problems,
         "f0_complete": not outstanding,
         "f0_outstanding": outstanding,
+        # A `port:` marker outside a crate's src/ claims a production home for
+        # code that is not one. Reported, not refused: these predate this step.
+        "port_annotations_outside_src": scope_module.annotations_outside_src(),
         "preparation": preparation,
         # One published result per preparation step. True only when every
         # operation on that step's roster is linked to a prepared case or a

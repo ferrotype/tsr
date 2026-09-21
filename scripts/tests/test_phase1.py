@@ -408,8 +408,13 @@ class DispatcherTests(unittest.TestCase):
         self.assertNotEqual(result["ok"], result["f0_complete"])
 
     def test_unprepared_family_is_refused_with_the_declared_list(self):
+        # A family the plan declares but no step has built yet. `config` was
+        # this test's subject until F3a built it; the check is about the
+        # declared-but-unbuilt state, so it moves to the next such family
+        # rather than disappearing when one is finished.
+        unbuilt = next(f for f in capture.DECLARED_FAMILIES if f not in capture.FAMILIES)
         with self.assertRaisesRegex(ValueError, "has no adapter yet"):
-            capture.capture("config", Path(tempfile.mkdtemp()) / "out")
+            capture.capture(unbuilt, Path(tempfile.mkdtemp()) / "out")
 
 
 class SourceClosureTests(unittest.TestCase):
@@ -429,6 +434,12 @@ class SourceClosureTests(unittest.TestCase):
                          "data/upstream.json", "scripts/s08_oracle.py",
                          "scripts/s04_common.py"):
             self.assertIn(required, closure, required)
+
+    def test_shared_harness_is_in_each_family_capture_closure(self):
+        for family in ("leaves", "filesystem", "config"):
+            closure = capture.source_closure(family)
+            self.assertIn("tools/phase1/harness/src/lib.rs", closure, family)
+            self.assertIn("tools/phase1/harness/Cargo.toml", closure, family)
 
     def test_closure_contains_every_native_probe(self):
         closure = capture.source_closure("pilot")
@@ -1461,13 +1472,17 @@ class FilesystemPreparationTests(unittest.TestCase):
         self.assertEqual(report["excepted_outputs"], 74)
 
     def test_removing_output_cases_cannot_leave_filesystem_prepared(self):
-        self.cases["cases"] = [c for c in self.cases["cases"] if not c.get("baseline")]
+        self.cases["cases"] = [
+            c for c in self.cases["cases"]
+            if not (c.get("baseline") and c.get("family") == "filesystem")
+        ]
         report = scope.leaf_preparation(self.scope, self.cases, "filesystem")
         self.assertFalse(report["complete"])
         self.assertEqual(len(report["outputs"]["problems"]), 142)
 
     def test_an_excepted_output_still_needs_a_prepared_comparison(self):
-        case = next(c for c in self.cases["cases"] if c.get("baseline"))
+        case = next(c for c in self.cases["cases"]
+                    if c.get("baseline") and c.get("family") == "filesystem")
         case["last_result"] = "not_run"
         report = baselines.matchfiles_preparation(self.cases)
         self.assertFalse(report["complete"])
@@ -1480,6 +1495,242 @@ class FilesystemPreparationTests(unittest.TestCase):
         report = scope.leaf_preparation(self.scope, self.cases, "filesystem")
         self.assertFalse(report["complete"])
         self.assertTrue(any(case["id"] in problem for problem in report["gap_problems"]))
+
+
+class PortAnnotationTests(unittest.TestCase):
+    """A Rust function's own `port:` annotation outranks the name it happens to have."""
+
+    def test_a_port_annotation_naming_another_operation_is_not_evidence(self):
+        # Two Go packages carry `isDoubleQuotedString` and they are NOT the same
+        # function: internal/parser's tests the single-quote token flag,
+        # internal/tsoptions' does not. The Rust port declares itself the port
+        # of the parser's, and the by-name rule attributed it to tsoptions'.
+        ports = scope.declared_ports()
+        self.assertEqual(
+            ports.get("is_double_quoted_string"),
+            {"tsc/internal/parser/parser.go:isDoubleQuotedString"},
+        )
+        index = {"is_double_quoted_string": ["crates/tsr_parser/src/json.rs"]}
+        disposition, basis = scope.classify(
+            {}, "isDoubleQuotedString", False, index, [], ports,
+            "tsc/internal/tsoptions/tsconfigparsing.go:isDoubleQuotedString")
+        self.assertEqual(disposition, "missing")
+        self.assertIn("names a different operation", basis)
+
+    def test_the_operation_its_annotation_does_name_still_matches(self):
+        ports = scope.declared_ports()
+        index = {"is_double_quoted_string": ["crates/tsr_parser/src/json.rs"]}
+        disposition, _basis = scope.classify(
+            {}, "isDoubleQuotedString", False, index, [], ports,
+            "tsc/internal/parser/parser.go:isDoubleQuotedString")
+        self.assertEqual(disposition, "implemented_untested")
+
+    def test_the_committed_scope_carries_the_correction(self):
+        row = next(r for r in json.loads((ROOT / "data/phase1/scope.json").read_text())["operations"]
+                   if r["id"] == "tsc/internal/tsoptions/tsconfigparsing.go:isDoubleQuotedString")
+        self.assertEqual(row["disposition"], "missing")
+
+
+    def test_an_annotated_home_is_recorded_beside_the_ledger_claim(self):
+        # PORTS.toml records a Rust home per source FILE, so a package the
+        # ledger does not map reports an empty home even where the port exists:
+        # all 40 internal/diagnosticwriter rows did, while
+        # crates/tsr_compiler/src/diagnostic_writer/ carried explicit
+        # `port:` annotations. The two sources stay separate on the row,
+        # because a ledger claim and an author's annotation are different
+        # kinds of evidence.
+        homes = scope.annotated_homes()
+        self.assertIn(
+            "crates/tsr_compiler/src/diagnostic_writer/mod.rs",
+            homes.get("tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.File", []),
+        )
+        rows = json.loads((ROOT / "data/phase1/scope.json").read_text())["operations"]
+        annotated = [r for r in rows
+                     if r["go_package"] == "internal/diagnosticwriter" and r.get("annotated_home")]
+        self.assertTrue(annotated)
+        for row in annotated:
+            self.assertEqual(row["rust_home"], [], "the ledger still claims nothing here")
+
+    def test_an_annotated_home_is_a_production_home(self):
+        for files in scope.annotated_homes().values():
+            for path in files:
+                self.assertIn("/src/", path)
+        self.assertEqual(scope.annotations_outside_src(), [])
+
+    def test_example_marker_is_reported_without_claiming_a_production_home(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = root / "crates/demo/examples/probe.rs"
+            source.parent.mkdir(parents=True)
+            source.write_text(
+                "// port: tsc/internal/diagnostics/diagnostics.go:Format\n"
+                "fn format_example() {}\n"
+            )
+            with patch.object(scope, "ROOT", root):
+                self.assertEqual(scope.annotated_homes(), {})
+                self.assertEqual(scope.annotations_outside_src(), [{
+                    "file": "crates/demo/examples/probe.rs",
+                    "rust_fn": "format_example",
+                    "operation": "tsc/internal/diagnostics/diagnostics.go:Format",
+                }])
+
+
+class ConfigRosterTests(unittest.TestCase):
+    def test_the_committed_config_ledger_validates(self):
+        cases = json.loads((ROOT / "data/phase1/cases.json").read_text())
+        scope_doc = json.loads((ROOT / "data/phase1/scope.json").read_text())
+        self.assertEqual(scope.roster_problems(scope_doc, cases, "config"), [])
+
+    def test_every_exemption_category_is_declared(self):
+        for entry in scope.leaf_roster("config")["exemptions"]:
+            self.assertIn(entry["category"], scope.ROSTER_CATEGORIES, entry["operation"])
+
+    def test_the_new_harness_category_is_defined_and_used(self):
+        self.assertIn("go_test_harness", scope.ROSTER_CATEGORIES)
+        used = {e["category"] for e in scope.leaf_roster("config")["exemptions"]}
+        self.assertIn("go_test_harness", used)
+
+    def test_an_exemption_for_an_operation_with_a_prepared_case_is_refused(self):
+        cases = json.loads((ROOT / "data/phase1/cases.json").read_text())
+        scope_doc = json.loads((ROOT / "data/phase1/scope.json").read_text())
+        witnessed = {op for witness in cases.get("witnesses", [])
+                     for op in witness.get("operations", [])}
+        for step, families in scope.STEP_FAMILIES.items():
+            owned = {row["id"] for row in scope_doc["operations"]
+                     if row["go_package"] in scope.STEP_PACKAGES[step]}
+            for result in scope.PREPARING_RESULTS:
+                with self.subTest(step=step, result=result):
+                    # A direct case, with no gated witness to mask a missing
+                    # family in prepared_links, must block the exemption.
+                    case = next(case for case in cases["cases"]
+                                if case["family"] in families
+                                and case.get("last_result") == result
+                                and set(case.get("operations", [])) & owned - witnessed)
+                    claimed = sorted(set(case["operations"]) & owned - witnessed)[0]
+                    roster = scope.leaf_roster(step)
+                    roster["exemptions"].append({
+                        "operation": claimed, "category": "unused_at_pin",
+                        "owner": "nothing", "evidence": "fabricated for this test",
+                    })
+                    with patch.object(scope, "leaf_roster", return_value=roster):
+                        problems = scope.roster_problems(scope_doc, cases, step)
+                    self.assertTrue(any(claimed in problem and "but also prepared by" in problem
+                                        for problem in problems), problems)
+
+
+class ConfigOutputPreparationTests(unittest.TestCase):
+    """F3a's 167 reference outputs, and the two merge defects the gate caught.
+
+    These outputs are `rendering_verified: true` in the index, so
+    `exception_problems` refuses an exception on any of them: the only passing
+    state is all 167 reproduced exactly.
+    """
+
+    def setUp(self):
+        self.cases = json.loads((ROOT / "data/phase1/cases.json").read_text())
+        self.scope = json.loads((ROOT / "data/phase1/scope.json").read_text())
+
+    def test_all_167_config_outputs_reproduce_exactly(self):
+        report = baselines.output_preparation(self.cases, "config")
+        self.assertEqual(report["problems"], [])
+        self.assertEqual(report["total_outputs"], 167)
+        self.assertEqual(report["exact_outputs"], 167)
+        self.assertEqual(report["excepted_outputs"], 0)
+
+    def test_the_three_groups_partition_the_309(self):
+        config = baselines.output_preparation(self.cases, "config")
+        filesystem = baselines.output_preparation(self.cases, "filesystem")
+        self.assertEqual(config["total_outputs"] + filesystem["total_outputs"], baselines.TOTAL)
+
+    def test_a_declining_probe_cannot_shadow_the_observing_one(self):
+        # Every probe answers the whole family schedule and declines what it
+        # does not serve, so each output has one observing row and several
+        # declines. Keeping the first row seen let the alphabetically earlier
+        # `commandline` probe's decline hide the `tsconfigparsing` probe's real
+        # observation, and all 87 reported "no corresponding native observation".
+        directory = ROOT / "data/phase1/native/config"
+        probes = sorted({probe for _group, probe
+                         in baselines.STEP_OUTPUT_GROUPS["config"][2]})
+        outputs = {case["id"] for case in self.cases["cases"]
+                   if case.get("family") == "config" and case.get("baseline")}
+        observers = {}
+        declined = {}
+        for probe in probes:
+            rows = json.loads((directory / probe / "observations.json").read_text())
+            for row in rows["observations"]:
+                if row["case"] not in outputs:
+                    continue
+                if row["result"] == "observed":
+                    observers.setdefault(row["case"], []).append(probe)
+                else:
+                    declined.setdefault(row["case"], []).append(probe)
+        # The invariant, not the arithmetic: every output is observed by
+        # exactly one probe and declined by every other one that saw it. A
+        # third probe joining the family changes the totals but not this.
+        self.assertEqual(sorted(observers), sorted(outputs))
+        for case, seen in observers.items():
+            self.assertEqual(len(seen), 1, f"{case} observed by {seen}")
+            self.assertNotIn(case, [c for c in declined if declined[c] == seen])
+        self.assertEqual(baselines.output_preparation(self.cases, "config")["problems"], [])
+
+    def test_a_failed_probe_is_not_hidden_by_another_probes_observation(self):
+        # Authenticate the deliberately changed bytes, then exercise the merge
+        # itself. Both probe orderings used to hide the harness failure.
+        for probe, subject_prefix in [("commandline", "config/tsconfigparsing/"),
+                                      ("tsconfigparsing", "config/commandline/")]:
+            with self.subTest(probe=probe), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                data = root / "data"
+                data.mkdir()
+                shutil.copy(ROOT / "data/upstream.json", data / "upstream.json")
+                phase = data / "phase1"
+                phase.mkdir()
+                shutil.copy(ROOT / "data/phase1/config-baselines.json", phase / "config-baselines.json")
+                native = phase / "native/config"
+                shutil.copytree(ROOT / "data/phase1/native/config", native)
+                path = native / probe / "observations.json"
+                document = json.loads(path.read_text())
+                row = next(r for r in document["observations"] if r["case"].startswith(subject_prefix))
+                row["result"] = "harness_failed"
+                row["error"] = "review failure injection"
+                row.pop("reason", None)
+                path.write_text(json.dumps(document))
+                provenance_path = native / "capture-provenance.json"
+                provenance = json.loads(provenance_path.read_text())
+                provenance["native_probes"][probe]["observations_sha256"] = sha(path.read_bytes())
+                provenance_path.write_text(json.dumps(provenance))
+                with patch.object(baselines, "ROOT", root):
+                    report = baselines.output_preparation(self.cases, "config")
+                self.assertFalse(report["complete"])
+                self.assertTrue(any(probe in p and row["case"] in p and "harness_failed" in p
+                                    for p in report["problems"]), report["problems"])
+
+    def test_one_probe_serving_two_groups_is_read_once(self):
+        # `commandline` renders both parseCommandLine and parseBuildOptions.
+        # Reading its observations once per group presented every row twice and
+        # tripped the two-observers conflict on the probe's own duplicate.
+        groups = baselines.STEP_OUTPUT_GROUPS["config"][2]
+        probes = [probe for _group, probe in groups]
+        self.assertGreater(len(probes), len(set(probes)), "a probe does serve two groups here")
+        self.assertEqual(baselines.output_preparation(self.cases, "config")["problems"], [])
+
+    def test_a_group_whose_rendering_regressed_is_refused(self):
+        case = next(c for c in self.cases["cases"]
+                    if c.get("baseline", "").startswith("tsoptions/commandLineParsing/"))
+        case["last_result"] = "not_run"
+        report = baselines.output_preparation(self.cases, "config")
+        self.assertFalse(report["complete"])
+        self.assertTrue(any(case["baseline"] in problem for problem in report["problems"]))
+
+    def test_config_outputs_gate_the_step(self):
+        stripped = dict(self.cases)
+        stripped["cases"] = [
+            c for c in self.cases["cases"]
+            if not (c.get("baseline") and c.get("family") == "config")
+        ]
+        report = scope.leaf_preparation(self.scope, stripped, "config")
+        self.assertFalse(report["complete"])
+        self.assertEqual(len(report["outputs"]["problems"]), 167)
 
 
 class RosterLedgerTests(unittest.TestCase):

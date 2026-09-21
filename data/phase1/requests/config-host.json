@@ -1,0 +1,200 @@
+{
+  "family": "config",
+  "requests": [
+    {
+      "action": "from_map",
+      "case": "config/host/from-map",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export const a = 1;\n",
+        "/project/src/b.ts": "export const b = 2;\n",
+        "/project/tsconfig.json": "{\"compilerOptions\":{\"strict\":true}}"
+      },
+      "operation": "tsoptionstest.parseConfigHost",
+      "probe": [
+        "/project/tsconfig.json",
+        "/project/src",
+        "/project/src/a.ts",
+        "/project/src/missing.ts",
+        "/project"
+      ],
+      "subject": "parseConfigHost"
+    },
+    {
+      "action": "from_map",
+      "case": "config/host/from-map-case-insensitive",
+      "caseSensitive": false,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export const a = 1;\n",
+        "/project/src/b.ts": "export const b = 2;\n",
+        "/project/tsconfig.json": "{\"compilerOptions\":{\"strict\":true}}"
+      },
+      "operation": "tsoptionstest.parseConfigHost",
+      "probe": [
+        "/PROJECT/TSCONFIG.JSON",
+        "/project/SRC/A.ts",
+        "/project/src/a.ts"
+      ],
+      "subject": "parseConfigHost"
+    },
+    {
+      "action": "from_map",
+      "case": "config/host/from-map-case-sensitive-control",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export const a = 1;\n",
+        "/project/src/b.ts": "export const b = 2;\n",
+        "/project/tsconfig.json": "{\"compilerOptions\":{\"strict\":true}}"
+      },
+      "operation": "tsoptionstest.parseConfigHost",
+      "probe": [
+        "/PROJECT/TSCONFIG.JSON",
+        "/project/SRC/A.ts",
+        "/project/src/a.ts"
+      ],
+      "subject": "parseConfigHost"
+    },
+    {
+      "action": "from_map",
+      "case": "config/host/from-map-empty",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {},
+      "operation": "tsoptionstest.parseConfigHost",
+      "probe": [
+        "/project",
+        "/project/tsconfig.json"
+      ],
+      "subject": "parseConfigHost"
+    },
+    {
+      "action": "get_parsed_command_line",
+      "case": "config/host/parsed-command-line",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "",
+        "/project/src/b.ts": ""
+      },
+      "jsonText": "{\"compilerOptions\":{\"strict\":true},\"include\":[\"src\"]}",
+      "operation": "tsoptionstest.parseConfigHost",
+      "probe": [],
+      "subject": "parseConfigHost"
+    },
+    {
+      "action": "get_parsed_command_line",
+      "case": "config/host/parsed-command-line-errors",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": ""
+      },
+      "jsonText": "{\"compilerOptions\":{\"strictt\":true},\"include\":[\"src\"]}",
+      "operation": "tsoptionstest.parseConfigHost",
+      "probe": [],
+      "subject": "parseConfigHost"
+    },
+    {
+      "action": "from_map_with_symlinks",
+      "case": "config/host/relative-path-refusal",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export const a = 1;\n",
+        "/project/src/b.ts": "export const b = 2;\n",
+        "/project/tsconfig.json": "{\"compilerOptions\":{\"strict\":true}}"
+      },
+      "operation": "tsoptionstest.parseConfigHost",
+      "probe": [
+        "link.ts",
+        "./src/b.ts",
+        "/project/src/b.ts"
+      ],
+      "subject": "parseConfigHost",
+      "symlinks": {
+        "link.ts": "src/b.ts"
+      }
+    },
+    {
+      "action": "from_map_with_symlinks",
+      "case": "config/host/symlinks-absolute",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export const a = 1;\n",
+        "/project/src/b.ts": "export const b = 2;\n",
+        "/project/tsconfig.json": "{\"compilerOptions\":{\"strict\":true}}"
+      },
+      "operation": "tsoptionstest.parseConfigHost",
+      "probe": [
+        "/project/link.ts",
+        "/project/src/a.ts"
+      ],
+      "subject": "parseConfigHost",
+      "symlinks": {
+        "/project/link.ts": "/project/src/a.ts"
+      }
+    },
+    {
+      "action": "from_map_with_symlinks",
+      "case": "config/host/symlinks-dotted",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export const a = 1;\n",
+        "/project/src/b.ts": "export const b = 2;\n",
+        "/project/tsconfig.json": "{\"compilerOptions\":{\"strict\":true}}"
+      },
+      "operation": "tsoptionstest.parseConfigHost",
+      "probe": [
+        "/project/link.ts",
+        "/project/nested/../link.ts"
+      ],
+      "subject": "parseConfigHost",
+      "symlinks": {
+        "/project/./nested/../link.ts": "/project/src/../src/a.ts"
+      }
+    },
+    {
+      "action": "from_map_with_symlinks",
+      "case": "config/host/symlinks-empty-delegates",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export const a = 1;\n",
+        "/project/src/b.ts": "export const b = 2;\n",
+        "/project/tsconfig.json": "{\"compilerOptions\":{\"strict\":true}}"
+      },
+      "operation": "tsoptionstest.parseConfigHost",
+      "probe": [
+        "/project/tsconfig.json",
+        "/project/src/a.ts"
+      ],
+      "subject": "parseConfigHost",
+      "symlinks": {}
+    },
+    {
+      "action": "from_map_with_symlinks",
+      "case": "config/host/symlinks-relative",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export const a = 1;\n",
+        "/project/src/b.ts": "export const b = 2;\n",
+        "/project/tsconfig.json": "{\"compilerOptions\":{\"strict\":true}}"
+      },
+      "operation": "tsoptionstest.parseConfigHost",
+      "probe": [
+        "/project/link.ts",
+        "/project/src/b.ts"
+      ],
+      "subject": "parseConfigHost",
+      "symlinks": {
+        "link.ts": "src/b.ts"
+      }
+    }
+  ]
+}

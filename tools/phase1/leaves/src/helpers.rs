@@ -459,7 +459,9 @@ pub fn observe(request: &Value) -> Option<Outcome> {
         .unwrap_or_default();
     let record = MISSING.iter().find(|(id, _, _)| *id == operation).copied();
     Some(match record {
-        Some((authority, signature, home)) => Outcome::missing(authority, signature, home),
+        Some((authority, signature, home)) => {
+            Outcome::missing(authority, authority, signature, home)
+        }
         None => Outcome::Failed(format!(
             "case declares operation {operation:?}, which this group has no gap record for"
         )),

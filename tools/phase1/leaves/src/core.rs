@@ -98,7 +98,7 @@ fn stringer(subject: &str, trace: &[Value]) -> Option<Outcome> {
             trace.len() - renderings,
         )));
     }
-    Some(Outcome::missing(authority, signature, home))
+    Some(Outcome::missing(*authority, authority, signature, home))
 }
 
 pub fn observe(request: &Value) -> Option<Outcome> {
@@ -110,7 +110,7 @@ pub fn observe(request: &Value) -> Option<Outcome> {
         "core.TextRange" => Ok(text_range(actions(request))),
         "core.ScriptKind" => script_kind(actions(request)),
         "core.Pattern" => pattern(actions(request)),
-        "core.TristateJson" => return Some(missing_tristate_json()),
+        "core.TristateJson" => return Some(missing_tristate_json(request)),
         "core.TextRangePredicates" => return Some(missing_text_range_predicates()),
         _ => return None,
     };
@@ -120,8 +120,19 @@ pub fn observe(request: &Value) -> Option<Outcome> {
     })
 }
 
-fn missing_tristate_json() -> Outcome {
-    Outcome::missing(
+fn missing_tristate_json(request: &Value) -> Outcome {
+    crate::api::missing_for_subject(
+        request,
+        &[
+            (
+                "core.TristateJson",
+                "tsc/internal/core/tristate.go:Tristate.MarshalJSON",
+            ),
+            (
+                "core.TristateJson",
+                "tsc/internal/core/tristate.go:Tristate.UnmarshalJSON",
+            ),
+        ],
         "tsc/internal/core/tristate.go:Tristate.MarshalJSON and Tristate.UnmarshalJSON",
         "a raw-bytes decoder plus a serde impl, because this group observes decoding at both the \
          levels Go exposes it at. \
@@ -144,6 +155,7 @@ fn missing_tristate_json() -> Outcome {
 
 fn missing_text_range_predicates() -> Outcome {
     Outcome::missing(
+        "tsc/internal/core/text.go:TextRange.IsValid",
         "tsc/internal/core/text.go:TextRange.IsValid, Contains, ContainsInclusive, \
          ContainsExclusive, ContainedBy, Overlaps, Intersects, WithPos, WithEnd, \
          CompareTextRanges and UndefinedTextRange",

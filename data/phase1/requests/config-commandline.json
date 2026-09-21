@@ -1,0 +1,565 @@
+{
+  "family": "config",
+  "requests": [
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/Handles did you mean for misspelt flags.js",
+      "case": "config/commandline/handles-did-you-mean-for-misspelt-flags",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/Handles may only be used with --build flags.js",
+      "case": "config/commandline/handles-may-only-be-used-with-build-flags",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/Parse --lib option with extra comma.js",
+      "case": "config/commandline/parse-lib-option-with-extra-comma",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/Parse --lib option with trailing white-space.js",
+      "case": "config/commandline/parse-lib-option-with-trailing-white-space",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/Parse empty options of --jsx.js",
+      "case": "config/commandline/parse-empty-options-of-jsx",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/Parse empty options of --lib.js",
+      "case": "config/commandline/parse-empty-options-of-lib",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/Parse empty options of --module.js",
+      "case": "config/commandline/parse-empty-options-of-module",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/Parse empty options of --moduleResolution.js",
+      "case": "config/commandline/parse-empty-options-of-moduleresolution",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/Parse empty options of --newLine.js",
+      "case": "config/commandline/parse-empty-options-of-newline",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/Parse empty options of --target.js",
+      "case": "config/commandline/parse-empty-options-of-target",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/Parse empty string of --lib.js",
+      "case": "config/commandline/parse-empty-string-of-lib",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/Parse explicit boolean flag value.js",
+      "case": "config/commandline/parse-explicit-boolean-flag-value",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/Parse immediately following command line argument of --lib.js",
+      "case": "config/commandline/parse-immediately-following-command-line-argument-of-lib",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/Parse implicit boolean flag value.js",
+      "case": "config/commandline/parse-implicit-boolean-flag-value",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/Parse invalid option of library flags.js",
+      "case": "config/commandline/parse-invalid-option-of-library-flags",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/Parse multiple compiler flags with input files at the end.js",
+      "case": "config/commandline/parse-multiple-compiler-flags-with-input-files-at-the-end",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/Parse multiple compiler flags with input files in the middle.js",
+      "case": "config/commandline/parse-multiple-compiler-flags-with-input-files-in-the-middle",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/Parse multiple library compiler flags .js",
+      "case": "config/commandline/parse-multiple-library-compiler-flags",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/Parse multiple options of library flags.js",
+      "case": "config/commandline/parse-multiple-options-of-library-flags",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/Parse non boolean argument after boolean flag.js",
+      "case": "config/commandline/parse-non-boolean-argument-after-boolean-flag",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/Parse single option of library flag.js",
+      "case": "config/commandline/parse-single-option-of-library-flag",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/allows setting option type boolean to false.js",
+      "case": "config/commandline/allows-setting-option-type-boolean-to-false",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/allows tsconfig only option to be set to null.js",
+      "case": "config/commandline/allows-tsconfig-only-option-to-be-set-to-null",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/errors on invalid excludeDirectories.js",
+      "case": "config/commandline/errors-on-invalid-excludedirectories",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/errors on invalid excludeFiles.js",
+      "case": "config/commandline/errors-on-invalid-excludefiles",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/errors on missing argument to --fallbackPolling.js",
+      "case": "config/commandline/errors-on-missing-argument-to-fallbackpolling",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/option of type boolean allows setting it to null.js",
+      "case": "config/commandline/option-of-type-boolean-allows-setting-it-to-null",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/option of type boolean errors if its followed by another option.js",
+      "case": "config/commandline/option-of-type-boolean-errors-if-its-followed-by-another-option",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/option of type boolean errors if its last option.js",
+      "case": "config/commandline/option-of-type-boolean-errors-if-its-last-option",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/option of type boolean errors if non null value is passed.js",
+      "case": "config/commandline/option-of-type-boolean-errors-if-non-null-value-is-passed",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/option of type list allows setting it to null.js",
+      "case": "config/commandline/option-of-type-list-allows-setting-it-to-null",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/option of type list errors if its followed by another option.js",
+      "case": "config/commandline/option-of-type-list-errors-if-its-followed-by-another-option",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/option of type list errors if its last option.js",
+      "case": "config/commandline/option-of-type-list-errors-if-its-last-option",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/option of type list errors if non null value is passed.js",
+      "case": "config/commandline/option-of-type-list-errors-if-non-null-value-is-passed",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/option of type number allows setting it to null.js",
+      "case": "config/commandline/option-of-type-number-allows-setting-it-to-null",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": "number"
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/option of type number errors if its followed by another option.js",
+      "case": "config/commandline/option-of-type-number-errors-if-its-followed-by-another-option",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": "number"
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/option of type number errors if its last option.js",
+      "case": "config/commandline/option-of-type-number-errors-if-its-last-option",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": "number"
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/option of type number errors if non null value is passed.js",
+      "case": "config/commandline/option-of-type-number-errors-if-non-null-value-is-passed",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": "number"
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/option of type object allows setting it to null.js",
+      "case": "config/commandline/option-of-type-object-allows-setting-it-to-null",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/option of type object errors if its followed by another option.js",
+      "case": "config/commandline/option-of-type-object-errors-if-its-followed-by-another-option",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/option of type object errors if its last option.js",
+      "case": "config/commandline/option-of-type-object-errors-if-its-last-option",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/option of type string allows setting it to null.js",
+      "case": "config/commandline/option-of-type-string-allows-setting-it-to-null",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": "string"
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/option of type string errors if its followed by another option.js",
+      "case": "config/commandline/option-of-type-string-errors-if-its-followed-by-another-option",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": "string"
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/option of type string errors if its last option.js",
+      "case": "config/commandline/option-of-type-string-errors-if-its-last-option",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": "string"
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/option of type string errors if non null value is passed.js",
+      "case": "config/commandline/option-of-type-string-errors-if-non-null-value-is-passed",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": "string"
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/parse --excludeDirectories.js",
+      "case": "config/commandline/parse-excludedirectories",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/parse --excludeFiles.js",
+      "case": "config/commandline/parse-excludefiles",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/parse --fallbackPolling.js",
+      "case": "config/commandline/parse-fallbackpolling",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/parse --incremental.js",
+      "case": "config/commandline/parse-incremental",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/parse --synchronousWatchDirectory.js",
+      "case": "config/commandline/parse-synchronouswatchdirectory",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/parse --tsBuildInfoFile.js",
+      "case": "config/commandline/parse-tsbuildinfofile",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/parse --watchDirectory.js",
+      "case": "config/commandline/parse-watchdirectory",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseCommandLine/parse --watchFile.js",
+      "case": "config/commandline/parse-watchfile",
+      "operation": "tsoptions.parseCommandLineBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseBuildOptions/--clean and --force together is invalid.js",
+      "case": "config/buildoptions/clean-and-force-together-is-invalid",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseBuildOptions/--clean and --verbose together is invalid.js",
+      "case": "config/buildoptions/clean-and-verbose-together-is-invalid",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseBuildOptions/--clean and --watch together is invalid.js",
+      "case": "config/buildoptions/clean-and-watch-together-is-invalid",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseBuildOptions/--singleThreaded and --builders together.js",
+      "case": "config/buildoptions/singlethreaded-and-builders-together",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseBuildOptions/--watch and --dry together is invalid.js",
+      "case": "config/buildoptions/watch-and-dry-together-is-invalid",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseBuildOptions/Parse multiple flags with input projects at the end.js",
+      "case": "config/buildoptions/parse-multiple-flags-with-input-projects-at-the-end",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseBuildOptions/Parse multiple flags with input projects in the beginning.js",
+      "case": "config/buildoptions/parse-multiple-flags-with-input-projects-in-the-beginning",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseBuildOptions/Parse multiple flags with input projects in the middle.js",
+      "case": "config/buildoptions/parse-multiple-flags-with-input-projects-in-the-middle",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseBuildOptions/Parse multiple options.js",
+      "case": "config/buildoptions/parse-multiple-options",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseBuildOptions/Parse option with invalid option.js",
+      "case": "config/buildoptions/parse-option-with-invalid-option",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseBuildOptions/errors on invalid excludeDirectories.js",
+      "case": "config/buildoptions/errors-on-invalid-excludedirectories",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseBuildOptions/errors on invalid excludeFiles.js",
+      "case": "config/buildoptions/errors-on-invalid-excludefiles",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseBuildOptions/errors on missing argument.js",
+      "case": "config/buildoptions/errors-on-missing-argument",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseBuildOptions/parse --builders.js",
+      "case": "config/buildoptions/parse-builders",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseBuildOptions/parse --excludeFiles.js",
+      "case": "config/buildoptions/parse-excludefiles",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseBuildOptions/parse --fallbackPolling.js",
+      "case": "config/buildoptions/parse-fallbackpolling",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseBuildOptions/parse --synchronousWatchDirectory.js",
+      "case": "config/buildoptions/parse-synchronouswatchdirectory",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseBuildOptions/parse --watchDirectory.js",
+      "case": "config/buildoptions/parse-watchdirectory",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseBuildOptions/parse --watchFile.js",
+      "case": "config/buildoptions/parse-watchfile",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseBuildOptions/parse build with --incremental.js",
+      "case": "config/buildoptions/parse-build-with-incremental",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseBuildOptions/parse build with --locale en-us.js",
+      "case": "config/buildoptions/parse-build-with-locale-en-us",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseBuildOptions/parse build with --tsBuildInfoFile.js",
+      "case": "config/buildoptions/parse-build-with-tsbuildinfofile",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseBuildOptions/parse build without any options .js",
+      "case": "config/buildoptions/parse-build-without-any-options",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseBuildOptions/reports error when --builders is 0.js",
+      "case": "config/buildoptions/reports-error-when-builders-is-0",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseBuildOptions/reports error when --builders is invalid type.js",
+      "case": "config/buildoptions/reports-error-when-builders-is-invalid-type",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseBuildOptions/reports error when --builders is negative.js",
+      "case": "config/buildoptions/reports-error-when-builders-is-negative",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    },
+    {
+      "baseline": "tsoptions/commandLineParsing/parseBuildOptions/reports other common may not be used with --build flags.js",
+      "case": "config/buildoptions/reports-other-common-may-not-be-used-with-build-flags",
+      "operation": "tsoptions.parseBuildOptionsBaseline",
+      "subject": "commandLineBaseline",
+      "synthetic_option": ""
+    }
+  ]
+}

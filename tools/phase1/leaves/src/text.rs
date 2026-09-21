@@ -88,7 +88,7 @@ pub fn observe(request: &Value) -> Option<Outcome> {
         .and_then(Value::as_str)
         .unwrap_or_default();
     if let Some((_, authority, signature, home)) = MISSING.iter().find(|row| row.0 == operation) {
-        return Some(Outcome::missing(authority, signature, home));
+        return Some(Outcome::missing(*authority, authority, signature, home));
     }
     let replay: fn(&Value) -> Result<Value, String> = match subject {
         "stringutil" => stringutil_row,

@@ -293,6 +293,7 @@ pub fn observe(request: &Value) -> Option<Outcome> {
 fn missing_new_line_from_text() -> Outcome {
     Outcome::missing(
         "tsc/internal/core/compileroptions.go:GetNewLineKind",
+        "tsc/internal/core/compileroptions.go:GetNewLineKind",
         "a free function on tsr_core mapping the two-byte literal CR LF to NewLineKind::CRLF, the \
          one-byte LF to NewLineKind::LF, and every other text -- including the empty string, a \
          lone CR, and any text merely containing one of the two -- to NewLineKind::NONE. The \
@@ -312,6 +313,7 @@ fn missing_new_line_from_text() -> Outcome {
 fn missing_jsx_emit_text() -> Outcome {
     Outcome::missing(
         "tsc/internal/core/compileroptions.go:JsxEmit.String",
+        "tsc/internal/core/compileroptions.go:JsxEmit.String",
         "a Display impl or an as_str on tsr_core::JsxEmit rendering preserve/react-native/react/\
          react-jsx/react-jsxdev for 1..=5, and panicking on the two arms the pinned switch panics \
          on -- \"should not use zero value of JsxEmit\" for JsxEmitNone and \"unhandled case in \
@@ -327,6 +329,7 @@ fn missing_jsx_emit_text() -> Outcome {
 
 fn missing_module_resolution_text() -> Outcome {
     Outcome::missing(
+        "tsc/internal/core/compileroptions.go:ModuleResolutionKind.String",
         "tsc/internal/core/compileroptions.go:ModuleResolutionKind.String",
         "a Display impl or an as_str on tsr_core::ModuleResolutionKind rendering Classic/Node10/\
          Node16/NodeNext/Bundler for 1/2/3/99/100, and panicking on the two arms the pinned \
@@ -348,6 +351,7 @@ fn missing_module_resolution_text() -> Outcome {
 
 fn missing_new_line_text() -> Outcome {
     Outcome::missing(
+        "tsc/internal/core/compileroptions.go:NewLineKind.GetNewLineCharacter",
         "tsc/internal/core/compileroptions.go:NewLineKind.GetNewLineCharacter",
         "tsr_core::NewLineKind::new_line_character(self) -> &'static [u8] answering b\"\\r\\n\" \
          for NewLineKindCRLF and b\"\\n\" for every other value. The pinned switch has one named \
