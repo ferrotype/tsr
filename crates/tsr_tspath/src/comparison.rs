@@ -211,3 +211,23 @@ pub fn contains_path(parent: &[u8], child: &[u8], cwd: &[u8], case_sensitive: bo
             }
         })
 }
+
+/// port: tsc/internal/tspath/path.go:ComparePathsCaseSensitive
+pub fn compare_paths_case_sensitive(left: &[u8], right: &[u8], cwd: &[u8]) -> std::cmp::Ordering {
+    compare_paths(left, right, cwd, true)
+}
+/// port: tsc/internal/tspath/path.go:ComparePathsCaseInsensitive
+pub fn compare_paths_case_insensitive(left: &[u8], right: &[u8], cwd: &[u8]) -> std::cmp::Ordering {
+    compare_paths(left, right, cwd, false)
+}
+/// The ordering comparer the path options select: case is ignored exactly when
+/// file names are not case sensitive.
+/// port: tsc/internal/tspath/path.go:ComparePathsOptions.GetComparer
+pub fn path_comparer(case_sensitive: bool) -> fn(&[u8], &[u8]) -> std::cmp::Ordering {
+    tsr_jsstring::compare::comparer(!case_sensitive)
+}
+/// Go's simple `EqualFold`, not full Unicode folding.
+/// port: tsc/internal/tspath/path.go:ComparePathsOptions.getEqualityComparer
+pub fn path_equality_comparer(case_sensitive: bool) -> fn(&[u8], &[u8]) -> bool {
+    tsr_jsstring::compare::equality_comparer(!case_sensitive)
+}
