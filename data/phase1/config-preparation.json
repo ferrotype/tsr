@@ -1,5 +1,5 @@
 {
-  "accounted_operations": 127,
+  "accounted_operations": 147,
   "complete": false,
   "exempt_by_category": {
     "go_test_harness": 17,
@@ -947,157 +947,6 @@
       "rust_home": [
         "crates/tsr_module/src/diagnostic.rs",
         "crates/tsr_module/src/package_maps.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/packagejson/cache.go:InfoCache.Get",
-      "rust_home": [
-        "crates/tsr_module/src/package_maps.rs",
-        "crates/tsr_module/src/resolver.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/packagejson/cache.go:InfoCache.Range",
-      "rust_home": [
-        "crates/tsr_module/src/package_maps.rs",
-        "crates/tsr_module/src/resolver.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/packagejson/cache.go:InfoCache.Set",
-      "rust_home": [
-        "crates/tsr_module/src/package_maps.rs",
-        "crates/tsr_module/src/resolver.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/packagejson/cache.go:InfoCacheEntry.Exists",
-      "rust_home": [
-        "crates/tsr_module/src/package_maps.rs",
-        "crates/tsr_module/src/resolver.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/packagejson/cache.go:InfoCacheEntry.GetContents",
-      "rust_home": [
-        "crates/tsr_module/src/package_maps.rs",
-        "crates/tsr_module/src/resolver.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/packagejson/cache.go:InfoCacheEntry.GetDirectory",
-      "rust_home": [
-        "crates/tsr_module/src/package_maps.rs",
-        "crates/tsr_module/src/resolver.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/packagejson/cache.go:InfoCacheEntry.WithPackageDirectory",
-      "rust_home": [
-        "crates/tsr_module/src/package_maps.rs",
-        "crates/tsr_module/src/resolver.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/packagejson/cache.go:NewInfoCache",
-      "rust_home": [
-        "crates/tsr_module/src/package_maps.rs",
-        "crates/tsr_module/src/resolver.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/packagejson/cache.go:PackageJson.GetVersionPaths",
-      "rust_home": [
-        "crates/tsr_module/src/package_maps.rs",
-        "crates/tsr_module/src/resolver.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/packagejson/cache.go:VersionPaths.Exists",
-      "rust_home": [
-        "crates/tsr_module/src/package_maps.rs",
-        "crates/tsr_module/src/resolver.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/packagejson/cache.go:VersionPaths.GetPaths",
-      "rust_home": [
-        "crates/tsr_module/src/package_maps.rs",
-        "crates/tsr_module/src/resolver.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/packagejson/expected.go:Expected.ExpectedJSONType",
-      "rust_home": [
-        "crates/tsr_module/src/package_json.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/packagejson/expected.go:Expected.IsValid",
-      "rust_home": [
-        "crates/tsr_module/src/package_json.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/packagejson/expected.go:ExpectedOf",
-      "rust_home": [
-        "crates/tsr_module/src/package_json.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/packagejson/jsonvalue.go:JSONValue.AsString",
-      "rust_home": [
-        "crates/tsr_module/src/package_json.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/packagejson/jsonvalue.go:JSONValue.IsPresent",
-      "rust_home": [
-        "crates/tsr_module/src/package_json.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/packagejson/jsonvalue.go:JSONValueType.String",
-      "rust_home": [
-        "crates/tsr_module/src/package_json.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/packagejson/packagejson.go:DependencyFields.GetRuntimeDependencyNames",
-      "rust_home": [
-        "crates/tsr_module/src/package_json.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/packagejson/packagejson.go:DependencyFields.HasDependency",
-      "rust_home": [
-        "crates/tsr_module/src/package_json.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/packagejson/packagejson.go:DependencyFields.RangeDependencies",
-      "rust_home": [
-        "crates/tsr_module/src/package_json.rs"
       ]
     },
     {
@@ -2942,7 +2791,7 @@
     }
   ],
   "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
-  "prepared_operations": 35,
+  "prepared_operations": 55,
   "roster_problems": [],
   "step": "config",
   "total_operations": 402,

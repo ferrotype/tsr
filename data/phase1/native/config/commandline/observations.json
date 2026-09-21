@@ -2433,6 +2433,102 @@
       "result": "native_unavailable"
     },
     {
+      "case": "config/packagejson/expected-validity-survives-a-repeated-field",
+      "operation": "tsc/internal/packagejson/expected.go:Expected.IsValid",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/packagejson/expected-json-type-is-the-declared-type",
+      "operation": "tsc/internal/packagejson/expected.go:Expected.ExpectedJSONType",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/packagejson/expected-of-builds-a-present-field-from-no-json",
+      "operation": "tsc/internal/packagejson/expected.go:ExpectedOf",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/packagejson/json-value-type-names-every-constant",
+      "operation": "tsc/internal/packagejson/jsonvalue.go:JSONValueType.String",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/packagejson/json-value-presence-separates-absent-from-null",
+      "operation": "tsc/internal/packagejson/jsonvalue.go:JSONValue.IsPresent",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/packagejson/as-string-panics-off-the-string-type",
+      "operation": "tsc/internal/packagejson/jsonvalue.go:JSONValue.AsString",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/packagejson/has-dependency-spans-all-four-fields",
+      "operation": "tsc/internal/packagejson/packagejson.go:DependencyFields.HasDependency",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/packagejson/range-dependencies-walks-the-fields-in-declaration-order",
+      "operation": "tsc/internal/packagejson/packagejson.go:DependencyFields.RangeDependencies",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/packagejson/runtime-dependency-names-exclude-devdependencies",
+      "operation": "tsc/internal/packagejson/packagejson.go:DependencyFields.GetRuntimeDependencyNames",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/packagejson/info-cache-entry-readers-guard-a-nil-receiver",
+      "operation": "tsc/internal/packagejson/cache.go:InfoCacheEntry.Exists",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/packagejson/with-package-directory-copies-and-does-not-guard-nil",
+      "operation": "tsc/internal/packagejson/cache.go:InfoCacheEntry.WithPackageDirectory",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/packagejson/info-cache-keys-normalise-and-the-first-write-wins",
+      "operation": "tsc/internal/packagejson/cache.go:InfoCache.Set",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/packagejson/info-cache-range-visits-every-entry",
+      "operation": "tsc/internal/packagejson/cache.go:InfoCache.Range",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/packagejson/version-paths-selection-and-mappings",
+      "operation": "tsc/internal/packagejson/cache.go:PackageJson.GetVersionPaths",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/packagejson/version-paths-mappings-are-rebuilt-per-retrieval",
+      "operation": "tsc/internal/packagejson/cache.go:VersionPaths.GetPaths",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/packagejson/version-paths-traces-replay-on-every-traced-call",
+      "operation": "tsc/internal/packagejson/cache.go:PackageJson.GetVersionPaths",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
       "case": "config/diagwriter/flatten-indents-each-chain-level-by-two-more-spaces",
       "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:FlattenDiagnosticMessage",
       "reason": "operation is not served by the command-line baseline probe",
@@ -2541,6 +2637,6 @@
       "result": "native_unavailable"
     }
   ],
-  "request_sha256": "231aa660b2fa8c2b07ad2172365ba1ef8c8d94ac30ef51586e379b3df3746a52",
+  "request_sha256": "f44399a6648acea9573f2996a4673cab8ed6280ffa7b5fe96fd31148830741fd",
   "version": 1
 }

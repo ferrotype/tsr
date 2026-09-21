@@ -1,10 +1,10 @@
 {
   "counts": {
-    "covered": 258,
+    "covered": 262,
     "equivalent_rust": 8,
-    "implemented_untested": 3232,
+    "implemented_untested": 3231,
     "later_phase": 18,
-    "missing": 1279
+    "missing": 1276
   },
   "dispositions": [
     "covered",
@@ -174578,9 +174578,11 @@
     },
     {
       "actual_home": "tsr_module::package_json / tsr_module::package_maps",
-      "basis": "unmapped and absent from the actual home for this package (tsr_module::package_json / tsr_module::package_maps)",
+      "basis": "a prepared case runs and reports the Rust entry point absent: config/packagejson/info-cache-range-visits-every-entry; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/packagejson/info-cache-range-visits-every-entry"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -174607,7 +174609,7 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -174618,9 +174620,11 @@
     },
     {
       "actual_home": "tsr_module::package_json / tsr_module::package_maps",
-      "basis": "unmapped and absent from the actual home for this package (tsr_module::package_json / tsr_module::package_maps)",
+      "basis": "a prepared case runs and reports the Rust entry point absent: config/packagejson/info-cache-keys-normalise-and-the-first-write-wins; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/packagejson/info-cache-keys-normalise-and-the-first-write-wins"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -174647,7 +174651,7 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -174658,9 +174662,11 @@
     },
     {
       "actual_home": "tsr_module::package_json / tsr_module::package_maps",
-      "basis": "unmapped and absent from the actual home for this package (tsr_module::package_json / tsr_module::package_maps)",
+      "basis": "a prepared case runs and reports the Rust entry point absent: config/packagejson/info-cache-entry-readers-guard-a-nil-receiver; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/packagejson/info-cache-entry-readers-guard-a-nil-receiver"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -174687,7 +174693,7 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -174778,9 +174784,11 @@
     },
     {
       "actual_home": "tsr_module::package_json / tsr_module::package_maps",
-      "basis": "unmapped and absent from the actual home for this package (tsr_module::package_json / tsr_module::package_maps)",
+      "basis": "a prepared case runs and reports the Rust entry point absent: config/packagejson/with-package-directory-copies-and-does-not-guard-nil; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/packagejson/with-package-directory-copies-and-does-not-guard-nil"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -174807,7 +174815,7 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -174858,9 +174866,12 @@
     },
     {
       "actual_home": "tsr_module::package_json / tsr_module::package_maps",
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): config/packagejson/version-paths-selection-and-mappings",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/packagejson/version-paths-selection-and-mappings",
+        "config/packagejson/version-paths-traces-replay-on-every-traced-call"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -174874,7 +174885,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/packagejson",
       "go_source": "tsc/internal/packagejson/cache.go",
       "id": "tsc/internal/packagejson/cache.go:PackageJson.GetVersionPaths",
@@ -174887,7 +174898,7 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -174898,9 +174909,11 @@
     },
     {
       "actual_home": "tsr_module::package_json / tsr_module::package_maps",
-      "basis": "unmapped and absent from the actual home for this package (tsr_module::package_json / tsr_module::package_maps)",
+      "basis": "witnessed by 1 exact link(s): config/packagejson/version-paths-selection-and-mappings",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/packagejson/version-paths-selection-and-mappings"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -174914,7 +174927,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/packagejson",
       "go_source": "tsc/internal/packagejson/cache.go",
       "id": "tsc/internal/packagejson/cache.go:VersionPaths.Exists",
@@ -174927,7 +174940,7 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -174938,9 +174951,11 @@
     },
     {
       "actual_home": "tsr_module::package_json / tsr_module::package_maps",
-      "basis": "unmapped and absent from the actual home for this package (tsr_module::package_json / tsr_module::package_maps)",
+      "basis": "witnessed by 1 exact link(s): config/packagejson/version-paths-selection-and-mappings",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/packagejson/version-paths-selection-and-mappings"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -174954,7 +174969,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/packagejson",
       "go_source": "tsc/internal/packagejson/cache.go",
       "id": "tsc/internal/packagejson/cache.go:VersionPaths.GetPaths",
@@ -174967,7 +174982,7 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -175019,9 +175034,11 @@
     },
     {
       "actual_home": "tsr_module::package_json / tsr_module::package_maps",
-      "basis": "unmapped and absent from the actual home for this package (tsr_module::package_json / tsr_module::package_maps)",
+      "basis": "a prepared case runs and reports the Rust entry point absent: config/packagejson/expected-json-type-is-the-declared-type; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/packagejson/expected-json-type-is-the-declared-type"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -175048,7 +175065,7 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -175140,9 +175157,11 @@
     },
     {
       "actual_home": "tsr_module::package_json / tsr_module::package_maps",
-      "basis": "unmapped and absent from the actual home for this package (tsr_module::package_json / tsr_module::package_maps)",
+      "basis": "witnessed by 1 exact link(s): config/packagejson/expected-validity-survives-a-repeated-field",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/packagejson/expected-validity-survives-a-repeated-field"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -175156,7 +175175,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/packagejson",
       "go_source": "tsc/internal/packagejson/expected.go",
       "id": "tsc/internal/packagejson/expected.go:Expected.IsValid",
@@ -175169,7 +175188,7 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -175220,9 +175239,11 @@
     },
     {
       "actual_home": "tsr_module::package_json / tsr_module::package_maps",
-      "basis": "unmapped and absent from the actual home for this package (tsr_module::package_json / tsr_module::package_maps)",
+      "basis": "a prepared case runs and reports the Rust entry point absent: config/packagejson/expected-of-builds-a-present-field-from-no-json; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/packagejson/expected-of-builds-a-present-field-from-no-json"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -175249,7 +175270,7 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -175628,9 +175649,11 @@
     },
     {
       "actual_home": "tsr_module::package_json / tsr_module::package_maps",
-      "basis": "unmapped and absent from the actual home for this package (tsr_module::package_json / tsr_module::package_maps)",
+      "basis": "a prepared case runs and reports the Rust entry point absent: config/packagejson/as-string-panics-off-the-string-type; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/packagejson/as-string-panics-off-the-string-type"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -175657,7 +175680,7 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -175708,9 +175731,11 @@
     },
     {
       "actual_home": "tsr_module::package_json / tsr_module::package_maps",
-      "basis": "unmapped and absent from the actual home for this package (tsr_module::package_json / tsr_module::package_maps)",
+      "basis": "a prepared case runs and reports the Rust entry point absent: config/packagejson/json-value-presence-separates-absent-from-null; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/packagejson/json-value-presence-separates-absent-from-null"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -175737,7 +175762,7 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -175788,9 +175813,11 @@
     },
     {
       "actual_home": "tsr_module::package_json / tsr_module::package_maps",
-      "basis": "unmapped and absent from the actual home for this package (tsr_module::package_json / tsr_module::package_maps)",
+      "basis": "a prepared case runs and reports the Rust entry point absent: config/packagejson/json-value-type-names-every-constant; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/packagejson/json-value-type-names-every-constant"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -175817,7 +175844,7 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -175907,9 +175934,11 @@
     },
     {
       "actual_home": "tsr_module::package_json / tsr_module::package_maps",
-      "basis": "unmapped and absent from the actual home for this package (tsr_module::package_json / tsr_module::package_maps)",
+      "basis": "a prepared case runs and reports the Rust entry point absent: config/packagejson/runtime-dependency-names-exclude-devdependencies; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/packagejson/runtime-dependency-names-exclude-devdependencies"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -175936,7 +175965,7 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -175946,9 +175975,11 @@
     },
     {
       "actual_home": "tsr_module::package_json / tsr_module::package_maps",
-      "basis": "unmapped and absent from the actual home for this package (tsr_module::package_json / tsr_module::package_maps)",
+      "basis": "a prepared case runs and reports the Rust entry point absent: config/packagejson/has-dependency-spans-all-four-fields; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/packagejson/has-dependency-spans-all-four-fields"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -175975,7 +176006,7 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -175985,9 +176016,11 @@
     },
     {
       "actual_home": "tsr_module::package_json / tsr_module::package_maps",
-      "basis": "unmapped and absent from the actual home for this package (tsr_module::package_json / tsr_module::package_maps)",
+      "basis": "a prepared case runs and reports the Rust entry point absent: config/packagejson/range-dependencies-walks-the-fields-in-declaration-order; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/packagejson/range-dependencies-walks-the-fields-in-declaration-order"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -176014,7 +176047,7 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [

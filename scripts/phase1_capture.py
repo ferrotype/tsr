@@ -269,6 +269,7 @@ FAMILIES = {
             "data/phase1/requests/config-commandline.json",
             "data/phase1/requests/config-tsconfigparsing.json",
             "data/phase1/requests/config-host.json",
+            "data/phase1/requests/config-packagejson.json",
             "data/phase1/requests/config-diagwriter.json",
         ],
         "native_probes": [
@@ -303,6 +304,12 @@ FAMILIES = {
             {"name": "diagwriter", "package": "diagnosticwriter",
              "probe": "tools/phase1/config/diagwriter_probe_test.go",
              "test": "TestPhase1ConfigDiagnosticWriter"},
+            # internal/packagejson. Its pinned test file imports internal/repo,
+            # which panics under -trimpath, so the flag is dropped here too.
+            {"name": "packagejson", "package": "packagejson",
+             "probe": "tools/phase1/config/packagejson_probe_test.go",
+             "test": "TestPhase1ConfigPackageJson",
+             "trimpath": False},
         ],
         "rust_package": "phase1_config",
         "rust_target_kind": "bin",

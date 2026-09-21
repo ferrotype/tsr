@@ -1638,6 +1638,360 @@
       ]
     },
     {
+      "expected_contract": "Witnesses that JSONValue.AsString is a CHECKED accessor: it returns the string when Type is exactly JSONValueTypeString and panics otherwise, including when the field is absent (jsonvalue.go:79-84). That is why every pinned call site guards it with an explicit Type test first -- resolver.go:2253 tests the type once and then calls AsString ten times -- and why a lenient port would convert a programming error into a silently wrong resolution. The panic is recorded as a class rather than as its text. Building that text runs JSONValueType.String through %v, but the text is discarded here, so this case does not claim that operation; config/packagejson/json-value-type-names-every-constant exercises it directly. The documents are set up by packagejson.go:Parse, which the witness/s07-packagejson-rust dataset already witnesses along with both unmarshalers, Expected.UnmarshalJSON and the ExportsOrImports accessors; no case here claims any of those seventeen operations, and the `load` action is recorded as reaching none.",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/packagejson/as-string-panics-off-the-string-type",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/packagejson/jsonvalue.go:JSONValue.AsString"
+      ],
+      "native_authority": "tools/phase1/config/packagejson_probe_test.go against the pinned internal/packagejson (in-package overlay, -trimpath off)",
+      "operation_actions": {
+        "json_value_as_string": [
+          "tsc/internal/packagejson/jsonvalue.go:JSONValue.AsString"
+        ],
+        "load": []
+      },
+      "operations": [
+        "tsc/internal/packagejson/jsonvalue.go:JSONValue.AsString"
+      ]
+    },
+    {
+      "expected_contract": "Witnesses that Expected.ExpectedJSONType is a function of the DECLARED type parameter and of nothing else: the same fifteen answers over an empty document and over one in which every field holds the wrong JSON type. That independence is what lets resolver.go:1882 render `expected {1}, got {2}` from the same field. Five of the pinned switch's six arms are exercised -- string, boolean, array (a slice), object (a map) and the `unknown` default, reached by the two struct instantiations. The numeric arm (expected.go:61-63) is NOT exercised and is not claimed: no pinned Expected[T] has a numeric T, so instantiating one would be probing a shape the pin does not have. The documents are set up by packagejson.go:Parse, which the witness/s07-packagejson-rust dataset already witnesses along with both unmarshalers, Expected.UnmarshalJSON and the ExportsOrImports accessors; no case here claims any of those seventeen operations, and the `load` action is recorded as reaching none.",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/packagejson/expected-json-type-is-the-declared-type",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/packagejson/expected.go:Expected.ExpectedJSONType"
+      ],
+      "native_authority": "tools/phase1/config/packagejson_probe_test.go against the pinned internal/packagejson (in-package overlay, -trimpath off)",
+      "operation_actions": {
+        "expected_json_type": [
+          "tsc/internal/packagejson/expected.go:Expected.ExpectedJSONType"
+        ],
+        "load": []
+      },
+      "operations": [
+        "tsc/internal/packagejson/expected.go:Expected.ExpectedJSONType"
+      ]
+    },
+    {
+      "expected_contract": "Witnesses that ExpectedOf constructs a valid, non-null field whose actualJSONType is the EXPECTED type rather than any observed one (expected.go:73-75), so a field nothing parsed still reports as present -- including the struct instantiation, whose actualJSONType becomes the literal `unknown`, a value no parse can produce. The unexported field is read directly off the struct, not through ActualJSONType(), which the s07 dataset already witnesses. The five nil-receiver actions witness the mechanism the constructor is built on: ExpectedJSONType reads only its type parameter, so (*Expected[T])(nil).ExpectedJSONType() is defined and does not panic. This case runs no parse at all.",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/packagejson/expected-of-builds-a-present-field-from-no-json",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/packagejson/expected.go:ExpectedOf"
+      ],
+      "native_authority": "tools/phase1/config/packagejson_probe_test.go against the pinned internal/packagejson (in-package overlay, -trimpath off)",
+      "operation_actions": {
+        "expected_of": [
+          "tsc/internal/packagejson/expected.go:ExpectedOf",
+          "tsc/internal/packagejson/expected.go:Expected.ExpectedJSONType"
+        ],
+        "nil_receiver_expected_json_type": [
+          "tsc/internal/packagejson/expected.go:Expected.ExpectedJSONType"
+        ]
+      },
+      "operations": [
+        "tsc/internal/packagejson/expected.go:Expected.ExpectedJSONType",
+        "tsc/internal/packagejson/expected.go:ExpectedOf"
+      ]
+    },
+    {
+      "expected_contract": "Witnesses that Expected.IsValid, read through the TypeValidatedField interface, answers false for an absent field, false for a field whose JSON was the wrong type, false for an explicit null and true for a well-typed one -- and that a REPEATED field keeps the validity its first occurrence earned, because UnmarshalJSON only ever sets Valid and never clears it (expected.go:21-23) while a null occurrence replaces the whole struct (:17-19). Fifteen fields per document, every Expected[T] the pinned Fields carries including the three inside ContentMapperFields, so a port that grew or lost a field shows as a length difference. The contentMapper wrapper is part of the contract: in the wrong-type document its three inner fields are all invalid while the wrapper itself is valid, because decoding a ContentMapperFields cannot fail. The documents are set up by packagejson.go:Parse, which the witness/s07-packagejson-rust dataset already witnesses along with both unmarshalers, Expected.UnmarshalJSON and the ExportsOrImports accessors; no case here claims any of those seventeen operations, and the `load` action is recorded as reaching none.",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/packagejson/expected-validity-survives-a-repeated-field",
+      "last_result": "match",
+      "native_authority": "tools/phase1/config/packagejson_probe_test.go against the pinned internal/packagejson (in-package overlay, -trimpath off)",
+      "operation_actions": {
+        "expected_is_valid": [
+          "tsc/internal/packagejson/expected.go:Expected.IsValid"
+        ],
+        "load": []
+      },
+      "operations": [
+        "tsc/internal/packagejson/expected.go:Expected.IsValid"
+      ]
+    },
+    {
+      "expected_contract": "Witnesses that DependencyFields.HasDependency is the WIDE membership predicate: it searches dependencies, devDependencies, peerDependencies and optionalDependencies (packagejson.go:34-56), unlike GetRuntimeDependencyNames in the same file, which excludes devDependencies. Also witnesses that a field whose JSON failed to decode is skipped rather than read as empty -- GetValue answers not-ok and the whole field is passed over -- and that the empty string is an ordinary key rather than a sentinel for absent. The documents are set up by packagejson.go:Parse, which the witness/s07-packagejson-rust dataset already witnesses along with both unmarshalers, Expected.UnmarshalJSON and the ExportsOrImports accessors; no case here claims any of those seventeen operations, and the `load` action is recorded as reaching none.",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/packagejson/has-dependency-spans-all-four-fields",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/packagejson/packagejson.go:DependencyFields.HasDependency"
+      ],
+      "native_authority": "tools/phase1/config/packagejson_probe_test.go against the pinned internal/packagejson (in-package overlay, -trimpath off)",
+      "operation_actions": {
+        "has_dependency": [
+          "tsc/internal/packagejson/packagejson.go:DependencyFields.HasDependency"
+        ],
+        "load": []
+      },
+      "operations": [
+        "tsc/internal/packagejson/packagejson.go:DependencyFields.HasDependency"
+      ]
+    },
+    {
+      "expected_contract": "Witnesses that all three InfoCacheEntry readers are callable on a typed nil receiver and answer false, nil and \"\" respectively (cache.go:129-145), which is what lets modulespecifiers/specifiers.go:870 and compiler/program.go:2244 call GetContents on a lookup that missed. The five receivers separate the two conditions the readers test independently: a nil entry, a live entry whose Contents is nil -- Exists false while GetDirectory still answers -- a live entry with contents, the same with DirectoryExists false, which none of the three readers consults, and one whose PackageDirectory is the empty string, so \"\" as an answer does not by itself mean the receiver was nil. This case runs no parse at all.",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/packagejson/info-cache-entry-readers-guard-a-nil-receiver",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/packagejson/cache.go:InfoCacheEntry.Exists"
+      ],
+      "native_authority": "tools/phase1/config/packagejson_probe_test.go against the pinned internal/packagejson (in-package overlay, -trimpath off)",
+      "operation_actions": {
+        "entry_readers": [
+          "tsc/internal/packagejson/cache.go:InfoCacheEntry.Exists",
+          "tsc/internal/packagejson/cache.go:InfoCacheEntry.GetContents",
+          "tsc/internal/packagejson/cache.go:InfoCacheEntry.GetDirectory"
+        ]
+      },
+      "operations": [
+        "tsc/internal/packagejson/cache.go:InfoCacheEntry.Exists",
+        "tsc/internal/packagejson/cache.go:InfoCacheEntry.GetContents",
+        "tsc/internal/packagejson/cache.go:InfoCacheEntry.GetDirectory"
+      ]
+    },
+    {
+      "expected_contract": "Witnesses that InfoCache.Set is LoadOrStore and not Store (cache.go:190-194): a second write of a key leaves the first entry in place and returns THAT entry, which is the value resolver.go:1772 takes and corrects. Single-threaded and deterministic -- the second cache_set answers with the first label. Also witnesses that both Get and Set key on tspath.ToPath(path, currentDirectory, useCaseSensitiveFileNames), so a relative path resolves against the cache's own directory, a path carrying . and .. segments normalises to the same key, and a path differing only in case hits in a case-insensitive cache and misses in a case-sensitive one. The normalisation itself belongs to internal/tspath and is not claimed here; what is witnessed is that the cache applies it. Entry identity travels as a label written into PackageDirectory and read back off the struct field, never through GetDirectory() and never as the computed key. This case runs no parse at all.",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/packagejson/info-cache-keys-normalise-and-the-first-write-wins",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/packagejson/cache.go:InfoCache.Set"
+      ],
+      "native_authority": "tools/phase1/config/packagejson_probe_test.go against the pinned internal/packagejson (in-package overlay, -trimpath off)",
+      "operation_actions": {
+        "cache_get": [
+          "tsc/internal/packagejson/cache.go:InfoCache.Get"
+        ],
+        "cache_set": [
+          "tsc/internal/packagejson/cache.go:InfoCache.Set"
+        ],
+        "new_info_cache": [
+          "tsc/internal/packagejson/cache.go:NewInfoCache"
+        ]
+      },
+      "operations": [
+        "tsc/internal/packagejson/cache.go:InfoCache.Get",
+        "tsc/internal/packagejson/cache.go:InfoCache.Set",
+        "tsc/internal/packagejson/cache.go:NewInfoCache"
+      ]
+    },
+    {
+      "expected_contract": "Witnesses that InfoCache.Range enumerates every cached entry, that an empty cache visits none, that a callback answering false ends the walk after exactly the number of entries it allowed, and that a second Set of an existing key adds no entry -- the walk after it still sees three, still labelled with the first writer's label. WHAT IS NOT WITNESSED: which entries a stopped walk reached, or in what order any walk reached them. Range forwards to sync.Map.Range (cache.go:196-198 over collections/syncmap.go:43-60), which is unordered, so a stopped walk records its count and no labels at all, and a complete walk records its labels sorted. This case runs no parse at all.",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/packagejson/info-cache-range-visits-every-entry",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/packagejson/cache.go:InfoCache.Range"
+      ],
+      "native_authority": "tools/phase1/config/packagejson_probe_test.go against the pinned internal/packagejson (in-package overlay, -trimpath off)",
+      "operation_actions": {
+        "cache_range": [
+          "tsc/internal/packagejson/cache.go:InfoCache.Range"
+        ],
+        "cache_set": [
+          "tsc/internal/packagejson/cache.go:InfoCache.Set"
+        ],
+        "new_info_cache": [
+          "tsc/internal/packagejson/cache.go:NewInfoCache"
+        ]
+      },
+      "operations": [
+        "tsc/internal/packagejson/cache.go:InfoCache.Range",
+        "tsc/internal/packagejson/cache.go:InfoCache.Set",
+        "tsc/internal/packagejson/cache.go:NewInfoCache"
+      ]
+    },
+    {
+      "expected_contract": "Witnesses that JSONValue.IsPresent tests against JSONValueTypeNotPresent alone (jsonvalue.go:46-48), so an explicit `null` is PRESENT and only an omitted field is not -- the distinction resolver.go:2172 and compiler/program.go:2193 depend on. Four documents fix all six states the type can be in, over typesVersions (a bare JSONValue) and over exports and imports, which reach the predicate by promotion through ExportsOrImports' embedded JSONValue, as the pinned call sites do. The raw Type discriminant is recorded beside the predicate so a port that answers the predicate correctly from a different internal state is still comparable. The documents are set up by packagejson.go:Parse, which the witness/s07-packagejson-rust dataset already witnesses along with both unmarshalers, Expected.UnmarshalJSON and the ExportsOrImports accessors; no case here claims any of those seventeen operations, and the `load` action is recorded as reaching none.",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/packagejson/json-value-presence-separates-absent-from-null",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/packagejson/jsonvalue.go:JSONValue.IsPresent"
+      ],
+      "native_authority": "tools/phase1/config/packagejson_probe_test.go against the pinned internal/packagejson (in-package overlay, -trimpath off)",
+      "operation_actions": {
+        "json_value_is_present": [
+          "tsc/internal/packagejson/jsonvalue.go:JSONValue.IsPresent"
+        ],
+        "load": []
+      },
+      "operations": [
+        "tsc/internal/packagejson/jsonvalue.go:JSONValue.IsPresent"
+      ]
+    },
+    {
+      "expected_contract": "Witnesses JSONValueType.String over the six names the pinned switch has, over JSONValueTypeNotPresent -- which the switch does NOT name, so 0 renders as `unknown(0)` -- and over five other int8 values including both extremes, all of which take the fmt.Sprintf(\"unknown(%d)\", t) default (jsonvalue.go:36-37). The renderer is message-visible, not internal: cache.go:40 and :63 pass its output as the third argument of Expected_type_of_0_field_in_package_json_to_be_1_got_2. This case runs no parse at all.",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/packagejson/json-value-type-names-every-constant",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/packagejson/jsonvalue.go:JSONValueType.String"
+      ],
+      "native_authority": "tools/phase1/config/packagejson_probe_test.go against the pinned internal/packagejson (in-package overlay, -trimpath off)",
+      "operation_actions": {
+        "json_value_type_string": [
+          "tsc/internal/packagejson/jsonvalue.go:JSONValueType.String"
+        ]
+      },
+      "operations": [
+        "tsc/internal/packagejson/jsonvalue.go:JSONValueType.String"
+      ]
+    },
+    {
+      "expected_contract": "Witnesses that DependencyFields.RangeDependencies enters the four fields in declaration order, reports a name once per field it appears in with that field's own version string, skips a field whose JSON failed to decode, and returns from the whole walk -- not just the current field -- the moment the callback answers false (packagejson.go:58-87). WHAT IS NOT WITNESSED: the order of names WITHIN one field, which comes out of a Go map and is randomised. The recorded entries are therefore sorted by (field index, name); the sequence of fields entered is recorded as observed, because that part is deterministic. The three stopping actions run against a document holding exactly one entry per field, which is what makes the entry a stop lands on deterministic. The documents are set up by packagejson.go:Parse, which the witness/s07-packagejson-rust dataset already witnesses along with both unmarshalers, Expected.UnmarshalJSON and the ExportsOrImports accessors; no case here claims any of those seventeen operations, and the `load` action is recorded as reaching none.",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/packagejson/range-dependencies-walks-the-fields-in-declaration-order",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/packagejson/packagejson.go:DependencyFields.RangeDependencies"
+      ],
+      "native_authority": "tools/phase1/config/packagejson_probe_test.go against the pinned internal/packagejson (in-package overlay, -trimpath off)",
+      "operation_actions": {
+        "load": [],
+        "range_dependencies": [
+          "tsc/internal/packagejson/packagejson.go:DependencyFields.RangeDependencies"
+        ]
+      },
+      "operations": [
+        "tsc/internal/packagejson/packagejson.go:DependencyFields.RangeDependencies"
+      ]
+    },
+    {
+      "expected_contract": "Witnesses that DependencyFields.GetRuntimeDependencyNames unions dependencies, peerDependencies and optionalDependencies and excludes devDependencies (packagejson.go:89-108), that a name in two included fields collapses to one member, that a field whose JSON failed to decode contributes nothing, and that the result is a non-nil set of length zero when nothing qualifies -- compiler/program.go:2248 iterates Keys() unconditionally, so an absent set and an empty one are not interchangeable. WHAT IS NOT WITNESSED: the iteration order of the set, which is a Go map; the names are recorded sorted and the length beside them. The documents are set up by packagejson.go:Parse, which the witness/s07-packagejson-rust dataset already witnesses along with both unmarshalers, Expected.UnmarshalJSON and the ExportsOrImports accessors; no case here claims any of those seventeen operations, and the `load` action is recorded as reaching none.",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/packagejson/runtime-dependency-names-exclude-devdependencies",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/packagejson/packagejson.go:DependencyFields.GetRuntimeDependencyNames"
+      ],
+      "native_authority": "tools/phase1/config/packagejson_probe_test.go against the pinned internal/packagejson (in-package overlay, -trimpath off)",
+      "operation_actions": {
+        "load": [],
+        "runtime_dependency_names": [
+          "tsc/internal/packagejson/packagejson.go:DependencyFields.GetRuntimeDependencyNames"
+        ]
+      },
+      "operations": [
+        "tsc/internal/packagejson/packagejson.go:DependencyFields.GetRuntimeDependencyNames"
+      ]
+    },
+    {
+      "expected_contract": "Witnesses where the pin memoises and where it does not. GetVersionPaths returns the PackageJson's VersionPaths struct BY VALUE (cache.go:85) and GetPaths memoises into whichever copy it was called on (cache.go:102-120), so the sync.Once makes the SELECTION happen once per package while the mapping table is rebuilt once per retrieval: two reads of one retrieved value share a table, two separate retrievals do not. Recorded as booleans over pointer identity, never as addresses, with the table sizes beside them so a port that differs on identity while agreeing on content is distinguishable from one that differs on both. The third document has no mappings at all and is the control: both comparisons are nil against nil and must agree. The documents are set up by packagejson.go:Parse, which the witness/s07-packagejson-rust dataset already witnesses along with both unmarshalers, Expected.UnmarshalJSON and the ExportsOrImports accessors; no case here claims any of those seventeen operations, and the `load` action is recorded as reaching none.",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/packagejson/version-paths-mappings-are-rebuilt-per-retrieval",
+      "last_result": "different",
+      "native_authority": "tools/phase1/config/packagejson_probe_test.go against the pinned internal/packagejson (in-package overlay, -trimpath off)",
+      "operation_actions": {
+        "get_version_paths": [
+          "tsc/internal/packagejson/cache.go:PackageJson.GetVersionPaths",
+          "tsc/internal/packagejson/cache.go:VersionPaths.Exists"
+        ],
+        "load": [],
+        "version_paths_identity": [
+          "tsc/internal/packagejson/cache.go:PackageJson.GetVersionPaths",
+          "tsc/internal/packagejson/cache.go:VersionPaths.GetPaths"
+        ]
+      },
+      "operations": [
+        "tsc/internal/packagejson/cache.go:PackageJson.GetVersionPaths",
+        "tsc/internal/packagejson/cache.go:VersionPaths.Exists",
+        "tsc/internal/packagejson/cache.go:VersionPaths.GetPaths"
+      ]
+    },
+    {
+      "expected_contract": "Witnesses which typesVersions entry GetVersionPaths selects and what GetPaths makes of it. Selection stops at the first key whose semver range matches the compiler version and returns from inside the loop (cache.go:59-72), so a document whose non-matching range precedes a matching one pins both the skip and the order keys are tried in. GetPaths (cache.go:98-121) is witnessed on three shapes at once: a mapping value that is not an array is dropped from the result entirely, a non-string ELEMENT inside an array leaves an EMPTY STRING in its slot because the slice is pre-sized and the loop only continues, and an empty array is kept as an empty slice rather than dropped. Four further documents fix the four ways the answer is nothing: no field, a field that is not an object, a matching entry whose value is not an object -- which returns early rather than trying the next key -- and a key that is not a semver range. The mappings travel as an ordered entry array because pathsJSON is a collections.OrderedMap and the order is part of the answer. The documents are set up by packagejson.go:Parse, which the witness/s07-packagejson-rust dataset already witnesses along with both unmarshalers, Expected.UnmarshalJSON and the ExportsOrImports accessors; no case here claims any of those seventeen operations, and the `load` action is recorded as reaching none.",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/packagejson/version-paths-selection-and-mappings",
+      "last_result": "match",
+      "native_authority": "tools/phase1/config/packagejson_probe_test.go against the pinned internal/packagejson (in-package overlay, -trimpath off)",
+      "operation_actions": {
+        "get_version_paths": [
+          "tsc/internal/packagejson/cache.go:PackageJson.GetVersionPaths",
+          "tsc/internal/packagejson/cache.go:VersionPaths.Exists"
+        ],
+        "load": [],
+        "version_paths_mappings": [
+          "tsc/internal/packagejson/cache.go:VersionPaths.GetPaths"
+        ]
+      },
+      "operations": [
+        "tsc/internal/packagejson/cache.go:PackageJson.GetVersionPaths",
+        "tsc/internal/packagejson/cache.go:VersionPaths.Exists",
+        "tsc/internal/packagejson/cache.go:VersionPaths.GetPaths"
+      ]
+    },
+    {
+      "expected_contract": "Witnesses that GetVersionPaths computes its diagnostics once under a sync.Once and APPENDS them to a slice on the PackageJson (cache.go:29-79), then replays that slice on every call whose callback is non-nil (cache.go:80-84). Two consequences: a second traced call emits the same sequence again rather than nothing, and a first call made WITHOUT a tracer still computes, so a later traced call emits the full sequence although the work is long done -- the last two actions. Five documents cover every branch that emits, including the wrong-type branch whose third argument is JSONValueType.String's output, which is why that operation is claimed here and not in the AsString case, where its output is discarded. Each diagnostic travels as its numeric code plus its rendered arguments; the message text is locale data and is not frozen. One argument is the pin's own core.VersionMajorMinor(), which is a constant of the pin (internal/core/version.go:8) and moves only when the pin moves. The documents are set up by packagejson.go:Parse, which the witness/s07-packagejson-rust dataset already witnesses along with both unmarshalers, Expected.UnmarshalJSON and the ExportsOrImports accessors; no case here claims any of those seventeen operations, and the `load` action is recorded as reaching none.",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/packagejson/version-paths-traces-replay-on-every-traced-call",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/packagejson/cache.go:PackageJson.GetVersionPaths"
+      ],
+      "native_authority": "tools/phase1/config/packagejson_probe_test.go against the pinned internal/packagejson (in-package overlay, -trimpath off)",
+      "operation_actions": {
+        "get_version_paths": [
+          "tsc/internal/packagejson/cache.go:PackageJson.GetVersionPaths",
+          "tsc/internal/packagejson/cache.go:VersionPaths.Exists"
+        ],
+        "get_version_paths_traced": [
+          "tsc/internal/packagejson/cache.go:PackageJson.GetVersionPaths",
+          "tsc/internal/packagejson/cache.go:VersionPaths.Exists",
+          "tsc/internal/packagejson/jsonvalue.go:JSONValueType.String"
+        ],
+        "load": []
+      },
+      "operations": [
+        "tsc/internal/packagejson/cache.go:PackageJson.GetVersionPaths",
+        "tsc/internal/packagejson/cache.go:VersionPaths.Exists",
+        "tsc/internal/packagejson/jsonvalue.go:JSONValueType.String"
+      ]
+    },
+    {
+      "expected_contract": "Witnesses that InfoCacheEntry.WithPackageDirectory returns the RECEIVER ITSELF when the directory already matches and a shallow copy otherwise, that the copy carries DirectoryExists across and SHARES the Contents pointer -- a change made through one view is visible through the other, which the last action pins by mutating the copy and reading the original -- and that the match test is a string comparison, so an empty directory matches an empty PackageDirectory (cache.go:158-167). Also witnesses the asymmetry with its three neighbours: this is the one InfoCacheEntry method that dereferences the receiver before deciding anything, so a nil receiver panics where Exists, GetContents and GetDirectory answer. The panic is recorded as a class; the Go runtime's text names dynamic types and moves with the toolchain. This case runs no parse at all.",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/packagejson/with-package-directory-copies-and-does-not-guard-nil",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/packagejson/cache.go:InfoCacheEntry.WithPackageDirectory"
+      ],
+      "native_authority": "tools/phase1/config/packagejson_probe_test.go against the pinned internal/packagejson (in-package overlay, -trimpath off)",
+      "operation_actions": {
+        "with_package_directory": [
+          "tsc/internal/packagejson/cache.go:InfoCacheEntry.WithPackageDirectory"
+        ],
+        "with_package_directory_shares_contents": [
+          "tsc/internal/packagejson/cache.go:InfoCacheEntry.WithPackageDirectory"
+        ]
+      },
+      "operations": [
+        "tsc/internal/packagejson/cache.go:InfoCacheEntry.WithPackageDirectory"
+      ]
+    },
+    {
       "baseline": "config/tsconfigParsing/allow dotted files and folders when explicitly requested with json api.js",
       "coverage_operations": [],
       "expected_contract": "the frozen config/tsconfigParsing/allow dotted files and folders when explicitly requested baseline for the json entry point, rebuilt from the pinned package-level input table and reproduced byte for byte",
