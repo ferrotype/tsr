@@ -2565,6 +2565,18 @@
       "result": "native_unavailable"
     },
     {
+      "case": "config/module/exports/alternate-result-retry",
+      "operation": "tsc/internal/module/resolver.go:extensionIsOk",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/exports/input-file-for-output-path",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.tryLoadInputFileForPath",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
       "case": "config/module/package/types-versions-subpath",
       "operation": "tsc/internal/module/resolver.go:resolutionState.tryLoadModuleUsingPaths",
       "reason": "operation is not served by the command-line baseline probe",
@@ -2979,6 +2991,6 @@
       "result": "native_unavailable"
     }
   ],
-  "request_sha256": "2821728493abee1b00e480fb26d97873d9fcf26e488d28a66514b7df845ae7d6",
+  "request_sha256": "aca8607b1387a8ab8f9b3711642023f6a3a351b1afa71c06a01b64531a93e8a8",
   "version": 1
 }

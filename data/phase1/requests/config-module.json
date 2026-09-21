@@ -1696,6 +1696,159 @@
               "path": "/p/src/index.ts"
             },
             {
+              "content": "{\"name\":\"pkg\",\"version\":\"1.0.0\",\"exports\":{\".\":{\"import\":\"./i.mjs\"}},\"types\":\"./t.d.ts\"}",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/i.mjs"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/t.d.ts"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "allowJs": true,
+            "module": 199,
+            "moduleResolution": 99,
+            "traceResolution": true
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg",
+          "op": "resolve"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 1,
+          "name": "pkg",
+          "op": "resolve"
+        }
+      ],
+      "case": "config/module/exports/alternate-result-retry",
+      "discriminates": "the modern-resolution retry (resolver.go:519-537) fires on a NINE-conjunct gate, one of which is that the file the exports map produced is not a TypeScript or declaration extension -- extensionIsOk over exactly TypeScript|Declaration, not over the request's own extension set. This package resolves to a .mjs under `import`, so the resolver runs a SECOND whole resolution with exports disabled and the extensions narrowed, and reports what that found as AlternateResult while keeping the first answer. A port that folds the retry into the node_modules success arm, or that omits the resolvedPackageDirectory or isConfigLookup conjunct, either misses the retry or runs it when the pin does not.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:extensionIsOk",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "{\"name\":\"app\",\"version\":\"0.0.1\",\"exports\":{\".\":\"./out/main.js\"}}",
+              "kind": "file",
+              "path": "/p/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/main.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/out/main.js"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "module": 199,
+            "moduleResolution": 99,
+            "outDir": "/p/out",
+            "traceResolution": true
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 1,
+          "name": "app",
+          "op": "resolve"
+        },
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "{\"name\":\"app\",\"version\":\"0.0.1\",\"exports\":{\".\":\"./out/main.js\"}}",
+              "kind": "file",
+              "path": "/p/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/main.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/out/main.js"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "module": 199,
+            "moduleResolution": 99,
+            "outDir": "/p/out",
+            "rootDir": "/p/src",
+            "traceResolution": true
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 1,
+          "name": "app",
+          "op": "resolve"
+        }
+      ],
+      "case": "config/module/exports/input-file-for-output-path",
+      "discriminates": "an exports target that points INTO an outDir is mapped back to the input file before it is looked up, and the pin refuses to guess: with neither rootDir nor configFilePath the project root is ambiguous, so it appends a resolution DIAGNOSTIC and returns unresolved (resolver.go:888-926) rather than searching. The paired half supplies rootDir and the same specifier resolves to the .ts input. This is the only producer of ResolutionDiagnostics in the whole resolver, and the pin attaches them to the result through createResolvedModule (:1171), so a port with no diagnostics accumulator reports an empty array on both halves.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.tryLoadInputFileForPath",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
               "content": "{\"name\":\"pkg\",\"version\":\"1.0.0\",\"typesVersions\":{\">=4.0\":{\"sub\":[\"ts/sub.d.ts\"],\"*\":[\"ts/*.d.ts\"]}}}",
               "kind": "file",
               "path": "/p/node_modules/pkg/package.json"
@@ -3647,7 +3800,7 @@
               "target": "/packages/pkg"
             },
             {
-              "content": "{\"name\":\"pkg\",\"version\":\"1.0.0\",\"exports\":{\".\":\"./index.d.ts\",\"./sub\":{\"types\":\"./sub.d.ts\",\"default\":\"./sub.js\"},\"./pat/*\":\"./pat/*.d.ts\"}}",
+              "content": "{\"name\":\"pkg\",\"version\":\"1.0.0\",\"exports\":{\".\":\"./index.d.ts\",\"./sub\":{\"types\":\"./sub.d.ts\",\"default\":\"./sub.js\"},\"./pat/*\":\"./pat/*.d.ts\",\"./js/*\":\"./js/*.js\"}}",
               "kind": "file",
               "path": "/packages/pkg/package.json"
             },
@@ -3675,6 +3828,11 @@
               "content": "",
               "kind": "file",
               "path": "/packages/pkg/pat/b.d.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/packages/pkg/js/c.d.ts"
             }
           ],
           "op": "new_resolver",

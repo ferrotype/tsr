@@ -1,10 +1,10 @@
 {
   "counts": {
-    "covered": 331,
+    "covered": 337,
     "equivalent_rust": 8,
-    "implemented_untested": 3207,
+    "implemented_untested": 3206,
     "later_phase": 18,
-    "missing": 1231
+    "missing": 1226
   },
   "dispositions": [
     "covered",
@@ -175639,9 +175639,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): config/module/exports/condition-order-and-nesting",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/exports/condition-order-and-nesting"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -175656,7 +175658,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:Resolver.newTraceBuilder",
@@ -175669,7 +175671,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -175867,9 +175869,12 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 2 exact link(s): config/module/exports/alternate-result-retry, config/module/exports/input-file-for-output-path",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/exports/alternate-result-retry",
+        "config/module/exports/input-file-for-output-path"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -175884,7 +175889,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:extensionIsOk",
@@ -175897,7 +175902,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -176140,9 +176145,10 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "witnessed by 1 exact link(s): config/module/exports/non-matching-conditions-are-announced-in-key-order",
+      "basis": "witnessed by 2 exact link(s): config/module/exports/alternate-result-retry, config/module/exports/non-matching-conditions-are-announced-in-key-order",
       "basis_kind": "rule",
       "cases": [
+        "config/module/exports/alternate-result-retry",
         "config/module/exports/non-matching-conditions-are-announced-in-key-order"
       ],
       "depends_on": [
@@ -176186,10 +176192,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "witnessed by 2 exact link(s): config/module/exports/condition-order-and-nesting, config/module/extensions/ts-substitution-for-js-specifier",
+      "basis": "witnessed by 3 exact link(s): config/module/exports/condition-order-and-nesting, config/module/exports/input-file-for-output-path, config/module/extensions/ts-substitution-for-js-specifier",
       "basis_kind": "rule",
       "cases": [
         "config/module/exports/condition-order-and-nesting",
+        "config/module/exports/input-file-for-output-path",
         "config/module/extensions/ts-substitution-for-js-specifier"
       ],
       "depends_on": [
@@ -176469,9 +176476,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): config/module/exports/input-file-for-output-path",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/exports/input-file-for-output-path"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -176486,7 +176495,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.getOutputDirectoriesForBaseDirectory",
@@ -176499,7 +176508,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -176561,10 +176570,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "witnessed by 3 exact link(s): config/module/exports/condition-order-and-nesting, config/module/package/package-id-and-peer-dependencies, config/module/typeref/type-root-file-and-package-id",
+      "basis": "witnessed by 4 exact link(s): config/module/exports/condition-order-and-nesting, config/module/exports/input-file-for-output-path, config/module/package/package-id-and-peer-dependencies",
       "basis_kind": "rule",
       "cases": [
         "config/module/exports/condition-order-and-nesting",
+        "config/module/exports/input-file-for-output-path",
         "config/module/package/package-id-and-peer-dependencies",
         "config/module/typeref/type-root-file-and-package-id"
       ],
@@ -176609,9 +176619,10 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "witnessed by 14 exact link(s): config/module/exports/bundler-feature-overrides, config/module/exports/missing-key-continues-the-search, config/module/extensions/esm-mode-blocks-directory-lookup",
+      "basis": "witnessed by 15 exact link(s): config/module/exports/alternate-result-retry, config/module/exports/bundler-feature-overrides, config/module/exports/missing-key-continues-the-search",
       "basis_kind": "rule",
       "cases": [
+        "config/module/exports/alternate-result-retry",
         "config/module/exports/bundler-feature-overrides",
         "config/module/exports/missing-key-continues-the-search",
         "config/module/extensions/esm-mode-blocks-directory-lookup",
@@ -176668,12 +176679,14 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "witnessed by 25 exact link(s): config/module/exports/bundler-feature-overrides, config/module/exports/condition-order-and-nesting, config/module/exports/invalid-target-shapes",
+      "basis": "witnessed by 27 exact link(s): config/module/exports/alternate-result-retry, config/module/exports/bundler-feature-overrides, config/module/exports/condition-order-and-nesting",
       "basis_kind": "rule",
       "cases": [
         "config/module/cache/negative-package-json-lookup-survives-host-change",
+        "config/module/exports/alternate-result-retry",
         "config/module/exports/bundler-feature-overrides",
         "config/module/exports/condition-order-and-nesting",
+        "config/module/exports/input-file-for-output-path",
         "config/module/exports/invalid-target-shapes",
         "config/module/exports/missing-key-continues-the-search",
         "config/module/exports/non-matching-conditions-are-announced-in-key-order",
@@ -176831,9 +176844,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): config/module/package/types-versions-directory-worker",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/package/types-versions-directory-worker"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -176848,7 +176863,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.getTraceFunc",
@@ -176861,7 +176876,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -176969,10 +176984,12 @@
       "annotated_home": [
         "crates/tsr_module/src/package_maps.rs"
       ],
-      "basis": "witnessed by 8 exact link(s): config/module/exports/condition-order-and-nesting, config/module/exports/invalid-target-shapes, config/module/exports/missing-key-continues-the-search",
+      "basis": "witnessed by 10 exact link(s): config/module/exports/alternate-result-retry, config/module/exports/condition-order-and-nesting, config/module/exports/input-file-for-output-path",
       "basis_kind": "rule",
       "cases": [
+        "config/module/exports/alternate-result-retry",
         "config/module/exports/condition-order-and-nesting",
+        "config/module/exports/input-file-for-output-path",
         "config/module/exports/invalid-target-shapes",
         "config/module/exports/missing-key-continues-the-search",
         "config/module/exports/non-matching-conditions-are-announced-in-key-order",
@@ -177123,9 +177140,10 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "witnessed by 11 exact link(s): config/module/exports/bundler-feature-overrides, config/module/exports/missing-key-continues-the-search, config/module/exports/self-name-two-pass",
+      "basis": "witnessed by 12 exact link(s): config/module/exports/alternate-result-retry, config/module/exports/bundler-feature-overrides, config/module/exports/missing-key-continues-the-search",
       "basis_kind": "rule",
       "cases": [
+        "config/module/exports/alternate-result-retry",
         "config/module/exports/bundler-feature-overrides",
         "config/module/exports/missing-key-continues-the-search",
         "config/module/exports/self-name-two-pass",
@@ -177276,9 +177294,10 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "witnessed by 22 exact link(s): config/module/exports/bundler-feature-overrides, config/module/exports/condition-order-and-nesting, config/module/exports/invalid-target-shapes",
+      "basis": "witnessed by 23 exact link(s): config/module/exports/alternate-result-retry, config/module/exports/bundler-feature-overrides, config/module/exports/condition-order-and-nesting",
       "basis_kind": "rule",
       "cases": [
+        "config/module/exports/alternate-result-retry",
         "config/module/exports/bundler-feature-overrides",
         "config/module/exports/condition-order-and-nesting",
         "config/module/exports/invalid-target-shapes",
@@ -177392,9 +177411,10 @@
       "annotated_home": [
         "crates/tsr_module/src/package_maps.rs"
       ],
-      "basis": "witnessed by 1 exact link(s): config/module/exports/self-name-two-pass",
+      "basis": "witnessed by 2 exact link(s): config/module/exports/input-file-for-output-path, config/module/exports/self-name-two-pass",
       "basis_kind": "rule",
       "cases": [
+        "config/module/exports/input-file-for-output-path",
         "config/module/exports/self-name-two-pass"
       ],
       "depends_on": [
@@ -177488,11 +177508,13 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "witnessed by 10 exact link(s): config/module/exports/bundler-feature-overrides, config/module/exports/condition-order-and-nesting, config/module/exports/invalid-target-shapes",
+      "basis": "witnessed by 12 exact link(s): config/module/exports/alternate-result-retry, config/module/exports/bundler-feature-overrides, config/module/exports/condition-order-and-nesting",
       "basis_kind": "rule",
       "cases": [
+        "config/module/exports/alternate-result-retry",
         "config/module/exports/bundler-feature-overrides",
         "config/module/exports/condition-order-and-nesting",
+        "config/module/exports/input-file-for-output-path",
         "config/module/exports/invalid-target-shapes",
         "config/module/exports/non-matching-conditions-are-announced-in-key-order",
         "config/module/exports/null-target-blocks-the-search",
@@ -177788,9 +177810,10 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "witnessed by 16 exact link(s): config/module/exports/bundler-feature-overrides, config/module/exports/condition-order-and-nesting, config/module/exports/missing-key-continues-the-search",
+      "basis": "witnessed by 17 exact link(s): config/module/exports/alternate-result-retry, config/module/exports/bundler-feature-overrides, config/module/exports/condition-order-and-nesting",
       "basis_kind": "rule",
       "cases": [
+        "config/module/exports/alternate-result-retry",
         "config/module/exports/bundler-feature-overrides",
         "config/module/exports/condition-order-and-nesting",
         "config/module/exports/missing-key-continues-the-search",
@@ -177895,11 +177918,13 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "witnessed by 25 exact link(s): config/module/exports/bundler-feature-overrides, config/module/exports/condition-order-and-nesting, config/module/exports/invalid-target-shapes",
+      "basis": "witnessed by 27 exact link(s): config/module/exports/alternate-result-retry, config/module/exports/bundler-feature-overrides, config/module/exports/condition-order-and-nesting",
       "basis_kind": "rule",
       "cases": [
+        "config/module/exports/alternate-result-retry",
         "config/module/exports/bundler-feature-overrides",
         "config/module/exports/condition-order-and-nesting",
+        "config/module/exports/input-file-for-output-path",
         "config/module/exports/invalid-target-shapes",
         "config/module/exports/missing-key-continues-the-search",
         "config/module/exports/non-matching-conditions-are-announced-in-key-order",
@@ -177965,9 +177990,10 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "witnessed by 19 exact link(s): config/module/exports/bundler-feature-overrides, config/module/exports/condition-order-and-nesting, config/module/exports/invalid-target-shapes",
+      "basis": "witnessed by 20 exact link(s): config/module/exports/alternate-result-retry, config/module/exports/bundler-feature-overrides, config/module/exports/condition-order-and-nesting",
       "basis_kind": "rule",
       "cases": [
+        "config/module/exports/alternate-result-retry",
         "config/module/exports/bundler-feature-overrides",
         "config/module/exports/condition-order-and-nesting",
         "config/module/exports/invalid-target-shapes",
@@ -178227,11 +178253,13 @@
       "annotated_home": [
         "crates/tsr_module/src/resolver.rs"
       ],
-      "basis": "witnessed by 27 exact link(s): config/module/exports/bundler-feature-overrides, config/module/exports/condition-order-and-nesting, config/module/exports/missing-key-continues-the-search",
+      "basis": "witnessed by 29 exact link(s): config/module/exports/alternate-result-retry, config/module/exports/bundler-feature-overrides, config/module/exports/condition-order-and-nesting",
       "basis_kind": "rule",
       "cases": [
+        "config/module/exports/alternate-result-retry",
         "config/module/exports/bundler-feature-overrides",
         "config/module/exports/condition-order-and-nesting",
+        "config/module/exports/input-file-for-output-path",
         "config/module/exports/missing-key-continues-the-search",
         "config/module/exports/non-matching-conditions-are-announced-in-key-order",
         "config/module/exports/self-name-two-pass",
@@ -178301,9 +178329,11 @@
       "annotated_home": [
         "crates/tsr_module/src/package_maps.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): config/module/exports/input-file-for-output-path",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/exports/input-file-for-output-path"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -178318,7 +178348,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.tryLoadInputFileForPath",
@@ -178331,7 +178361,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -178532,11 +178562,13 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "witnessed by 21 exact link(s): config/module/exports/bundler-feature-overrides, config/module/exports/condition-order-and-nesting, config/module/exports/missing-key-continues-the-search",
+      "basis": "witnessed by 23 exact link(s): config/module/exports/alternate-result-retry, config/module/exports/bundler-feature-overrides, config/module/exports/condition-order-and-nesting",
       "basis_kind": "rule",
       "cases": [
+        "config/module/exports/alternate-result-retry",
         "config/module/exports/bundler-feature-overrides",
         "config/module/exports/condition-order-and-nesting",
+        "config/module/exports/input-file-for-output-path",
         "config/module/exports/missing-key-continues-the-search",
         "config/module/exports/non-matching-conditions-are-announced-in-key-order",
         "config/module/exports/self-name-two-pass",
@@ -179152,9 +179184,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): config/module/exports/condition-order-and-nesting",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/exports/condition-order-and-nesting"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -179169,7 +179203,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/types.go",
       "id": "tsc/internal/module/types.go:extensions.String",
@@ -179182,7 +179216,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [

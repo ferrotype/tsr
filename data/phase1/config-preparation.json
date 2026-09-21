@@ -1,5 +1,5 @@
 {
-  "accounted_operations": 236,
+  "accounted_operations": 245,
   "complete": false,
   "exempt_by_category": {
     "go_test_harness": 17,
@@ -16,92 +16,6 @@
     "total_outputs": 167
   },
   "pending": [
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/module/resolver.go:Resolver.newTraceBuilder",
-      "rust_home": [
-        "crates/tsr_module/src/package_maps.rs",
-        "crates/tsr_module/src/resolver.rs",
-        "crates/tsr_module/src/trace.rs",
-        "crates/tsr_module/src/type_references.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/module/resolver.go:extensionIsOk",
-      "rust_home": [
-        "crates/tsr_module/src/package_maps.rs",
-        "crates/tsr_module/src/resolver.rs",
-        "crates/tsr_module/src/trace.rs",
-        "crates/tsr_module/src/type_references.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/module/resolver.go:resolutionState.getMatchedStarForPatternEntrypoint",
-      "rust_home": [
-        "crates/tsr_module/src/package_maps.rs",
-        "crates/tsr_module/src/resolver.rs",
-        "crates/tsr_module/src/trace.rs",
-        "crates/tsr_module/src/type_references.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/module/resolver.go:resolutionState.getOutputDirectoriesForBaseDirectory",
-      "rust_home": [
-        "crates/tsr_module/src/package_maps.rs",
-        "crates/tsr_module/src/resolver.rs",
-        "crates/tsr_module/src/trace.rs",
-        "crates/tsr_module/src/type_references.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/module/resolver.go:resolutionState.getTraceFunc",
-      "rust_home": [
-        "crates/tsr_module/src/package_maps.rs",
-        "crates/tsr_module/src/resolver.rs",
-        "crates/tsr_module/src/trace.rs",
-        "crates/tsr_module/src/type_references.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/module/resolver.go:resolutionState.tryLoadInputFileForPath",
-      "rust_home": [
-        "crates/tsr_module/src/package_maps.rs",
-        "crates/tsr_module/src/resolver.rs",
-        "crates/tsr_module/src/trace.rs",
-        "crates/tsr_module/src/type_references.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/module/types.go:extensions.Array",
-      "rust_home": [
-        "crates/tsr_compiler/src/include_reason.rs",
-        "crates/tsr_module/src/resolver.rs",
-        "crates/tsr_module/src/type_references.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/module/types.go:extensions.String",
-      "rust_home": [
-        "crates/tsr_compiler/src/include_reason.rs",
-        "crates/tsr_module/src/resolver.rs",
-        "crates/tsr_module/src/type_references.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/module/util.go:TryGetJSExtensionForFile",
-      "rust_home": [
-        "crates/tsr_module/src/diagnostic.rs",
-        "crates/tsr_module/src/package_maps.rs"
-      ]
-    },
     {
       "disposition": "missing",
       "operation": "tsc/internal/tsoptions/commandlineoption.go:CommandLineOption.DeprecatedKeys",
@@ -1944,7 +1858,7 @@
     }
   ],
   "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
-  "prepared_operations": 144,
+  "prepared_operations": 153,
   "roster_problems": [],
   "step": "config",
   "total_operations": 402,

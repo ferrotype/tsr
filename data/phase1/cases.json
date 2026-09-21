@@ -1823,14 +1823,60 @@
           "tsc/internal/module/resolver.go:ResolvedEntrypoint.SymlinkOrRealpath",
           "tsc/internal/module/resolver.go:Resolver.GetEntrypointsFromPackageJsonInfo",
           "tsc/internal/module/resolver.go:Resolver.createResolvedEntrypointHandlingSymlink",
-          "tsc/internal/module/resolver.go:resolutionState.loadEntrypointsFromExportMap"
+          "tsc/internal/module/resolver.go:resolutionState.getMatchedStarForPatternEntrypoint",
+          "tsc/internal/module/resolver.go:resolutionState.loadEntrypointsFromExportMap",
+          "tsc/internal/module/types.go:extensions.Array",
+          "tsc/internal/module/util.go:TryGetJSExtensionForFile"
         ]
       },
       "operations": [
         "tsc/internal/module/resolver.go:ResolvedEntrypoint.SymlinkOrRealpath",
         "tsc/internal/module/resolver.go:Resolver.GetEntrypointsFromPackageJsonInfo",
         "tsc/internal/module/resolver.go:Resolver.createResolvedEntrypointHandlingSymlink",
-        "tsc/internal/module/resolver.go:resolutionState.loadEntrypointsFromExportMap"
+        "tsc/internal/module/resolver.go:resolutionState.getMatchedStarForPatternEntrypoint",
+        "tsc/internal/module/resolver.go:resolutionState.loadEntrypointsFromExportMap",
+        "tsc/internal/module/types.go:extensions.Array",
+        "tsc/internal/module/util.go:TryGetJSExtensionForFile"
+      ]
+    },
+    {
+      "expected_contract": "the modern-resolution retry (resolver.go:519-537) fires on a NINE-conjunct gate, one of which is that the file the exports map produced is not a TypeScript or declaration extension -- extensionIsOk over exactly TypeScript|Declaration, not over the request's own extension set. This package resolves to a .mjs under `import`, so the resolver runs a SECOND whole resolution with exports disabled and the extensions narrowed, and reports what that found as AlternateResult while keeping the first answer. A port that folds the retry into the node_modules success arm, or that omits the resolvedPackageDirectory or isConfigLookup conjunct, either misses the retry or runs it when the pin does not.",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/module/exports/alternate-result-retry",
+      "last_result": "match",
+      "native_authority": "tools/phase1/config/module_probe_test.go against the pinned internal/module package",
+      "operation_actions": {
+        "resolve": [
+          "tsc/internal/module/resolver.go:extensionIsOk",
+          "tsc/internal/module/resolver.go:resolutionState.conditionMatches",
+          "tsc/internal/module/resolver.go:resolutionState.getPackageJSONPathField",
+          "tsc/internal/module/resolver.go:resolutionState.getPackageJsonInfo",
+          "tsc/internal/module/resolver.go:resolutionState.loadModuleFromExports",
+          "tsc/internal/module/resolver.go:resolutionState.loadModuleFromFileNoImplicitExtensions",
+          "tsc/internal/module/resolver.go:resolutionState.loadModuleFromNearestNodeModulesDirectory",
+          "tsc/internal/module/resolver.go:resolutionState.loadModuleFromTargetExportOrImport",
+          "tsc/internal/module/resolver.go:resolutionState.realPath",
+          "tsc/internal/module/resolver.go:resolutionState.resolveNodeLike",
+          "tsc/internal/module/resolver.go:resolutionState.resolveNodeLikeWorker",
+          "tsc/internal/module/resolver.go:resolutionState.tryFileLookup",
+          "tsc/internal/module/resolver.go:resolutionState.validatePackageJSONField"
+        ]
+      },
+      "operations": [
+        "tsc/internal/module/resolver.go:extensionIsOk",
+        "tsc/internal/module/resolver.go:resolutionState.conditionMatches",
+        "tsc/internal/module/resolver.go:resolutionState.getPackageJSONPathField",
+        "tsc/internal/module/resolver.go:resolutionState.getPackageJsonInfo",
+        "tsc/internal/module/resolver.go:resolutionState.loadModuleFromExports",
+        "tsc/internal/module/resolver.go:resolutionState.loadModuleFromFileNoImplicitExtensions",
+        "tsc/internal/module/resolver.go:resolutionState.loadModuleFromNearestNodeModulesDirectory",
+        "tsc/internal/module/resolver.go:resolutionState.loadModuleFromTargetExportOrImport",
+        "tsc/internal/module/resolver.go:resolutionState.realPath",
+        "tsc/internal/module/resolver.go:resolutionState.resolveNodeLike",
+        "tsc/internal/module/resolver.go:resolutionState.resolveNodeLikeWorker",
+        "tsc/internal/module/resolver.go:resolutionState.tryFileLookup",
+        "tsc/internal/module/resolver.go:resolutionState.validatePackageJSONField"
       ]
     },
     {
@@ -1882,6 +1928,7 @@
       "native_authority": "tools/phase1/config/module_probe_test.go against the pinned internal/module package",
       "operation_actions": {
         "resolve": [
+          "tsc/internal/module/resolver.go:Resolver.newTraceBuilder",
           "tsc/internal/module/resolver.go:newResolutionState",
           "tsc/internal/module/resolver.go:resolutionState.createResolvedModule",
           "tsc/internal/module/resolver.go:resolutionState.createResolvedModuleHandlingSymlink",
@@ -1902,10 +1949,12 @@
           "tsc/internal/module/resolver.go:resolved.shouldContinueSearching",
           "tsc/internal/module/resolver.go:tracer.getTraces",
           "tsc/internal/module/resolver.go:tracer.write",
+          "tsc/internal/module/types.go:extensions.String",
           "tsc/internal/module/util.go:ParsePackageName"
         ]
       },
       "operations": [
+        "tsc/internal/module/resolver.go:Resolver.newTraceBuilder",
         "tsc/internal/module/resolver.go:newResolutionState",
         "tsc/internal/module/resolver.go:resolutionState.createResolvedModule",
         "tsc/internal/module/resolver.go:resolutionState.createResolvedModuleHandlingSymlink",
@@ -1926,6 +1975,7 @@
         "tsc/internal/module/resolver.go:resolved.shouldContinueSearching",
         "tsc/internal/module/resolver.go:tracer.getTraces",
         "tsc/internal/module/resolver.go:tracer.write",
+        "tsc/internal/module/types.go:extensions.String",
         "tsc/internal/module/util.go:ParsePackageName"
       ]
     },
@@ -1960,6 +2010,44 @@
         "tsc/internal/module/resolver.go:resolutionState.resolveNodeLike",
         "tsc/internal/module/resolver.go:resolutionState.resolveNodeLikeWorker",
         "tsc/internal/module/resolver.go:resolutionState.tryFileLookup",
+        "tsc/internal/module/resolver.go:resolutionState.validatePackageJSONField"
+      ]
+    },
+    {
+      "expected_contract": "an exports target that points INTO an outDir is mapped back to the input file before it is looked up, and the pin refuses to guess: with neither rootDir nor configFilePath the project root is ambiguous, so it appends a resolution DIAGNOSTIC and returns unresolved (resolver.go:888-926) rather than searching. The paired half supplies rootDir and the same specifier resolves to the .ts input. This is the only producer of ResolutionDiagnostics in the whole resolver, and the pin attaches them to the result through createResolvedModule (:1171), so a port with no diagnostics accumulator reports an empty array on both halves.",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/module/exports/input-file-for-output-path",
+      "last_result": "match",
+      "native_authority": "tools/phase1/config/module_probe_test.go against the pinned internal/module package",
+      "operation_actions": {
+        "resolve": [
+          "tsc/internal/module/resolver.go:extensionIsOk",
+          "tsc/internal/module/resolver.go:resolutionState.createResolvedModule",
+          "tsc/internal/module/resolver.go:resolutionState.getOutputDirectoriesForBaseDirectory",
+          "tsc/internal/module/resolver.go:resolutionState.getPackageId",
+          "tsc/internal/module/resolver.go:resolutionState.getPackageJsonInfo",
+          "tsc/internal/module/resolver.go:resolutionState.loadModuleFromExports",
+          "tsc/internal/module/resolver.go:resolutionState.loadModuleFromSelfNameReference",
+          "tsc/internal/module/resolver.go:resolutionState.loadModuleFromTargetExportOrImport",
+          "tsc/internal/module/resolver.go:resolutionState.resolveNodeLike",
+          "tsc/internal/module/resolver.go:resolutionState.tryFileLookup",
+          "tsc/internal/module/resolver.go:resolutionState.tryLoadInputFileForPath",
+          "tsc/internal/module/resolver.go:resolutionState.validatePackageJSONField"
+        ]
+      },
+      "operations": [
+        "tsc/internal/module/resolver.go:extensionIsOk",
+        "tsc/internal/module/resolver.go:resolutionState.createResolvedModule",
+        "tsc/internal/module/resolver.go:resolutionState.getOutputDirectoriesForBaseDirectory",
+        "tsc/internal/module/resolver.go:resolutionState.getPackageId",
+        "tsc/internal/module/resolver.go:resolutionState.getPackageJsonInfo",
+        "tsc/internal/module/resolver.go:resolutionState.loadModuleFromExports",
+        "tsc/internal/module/resolver.go:resolutionState.loadModuleFromSelfNameReference",
+        "tsc/internal/module/resolver.go:resolutionState.loadModuleFromTargetExportOrImport",
+        "tsc/internal/module/resolver.go:resolutionState.resolveNodeLike",
+        "tsc/internal/module/resolver.go:resolutionState.tryFileLookup",
+        "tsc/internal/module/resolver.go:resolutionState.tryLoadInputFileForPath",
         "tsc/internal/module/resolver.go:resolutionState.validatePackageJSONField"
       ]
     },
@@ -2735,6 +2823,7 @@
           "tsc/internal/module/resolver.go:resolutionState.getPackageFile",
           "tsc/internal/module/resolver.go:resolutionState.getPackageJSONPathField",
           "tsc/internal/module/resolver.go:resolutionState.getPackageJsonInfo",
+          "tsc/internal/module/resolver.go:resolutionState.getTraceFunc",
           "tsc/internal/module/resolver.go:resolutionState.loadModuleFromNearestNodeModulesDirectory",
           "tsc/internal/module/resolver.go:resolutionState.loadNodeModuleFromDirectoryWorker",
           "tsc/internal/module/resolver.go:resolutionState.realPath",
@@ -2749,6 +2838,7 @@
         "tsc/internal/module/resolver.go:resolutionState.getPackageFile",
         "tsc/internal/module/resolver.go:resolutionState.getPackageJSONPathField",
         "tsc/internal/module/resolver.go:resolutionState.getPackageJsonInfo",
+        "tsc/internal/module/resolver.go:resolutionState.getTraceFunc",
         "tsc/internal/module/resolver.go:resolutionState.loadModuleFromNearestNodeModulesDirectory",
         "tsc/internal/module/resolver.go:resolutionState.loadNodeModuleFromDirectoryWorker",
         "tsc/internal/module/resolver.go:resolutionState.realPath",

@@ -396,19 +396,15 @@ func p1typeReferenceRows(resolved *module.ResolvedTypeReferenceDirective) []any 
 // source raises itself keeps its literal text, because that sentence IS the
 // contract a port has to reproduce; anything else is the toolchain's wording
 // and only its shape is recorded.
-//
-// The Go RUNTIME's wording is the case that matters here. "runtime error: index
-// out of range [16] with length 16" is not a fact about the pinned port -- it
-// is a fact about the Go toolchain, and its phrasing and bracketed values have
-// changed across releases. Freezing it would make a case fail on a Go upgrade
-// that changed no behaviour, while what the case actually witnesses is that the
-// pin indexes without a guard. So a runtime.Error keeps only its kind, taken
-// from the leading words before the first `[` or `:` detail, and everything
-// else keeps its text.
+// The Go RUNTIME's wording is the case that matters here. "runtime error:
+// index out of range [16] with length 16" is not a fact about the pinned port
+// -- it is a fact about the Go toolchain, and its phrasing and bracketed values
+// have changed across releases. Freezing it would make a case fail on a Go
+// upgrade that changed no behaviour, while what the case actually witnesses is
+// that the pin indexes without a guard. So a runtime.Error keeps only its kind.
 func p1classify(value any) string {
-	if _, isRuntime := value.(runtime.Error); isRuntime {
-		text := value.(error).Error()
-		text = strings.TrimPrefix(text, "runtime error: ")
+	if runtimeError, isRuntime := value.(runtime.Error); isRuntime {
+		text := strings.TrimPrefix(runtimeError.Error(), "runtime error: ")
 		if cut := strings.IndexByte(text, '['); cut >= 0 {
 			text = strings.TrimSpace(text[:cut])
 		}
