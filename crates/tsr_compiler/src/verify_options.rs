@@ -582,21 +582,10 @@ fn jsx_name(value: JsxEmit) -> &'static [u8] {
     }
 }
 fn module_name(value: ModuleKind) -> JsString {
-    let name = match value {
-        ModuleKind::NODE16 => b"Node16".as_slice(),
-        ModuleKind::NODE18 => b"Node18",
-        ModuleKind::NODE20 => b"Node20",
-        ModuleKind::NODE_NEXT => b"NodeNext",
-        _ => return JsString::from_bytes(format!("ModuleKind({})", value.0).into_bytes()),
-    };
-    JsString::from_bytes(name)
+    JsString::from_bytes(value.to_string().into_bytes())
 }
 fn resolution_name(value: ModuleResolutionKind) -> &'static [u8] {
-    match value {
-        ModuleResolutionKind::NODE16 => b"Node16",
-        ModuleResolutionKind::NODE_NEXT => b"NodeNext",
-        _ => panic!("unhandled case in ModuleResolutionKind.String"),
-    }
+    value.as_str().as_bytes()
 }
 
 /// A source include explanation requested by option verification. The owning

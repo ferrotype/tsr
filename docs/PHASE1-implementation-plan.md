@@ -1,6 +1,6 @@
 # Phase 1 implementation plan: complete the foundations
 
-Status: in progress; F1b authorized after the F3a review, 2026-09-21.
+Status: in progress; F1b prepared implementation scope complete, 2026-09-21. Remaining steps retain their own gates; see PHASE1-progress.md.
 Baseline: merged main `03a55ac`, after the S12 closure, 2026-09-20.
 Upstream authority: `1f70213d4922b434345f639b441681e470c7cfc1`.
 
@@ -583,16 +583,16 @@ by leaf probes. Apply these dispositions:
 | --- | --- |
 | `tsr_tsoptions::file_names_from_specs` | Migrate its three maps now. Preserve literal/wildcard/JSON group order, case-canonical keys and extension priority. Use the direct `config/specs/file-names-*` cases and source-config parsing comparisons. The 142 matchFiles outputs exercise directory matching, not this aggregation by themselves. |
 | `ConfigValue::Object` | Migrate to `OrderedMap<JsString, ConfigValue>` with the F1b JSON batch. Keep first insertion position on overwrite and source-order traversal. Preserve the current value-cloning contract; mutable shallow sharing is a separate, still-unapproved difference. Exercise duplicate source properties, config diagnostics, and the F3 config rendering path. |
-| `CompilerOptions::paths` / `PathMappings` | Migrate to `OrderedMap<JsString, Option<Vec<JsString>>>` with the same JSON batch. Retain the outer `Option`, nil versus allocated-empty target lists, source order and pattern tie-breaking. Test actual config/options serialization and module resolution as well as the five ordered-map JSON leaf cases. Do not convert through a sorted map. |
+| `CompilerOptions::paths` / `PathMappings` | Use owned `OrderedMap<JsString, Option<Vec<JsString>>>`. The owner-approved compiler-options clone divergence preserves independent option containers; see [the aliasing audit](PHASE1-aliasing-audit.md). Generic slice-helper identity is a separate contract. Retain the outer `Option`, nil versus allocated-empty target lists, source order and pattern tie-breaking. Test actual config/options serialization and module resolution as well as the five ordered-map JSON leaf cases. Do not convert through a sorted map. |
 | `package_json::Object<'a>` | Keep the ordered raw-member sequence. It is a decode stream, not a key/value map: duplicate document fields can partially update prior typed values, while nested typed objects can reject duplicates. Inserting into `OrderedMap` first would erase that information. Existing native witnesses include `duplicate-string-invalid`, `duplicate-deps-merge`, `deps-duplicate-prior` and `exports-order` in `data/s07/packagejson-observations.json`. The post-decode semantic objects currently use `serde_json::Map` with `preserve_order`; audit their migration separately with the JSON decoder, preserving the raw stream and typed-field failure state. |
 
 The planned `tsr_json` layer owns the streaming encode/decode traits and their
 ordered-map implementations, and depends on `tsr_core`; core storage must not
 depend on the JSON layer. `tsr_tsoptions` implements those traits for its config
-values and uses the same writer for actual options/config output. Select the
-underlying JSON dependency against the frozen F1a contracts before implementing
-that layer. The dependency choice is still open; the storage and dependency
-direction are settled. This permits one ordered encoding implementation without
+values and uses the same writer for actual options/config output. The F1b implementation uses the existing stack-growth dependency and a Rust
+token codec checked against the pinned Go JSON module; it introduces no second
+JSON value tree or external JSON dependency. The storage and dependency direction
+remain as specified. This permits one ordered encoding implementation without
 a core/JSON cycle or conversions between private containers at every call.
 
 The JSON batch must reach those real callers before claiming completion. Five

@@ -155,7 +155,7 @@ pub fn to_lower_go(bytes: &[u8]) -> Vec<u8> {
     result
 }
 
-fn simple_lower(rune: i32) -> i32 {
+pub(crate) fn simple_lower(rune: i32) -> i32 {
     SIMPLE_LOWER
         .binary_search_by_key(&rune, |row| row.0)
         .map_or(rune, |index| SIMPLE_LOWER[index].1)

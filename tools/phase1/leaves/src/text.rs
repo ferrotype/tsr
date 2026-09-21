@@ -14,11 +14,8 @@
 //! Every Number travels as its IEEE-754 bit pattern for the same reason, paired
 //! with the rendering `Display` produced.
 //!
-//! An operation with no leaf-crate entry point is recorded in `MISSING`, keyed
-//! by the request's operation id. Preparation names the gap; it never emulates
-//! the algorithm here to make a comparison run, so a case whose trace would
-//! need one missing call is a `MISSING` row in full rather than a trace with a
-//! hand-written step in the middle.
+//! Every action delegates to its production leaf implementation. The adapter
+//! only decodes requests and serializes the observations.
 
 use std::cmp::Ordering;
 
@@ -26,69 +23,10 @@ use serde_json::{json, Value};
 
 use crate::api::{self, Outcome};
 
-/// Operations this group covers that have no callable entry point in any crate
-/// the leaf driver links. Each row names the pinned Go authority, the signature
-/// the port is expected to carry and the file that does not provide it yet.
-/// Where a private or out-of-reach equivalent already exists, the home says so
-/// rather than claiming the behavior is unwritten.
-const MISSING: &[(&str, &str, &str, &str)] = &[
-    ("tsc/internal/stringutil/compare.go:CompareStringsCaseInsensitive",
-     "tsc/internal/stringutil/compare.go:CompareStringsCaseInsensitive",
-     "pub fn compare_case_insensitive(left: &[u8], right: &[u8]) -> Ordering decoding one rune at a time and comparing unicode simple lowercase, with compare_case_sensitive (raw byte order), compare_case_insensitive_then_sensitive, equate_case_sensitive and the two selector functions that return them",
-     "crates/tsr_jsstring/src/compare.rs (no such file; tsr_jsstring exposes equal_fold and to_lower_go but no ordering comparer)"),
-    ("tsc/internal/stringutil/compare.go:CompareStringsCaseInsensitiveEslintCompatible",
-     "tsc/internal/stringutil/compare.go:CompareStringsCaseInsensitiveEslintCompatible",
-     "pub fn compare_case_insensitive_eslint(left: &[u8], right: &[u8]) -> Ordering lowercasing both sides with Go strings.ToLower semantics, which repairs every malformed byte to U+FFFD, and then comparing the results as bytes",
-     "crates/tsr_jsstring/src/compare.rs (no such file)"),
-    ("tsc/internal/stringutil/compare.go:HasPrefix",
-     "tsc/internal/stringutil/compare.go:HasPrefix",
-     "pub fn has_prefix(text: &[u8], prefix: &[u8], case_sensitive: bool) -> bool with has_suffix and has_prefix_and_suffix_without_overlap, folding a byte window cut to the affix's byte length rather than to a rune boundary",
-     "crates/tsr_jsstring/src/compare.rs (no such file)"),
-    ("tsc/internal/stringutil/identifier.go:IsUnicodeIdentifierStart",
-     "tsc/internal/stringutil/identifier.go:IsUnicodeIdentifierStart",
-     "pub fn is_unicode_identifier_start(ch: i32) -> bool and is_unicode_identifier_part over the generated ES ID_Start / ID_Continue range tables",
-     "crates/tsr_jsstring/src/identifier.rs (no such file; tsr_scanner::is_identifier_start is the scanner's wider set including $ and _, not these tables, and tsr_scanner is not a leaf dependency)"),
-    ("tsc/internal/stringutil/util.go:IsWhiteSpaceLike",
-     "tsc/internal/stringutil/util.go:IsWhiteSpaceLike",
-     "pub fn is_white_space_like(ch: i32) -> bool with is_white_space_single_line, is_line_break, is_digit, is_octal_digit, is_hex_digit and is_ascii_letter",
-     "crates/tsr_jsstring/src/helpers.rs (the file exists; none of these predicates do; equivalents live in crates/tsr_scanner/src/utilities.rs, three public and four pub(crate), and tsr_scanner is not a leaf dependency)"),
-    ("tsc/internal/stringutil/util.go:EncodeURI",
-     "tsc/internal/stringutil/util.go:EncodeURI",
-     "pub fn encode_uri(text: &[u8]) -> Vec<u8> escaping per byte with uppercase hex, plus the should_escape_for_encode_uri predicate that keeps the ECMAScript unreserved set",
-     "crates/tsr_jsstring/src/escape.rs (the file exists and carries the string-literal escapers; encode_uri is absent)"),
-    ("tsc/internal/stringutil/util.go:RemoveByteOrderMark",
-     "tsc/internal/stringutil/util.go:RemoveByteOrderMark",
-     "pub fn remove_byte_order_mark(text: &[u8]) -> &[u8] and add_utf8_byte_order_mark, over a byte_order_mark_length probe that recognises the UTF-16 marks as well as the UTF-8 one",
-     "crates/tsr_jsstring/src/source_text.rs (the file exists and carries SourceText; neither BOM operation is present)"),
-    ("tsc/internal/stringutil/util.go:SplitLines",
-     "tsc/internal/stringutil/util.go:SplitLines",
-     "pub fn split_lines(text: &[u8]) -> Vec<&[u8]> treating CRLF as one break and emitting no trailing empty line, and guess_indentation(lines: &[&[u8]]) -> usize measuring leading whitespace in bytes",
-     "crates/tsr_jsstring/src/line_map.rs (the file exists; neither function does; compute_ecma_line_starts answers a different question and includes U+2028)"),
-    ("tsc/internal/stringutil/util.go:StripQuotes",
-     "tsc/internal/stringutil/util.go:StripQuotes",
-     "pub fn strip_quotes(name: &[u8]) -> &[u8] comparing the first and last runes, and unquote_string applying the `\\\\.` replacement whose dot excludes LF",
-     "crates/tsr_jsstring/src/go_quote.rs (the file exists and carries go_quote only; a private byte-level unquote_name exists in crates/tsr_checker/src/node_builder_names.rs and no leaf crate can reach it)"),
-    ("tsc/internal/jsnum/jsnum.go:Number.Floor",
-     "tsc/internal/jsnum/jsnum.go:Number.Floor",
-     "pub fn floor/abs/trunc/is_nan/is_inf on Number, the is_non_finite exponent-mask predicate, the NaN and Inf constructors, and a public shift_count",
-     "crates/tsr_jsnum/src/arithmetic.rs (Number carries to_int32, to_uint32 and the operators; shift_count is private and the classifiers and rounding operations are absent)"),
-    ("tsc/internal/jsnum/pseudobigint.go:ParseValidBigInt",
-     "tsc/internal/jsnum/pseudobigint.go:ParseValidBigInt",
-     "pub fn parse_valid_big_int(text: &[u8]) -> PseudoBigInt splitting the sign before the radix parse, and PseudoBigInt::sign(&self) -> i32",
-     "crates/tsr_jsnum/src/pseudobigint.rs (PseudoBigInt has new and to_text only)"),
-];
-
 pub fn observe(request: &Value) -> Option<Outcome> {
     let subject = api::subject(request);
     if !matches!(subject, "stringutil" | "semver" | "jsnum") {
         return None;
-    }
-    let operation = request
-        .get("operation")
-        .and_then(Value::as_str)
-        .unwrap_or_default();
-    if let Some((_, authority, signature, home)) = MISSING.iter().find(|row| row.0 == operation) {
-        return Some(Outcome::missing(*authority, authority, signature, home));
     }
     let replay: fn(&Value) -> Result<Value, String> = match subject {
         "stringutil" => stringutil_row,
@@ -180,6 +118,92 @@ fn stringutil_row(action: &Value) -> Result<Value, String> {
         "equate_ci" => {
             let right = payload(action, "right", "right_hex")?;
             json!(tsr_jsstring::equal_fold(&left, &right))
+        }
+        "equate_cs" | "equality_comparer_ci" | "equality_comparer_cs" => {
+            let right = payload(action, "right", "right_hex")?;
+            json!(tsr_jsstring::compare::equality_comparer(
+                op == "equality_comparer_ci"
+            )(&left, &right))
+        }
+        "compare_ci" | "compare_cs" | "comparer_ci" | "comparer_cs" | "compare_ci_then_cs"
+        | "compare_eslint" => {
+            use tsr_jsstring::compare::{
+                compare_case_insensitive_eslint, compare_case_insensitive_then_sensitive, comparer,
+            };
+            let right = payload(action, "right", "right_hex")?;
+            let compare = match op {
+                "compare_ci_then_cs" => compare_case_insensitive_then_sensitive,
+                "compare_eslint" => compare_case_insensitive_eslint,
+                _ => comparer(matches!(op, "compare_ci" | "comparer_ci")),
+            };
+            json!(ordering(compare(&left, &right)))
+        }
+        "has_prefix" | "has_suffix" | "has_prefix_and_suffix" => {
+            use tsr_jsstring::compare::{
+                has_prefix, has_prefix_and_suffix_without_overlap, has_suffix,
+            };
+            let right = payload(action, "right", "right_hex")?;
+            let enabled = flag(action, "enabled");
+            json!(match op {
+                "has_prefix" => has_prefix(&left, &right, enabled),
+                "has_suffix" => has_suffix(&left, &right, enabled),
+                _ => has_prefix_and_suffix_without_overlap(
+                    &left,
+                    &right,
+                    &payload(action, "extra", "extra_hex")?,
+                    enabled
+                ),
+            })
+        }
+        "identifier_start" => json!(tsr_jsstring::identifier::is_unicode_identifier_start(rune(
+            action, "rune"
+        )?)),
+        "identifier_part" => json!(tsr_jsstring::identifier::is_unicode_identifier_part(rune(
+            action, "rune"
+        )?)),
+        "white_space_like"
+        | "white_space_single_line"
+        | "line_break"
+        | "digit"
+        | "octal_digit"
+        | "hex_digit"
+        | "ascii_letter" => {
+            use tsr_jsstring::classify::{
+                is_ascii_letter, is_digit, is_hex_digit, is_line_break, is_octal_digit,
+                is_white_space_like, is_white_space_single_line,
+            };
+            let predicate = match op {
+                "white_space_like" => is_white_space_like,
+                "white_space_single_line" => is_white_space_single_line,
+                "line_break" => is_line_break,
+                "digit" => is_digit,
+                "octal_digit" => is_octal_digit,
+                "hex_digit" => is_hex_digit,
+                _ => is_ascii_letter,
+            };
+            json!(predicate(rune(action, "rune")?))
+        }
+        "encode_uri" => json!(encode_hex(&tsr_jsstring::text::encode_uri(&left))),
+        "remove_bom" => json!(encode_hex(tsr_jsstring::text::remove_byte_order_mark(
+            &left
+        ))),
+        "add_bom" => json!(encode_hex(&tsr_jsstring::text::add_utf8_byte_order_mark(
+            &left
+        ))),
+        "strip_quotes" => json!(encode_hex(tsr_jsstring::text::strip_quotes(&left))),
+        "unquote_string" => json!(encode_hex(&tsr_jsstring::text::unquote_string(&left))),
+        "split_lines" => json!(tsr_jsstring::text::split_lines(&left)
+            .into_iter()
+            .map(encode_hex)
+            .collect::<Vec<_>>()),
+        "guess_indentation" => {
+            let lines = text_list(action, "lines_hex")
+                .iter()
+                .map(|v| decode_hex(v.as_str().unwrap_or_default()))
+                .collect::<Result<Vec<_>, _>>()?;
+            json!(tsr_jsstring::text::guess_indentation(
+                &lines.iter().map(Vec::as_slice).collect::<Vec<_>>()
+            ))
         }
         "to_lower_js" => json!(encode_hex(&to_lower_js(&left))),
         "to_upper_js" => json!(encode_hex(&to_upper_js(&left))),
@@ -358,6 +382,25 @@ fn jsnum_row(action: &Value) -> Result<Value, String> {
         }
         "to_int32" => json!(number(action, "bits")?.to_int32()),
         "to_uint32" => json!(number(action, "bits")?.to_uint32()),
+        "to_shift_count" => json!(number(action, "bits")?.shift_count()),
+        "floor" => number_observation(number(action, "bits")?.floor()),
+        "abs" => number_observation(number(action, "bits")?.abs()),
+        "trunc" => number_observation(number(action, "bits")?.trunc()),
+        "is_nan" => json!(number(action, "bits")?.is_nan()),
+        "is_inf" => json!(number(action, "bits")?.is_inf()),
+        "is_non_finite" => json!(number(action, "bits")?.is_non_finite()),
+        "nan_constructor" => number_observation(tsr_jsnum::Number::nan()),
+        "inf_constructor" => number_observation(tsr_jsnum::Number::inf(api::action_i64(
+            action, "count",
+        ) as isize)),
+        "parse_valid_big_int" => big_int_observation(&tsr_jsnum::parse_valid_big_int(&payload(
+            action, "text", "text_hex",
+        )?)),
+        "pseudo_big_int_sign" => json!(tsr_jsnum::PseudoBigInt::new(
+            &payload(action, "text", "text_hex")?,
+            flag(action, "enabled")
+        )
+        .sign()),
         "signed_right_shift" => {
             number_observation(number(action, "bits")?.signed_right_shift(number(action, "bits2")?))
         }

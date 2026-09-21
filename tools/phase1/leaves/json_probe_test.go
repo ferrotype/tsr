@@ -325,6 +325,18 @@ func buildValue(kind, text, inputHex string, entries [][2]string) (any, error) {
 			return nil, err
 		}
 		return string(raw), nil
+	case "int64":
+		return strconv.ParseInt(text, 10, 64)
+	case "uint64":
+		return strconv.ParseUint(text, 10, 64)
+	case "integer_record":
+		return struct {
+			Name    string `json:"name"`
+			Counter uint64 `json:"counter"`
+			Active  bool   `json:"active"`
+		}{"worker", math.MaxUint64, true}, nil
+	case "float_list":
+		return []float64{1, math.Inf(1)}, nil
 	case "float":
 		number, err := strconv.ParseFloat(text, 64)
 		if err != nil {

@@ -10,7 +10,8 @@
   },
   "outputs": {
     "crates/tsr_jsstring/src/go_fold_generated.rs": "08677ddcc7a94fb1cad65720dd8c6fefc34359180223e233c5f34e15583aa87a",
-    "crates/tsr_scanner/src/tables_generated.rs": "7e574dfa4409c4a14c304a6e091d6c4deb2862bfc52ab8889234cecf9576cab1",
+    "crates/tsr_jsstring/src/identifier_generated.rs": "e4f52df228fd92f02f80df2c71e538fdd5c4a6c1cf10c9e06ebd5260aae68c7a",
+    "crates/tsr_scanner/src/tables_generated.rs": "a67817ac72fc59d8847d54b1638ae8ba8d495bf04f4f253145243d59c6e7c05b",
     "data/s05/tables.json": "2accdd4925b8f2177b0f1243fb8ae67594e90b2e399bf4d42452f226f78923c2"
   },
   "upstream_pin": "1f70213d4922b434345f639b441681e470c7cfc1",

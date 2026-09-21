@@ -10,12 +10,14 @@ fn byte_keys_are_checked_after_repair_without_modifying_the_input() {
     ]
     .into_iter()
     .collect();
-    assert_eq!(marshal(&map, Options::default()), Err(Error::DuplicateName));
+    assert!(marshal(&map, Options::default())
+        .unwrap_err()
+        .is_duplicate_name());
     assert_eq!(
         marshal(
             &map,
             Options {
-                allow_duplicate_names: true,
+                allow_duplicate_names: Some(true),
                 ..Options::default()
             }
         )
@@ -58,8 +60,7 @@ fn depth_limit_precedes_stack_exhaustion() {
     impl Encode for Nested {
         fn encode(&self, out: &mut Encoder<'_>) -> Result<(), Error> {
             if self.0 == 0 {
-                out.null();
-                Ok(())
+                out.null()
             } else {
                 out.array([&Self(self.0 - 1)])
             }
@@ -72,10 +73,10 @@ fn depth_limit_precedes_stack_exhaustion() {
                 marshal(&Nested(10_000), Options::default()).unwrap().len(),
                 20_004
             );
-            assert_eq!(
+            assert!(matches!(
                 marshal(&Nested(10_001), Options::default()),
-                Err(Error::NestingDepth)
-            );
+                Err(Error::Syntax(error)) if error.message == "exceeded max depth"
+            ));
         })
         .unwrap()
         .join()

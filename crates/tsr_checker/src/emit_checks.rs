@@ -512,22 +512,5 @@ fn helper_names(helper: u32, legacy: bool) -> Result<&'static [&'static [u8]], E
 
 // Source: tsc/internal/core/modulekind_stringer_generated.go:ModuleKind.String
 pub(crate) fn module_kind_text(kind: ModuleKind) -> Vec<u8> {
-    let text: &[u8] = match kind {
-        ModuleKind::NONE => b"None",
-        ModuleKind::COMMON_JS => b"CommonJS",
-        ModuleKind::AMD => b"AMD",
-        ModuleKind::UMD => b"UMD",
-        ModuleKind::SYSTEM => b"System",
-        ModuleKind::ES2015 => b"ES2015",
-        ModuleKind::ES2020 => b"ES2020",
-        ModuleKind::ES2022 => b"ES2022",
-        ModuleKind::ESNEXT => b"ESNext",
-        ModuleKind::NODE16 => b"Node16",
-        ModuleKind::NODE18 => b"Node18",
-        ModuleKind::NODE20 => b"Node20",
-        ModuleKind::NODE_NEXT => b"NodeNext",
-        ModuleKind::PRESERVE => b"Preserve",
-        _ => return format!("ModuleKind({})", kind.0).into_bytes(),
-    };
-    text.to_vec()
+    kind.to_string().into_bytes()
 }

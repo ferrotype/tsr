@@ -2,19 +2,11 @@ use tsr_ast::SyntaxKind;
 use tsr_core::LanguageVariant;
 use tsr_jsstring::wtf8::{encode_rune, is_high_surrogate};
 
-use crate::tables_generated::{keyword_kind, IDENTIFIER_PART, IDENTIFIER_START, KEYWORDS, TOKENS};
+use crate::tables_generated::{keyword_kind, KEYWORDS, TOKENS};
 use crate::utilities::{is_ascii_letter, is_digit};
 use crate::{IdentifierVariant, Scanner, TokenValue};
 
-fn in_ranges(ch: i32, ranges: &[(u32, u32, u32)]) -> bool {
-    let Ok(ch) = u32::try_from(ch) else {
-        return false;
-    };
-    let index = ranges.partition_point(|&(_, end, _)| end < ch);
-    ranges
-        .get(index)
-        .is_some_and(|&(start, end, stride)| ch >= start && ch <= end && (ch - start) % stride == 0)
-}
+use tsr_jsstring::identifier::{is_unicode_identifier_part, is_unicode_identifier_start};
 
 pub(crate) fn keyword(bytes: &[u8]) -> SyntaxKind {
     keyword_kind(bytes).map_or(SyntaxKind::Unknown, |kind| {
@@ -61,7 +53,7 @@ pub fn is_identifier_start(ch: i32) -> bool {
     is_ascii_letter(ch)
         || ch == i32::from(b'_')
         || ch == i32::from(b'$')
-        || ch > 127 && in_ranges(ch, IDENTIFIER_START)
+        || ch > 127 && is_unicode_identifier_start(ch)
 }
 /// port: tsc/internal/scanner/scanner.go:IsIdentifierPart
 pub fn is_identifier_part(ch: i32) -> bool {
@@ -71,7 +63,7 @@ pub fn is_identifier_part(ch: i32) -> bool {
 pub fn is_identifier_part_ex(ch: i32, variant: LanguageVariant) -> bool {
     is_word_character(ch)
         || ch == i32::from(b'$')
-        || ch > 127 && in_ranges(ch, IDENTIFIER_PART)
+        || ch > 127 && is_unicode_identifier_part(ch)
         || variant == LanguageVariant::JSX && ch == i32::from(b'-')
 }
 /// port: tsc/internal/scanner/scanner.go:TokenToString

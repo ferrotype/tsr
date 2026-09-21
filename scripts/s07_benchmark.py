@@ -33,7 +33,7 @@ def sha(data):
 def source_fingerprint():
     """Bind captures to source bytes, including uncommitted implementation files."""
     sources = set()
-    for crate in ("tsr_arena", "tsr_ast", "tsr_bench", "tsr_binder", "tsr_core", "tsr_diagnostics", "tsr_jsnum", "tsr_jsstring", "tsr_parser", "tsr_scanner"):
+    for crate in ("tsr_arena", "tsr_ast", "tsr_bench", "tsr_binder", "tsr_core", "tsr_diagnostics", "tsr_json", "tsr_locale", "tsr_jsnum", "tsr_jsstring", "tsr_parser", "tsr_scanner"):
         sources.update(p for p in (ROOT / "crates" / crate).rglob("*") if p.is_file() and p.suffix in {".rs", ".toml"})
     for directory in ("scripts/s07_oracle", "tools/s07/benchmark", ".cargo"):
         sources.update(p for p in (ROOT / directory).rglob("*") if p.is_file() and "__pycache__" not in p.parts)

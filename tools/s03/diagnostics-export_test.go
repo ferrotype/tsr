@@ -5,11 +5,14 @@
 package main
 
 import (
+	"compress/gzip"
 	"encoding/json"
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"io"
 	"os"
+	"path/filepath"
 	"slices"
 	"strconv"
 	"strings"
@@ -55,9 +58,10 @@ func TestS03ExportDiagnostics(t *testing.T) {
 	}
 	verifyPinnedDeclarations(t, rows)
 	data, err := json.MarshalIndent(struct {
-		Version  int               `json:"version"`
-		Messages []exportedMessage `json:"messages"`
-	}{Version: 1, Messages: rows}, "", "  ")
+		Version  int                          `json:"version"`
+		Messages []exportedMessage            `json:"messages"`
+		Locales  map[string]map[string]string `json:"locales"`
+	}{Version: 1, Messages: rows, Locales: exportLocales(t)}, "", "  ")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -130,4 +134,41 @@ func verifyPinnedDeclarations(t *testing.T, rows []exportedMessage) {
 	if seen != len(rows) {
 		t.Fatalf("export has %d rows but pinned declarations have %d", len(rows), seen)
 	}
+}
+
+// The generator's compressed localization assets are data authorities too.
+func exportLocales(t *testing.T) map[string]map[string]string {
+	t.Helper()
+	paths, err := filepath.Glob("loc/*.json.gz")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(paths) != 13 {
+		t.Fatalf("expected 13 localization assets, found %d", len(paths))
+	}
+	result := map[string]map[string]string{}
+	for _, path := range paths {
+		file, err := os.Open(path)
+		if err != nil {
+			t.Fatal(err)
+		}
+		reader, err := gzip.NewReader(file)
+		if err != nil {
+			file.Close()
+			t.Fatal(err)
+		}
+		data, err := io.ReadAll(reader)
+		reader.Close()
+		file.Close()
+		if err != nil {
+			t.Fatal(err)
+		}
+		var values map[string]string
+		if err = json.Unmarshal(data, &values); err != nil {
+			t.Fatal(err)
+		}
+		name := strings.TrimSuffix(filepath.Base(path), ".json.gz")
+		result[name] = values
+	}
+	return result
 }

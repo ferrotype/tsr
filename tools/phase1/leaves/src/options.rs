@@ -15,13 +15,6 @@
 //! refuses the same name for the same reason, and derives its own roster by
 //! reflection over the pinned struct rather than repeating this list.
 //!
-//! Three operations have no production home and are recorded as gaps:
-//! `JsxEmit.String`, `ModuleResolutionKind.String` and
-//! `NewLineKind.GetNewLineCharacter`. Unlike the five generated stringers, all
-//! three are hand written in the pinned file and two of them panic rather than
-//! falling back to a numeric form, so there is no generated fallback to port.
-//! Nothing here emulates any of them.
-//!
 //! A panic reachable from this group is raised by the pinned source itself, so
 //! its literal text is the contract and is recorded as written -- unlike the
 //! runtime panics a neighbouring group has to reduce to a class.
@@ -30,6 +23,7 @@ use std::panic::AssertUnwindSafe;
 
 use serde_json::{json, Value};
 use tsr_core::{CompilerOptions, ModuleKind, PathMappings, Tristate};
+use tsr_core::{JsxEmit, ModuleResolutionKind, NewLineKind};
 use tsr_jsstring::JsString;
 
 use crate::api::{action_i64, action_op, action_str, actions, ordered, subject, Outcome};
@@ -274,10 +268,10 @@ pub fn observe(request: &Value) -> Option<Outcome> {
         "options.Getters" => getters(actions(request)),
         "options.Clone" => clone_roster(actions(request)),
         "options.ModuleKind" => module_kind(actions(request)),
-        "options.JsxEmitText" => return Some(missing_jsx_emit_text()),
-        "options.ModuleResolutionText" => return Some(missing_module_resolution_text()),
-        "options.NewLineText" => return Some(missing_new_line_text()),
-        "options.NewLineFromText" => return Some(missing_new_line_from_text()),
+        "options.JsxEmitText"
+        | "options.ModuleResolutionText"
+        | "options.NewLineText"
+        | "options.NewLineFromText" => render_options(actions(request)),
         _ => return None,
     };
     Some(match replayed {
@@ -286,88 +280,47 @@ pub fn observe(request: &Value) -> Option<Outcome> {
     })
 }
 
-/// The classifier that turns a newline literal into a NewLineKind. Unlike the
-/// renderers above it is a free function rather than a method, and unlike them
-/// it has no partial rendering anywhere in the port to point at: the port reads
-/// `options.new_line` as an already-classified enum and never parses the text.
-fn missing_new_line_from_text() -> Outcome {
-    Outcome::missing(
-        "tsc/internal/core/compileroptions.go:GetNewLineKind",
-        "tsc/internal/core/compileroptions.go:GetNewLineKind",
-        "a free function on tsr_core mapping the two-byte literal CR LF to NewLineKind::CRLF, the \
-         one-byte LF to NewLineKind::LF, and every other text -- including the empty string, a \
-         lone CR, and any text merely containing one of the two -- to NewLineKind::NONE. The \
-         pinned switch closes its domain with a default arm rather than a panic, so there is no \
-         error path to port",
-        "crates/tsr_core/src/compiler_options.rs (NewLineKind declares NONE, CRLF and LF at :52-56 \
-         and nothing that reads a literal). The port does classify this text, but not as this \
-         operation and not anywhere a caller could reach: \
-         crates/tsr_printer/src/change_tracker_writer.rs:282-287 carries the port marker for it on \
-         an inline match inside a PrinterOptions struct literal, private to tsr_printer and \
-         written for that one call site. crates/tsr_tsoptions/src/fixture_options.rs:194 is not a \
-         second one: it substitutes CRLF for NONE on an already-classified value and never looks \
-         at text",
-    )
+fn render_options(trace: &[Value]) -> Result<Vec<Value>, String> {
+    let mut rows = Vec::new();
+    for action in trace {
+        let op = action_op(action);
+        let mut row = json!({"op":op});
+        match op {
+            "new_line_kind_from_text" => {
+                let text = action_str(action, "text");
+                row["text"] = json!(text);
+                row["result"] = json!(NewLineKind::from_text(text.as_bytes()).0);
+            }
+            "new_line_character" => {
+                let n = action_i64(action, "new_line");
+                row["new_line"] = json!(n);
+                row["result"] = json!(NewLineKind(n as i32).as_str());
+            }
+            "jsx_emit_text" | "module_resolution_text" => {
+                let field = if op == "jsx_emit_text" {
+                    "jsx"
+                } else {
+                    "module_resolution"
+                };
+                let n = action_i64(action, field);
+                row[field] = json!(n);
+                let (result, panic) = guarded(|| {
+                    json!(if op == "jsx_emit_text" {
+                        JsxEmit(n as i32).as_str()
+                    } else {
+                        ModuleResolutionKind(n as i32).as_str()
+                    })
+                });
+                row["result"] = result;
+                row["panic"] = json!(panic);
+            }
+            _ => return Err(format!("unknown option rendering {op}")),
+        }
+        rows.push(row);
+    }
+    Ok(rows)
 }
 
-fn missing_jsx_emit_text() -> Outcome {
-    Outcome::missing(
-        "tsc/internal/core/compileroptions.go:JsxEmit.String",
-        "tsc/internal/core/compileroptions.go:JsxEmit.String",
-        "a Display impl or an as_str on tsr_core::JsxEmit rendering preserve/react-native/react/\
-         react-jsx/react-jsxdev for 1..=5, and panicking on the two arms the pinned switch panics \
-         on -- \"should not use zero value of JsxEmit\" for JsxEmitNone and \"unhandled case in \
-         JsxEmit.String\" for every other value. It is hand written, not generated by stringer, \
-         so there is no numeric fallback to port: the domain is closed by a panic",
-        "crates/tsr_core/src/compiler_options.rs (JsxEmit declares the six constants and nothing \
-         else). The nearest rendering in the port is not this operation: \
-         crates/tsr_compiler/src/verify_options.rs:576 fn jsx_name is private to that crate, \
-         names only REACT_JSX/REACT_JSX_DEV/REACT and answers the empty string for the other \
-         three declared values and for the zero value, where the pin panics",
-    )
-}
-
-fn missing_module_resolution_text() -> Outcome {
-    Outcome::missing(
-        "tsc/internal/core/compileroptions.go:ModuleResolutionKind.String",
-        "tsc/internal/core/compileroptions.go:ModuleResolutionKind.String",
-        "a Display impl or an as_str on tsr_core::ModuleResolutionKind rendering Classic/Node10/\
-         Node16/NodeNext/Bundler for 1/2/3/99/100, and panicking on the two arms the pinned \
-         switch panics on -- \"should not use zero value of ModuleResolutionKind\" for the zero \
-         value and \"unhandled case in ModuleResolutionKind.String\" for every other value. The \
-         pinned comment says stringer is deliberately not used here because the names are \
-         user-facing in --traceResolution, so the panic on the zero value is the contract, not \
-         an oversight",
-        "crates/tsr_core/src/compiler_options.rs (ModuleResolutionKind declares the six \
-         constants and nothing else). The port has two partial renderings instead, neither \
-         reachable from outside its crate and neither matching: \
-         crates/tsr_module/src/resolver.rs:249 is an inline match in the trace path that answers \
-         b\"Unknown\" for Classic, Node10 and the zero value where the pin renders Classic and \
-         Node10 and panics; crates/tsr_compiler/src/verify_options.rs:594 fn resolution_name \
-         names only NODE16 and NODE_NEXT and raises the pin's \"unhandled case\" text for \
-         Classic, Node10 and Bundler, which the pin renders",
-    )
-}
-
-fn missing_new_line_text() -> Outcome {
-    Outcome::missing(
-        "tsc/internal/core/compileroptions.go:NewLineKind.GetNewLineCharacter",
-        "tsc/internal/core/compileroptions.go:NewLineKind.GetNewLineCharacter",
-        "tsr_core::NewLineKind::new_line_character(self) -> &'static [u8] answering b\"\\r\\n\" \
-         for NewLineKindCRLF and b\"\\n\" for every other value. The pinned switch has one named \
-         case and a default, so NewLineKindNone, NewLineKindLF and every out-of-domain value all \
-         answer the single linefeed; a port written as a three-way match that panicked on None \
-         would be wrong",
-        "crates/tsr_core/src/compiler_options.rs (NewLineKind declares the three constants and \
-         nothing else). crates/tsr_printer/src/printer.rs:69 fn new_line_character has exactly \
-         this body but is private to tsr_printer and carries no port marker, so no consumer of \
-         tsr_core can reach it",
-    )
-}
-
-/// The option value an action asks for, plus how many option names it set.
-/// A name the roster does not carry fails the case: the Go probe refuses it
-/// too, so neither side can quietly ignore a field and agree by accident.
 fn build(action: &Value) -> Result<(CompilerOptions, usize), String> {
     let mut options = CompilerOptions::default();
     let Some(raw) = action.get("options") else {

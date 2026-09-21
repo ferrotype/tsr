@@ -1604,8 +1604,10 @@ class ConfigRosterTests(unittest.TestCase):
                     # family in prepared_links, must block the exemption.
                     case = next(case for case in cases["cases"]
                                 if case["family"] in families
-                                and case.get("last_result") == result
                                 and set(case.get("operations", [])) & owned - witnessed)
+                    # Implementation can make every case pass. Exercise each
+                    # preparation state explicitly rather than require live gaps.
+                    case["last_result"] = result
                     claimed = sorted(set(case["operations"]) & owned - witnessed)[0]
                     roster = scope.leaf_roster(step)
                     roster["exemptions"].append({
@@ -1850,6 +1852,14 @@ class RosterLedgerTests(unittest.TestCase):
         links let an operation be prepared and exempted at the same time, which
         is how two committed exemptions survived a validating ledger.
         """
+        # A completed leaf family has no live gaps. Inject one for an otherwise
+        # unlinked operation so consulting recorded matches cannot reject it.
+        operation = self.a_leaf_operation()
+        self.cases["cases"].append({
+            "id": "test/prepared-only", "family": "leaves",
+            "last_result": "not_implemented", "operations": [operation],
+            "missing_operations": [operation],
+        })
         prepared = scope.prepared_links(self.cases)
         covering = scope.cases_by_operation()
         gap_only = sorted(set(prepared) - set(covering))

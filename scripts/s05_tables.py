@@ -100,10 +100,6 @@ def validate_tables(tables):
 def render(tables, pin):
     validate_tables(tables)
     out = ["// Generated from the pinned Go scanner/stringutil tables. Do not edit.", f"// Upstream {pin}; identifier Unicode 15.1; SimpleFold Go Unicode {tables['go_unicode_version']}."]
-    def integers(name, rows, width):
-        out.append(f"pub(crate) const {name}: &[({', '.join(['u32']*width)})] = &[")
-        out.extend("(" + ", ".join(f"{value:_}" for value in row) + ")," for row in rows)
-        out.append("];")
     def strings(name, rows):
         out.append(f"pub(crate) const {name}: &[&str] = &[")
         out.extend(rust_string_literal(row) + "," for row in rows)
@@ -112,8 +108,6 @@ def render(tables, pin):
         out.append(f"pub(crate) const {name}: &[(&str, {'u16' if numeric else '&str'})] = &[")
         out.extend(f"({rust_string_literal(key)}, {value if numeric else rust_string_literal(value)})," for key, value in sorted(rows.items()))
         out.append("];")
-    integers("IDENTIFIER_START", tables["identifier"]["start"], 3)
-    integers("IDENTIFIER_PART", tables["identifier"]["part"], 3)
     scanner = tables["scanner"]
     mapping("KEYWORDS", scanner["keywords"], True)
     out.extend(["pub(crate) fn keyword_kind(bytes: &[u8]) -> Option<u16> {", "match bytes {"])
@@ -125,6 +119,18 @@ def render(tables, pin):
     strings("STRING_PROPERTIES", scanner["strings"])
     strings("GENERAL_CATEGORIES", scanner["values"]["General_Category"])
     strings("SCRIPT_VALUES", scanner["values"]["Script"])
+    edition = tomllib.loads((ROOT / "Cargo.toml").read_text())["workspace"]["package"]["edition"]
+    return command(["rustfmt", "--edition", str(edition)], cwd=ROOT, data=("\n".join(out)+"\n").encode())
+
+
+def render_identifiers(tables, pin):
+    validate_tables(tables)
+    out = ["// Generated from pinned Go stringutil identifier tables. Do not edit.",
+           f"// Upstream {pin}; identifier Unicode 15.1."]
+    for name, rows in tables["identifier"].items():
+        out.append(f"pub(crate) const IDENTIFIER_{name.upper()}: &[(u32, u32, u32)] = &[")
+        out.extend("(" + ", ".join(f"{value:_}" for value in row) + ")," for row in rows)
+        out.append("];")
     edition = tomllib.loads((ROOT / "Cargo.toml").read_text())["workspace"]["package"]["edition"]
     return command(["rustfmt", "--edition", str(edition)], cwd=ROOT, data=("\n".join(out)+"\n").encode())
 
@@ -144,7 +150,7 @@ def update(tables, write=False):
     pin = strict_json_loads((ROOT / "data/upstream.json").read_bytes())["pin"]
     raw = (json.dumps(tables, sort_keys=True, indent=2)+"\n").encode()
     generated = render(tables, pin)
-    outputs = {"data/s05/tables.json": raw, "crates/tsr_scanner/src/tables_generated.rs": generated, "crates/tsr_jsstring/src/go_fold_generated.rs": render_fold(tables, pin)}
+    outputs = {"data/s05/tables.json": raw, "crates/tsr_scanner/src/tables_generated.rs": generated, "crates/tsr_jsstring/src/go_fold_generated.rs": render_fold(tables, pin), "crates/tsr_jsstring/src/identifier_generated.rs": render_identifiers(tables, pin)}
     manifest = {"version": 1, "upstream_pin": pin,
                 "go_unicode_version": tables["go_unicode_version"], "identifier_unicode_version": "15.1.0",
                 "inputs": {path: hashlib.sha256((ROOT / "upstream" / path).read_bytes()).hexdigest() for path in INPUTS},

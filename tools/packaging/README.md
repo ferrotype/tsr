@@ -45,7 +45,7 @@ does not satisfy a dependency on `0.1.0`.
 ## Content and private harnesses
 
 Package manifests include source, README, license and notice files explicitly;
-`tsr_bundled` also includes its pinned assets and `tsr_core` its Go BSD license.
+`tsr_bundled` also includes its pinned assets and `tsr_core`, `tsr_json` and `tsr_locale` their Go BSD license.
 Repository examples, integration tests, capture archives and fixture corpora
 are excluded. Each package has a description and the current repository URL.
 Tests embedded under `src` can still reference repository fixtures: running a
@@ -76,7 +76,7 @@ and exports stay unchanged. Old captures retain their own archived ABI wrappers.
 
 The project branding is **tsr**; `tsr_embed` is the application entry point.
 A `tsr` facade that re-exports the public embedding surface remains a separate follow-up; neither
-`tsr` nor `tsrust` is added to this 29-package release set. All package READMEs
+`tsr` nor `tsrust` is added to this 30-package release set. All package READMEs
 state the Rust 1.96 minimum, and package metadata includes search keywords and
 the compiler category.
 
@@ -86,7 +86,7 @@ Generate release archives after this update so their immutable manifests contain
 the final URL. Historical pull-request and Actions links in `docs/` retain their
 original addresses and resolve through GitHub redirects.
 
-Do not schedule the first release as 29 immediate uploads. crates.io's recorded
+Do not schedule the first release as 30 immediate uploads. crates.io's recorded
 [default limiter](https://github.com/rust-lang/crates.io/blob/5723cfaf552efd5e870d25c71f2bb5193b21a958/src/rate_limiter.rs)
 allows five new crates in a burst and replenishes one slot per ten minutes.
 Updates have a separate default allowance. If 24 of these names are still new
@@ -109,32 +109,33 @@ build and optional dependencies. It is for a later, explicitly authorized releas
 1. `tsr_jsstring`
 2. `tsr_arena`
 3. `tsr_core`
-4. `tsr_diagnostics`
-5. `tsr_ast`
-6. `tsr_jsnum`
-7. `tsr_scanner`
-8. `tsr_encoder`
-9. `tsr_parser`
-10. `tsr_binder`
-11. `tsr_semver`
-12. `tsr_tspath`
-13. `tsr_vfs`
-14. `tsr_bundled`
-15. `tsr_json`
-16. `tsr_tsoptions`
-17. `tsr_module`
-18. `tsr_nodebuilder`
-19. `tsr_printer`
-20. `tsr_pseudochecker`
-21. `tsr_checker`
-22. `tsr_astnav`
-23. `tsr_format`
-24. `tsr_transformers`
-25. `tsr_compiler`
-26. `tsr_project`
-27. `tsr_api`
-28. `tsr_embed`
-29. `tsr_wasm`
+4. `tsr_locale`
+5. `tsr_jsnum`
+6. `tsr_json`
+7. `tsr_diagnostics`
+8. `tsr_ast`
+9. `tsr_scanner`
+10. `tsr_encoder`
+11. `tsr_parser`
+12. `tsr_binder`
+13. `tsr_semver`
+14. `tsr_tspath`
+15. `tsr_vfs`
+16. `tsr_bundled`
+17. `tsr_tsoptions`
+18. `tsr_module`
+19. `tsr_nodebuilder`
+20. `tsr_printer`
+21. `tsr_pseudochecker`
+22. `tsr_checker`
+23. `tsr_astnav`
+24. `tsr_format`
+25. `tsr_transformers`
+26. `tsr_compiler`
+27. `tsr_project`
+28. `tsr_api`
+29. `tsr_embed`
+30. `tsr_wasm`
 
 ## Package policy
 
@@ -161,6 +162,7 @@ build and optional dependencies. It is for a later, explicitly authorized releas
 | `tsr_jsnum` | Prepared | Rust library and its public dependency closure |
 | `tsr_json` | Prepared | Rust library and its public dependency closure |
 | `tsr_jsstring` | Prepared | Rust library and its public dependency closure |
+| `tsr_locale` | Prepared | Rust library and its public dependency closure |
 | `tsr_module` | Prepared | Rust library and its public dependency closure |
 | `tsr_node` | Private | Node addon distributed separately; not a Rust library package |
 | `tsr_nodebuilder` | Prepared | Rust library and its public dependency closure |

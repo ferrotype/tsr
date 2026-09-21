@@ -60,6 +60,9 @@ pub type ResolutionMode = ModuleKind;
 pub type PathMappings = crate::collections::OrderedMap<JsString, Option<Vec<JsString>>>;
 
 /// Slices preserve nil versus nonnil empty; paths preserve insertion order.
+/// Cloning owns independent option containers, unlike Go's shallow pointer and
+/// slice-header copy. This owner-approved difference keeps published program
+/// inputs immutable; see docs/PHASE1-aliasing-audit.md.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct CompilerOptions {
     pub allow_js: Tristate,

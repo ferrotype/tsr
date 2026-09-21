@@ -56,24 +56,19 @@ fn from_entries(action: &Value) -> OrderedMap<String, String> {
 }
 
 pub(super) fn map(request: &Value) -> Outcome {
-    for action in api::actions(request) {
-        let operation = match api::action_op(action) {
-            "marshal" | "marshal_int_keys" => {
-                "tsc/internal/collections/ordered_map.go:OrderedMap.MarshalJSONTo"
-            }
-            "unmarshal" => "tsc/internal/collections/ordered_map.go:OrderedMap.UnmarshalJSONFrom",
-            _ => continue,
-        };
-        return Outcome::missing(
-            operation,
-            "tsc/internal/collections/ordered_map.go",
-            "ordered-map encoding/decoding through the production JSON contract",
-            "crates/tsr_core/src/collections/ordered_map.rs (JSON integration pending)",
-        );
-    }
     match map_trace(api::actions(request)) {
         Ok(rows) => Outcome::Observed(api::ordered(rows)),
         Err(error) => Outcome::Failed(error),
+    }
+}
+
+fn render_json(encoded: Result<Vec<u8>, tsr_json::Error>) -> Value {
+    match encoded {
+        Ok(bytes) => json!([
+            "bytes",
+            String::from_utf8(bytes).expect("encoded JSON is UTF-8")
+        ]),
+        Err(error) => json!(["error", error.to_string()]),
     }
 }
 
@@ -107,6 +102,52 @@ fn map_trace(actions: &[Value]) -> Result<Vec<Value>, String> {
                     m.insert(key.into(), value.into());
                 }),
             ),
+            "marshal" => {
+                let encoded = tsr_json::marshal(&map, tsr_json::Options::default());
+                result(&mut row, Ok(render_json(encoded)));
+            }
+            "marshal_int_keys" => {
+                let mut numbered = OrderedMap::<isize, String>::default();
+                for pair in action["entries"].as_array().ok_or("missing entries")? {
+                    let key = pair[0]
+                        .as_str()
+                        .ok_or("string key")?
+                        .parse::<isize>()
+                        .map_err(|e| e.to_string())?;
+                    numbered.insert(key, pair[1].as_str().ok_or("string value")?.into());
+                }
+                result(
+                    &mut row,
+                    Ok(render_json(tsr_json::marshal(
+                        &numbered,
+                        tsr_json::Options::default(),
+                    ))),
+                );
+            }
+            "unmarshal" => {
+                let source = api::action_str(action, "source");
+                row["source"] = json!(source);
+                let outcome = required(map.as_mut()).map(|map| {
+                    let result =
+                        tsr_json::unmarshal(source.as_bytes(), map, tsr_json::Options::default());
+                    let category = match result {
+                        Ok(()) => json!(["none", ""]),
+                        Err(e)
+                            if e.to_string()
+                                .contains("cannot unmarshal non-object JSON value into Map") =>
+                        {
+                            json!([
+                                "non_object",
+                                "cannot unmarshal non-object JSON value into Map"
+                            ])
+                        }
+                        Err(e) if e.is_unexpected_eof() => json!(["truncated", ""]),
+                        Err(_) => json!(["decoder", ""]),
+                    };
+                    json!([category, entries(Some(map))])
+                });
+                result(&mut row, outcome);
+            }
             "get" => result(
                 &mut row,
                 required(map.as_ref()).map(|m| {

@@ -12,5 +12,10 @@ categories.workspace = true
 readme = "README.md"
 include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/licenses/**"]
 
+[dependencies]
+tsr_locale = { path = "../tsr_locale", version = "0.1.0" }
+tsr_core = { path = "../tsr_core", version = "0.1.0" }
+tsr_json = { path = "../tsr_json", version = "0.1.0" }
+
 [lints]
 workspace = true

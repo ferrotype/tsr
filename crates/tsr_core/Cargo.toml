@@ -12,6 +12,11 @@ categories.workspace = true
 readme = "README.md"
 include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/licenses/**"]
 
+[features]
+default = []
+# Explicit Go slice-header aliasing, used by the Phase 1 compatibility probes.
+go-slice-compat = []
+
 [dependencies]
 tsr_jsstring = { path = "../tsr_jsstring", version = "0.1.0" }
 

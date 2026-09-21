@@ -452,6 +452,58 @@ impl BundledFs {
         Self { inner }
     }
 }
+// Available only to test consumers that have a source checkout. Cargo's
+// remapped source filenames do not change CARGO_MANIFEST_DIR.
+#[cfg(feature = "test-support")]
+/// port: tsc/internal/bundled/bundled.go:TestingLibPath
+pub fn testing_lib_path() -> std::path::PathBuf {
+    std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("bundled/libs")
+}
+
+impl BundledFs {
+    /// port: tsc/internal/bundled/embed.go:wrappedFS.walkDir
+    fn walk_bundled(
+        rest: &[u8],
+        visit: &mut tsr_vfs::WalkCallback<'_>,
+    ) -> Result<tsr_vfs::WalkControl, Error> {
+        use tsr_vfs::{WalkControl as C, WalkEntry};
+        if rest.is_empty() {
+            let entry = WalkEntry {
+                name: JsString::from_bytes(b"libs".as_slice()),
+                info: FileInfo {
+                    directory: true,
+                    size: 0,
+                },
+                symlink: false,
+            };
+            match visit(b"bundled:////libs", Some(&entry), None)? {
+                C::SkipAll => return Ok(C::SkipAll),
+                C::SkipDir => return Ok(C::Continue),
+                C::Continue => return Self::walk_bundled(b"libs", visit),
+            }
+        }
+        if rest == b"libs" {
+            for &(name, bytes) in LIBRARIES {
+                let mut path = b"bundled:///libs/".to_vec();
+                path.extend_from_slice(name.as_bytes());
+                let entry = WalkEntry {
+                    name: JsString::from_bytes(name.as_bytes()),
+                    info: FileInfo {
+                        directory: false,
+                        size: bytes.len() as u64,
+                    },
+                    symlink: false,
+                };
+                // The embedded implementation treats SkipDir on a file as
+                // continue, unlike io/fs.WalkDir. Preserve that pinned quirk.
+                if visit(&path, Some(&entry), None)? == C::SkipAll {
+                    return Ok(C::SkipAll);
+                }
+            }
+        }
+        Ok(C::Continue)
+    }
+}
 impl FileSystem for BundledFs {
     fn use_case_sensitive_file_names(&self) -> bool {
         self.inner.use_case_sensitive_file_names()
@@ -508,6 +560,37 @@ impl FileSystem for BundledFs {
             return Ok(entries);
         }
         self.inner.entries(path)
+    }
+    /// port: tsc/internal/bundled/embed.go:wrappedFS.WalkDir
+    fn walk_dir(&self, root: &[u8], visit: &mut tsr_vfs::WalkCallback<'_>) -> Result<(), Error> {
+        if let Some(rest) = root.strip_prefix(b"bundled:///") {
+            Self::walk_bundled(rest, visit).map(|_| ())
+        } else {
+            self.inner.walk_dir(root, visit)
+        }
+    }
+    /// port: tsc/internal/bundled/embed.go:wrappedFS.WriteFile
+    fn write_file(&self, path: &[u8], data: &[u8]) -> Result<(), Error> {
+        assert!(!is_bundled(path), "cannot write to embedded file system");
+        self.inner.write_file(path, data)
+    }
+    /// port: tsc/internal/bundled/embed.go:wrappedFS.AppendFile
+    fn append_file(&self, path: &[u8], data: &[u8]) -> Result<(), Error> {
+        assert!(!is_bundled(path), "cannot write to embedded file system");
+        self.inner.append_file(path, data)
+    }
+    /// port: tsc/internal/bundled/embed.go:wrappedFS.Remove
+    fn remove(&self, path: &[u8]) -> Result<(), Error> {
+        assert!(!is_bundled(path), "cannot remove from embedded file system");
+        self.inner.remove(path)
+    }
+    /// port: tsc/internal/bundled/embed.go:wrappedFS.Chtimes
+    fn change_times(&self, path: &[u8]) -> Result<(), Error> {
+        assert!(
+            !is_bundled(path),
+            "cannot change times on embedded file system"
+        );
+        self.inner.change_times(path)
     }
     fn realpath(&self, path: &[u8]) -> Result<JsString, Error> {
         if is_bundled(path) {

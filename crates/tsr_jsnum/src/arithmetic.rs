@@ -5,6 +5,45 @@ use num_bigint::BigInt;
 use num_traits::ToPrimitive;
 
 impl Number {
+    /// port: tsc/internal/jsnum/jsnum.go:NaN
+    pub fn nan() -> Self {
+        Self::new(f64::NAN)
+    }
+    /// port: tsc/internal/jsnum/jsnum.go:Inf
+    pub fn inf(sign: isize) -> Self {
+        Self::new(if sign < 0 {
+            f64::NEG_INFINITY
+        } else {
+            f64::INFINITY
+        })
+    }
+    /// port: tsc/internal/jsnum/jsnum.go:Number.IsNaN
+    pub fn is_nan(self) -> bool {
+        self.0.is_nan()
+    }
+    /// port: tsc/internal/jsnum/jsnum.go:Number.IsInf
+    pub fn is_inf(self) -> bool {
+        self.0.is_infinite()
+    }
+    /// port: tsc/internal/jsnum/jsnum.go:isNonFinite
+    pub fn is_non_finite(self) -> bool {
+        self.0.to_bits() & 0x7ff0_0000_0000_0000 == 0x7ff0_0000_0000_0000
+    }
+    /// port: tsc/internal/jsnum/jsnum.go:Number.Floor
+    #[must_use]
+    pub fn floor(self) -> Self {
+        Self::new(self.0.floor())
+    }
+    /// port: tsc/internal/jsnum/jsnum.go:Number.Abs
+    #[must_use]
+    pub fn abs(self) -> Self {
+        Self::new(self.0.abs())
+    }
+    /// port: tsc/internal/jsnum/jsnum.go:Number.trunc
+    #[must_use]
+    pub fn trunc(self) -> Self {
+        Self::new(self.0.trunc())
+    }
     // port: tsc/internal/jsnum/jsnum.go:Number.toInt32
     pub fn to_int32(self) -> i32 {
         let value = self.value();
@@ -25,7 +64,7 @@ impl Number {
     }
 
     // port: tsc/internal/jsnum/jsnum.go:Number.toShiftCount
-    fn shift_count(self) -> u32 {
+    pub fn shift_count(self) -> u32 {
         self.to_uint32() & 31
     }
 
