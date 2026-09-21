@@ -1,0 +1,21 @@
+[package]
+name = "phase1_filesystem"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+description = "Phase 1 F2a: answers the filesystem, path and matching request schedule with the production Rust implementations, row for row"
+
+# A private harness, following tools/phase1/leaves. It needs direct dependencies
+# on every crate the filesystem surface touches, and no published crate has that
+# set, so it lives here rather than as an example on a shipped crate.
+[dependencies]
+serde_json = { version = "1", features = ["preserve_order"] }
+tsr_jsstring = { version = "0.1.0", path = "../../../crates/tsr_jsstring" }
+tsr_tsoptions = { version = "0.1.0", path = "../../../crates/tsr_tsoptions" }
+tsr_tspath = { version = "0.1.0", path = "../../../crates/tsr_tspath" }
+tsr_vfs = { version = "0.1.0", path = "../../../crates/tsr_vfs" }
+
+[lints]
+workspace = true

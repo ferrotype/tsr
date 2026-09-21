@@ -192,6 +192,44 @@ FAMILIES = {
         "rust_example": "phase1_leaves",
         "rust_target": "tools/phase1/leaves/src/main.rs",
     },
+    "filesystem": {
+        # One request fragment per adapter surface, so each group owns its file.
+        "requests": [
+            "data/phase1/requests/filesystem-tspath.json",
+            "data/phase1/requests/filesystem-glob.json",
+            "data/phase1/requests/filesystem-vfsmatch.json",
+            "data/phase1/requests/filesystem-memory.json",
+            "data/phase1/requests/filesystem-adapters.json",
+            "data/phase1/requests/filesystem-os.json",
+        ],
+        "native_probes": [
+            {"name": "tspath", "package": "tspath",
+             "probe": "tools/phase1/filesystem/tspath_probe_test.go",
+             "test": "TestPhase1FilesystemTspath"},
+            {"name": "glob", "package": "glob",
+             "probe": "tools/phase1/filesystem/glob_probe_test.go",
+             "test": "TestPhase1FilesystemGlob"},
+            {"name": "vfsmatch", "package": "vfs/vfsmatch",
+             "probe": "tools/phase1/filesystem/vfsmatch_probe_test.go",
+             "test": "TestPhase1FilesystemVfsmatch"},
+            {"name": "vfstest", "package": "vfs/vfstest",
+             "probe": "tools/phase1/filesystem/vfstest_probe_test.go",
+             "test": "TestPhase1FilesystemVfstest"},
+            {"name": "adapters", "package": "vfs/cachedvfs",
+             "probe": "tools/phase1/filesystem/adapters_probe_test.go",
+             "test": "TestPhase1FilesystemAdapters"},
+            # The live OS group mutates a real filesystem, so it stays inside a
+            # per-case temporary root and its cases declare host applicability:
+            # one host's results never certify the other.
+            {"name": "osvfs", "package": "vfs/osvfs",
+             "probe": "tools/phase1/filesystem/osvfs_probe_test.go",
+             "test": "TestPhase1FilesystemOsvfs"},
+        ],
+        "rust_package": "phase1_filesystem",
+        "rust_target_kind": "bin",
+        "rust_example": "phase1_filesystem",
+        "rust_target": "tools/phase1/filesystem/src/main.rs",
+    },
 }
 # The six command families the plan names. Only `pilot` is wired at F0; the
 # rest are registered so `inventory --check` can report them as unprepared

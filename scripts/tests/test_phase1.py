@@ -1414,7 +1414,7 @@ class RosterLedgerTests(unittest.TestCase):
     def setUp(self):
         self.scope = json.loads((ROOT / "data/phase1/scope.json").read_text())
         self.cases = json.loads((ROOT / "data/phase1/cases.json").read_text())
-        self.path = ROOT / "data/phase1/leaf-roster.json"
+        self.path = scope.roster_path("leaves")
         self.original = self.path.read_bytes() if self.path.is_file() else None
 
     def tearDown(self):
@@ -1446,16 +1446,33 @@ class RosterLedgerTests(unittest.TestCase):
         }])
         self.assertTrue(any("not an operation in the frozen scope" in p for p in problems))
 
-    def test_an_exemption_outside_the_leaf_packages_is_rejected(self):
-        outside = next(
-            row["id"] for row in self.scope["operations"]
-            if row["go_package"] not in scope.LEAF_PACKAGES
-        )
-        problems = self.forge([{
-            "operation": outside, "category": "later_step",
-            "owner": "F2a", "evidence": "read at the pin",
-        }])
-        self.assertTrue(any("never on F1a's roster" in p for p in problems))
+    def test_an_exemption_outside_the_step_packages_is_rejected(self):
+        """A step may not exempt what was never on its roster, including another step's."""
+        owned = set().union(*scope.STEP_PACKAGES.values())
+        for outside, why in (
+            (next(row["id"] for row in self.scope["operations"]
+                  if row["go_package"] not in owned), "no step owns it"),
+            (next(row["id"] for row in self.scope["operations"]
+                  if row["go_package"] in scope.FILESYSTEM_PACKAGES), "another step owns it"),
+        ):
+            problems = self.forge([{
+                "operation": outside, "category": "later_step",
+                "owner": "somewhere else", "evidence": "read at the pin",
+            }])
+            self.assertTrue(any("was never on that roster" in p for p in problems), why)
+
+    def test_every_declared_step_is_validated_when_none_is_named(self):
+        """A new step cannot slip in with no ledger: the unnamed call checks them all."""
+        self.assertEqual(scope.roster_problems(self.scope, self.cases), [])
+        for step in scope.STEP_PACKAGES:
+            path = scope.roster_path(step)
+            original = path.read_bytes()
+            try:
+                path.unlink()
+                problems = scope.roster_problems(self.scope, self.cases)
+            finally:
+                path.write_bytes(original)
+            self.assertTrue(any(step in p and "has no reviewed ledger" in p for p in problems), step)
 
     def test_an_unknown_category_is_rejected(self):
         problems = self.forge([{
@@ -1538,7 +1555,7 @@ class RosterLedgerTests(unittest.TestCase):
     def test_an_absent_ledger_is_itself_a_problem(self):
         self.path.unlink(missing_ok=True)
         self.assertTrue(any("has no reviewed ledger" in p
-                            for p in scope.roster_problems(self.scope, self.cases)))
+                            for p in scope.roster_problems(self.scope, self.cases, "leaves")))
 
     def test_every_exempt_category_is_documented(self):
         document = json.loads(self.original) if self.original else {"exemptions": []}
