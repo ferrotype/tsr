@@ -7402,7 +7402,6 @@
       "tsc/internal/tspath/path.go:EnsurePathIsNonModuleName",
       "tsc/internal/tspath/path.go:EnsureTrailingDirectorySeparator",
       "tsc/internal/tspath/path.go:FileExtensionIs",
-      "tsc/internal/tspath/path.go:ForEachAncestorDirectory",
       "tsc/internal/tspath/path.go:ForEachAncestorDirectoryPath",
       "tsc/internal/tspath/path.go:ForEachAncestorDirectoryStoppingAtGlobalCache",
       "tsc/internal/tspath/path.go:GetCommonParents",

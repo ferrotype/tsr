@@ -2,9 +2,9 @@
   "counts": {
     "covered": 151,
     "equivalent_rust": 8,
-    "implemented_untested": 3339,
+    "implemented_untested": 3340,
     "later_phase": 18,
-    "missing": 1279
+    "missing": 1278
   },
   "dispositions": [
     "covered",
@@ -226747,14 +226747,14 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
       "depends_on": [
         "internal/stringutil"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "implemented_untested",
       "f1a_roster": null,
       "f1a_roster_owner": null,
       "go_package": "internal/tspath",
@@ -226764,7 +226764,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "path operations",
       "rust_home": [
