@@ -149905,11 +149905,12 @@
     },
     {
       "actual_home": null,
-      "basis": "witnessed by 2 exact link(s): leaves/options/effective-type-roots-config-base, leaves/options/effective-type-roots-explicit",
+      "basis": "witnessed by 3 exact link(s): leaves/options/effective-type-roots-config-base, leaves/options/effective-type-roots-explicit, leaves/options/effective-type-roots-relative-and-empty-base",
       "basis_kind": "rule",
       "cases": [
         "leaves/options/effective-type-roots-config-base",
-        "leaves/options/effective-type-roots-explicit"
+        "leaves/options/effective-type-roots-explicit",
+        "leaves/options/effective-type-roots-relative-and-empty-base"
       ],
       "depends_on": [
         "internal/collections",

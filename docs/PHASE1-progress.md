@@ -11,7 +11,7 @@ moved pin invalidates it.
 | Step | State |
 | --- | --- |
 | F0 — inventory, manifests and executable setup | **incomplete**: implementing and verifying the approved matchFiles test renderer, and connecting existing evidence to operation ids |
-| F1a — foundation leaf tests | **complete**: `leaves_prepared: true`; 225 leaf cases frozen, and all 460 inventoried leaf operations are prepared, witnessed or exempted by the reviewed ledger |
+| F1a — foundation leaf tests | **complete**: `leaves_prepared: true`; 225 leaf cases frozen, all 460 inventoried leaf operations prepared, witnessed or exempted by the reviewed ledger, and both divergences triaged |
 | F2a — filesystem, path and matching tests | not started |
 | F3a — config, command-line and resolution tests | not started |
 | F4a — syntax, binder and utility coverage | not started |
@@ -37,17 +37,18 @@ packages and a classified Rust result.
 | core/collections | 42 | 0 | 42 | 0 |
 | core | 21 | 13 | 8 | 0 |
 | core helpers | 20 | 1 | 19 | 0 |
-| compiler options | 32 | 26 | 4 | 2 |
+| compiler options | 32 | 27 | 4 | 1 |
 | JSON | 30 | 0 | 30 | 0 |
 | text/number/semver | 31 | 20 | 11 | 0 |
 | locale | 12 | 0 | 12 | 0 |
 | diagnostics | 27 | 6 | 21 | 0 |
 | bundled | 10 | 7 | 3 | 0 |
-| **total** | **225** | **73** | **150** | **2** |
+| **total** | **225** | **74** | **150** | **1** |
 
 Zero `native_unavailable`, zero `harness_failed`, zero `not_run`: every case
-runs on both sides. Both `different` rows are real port divergences this step
-found, recorded below rather than fixed here. The 150 `not_implemented` rows are
+runs on both sides. The two divergences this step found were triaged: one was a
+defect and is fixed, the other is a deliberate representation difference and is
+left recorded as the single `different` row. The 150 `not_implemented` rows are
 the honest preparation-time result — no `tsr_core::collections`, `tsr_json` or
 `tsr_locale` exists, and neither do most of the generic helpers — and each names
 its Go authority, intended signature and production home.
@@ -178,50 +179,71 @@ whose case set disagrees with the manifest in either direction. Before that
 command existed, `last_result` decided coverage and was written by hand, so a
 case could claim `match` without the run ever happening.
 
-### A port defect preparation found
+### A port defect preparation found, and fixed
 
-`crates/tsr_tspath/src/lib.rs:144` ends its ancestor walk with
+`crates/tsr_tspath/src/lib.rs` ended its ancestor walk with
 `if path.is_empty() { break; }`. The pinned `ForEachAncestorDirectory`
 (`upstream/tsc/internal/tspath/path.go:1116`) has no such guard: it stops only
-when the parent equals the directory, so a *relative* base yields the
-empty-string ancestor as its last step and Rust drops it. Absolute bases bottom
-out at the root and agree, which is why nothing had noticed.
+when the parent equals the directory.
 
-It is reachable through `GetEffectiveTypeRoots`: with `configFilePath` set to
-`sub/tsconfig.json`, Go answers `["sub/node_modules/@types", "node_modules/@types"]`
-and Rust answers `["sub/node_modules/@types"]`. The case
-`leaves/options/effective-type-roots-relative-and-empty-base` records it as
-`different`, which is the classification F1a asks for rather than a fix — the
-plan is explicit that production code is not ported to make this step green.
+The two are otherwise identical, and both languages compute a parent as
+`path[..max(root_length, last_slash)]`. For a **rooted** path that always
+retains the root and is never empty, so the extra guard cannot fire; for a
+**relative** one it fires exactly once, dropping the empty-string ancestor the
+pin yields last. So the walks agreed exactly on rooted input and differed by
+exactly one element on relative input — a proof from the source rather than a
+sample, and the reason the fix is safe: deleting the guard cannot change any
+rooted caller's answer.
 
-The fix belongs to F2b, because `tspath` is F2a's package. Size it before
-fixing: `path::ancestors` has six other call sites
-(`tsr_module/src/type_references.rs` twice, `tsr_module/src/resolver.rs`,
-`tsr_vfs/src/lib.rs` twice, `tsr_compiler/src/checker_module_specifiers.rs`,
-`tsr_testhost/src/filesystem.rs`), and each needs checking for whether its
-input can be relative.
+It surfaced through `GetEffectiveTypeRoots`, where a `configFilePath` of
+`sub/tsconfig.json` made Go answer
+`["sub/node_modules/@types", "node_modules/@types"]` and Rust answer only the
+first. Absolute bases agreed, which is why nothing had noticed.
+`leaves/options/effective-type-roots-relative-and-empty-base` now matches, and
+616 workspace tests pass with the guard gone.
 
-### A second divergence: `Clone` shares what it copies
+A sweep for the same class found nothing else.
+`crates/tsr_checker/src/module_specifiers.rs:156` looks similar but its
+`remaining.is_empty()` exit is behaviour-preserving, because whatever is left is
+appended after the loop; `contains_path` carries the identical empty check the
+pin has.
+
+### The one divergence left standing: `Clone` shares what it copies
 
 `CompilerOptions.Clone` is a field-by-field reflective `Set`
 (`upstream/tsc/internal/core/compileroptions.go:180-192`), so a pointer-backed
 field is copied as the pointer and a slice as its header. Writing through the
-source *after* the clone is therefore read back by the clone: with
-`Checkers` (`*int`) set to 2 and `Types` to `["alpha", "beta"]`, mutating the
-source to 7 and `"rewritten"` leaves the Go clone reading 7 and `"rewritten"`.
-`tsr_core::CompilerOptions` derives `Clone` over owned fields
-(`checkers: Option<isize>`), so the port's clone reads 2 and `"alpha"`.
+source *after* the clone is therefore read back by the clone: with `Checkers`
+(`*int`) at 2 and `Types` at `["alpha", "beta"]`, mutating the source to 7 and
+`"rewritten"` leaves the Go clone reading 7 and `"rewritten"`.
+`tsr_core::CompilerOptions` derives `Clone` over owned fields, so the port's
+clone reads 2 and `"alpha"`. Nine of the pinned struct's 131 fields can share:
+`Paths`, `MaxNodeModuleJsDepth`, `Checkers` and six `[]string`.
 
-The original field-roster case could not see this: at the instant of the clone
-the two sides agree, which is exactly why the mutation case exists.
-`leaves/options/clone-shares-pointer-backed-fields` records it as `different`.
-Its third action sets neither field, so the mutation is a no-op there and both
-sides agree — which keeps the difference attributable to the sharing rather
-than to the action.
+**Triaged as a deliberate difference, not a defect.** The sharing is incidental
+in the pin, not load-bearing:
 
-F1b owns the decision: whether the port represents a shared option field at
-all, or whether the callers that rely on writing through a cloned
-`CompilerOptions` are themselves ported differently.
+- Every pinned `Clone()` caller assigns whole fields afterwards —
+  `transpile.go:127`, `ls/sourcedefinition.go:149`, and `harnessutil.go:260`
+  through `ParseCompilerOptions`, which assigns.
+- The one place the pin needs an independent `Paths` it deep-clones
+  **explicitly**: `tsoptions/tsconfigparsing.go:1830-1839` does
+  `paths = compilerOptions.Paths.Clone()` and reassigns before mutating. That is
+  the pin working around its own shallow `Clone`.
+
+The port never had the sharing to lose, either: `paths` is
+`Vec<(JsString, Option<Vec<JsString>>)>`, an owned value rather than a pointer
+to an `OrderedMap`. Reproducing the sharing would mean `Arc` or interior
+mutability across nine fields to carry a property no caller uses.
+
+So the recommendation is to leave the port deep and keep
+`leaves/options/clone-shares-pointer-backed-fields` reporting `different`, so
+the difference stays visible rather than being waived. F3b confirms it as the
+option-consuming callers land. The original field-roster case could not see any
+of this: at the instant of the clone the two sides agree, which is exactly why
+the mutation case exists. Its third action sets neither field, so the mutation
+is a no-op there and both sides agree, keeping the difference attributable to
+the sharing rather than to the action.
 
 ### F1b queue
 

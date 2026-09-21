@@ -3749,11 +3749,11 @@
       ]
     },
     {
-      "expected_contract": "The ancestor walk stops only when a directory is its own parent, so a relative base ends with the empty-string ancestor and contributes a final bare node_modules/@types entry. A configFilePath with no directory part gives an empty base and still walks, because the empty-base panic guards only the current-directory branch; with neither a configFilePath nor a current directory the pinned panic text is the contract.",
+      "expected_contract": "The ancestor walk stops only when a directory is its own parent, so a relative base ends with the empty-string ancestor and contributes a final bare node_modules/@types entry. A configFilePath with no directory part gives an empty base and still walks, because the empty-base panic guards only the current-directory branch; with neither a configFilePath nor a current directory the pinned panic text is the contract. This case reported `different` when it was first frozen: crates/tsr_tspath/src/lib.rs ended its ancestor walk on an empty path, where the pinned ForEachAncestorDirectory stops only when the parent equals the directory, so a relative base lost its last type root. The guard is gone and the case matches; it stays as the regression that would catch the guard coming back",
       "family": "leaves",
       "host_applicability": "any",
       "id": "leaves/options/effective-type-roots-relative-and-empty-base",
-      "last_result": "different",
+      "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operation_actions": {
         "0:get_effective_type_roots": [
