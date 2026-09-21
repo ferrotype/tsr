@@ -13129,10 +13129,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/glob/element-render-direct",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/glob/glob.go:charRange.String"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "00 build_elems": [],
@@ -13353,10 +13350,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/glob/match-byte-vs-rune",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/glob/glob.go:match"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "00 parse \"?\"": [
@@ -13493,10 +13487,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/glob/match-group-branch-buffer",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/glob/glob.go:match"
-      ],
+      "last_result": "different",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "00 build_elems": [],
@@ -13607,10 +13598,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/glob/match-star-separator",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/glob/glob.go:Glob.Match"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "00 parse \"*/a\"": [
@@ -13899,10 +13887,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/glob/parse-grammar-battery",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/glob/glob.go:Parse"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "00 parse \"\"": [
@@ -14116,10 +14101,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/glob/parse-literal-nested-specials",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/glob/glob.go:Glob.parseLiteral"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "00 parse_literal \"abc\" nested=false": [
@@ -14216,10 +14198,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/glob/parse-nested-residual",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/glob/glob.go:parse"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "00 parse_nested \"a,b}\" nested=false": [
@@ -14293,10 +14272,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/glob/read-range-rune-decode",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/glob/glob.go:readRangeRune"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "00 read_range_rune \"\"": [
@@ -14342,10 +14318,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/glob/split-separator-runs",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/glob/glob.go:split"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "00 split \"\"": [
@@ -14394,10 +14367,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/glob/string-round-trip",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/glob/glob.go:Glob.String"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "00 parse \"\"": [
@@ -14673,10 +14643,7 @@
       "family": "filesystem",
       "host_applicability": "any. Every backing is in memory (testing/fstest.MapFS, the pinned vfstest.MapFS, or a probe-local double), the clock is injected (vfstest.go:80) so no observation is a wall-clock reading, and no action touches the host filesystem, the environment or the working directory.",
       "id": "filesystem/iovfs/chtimes-arguments-and-effect",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/iovfs/iofs.go:ioFS.Chtimes"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "backing_mod_time": [],
@@ -14704,10 +14671,7 @@
       "family": "filesystem",
       "host_applicability": "any. Every backing is in memory (testing/fstest.MapFS, the pinned vfstest.MapFS, or a probe-local double), the clock is injected (vfstest.go:80) so no observation is a wall-clock reading, and no action touches the host filesystem, the environment or the working directory.",
       "id": "filesystem/iovfs/entries-order-and-symlinks",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/iovfs/iofs.go:ioFS.GetAccessibleEntries"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "entries": [
@@ -14728,10 +14692,7 @@
       "family": "filesystem",
       "host_applicability": "any. Every backing is in memory (testing/fstest.MapFS, the pinned vfstest.MapFS, or a probe-local double), the clock is injected (vfstest.go:80) so no observation is a wall-clock reading, and no action touches the host filesystem, the environment or the working directory.",
       "id": "filesystem/iovfs/entries-root-symlink-panic",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/iovfs/iofs.go:ioFS.GetAccessibleEntries"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "entries": [
@@ -14762,10 +14723,7 @@
       "family": "filesystem",
       "host_applicability": "any. Every backing is in memory (testing/fstest.MapFS, the pinned vfstest.MapFS, or a probe-local double), the clock is injected (vfstest.go:80) so no observation is a wall-clock reading, and no action touches the host filesystem, the environment or the working directory.",
       "id": "filesystem/iovfs/exists-cross-polarity",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/iovfs/iofs.go:ioFS.FileExists"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "directory_exists": [
@@ -14791,10 +14749,7 @@
       "family": "filesystem",
       "host_applicability": "any. Every backing is in memory (testing/fstest.MapFS, the pinned vfstest.MapFS, or a probe-local double), the clock is injected (vfstest.go:80) so no observation is a wall-clock reading, and no action touches the host filesystem, the environment or the working directory.",
       "id": "filesystem/iovfs/from-capability-matrix",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/iovfs/iofs.go:From"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "append_file": [
@@ -14839,10 +14794,7 @@
       "family": "filesystem",
       "host_applicability": "any. Every backing is in memory (testing/fstest.MapFS, the pinned vfstest.MapFS, or a probe-local double), the clock is injected (vfstest.go:80) so no observation is a wall-clock reading, and no action touches the host filesystem, the environment or the working directory.",
       "id": "filesystem/iovfs/fsys-identity-and-aliasing",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/iovfs/iofs.go:ioFS.FSys"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "fsys_identity": [
@@ -14880,10 +14832,7 @@
       "family": "filesystem",
       "host_applicability": "any. Every backing is in memory (testing/fstest.MapFS, the pinned vfstest.MapFS, or a probe-local double), the clock is injected (vfstest.go:80) so no observation is a wall-clock reading, and no action touches the host filesystem, the environment or the working directory.",
       "id": "filesystem/iovfs/read-file-decoding",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/iovfs/iofs.go:ioFS.ReadFile"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "new_fs": [
@@ -14904,10 +14853,7 @@
       "family": "filesystem",
       "host_applicability": "any. Every backing is in memory (testing/fstest.MapFS, the pinned vfstest.MapFS, or a probe-local double), the clock is injected (vfstest.go:80) so no observation is a wall-clock reading, and no action touches the host filesystem, the environment or the working directory.",
       "id": "filesystem/iovfs/realpath-capability-modes",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/iovfs/iofs.go:ioFS.Realpath"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "new_fs": [
@@ -14928,10 +14874,7 @@
       "family": "filesystem",
       "host_applicability": "any. Every backing is in memory (testing/fstest.MapFS, the pinned vfstest.MapFS, or a probe-local double), the clock is injected (vfstest.go:80) so no observation is a wall-clock reading, and no action touches the host filesystem, the environment or the working directory.",
       "id": "filesystem/iovfs/remove-semantics",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/iovfs/iofs.go:ioFS.Remove"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "directory_exists": [
@@ -14967,10 +14910,7 @@
       "family": "filesystem",
       "host_applicability": "any. Every backing is in memory (testing/fstest.MapFS, the pinned vfstest.MapFS, or a probe-local double), the clock is injected (vfstest.go:80) so no observation is a wall-clock reading, and no action touches the host filesystem, the environment or the working directory.",
       "id": "filesystem/iovfs/stat-path-forms-and-roots",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/iovfs/iofs.go:ioFS.Stat"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "new_fs": [
@@ -14991,10 +14931,7 @@
       "family": "filesystem",
       "host_applicability": "any. Every backing is in memory (testing/fstest.MapFS, the pinned vfstest.MapFS, or a probe-local double), the clock is injected (vfstest.go:80) so no observation is a wall-clock reading, and no action touches the host filesystem, the environment or the working directory.",
       "id": "filesystem/iovfs/use-case-sensitive-file-names",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/iovfs/iofs.go:ioFS.UseCaseSensitiveFileNames"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "file_exists": [
@@ -15024,10 +14961,7 @@
       "family": "filesystem",
       "host_applicability": "any. Every backing is in memory (testing/fstest.MapFS, the pinned vfstest.MapFS, or a probe-local double), the clock is injected (vfstest.go:80) so no observation is a wall-clock reading, and no action touches the host filesystem, the environment or the working directory.",
       "id": "filesystem/iovfs/walkdir-order-and-controls",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/iovfs/iofs.go:ioFS.WalkDir"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "new_fs": [
@@ -15048,10 +14982,7 @@
       "family": "filesystem",
       "host_applicability": "any. Every backing is in memory (testing/fstest.MapFS, the pinned vfstest.MapFS, or a probe-local double), the clock is injected (vfstest.go:80) so no observation is a wall-clock reading, and no action touches the host filesystem, the environment or the working directory.",
       "id": "filesystem/iovfs/walkdir-roots-and-errors",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/iovfs/iofs.go:ioFS.WalkDir"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "new_fs": [
@@ -15072,10 +15003,7 @@
       "family": "filesystem",
       "host_applicability": "any. Every backing is in memory (testing/fstest.MapFS, the pinned vfstest.MapFS, or a probe-local double), the clock is injected (vfstest.go:80) so no observation is a wall-clock reading, and no action touches the host filesystem, the environment or the working directory.",
       "id": "filesystem/iovfs/write-and-append-semantics",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/iovfs/iofs.go:ioFS.AppendFile"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "append_file": [
@@ -15124,10 +15052,7 @@
       "family": "filesystem",
       "host_applicability": "any. Every backing is in memory (testing/fstest.MapFS, the pinned vfstest.MapFS, or a probe-local double), the clock is injected (vfstest.go:80) so no observation is a wall-clock reading, and no action touches the host filesystem, the environment or the working directory.",
       "id": "filesystem/iovfs/write-file-ensuring-dir-control-flow",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/iovfs/iofs.go:ioFS.writeFileEnsuringDir"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "append_file": [
@@ -15157,10 +15082,7 @@
       "family": "filesystem",
       "host_applicability": "any. Every backing is in memory (testing/fstest.MapFS, the pinned vfstest.MapFS, or a probe-local double), the clock is injected (vfstest.go:80) so no observation is a wall-clock reading, and no action touches the host filesystem, the environment or the working directory.",
       "id": "filesystem/iovfs/write-file-ensuring-dir-live",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/iovfs/iofs.go:ioFS.WriteFile"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "append_file": [
@@ -17961,10 +17883,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/symlinks/a-nil-link-is-present-and-blocks-the-reverse-index-forever",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/symlinks/knownsymlinks.go:KnownSymlinks.SetDirectory"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "dump": [
@@ -18002,10 +17921,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/symlinks/has-directory-appends-the-separator-and-set-directory-does-not",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/symlinks/knownsymlinks.go:KnownSymlinks.HasDirectory"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "dump": [
@@ -18043,10 +17959,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/symlinks/process-resolution-records-the-file-even-when-it-guesses-no-directory",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/symlinks/knownsymlinks.go:KnownSymlinks.ProcessResolution"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "dump": [
@@ -18088,10 +18001,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/symlinks/resolutions-are-drained-modules-first-with-a-nil-source-file",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/symlinks/knownsymlinks.go:KnownSymlinks.SetSymlinksFromResolutions"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "dump": [
@@ -18135,10 +18045,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/symlinks/set-file-canonicalises-only-the-reverse-key",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/symlinks/knownsymlinks.go:KnownSymlinks.SetFile"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "dump": [
@@ -18172,10 +18079,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/symlinks/the-common-ancestor-walk-stops-at-the-package-boundary",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/symlinks/knownsymlinks.go:KnownSymlinks.guessDirectorySymlink"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "guess_directory_symlink": [
@@ -18197,10 +18101,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/symlinks/the-constructor-captures-cwd-and-case-sensitivity-for-the-cache-s-lifetime",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/symlinks/knownsymlinks.go:NewKnownSymlink"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "dump": [
@@ -18242,10 +18143,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/symlinks/the-four-accessors-hand-back-the-cache-s-own-storage",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/symlinks/knownsymlinks.go:KnownSymlinks.Directories"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "dump": [
@@ -18309,10 +18207,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/symlinks/the-ignored-path-test-runs-on-the-canonical-path-and-spares-the-file-half",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/symlinks/knownsymlinks.go:KnownSymlinks.ProcessResolution"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "dump": [
@@ -18354,10 +18249,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/symlinks/the-package-boundary-test-folds-node-modules-but-not-the-scope-sigil",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/symlinks/knownsymlinks.go:KnownSymlinks.isNodeModulesOrScopedPackageDirectory"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "is_node_modules_or_scoped_package_directory": [
@@ -18377,10 +18269,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/symlinks/the-reverse-directory-index-is-written-once-and-never-corrected",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/symlinks/knownsymlinks.go:KnownSymlinks.SetDirectory"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "dump": [
@@ -18414,10 +18303,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/tspath/ancestor-walk-path-dialect",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tspath/path.go:ForEachAncestorDirectoryPath"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "ancestor_walk_path": [
@@ -18449,10 +18335,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/tspath/ancestor-walk-stop-and-global-cache",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tspath/path.go:ForEachAncestorDirectoryStoppingAtGlobalCache"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "ancestor_walk_stop_at": [
@@ -18473,7 +18356,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/tspath/base-file-name",
-      "last_result": "different",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "base_file_name": [
@@ -18489,10 +18372,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/tspath/byte-predicates",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tspath/path.go:IsVolumeCharacter"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "byte_predicates": [
@@ -18531,10 +18411,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/tspath/change-extension-family",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tspath/extension.go:ChangeExtension"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "change_any_extension": [
@@ -18574,10 +18451,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/tspath/common-parents",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tspath/path.go:GetCommonParents"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "common_parents": [
@@ -18598,10 +18472,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/tspath/compare-separator-count",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tspath/path.go:CompareNumberOfDirectorySeparators"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "compare_number_of_directory_separators": [
@@ -18617,10 +18488,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/tspath/component-reduction",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tspath/path.go:reducePathComponents"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "normalized_components_from_combined": [
@@ -18640,10 +18508,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/tspath/contains-ignored-path",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tspath/ignoredpaths.go:ContainsIgnoredPath"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "contains_ignored_path": [
@@ -18659,10 +18524,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/tspath/convert-to-relative-path",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tspath/path.go:ConvertToRelativePath"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "convert_to_relative_path": [
@@ -18694,10 +18556,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/tspath/extension-extract-tables",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tspath/extension.go:TryGetExtensionFromPath"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "extension_extract_tables": [
@@ -18721,10 +18580,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/tspath/extension-family-predicates",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tspath/extension.go:HasTSFileExtension"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "extension_family_predicates": [
@@ -18746,10 +18602,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/tspath/extension-first-versus-longest",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tspath/path.go:GetAnyExtensionFromPath"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "any_extension_from_path": [
@@ -18777,10 +18630,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/tspath/extension-is-predicates",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tspath/extension.go:ExtensionIsTs"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "extension_is_one_of": [
@@ -18800,10 +18650,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/tspath/file-extension-is",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tspath/path.go:FileExtensionIs"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "file_extension_is": [
@@ -18823,10 +18670,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/tspath/file-url-volume-separator-end",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tspath/path.go:getFileUrlVolumeSeparatorEnd"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "file_url_volume_separator_end": [
@@ -18842,7 +18686,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/tspath/has-extension",
-      "last_result": "different",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "has_extension": [
@@ -18876,10 +18720,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/tspath/module-name-shape",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tspath/path.go:EnsurePathIsNonModuleName"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "module_name_shape": [
@@ -18897,10 +18738,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/tspath/normalize-fast-path",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tspath/path.go:simpleNormalizePath"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "has_relative_path_segment": [
@@ -18969,10 +18807,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/tspath/normalized-absolute-path-without-root",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tspath/path.go:GetNormalizedAbsolutePathWithoutRoot"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "normalized_absolute_path_without_root": [
@@ -18988,10 +18823,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/tspath/path-comparison-modes",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tspath/path.go:ComparePathsCaseSensitive"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "compare_paths_wrappers": [
@@ -19020,10 +18852,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/tspath/path-components-relative-to",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tspath/path.go:GetPathComponentsRelativeTo"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "path_components_relative_to": [
@@ -19039,10 +18868,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/tspath/path-components-split",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tspath/path.go:GetPathComponents"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "path_components": [
@@ -19079,10 +18905,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/tspath/remove-extension-family",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tspath/extension.go:RemoveExtension"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "remove_any_file_extension": [
@@ -19134,10 +18957,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/tspath/resolve-tripleslash-reference",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tspath/path.go:ResolveTripleslashReference"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "resolve_tripleslash_reference": [
@@ -19171,10 +18991,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/tspath/root-predicates",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tspath/path.go:PathIsAbsolute"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "root_predicates": [
@@ -19198,10 +19015,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/tspath/split-volume-path",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tspath/path.go:SplitVolumePath"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "split_volume_path": [
@@ -19217,10 +19031,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/tspath/starts-with-directory",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tspath/path.go:StartsWithDirectory"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "starts_with_directory": [
@@ -19252,7 +19063,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/tspath/to-path-modes",
-      "last_result": "different",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "to_path": [
@@ -19268,10 +19079,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/tspath/trailing-separator-family",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tspath/path.go:HasTrailingDirectorySeparator"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "trailing_separator_family": [
@@ -19297,10 +19105,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/tspath/trim-rune-count",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tspath/path.go:trimRuneCount"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "trim_rune_count": [
@@ -19316,10 +19121,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/tspath/typed-path-contains",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tspath/path.go:Path.ContainsPath"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "typed_path_contains": [
@@ -19335,10 +19137,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/tspath/typed-path-directory",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tspath/path.go:Path.GetDirectoryPath"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "typed_path_directory": [
@@ -19430,7 +19229,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/vfsmatch/read-directory-base-path-comparer",
-      "last_result": "different",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "read_directory includes=[../Other/**/*.ts,../other/**/*.ts] caseSensitive=false": [
@@ -23060,10 +22859,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/vfsmatch/usage-string-domain",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/vfsmatch/stringer_generated.go:Usage.String"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "usage_string value=-1": [
@@ -23408,10 +23204,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/vfstest/broken-symlink-error-taxonomy",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/vfstest/vfstest.go:MapFS.getFollowingSymlinksWorker"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "from_map": [
@@ -23472,10 +23265,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/vfstest/chtimes-keeps-only-the-modification-time",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/vfstest/vfstest.go:MapFS.Chtimes"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "chtimes": [
@@ -23535,10 +23325,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/vfstest/convert-map-fs-rejects-a-colliding-or-shadowed-map",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/vfstest/vfstest.go:convertMapFS"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "convert_map_fs": [
@@ -23600,10 +23387,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/vfstest/entries-order-is-segment-order",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/vfstest/vfstest.go:comparePathsByParts"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "compare_paths": [
@@ -23655,10 +23439,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/vfstest/from-map-rejects-malformed-maps",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/vfstest/vfstest.go:FromMap"
-      ],
+      "last_result": "different",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "entries": [
@@ -23711,10 +23492,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/vfstest/get-file-info-answers-for-the-link-itself",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/vfstest/vfstest.go:MapFS.GetFileInfo"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "from_map": [
@@ -23807,10 +23585,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/vfstest/handle-names-come-from-the-realpath",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/vfstest/vfstest.go:fileInfo.Name"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "base_name": [
@@ -23911,10 +23686,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/vfstest/injected-clock-orders-every-stamp",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/vfstest/vfstest.go:FromMapWithClock"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "add_symlink": [
@@ -24021,10 +23793,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/vfstest/mkdir-all-restarts-at-a-symlinked-parent",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/vfstest/vfstest.go:MapFS.mkdirAll"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "add_symlink": [
@@ -24116,10 +23885,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/vfstest/path-helpers-at-the-drive-root-boundary",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/vfstest/vfstest.go:splitPath"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "base_name": [
@@ -24159,10 +23925,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/vfstest/realpath-reports-the-stored-spelling",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/vfstest/vfstest.go:MapFS.Realpath"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "add_symlink": [
@@ -24223,10 +23986,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/vfstest/remove-is-recursive-and-prefix-guarded",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/vfstest/vfstest.go:MapFS.Remove"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "add_symlink": [
@@ -24354,7 +24114,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/vfstest/snapshot-paired-publication-retains-bytes",
-      "last_result": "different",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "build": [
@@ -24405,10 +24165,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/vfstest/symlink-creation-rooting-asymmetry",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/vfstest/vfstest.go:MapFS.AddSymlink"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "add_symlink": [
@@ -24490,10 +24247,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/vfstest/synthesized-directories-and-the-dot-root",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/vfstest/vfstest.go:MapFS.Open"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "convert_info_raw": [
@@ -24577,10 +24331,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/vfstest/the-map-is-keyed-canonically-the-name-is-not",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/vfstest/vfstest.go:MapFS.setEntry"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "canonical": [
@@ -24668,10 +24419,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/vfstest/write-file-parent-rules-across-dialects",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/vfstest/vfstest.go:MapFS.WriteFile"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "add_symlink": [
@@ -24746,10 +24494,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/vfstest/write-through-a-broken-symlink-duplicates-a-name",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/vfstest/vfstest.go:MapFS.AppendFile"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "add_symlink": [
