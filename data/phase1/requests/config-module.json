@@ -1,0 +1,4024 @@
+{
+  "family": "config",
+  "requests": [
+    {
+      "actions": [
+        {
+          "keys": [
+            "types@>=4.0",
+            "types@>=7.0",
+            "types@>=7.1",
+            "types@>=7.2",
+            "types@7.1",
+            "types@*",
+            "types@<7.1",
+            "types@>=7.1.0-dev",
+            "types@>=4.0 <8.0",
+            "types",
+            "types@",
+            "types@not-a-range",
+            "require",
+            "TYPES@>=4.0"
+          ],
+          "op": "versioned_types_key"
+        }
+      ],
+      "case": "config/module/helpers/versioned-types-key",
+      "discriminates": "a port that accepts any `types@` prefix without parsing the range, or that parses the range but compares against a hardcoded release version rather than semver.MustParse(core.Version()) (util.go:13). The pinned compiler version is a PRERELEASE, so a range whose lower bound is the same release excludes it; a port that dropped the prerelease component answers the opposite for `types@>=7.1`. The two malformed keys catch a port that returns true whenever the prefix matches.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/util.go:IsApplicableVersionedTypesKey",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "names": [
+            "@scope/pkg",
+            "pkg",
+            "@scope",
+            "@",
+            "@/x",
+            "",
+            "@a/b/c",
+            "a/b",
+            "a@b/c"
+          ],
+          "op": "mangle_scoped"
+        },
+        {
+          "names": [
+            "@scope/pkg",
+            "pkg",
+            "@scope",
+            "",
+            "@a/b/c"
+          ],
+          "op": "types_package_name"
+        }
+      ],
+      "case": "config/module/helpers/mangle-scoped-and-types-package-name",
+      "discriminates": "the two boundary spellings the pin returns UNCHANGED: a bare `@scope` with no slash (util.go:60-62 returns the argument, including its `@`) and a name whose `@` is not at index 0. A port that strips the `@` before looking for the slash returns `scope`, and a port that uses a general `split('/')` mangles `@a/b/c` to `a__b/c` where the pin's single-cut produces `a__b/c` only because it cuts at the FIRST slash.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/util.go:MangleScopedPackageName",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "names": [
+            "a__b",
+            "a__b__c",
+            "__b",
+            "a__",
+            "plain",
+            "",
+            "__",
+            "a__b/c"
+          ],
+          "op": "unmangle_scoped"
+        },
+        {
+          "names": [
+            "@types/a__b",
+            "@types/plain",
+            "plain",
+            "@types/",
+            "a__b",
+            "@types/@types/x"
+          ],
+          "op": "package_name_from_types_package_name"
+        }
+      ],
+      "case": "config/module/helpers/unmangle-scoped-package-name",
+      "discriminates": "the pin cuts at the FIRST `__` and re-adds the `@` and `/` unconditionally (util.go:69-75), so a name with two `__` runs, a leading `__` and a trailing `__` all have defined answers a port that uses a last-index cut or a guard on the result gets wrong. GetPackageNameFromTypesPackageName is driven in the same trace because its only non-trivial branch is the unmangle call it makes after stripping `@types/` (util.go:81-87).",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/util.go:UnmangleScopedPackageName",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "inputs": [
+            {
+              "is_folder": false,
+              "path": "/a/node_modules/b/c.ts"
+            },
+            {
+              "is_folder": true,
+              "path": "/a/node_modules/b/c.ts"
+            },
+            {
+              "is_folder": false,
+              "path": "/a/node_modules/@s/b/c.ts"
+            },
+            {
+              "is_folder": true,
+              "path": "/a/node_modules/@s/b/c.ts"
+            },
+            {
+              "is_folder": false,
+              "path": "/a/node_modules/b/sub"
+            },
+            {
+              "is_folder": true,
+              "path": "/a/node_modules/b/sub"
+            },
+            {
+              "is_folder": false,
+              "path": "/a/node_modules/@s/b/sub"
+            },
+            {
+              "is_folder": true,
+              "path": "/a/node_modules/@s/b/sub"
+            },
+            {
+              "is_folder": false,
+              "path": "/a/node_modules/b"
+            },
+            {
+              "is_folder": true,
+              "path": "/a/node_modules/b"
+            },
+            {
+              "is_folder": false,
+              "path": "/a/node_modules/@s/b"
+            },
+            {
+              "is_folder": true,
+              "path": "/a/node_modules/@s/b"
+            },
+            {
+              "is_folder": false,
+              "path": "/a/node_modules/@s"
+            },
+            {
+              "is_folder": true,
+              "path": "/a/node_modules/@s"
+            },
+            {
+              "is_folder": false,
+              "path": "/a/node_modules/@types"
+            },
+            {
+              "is_folder": true,
+              "path": "/a/node_modules/@types"
+            },
+            {
+              "is_folder": false,
+              "path": "/a/b/c.ts"
+            },
+            {
+              "is_folder": true,
+              "path": "/a/b/c.ts"
+            },
+            {
+              "is_folder": false,
+              "path": "/a/node_modules/b/node_modules/c/d.ts"
+            },
+            {
+              "is_folder": true,
+              "path": "/a/node_modules/b/node_modules/c/d.ts"
+            }
+          ],
+          "op": "parse_node_module_from_path"
+        },
+        {
+          "inputs": [
+            {
+              "is_folder": false,
+              "path": "/a/node_modules/"
+            }
+          ],
+          "op": "parse_node_module_from_path"
+        }
+      ],
+      "case": "config/module/helpers/parse-node-module-from-path",
+      "discriminates": "the isFolder=false / no-trailing-separator corner: moveToNextDirectorySeparatorIfAvailable (resolver.go:1971-1984) returns the PREVIOUS separator index, so `/a/node_modules/b` with isFolder=false truncates to `/a/node_modules/` -- before the package name -- while isFolder=true returns the whole path. A port that always includes the package name answers `/a/node_modules/b` for both. The bare `@scope` and bare `@types` rows are the issue-4373 no-panic regression the pinned TestParseNodeModuleFromPath (resolver_test.go:301-330) exists for: the second move call runs on a path with no further separator.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/util.go:ParseNodeModuleFromPath",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "mode": 0,
+          "op": "conditions",
+          "options": {
+            "moduleResolution": 100
+          }
+        },
+        {
+          "mode": 1,
+          "op": "conditions",
+          "options": {
+            "moduleResolution": 100
+          }
+        },
+        {
+          "mode": 1,
+          "op": "conditions",
+          "options": {
+            "moduleResolution": 99
+          }
+        },
+        {
+          "mode": 99,
+          "op": "conditions",
+          "options": {
+            "moduleResolution": 3
+          }
+        },
+        {
+          "mode": 99,
+          "op": "conditions",
+          "options": {
+            "moduleResolution": 99,
+            "noDtsResolution": true
+          }
+        },
+        {
+          "mode": 99,
+          "op": "conditions",
+          "options": {
+            "customConditions": [
+              "zeta",
+              "alpha"
+            ],
+            "moduleResolution": 100
+          }
+        },
+        {
+          "mode": 0,
+          "op": "conditions",
+          "options": {}
+        },
+        {
+          "mode": 0,
+          "op": "conditions",
+          "options": {
+            "module": 199
+          }
+        }
+      ],
+      "case": "config/module/helpers/conditions-by-mode-and-kind",
+      "discriminates": "the ORDER and the three independent gates of the condition list (resolver.go:1925-1945): `import`/`require` first and chosen by the resolution MODE, `types` only when noDtsResolution is not true, `node` only when the resolution kind is not Bundler, and the custom conditions appended last in their own order. The mode==None-under-Bundler row catches a port that omits the ESNext substitution at :1928. A port that sorts, dedupes or returns a set loses the order the exports walk depends on.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:GetConditions",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "is_declaration_file": false,
+          "op": "resolution_diagnostic",
+          "options": {},
+          "resolved": {
+            "extension": ".ts",
+            "resolved_using_extra_extensions": false
+          }
+        },
+        {
+          "is_declaration_file": false,
+          "op": "resolution_diagnostic",
+          "options": {},
+          "resolved": {
+            "extension": ".d.ts",
+            "resolved_using_extra_extensions": false
+          }
+        },
+        {
+          "is_declaration_file": false,
+          "op": "resolution_diagnostic",
+          "options": {},
+          "resolved": {
+            "extension": ".mts",
+            "resolved_using_extra_extensions": false
+          }
+        },
+        {
+          "is_declaration_file": false,
+          "op": "resolution_diagnostic",
+          "options": {},
+          "resolved": {
+            "extension": ".cts",
+            "resolved_using_extra_extensions": false
+          }
+        },
+        {
+          "is_declaration_file": false,
+          "op": "resolution_diagnostic",
+          "options": {},
+          "resolved": {
+            "extension": ".tsx",
+            "resolved_using_extra_extensions": false
+          }
+        },
+        {
+          "is_declaration_file": false,
+          "op": "resolution_diagnostic",
+          "options": {},
+          "resolved": {
+            "extension": ".jsx",
+            "resolved_using_extra_extensions": false
+          }
+        },
+        {
+          "is_declaration_file": false,
+          "op": "resolution_diagnostic",
+          "options": {},
+          "resolved": {
+            "extension": ".js",
+            "resolved_using_extra_extensions": false
+          }
+        },
+        {
+          "is_declaration_file": false,
+          "op": "resolution_diagnostic",
+          "options": {},
+          "resolved": {
+            "extension": ".mjs",
+            "resolved_using_extra_extensions": false
+          }
+        },
+        {
+          "is_declaration_file": false,
+          "op": "resolution_diagnostic",
+          "options": {},
+          "resolved": {
+            "extension": ".cjs",
+            "resolved_using_extra_extensions": false
+          }
+        },
+        {
+          "is_declaration_file": false,
+          "op": "resolution_diagnostic",
+          "options": {},
+          "resolved": {
+            "extension": ".json",
+            "resolved_using_extra_extensions": false
+          }
+        },
+        {
+          "is_declaration_file": false,
+          "op": "resolution_diagnostic",
+          "options": {},
+          "resolved": {
+            "extension": ".css",
+            "resolved_using_extra_extensions": false
+          }
+        },
+        {
+          "is_declaration_file": false,
+          "op": "resolution_diagnostic",
+          "options": {
+            "jsx": 1
+          },
+          "resolved": {
+            "extension": ".tsx",
+            "resolved_using_extra_extensions": false
+          }
+        },
+        {
+          "is_declaration_file": false,
+          "op": "resolution_diagnostic",
+          "options": {
+            "jsx": 1
+          },
+          "resolved": {
+            "extension": ".jsx",
+            "resolved_using_extra_extensions": false
+          }
+        },
+        {
+          "is_declaration_file": false,
+          "op": "resolution_diagnostic",
+          "options": {
+            "allowJs": true
+          },
+          "resolved": {
+            "extension": ".js",
+            "resolved_using_extra_extensions": false
+          }
+        },
+        {
+          "is_declaration_file": false,
+          "op": "resolution_diagnostic",
+          "options": {
+            "strict": true
+          },
+          "resolved": {
+            "extension": ".js",
+            "resolved_using_extra_extensions": false
+          }
+        },
+        {
+          "is_declaration_file": false,
+          "op": "resolution_diagnostic",
+          "options": {
+            "resolveJsonModule": true
+          },
+          "resolved": {
+            "extension": ".json",
+            "resolved_using_extra_extensions": false
+          }
+        },
+        {
+          "is_declaration_file": true,
+          "op": "resolution_diagnostic",
+          "options": {},
+          "resolved": {
+            "extension": ".css",
+            "resolved_using_extra_extensions": false
+          }
+        },
+        {
+          "is_declaration_file": false,
+          "op": "resolution_diagnostic",
+          "options": {
+            "allowArbitraryExtensions": true
+          },
+          "resolved": {
+            "extension": ".css",
+            "resolved_using_extra_extensions": false
+          }
+        },
+        {
+          "is_declaration_file": false,
+          "op": "resolution_diagnostic",
+          "options": {},
+          "resolved": {
+            "extension": ".json",
+            "resolved_using_extra_extensions": true
+          }
+        }
+      ],
+      "case": "config/module/helpers/resolution-diagnostic-by-extension",
+      "discriminates": "the extension switch and its three option gates (util.go:125-180), including the two orderings a port gets wrong: `.jsx` asks needJsx FIRST and only then needAllowJs, while `.tsx` asks needJsx alone; and the ResolvedUsingExtraExtensions early return at :171 precedes the switch, so a module resolved through an extra extension reports nothing even for `.json` with resolveJsonModule off. The unknown-extension rows exercise the default arm, which reads file.IsDeclarationFile and therefore has two answers for one extension.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/util.go:GetResolutionDiagnostic",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "module_file_names": [
+            "",
+            "/p/src/a.ts",
+            " "
+          ],
+          "op": "is_resolved",
+          "type_reference_file_names": [
+            "",
+            "/p/src/a.d.ts",
+            " "
+          ]
+        }
+      ],
+      "case": "config/module/helpers/is-resolved-on-both-result-types",
+      "discriminates": "both predicates answer on the EMPTY file name, which is the `unresolved()` shape the resolver returns for a blocked export (types.go:77-79, :90-92). A port that tests for the presence of a result object rather than for a non-empty ResolvedFileName reports true for the zero value, which turns every blocked resolution into a successful one. The nil-receiver asymmetry between the two methods is NOT driven here; see NOTES.md.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/types.go:ResolvedModule.IsResolved",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "op": "package_id_string",
+          "package_ids": [
+            {
+              "name": "pkg",
+              "peer_dependencies": "",
+              "sub_module_name": "",
+              "version": "1.0.0"
+            },
+            {
+              "name": "pkg",
+              "peer_dependencies": "",
+              "sub_module_name": "sub/deep.js",
+              "version": "1.0.0"
+            },
+            {
+              "name": "@s/pkg",
+              "peer_dependencies": "+a@1.0.0+b@2.0.0",
+              "sub_module_name": "x.js",
+              "version": "0.0.0-dev"
+            },
+            {
+              "name": "pkg",
+              "peer_dependencies": "",
+              "sub_module_name": "",
+              "version": ""
+            },
+            {
+              "name": "",
+              "peer_dependencies": "",
+              "sub_module_name": "",
+              "version": ""
+            }
+          ]
+        }
+      ],
+      "case": "config/module/helpers/package-id-string-and-package-name",
+      "discriminates": "the exact rendering the `..._with_Package_ID_2` trace argument and every downstream package identity carry: `name[/subModuleName]@version` with the peerDependencies suffix appended RAW (types.go:54-60). A port that inserts a separator before the suffix, that omits the sub-module when it is empty by testing the whole id rather than SubModuleName, or that formats an empty version as `name` instead of `name@`, diverges on these rows.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/types.go:PackageId.String",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "candidates": [
+            "exact",
+            "a/x",
+            "a/b/x",
+            "two**stars",
+            "unrelated",
+            "a/"
+          ],
+          "op": "parsed_patterns",
+          "paths": {
+            "*": [
+              "./any/*.ts"
+            ],
+            "a/*": [
+              "./g/*.ts"
+            ],
+            "a/b/*": [
+              "./s/*.ts"
+            ],
+            "exact": [
+              "./e.ts"
+            ],
+            "two**stars": [
+              "./x.ts"
+            ]
+          }
+        }
+      ],
+      "case": "config/module/helpers/parsed-patterns-and-match",
+      "discriminates": "the exact-before-pattern rule and the longest-prefix tie-break the pinned ParsedPatterns encodes as TWO collections (resolver.go:1995-2045): an exact key is answered from matchableStringSet with StarIndex -1 and an EMPTY MatchedText, while a starred key goes through FindBestPatternMatch, which keeps the entry with the greatest StarIndex. A key with two stars is rejected by core.TryParsePattern and belongs to neither collection, so it can never match even itself. A port that keeps one ordered list and returns the first match answers `a/*` for `a/b/x` where the pin answers `a/b/*`.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:TryParsePatterns",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "{\"name\":\"pkg\",\"version\":\"1.0.0\",\"exports\":{\".\":{\"types\":{\"import\":\"./t.d.mts\",\"require\":\"./t.d.cts\"},\"import\":\"./i.mjs\",\"default\":\"./d.cjs\"}}}",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/t.d.mts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/t.d.cts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/i.mjs"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/d.cjs"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "module": 199,
+            "moduleResolution": 99,
+            "traceResolution": true
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg",
+          "op": "resolve"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 1,
+          "name": "pkg",
+          "op": "resolve"
+        }
+      ],
+      "case": "config/module/exports/condition-order-and-nesting",
+      "discriminates": "the conditional-exports walk is a DEPTH-FIRST walk in the package.json's own key order, and the pin announces every step of it (resolver.go:826-861): Entering, then per key either Matched/Resolved-under/Failed-to-resolve-under or Saw-non-matching, then Exiting. The nested `types` object is entered before `import` is ever considered, so a port that flattens the conditions map, that sorts its keys, or that evaluates `import`/`require` before `types` resolves to a different file under ESM. The paired CJS request pins the other arm.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.loadModuleFromTargetExportOrImport",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "{\"name\":\"pkg\",\"version\":\"1.0.0\",\"exports\":{\".\":{\"browser\":\"./b.js\",\"types@>=4.0\":\"./old.d.ts\",\"node\":\"./n.js\",\"custom\":\"./c.js\",\"default\":\"./d.js\"}}}",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/b.js"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/old.d.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/n.js"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/c.js"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/d.js"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "customConditions": [
+              "custom"
+            ],
+            "module": 199,
+            "moduleResolution": 99,
+            "traceResolution": true
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg",
+          "op": "resolve"
+        },
+        {
+          "file": "/p/src/other.ts",
+          "mode": 99,
+          "name": "pkg",
+          "op": "resolve"
+        }
+      ],
+      "case": "config/module/exports/non-matching-conditions-are-announced-in-key-order",
+      "discriminates": "conditionMatches (resolver.go:1908-1916) is three rules, not one membership test: `default` always matches, a member of the request's condition list matches, and a `types@<range>` key matches ONLY when `types` is itself among the conditions. The trace announces every key it walks past, so a port that short-circuits on the first match without emitting Saw_non_matching_condition_0 for the earlier keys, or that treats the versioned key as a plain string, produces a different callback stream even when it resolves the same file.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.conditionMatches",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "{\"name\":\"pkg\",\"version\":\"1.0.0\",\"exports\":{\".\":null}}",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/m.js"
+            },
+            {
+              "content": "{\"name\":\"pkg\",\"version\":\"1.0.0\",\"main\":\"./m.js\"}",
+              "kind": "file",
+              "path": "/node_modules/pkg/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/node_modules/pkg/m.js"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "module": 199,
+            "moduleResolution": 99,
+            "traceResolution": true
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg",
+          "op": "resolve"
+        }
+      ],
+      "case": "config/module/exports/null-target-blocks-the-search",
+      "discriminates": "an explicit `null` target returns unresolved() -- a NON-nil resolved with an empty path (resolver.go:40-42) -- so shouldContinueSearching is false and the ancestor walk STOPS, leaving the outer /node_modules/pkg unreached. A port that models the tri-state as an Option and returns None for a null target keeps walking and resolves the outer package instead. The paired case exports/missing-key-continues-the-search is the same fixture with the null replaced by an absent key, where the walk must continue.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:unresolved",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "{\"name\":\"pkg\",\"version\":\"1.0.0\",\"exports\":{\"./other\":\"./o.js\"}}",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/o.js"
+            },
+            {
+              "content": "{\"name\":\"pkg\",\"version\":\"1.0.0\",\"main\":\"./m.js\"}",
+              "kind": "file",
+              "path": "/node_modules/pkg/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/node_modules/pkg/m.js"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "module": 199,
+            "moduleResolution": 99,
+            "traceResolution": true
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg",
+          "op": "resolve"
+        }
+      ],
+      "case": "config/module/exports/missing-key-continues-the-search",
+      "discriminates": "the companion of exports/null-target-blocks-the-search: an exports map without the requested subpath returns continueSearching() -- a nil resolved (resolver.go:36-38) -- so the ancestor walk proceeds to /node_modules/pkg and resolves it. A port that conflates the two absent shapes answers unresolved here and resolves the inner package there; either confusion shows up as one of the pair diverging.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:continueSearching",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "{\"name\":\"pkg\",\"version\":\"1.0.0\",\"exports\":{\"./*\":\"./generic/*.js\",\"./a/*\":\"./specific/*.js\",\"./a/b\":\"./exact.js\",\"./a/\":\"./dir/\"}}",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/generic/c.js"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/generic/z.js"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/specific/c.js"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/exact.js"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/dir/d.js"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "module": 199,
+            "moduleResolution": 99,
+            "traceResolution": true
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg/a/b",
+          "op": "resolve"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg/a/c",
+          "op": "resolve"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg/z",
+          "op": "resolve"
+        }
+      ],
+      "case": "config/module/exports/subpath-pattern-key-priority",
+      "discriminates": "the two-stage key selection at resolver.go:706-734: an EXACT key wins before any pattern is considered, and the remaining keys are filtered to those with exactly one `*` or a trailing `/` and then sorted with ComparePatternKeys (util.go:89-120), which orders by the length of the text BEFORE the star and only then by total length. `pkg/a/b` must take the exact entry and `pkg/a/c` must take `./a/*` rather than `./*`. A port that iterates the map in declaration order, or that sorts by whole-key length, picks the generic pattern.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.loadModuleFromExportsOrImports",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "{\"name\":\"pkg\",\"version\":\"1.0.0\",\"exports\":{\"./*.js\":\"./src/*.ts\",\"./x*\":\"./trail/*.ts\",\"./a*a\":\"./ov.ts\"}}",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/src/foo.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/trail/y.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/ov.ts"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "module": 199,
+            "moduleResolution": 99,
+            "traceResolution": true
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg/foo.js",
+          "op": "resolve"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg/xy",
+          "op": "resolve"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg/a",
+          "op": "resolve"
+        }
+      ],
+      "case": "config/module/exports/pattern-with-trailer",
+      "discriminates": "matchesPatternWithTrailer (resolver.go:2062-2071) deliberately returns FALSE when the key ends with `*`, so a trailing-star key is handled by the next branch with a different subpath arithmetic, while a key with text after the star matches prefix AND suffix. The pin applies no length guard, so an overlapping prefix and suffix (`./a*a` against `pkg/a`) matches at the pin and the substring arithmetic at :726 then runs on overlapping bounds. A port that merges the two branches, or that adds a `len(name) >= len(prefix)+len(suffix)` guard, diverges on exactly these rows.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:matchesPatternWithTrailer",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "{\"name\":\"pkg\",\"version\":\"1.0.0\",\"exports\":{\"./num\":42,\"./bare\":\"other-pkg\",\"./esc\":\"./../escape.js\",\"./nm\":\"./node_modules/x.js\",\"./empty\":[],\"./dot\":\"./a/./b.js\",\"./plain\":\"./p.js\"}}",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/p.js"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/escape.js"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/node_modules/x.js"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/a/b.js"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "module": 199,
+            "moduleResolution": 99,
+            "traceResolution": true
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg/num",
+          "op": "resolve"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg/bare",
+          "op": "resolve"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg/esc",
+          "op": "resolve"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg/nm",
+          "op": "resolve"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg/empty",
+          "op": "resolve"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg/dot",
+          "op": "resolve"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg/plain/extra",
+          "op": "resolve"
+        }
+      ],
+      "case": "config/module/exports/invalid-target-shapes",
+      "discriminates": "the five distinct rejections the pin makes, all of which emit the SAME `has invalid type for target of specifier` line but at different points (resolver.go:743-800, :869-880): a non-string non-object non-array target; a bare target in an EXPORTS map (allowed only for imports); a relative target whose components after the first contain `..`, `.` or `node_modules`; an empty array; and a string target with a non-empty subpath that does not end in `/` when the key was not a pattern. A port that validates only the leading `./` accepts the escape target and resolves outside the package.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.loadModuleFromTargetExportOrImport",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "{\"name\":\"pkg\",\"version\":\"1.0.0\",\"exports\":{\"#a\":\"./x.js\"}}",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/x.js"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "module": 199,
+            "moduleResolution": 99,
+            "traceResolution": true
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg",
+          "op": "resolve"
+        },
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "{\"name\":\"pkg2\",\"version\":\"1.0.0\",\"exports\":{}}",
+              "kind": "file",
+              "path": "/p/node_modules/pkg2/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg2/index.js"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "module": 199,
+            "moduleResolution": 99,
+            "traceResolution": true
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg2",
+          "op": "resolve"
+        },
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "{\"name\":\"pkg3\",\"version\":\"1.0.0\",\"exports\":{\"#a\":\"./x.js\",\"plain\":\"./y.js\"}}",
+              "kind": "file",
+              "path": "/p/node_modules/pkg3/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg3/x.js"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg3/y.js"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "module": 199,
+            "moduleResolution": 99,
+            "traceResolution": true
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg3",
+          "op": "resolve"
+        },
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "{\"name\":\"pkg4\",\"version\":\"1.0.0\",\"exports\":{\"node\":\"./n.js\",\"default\":\"./d.js\"}}",
+              "kind": "file",
+              "path": "/p/node_modules/pkg4/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg4/n.js"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg4/d.js"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "module": 199,
+            "moduleResolution": 99,
+            "traceResolution": true
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg4",
+          "op": "resolve"
+        }
+      ],
+      "case": "config/module/exports/dot-object-classification",
+      "discriminates": "for subpath `.` the pin asks ExportsOrImports.IsConditions() (resolver.go:678), which is decided by initObjectKind (packagejson/exportsorimports.go:58-83) on the FIRST BYTE of each key: any `#` key makes the object an IMPORTS map, a mix of `#`/`.` and plain keys makes it INVALID, and only an object with no `.`/`#` keys at all -- including the empty object -- is conditions. A port that classifies by `none of the keys start with a dot` treats `{\"#a\": ...}` as a conditions map and walks `#a` as a CONDITION, emitting Entering/Saw-non-matching/Exiting where the pin emits only `Export specifier '.' does not exist`.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.loadModuleFromExports",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "{\"name\":\"app\",\"version\":\"0.0.1\",\"imports\":{\"#dep\":\"./src/dep.ts\",\"#pat/*\":\"./src/pat/*.ts\"}}",
+              "kind": "file",
+              "path": "/p/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/dep.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/pat/x.ts"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "module": 199,
+            "moduleResolution": 99,
+            "traceResolution": true
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "#dep",
+          "op": "resolve"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "#pat/x",
+          "op": "resolve"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "#absent",
+          "op": "resolve"
+        }
+      ],
+      "case": "config/module/imports/hash-specifier-resolution",
+      "discriminates": "an imports lookup is scoped to the nearest package.json ABOVE the importing file, not to a package the specifier names, and the pin reports the three failure shapes distinctly: no containing scope, a scope whose `imports` is not an object, and a scope whose imports map has no such key (resolver.go:632-664). The exact-then-pattern selection is the same machinery as exports, so `#pat/x` must take the starred key.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.loadModuleFromImports",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "{\"name\":\"app\",\"version\":\"0.0.1\",\"imports\":{\"#/*\":\"./src/root/*.ts\"}}",
+              "kind": "file",
+              "path": "/p/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/root/x.ts"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "module": 100,
+            "moduleResolution": 3,
+            "traceResolution": true
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "#",
+          "op": "resolve"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "#/x",
+          "op": "resolve"
+        },
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "{\"name\":\"app\",\"version\":\"0.0.1\",\"imports\":{\"#/*\":\"./src/root/*.ts\"}}",
+              "kind": "file",
+              "path": "/p/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/root/x.ts"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "module": 199,
+            "moduleResolution": 99,
+            "traceResolution": true
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "#",
+          "op": "resolve"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "#/x",
+          "op": "resolve"
+        }
+      ],
+      "case": "config/module/imports/invalid-and-root-specifiers",
+      "discriminates": "`#` alone is always invalid, and `#/...` is invalid unless the feature set carries ImportsPatternRoot (resolver.go:633-639). That flag is the ONLY difference between Node16Default and NodeNextDefault at this pin (types.go:41-44), and newResolutionState selects between them by resolution kind (:121-127). A port that folds Node16 and NodeNext into one feature set resolves `#/x` under Node16, where the pin refuses it.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:newResolutionState",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "{\"name\":\"app\",\"version\":\"0.0.1\",\"imports\":{\"#lib\":\"pkg/sub\"}}",
+              "kind": "file",
+              "path": "/p/package.json"
+            },
+            {
+              "content": "{\"name\":\"pkg\",\"version\":\"1.0.0\",\"exports\":{\"./sub\":\"./s.js\"}}",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/s.js"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "module": 199,
+            "moduleResolution": 99,
+            "traceResolution": true
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "#lib",
+          "op": "resolve"
+        }
+      ],
+      "case": "config/module/imports/bare-target-reenters-resolution",
+      "discriminates": "an imports target that is neither relative nor rooted RE-ENTERS the whole node-like resolution with the name and containing directory temporarily swapped, restoring them through a defer (resolver.go:752-777). The trace proves the recursion: a second `Resolving module ... from ...` line appears mid-walk with the package scope directory as its origin. A port that resolves the bare target as a plain path, or that forgets to restore r.name, cannot produce that nested pair.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.resolveNodeLike",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "{\"name\":\"app\",\"version\":\"0.0.1\",\"exports\":{\".\":\"./src/main.js\",\"./x\":\"./src/x.js\"}}",
+              "kind": "file",
+              "path": "/p/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/main.js"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/main.d.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/x.js"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "module": 199,
+            "moduleResolution": 99,
+            "traceResolution": true
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "app",
+          "op": "resolve"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "app/x",
+          "op": "resolve"
+        },
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "{\"name\":\"app\",\"version\":\"0.0.1\",\"exports\":{\".\":\"./src/main.js\",\"./x\":\"./src/x.js\"}}",
+              "kind": "file",
+              "path": "/p/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/main.js"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/main.d.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/x.js"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "allowJs": true,
+            "module": 199,
+            "moduleResolution": 99,
+            "traceResolution": true
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "app",
+          "op": "resolve"
+        }
+      ],
+      "case": "config/module/exports/self-name-two-pass",
+      "discriminates": "a bare specifier equal to the containing package's own `name` resolves through that package's exports without any node_modules lookup, and the pin splits the extensions into TWO passes -- TypeScript/Declaration first, then the rest -- except when allowJs is set and the importer is outside node_modules, where a single pass runs so an input .js can win over an output .d.ts (resolver.go:614-631). The paired requests differ only in allowJs, so a port that always runs one pass, or always two, diverges on one of them.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.loadModuleFromSelfNameReference",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "{\"name\":\"pkg\",\"version\":\"1.0.0\",\"exports\":{\".\":\"./e.js\"},\"main\":\"./m.js\"}",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/e.js"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/m.js"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "module": 199,
+            "moduleResolution": 100,
+            "traceResolution": true
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg",
+          "op": "resolve"
+        },
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "{\"name\":\"pkg\",\"version\":\"1.0.0\",\"exports\":{\".\":\"./e.js\"},\"main\":\"./m.js\"}",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/e.js"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/m.js"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "module": 199,
+            "moduleResolution": 100,
+            "resolvePackageJsonExports": false,
+            "traceResolution": true
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg",
+          "op": "resolve"
+        },
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "{\"name\":\"pkg\",\"version\":\"1.0.0\",\"exports\":{\".\":\"./e.js\"},\"main\":\"./m.js\"}",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/e.js"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/m.js"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "module": 199,
+            "moduleResolution": 99,
+            "resolvePackageJsonExports": false,
+            "traceResolution": true
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg",
+          "op": "resolve"
+        }
+      ],
+      "case": "config/module/exports/bundler-feature-overrides",
+      "discriminates": "getNodeResolutionFeatures (resolver.go:1947-1969) is consulted ONLY from the Bundler arm of newResolutionState (:132-133), and it applies resolvePackageJsonExports/Imports as three-state overrides on top of the kind's default set. With exports switched off the package's `exports` block stops blocking the `main` fallback and the same specifier resolves to a different file. A port that reads the two options unconditionally changes Node16 behaviour too, and a port that treats them as booleans cannot express the unset state.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:getNodeResolutionFeatures",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "{\"name\":\"pkg\",\"version\":\"1.0.0\",\"typesVersions\":{\">=4.0\":{\"sub\":[\"ts/sub.d.ts\"],\"*\":[\"ts/*.d.ts\"]}}}",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/ts/sub.d.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/ts/other.d.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/sub.d.ts"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "module": 199,
+            "moduleResolution": 99,
+            "traceResolution": true
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg/sub",
+          "op": "resolve"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg/other",
+          "op": "resolve"
+        }
+      ],
+      "case": "config/module/package/types-versions-subpath",
+      "discriminates": "a typesVersions block whose range matches the compiler version turns a package SUBPATH request into a paths lookup rooted at the package directory (resolver.go:1143-1151), with the substitution announced by Module_name_0_matched_pattern_1 and Trying_substitution_0_candidate_module_location_1. The pinned trace also carries core.Version() verbatim, so a port that hardcodes a version string diverges the moment the pin moves. A port that applies typesVersions before exports, or that applies it to the root request rather than the rest after the package name, resolves a different file.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.tryLoadModuleUsingPaths",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "{\"name\":\"pkg\",\"version\":\"1.0.0\",\"main\":\"./lib/main.js\",\"typesVersions\":{\">=4.0\":{\"lib/main.js\":[\"ts/main.d.ts\"]}}}",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/lib/main.js"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/ts/main.d.ts"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "module": 199,
+            "moduleResolution": 99,
+            "traceResolution": true
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg",
+          "op": "resolve"
+        }
+      ],
+      "case": "config/module/package/types-versions-directory-worker",
+      "discriminates": "the SECOND typesVersions call site (resolver.go:1668-1686), reached through the directory worker rather than the subpath branch: the module name handed to the paths lookup is the relative path from the candidate directory to the package file, or to `<candidate>/index` when there is none, and the pin asserts the result carries no packageId (:1681-1684). A port that reuses the subpath call site for the package root asks for the wrong module name and misses the mapping entirely.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.loadNodeModuleFromDirectoryWorker",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "{\"name\":\"pkg\",\"version\":\"1.0.0\",\"main\":42,\"types\":\"\",\"typings\":\"./t.d.ts\"}",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/t.d.ts"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "module": 199,
+            "moduleResolution": 99,
+            "traceResolution": true
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg",
+          "op": "resolve"
+        }
+      ],
+      "case": "config/module/package/field-validation-and-falsy",
+      "discriminates": "the three distinct announcements a package.json field produces (resolver.go:1876-1906): a present field of the WRONG JSON type reports both the expected and the actual type and then ALSO reports the field as absent; a present, valid but EMPTY string reports `had a falsy field`; and a usable field reports the value and the path it resolves to. A port that treats an invalid field as absent loses the first line, and a port that treats an empty string as absent loses the second.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.getPackageJSONPathField",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "{\"name\":\"pkg\",\"version\":\"1.0.0\",\"main\":\"./m.js\",\"types\":\"./types.d.ts\",\"typings\":\"./typings.d.ts\"}",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/m.js"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/types.d.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/typings.d.ts"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "module": 199,
+            "moduleResolution": 99,
+            "traceResolution": true
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg",
+          "op": "resolve"
+        },
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "{\"name\":\"pkg\",\"version\":\"1.0.0\",\"main\":\"./m.js\",\"types\":\"./types.d.ts\",\"typings\":\"./typings.d.ts\"}",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/m.js"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/types.d.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/typings.d.ts"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "module": 199,
+            "moduleResolution": 99,
+            "noDtsResolution": true,
+            "traceResolution": true
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg",
+          "op": "resolve"
+        }
+      ],
+      "case": "config/module/package/main-types-typings-priority",
+      "discriminates": "getPackageFile (resolver.go:1743-1762) asks for `typings` BEFORE `types` and only falls back to `main`, and it asks for the declaration fields at all only when the extension set includes Declaration. The paired request with noDtsResolution removes Declaration from the set, so the same package resolves through `main` instead. A port that prefers `types` over `typings`, or that consults `main` first, resolves the wrong file for the first request.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.getPackageFile",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "{\"name\":\"pkg\",\"version\":\"1.0.0\",\"main\":\"./m.js\",\"peerDependencies\":{\"zeta\":\"*\",\"alpha\":\"*\",\"absent\":\"*\"}}",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/m.js"
+            },
+            {
+              "content": "{\"name\":\"alpha\",\"version\":\"1.0.0\",\"main\":\"./a.js\"}",
+              "kind": "file",
+              "path": "/p/node_modules/alpha/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/alpha/a.js"
+            },
+            {
+              "content": "{\"name\":\"zeta\",\"version\":\"1.0.0\",\"main\":\"./z.js\"}",
+              "kind": "file",
+              "path": "/p/node_modules/zeta/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/zeta/z.js"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "module": 199,
+            "moduleResolution": 99,
+            "traceResolution": true
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg",
+          "op": "resolve"
+        }
+      ],
+      "case": "config/module/package/package-id-and-peer-dependencies",
+      "discriminates": "the peerDependencies suffix is built from the peer names SORTED (resolver.go:1848) and looked up under the REALPATH of the package's own node_modules root (:1842-1846), with a found peer contributing `+name@version` and a missing one contributing nothing but its own trace line. A port that iterates the peerDependencies map in its JSON order, or that skips the realpath, produces a different PackageId string and therefore a different resolution identity for the same file.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.readPackageJsonPeerDependencies",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/a.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/a.tsx"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/a.d.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/a.js"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/b.js"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/c.mts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/d.ts"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "allowJs": true,
+            "module": 199,
+            "moduleResolution": 99,
+            "traceResolution": true
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "./a.js",
+          "op": "resolve"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "./b.js",
+          "op": "resolve"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "./c.mjs",
+          "op": "resolve"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 1,
+          "name": "./d",
+          "op": "resolve"
+        }
+      ],
+      "case": "config/module/extensions/ts-substitution-for-js-specifier",
+      "discriminates": "a specifier that already carries an extension goes through loadModuleFromFileNoImplicitExtensions, which STRIPS the extension, announces the strip, and hands the remainder to tryAddingExtensions with the original extension in hand (resolver.go:1427-1447). The per-arm candidate ORDER is the contract: for a `.js` original the pin tries .ts, .tsx, .d.ts and only then .js, so a directory holding several of them distinguishes any port that reorders the arm or that tries the original extension first.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.tryAddingExtensions",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/a.ios.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/a.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/b.ts"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "module": 199,
+            "moduleResolution": 99,
+            "moduleSuffixes": [
+              ".ios",
+              ""
+            ],
+            "traceResolution": true
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 1,
+          "name": "./a",
+          "op": "resolve"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 1,
+          "name": "./b",
+          "op": "resolve"
+        },
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/a.ios.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/a.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/b.ts"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "module": 199,
+            "moduleResolution": 99,
+            "moduleSuffixes": [
+              ".ios"
+            ],
+            "traceResolution": true
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 1,
+          "name": "./a",
+          "op": "resolve"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 1,
+          "name": "./b",
+          "op": "resolve"
+        }
+      ],
+      "case": "config/module/extensions/module-suffixes",
+      "discriminates": "moduleSuffixes turns every single file probe into an ordered sweep that splices the suffix BEFORE the extension (resolver.go:1585-1599), and a list that does not contain the empty string means the unsuffixed file is never tried at all. A port that appends the suffix after the extension, or that always falls back to the plain name, resolves a different file for the first request and resolves at all for the second where the pin does not.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.tryFile",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/dir/index.ts"
+            },
+            {
+              "content": "{\"main\":\"./m.js\"}",
+              "kind": "file",
+              "path": "/p/src/dir/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/dir/m.js"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/e.ts"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "allowJs": true,
+            "module": 199,
+            "moduleResolution": 99,
+            "traceResolution": true
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "./dir",
+          "op": "resolve"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "./e",
+          "op": "resolve"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 1,
+          "name": "./dir",
+          "op": "resolve"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 1,
+          "name": "./e",
+          "op": "resolve"
+        }
+      ],
+      "case": "config/module/extensions/esm-mode-blocks-directory-lookup",
+      "discriminates": "esmMode suppresses BOTH halves of directory resolution for a relative specifier: the implicit-extension pass in loadModuleFromFile (resolver.go:1412-1425) and the whole directory branch at :1417-1420. The same fixture under CommonJS resolves the directory's index, so the pair separates a port that applies esmMode only to the index lookup, or only to the extension pass.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.nodeLoadModuleByRelativeName",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/sub/index.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/index.ts"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "module": 199,
+            "moduleResolution": 100,
+            "traceResolution": true
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 1,
+          "name": ".",
+          "op": "resolve"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 1,
+          "name": "./sub/.",
+          "op": "resolve"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 1,
+          "name": "..",
+          "op": "resolve"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 1,
+          "name": "./sub",
+          "op": "resolve"
+        }
+      ],
+      "case": "config/module/extensions/relative-dot-normalization",
+      "discriminates": "a relative specifier whose last component is `.` or `..` keeps a TRAILING SEPARATOR (resolver.go:2052-2060), which is what tells nodeLoadModuleByRelativeName to skip the file probe entirely and go straight to the directory branch (:1378). A port that calls a plain normalize loses the separator, probes `/p/src` as a FILE first, and emits an extra File-does-not-exist line even when it eventually resolves the same index.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:normalizePathForCJSResolution",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/a.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/exact.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/typed.ts"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "module": 199,
+            "moduleResolution": 99,
+            "paths": {
+              "alias/*": [
+                "./src/*"
+              ],
+              "exact": [
+                "./src/exact.ts"
+              ],
+              "typed/*": [
+                "./src/*.ts"
+              ]
+            },
+            "pathsBasePath": "/p",
+            "traceResolution": true
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 1,
+          "name": "alias/a",
+          "op": "resolve"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 1,
+          "name": "exact",
+          "op": "resolve"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 1,
+          "name": "typed/typed",
+          "op": "resolve"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 1,
+          "name": "./a",
+          "op": "resolve"
+        }
+      ],
+      "case": "config/module/paths/substitution-and-ts-extension-suppression",
+      "discriminates": "the paths branch runs only for a NON-relative name and only when Paths is non-empty (resolver.go:1240-1246), it resolves the patterns through the resolver-wide parsed-pattern cache (:1236, :1991, cache.go:54-60), and a substitution that carries an explicit extension sets candidateEndingIsFromConfig, which SUPPRESSES resolvedUsingTsExtension on the result (:1286-1293, :1573-1583). A port that reports resolvedUsingTsExtension for a config-supplied extension makes the checker rewrite a specifier the user never wrote.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.tryLoadModuleUsingPathsIfEligible",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/a/b/only-in-generated.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/gen/deep/only-in-generated.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/gen/only-in-generated.ts"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "module": 199,
+            "moduleResolution": 99,
+            "rootDirs": [
+              "/p/a",
+              "/p/a/b",
+              "/p/gen"
+            ],
+            "traceResolution": true
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/a/b/src.ts",
+          "mode": 1,
+          "name": "./missing",
+          "op": "resolve"
+        },
+        {
+          "file": "/p/a/b/src.ts",
+          "mode": 1,
+          "name": "./only-in-generated",
+          "op": "resolve"
+        }
+      ],
+      "case": "config/module/paths/root-dirs-longest-prefix",
+      "discriminates": "rootDirs applies only to a RELATIVE name, picks the LONGEST matching prefix by scanning all entries and announcing the verdict for each one as a boolean trace argument (resolver.go:1300-1373), tries the original location first and only then the other roots in declaration order. A port that stops at the first matching root, or that reports the per-root verdict as a string, produces a different callback stream; a port that tries the other roots before the original resolves the wrong file here.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.tryLoadModuleUsingRootDirs",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/types/foo/index.d.ts"
+            },
+            {
+              "content": "{\"name\":\"foo\",\"version\":\"3.0.0\",\"types\":\"./index.d.ts\"}",
+              "kind": "file",
+              "path": "/p/types/foo/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/other/bar/index.d.ts"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "module": 199,
+            "moduleResolution": 99,
+            "traceResolution": true,
+            "typeRoots": [
+              "/p/missing",
+              "/p/types",
+              "/p/other"
+            ]
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 1,
+          "name": "foo",
+          "op": "resolve_type_reference"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 1,
+          "name": "bar",
+          "op": "resolve_type_reference"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 1,
+          "name": "absent",
+          "op": "resolve_type_reference"
+        }
+      ],
+      "case": "config/module/typeref/primary-type-roots",
+      "discriminates": "the primary lookup walks the configured typeRoots in order, skipping a root whose directory does not exist with its own trace line, and reports the outcome through traceTypeReferenceDirectiveResult, which has THREE shapes depending on whether the result resolved and whether it carries a package id (resolver.go:376-395, :397-427). A port that reports one shape, or that omits `primary`, loses the distinction the compiler uses to decide whether a directive is ambient.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.resolveTypeReferenceDirective",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/@types/s__pkg/index.d.ts"
+            },
+            {
+              "content": "{\"name\":\"@types/s__pkg\",\"version\":\"1.2.3\",\"types\":\"./index.d.ts\"}",
+              "kind": "file",
+              "path": "/p/node_modules/@types/s__pkg/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/types/@s/pkg/index.d.ts"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "module": 199,
+            "moduleResolution": 99,
+            "traceResolution": true,
+            "typeRoots": [
+              "/p/node_modules/@types",
+              "/p/types"
+            ]
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 1,
+          "name": "@s/pkg",
+          "op": "resolve_type_reference"
+        }
+      ],
+      "case": "config/module/typeref/type-root-file-and-package-id",
+      "discriminates": "getCandidateFromTypeRoot (resolver.go:448-454) mangles a scoped name ONLY when the type root's last two components are `node_modules/@types`, with or without a trailing separator, and the mangle is announced by its own trace line only when it changed the name (:456-465). The custom-root request then takes the fromConfig FILE branch (:412-420), which derives a package directory with ParseNodeModuleFromPath and attaches a package id; the plain root does not. A port that mangles for every root looks for `s__pkg` under /p/types.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.getCandidateFromTypeRoot",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/@types/pkg/index.d.ts"
+            },
+            {
+              "content": "{\"name\":\"@types/pkg\",\"version\":\"1.0.0\",\"types\":\"./index.d.ts\"}",
+              "kind": "file",
+              "path": "/p/node_modules/@types/pkg/package.json"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "module": 199,
+            "moduleResolution": 99,
+            "traceResolution": true,
+            "typeRoots": []
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 1,
+          "name": "pkg",
+          "op": "resolve_type_reference"
+        }
+      ],
+      "case": "config/module/typeref/secondary-node-modules-at-types",
+      "discriminates": "with no type roots the pin announces that the root directory cannot be determined and falls through to the node_modules walk, which probes the package itself and only then `node_modules/@types/<mangled>` -- and only when the extension set includes Declaration (resolver.go:1025-1052). A missing @types directory gets its own skip line. A port that probes @types first, or that probes it for implementation extensions too, produces a different lookup sequence.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.loadModuleFromImmediateNodeModulesDirectory",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/@types/pkg/index.d.ts"
+            },
+            {
+              "content": "{\"name\":\"@types/pkg\",\"version\":\"1.0.0\",\"types\":\"./index.d.ts\"}",
+              "kind": "file",
+              "path": "/p/node_modules/@types/pkg/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/types/placeholder/index.d.ts"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "module": 199,
+            "moduleResolution": 99,
+            "traceResolution": true,
+            "typeRoots": [
+              "/p/types"
+            ]
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 1,
+          "name": "pkg",
+          "op": "resolve_type_reference"
+        },
+        {
+          "file": "/p/src/__inferred type names__.ts",
+          "mode": 1,
+          "name": "pkg",
+          "op": "resolve_type_reference"
+        }
+      ],
+      "case": "config/module/typeref/inferred-types-containing-file-skips-node-modules",
+      "discriminates": "the secondary node_modules lookup is SKIPPED, with its own trace line, exactly when the type roots came from configuration AND the containing file is the inferred-types sentinel `__inferred type names__.ts` (resolver.go:430-443, util.go:15). The paired request differs only in the containing file name, so a port that ignores the sentinel resolves the package in both and a port that always skips resolves in neither.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.resolveTypeReferenceDirective",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/local.d.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/sub/index.d.ts"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "module": 199,
+            "moduleResolution": 99,
+            "traceResolution": true,
+            "typeRoots": []
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 1,
+          "name": "./local",
+          "op": "resolve_type_reference"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 1,
+          "name": "./sub/.",
+          "op": "resolve_type_reference"
+        }
+      ],
+      "case": "config/module/typeref/relative-reference-normalization",
+      "discriminates": "a RELATIVE type reference takes the nodeLoadModuleByRelativeName branch with a candidate built by normalizePathForCJSResolution (resolver.go:437-441), which is the type-reference half of a call the module path also makes. A port that normalizes the type-reference candidate with a plain path join loses the trailing separator for a `.`-terminated reference and probes the directory as a file first.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.resolveTypeReferenceDirective",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/types/pkg/index.d.ts"
+            },
+            {
+              "content": "{\"name\":\"pkg\",\"version\":\"9.9.9\",\"types\":\"./index.d.ts\"}",
+              "kind": "file",
+              "path": "/p/types/pkg/package.json"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "module": 199,
+            "moduleResolution": 99,
+            "traceResolution": true,
+            "typeRoots": [
+              "/p/types"
+            ]
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg",
+          "op": "resolve"
+        }
+      ],
+      "case": "config/module/typeref/resolve-from-type-root-fallback",
+      "discriminates": "a MODULE resolution -- not a type reference -- falls back to the configured typeRoots after the node_modules walk fails, but only while the extension set still contains Declaration (resolver.go:571-575, :467-491). The fallback is silent except for the lookups it makes, so the trace is the only evidence it ran. A port that wires this fallback into the type reference path only never resolves the first request.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.resolveFromTypeRoot",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "kind": "symlink",
+              "path": "/p/node_modules/pkg",
+              "target": "/packages/pkg"
+            },
+            {
+              "content": "{\"name\":\"pkg\",\"version\":\"1.0.0\",\"main\":\"./m.js\"}",
+              "kind": "file",
+              "path": "/packages/pkg/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/packages/pkg/m.js"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/packages/pkg/rel.ts"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "allowJs": true,
+            "module": 199,
+            "moduleResolution": 99,
+            "traceResolution": true
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg",
+          "op": "resolve"
+        },
+        {
+          "file": "/p/node_modules/pkg/inner.ts",
+          "mode": 1,
+          "name": "./rel",
+          "op": "resolve"
+        }
+      ],
+      "case": "config/module/symlinks/realpath-and-original-path",
+      "discriminates": "a package reached through a symlinked node_modules entry is reported with BOTH paths: ResolvedFileName is the realpath and OriginalPath is the symlinked spelling, and the swap happens only for a non-relative name that landed inside node_modules and has no OriginalPath yet (resolver.go:1154-1167). getOriginalAndResolvedFileName additionally returns an EMPTY original when the two paths differ only by case, which is why it compares with ComparePaths rather than with equality (:1209-1221). A port that always fills OriginalPath breaks forceConsistentCasingInFileNames.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.getOriginalAndResolvedFileName",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "kind": "symlink",
+              "path": "/p/node_modules/pkg",
+              "target": "/packages/pkg"
+            },
+            {
+              "content": "{\"name\":\"pkg\",\"version\":\"1.0.0\",\"main\":\"./m.js\"}",
+              "kind": "file",
+              "path": "/packages/pkg/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/packages/pkg/m.js"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "allowJs": true,
+            "module": 199,
+            "moduleResolution": 99,
+            "preserveSymlinks": true,
+            "traceResolution": true
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg",
+          "op": "resolve"
+        }
+      ],
+      "case": "config/module/symlinks/preserve-symlinks",
+      "discriminates": "preserveSymlinks is checked BEFORE the realpath call, so with it set the resolver never asks the host for a real path at all and the result keeps the symlinked spelling with an empty OriginalPath (resolver.go:1156). The trace difference is therefore the ABSENCE of a `Resolving real path for ...` line, which a port that computes the realpath and then discards it cannot reproduce.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.createResolvedModuleHandlingSymlink",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "{\"name\":\"pkg\",\"version\":\"1.0.0\",\"exports\":{\".\":{\"import\":\"./i.mjs\",\"require\":\"./r.cjs\"}}}",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/i.mjs"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/r.cjs"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/other/c.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/b.ts"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "allowJs": true,
+            "module": 199,
+            "moduleResolution": 99
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg",
+          "op": "resolve"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg",
+          "op": "resolve"
+        }
+      ],
+      "case": "config/module/cache/repeat-resolution-is-a-hit",
+      "discriminates": "with tracing off a repeated request for the same (containing directory, name, mode, redirect) key is answered from the cache and touches the filesystem ZERO times (resolver.go:278-283). The cache key is built with getRedirectConfigName even when there is no redirect (:275, cache.go:84-89), and newCaches builds the entry the Get reads (:74-82). A port with no resolution cache, or one that caches the RESULT but still probes, reports a filesystem touch on the repeat.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/cache.go:moduleResolutionCache.Get",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "{\"name\":\"pkg\",\"version\":\"1.0.0\",\"exports\":{\".\":{\"import\":\"./i.mjs\",\"require\":\"./r.cjs\"}}}",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/i.mjs"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/r.cjs"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/other/c.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/b.ts"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "allowJs": true,
+            "module": 199,
+            "moduleResolution": 99
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg",
+          "op": "resolve"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 1,
+          "name": "pkg",
+          "op": "resolve"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 1,
+          "name": "pkg",
+          "op": "resolve"
+        }
+      ],
+      "case": "config/module/cache/separated-by-mode",
+      "discriminates": "the wrong-mode control. The cache key carries the resolution MODE, and this package resolves to a different file under import than under require, so a port that omits the mode from the key hands back the ESM answer for the CJS request -- and reports no filesystem touch while doing it. Both failures are visible in one row, and the third action proves the second mode is itself cached rather than merely recomputed.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/cache.go:moduleResolutionCache.Set",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "{\"name\":\"pkg\",\"version\":\"1.0.0\",\"exports\":{\".\":{\"import\":\"./i.mjs\",\"require\":\"./r.cjs\"}}}",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/i.mjs"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/r.cjs"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/other/c.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/b.ts"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "allowJs": true,
+            "module": 199,
+            "moduleResolution": 99
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg",
+          "op": "resolve"
+        },
+        {
+          "file": "/p/src/b.ts",
+          "mode": 99,
+          "name": "pkg",
+          "op": "resolve"
+        },
+        {
+          "file": "/p/other/c.ts",
+          "mode": 99,
+          "name": "pkg",
+          "op": "resolve"
+        }
+      ],
+      "case": "config/module/cache/separated-by-importing-directory",
+      "discriminates": "the cache is keyed on the containing DIRECTORY, not the containing file (resolver.go:268, :271-276), so two different importers in one directory share an entry while an importer one directory away does not. A port that keys on the file re-resolves for the second importer; a port that keys on nothing but the name answers the third from the cache, which would be wrong the moment the two directories have different node_modules.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/cache.go:moduleResolutionCache.Get",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/@types/pkg/index.d.ts"
+            },
+            {
+              "content": "{\"name\":\"@types/pkg\",\"version\":\"1.0.0\",\"types\":\"./index.d.ts\"}",
+              "kind": "file",
+              "path": "/p/node_modules/@types/pkg/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/types/placeholder/index.d.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/__inferred type names__.ts"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "module": 199,
+            "moduleResolution": 99,
+            "typeRoots": [
+              "/p/types"
+            ]
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 1,
+          "name": "pkg",
+          "op": "resolve_type_reference"
+        },
+        {
+          "file": "/p/src/__inferred type names__.ts",
+          "mode": 1,
+          "name": "pkg",
+          "op": "resolve_type_reference"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 1,
+          "name": "pkg",
+          "op": "resolve_type_reference"
+        }
+      ],
+      "case": "config/module/typeref-cache/separated-by-inferred-types-file",
+      "discriminates": "the type-reference cache key carries a FIFTH component the module cache does not: whether the containing file is the inferred-types sentinel (cache.go:30-36, resolver.go:231-239). The two requests here share directory, name and mode and differ only in that flag, and they resolve differently because the sentinel suppresses the node_modules lookup. A port that reuses the module cache key answers the second from the first entry.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/cache.go:typeRefDirectiveResolutionCache.Get",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/dep.ts"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "module": 199,
+            "moduleResolution": 99,
+            "traceResolution": true
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "#dep",
+          "op": "resolve"
+        },
+        {
+          "add": [
+            {
+              "content": "{\"name\":\"app\",\"version\":\"0.0.1\",\"imports\":{\"#dep\":\"./src/dep.ts\"}}",
+              "kind": "file",
+              "path": "/p/package.json"
+            }
+          ],
+          "op": "mutate",
+          "remove": []
+        },
+        {
+          "file": "/p/src/other.ts",
+          "mode": 99,
+          "name": "#dep",
+          "op": "resolve"
+        }
+      ],
+      "case": "config/module/cache/negative-package-json-lookup-survives-host-change",
+      "discriminates": "a package.json lookup that MISSED is remembered as an entry with a nil Contents, and the next lookup short-circuits on it and returns nil without asking the host again (resolver.go:1766-1779, :1804-1808). The fixture gains a /p/package.json between the two requests and the second still reports no containing scope, announced by the `according to earlier cached lookups` line. A port that treats a missing entry and a negative entry alike re-probes and resolves the import the pin refuses.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.getPackageJsonInfo",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/a.ts"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "module": 199,
+            "moduleResolution": 99,
+            "traceResolution": true
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 1,
+          "name": "./a",
+          "op": "resolve"
+        },
+        {
+          "add": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/a.tsx"
+            }
+          ],
+          "op": "mutate",
+          "remove": [
+            "/p/src/a.ts"
+          ]
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 1,
+          "name": "./a",
+          "op": "resolve"
+        },
+        {
+          "enabled": false,
+          "op": "set_trace"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 1,
+          "name": "./a",
+          "op": "resolve"
+        }
+      ],
+      "case": "config/module/cache/module-cache-set-is-first-writer-wins",
+      "discriminates": "moduleResolutionCache.Set is a LoadOrStore (cache.go:26-28), so a second write for a key that already has an entry is DISCARDED. Tracing is the only way to reach the write path twice, because a cache read short-circuits it otherwise (resolver.go:278-283), and the resolver re-reads TraceResolution from the caller's options on every request (:201-206). After the fixture changes and a second traced resolution stores a different answer, the untraced third request must return the FIRST answer. A port whose cache write is a plain insert returns the second.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/cache.go:moduleResolutionCache.Set",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/a.d.ts"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "module": 199,
+            "moduleResolution": 99,
+            "traceResolution": true,
+            "typeRoots": []
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 1,
+          "name": "./a",
+          "op": "resolve_type_reference"
+        },
+        {
+          "add": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/a/index.d.ts"
+            }
+          ],
+          "op": "mutate",
+          "remove": [
+            "/p/src/a.d.ts"
+          ]
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 1,
+          "name": "./a",
+          "op": "resolve_type_reference"
+        },
+        {
+          "enabled": false,
+          "op": "set_trace"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 1,
+          "name": "./a",
+          "op": "resolve_type_reference"
+        }
+      ],
+      "case": "config/module/typeref-cache/set-is-last-writer-wins",
+      "discriminates": "the companion of cache/module-cache-set-is-first-writer-wins, and the reason the pair exists: the type-reference cache writes with Store (cache.go:46-48) where the module cache writes with LoadOrStore. The identical action sequence must therefore end on the SECOND answer here and on the first answer there. A port that gives both caches the same write semantics gets exactly one of the pair wrong, whichever semantics it chose.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/cache.go:typeRefDirectiveResolutionCache.Set",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": false,
+          "cwd": "/p",
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "{\"name\":\"pkg\",\"version\":\"1.0.0\",\"main\":\"./m.js\"}",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/m.js"
+            }
+          ],
+          "op": "new_resolver_with_options",
+          "options": {
+            "allowJs": true,
+            "module": 199,
+            "moduleResolution": 99,
+            "traceResolution": true
+          },
+          "package_json_cache": [
+            {
+              "contents": null,
+              "directory_exists": true,
+              "package_json_path": "/p/node_modules/pkg/package.json"
+            },
+            {
+              "contents": "{\"name\":\"shadow\",\"version\":\"9.9.9\",\"main\":\"./s.js\"}",
+              "directory_exists": true,
+              "package_json_path": "/P/NODE_MODULES/PKG/package.json"
+            }
+          ],
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg",
+          "op": "resolve"
+        },
+        {
+          "op": "package_json_cache_entries"
+        }
+      ],
+      "case": "config/module/cache/injected-package-json-cache-and-entries",
+      "discriminates": "NewResolverWithOptions takes an EXTERNAL packagejson.InfoCache and, when one is supplied, leaves the rest of the caches zero-valued (resolver.go:180-199). InfoCache.Set is a LoadOrStore that RETURNS the winner (packagejson/cache.go:190-194), so two seeds whose paths canonicalise onto one key -- here through a case-insensitive host -- hand the second caller the FIRST entry, which is the single-threaded form of the contract the pinned TestResolveModuleNameTrailingSlashRace exists for. The seeded negative entry then steers a real resolution, and PackageJsonCacheEntries reports what the resolver accumulated.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:NewResolverWithOptions",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "op": "compiler_options_with_redirect",
+          "options": {
+            "module": 199,
+            "moduleResolution": 99
+          },
+          "redirect": null
+        },
+        {
+          "op": "compiler_options_with_redirect",
+          "options": {
+            "module": 199,
+            "moduleResolution": 99
+          },
+          "redirect": {
+            "config_name": "/p/ref/tsconfig.json",
+            "options": null
+          }
+        },
+        {
+          "op": "compiler_options_with_redirect",
+          "options": {
+            "module": 199,
+            "moduleResolution": 99
+          },
+          "redirect": {
+            "config_name": "/p/ref/tsconfig.json",
+            "options": {
+              "moduleResolution": 100,
+              "traceResolution": true
+            }
+          }
+        }
+      ],
+      "case": "config/module/redirect/compiler-options-with-redirect",
+      "discriminates": "the redirect substitution is three-valued, not two (resolver.go:139-147): no reference at all returns the caller's own pointer, a reference whose CompilerOptions() is nil ALSO returns the caller's pointer, and only a reference with options returns those. A port that tests the reference for nil alone substitutes a nil options struct and loses every option the base configuration set.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:GetCompilerOptionsWithRedirect",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "{\"name\":\"pkg\",\"version\":\"1.0.0\",\"exports\":{\".\":\"./e.js\"},\"main\":\"./m.js\"}",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/e.js"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/m.js"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "allowJs": true,
+            "module": 199,
+            "moduleResolution": 99,
+            "traceResolution": true
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg",
+          "op": "resolve_with_redirect",
+          "redirect": {
+            "config_name": "/p/ref/tsconfig.json",
+            "options": {
+              "allowJs": true,
+              "module": 199,
+              "moduleResolution": 100,
+              "resolvePackageJsonExports": false,
+              "traceResolution": true
+            }
+          }
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg",
+          "op": "resolve_with_redirect",
+          "redirect": {
+            "config_name": "/p/ref/tsconfig.json",
+            "options": null
+          }
+        },
+        {
+          "enabled": false,
+          "op": "set_trace"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg",
+          "op": "resolve"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg",
+          "op": "resolve_with_redirect",
+          "redirect": {
+            "config_name": "/p/ref/tsconfig.json",
+            "options": {
+              "allowJs": true,
+              "module": 199,
+              "moduleResolution": 99
+            }
+          }
+        }
+      ],
+      "case": "config/module/redirect/cache-key-and-trace",
+      "discriminates": "a redirected resolution announces the reference it borrowed options from, but only when that reference actually HAS options (resolver.go:216-220), and it resolves under those options rather than the resolver's own. The redirect's config name is part of the cache key (cache.go:11-16, :84-89), so the untraced pair at the end must both touch the filesystem: a port that omits the redirect from the key answers the second from the first entry, under the wrong options.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:tracer.traceResolutionUsingProjectReference",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "kind": "symlink",
+              "path": "/p/node_modules/pkg",
+              "target": "/packages/pkg"
+            },
+            {
+              "content": "{\"name\":\"pkg\",\"version\":\"1.0.0\",\"exports\":{\".\":\"./index.d.ts\",\"./sub\":{\"types\":\"./sub.d.ts\",\"default\":\"./sub.js\"},\"./pat/*\":\"./pat/*.d.ts\"}}",
+              "kind": "file",
+              "path": "/packages/pkg/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/packages/pkg/index.d.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/packages/pkg/sub.d.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/packages/pkg/sub.js"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/packages/pkg/pat/a.d.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/packages/pkg/pat/b.d.ts"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "allowJs": true,
+            "module": 199,
+            "moduleResolution": 99,
+            "traceResolution": true
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "directory": "/p/node_modules/pkg",
+          "enable_directory_search": true,
+          "op": "entrypoints",
+          "package_name": "pkg"
+        }
+      ],
+      "case": "config/module/entrypoints/export-map-entrypoints",
+      "discriminates": "entrypoint discovery is the reverse direction of resolution: it walks the whole exports map and reports every file it can reach, each with the module specifier that reaches it and an Ending that says how much of that specifier may be rewritten (resolver.go:2133-2159, :2168-2225, :2244-2357). SymlinkOrRealpath prefers the symlinked spelling and falls back to the real one (:2161-2166). A port that reuses the forward resolver for this answers only the `.` entry, and a port that reports one path per entrypoint loses the symlink distinction.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:Resolver.GetEntrypointsFromPackageJsonInfo",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/global/types/node_modules/pkg/index.d.ts"
+            },
+            {
+              "content": "{\"name\":\"pkg\",\"version\":\"1.0.0\",\"types\":\"./index.d.ts\"}",
+              "kind": "file",
+              "path": "/global/types/node_modules/pkg/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/global/types/node_modules/typed/index.d.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/typed/index.d.ts"
+            },
+            {
+              "content": "{\"name\":\"typed\",\"version\":\"2.0.0\",\"types\":\"./index.d.ts\"}",
+              "kind": "file",
+              "path": "/p/node_modules/typed/package.json"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "allowJs": true,
+            "module": 199,
+            "moduleResolution": 99,
+            "traceResolution": true
+          },
+          "project_name": "proj",
+          "typings_location": "/global/types"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg",
+          "op": "resolve"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "typed",
+          "op": "resolve"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "./missing",
+          "op": "resolve"
+        }
+      ],
+      "case": "config/module/typings/typings-location-fallback",
+      "discriminates": "the typings-location pass runs AFTER the ordinary resolution, only for a non-relative name, and only when the ordinary result did not already land on a TypeScript or JSON extension (resolver.go:339-366). It announces itself with the project name and the cache location, and it concatenates the original result's diagnostics in front of its own. The paired requests differ in whether the ordinary resolution already succeeded with a .d.ts, so a port that always runs the extra pass overwrites the first answer.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:Resolver.tryResolveFromTypingsLocation",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/types/alpha/index.d.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/types/zeta/index.d.ts"
+            },
+            {
+              "content": "{\"typings\":null}",
+              "kind": "file",
+              "path": "/p/types/notneeded/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/types/notneeded/index.d.ts"
+            },
+            {
+              "content": "{\"name\":\"plainjson\"}",
+              "kind": "file",
+              "path": "/p/types/plainjson/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/types/plainjson/index.d.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/types/.hidden/index.d.ts"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "module": 199,
+            "moduleResolution": 99,
+            "typeRoots": [
+              "/p/types"
+            ],
+            "types": [
+              "explicit",
+              "*",
+              "alpha"
+            ]
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "op": "automatic_type_directive_names"
+        }
+      ],
+      "case": "config/module/types/automatic-type-directive-names",
+      "discriminates": "the wildcard expands IN PLACE inside the `types` array and the whole result is deduplicated (resolver.go:2086-2132), a directory whose package.json has `\"typings\": null` is excluded as a not-needed package, and a directory whose base name starts with `.` is skipped. A port that appends the wildcard matches at the end, that sorts them, or that treats a missing typings field the same as an explicit null produces a different list -- and this list is ordered data, because program construction consumes it in order.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:GetAutomaticTypeDirectiveNames",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "{\"name\":\"pkg\",\"version\":\"1.0.0\",\"main\":\"./m.js\"}",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/node_modules/pkg/m.js"
+            },
+            {
+              "kind": "symlink",
+              "path": "/p/node_modules/linked",
+              "target": "/packages/linked"
+            },
+            {
+              "content": "{\"name\":\"linked\",\"version\":\"1.0.0\"}",
+              "kind": "file",
+              "path": "/packages/linked/package.json"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/packages/linked/index.js"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "allowJs": true,
+            "module": 199,
+            "moduleResolution": 99
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg",
+          "op": "resolve_package_directory"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "pkg/sub",
+          "op": "resolve_package_directory"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "linked",
+          "op": "resolve_package_directory"
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "absent",
+          "op": "resolve_package_directory"
+        }
+      ],
+      "case": "config/module/package-directory/resolve-package-directory-only",
+      "discriminates": "ResolvePackageDirectory short-circuits inside loadModuleFromSpecificNodeModulesDirectory (resolver.go:1074-1079): it checks only that the package DIRECTORY exists, returns that directory as the resolved path with no extension and no package id, and never reads a package.json. It still goes through createResolvedModuleHandlingSymlink, so a symlinked package is reported with its real path and its original spelling. A port that routes this through the ordinary resolver returns a file and a package id.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:Resolver.ResolvePackageDirectory",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/a.ts"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "moduleResolution": 5
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/index.ts",
+          "mode": 1,
+          "name": "./a",
+          "op": "resolve"
+        }
+      ],
+      "case": "config/module/control/unsupported-module-resolution-kind",
+      "discriminates": "the refusal control. GetModuleResolutionKind maps Unknown, Classic and Node10 onto a supported kind (core/compileroptions.go:223-237), so the only way to reach the resolver's own default arm is a kind outside the enum -- and there the pin PANICS (resolver.go:305-307) rather than returning an unresolved result. Any port that reports a refusal as an ordinary unresolved module must be rejected by this row, whichever side it is on; the two sides agreeing on `unresolved` here would be the failure.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:newResolutionState",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/a.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/b.ts"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "module": 199,
+            "moduleResolution": 99,
+            "traceResolution": true
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "file": "/p/src/a.ts",
+          "mode": 1,
+          "name": "./b",
+          "op": "resolve"
+        },
+        {
+          "file": "src/a.ts",
+          "mode": 1,
+          "name": "./b",
+          "op": "resolve"
+        }
+      ],
+      "case": "config/module/control/relative-containing-file",
+      "discriminates": "the containing file is used EXACTLY as given: ResolveModuleName takes tspath.GetDirectoryPath(containingFile) with no absolutization (resolver.go:268), so a relative containing file produces a relative containing directory and every probe below it is relative too. A port that absolutizes against the current directory resolves this request where the pin does not -- and keys its cache under a different directory, so the two spellings collide there and not here.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.newResolutionState",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
+    }
+  ]
+}

@@ -1,10 +1,10 @@
 {
   "counts": {
-    "covered": 262,
+    "covered": 331,
     "equivalent_rust": 8,
-    "implemented_untested": 3231,
+    "implemented_untested": 3207,
     "later_phase": 18,
-    "missing": 1276
+    "missing": 1231
   },
   "dispositions": [
     "covered",
@@ -174600,9 +174600,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): config/module/cache/repeat-resolution-is-a-hit",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/cache/repeat-resolution-is-a-hit"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -174617,7 +174619,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/cache.go",
       "id": "tsc/internal/module/cache.go:getRedirectConfigName",
@@ -174630,7 +174632,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -174641,9 +174643,13 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 3 exact link(s): config/module/cache/repeat-resolution-is-a-hit, config/module/cache/separated-by-importing-directory, config/module/cache/separated-by-mode",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/cache/repeat-resolution-is-a-hit",
+        "config/module/cache/separated-by-importing-directory",
+        "config/module/cache/separated-by-mode"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -174658,7 +174664,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/cache.go",
       "id": "tsc/internal/module/cache.go:moduleResolutionCache.Get",
@@ -174671,7 +174677,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -174682,9 +174688,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "a prepared case runs and reports the Rust entry point absent: config/module/cache/module-cache-set-is-first-writer-wins; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/cache/module-cache-set-is-first-writer-wins"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -174712,7 +174720,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -174723,9 +174731,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): config/module/cache/repeat-resolution-is-a-hit",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/cache/repeat-resolution-is-a-hit"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -174740,7 +174750,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/cache.go",
       "id": "tsc/internal/module/cache.go:newCaches",
@@ -174753,7 +174763,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -174764,9 +174774,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): config/module/paths/substitution-and-ts-extension-suppression",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/paths/substitution-and-ts-extension-suppression"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -174781,7 +174793,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/cache.go",
       "id": "tsc/internal/module/cache.go:parsedPatternsCache.Get",
@@ -174794,7 +174806,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -174805,9 +174817,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): config/module/typeref-cache/separated-by-inferred-types-file",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/typeref-cache/separated-by-inferred-types-file"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -174822,7 +174836,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/cache.go",
       "id": "tsc/internal/module/cache.go:typeRefDirectiveResolutionCache.Get",
@@ -174835,7 +174849,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -174846,9 +174860,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "a prepared case runs and reports the Rust entry point absent: config/module/typeref-cache/set-is-last-writer-wins; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/typeref-cache/set-is-last-writer-wins"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -174876,7 +174892,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -174889,9 +174905,11 @@
       "annotated_home": [
         "crates/tsr_module/src/type_references.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): config/module/types/automatic-type-directive-names",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/types/automatic-type-directive-names"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -174906,7 +174924,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:GetAutomaticTypeDirectiveNames",
@@ -174919,7 +174937,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -174933,9 +174951,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "a prepared case runs and reports the Rust entry point absent: config/module/redirect/compiler-options-with-redirect; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/redirect/compiler-options-with-redirect"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -174963,7 +174983,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -174979,9 +174999,11 @@
       "annotated_home": [
         "crates/tsr_module/src/resolver.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): config/module/helpers/conditions-by-mode-and-kind",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/helpers/conditions-by-mode-and-kind"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -174996,7 +175018,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:GetConditions",
@@ -175009,7 +175031,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -175113,9 +175135,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "a prepared case runs and reports the Rust entry point absent: config/module/cache/injected-package-json-cache-and-entries; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/cache/injected-package-json-cache-and-entries"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -175143,7 +175167,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -175249,9 +175273,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "a prepared case runs and reports the Rust entry point absent: config/module/entrypoints/export-map-entrypoints; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/entrypoints/export-map-entrypoints"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -175279,7 +175305,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -175431,9 +175457,11 @@
       "annotated_home": [
         "crates/tsr_module/src/resolver.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): config/module/package-directory/resolve-package-directory-only",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/package-directory/resolve-package-directory-only"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -175448,7 +175476,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:Resolver.ResolvePackageDirectory",
@@ -175461,7 +175489,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -175565,9 +175593,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): config/module/paths/substitution-and-ts-extension-suppression",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/paths/substitution-and-ts-extension-suppression"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -175582,7 +175612,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:Resolver.getParsedPatternsForPaths",
@@ -175595,7 +175625,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -175699,9 +175729,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "a prepared case runs and reports the Rust entry point absent: config/module/typings/typings-location-fallback; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/typings/typings-location-fallback"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -175729,7 +175761,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -175743,9 +175775,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "a prepared case runs and reports the Rust entry point absent: config/module/helpers/parsed-patterns-and-match; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/helpers/parsed-patterns-and-match"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -175773,7 +175807,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -175787,9 +175821,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): config/module/exports/missing-key-continues-the-search",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/exports/missing-key-continues-the-search"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -175804,7 +175840,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:continueSearching",
@@ -175817,7 +175853,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -175875,9 +175911,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): config/module/exports/bundler-feature-overrides",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/exports/bundler-feature-overrides"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -175892,7 +175930,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:getNodeResolutionFeatures",
@@ -175905,7 +175943,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -176007,9 +176045,13 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 3 exact link(s): config/module/exports/bundler-feature-overrides, config/module/exports/condition-order-and-nesting, config/module/imports/invalid-and-root-specifiers",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/exports/bundler-feature-overrides",
+        "config/module/exports/condition-order-and-nesting",
+        "config/module/imports/invalid-and-root-specifiers"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -176024,7 +176066,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:newResolutionState",
@@ -176037,7 +176079,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -176051,9 +176093,12 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 2 exact link(s): config/module/extensions/relative-dot-normalization, config/module/extensions/ts-substitution-for-js-specifier",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/extensions/relative-dot-normalization",
+        "config/module/extensions/ts-substitution-for-js-specifier"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -176068,7 +176113,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:normalizePathForCJSResolution",
@@ -176081,7 +176126,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -176095,9 +176140,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): config/module/exports/non-matching-conditions-are-announced-in-key-order",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/exports/non-matching-conditions-are-announced-in-key-order"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -176112,7 +176159,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.conditionMatches",
@@ -176125,7 +176172,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -176139,9 +176186,12 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 2 exact link(s): config/module/exports/condition-order-and-nesting, config/module/extensions/ts-substitution-for-js-specifier",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/exports/condition-order-and-nesting",
+        "config/module/extensions/ts-substitution-for-js-specifier"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -176156,7 +176206,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.createResolvedModule",
@@ -176169,7 +176219,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -176183,9 +176233,14 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 4 exact link(s): config/module/exports/condition-order-and-nesting, config/module/package-directory/resolve-package-directory-only, config/module/symlinks/preserve-symlinks",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/exports/condition-order-and-nesting",
+        "config/module/package-directory/resolve-package-directory-only",
+        "config/module/symlinks/preserve-symlinks",
+        "config/module/symlinks/realpath-and-original-path"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -176200,7 +176255,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.createResolvedModuleHandlingSymlink",
@@ -176213,7 +176268,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -176227,9 +176282,14 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 4 exact link(s): config/module/typeref/inferred-types-containing-file-skips-node-modules, config/module/typeref/primary-type-roots, config/module/typeref/secondary-node-modules-at-types",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/typeref/inferred-types-containing-file-skips-node-modules",
+        "config/module/typeref/primary-type-roots",
+        "config/module/typeref/secondary-node-modules-at-types",
+        "config/module/typeref/type-root-file-and-package-id"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -176244,7 +176304,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.createResolvedTypeReferenceDirective",
@@ -176257,7 +176317,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -176271,9 +176331,13 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 3 exact link(s): config/module/typeref/primary-type-roots, config/module/typeref/resolve-from-type-root-fallback, config/module/typeref/type-root-file-and-package-id",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/typeref/primary-type-roots",
+        "config/module/typeref/resolve-from-type-root-fallback",
+        "config/module/typeref/type-root-file-and-package-id"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -176288,7 +176352,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.getCandidateFromTypeRoot",
@@ -176301,7 +176365,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -176359,9 +176423,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): config/module/symlinks/realpath-and-original-path",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/symlinks/realpath-and-original-path"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -176376,7 +176442,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.getOriginalAndResolvedFileName",
@@ -176389,7 +176455,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -176447,9 +176513,13 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 3 exact link(s): config/module/package/field-validation-and-falsy, config/module/package/main-types-typings-priority, config/module/package/types-versions-directory-worker",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/package/field-validation-and-falsy",
+        "config/module/package/main-types-typings-priority",
+        "config/module/package/types-versions-directory-worker"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -176464,7 +176534,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.getPackageFile",
@@ -176477,7 +176547,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -176491,9 +176561,13 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 3 exact link(s): config/module/exports/condition-order-and-nesting, config/module/package/package-id-and-peer-dependencies, config/module/typeref/type-root-file-and-package-id",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/exports/condition-order-and-nesting",
+        "config/module/package/package-id-and-peer-dependencies",
+        "config/module/typeref/type-root-file-and-package-id"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -176508,7 +176582,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.getPackageId",
@@ -176521,7 +176595,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -176535,9 +176609,24 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 14 exact link(s): config/module/exports/bundler-feature-overrides, config/module/exports/missing-key-continues-the-search, config/module/extensions/esm-mode-blocks-directory-lookup",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/exports/bundler-feature-overrides",
+        "config/module/exports/missing-key-continues-the-search",
+        "config/module/extensions/esm-mode-blocks-directory-lookup",
+        "config/module/package/field-validation-and-falsy",
+        "config/module/package/main-types-typings-priority",
+        "config/module/package/package-id-and-peer-dependencies",
+        "config/module/package/types-versions-directory-worker",
+        "config/module/symlinks/preserve-symlinks",
+        "config/module/symlinks/realpath-and-original-path",
+        "config/module/typeref/inferred-types-containing-file-skips-node-modules",
+        "config/module/typeref/primary-type-roots",
+        "config/module/typeref/resolve-from-type-root-fallback",
+        "config/module/typeref/secondary-node-modules-at-types",
+        "config/module/typeref/type-root-file-and-package-id"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -176552,7 +176641,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.getPackageJSONPathField",
@@ -176565,7 +176654,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -176579,9 +176668,36 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 25 exact link(s): config/module/exports/bundler-feature-overrides, config/module/exports/condition-order-and-nesting, config/module/exports/invalid-target-shapes",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/cache/negative-package-json-lookup-survives-host-change",
+        "config/module/exports/bundler-feature-overrides",
+        "config/module/exports/condition-order-and-nesting",
+        "config/module/exports/invalid-target-shapes",
+        "config/module/exports/missing-key-continues-the-search",
+        "config/module/exports/non-matching-conditions-are-announced-in-key-order",
+        "config/module/exports/null-target-blocks-the-search",
+        "config/module/exports/self-name-two-pass",
+        "config/module/exports/subpath-pattern-key-priority",
+        "config/module/extensions/esm-mode-blocks-directory-lookup",
+        "config/module/extensions/relative-dot-normalization",
+        "config/module/imports/bare-target-reenters-resolution",
+        "config/module/imports/hash-specifier-resolution",
+        "config/module/imports/invalid-and-root-specifiers",
+        "config/module/package/field-validation-and-falsy",
+        "config/module/package/main-types-typings-priority",
+        "config/module/package/package-id-and-peer-dependencies",
+        "config/module/package/types-versions-directory-worker",
+        "config/module/package/types-versions-subpath",
+        "config/module/symlinks/preserve-symlinks",
+        "config/module/symlinks/realpath-and-original-path",
+        "config/module/typeref/inferred-types-containing-file-skips-node-modules",
+        "config/module/typeref/primary-type-roots",
+        "config/module/typeref/resolve-from-type-root-fallback",
+        "config/module/typeref/secondary-node-modules-at-types",
+        "config/module/typeref/type-root-file-and-package-id"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -176596,7 +176712,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.getPackageJsonInfo",
@@ -176609,7 +176725,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -176669,9 +176785,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): config/module/paths/substitution-and-ts-extension-suppression",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/paths/substitution-and-ts-extension-suppression"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -176686,7 +176804,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.getParsedPatternsForPaths",
@@ -176699,7 +176817,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -176803,9 +176921,11 @@
       "annotated_home": [
         "crates/tsr_module/src/package_maps.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): config/module/package/main-types-typings-priority",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/package/main-types-typings-priority"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -176820,7 +176940,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.loadFileNameFromPackageJSONField",
@@ -176833,7 +176953,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -176849,9 +176969,18 @@
       "annotated_home": [
         "crates/tsr_module/src/package_maps.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 8 exact link(s): config/module/exports/condition-order-and-nesting, config/module/exports/invalid-target-shapes, config/module/exports/missing-key-continues-the-search",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/exports/condition-order-and-nesting",
+        "config/module/exports/invalid-target-shapes",
+        "config/module/exports/missing-key-continues-the-search",
+        "config/module/exports/non-matching-conditions-are-announced-in-key-order",
+        "config/module/exports/null-target-blocks-the-search",
+        "config/module/exports/self-name-two-pass",
+        "config/module/exports/subpath-pattern-key-priority",
+        "config/module/imports/bare-target-reenters-resolution"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -176866,7 +176995,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.loadModuleFromExports",
@@ -176879,7 +177008,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -176895,9 +177024,13 @@
       "annotated_home": [
         "crates/tsr_module/src/package_maps.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 3 exact link(s): config/module/exports/invalid-target-shapes, config/module/exports/subpath-pattern-key-priority, config/module/imports/hash-specifier-resolution",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/exports/invalid-target-shapes",
+        "config/module/exports/subpath-pattern-key-priority",
+        "config/module/imports/hash-specifier-resolution"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -176912,7 +177045,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.loadModuleFromExportsOrImports",
@@ -176925,7 +177058,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -176941,9 +177074,14 @@
       "annotated_home": [
         "crates/tsr_module/src/resolver.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 4 exact link(s): config/module/extensions/esm-mode-blocks-directory-lookup, config/module/extensions/module-suffixes, config/module/extensions/ts-substitution-for-js-specifier",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/extensions/esm-mode-blocks-directory-lookup",
+        "config/module/extensions/module-suffixes",
+        "config/module/extensions/ts-substitution-for-js-specifier",
+        "config/module/typeref/type-root-file-and-package-id"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -176958,7 +177096,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.loadModuleFromFile",
@@ -176971,7 +177109,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -176985,9 +177123,21 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 11 exact link(s): config/module/exports/bundler-feature-overrides, config/module/exports/missing-key-continues-the-search, config/module/exports/self-name-two-pass",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/exports/bundler-feature-overrides",
+        "config/module/exports/missing-key-continues-the-search",
+        "config/module/exports/self-name-two-pass",
+        "config/module/exports/subpath-pattern-key-priority",
+        "config/module/extensions/esm-mode-blocks-directory-lookup",
+        "config/module/extensions/ts-substitution-for-js-specifier",
+        "config/module/imports/bare-target-reenters-resolution",
+        "config/module/package/main-types-typings-priority",
+        "config/module/package/package-id-and-peer-dependencies",
+        "config/module/symlinks/preserve-symlinks",
+        "config/module/symlinks/realpath-and-original-path"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -177002,7 +177152,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.loadModuleFromFileNoImplicitExtensions",
@@ -177015,7 +177165,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -177029,9 +177179,12 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 2 exact link(s): config/module/exports/condition-order-and-nesting, config/module/typeref/secondary-node-modules-at-types",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/exports/condition-order-and-nesting",
+        "config/module/typeref/secondary-node-modules-at-types"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -177046,7 +177199,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.loadModuleFromImmediateNodeModulesDirectory",
@@ -177059,7 +177212,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -177075,9 +177228,13 @@
       "annotated_home": [
         "crates/tsr_module/src/package_maps.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 3 exact link(s): config/module/imports/bare-target-reenters-resolution, config/module/imports/hash-specifier-resolution, config/module/imports/invalid-and-root-specifiers",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/imports/bare-target-reenters-resolution",
+        "config/module/imports/hash-specifier-resolution",
+        "config/module/imports/invalid-and-root-specifiers"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -177092,7 +177249,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.loadModuleFromImports",
@@ -177105,7 +177262,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -177119,9 +177276,32 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 22 exact link(s): config/module/exports/bundler-feature-overrides, config/module/exports/condition-order-and-nesting, config/module/exports/invalid-target-shapes",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/exports/bundler-feature-overrides",
+        "config/module/exports/condition-order-and-nesting",
+        "config/module/exports/invalid-target-shapes",
+        "config/module/exports/missing-key-continues-the-search",
+        "config/module/exports/non-matching-conditions-are-announced-in-key-order",
+        "config/module/exports/null-target-blocks-the-search",
+        "config/module/exports/subpath-pattern-key-priority",
+        "config/module/imports/bare-target-reenters-resolution",
+        "config/module/imports/hash-specifier-resolution",
+        "config/module/imports/invalid-and-root-specifiers",
+        "config/module/package-directory/resolve-package-directory-only",
+        "config/module/package/field-validation-and-falsy",
+        "config/module/package/main-types-typings-priority",
+        "config/module/package/package-id-and-peer-dependencies",
+        "config/module/package/types-versions-directory-worker",
+        "config/module/package/types-versions-subpath",
+        "config/module/symlinks/preserve-symlinks",
+        "config/module/symlinks/realpath-and-original-path",
+        "config/module/typeref/inferred-types-containing-file-skips-node-modules",
+        "config/module/typeref/primary-type-roots",
+        "config/module/typeref/resolve-from-type-root-fallback",
+        "config/module/typeref/secondary-node-modules-at-types"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -177136,7 +177316,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.loadModuleFromNearestNodeModulesDirectory",
@@ -177149,7 +177329,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -177163,9 +177343,12 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 2 exact link(s): config/module/exports/condition-order-and-nesting, config/module/typeref/secondary-node-modules-at-types",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/exports/condition-order-and-nesting",
+        "config/module/typeref/secondary-node-modules-at-types"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -177180,7 +177363,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.loadModuleFromNearestNodeModulesDirectoryWorker",
@@ -177193,7 +177376,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -177209,9 +177392,11 @@
       "annotated_home": [
         "crates/tsr_module/src/package_maps.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): config/module/exports/self-name-two-pass",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/exports/self-name-two-pass"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -177226,7 +177411,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.loadModuleFromSelfNameReference",
@@ -177239,7 +177424,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -177255,9 +177440,13 @@
       "annotated_home": [
         "crates/tsr_module/src/package_maps.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 3 exact link(s): config/module/exports/condition-order-and-nesting, config/module/package-directory/resolve-package-directory-only, config/module/package/types-versions-subpath",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/exports/condition-order-and-nesting",
+        "config/module/package-directory/resolve-package-directory-only",
+        "config/module/package/types-versions-subpath"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -177272,7 +177461,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.loadModuleFromSpecificNodeModulesDirectory",
@@ -177285,7 +177474,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -177299,9 +177488,20 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 10 exact link(s): config/module/exports/bundler-feature-overrides, config/module/exports/condition-order-and-nesting, config/module/exports/invalid-target-shapes",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/exports/bundler-feature-overrides",
+        "config/module/exports/condition-order-and-nesting",
+        "config/module/exports/invalid-target-shapes",
+        "config/module/exports/non-matching-conditions-are-announced-in-key-order",
+        "config/module/exports/null-target-blocks-the-search",
+        "config/module/exports/self-name-two-pass",
+        "config/module/exports/subpath-pattern-key-priority",
+        "config/module/imports/bare-target-reenters-resolution",
+        "config/module/imports/hash-specifier-resolution",
+        "config/module/imports/invalid-and-root-specifiers"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -177316,7 +177516,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.loadModuleFromTargetExportOrImport",
@@ -177329,7 +177529,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -177343,9 +177543,12 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 2 exact link(s): config/module/extensions/esm-mode-blocks-directory-lookup, config/module/typeref/primary-type-roots",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/extensions/esm-mode-blocks-directory-lookup",
+        "config/module/typeref/primary-type-roots"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -177360,7 +177563,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.loadNodeModuleFromDirectory",
@@ -177373,7 +177576,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -177387,9 +177590,13 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 3 exact link(s): config/module/extensions/esm-mode-blocks-directory-lookup, config/module/package/main-types-typings-priority, config/module/package/types-versions-directory-worker",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/extensions/esm-mode-blocks-directory-lookup",
+        "config/module/package/main-types-typings-priority",
+        "config/module/package/types-versions-directory-worker"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -177404,7 +177611,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.loadNodeModuleFromDirectoryWorker",
@@ -177417,7 +177624,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -177431,9 +177638,12 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 2 exact link(s): config/module/typeref/secondary-node-modules-at-types, config/module/typeref/type-root-file-and-package-id",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/typeref/secondary-node-modules-at-types",
+        "config/module/typeref/type-root-file-and-package-id"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -177448,7 +177658,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.mangleScopedPackageName",
@@ -177461,7 +177671,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -177475,9 +177685,22 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 12 exact link(s): config/module/exports/bundler-feature-overrides, config/module/exports/missing-key-continues-the-search, config/module/extensions/esm-mode-blocks-directory-lookup",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/exports/bundler-feature-overrides",
+        "config/module/exports/missing-key-continues-the-search",
+        "config/module/extensions/esm-mode-blocks-directory-lookup",
+        "config/module/extensions/module-suffixes",
+        "config/module/extensions/relative-dot-normalization",
+        "config/module/extensions/ts-substitution-for-js-specifier",
+        "config/module/package/main-types-typings-priority",
+        "config/module/package/package-id-and-peer-dependencies",
+        "config/module/paths/root-dirs-longest-prefix",
+        "config/module/paths/substitution-and-ts-extension-suppression",
+        "config/module/symlinks/preserve-symlinks",
+        "config/module/symlinks/realpath-and-original-path"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -177492,7 +177715,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.nodeLoadModuleByRelativeName",
@@ -177505,7 +177728,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -177519,9 +177742,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): config/module/package/package-id-and-peer-dependencies",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/package/package-id-and-peer-dependencies"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -177536,7 +177761,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.readPackageJsonPeerDependencies",
@@ -177549,7 +177774,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -177563,9 +177788,26 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 16 exact link(s): config/module/exports/bundler-feature-overrides, config/module/exports/condition-order-and-nesting, config/module/exports/missing-key-continues-the-search",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/exports/bundler-feature-overrides",
+        "config/module/exports/condition-order-and-nesting",
+        "config/module/exports/missing-key-continues-the-search",
+        "config/module/exports/non-matching-conditions-are-announced-in-key-order",
+        "config/module/exports/subpath-pattern-key-priority",
+        "config/module/imports/bare-target-reenters-resolution",
+        "config/module/package/field-validation-and-falsy",
+        "config/module/package/main-types-typings-priority",
+        "config/module/package/package-id-and-peer-dependencies",
+        "config/module/package/types-versions-directory-worker",
+        "config/module/package/types-versions-subpath",
+        "config/module/symlinks/realpath-and-original-path",
+        "config/module/typeref/inferred-types-containing-file-skips-node-modules",
+        "config/module/typeref/primary-type-roots",
+        "config/module/typeref/secondary-node-modules-at-types",
+        "config/module/typeref/type-root-file-and-package-id"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -177580,7 +177822,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.realPath",
@@ -177593,7 +177835,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -177607,9 +177849,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): config/module/typeref/resolve-from-type-root-fallback",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/typeref/resolve-from-type-root-fallback"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -177624,7 +177868,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.resolveFromTypeRoot",
@@ -177637,7 +177881,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -177651,9 +177895,35 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 25 exact link(s): config/module/exports/bundler-feature-overrides, config/module/exports/condition-order-and-nesting, config/module/exports/invalid-target-shapes",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/exports/bundler-feature-overrides",
+        "config/module/exports/condition-order-and-nesting",
+        "config/module/exports/invalid-target-shapes",
+        "config/module/exports/missing-key-continues-the-search",
+        "config/module/exports/non-matching-conditions-are-announced-in-key-order",
+        "config/module/exports/null-target-blocks-the-search",
+        "config/module/exports/self-name-two-pass",
+        "config/module/exports/subpath-pattern-key-priority",
+        "config/module/extensions/esm-mode-blocks-directory-lookup",
+        "config/module/extensions/module-suffixes",
+        "config/module/extensions/relative-dot-normalization",
+        "config/module/extensions/ts-substitution-for-js-specifier",
+        "config/module/imports/bare-target-reenters-resolution",
+        "config/module/imports/hash-specifier-resolution",
+        "config/module/imports/invalid-and-root-specifiers",
+        "config/module/package/field-validation-and-falsy",
+        "config/module/package/main-types-typings-priority",
+        "config/module/package/package-id-and-peer-dependencies",
+        "config/module/package/types-versions-directory-worker",
+        "config/module/package/types-versions-subpath",
+        "config/module/paths/root-dirs-longest-prefix",
+        "config/module/paths/substitution-and-ts-extension-suppression",
+        "config/module/symlinks/preserve-symlinks",
+        "config/module/symlinks/realpath-and-original-path",
+        "config/module/typeref/resolve-from-type-root-fallback"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -177668,7 +177938,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.resolveNodeLike",
@@ -177681,7 +177951,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -177695,9 +177965,29 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 19 exact link(s): config/module/exports/bundler-feature-overrides, config/module/exports/condition-order-and-nesting, config/module/exports/invalid-target-shapes",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/exports/bundler-feature-overrides",
+        "config/module/exports/condition-order-and-nesting",
+        "config/module/exports/invalid-target-shapes",
+        "config/module/exports/missing-key-continues-the-search",
+        "config/module/exports/non-matching-conditions-are-announced-in-key-order",
+        "config/module/exports/null-target-blocks-the-search",
+        "config/module/exports/subpath-pattern-key-priority",
+        "config/module/extensions/relative-dot-normalization",
+        "config/module/imports/bare-target-reenters-resolution",
+        "config/module/imports/hash-specifier-resolution",
+        "config/module/imports/invalid-and-root-specifiers",
+        "config/module/package/field-validation-and-falsy",
+        "config/module/package/main-types-typings-priority",
+        "config/module/package/package-id-and-peer-dependencies",
+        "config/module/package/types-versions-directory-worker",
+        "config/module/package/types-versions-subpath",
+        "config/module/symlinks/preserve-symlinks",
+        "config/module/symlinks/realpath-and-original-path",
+        "config/module/typeref/resolve-from-type-root-fallback"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -177712,7 +178002,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.resolveNodeLikeWorker",
@@ -177725,7 +178015,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -177739,9 +178029,14 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 4 exact link(s): config/module/typeref/inferred-types-containing-file-skips-node-modules, config/module/typeref/primary-type-roots, config/module/typeref/secondary-node-modules-at-types",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/typeref/inferred-types-containing-file-skips-node-modules",
+        "config/module/typeref/primary-type-roots",
+        "config/module/typeref/secondary-node-modules-at-types",
+        "config/module/typeref/type-root-file-and-package-id"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -177756,7 +178051,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.resolveTypeReferenceDirective",
@@ -177769,7 +178064,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -177785,9 +178080,12 @@
       "annotated_home": [
         "crates/tsr_module/src/resolver.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 2 exact link(s): config/module/extensions/module-suffixes, config/module/extensions/ts-substitution-for-js-specifier",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/extensions/module-suffixes",
+        "config/module/extensions/ts-substitution-for-js-specifier"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -177802,7 +178100,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.tryAddingExtensions",
@@ -177815,7 +178113,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -177831,9 +178129,11 @@
       "annotated_home": [
         "crates/tsr_module/src/resolver.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): config/module/extensions/ts-substitution-for-js-specifier",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/extensions/ts-substitution-for-js-specifier"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -177848,7 +178148,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.tryExtension",
@@ -177861,7 +178161,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -177877,9 +178177,13 @@
       "annotated_home": [
         "crates/tsr_module/src/resolver.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 3 exact link(s): config/module/extensions/module-suffixes, config/module/extensions/ts-substitution-for-js-specifier, config/module/paths/substitution-and-ts-extension-suppression",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/extensions/module-suffixes",
+        "config/module/extensions/ts-substitution-for-js-specifier",
+        "config/module/paths/substitution-and-ts-extension-suppression"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -177894,7 +178198,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.tryFile",
@@ -177907,7 +178211,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -177923,9 +178227,37 @@
       "annotated_home": [
         "crates/tsr_module/src/resolver.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 27 exact link(s): config/module/exports/bundler-feature-overrides, config/module/exports/condition-order-and-nesting, config/module/exports/missing-key-continues-the-search",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/exports/bundler-feature-overrides",
+        "config/module/exports/condition-order-and-nesting",
+        "config/module/exports/missing-key-continues-the-search",
+        "config/module/exports/non-matching-conditions-are-announced-in-key-order",
+        "config/module/exports/self-name-two-pass",
+        "config/module/exports/subpath-pattern-key-priority",
+        "config/module/extensions/esm-mode-blocks-directory-lookup",
+        "config/module/extensions/module-suffixes",
+        "config/module/extensions/relative-dot-normalization",
+        "config/module/extensions/ts-substitution-for-js-specifier",
+        "config/module/imports/bare-target-reenters-resolution",
+        "config/module/imports/hash-specifier-resolution",
+        "config/module/imports/invalid-and-root-specifiers",
+        "config/module/package/field-validation-and-falsy",
+        "config/module/package/main-types-typings-priority",
+        "config/module/package/package-id-and-peer-dependencies",
+        "config/module/package/types-versions-directory-worker",
+        "config/module/package/types-versions-subpath",
+        "config/module/paths/root-dirs-longest-prefix",
+        "config/module/paths/substitution-and-ts-extension-suppression",
+        "config/module/symlinks/preserve-symlinks",
+        "config/module/symlinks/realpath-and-original-path",
+        "config/module/typeref/inferred-types-containing-file-skips-node-modules",
+        "config/module/typeref/primary-type-roots",
+        "config/module/typeref/resolve-from-type-root-fallback",
+        "config/module/typeref/secondary-node-modules-at-types",
+        "config/module/typeref/type-root-file-and-package-id"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -177940,7 +178272,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.tryFileLookup",
@@ -177953,7 +178285,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -178013,9 +178345,12 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 2 exact link(s): config/module/paths/root-dirs-longest-prefix, config/module/paths/substitution-and-ts-extension-suppression",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/paths/root-dirs-longest-prefix",
+        "config/module/paths/substitution-and-ts-extension-suppression"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -178030,7 +178365,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.tryLoadModuleUsingOptionalResolutionSettings",
@@ -178043,7 +178378,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -178057,9 +178392,13 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 3 exact link(s): config/module/package/types-versions-directory-worker, config/module/package/types-versions-subpath, config/module/paths/substitution-and-ts-extension-suppression",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/package/types-versions-directory-worker",
+        "config/module/package/types-versions-subpath",
+        "config/module/paths/substitution-and-ts-extension-suppression"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -178074,7 +178413,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.tryLoadModuleUsingPaths",
@@ -178087,7 +178426,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -178101,9 +178440,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): config/module/paths/substitution-and-ts-extension-suppression",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/paths/substitution-and-ts-extension-suppression"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -178118,7 +178459,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.tryLoadModuleUsingPathsIfEligible",
@@ -178131,7 +178472,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -178145,9 +178486,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): config/module/paths/root-dirs-longest-prefix",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/paths/root-dirs-longest-prefix"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -178162,7 +178505,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.tryLoadModuleUsingRootDirs",
@@ -178175,7 +178518,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -178189,9 +178532,31 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 21 exact link(s): config/module/exports/bundler-feature-overrides, config/module/exports/condition-order-and-nesting, config/module/exports/missing-key-continues-the-search",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/exports/bundler-feature-overrides",
+        "config/module/exports/condition-order-and-nesting",
+        "config/module/exports/missing-key-continues-the-search",
+        "config/module/exports/non-matching-conditions-are-announced-in-key-order",
+        "config/module/exports/self-name-two-pass",
+        "config/module/exports/subpath-pattern-key-priority",
+        "config/module/extensions/esm-mode-blocks-directory-lookup",
+        "config/module/imports/bare-target-reenters-resolution",
+        "config/module/imports/hash-specifier-resolution",
+        "config/module/imports/invalid-and-root-specifiers",
+        "config/module/package/field-validation-and-falsy",
+        "config/module/package/main-types-typings-priority",
+        "config/module/package/package-id-and-peer-dependencies",
+        "config/module/package/types-versions-directory-worker",
+        "config/module/symlinks/preserve-symlinks",
+        "config/module/symlinks/realpath-and-original-path",
+        "config/module/typeref/inferred-types-containing-file-skips-node-modules",
+        "config/module/typeref/primary-type-roots",
+        "config/module/typeref/resolve-from-type-root-fallback",
+        "config/module/typeref/secondary-node-modules-at-types",
+        "config/module/typeref/type-root-file-and-package-id"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -178206,7 +178571,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolutionState.validatePackageJSONField",
@@ -178219,7 +178584,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -178233,9 +178598,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): config/module/exports/condition-order-and-nesting",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/exports/condition-order-and-nesting"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -178250,7 +178617,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolved.isResolved",
@@ -178263,7 +178630,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -178277,9 +178644,13 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 3 exact link(s): config/module/exports/condition-order-and-nesting, config/module/exports/missing-key-continues-the-search, config/module/exports/null-target-blocks-the-search",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/exports/condition-order-and-nesting",
+        "config/module/exports/missing-key-continues-the-search",
+        "config/module/exports/null-target-blocks-the-search"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -178294,7 +178665,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:resolved.shouldContinueSearching",
@@ -178307,7 +178678,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -178323,9 +178694,11 @@
       "annotated_home": [
         "crates/tsr_module/src/trace.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): config/module/exports/condition-order-and-nesting",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/exports/condition-order-and-nesting"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -178340,7 +178713,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:tracer.getTraces",
@@ -178353,7 +178726,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -178367,9 +178740,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "a prepared case runs and reports the Rust entry point absent: config/module/redirect/cache-key-and-trace; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/redirect/cache-key-and-trace"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -178397,7 +178772,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -178411,9 +178786,14 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 4 exact link(s): config/module/typeref/inferred-types-containing-file-skips-node-modules, config/module/typeref/primary-type-roots, config/module/typeref/secondary-node-modules-at-types",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/typeref/inferred-types-containing-file-skips-node-modules",
+        "config/module/typeref/primary-type-roots",
+        "config/module/typeref/secondary-node-modules-at-types",
+        "config/module/typeref/type-root-file-and-package-id"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -178428,7 +178808,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:tracer.traceTypeReferenceDirectiveResult",
@@ -178441,7 +178821,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -178457,9 +178837,11 @@
       "annotated_home": [
         "crates/tsr_module/src/trace.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): config/module/exports/condition-order-and-nesting",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/exports/condition-order-and-nesting"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -178474,7 +178856,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:tracer.write",
@@ -178487,7 +178869,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -178501,9 +178883,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): config/module/exports/null-target-blocks-the-search",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/exports/null-target-blocks-the-search"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -178518,7 +178902,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/resolver.go",
       "id": "tsc/internal/module/resolver.go:unresolved",
@@ -178531,7 +178915,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -178590,9 +178974,11 @@
       "annotated_home": [
         "crates/tsr_compiler/src/include_reason.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "a prepared case runs and reports the Rust entry point absent: config/module/helpers/package-id-string-and-package-name; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/helpers/package-id-string-and-package-name"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -178607,7 +178993,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "missing",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/types.go",
       "id": "tsc/internal/module/types.go:PackageId.String",
@@ -178620,7 +179006,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -178633,9 +179019,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): config/module/helpers/is-resolved-on-both-result-types",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/helpers/is-resolved-on-both-result-types"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -178650,7 +179038,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/types.go",
       "id": "tsc/internal/module/types.go:ResolvedModule.IsResolved",
@@ -178663,7 +179051,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -178676,9 +179064,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): config/module/helpers/is-resolved-on-both-result-types",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/helpers/is-resolved-on-both-result-types"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -178693,7 +179083,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/types.go",
       "id": "tsc/internal/module/types.go:ResolvedTypeReferenceDirective.IsResolved",
@@ -178706,7 +179096,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -178807,9 +179197,11 @@
       "annotated_home": [
         "crates/tsr_module/src/package_maps.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): config/module/exports/subpath-pattern-key-priority",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/exports/subpath-pattern-key-priority"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -178824,7 +179216,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/util.go",
       "id": "tsc/internal/module/util.go:ComparePatternKeys",
@@ -178837,7 +179229,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -178895,9 +179287,11 @@
       "annotated_home": [
         "crates/tsr_module/src/diagnostic.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): config/module/helpers/resolution-diagnostic-by-extension",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/helpers/resolution-diagnostic-by-extension"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -178912,7 +179306,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/util.go",
       "id": "tsc/internal/module/util.go:GetResolutionDiagnostic",
@@ -178925,7 +179319,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -178939,9 +179333,11 @@
       "annotated_home": [
         "crates/tsr_module/src/resolver.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): config/module/helpers/mangle-scoped-and-types-package-name",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/helpers/mangle-scoped-and-types-package-name"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -178956,7 +179352,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/util.go",
       "id": "tsc/internal/module/util.go:GetTypesPackageName",
@@ -178969,7 +179365,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -178983,9 +179379,12 @@
       "annotated_home": [
         "crates/tsr_module/src/package_maps.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 2 exact link(s): config/module/exports/non-matching-conditions-are-announced-in-key-order, config/module/helpers/versioned-types-key",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/exports/non-matching-conditions-are-announced-in-key-order",
+        "config/module/helpers/versioned-types-key"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -179000,7 +179399,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/util.go",
       "id": "tsc/internal/module/util.go:IsApplicableVersionedTypesKey",
@@ -179013,7 +179412,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -179027,9 +179426,12 @@
       "annotated_home": [
         "crates/tsr_module/src/resolver.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 2 exact link(s): config/module/helpers/mangle-scoped-and-types-package-name, config/module/typeref/type-root-file-and-package-id",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/helpers/mangle-scoped-and-types-package-name",
+        "config/module/typeref/type-root-file-and-package-id"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -179044,7 +179446,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/util.go",
       "id": "tsc/internal/module/util.go:MangleScopedPackageName",
@@ -179057,7 +179459,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -179069,9 +179471,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "a prepared case runs and reports the Rust entry point absent: config/module/helpers/parse-node-module-from-path; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/helpers/parse-node-module-from-path"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -179099,7 +179503,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -179111,9 +179515,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input, but `parse_package_name` is defined at crates/tsr_module/src/resolver.rs; needs a behavioral witness to become covered",
+      "basis": "witnessed by 1 exact link(s): config/module/exports/condition-order-and-nesting",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/exports/condition-order-and-nesting"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -179128,7 +179534,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/module",
       "go_source": "tsc/internal/module/util.go",
       "id": "tsc/internal/module/util.go:ParsePackageName",
@@ -179141,7 +179547,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -179197,9 +179603,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "a prepared case runs and reports the Rust entry point absent: config/module/helpers/unmangle-scoped-package-name; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/module/helpers/unmangle-scoped-package-name"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -179227,7 +179635,7 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [

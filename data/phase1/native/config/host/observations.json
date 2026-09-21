@@ -1351,6 +1351,348 @@
       "result": "observed"
     },
     {
+      "case": "config/module/helpers/versioned-types-key",
+      "operation": "tsc/internal/module/util.go:IsApplicableVersionedTypesKey",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/helpers/mangle-scoped-and-types-package-name",
+      "operation": "tsc/internal/module/util.go:MangleScopedPackageName",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/helpers/unmangle-scoped-package-name",
+      "operation": "tsc/internal/module/util.go:UnmangleScopedPackageName",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/helpers/parse-node-module-from-path",
+      "operation": "tsc/internal/module/util.go:ParseNodeModuleFromPath",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/helpers/conditions-by-mode-and-kind",
+      "operation": "tsc/internal/module/resolver.go:GetConditions",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/helpers/resolution-diagnostic-by-extension",
+      "operation": "tsc/internal/module/util.go:GetResolutionDiagnostic",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/helpers/is-resolved-on-both-result-types",
+      "operation": "tsc/internal/module/types.go:ResolvedModule.IsResolved",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/helpers/package-id-string-and-package-name",
+      "operation": "tsc/internal/module/types.go:PackageId.String",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/helpers/parsed-patterns-and-match",
+      "operation": "tsc/internal/module/resolver.go:TryParsePatterns",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/exports/condition-order-and-nesting",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.loadModuleFromTargetExportOrImport",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/exports/non-matching-conditions-are-announced-in-key-order",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.conditionMatches",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/exports/null-target-blocks-the-search",
+      "operation": "tsc/internal/module/resolver.go:unresolved",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/exports/missing-key-continues-the-search",
+      "operation": "tsc/internal/module/resolver.go:continueSearching",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/exports/subpath-pattern-key-priority",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.loadModuleFromExportsOrImports",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/exports/pattern-with-trailer",
+      "operation": "tsc/internal/module/resolver.go:matchesPatternWithTrailer",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/exports/invalid-target-shapes",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.loadModuleFromTargetExportOrImport",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/exports/dot-object-classification",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.loadModuleFromExports",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/imports/hash-specifier-resolution",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.loadModuleFromImports",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/imports/invalid-and-root-specifiers",
+      "operation": "tsc/internal/module/resolver.go:newResolutionState",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/imports/bare-target-reenters-resolution",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.resolveNodeLike",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/exports/self-name-two-pass",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.loadModuleFromSelfNameReference",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/exports/bundler-feature-overrides",
+      "operation": "tsc/internal/module/resolver.go:getNodeResolutionFeatures",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/package/types-versions-subpath",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.tryLoadModuleUsingPaths",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/package/types-versions-directory-worker",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.loadNodeModuleFromDirectoryWorker",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/package/field-validation-and-falsy",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.getPackageJSONPathField",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/package/main-types-typings-priority",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.getPackageFile",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/package/package-id-and-peer-dependencies",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.readPackageJsonPeerDependencies",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/extensions/ts-substitution-for-js-specifier",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.tryAddingExtensions",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/extensions/module-suffixes",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.tryFile",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/extensions/esm-mode-blocks-directory-lookup",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.nodeLoadModuleByRelativeName",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/extensions/relative-dot-normalization",
+      "operation": "tsc/internal/module/resolver.go:normalizePathForCJSResolution",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/paths/substitution-and-ts-extension-suppression",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.tryLoadModuleUsingPathsIfEligible",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/paths/root-dirs-longest-prefix",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.tryLoadModuleUsingRootDirs",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/typeref/primary-type-roots",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.resolveTypeReferenceDirective",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/typeref/type-root-file-and-package-id",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.getCandidateFromTypeRoot",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/typeref/secondary-node-modules-at-types",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.loadModuleFromImmediateNodeModulesDirectory",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/typeref/inferred-types-containing-file-skips-node-modules",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.resolveTypeReferenceDirective",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/typeref/relative-reference-normalization",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.resolveTypeReferenceDirective",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/typeref/resolve-from-type-root-fallback",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.resolveFromTypeRoot",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/symlinks/realpath-and-original-path",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.getOriginalAndResolvedFileName",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/symlinks/preserve-symlinks",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.createResolvedModuleHandlingSymlink",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/cache/repeat-resolution-is-a-hit",
+      "operation": "tsc/internal/module/cache.go:moduleResolutionCache.Get",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/cache/separated-by-mode",
+      "operation": "tsc/internal/module/cache.go:moduleResolutionCache.Set",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/cache/separated-by-importing-directory",
+      "operation": "tsc/internal/module/cache.go:moduleResolutionCache.Get",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/typeref-cache/separated-by-inferred-types-file",
+      "operation": "tsc/internal/module/cache.go:typeRefDirectiveResolutionCache.Get",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/cache/negative-package-json-lookup-survives-host-change",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.getPackageJsonInfo",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/cache/module-cache-set-is-first-writer-wins",
+      "operation": "tsc/internal/module/cache.go:moduleResolutionCache.Set",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/typeref-cache/set-is-last-writer-wins",
+      "operation": "tsc/internal/module/cache.go:typeRefDirectiveResolutionCache.Set",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/cache/injected-package-json-cache-and-entries",
+      "operation": "tsc/internal/module/resolver.go:NewResolverWithOptions",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/redirect/compiler-options-with-redirect",
+      "operation": "tsc/internal/module/resolver.go:GetCompilerOptionsWithRedirect",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/redirect/cache-key-and-trace",
+      "operation": "tsc/internal/module/resolver.go:tracer.traceResolutionUsingProjectReference",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/entrypoints/export-map-entrypoints",
+      "operation": "tsc/internal/module/resolver.go:Resolver.GetEntrypointsFromPackageJsonInfo",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/typings/typings-location-fallback",
+      "operation": "tsc/internal/module/resolver.go:Resolver.tryResolveFromTypingsLocation",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/types/automatic-type-directive-names",
+      "operation": "tsc/internal/module/resolver.go:GetAutomaticTypeDirectiveNames",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/package-directory/resolve-package-directory-only",
+      "operation": "tsc/internal/module/resolver.go:Resolver.ResolvePackageDirectory",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/control/unsupported-module-resolution-kind",
+      "operation": "tsc/internal/module/resolver.go:newResolutionState",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/module/control/relative-containing-file",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.newResolutionState",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
       "case": "config/packagejson/expected-validity-survives-a-repeated-field",
       "operation": "tsc/internal/packagejson/expected.go:Expected.IsValid",
       "reason": "operation is not served by the parse-config host probe",
@@ -1555,6 +1897,6 @@
       "result": "native_unavailable"
     }
   ],
-  "request_sha256": "f44399a6648acea9573f2996a4673cab8ed6280ffa7b5fe96fd31148830741fd",
+  "request_sha256": "2821728493abee1b00e480fb26d97873d9fcf26e488d28a66514b7df845ae7d6",
   "version": 1
 }
