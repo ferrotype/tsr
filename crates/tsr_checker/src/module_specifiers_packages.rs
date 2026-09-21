@@ -108,29 +108,13 @@ fn subpaths(value: &Value) -> bool {
     // Once a dot key exists, any condition key makes the object invalid.
     dot && !other
 }
+// The shared path crate owns these; the names stay local so call sites read the same.
+use path::{
+    change_extension, change_full_extension,
+    has_implementation_ts_file_extension as implementation_ts,
+};
 fn ts_file(file: &[u8]) -> bool {
-    has_extension(file, &[b".ts", b".tsx", b".cts", b".mts"])
-}
-fn implementation_ts(file: &[u8]) -> bool {
-    ts_file(file) && !path::is_declaration_file_name(file)
-}
-fn change_extension(file: &[u8], ext: &[u8]) -> Vec<u8> {
-    let stem = path::remove_file_extension(file);
-    if stem.len() == file.len() {
-        file.to_vec()
-    } else {
-        [stem, ext].concat()
-    }
-}
-// port: tsc/internal/tspath/extension.go:ChangeFullExtension
-fn change_full_extension(file: &[u8], ext: &[u8]) -> Vec<u8> {
-    if path::is_declaration_file_name(file) {
-        let base = path::base_name(file);
-        if let Some(index) = base.windows(3).position(|part| part == b".d.") {
-            return [&file[..file.len() - base.len() + index], ext].concat();
-        }
-    }
-    change_extension(file, ext)
+    path::file_extension_is_one_of(file, path::SUPPORTED_TS_IMPLEMENTATION_EXTENSIONS)
 }
 
 impl Generation<'_> {
