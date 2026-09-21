@@ -1667,6 +1667,38 @@ class ConfigOutputPreparationTests(unittest.TestCase):
             self.assertNotIn(case, [c for c in declined if declined[c] == seen])
         self.assertEqual(baselines.output_preparation(self.cases, "config")["problems"], [])
 
+    def test_a_failed_probe_is_not_hidden_by_another_probes_observation(self):
+        # Authenticate the deliberately changed bytes, then exercise the merge
+        # itself. Both probe orderings used to hide the harness failure.
+        for probe, subject_prefix in [("commandline", "config/tsconfigparsing/"),
+                                      ("tsconfigparsing", "config/commandline/")]:
+            with self.subTest(probe=probe), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                data = root / "data"
+                data.mkdir()
+                shutil.copy(ROOT / "data/upstream.json", data / "upstream.json")
+                phase = data / "phase1"
+                phase.mkdir()
+                shutil.copy(ROOT / "data/phase1/config-baselines.json", phase / "config-baselines.json")
+                native = phase / "native/config"
+                shutil.copytree(ROOT / "data/phase1/native/config", native)
+                path = native / probe / "observations.json"
+                document = json.loads(path.read_text())
+                row = next(r for r in document["observations"] if r["case"].startswith(subject_prefix))
+                row["result"] = "harness_failed"
+                row["error"] = "review failure injection"
+                row.pop("reason", None)
+                path.write_text(json.dumps(document))
+                provenance_path = native / "capture-provenance.json"
+                provenance = json.loads(provenance_path.read_text())
+                provenance["native_probes"][probe]["observations_sha256"] = sha(path.read_bytes())
+                provenance_path.write_text(json.dumps(provenance))
+                with patch.object(baselines, "ROOT", root):
+                    report = baselines.output_preparation(self.cases, "config")
+                self.assertFalse(report["complete"])
+                self.assertTrue(any(probe in p and row["case"] in p and "harness_failed" in p
+                                    for p in report["problems"]), report["problems"])
+
     def test_one_probe_serving_two_groups_is_read_once(self):
         # `commandline` renders both parseCommandLine and parseBuildOptions.
         # Reading its observations once per group presented every row twice and

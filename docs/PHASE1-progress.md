@@ -1119,3 +1119,18 @@ scoped leaves re-record before it can describe the corrected driver. No native
 observations, frozen reports or acceptance evidence were refreshed for this
 refactor. Cargo dependency changes invalidate affected capture fingerprints
 under the existing rules.
+
+The final PR review also repaired two preparation-layer gaps: an observed row
+could hide another baseline probe's harness failure, and a bare diagnostic-writer
+operation label could leak into `missing_operation` instead of the pinned ID.
+Failure injection now rejects both probe orderings; an identity regression checks
+the canonical writer ID. The current request schedule is unchanged by these
+repairs. The CI publication-policy failure was the omitted private
+`phase1_config` package; both it and `phase1_harness` are now registered.
+
+The removed P2 sorter marker required regenerating `data/s07/operations.json`.
+The accepted subset review records that the sole inventory change is removal of
+that example mapping; the production mapping remains. Replaying existing,
+authenticated syntax and loader captures produced byte-identical selected cases
+and checker obligations. Only the operation-matrix digest and its review chain
+changed, without updating any measured outcome or producer fingerprint.

@@ -327,8 +327,8 @@ const GAPS: &[(&str, &str, &str, &str)] = &[
 fn gap(requested: &str) -> Outcome {
     let bare = requested.strip_prefix(GO).unwrap_or(requested);
     match GAPS.iter().find(|(name, ..)| *name == bare) {
-        Some((_, authority, signature, home)) => {
-            Outcome::missing(requested, authority, signature, home)
+        Some((name, authority, signature, home)) => {
+            Outcome::missing(format!("{GO}{name}"), authority, signature, home)
         }
         None => Outcome::Failed(format!(
             "no reviewed diagnosticWriter record for operation {requested:?}"
@@ -527,4 +527,21 @@ pub fn observe(request: &Value) -> Option<Outcome> {
         Ok(observation) => Outcome::Observed(observation),
         Err(error) => Outcome::Failed(error),
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn bare_operation_labels_still_report_the_pinned_identity() {
+        let row = crate::api::response(
+            &json!({"case":"identity-control", "operation":"ASTDiagnostic.Source"}),
+            gap("ASTDiagnostic.Source"),
+        );
+        assert_eq!(
+            row["missing_operation"]["operation"],
+            format!("{GO}ASTDiagnostic.Source")
+        );
+    }
 }

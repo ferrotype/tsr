@@ -424,7 +424,18 @@ def output_preparation(cases: dict, step: str) -> dict:
         if digest(native.read_bytes()) != declared.get("observations_sha256"):
             problems.append(f"probe {probe} native observations disagree with their digest")
             continue
+        seen: set[str] = set()
         for row in json.loads(native.read_text())["observations"]:
+            case_id = row["case"]
+            if case_id in seen:
+                problems.append(f"probe {probe} duplicates native row {case_id}")
+                continue
+            seen.add(case_id)
+            if row.get("result") not in ("observed", "native_unavailable"):
+                problems.append(
+                    f"probe {probe}, case {case_id}: {row.get('result')!r}: {row.get('error', '')}"
+                )
+                continue
             # Every probe sees the whole family schedule and declines the cases
             # it does not serve, so a case has one observing row and N-1
             # declines. Keeping the first row seen would let an alphabetically
