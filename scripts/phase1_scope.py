@@ -509,6 +509,18 @@ STEP_PACKAGES: dict[str, frozenset[str]] = {
             "vfs/vfstest", "vfs/vfsmock",
         )
     ),
+    # F3a. `internal/compiler` is deliberately absent: F3a's program-loading
+    # cases drive its loader, but the plan gives F4a the job of enumerating
+    # which of its 340 operations are Phase 1 at all, and a package cannot be
+    # rostered twice. Those cases link compiler operations without claiming to
+    # account for them, and F4a's roster is where that accounting happens.
+    "config": frozenset(
+        "internal/" + name
+        for name in (
+            "tsoptions", "tsoptions/tsoptionstest", "module", "packagejson",
+            "diagnosticwriter", "testutil/baseline", "testutil/filefixture",
+        )
+    ),
 }
 
 # The step a package belongs to, for the per-operation roster field. A package
@@ -649,7 +661,11 @@ def roster_problems(
 
 
 # The comparison family whose cases prepare each step's operations.
-STEP_FAMILIES = {"leaves": ("leaves",), "filesystem": ("filesystem", "pilot")}
+STEP_FAMILIES = {
+    "leaves": ("leaves",),
+    "filesystem": ("filesystem", "pilot"),
+    "config": ("config",),
+}
 
 
 def leaf_preparation(scope: dict, cases: dict, step: str = "leaves") -> dict:

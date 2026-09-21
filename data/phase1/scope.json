@@ -165929,8 +165929,8 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "ASTDiagnostic.End"
@@ -165963,8 +165963,8 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "ASTDiagnostic.File"
@@ -165997,8 +165997,8 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "ASTDiagnostic.Len"
@@ -166031,8 +166031,8 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "ASTDiagnostic.MessageChain"
@@ -166065,8 +166065,8 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "ASTDiagnostic.Pos"
@@ -166099,8 +166099,8 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "ASTDiagnostic.RelatedInformation"
@@ -166133,8 +166133,8 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "ASTDiagnostic.Source"
@@ -166167,8 +166167,8 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "ASTDiagnostic.resolve"
@@ -166201,8 +166201,8 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "CompareASTDiagnostics"
@@ -166235,8 +166235,8 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "FlattenDiagnosticMessage"
@@ -166269,8 +166269,8 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "FormatDiagnosticWithColorAndContext"
@@ -166303,8 +166303,8 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "FormatDiagnosticsStatusAndTime"
@@ -166337,8 +166337,8 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "FormatDiagnosticsStatusWithColorAndTime"
@@ -166371,8 +166371,8 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "FormatDiagnosticsWithColorAndContext"
@@ -166405,8 +166405,8 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "FromASTDiagnostics"
@@ -166439,8 +166439,8 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "ToDiagnostics"
@@ -166473,8 +166473,8 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "TryClearScreen"
@@ -166507,8 +166507,8 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "WrapASTDiagnostic"
@@ -166541,8 +166541,8 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "WrapASTDiagnostics"
@@ -166575,8 +166575,8 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "WriteErrorSummaryText"
@@ -166609,8 +166609,8 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "WriteFlattenedASTDiagnosticMessage"
@@ -166643,8 +166643,8 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "WriteFlattenedDiagnosticMessage"
@@ -166677,8 +166677,8 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "WriteFormatDiagnostic"
@@ -166711,8 +166711,8 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "WriteFormatDiagnostics"
@@ -166745,8 +166745,8 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "WriteLocation"
@@ -166779,8 +166779,8 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "diagnosticPrefix"
@@ -166813,8 +166813,8 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "flattenDiagnosticMessageChain"
@@ -166847,8 +166847,8 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "getCategoryFormat"
@@ -166881,8 +166881,8 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "getErrorSummary"
@@ -166915,8 +166915,8 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "newOriginalTextFile"
@@ -166949,8 +166949,8 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "originalTextFile.ECMALineMap"
@@ -166983,8 +166983,8 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "originalTextFile.FileName"
@@ -167017,8 +167017,8 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "originalTextFile.Text"
@@ -167051,8 +167051,8 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "prettyPathForFileError"
@@ -167085,8 +167085,8 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "renamedFile.ECMALineMap"
@@ -167119,8 +167119,8 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "renamedFile.FileName"
@@ -167153,8 +167153,8 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "renamedFile.Text"
@@ -167187,8 +167187,8 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "writeCodeSnippet"
@@ -167221,8 +167221,8 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "writeTabularErrorsDisplay"
@@ -167255,8 +167255,8 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "writeWithStyleAndReset"
@@ -169684,8 +169684,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/resolver.rs"
@@ -169724,8 +169724,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/resolver.rs"
@@ -169764,8 +169764,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/resolver.rs"
@@ -169804,8 +169804,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/resolver.rs"
@@ -169844,8 +169844,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/resolver.rs"
@@ -169884,8 +169884,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/resolver.rs"
@@ -169924,8 +169924,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/resolver.rs"
@@ -169964,8 +169964,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -170007,8 +170007,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -170050,8 +170050,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -170093,8 +170093,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -170136,8 +170136,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -170179,8 +170179,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -170222,8 +170222,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -170265,8 +170265,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -170308,8 +170308,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -170351,8 +170351,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -170394,8 +170394,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -170437,8 +170437,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -170480,8 +170480,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -170523,8 +170523,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -170566,8 +170566,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -170609,8 +170609,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -170652,8 +170652,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -170695,8 +170695,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -170738,8 +170738,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -170781,8 +170781,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -170824,8 +170824,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -170867,8 +170867,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -170910,8 +170910,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -170953,8 +170953,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -170996,8 +170996,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -171039,8 +171039,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -171082,8 +171082,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -171125,8 +171125,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -171168,8 +171168,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -171211,8 +171211,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -171254,8 +171254,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -171297,8 +171297,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -171340,8 +171340,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -171383,8 +171383,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -171426,8 +171426,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -171469,8 +171469,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -171512,8 +171512,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -171555,8 +171555,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -171598,8 +171598,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -171641,8 +171641,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -171684,8 +171684,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -171727,8 +171727,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -171770,8 +171770,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -171813,8 +171813,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -171856,8 +171856,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -171899,8 +171899,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -171942,8 +171942,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -171985,8 +171985,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -172028,8 +172028,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -172071,8 +172071,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -172114,8 +172114,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -172157,8 +172157,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -172200,8 +172200,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -172243,8 +172243,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -172286,8 +172286,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -172329,8 +172329,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -172372,8 +172372,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -172415,8 +172415,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -172458,8 +172458,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -172501,8 +172501,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -172544,8 +172544,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -172587,8 +172587,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -172630,8 +172630,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -172673,8 +172673,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -172716,8 +172716,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -172759,8 +172759,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -172802,8 +172802,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -172845,8 +172845,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -172888,8 +172888,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -172931,8 +172931,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -172974,8 +172974,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -173017,8 +173017,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -173060,8 +173060,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -173103,8 +173103,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -173146,8 +173146,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -173189,8 +173189,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -173232,8 +173232,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -173275,8 +173275,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -173318,8 +173318,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -173361,8 +173361,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -173404,8 +173404,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -173447,8 +173447,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -173490,8 +173490,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -173532,8 +173532,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -173574,8 +173574,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -173616,8 +173616,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -173658,8 +173658,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -173700,8 +173700,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -173742,8 +173742,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/diagnostic.rs",
@@ -173783,8 +173783,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/diagnostic.rs",
@@ -173824,8 +173824,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/diagnostic.rs",
@@ -173865,8 +173865,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/diagnostic.rs",
@@ -173906,8 +173906,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/diagnostic.rs",
@@ -173947,8 +173947,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/diagnostic.rs",
@@ -173988,8 +173988,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/diagnostic.rs",
@@ -174029,8 +174029,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/diagnostic.rs",
@@ -174070,8 +174070,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/diagnostic.rs",
@@ -174111,8 +174111,8 @@
       "membership_reason": "module resolution",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/diagnostic.rs",
@@ -174495,8 +174495,8 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -174535,8 +174535,8 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -174575,8 +174575,8 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -174615,8 +174615,8 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -174655,8 +174655,8 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -174695,8 +174695,8 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -174735,8 +174735,8 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -174775,8 +174775,8 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -174815,8 +174815,8 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -174855,8 +174855,8 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -174895,8 +174895,8 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_maps.rs",
@@ -174935,8 +174935,8 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_json.rs"
@@ -174974,8 +174974,8 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_json.rs"
@@ -175013,8 +175013,8 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_json.rs"
@@ -175052,8 +175052,8 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_json.rs"
@@ -175091,8 +175091,8 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_json.rs"
@@ -175130,8 +175130,8 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_json.rs"
@@ -175169,8 +175169,8 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_json.rs"
@@ -175208,8 +175208,8 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_json.rs"
@@ -175247,8 +175247,8 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_json.rs"
@@ -175286,8 +175286,8 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_json.rs"
@@ -175325,8 +175325,8 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_json.rs"
@@ -175364,8 +175364,8 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_json.rs"
@@ -175403,8 +175403,8 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_json.rs"
@@ -175442,8 +175442,8 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_json.rs"
@@ -175481,8 +175481,8 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_json.rs"
@@ -175520,8 +175520,8 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_json.rs"
@@ -175559,8 +175559,8 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_json.rs"
@@ -175598,8 +175598,8 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_json.rs"
@@ -175637,8 +175637,8 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_json.rs"
@@ -175676,8 +175676,8 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_json.rs"
@@ -175715,8 +175715,8 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_json.rs"
@@ -175754,8 +175754,8 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_json.rs"
@@ -175793,8 +175793,8 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_json.rs"
@@ -175832,8 +175832,8 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_json.rs"
@@ -175871,8 +175871,8 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_json.rs"
@@ -175910,8 +175910,8 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_json.rs"
@@ -175949,8 +175949,8 @@
       "membership_reason": "package JSON; actual home is tsr_module",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/package_json.rs"
@@ -221629,8 +221629,8 @@
       "membership_reason": "the baseline renderer the 309 outputs go through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "DiffText"
@@ -221659,8 +221659,8 @@
       "membership_reason": "the baseline renderer the 309 outputs go through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "Run"
@@ -221689,8 +221689,8 @@
       "membership_reason": "the baseline renderer the 309 outputs go through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "writeComparison"
@@ -221719,8 +221719,8 @@
       "membership_reason": "the baseline renderer the 309 outputs go through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "Track"
@@ -221749,8 +221749,8 @@
       "membership_reason": "the baseline renderer the 309 outputs go through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "doWriteRecordedBaselines"
@@ -221779,8 +221779,8 @@
       "membership_reason": "the baseline renderer the 309 outputs go through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "recordBaseline"
@@ -221809,8 +221809,8 @@
       "membership_reason": "the baseline renderer the 309 outputs go through",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "writeRecordedBaselines"
@@ -221835,8 +221835,8 @@
       "membership_reason": "fixture loading used by the config tests",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "FromFile"
@@ -221861,8 +221861,8 @@
       "membership_reason": "fixture loading used by the config tests",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "FromString"
@@ -221887,8 +221887,8 @@
       "membership_reason": "fixture loading used by the config tests",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "fromFile.Name"
@@ -221913,8 +221913,8 @@
       "membership_reason": "fixture loading used by the config tests",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "fromFile.Path"
@@ -221939,8 +221939,8 @@
       "membership_reason": "fixture loading used by the config tests",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "fromFile.ReadFile"
@@ -221965,8 +221965,8 @@
       "membership_reason": "fixture loading used by the config tests",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "fromFile.SkipIfNotExist"
@@ -221991,8 +221991,8 @@
       "membership_reason": "fixture loading used by the config tests",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "fromString.Name"
@@ -222017,8 +222017,8 @@
       "membership_reason": "fixture loading used by the config tests",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "fromString.Path"
@@ -222043,8 +222043,8 @@
       "membership_reason": "fixture loading used by the config tests",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "fromString.ReadFile"
@@ -222069,8 +222069,8 @@
       "membership_reason": "fixture loading used by the config tests",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "fromString.SkipIfNotExist"
@@ -227612,8 +227612,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/option_declarations.rs"
@@ -227667,8 +227667,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/option_declarations.rs"
@@ -227722,8 +227722,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/option_declarations.rs"
@@ -227777,8 +227777,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/option_declarations.rs"
@@ -227834,8 +227834,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "prepared",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/fixture_options.rs"
@@ -227891,8 +227891,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "prepared",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/fixture_options.rs"
@@ -227946,8 +227946,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/fixture_options.rs"
@@ -228001,8 +228001,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/fixture_options.rs"
@@ -228056,8 +228056,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/fixture_options.rs"
@@ -228111,8 +228111,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/fixture_options.rs"
@@ -228166,8 +228166,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/fixture_options.rs"
@@ -228221,8 +228221,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/fixture_options.rs"
@@ -228276,8 +228276,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/fixture_options.rs"
@@ -228331,8 +228331,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/fixture_options.rs"
@@ -228386,8 +228386,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/fixture_options.rs"
@@ -228441,8 +228441,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/fixture_options.rs"
@@ -228496,8 +228496,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/fixture_options.rs"
@@ -228551,8 +228551,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/fixture_options.rs"
@@ -228606,8 +228606,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/fixture_options.rs"
@@ -228661,8 +228661,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_module/src/config_mapper.rs"
@@ -228716,8 +228716,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/option_declarations_generated.rs"
@@ -228771,8 +228771,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/option_declarations_generated.rs"
@@ -228826,8 +228826,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/option_declarations_generated.rs"
@@ -228881,8 +228881,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/option_declarations_generated.rs"
@@ -228936,8 +228936,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/option_declarations_generated.rs"
@@ -228991,8 +228991,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "getParseCommandLineWorkerDiagnostics"
@@ -229044,8 +229044,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/lib.rs"
@@ -229099,8 +229099,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/lib.rs"
@@ -229154,8 +229154,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/lib.rs"
@@ -229209,8 +229209,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_syntax.rs"
@@ -229264,8 +229264,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_syntax.rs"
@@ -229319,8 +229319,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_syntax.rs"
@@ -229374,8 +229374,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_syntax.rs"
@@ -229429,8 +229429,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_syntax.rs"
@@ -229484,8 +229484,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_syntax.rs"
@@ -229539,8 +229539,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_syntax.rs"
@@ -229594,8 +229594,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_syntax.rs"
@@ -229649,8 +229649,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_syntax.rs"
@@ -229704,8 +229704,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/option_declarations.rs"
@@ -229759,8 +229759,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/option_declarations.rs"
@@ -229814,8 +229814,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/option_declarations.rs"
@@ -229869,8 +229869,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/option_declarations.rs"
@@ -229924,8 +229924,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "ParsedBuildCommandLine.Locale"
@@ -229977,8 +229977,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "ParsedBuildCommandLine.ResolvedProjectPaths"
@@ -230030,8 +230030,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_specs.rs",
@@ -230086,8 +230086,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_specs.rs",
@@ -230142,8 +230142,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_specs.rs",
@@ -230198,8 +230198,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_specs.rs",
@@ -230254,8 +230254,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_specs.rs",
@@ -230310,8 +230310,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_specs.rs",
@@ -230366,8 +230366,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_specs.rs",
@@ -230422,8 +230422,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_specs.rs",
@@ -230478,8 +230478,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_specs.rs",
@@ -230534,8 +230534,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_specs.rs",
@@ -230590,8 +230590,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_specs.rs",
@@ -230646,8 +230646,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_specs.rs",
@@ -230702,8 +230702,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_specs.rs",
@@ -230758,8 +230758,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_specs.rs",
@@ -230814,8 +230814,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_specs.rs",
@@ -230870,8 +230870,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_specs.rs",
@@ -230926,8 +230926,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_specs.rs",
@@ -230982,8 +230982,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_specs.rs",
@@ -231038,8 +231038,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_specs.rs",
@@ -231094,8 +231094,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_specs.rs",
@@ -231150,8 +231150,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_specs.rs",
@@ -231206,8 +231206,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_specs.rs",
@@ -231262,8 +231262,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_specs.rs",
@@ -231318,8 +231318,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_specs.rs",
@@ -231374,8 +231374,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_specs.rs",
@@ -231430,8 +231430,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_specs.rs",
@@ -231486,8 +231486,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_specs.rs",
@@ -231542,8 +231542,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_specs.rs",
@@ -231598,8 +231598,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_specs.rs",
@@ -231654,8 +231654,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_specs.rs",
@@ -231710,8 +231710,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_specs.rs",
@@ -231766,8 +231766,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_specs.rs",
@@ -231822,8 +231822,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_specs.rs",
@@ -231878,8 +231878,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_specs.rs",
@@ -231934,8 +231934,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_specs.rs",
@@ -231990,8 +231990,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_specs.rs",
@@ -232046,8 +232046,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_specs.rs",
@@ -232102,8 +232102,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_mappers.rs",
@@ -232160,8 +232160,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_mappers.rs",
@@ -232218,8 +232218,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_mappers.rs",
@@ -232276,8 +232276,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_mappers.rs",
@@ -232334,8 +232334,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_mappers.rs",
@@ -232392,8 +232392,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_mappers.rs",
@@ -232450,8 +232450,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_mappers.rs",
@@ -232508,8 +232508,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_mappers.rs",
@@ -232566,8 +232566,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_mappers.rs",
@@ -232624,8 +232624,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_mappers.rs",
@@ -232682,8 +232682,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_mappers.rs",
@@ -232740,8 +232740,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_mappers.rs",
@@ -232798,8 +232798,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_mappers.rs",
@@ -232856,8 +232856,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_mappers.rs",
@@ -232914,8 +232914,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_mappers.rs",
@@ -232972,8 +232972,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_mappers.rs",
@@ -233030,8 +233030,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_mappers.rs",
@@ -233088,8 +233088,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_mappers.rs",
@@ -233146,8 +233146,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_mappers.rs",
@@ -233204,8 +233204,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_mappers.rs",
@@ -233262,8 +233262,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_mappers.rs",
@@ -233320,8 +233320,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_mappers.rs",
@@ -233378,8 +233378,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_mappers.rs",
@@ -233436,8 +233436,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_mappers.rs",
@@ -233494,8 +233494,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_mappers.rs",
@@ -233552,8 +233552,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_mappers.rs",
@@ -233610,8 +233610,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_mappers.rs",
@@ -233668,8 +233668,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_mappers.rs",
@@ -233726,8 +233726,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_mappers.rs",
@@ -233784,8 +233784,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_tsoptions/src/config_mappers.rs",
@@ -233842,8 +233842,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "ConvertToTSConfig"
@@ -233895,8 +233895,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "addImpliedOptions"
@@ -233948,8 +233948,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "anyDependencyProvided"
@@ -234001,8 +234001,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "computeFn"
@@ -234054,8 +234054,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "filterSameAsDefaultInclude"
@@ -234107,8 +234107,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "getNameOfCompilerOptionValue"
@@ -234160,8 +234160,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "serializeCompilerOptions"
@@ -234213,8 +234213,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "serializeEnumValue"
@@ -234266,8 +234266,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "serializeImpliedOptionValue"
@@ -234319,8 +234319,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -234384,8 +234384,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -234449,8 +234449,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -234514,8 +234514,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -234579,8 +234579,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -234644,8 +234644,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -234709,8 +234709,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -234774,8 +234774,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -234839,8 +234839,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -234904,8 +234904,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -234969,8 +234969,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -235034,8 +235034,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -235099,8 +235099,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -235164,8 +235164,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -235229,8 +235229,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -235294,8 +235294,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -235359,8 +235359,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -235424,8 +235424,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -235489,8 +235489,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -235554,8 +235554,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -235619,8 +235619,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -235684,8 +235684,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -235749,8 +235749,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -235814,8 +235814,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -235879,8 +235879,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -235944,8 +235944,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -236009,8 +236009,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -236074,8 +236074,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -236139,8 +236139,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -236204,8 +236204,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -236269,8 +236269,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -236334,8 +236334,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -236399,8 +236399,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -236464,8 +236464,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -236529,8 +236529,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -236594,8 +236594,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -236659,8 +236659,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -236724,8 +236724,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -236789,8 +236789,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -236854,8 +236854,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -236919,8 +236919,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -236984,8 +236984,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -237049,8 +237049,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -237114,8 +237114,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -237179,8 +237179,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -237244,8 +237244,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -237309,8 +237309,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -237374,8 +237374,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -237439,8 +237439,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -237504,8 +237504,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -237569,8 +237569,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -237634,8 +237634,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -237699,8 +237699,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -237764,8 +237764,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -237829,8 +237829,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -237894,8 +237894,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -237959,8 +237959,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -238024,8 +238024,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -238089,8 +238089,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -238154,8 +238154,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -238219,8 +238219,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -238284,8 +238284,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -238349,8 +238349,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -238414,8 +238414,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -238479,8 +238479,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -238544,8 +238544,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -238609,8 +238609,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -238674,8 +238674,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -238739,8 +238739,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -238804,8 +238804,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -238869,8 +238869,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -238934,8 +238934,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -238999,8 +238999,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs",
@@ -239042,8 +239042,8 @@
       "membership_reason": "the pinned config test host",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "GetParsedCommandLine"
@@ -239073,8 +239073,8 @@
       "membership_reason": "the pinned config test host",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "NewVFSParseConfigHost"
@@ -239104,8 +239104,8 @@
       "membership_reason": "the pinned config test host",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "NewVFSParseConfigHostWithSymlinks"
@@ -239135,8 +239135,8 @@
       "membership_reason": "the pinned config test host",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "VfsParseConfigHost.FS"
@@ -239166,8 +239166,8 @@
       "membership_reason": "the pinned config test host",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "VfsParseConfigHost.GetCurrentDirectory"
@@ -239197,8 +239197,8 @@
       "membership_reason": "the pinned config test host",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "fixRoot"
@@ -239250,8 +239250,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "getWildcardDirectories"
@@ -239303,8 +239303,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "getWildcardDirectoryFromSpec"
@@ -239356,8 +239356,8 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": null,
-        "step": null
+        "state": "pending",
+        "step": "config"
       },
       "rust_home": [],
       "symbol": "toCanonicalKey"

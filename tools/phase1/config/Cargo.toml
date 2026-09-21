@@ -1,0 +1,24 @@
+[package]
+name = "phase1_config"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+description = "Phase 1 F3a: answers the config, command-line, package and module-resolution request schedule with the production Rust implementations, row for row"
+
+# A private harness, following tools/phase1/leaves and tools/phase1/filesystem.
+# It needs direct dependencies on every crate the config and resolution surface
+# touches, and no published crate has that set, so it lives here rather than as
+# an example on a shipped crate.
+[dependencies]
+serde_json = { version = "1", features = ["preserve_order"] }
+tsr_core = { version = "0.1.0", path = "../../../crates/tsr_core" }
+tsr_jsstring = { version = "0.1.0", path = "../../../crates/tsr_jsstring" }
+tsr_module = { version = "0.1.0", path = "../../../crates/tsr_module" }
+tsr_tsoptions = { version = "0.1.0", path = "../../../crates/tsr_tsoptions" }
+tsr_tspath = { version = "0.1.0", path = "../../../crates/tsr_tspath" }
+tsr_vfs = { version = "0.1.0", path = "../../../crates/tsr_vfs" }
+
+[lints]
+workspace = true

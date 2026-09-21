@@ -1,0 +1,3810 @@
+{
+  "accounted_operations": 0,
+  "complete": false,
+  "exempt_by_category": {},
+  "exempt_operations": 0,
+  "gap_problems": [],
+  "pending": [
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.End",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.File",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.Len",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.MessageChain",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.Pos",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.RelatedInformation",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.Source",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.resolve",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:CompareASTDiagnostics",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:FlattenDiagnosticMessage",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:FormatDiagnosticWithColorAndContext",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:FormatDiagnosticsStatusAndTime",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:FormatDiagnosticsStatusWithColorAndTime",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:FormatDiagnosticsWithColorAndContext",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:FromASTDiagnostics",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:ToDiagnostics",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:TryClearScreen",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:WrapASTDiagnostic",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:WrapASTDiagnostics",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:WriteErrorSummaryText",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:WriteFlattenedASTDiagnosticMessage",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:WriteFlattenedDiagnosticMessage",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:WriteFormatDiagnostic",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:WriteFormatDiagnostics",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:WriteLocation",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:diagnosticPrefix",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:flattenDiagnosticMessageChain",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:getCategoryFormat",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:getErrorSummary",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:newOriginalTextFile",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:originalTextFile.ECMALineMap",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:originalTextFile.FileName",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:originalTextFile.Text",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:prettyPathForFileError",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:renamedFile.ECMALineMap",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:renamedFile.FileName",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:renamedFile.Text",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:writeCodeSnippet",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:writeTabularErrorsDisplay",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:writeWithStyleAndReset",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/cache.go:getRedirectConfigName",
+      "rust_home": [
+        "crates/tsr_module/src/resolver.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/cache.go:moduleResolutionCache.Get",
+      "rust_home": [
+        "crates/tsr_module/src/resolver.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/cache.go:moduleResolutionCache.Set",
+      "rust_home": [
+        "crates/tsr_module/src/resolver.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/cache.go:newCaches",
+      "rust_home": [
+        "crates/tsr_module/src/resolver.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/cache.go:parsedPatternsCache.Get",
+      "rust_home": [
+        "crates/tsr_module/src/resolver.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/cache.go:typeRefDirectiveResolutionCache.Get",
+      "rust_home": [
+        "crates/tsr_module/src/resolver.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/cache.go:typeRefDirectiveResolutionCache.Set",
+      "rust_home": [
+        "crates/tsr_module/src/resolver.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/module/resolver.go:GetAutomaticTypeDirectiveNames",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:GetCompilerOptionsWithRedirect",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/module/resolver.go:GetConditions",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:MatchPatternOrExact",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:NewResolver",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:NewResolverWithOptions",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/module/resolver.go:ResolveConfig",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:ResolvedEntrypoint.SymlinkOrRealpath",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:Resolver.GetEntrypointsFromPackageJsonInfo",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:Resolver.GetPackageScopeForPath",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:Resolver.PackageJsonCacheEntries",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:Resolver.ResolveModuleName",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/module/resolver.go:Resolver.ResolvePackageDirectory",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:Resolver.ResolveTypeReferenceDirective",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:Resolver.createResolvedEntrypointHandlingSymlink",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:Resolver.getParsedPatternsForPaths",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:Resolver.newTraceBuilder",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/module/resolver.go:Resolver.resolveConfig",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:Resolver.tryResolveFromTypingsLocation",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:TryParsePatterns",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:continueSearching",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:extensionIsOk",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:getNodeResolutionFeatures",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:matchesPatternWithTrailer",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:moveToNextDirectorySeparatorIfAvailable",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:newResolutionState",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:normalizePathForCJSResolution",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.conditionMatches",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.createResolvedModule",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.createResolvedModuleHandlingSymlink",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.createResolvedTypeReferenceDirective",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.getCandidateFromTypeRoot",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.getMatchedStarForPatternEntrypoint",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.getOriginalAndResolvedFileName",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.getOutputDirectoriesForBaseDirectory",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.getPackageFile",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.getPackageId",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.getPackageJSONPathField",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.getPackageJsonInfo",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.getPackageScopeForPath",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.getParsedPatternsForPaths",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.getTraceFunc",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.loadEntrypointsFromExportMap",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.loadFileNameFromPackageJSONField",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.loadModuleFromExports",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.loadModuleFromExportsOrImports",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.loadModuleFromFile",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.loadModuleFromFileNoImplicitExtensions",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.loadModuleFromImmediateNodeModulesDirectory",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.loadModuleFromImports",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.loadModuleFromNearestNodeModulesDirectory",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.loadModuleFromNearestNodeModulesDirectoryWorker",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.loadModuleFromSelfNameReference",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.loadModuleFromSpecificNodeModulesDirectory",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.loadModuleFromTargetExportOrImport",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.loadNodeModuleFromDirectory",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.loadNodeModuleFromDirectoryWorker",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.mangleScopedPackageName",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.nodeLoadModuleByRelativeName",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.readPackageJsonPeerDependencies",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.realPath",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.resolveFromTypeRoot",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.resolveNodeLike",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.resolveNodeLikeWorker",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.resolveTypeReferenceDirective",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.tryAddingExtensions",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.tryExtension",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.tryFile",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.tryFileLookup",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.tryLoadInputFileForPath",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.tryLoadModuleUsingOptionalResolutionSettings",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.tryLoadModuleUsingPaths",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.tryLoadModuleUsingPathsIfEligible",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.tryLoadModuleUsingRootDirs",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.validatePackageJSONField",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:resolved.isResolved",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:resolved.shouldContinueSearching",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/module/resolver.go:tracer.getTraces",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:tracer.traceResolutionUsingProjectReference",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:tracer.traceTypeReferenceDirectiveResult",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/module/resolver.go:tracer.write",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/resolver.go:unresolved",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/trace.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/types.go:PackageId.PackageName",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/module/types.go:PackageId.String",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/types.go:ResolvedModule.IsResolved",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/types.go:ResolvedTypeReferenceDirective.IsResolved",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/types.go:extensions.Array",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/types.go:extensions.String",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_module/src/resolver.rs",
+        "crates/tsr_module/src/type_references.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/module/util.go:ComparePatternKeys",
+      "rust_home": [
+        "crates/tsr_module/src/diagnostic.rs",
+        "crates/tsr_module/src/package_maps.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/module/util.go:GetPackageNameFromTypesPackageName",
+      "rust_home": [
+        "crates/tsr_module/src/diagnostic.rs",
+        "crates/tsr_module/src/package_maps.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/module/util.go:GetResolutionDiagnostic",
+      "rust_home": [
+        "crates/tsr_module/src/diagnostic.rs",
+        "crates/tsr_module/src/package_maps.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/module/util.go:GetTypesPackageName",
+      "rust_home": [
+        "crates/tsr_module/src/diagnostic.rs",
+        "crates/tsr_module/src/package_maps.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/module/util.go:IsApplicableVersionedTypesKey",
+      "rust_home": [
+        "crates/tsr_module/src/diagnostic.rs",
+        "crates/tsr_module/src/package_maps.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/module/util.go:MangleScopedPackageName",
+      "rust_home": [
+        "crates/tsr_module/src/diagnostic.rs",
+        "crates/tsr_module/src/package_maps.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/util.go:ParseNodeModuleFromPath",
+      "rust_home": [
+        "crates/tsr_module/src/diagnostic.rs",
+        "crates/tsr_module/src/package_maps.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/module/util.go:ParsePackageName",
+      "rust_home": [
+        "crates/tsr_module/src/diagnostic.rs",
+        "crates/tsr_module/src/package_maps.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/module/util.go:TryGetJSExtensionForFile",
+      "rust_home": [
+        "crates/tsr_module/src/diagnostic.rs",
+        "crates/tsr_module/src/package_maps.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/module/util.go:UnmangleScopedPackageName",
+      "rust_home": [
+        "crates/tsr_module/src/diagnostic.rs",
+        "crates/tsr_module/src/package_maps.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/packagejson/cache.go:InfoCache.Get",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/packagejson/cache.go:InfoCache.Range",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/packagejson/cache.go:InfoCache.Set",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/packagejson/cache.go:InfoCacheEntry.Exists",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/packagejson/cache.go:InfoCacheEntry.GetContents",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/packagejson/cache.go:InfoCacheEntry.GetDirectory",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/packagejson/cache.go:InfoCacheEntry.WithPackageDirectory",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/packagejson/cache.go:NewInfoCache",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/packagejson/cache.go:PackageJson.GetVersionPaths",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/packagejson/cache.go:VersionPaths.Exists",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/packagejson/cache.go:VersionPaths.GetPaths",
+      "rust_home": [
+        "crates/tsr_module/src/package_maps.rs",
+        "crates/tsr_module/src/resolver.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/packagejson/expected.go:Expected.ActualJSONType",
+      "rust_home": [
+        "crates/tsr_module/src/package_json.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/packagejson/expected.go:Expected.ExpectedJSONType",
+      "rust_home": [
+        "crates/tsr_module/src/package_json.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/packagejson/expected.go:Expected.GetValue",
+      "rust_home": [
+        "crates/tsr_module/src/package_json.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/packagejson/expected.go:Expected.IsPresent",
+      "rust_home": [
+        "crates/tsr_module/src/package_json.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/packagejson/expected.go:Expected.IsValid",
+      "rust_home": [
+        "crates/tsr_module/src/package_json.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/packagejson/expected.go:Expected.UnmarshalJSON",
+      "rust_home": [
+        "crates/tsr_module/src/package_json.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/packagejson/expected.go:ExpectedOf",
+      "rust_home": [
+        "crates/tsr_module/src/package_json.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/packagejson/exportsorimports.go:ExportsOrImports.AsArray",
+      "rust_home": [
+        "crates/tsr_module/src/package_json.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/packagejson/exportsorimports.go:ExportsOrImports.AsObject",
+      "rust_home": [
+        "crates/tsr_module/src/package_json.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/packagejson/exportsorimports.go:ExportsOrImports.IsConditions",
+      "rust_home": [
+        "crates/tsr_module/src/package_json.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/packagejson/exportsorimports.go:ExportsOrImports.IsImports",
+      "rust_home": [
+        "crates/tsr_module/src/package_json.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/packagejson/exportsorimports.go:ExportsOrImports.IsSubpaths",
+      "rust_home": [
+        "crates/tsr_module/src/package_json.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/packagejson/exportsorimports.go:ExportsOrImports.UnmarshalJSONFrom",
+      "rust_home": [
+        "crates/tsr_module/src/package_json.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/packagejson/exportsorimports.go:ExportsOrImports.initObjectKind",
+      "rust_home": [
+        "crates/tsr_module/src/package_json.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/packagejson/jsonvalue.go:JSONValue.AsArray",
+      "rust_home": [
+        "crates/tsr_module/src/package_json.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/packagejson/jsonvalue.go:JSONValue.AsObject",
+      "rust_home": [
+        "crates/tsr_module/src/package_json.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/packagejson/jsonvalue.go:JSONValue.AsString",
+      "rust_home": [
+        "crates/tsr_module/src/package_json.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/packagejson/jsonvalue.go:JSONValue.IsFalsy",
+      "rust_home": [
+        "crates/tsr_module/src/package_json.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/packagejson/jsonvalue.go:JSONValue.IsPresent",
+      "rust_home": [
+        "crates/tsr_module/src/package_json.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/packagejson/jsonvalue.go:JSONValue.UnmarshalJSONFrom",
+      "rust_home": [
+        "crates/tsr_module/src/package_json.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/packagejson/jsonvalue.go:JSONValueType.String",
+      "rust_home": [
+        "crates/tsr_module/src/package_json.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/packagejson/jsonvalue.go:unmarshalJSONValue",
+      "rust_home": [
+        "crates/tsr_module/src/package_json.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/packagejson/jsonvalue.go:unmarshalJSONValueV2",
+      "rust_home": [
+        "crates/tsr_module/src/package_json.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/packagejson/packagejson.go:DependencyFields.GetRuntimeDependencyNames",
+      "rust_home": [
+        "crates/tsr_module/src/package_json.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/packagejson/packagejson.go:DependencyFields.HasDependency",
+      "rust_home": [
+        "crates/tsr_module/src/package_json.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/packagejson/packagejson.go:DependencyFields.RangeDependencies",
+      "rust_home": [
+        "crates/tsr_module/src/package_json.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/packagejson/packagejson.go:Parse",
+      "rust_home": [
+        "crates/tsr_module/src/package_json.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/testutil/baseline/baseline.go:DiffText",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/testutil/baseline/baseline.go:Run",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/testutil/baseline/baseline.go:writeComparison",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/testutil/baseline/testmain.go:Track",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/testutil/baseline/testmain.go:doWriteRecordedBaselines",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/testutil/baseline/testmain.go:recordBaseline",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/testutil/baseline/testmain.go:writeRecordedBaselines",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/testutil/filefixture/filefixture.go:FromFile",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/testutil/filefixture/filefixture.go:FromString",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/testutil/filefixture/filefixture.go:fromFile.Name",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/testutil/filefixture/filefixture.go:fromFile.Path",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/testutil/filefixture/filefixture.go:fromFile.ReadFile",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/testutil/filefixture/filefixture.go:fromFile.SkipIfNotExist",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/testutil/filefixture/filefixture.go:fromString.Name",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/testutil/filefixture/filefixture.go:fromString.Path",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/testutil/filefixture/filefixture.go:fromString.ReadFile",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/testutil/filefixture/filefixture.go:fromString.SkipIfNotExist",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/commandlineoption.go:CommandLineOption.DeprecatedKeys",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/option_declarations.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/commandlineoption.go:CommandLineOption.DisallowNullOrUndefined",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/option_declarations.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/commandlineoption.go:CommandLineOption.Elements",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/option_declarations.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/commandlineoption.go:CommandLineOption.EnumMap",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/option_declarations.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/commandlineparser.go:ParseBuildCommandLine",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/fixture_options.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/commandlineparser.go:ParseCommandLine",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/fixture_options.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/commandlineparser.go:ParseListTypeOption",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/fixture_options.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/commandlineparser.go:commandLineParser.AlternateMode",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/fixture_options.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/commandlineparser.go:commandLineParser.OptionsDeclarations",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/fixture_options.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/commandlineparser.go:commandLineParser.UnknownDidYouMeanDiagnostic",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/fixture_options.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/commandlineparser.go:commandLineParser.UnknownOptionDiagnostic",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/fixture_options.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/commandlineparser.go:commandLineParser.parseListTypeOption",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/fixture_options.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/commandlineparser.go:commandLineParser.parseOptionValue",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/fixture_options.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/commandlineparser.go:commandLineParser.parseResponseFile",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/fixture_options.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/commandlineparser.go:commandLineParser.parseStrings",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/fixture_options.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/commandlineparser.go:convertJsonOptionOfEnumType",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/fixture_options.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/commandlineparser.go:getInputOptionName",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/fixture_options.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/commandlineparser.go:parseCommandLineWorker",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/fixture_options.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/commandlineparser.go:tryReadFile",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/fixture_options.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/contentmappers.go:resolveContentMapperManifest",
+      "rust_home": [
+        "crates/tsr_module/src/config_mapper.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/declscompiler.go:CompilerOptionsAffectDeclarationPath",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/option_declarations_generated.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/declscompiler.go:CompilerOptionsAffectEmit",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/option_declarations_generated.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/declscompiler.go:CompilerOptionsAffectSemanticDiagnostics",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/option_declarations_generated.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/declscompiler.go:ForEachCompilerOptionValue",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/option_declarations_generated.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/declscompiler.go:optionsHaveChanges",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/option_declarations_generated.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/diagnostics.go:getParseCommandLineWorkerDiagnostics",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/enummaps.go:GetDefaultLibFileName",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/enummaps.go:GetLibFileName",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/enummaps.go:TargetToLibMap",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/errors.go:CreateDiagnosticForNodeInSourceFile",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_syntax.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/errors.go:CreateDiagnosticForNodeInSourceFileOrCompilerDiagnostic",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_syntax.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/errors.go:commandLineParser.createUnknownOptionError",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_syntax.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/errors.go:createDiagnosticForInvalidEnumType",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_syntax.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/errors.go:createUnknownOptionError",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_syntax.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/errors.go:extraKeyDiagnostics",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_syntax.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/errors.go:extraKeyDidYouMeanDiagnostics",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_syntax.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/errors.go:formatEnumTypeKeys",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_syntax.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/errors.go:getCompilerOptionValueTypeString",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_syntax.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/namemap.go:GetNameMapFromList",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/option_declarations.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/namemap.go:NameMap.Get",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/option_declarations.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/namemap.go:NameMap.GetFromShort",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/option_declarations.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/namemap.go:NameMap.GetOptionDeclarationFromName",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/option_declarations.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsedbuildcommandline.go:ParsedBuildCommandLine.Locale",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsedbuildcommandline.go:ParsedBuildCommandLine.ResolvedProjectPaths",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:NewParsedCommandLine",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.CommonSourceDirectory",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.CompilerOptions",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.ConfigName",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.ContentMapperExtensions",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.ContentMappers",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.ExtendedSourceFiles",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.FileNames",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.FileNamesByPath",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.GetBuildInfoFileName",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.GetConfigFileParsingDiagnostics",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.GetContentMapperForFileName",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.GetCurrentDirectory",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.GetMatchedFileSpec",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.GetMatchedIncludeSpec",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.GetOutputFileNames",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.LiteralFileNames",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.Locale",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.OutputDtsToProjectReference",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.ParseInputOutputNames",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.PossiblyMatchesDirectoryName",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.PossiblyMatchesFileName",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.ProjectReferences",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.ReloadFileNamesOfParsedCommandLine",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.ResolvedProjectReferencePaths",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.SetCompilerOptions",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.SetParsedOptions",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.SetTypeAcquisition",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.SourceToProjectReference",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.TypeAcquisition",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.UseCaseSensitiveFileNames",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.WildcardDirectories",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.WildcardDirectoryGlobs",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.WithFileNames",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.checkSourceFilesBelongToPath",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.fileGlobPatterns",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.getOutputDeclarationAndSourceFileNames",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsinghelpers.go:ConvertOptionToAbsolutePath",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/merge_options.rs",
+        "crates/tsr_tsoptions/src/parse_options.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsinghelpers.go:ParseBuildOptions",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/merge_options.rs",
+        "crates/tsr_tsoptions/src/parse_options.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/parsinghelpers.go:ParseCompilerOptions",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/merge_options.rs",
+        "crates/tsr_tsoptions/src/parse_options.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/parsinghelpers.go:ParseString",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/merge_options.rs",
+        "crates/tsr_tsoptions/src/parse_options.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/parsinghelpers.go:ParseStringArray",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/merge_options.rs",
+        "crates/tsr_tsoptions/src/parse_options.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/parsinghelpers.go:ParseTristate",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/merge_options.rs",
+        "crates/tsr_tsoptions/src/parse_options.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/parsinghelpers.go:ParseTypeAcquisition",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/merge_options.rs",
+        "crates/tsr_tsoptions/src/parse_options.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsinghelpers.go:ParseWatchOptions",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/merge_options.rs",
+        "crates/tsr_tsoptions/src/parse_options.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsinghelpers.go:buildOptionsParser.ParseOption",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/merge_options.rs",
+        "crates/tsr_tsoptions/src/parse_options.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsinghelpers.go:buildOptionsParser.UnknownDidYouMeanDiagnostic",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/merge_options.rs",
+        "crates/tsr_tsoptions/src/parse_options.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsinghelpers.go:buildOptionsParser.UnknownOptionDiagnostic",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/merge_options.rs",
+        "crates/tsr_tsoptions/src/parse_options.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsinghelpers.go:compilerOptionsParser.ParseOption",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/merge_options.rs",
+        "crates/tsr_tsoptions/src/parse_options.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsinghelpers.go:compilerOptionsParser.UnknownDidYouMeanDiagnostic",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/merge_options.rs",
+        "crates/tsr_tsoptions/src/parse_options.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsinghelpers.go:compilerOptionsParser.UnknownOptionDiagnostic",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/merge_options.rs",
+        "crates/tsr_tsoptions/src/parse_options.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsinghelpers.go:convertToOptionsWithAbsolutePaths",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/merge_options.rs",
+        "crates/tsr_tsoptions/src/parse_options.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsinghelpers.go:floatOrInt32ToFlag",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/merge_options.rs",
+        "crates/tsr_tsoptions/src/parse_options.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/parsinghelpers.go:mergeCompilerOptions",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/merge_options.rs",
+        "crates/tsr_tsoptions/src/parse_options.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/parsinghelpers.go:parseCompilerOptions",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/merge_options.rs",
+        "crates/tsr_tsoptions/src/parse_options.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/parsinghelpers.go:parseContentMapper",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/merge_options.rs",
+        "crates/tsr_tsoptions/src/parse_options.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsinghelpers.go:parseJsonToStringKey",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/merge_options.rs",
+        "crates/tsr_tsoptions/src/parse_options.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/parsinghelpers.go:parseNumber",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/merge_options.rs",
+        "crates/tsr_tsoptions/src/parse_options.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsinghelpers.go:parseProjectReference",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/merge_options.rs",
+        "crates/tsr_tsoptions/src/parse_options.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/parsinghelpers.go:parseStringArrayStrict",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/merge_options.rs",
+        "crates/tsr_tsoptions/src/parse_options.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/parsinghelpers.go:parseStringMap",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/merge_options.rs",
+        "crates/tsr_tsoptions/src/parse_options.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsinghelpers.go:typeAcquisitionParser.ParseOption",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/merge_options.rs",
+        "crates/tsr_tsoptions/src/parse_options.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsinghelpers.go:typeAcquisitionParser.UnknownDidYouMeanDiagnostic",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/merge_options.rs",
+        "crates/tsr_tsoptions/src/parse_options.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsinghelpers.go:typeAcquisitionParser.UnknownOptionDiagnostic",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/merge_options.rs",
+        "crates/tsr_tsoptions/src/parse_options.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsinghelpers.go:watchOptionsParser.ParseOption",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/merge_options.rs",
+        "crates/tsr_tsoptions/src/parse_options.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsinghelpers.go:watchOptionsParser.UnknownDidYouMeanDiagnostic",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/merge_options.rs",
+        "crates/tsr_tsoptions/src/parse_options.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsinghelpers.go:watchOptionsParser.UnknownOptionDiagnostic",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/merge_options.rs",
+        "crates/tsr_tsoptions/src/parse_options.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/showconfig.go:ConvertToTSConfig",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/showconfig.go:addImpliedOptions",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/showconfig.go:anyDependencyProvided",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/showconfig.go:computeFn",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/showconfig.go:filterSameAsDefaultInclude",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/showconfig.go:getNameOfCompilerOptionValue",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/showconfig.go:serializeCompilerOptions",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/showconfig.go:serializeEnumValue",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/showconfig.go:serializeImpliedOptionValue",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:CommandLineOptionNameMap.Get",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:CommandLineOptionNameMap.GetSpellingSuggestion",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:CreateDiagnosticAtReferenceSyntax",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:ExtendedConfigCacheEntry.ExtendedFileNames",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:ForEachPropertyAssignment",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:ForEachTsConfigPropArray",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:GetCallbackForFindingPropertyAssignmentByValue",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:GetContentMapperOptionDiagnosticLocation",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:GetOptionsSyntaxByArrayElementValue",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:GetParsedCommandLineOfConfigFile",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:GetParsedCommandLineOfConfigFilePath",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:GetSupportedExtensions",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:GetSupportedExtensionsWithJsonIfResolveJsonModule",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:GetTsConfigPropArrayElementValue",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:NewTsconfigSourceFileFromFilePath",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:ParseConfigFileTextToJson",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:ParseExtendedConfig",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:canJsonReportNoInputFiles",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:commandLineOptionsToMap",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:configFileSpecs.getMatchedFileSpec",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:configFileSpecs.getMatchedIncludeSpec",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:configFileSpecs.matchesExclude",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:convertArrayLiteralExpressionToJson",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:convertCompilerOptionsFromJsonWorker",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:convertConfigFileToObject",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:convertJsonOption",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:convertJsonOptionOfListType",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:convertMapToOptions",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:convertObjectLiteralExpressionToJson",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:convertOptionsFromJson",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:convertPropertyValueToJson",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:convertToJson",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:convertToObject",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:convertTypeAcquisitionFromJsonWorker",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:createDiagnosticAtProjectReferenceProperty",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:directoryOfCombinedPath",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:getContentMapperExtensionSyntax",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:getContentMapperSyntax",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:getContentMappersKeySyntax",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:getDefaultCompilerOptions",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:getDefaultTypeAcquisition",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:getExtendedConfig",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:getExtendsConfigPath",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:getExtendsConfigPathOrArray",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:getFileNamesFromConfigSpecs",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:getSubstitutedPathWithConfigDirTemplate",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:getSubstitutedStringArrayWithConfigDirTemplate",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:getTsConfigObjectLiteralExpression",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:handleOptionConfigDirTemplateSubstitution",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:hasFileWithHigherPriorityExtension",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:invalidDotDotAfterRecursiveWildcard",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:invalidTrailingRecursion",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:isCompilerOptionsValue",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:isDoubleQuotedString",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:isStringValue",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:normalizeJsonValue",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:normalizeNonListOptionValue",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:parseConfig",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:parseJsonConfigFileContentWorker",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:parseOwnConfigOfJson",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:parseOwnConfigOfJsonSourceFile",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:readJsonConfigFile",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:removeWildcardFilesWithLowerPriorityExtension",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:resolverHost.Trace",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:setContentMapperDiagnosticLocation",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:shouldReportNoInputFiles",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:specToDiagnostic",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:startsWithConfigDirTemplate",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:tsconfigToSourceFile",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:validateJsonOptionValue",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:validateSpecs",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/tsoptionstest/parsedcommandline.go:GetParsedCommandLine",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:NewVFSParseConfigHost",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:NewVFSParseConfigHostWithSymlinks",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:VfsParseConfigHost.FS",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:VfsParseConfigHost.GetCurrentDirectory",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go:fixRoot",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/wildcarddirectories.go:getWildcardDirectories",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/wildcarddirectories.go:getWildcardDirectoryFromSpec",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/wildcarddirectories.go:toCanonicalKey",
+      "rust_home": []
+    }
+  ],
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "prepared_operations": 0,
+  "roster_problems": [],
+  "step": "config",
+  "total_operations": 402,
+  "version": 2,
+  "witnessed_operations": 0
+}

@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "purpose": "Operations removed from F3a's config roster, each with the category, the owner that does have it, and the evidence read at the pin. An entry here is a claim that this step owes no prepared case for the operation, so it is validated like any other claim: see roster_problems in scripts/phase1_scope.py.",
+  "rule": "The caller rule governs generic helpers and Go machinery. It does NOT override an operation the plan names as this step's own work -- option semantics, config and command-line parsing, package JSON, module resolution and the diagnostic rendering the 309 baselines go through are F3a's, however few callers they have. The `unused_at_pin` category records that there is no caller at all, with the occurrence count that says so. `later_step` is decided by the pinned callers: when every non-test caller is outside this step, the step that ports those callers owns the operation. Note that a Go method VALUE, written `(*T).Method`, is a caller that a search for `.Method(` does not find.",
+  "exemptions": []
+}
