@@ -251,15 +251,20 @@ fn render_value(value: &ConfigValue) -> Value {
         ]),
     }
 }
-/// Go's `[]string` is nil or a slice; the Rust counterpart is `Option<Vec<_>>`.
-fn render_strings(values: Option<&Vec<JsString>>) -> Value {
+/// Go's nil slice remains distinct from allocated-empty storage.
+fn render_strings<I>(values: Option<I>) -> Value
+where
+    I: IntoIterator,
+    I::Item: std::borrow::Borrow<JsString>,
+{
+    use std::borrow::Borrow;
     match values {
         None => json!(["nilarray"]),
         Some(values) => json!([
             "strings",
             values
-                .iter()
-                .map(|value| text(value.as_bytes()))
+                .into_iter()
+                .map(|value| text(value.borrow().as_bytes()))
                 .collect::<Vec<_>>()
         ]),
     }
@@ -308,6 +313,7 @@ fn render_options(options: &CompilerOptions, names: &[Vec<u8>]) -> Result<Value,
                 Some(paths) => json!([
                     "object",
                     paths
+                        .read()
                         .iter()
                         .map(|(key, values)| json!([
                             text(key.as_bytes()),
@@ -324,9 +330,9 @@ fn render_options(options: &CompilerOptions, names: &[Vec<u8>]) -> Result<Value,
             b"declaration" => tristate(options.declaration),
             b"resolveJsonModule" => tristate(options.resolve_json_module),
             b"runExternalCode" => tristate(options.run_external_code),
-            b"maxNodeModuleJsDepth" => match options.max_node_module_js_depth {
+            b"maxNodeModuleJsDepth" => match options.max_node_module_js_depth.as_ref() {
                 None => json!(["null"]),
-                Some(depth) => json!(["int", depth]),
+                Some(depth) => json!(["int", depth.get()]),
             },
             b"target" => json!(["int", options.target.0]),
             b"module" => json!(["int", options.module.0]),

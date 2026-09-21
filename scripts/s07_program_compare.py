@@ -107,7 +107,7 @@ def config_provenance_inputs():
             'data/upstream.json', 'data/s04/toolchains.toml'}
     crates = ('tsr_compiler', 'tsr_module', 'tsr_semver', 'tsr_tsoptions', 'tsr_vfs',
               'tsr_bundled', 'tsr_tspath', 'tsr_core', 'tsr_parser', 'tsr_scanner',
-              'tsr_ast', 'tsr_arena', 'tsr_binder', 'tsr_jsstring', 'tsr_jsnum', 'tsr_diagnostics')
+              'tsr_ast', 'tsr_arena', 'tsr_binder', 'tsr_jsstring', 'tsr_jsnum', 'tsr_diagnostics', 'tsr_json', 'tsr_locale')
     for crate in crates:
         directory = ROOT / 'crates' / crate
         rust.add(str((directory / 'Cargo.toml').relative_to(ROOT)))
@@ -195,7 +195,7 @@ def rust_binary():
 
 
 def input_fingerprints():
-    crates = ('tsr_arena', 'tsr_ast', 'tsr_core', 'tsr_diagnostics', 'tsr_jsstring',
+    crates = ('tsr_arena', 'tsr_ast', 'tsr_core', 'tsr_diagnostics', 'tsr_json', 'tsr_locale', 'tsr_jsstring',
               'tsr_jsnum', 'tsr_scanner', 'tsr_parser', 'tsr_binder', 'tsr_tspath',
               'tsr_vfs', 'tsr_bundled', 'tsr_tsoptions', 'tsr_semver', 'tsr_module', 'tsr_compiler')
     paths=[ROOT/'Cargo.lock',ROOT/'Cargo.toml',ROOT/'rust-toolchain.toml',

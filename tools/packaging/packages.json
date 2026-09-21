@@ -164,6 +164,12 @@
       "reason": "Rust library and its public dependency closure"
     },
     {
+      "name": "tsr_locale",
+      "manifest": "crates/tsr_locale/Cargo.toml",
+      "publish": true,
+      "reason": "Rust library and its public dependency closure"
+    },
+    {
       "name": "tsr_memory_profile",
       "manifest": "tools/s07/memory-profile/rust/Cargo.toml",
       "publish": false,

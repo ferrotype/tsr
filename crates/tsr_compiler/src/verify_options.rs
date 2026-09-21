@@ -296,7 +296,8 @@ fn initial_options(v: &mut Verifier<'_>, options: &CompilerOptions) {
 }
 
 fn path_and_emit_options(v: &mut Verifier<'_>, options: &CompilerOptions) {
-    for (key, values) in options.paths.iter().flatten() {
+    let paths = options.paths.as_ref().map(|value| value.read());
+    for (key, values) in paths.as_deref().into_iter().flatten() {
         let key = key.as_bytes();
         if !has_zero_or_one_asterisk(key) {
             v.path(
@@ -315,7 +316,10 @@ fn path_and_emit_options(v: &mut Verifier<'_>, options: &CompilerOptions) {
                 d::Substitutions_for_pattern_0_should_be_an_array,
                 &[key],
             );
-        } else if values.as_ref().is_some_and(Vec::is_empty) {
+        } else if values
+            .as_ref()
+            .is_some_and(tsr_core::slices::SharedSlice::is_empty)
+        {
             v.path(
                 false,
                 key,
@@ -582,21 +586,10 @@ fn jsx_name(value: JsxEmit) -> &'static [u8] {
     }
 }
 fn module_name(value: ModuleKind) -> JsString {
-    let name = match value {
-        ModuleKind::NODE16 => b"Node16".as_slice(),
-        ModuleKind::NODE18 => b"Node18",
-        ModuleKind::NODE20 => b"Node20",
-        ModuleKind::NODE_NEXT => b"NodeNext",
-        _ => return JsString::from_bytes(format!("ModuleKind({})", value.0).into_bytes()),
-    };
-    JsString::from_bytes(name)
+    JsString::from_bytes(value.to_string().into_bytes())
 }
 fn resolution_name(value: ModuleResolutionKind) -> &'static [u8] {
-    match value {
-        ModuleResolutionKind::NODE16 => b"Node16",
-        ModuleResolutionKind::NODE_NEXT => b"NodeNext",
-        _ => panic!("unhandled case in ModuleResolutionKind.String"),
-    }
+    value.as_str().as_bytes()
 }
 
 /// A source include explanation requested by option verification. The owning

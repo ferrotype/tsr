@@ -1644,6 +1644,372 @@
       "operation": "tsc/internal/core/core.go:StringifyJson",
       "order_sensitive": true,
       "subject": "helpers.StringifyJson"
+    },
+    {
+      "actions": [
+        {
+          "items": [
+            "0",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10",
+            "11",
+            "12",
+            "13",
+            "14",
+            "15",
+            "16",
+            "17",
+            "18",
+            "19",
+            "20",
+            "21",
+            "22",
+            "23",
+            "24",
+            "25",
+            "26",
+            "27",
+            "28",
+            "29",
+            "30",
+            "31"
+          ],
+          "op": "set",
+          "target": "result"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "result",
+          "value": "32"
+        },
+        {
+          "op": "alias",
+          "other": "result",
+          "target": "saved"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "result",
+          "value": "33"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "result",
+          "value": "34"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "result",
+          "value": "35"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "result",
+          "value": "36"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "result",
+          "value": "37"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "result",
+          "value": "38"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "result",
+          "value": "39"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "result",
+          "value": "40"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "result",
+          "value": "41"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "result",
+          "value": "42"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "result",
+          "value": "43"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "result",
+          "value": "44"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "result",
+          "value": "45"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "result",
+          "value": "46"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "result",
+          "value": "47"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "result",
+          "value": "48"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "result",
+          "value": "49"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "result",
+          "value": "50"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "result",
+          "value": "51"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "result",
+          "value": "52"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "result",
+          "value": "53"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "result",
+          "value": "54"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "result",
+          "value": "55"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "result",
+          "value": "56"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "result",
+          "value": "57"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "result",
+          "value": "58"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "result",
+          "value": "59"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "result",
+          "value": "60"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "result",
+          "value": "61"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "result",
+          "value": "62"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "result",
+          "value": "63"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "result",
+          "value": "64"
+        },
+        {
+          "index": 0,
+          "op": "mutate",
+          "target": "result",
+          "value": "shared"
+        },
+        {
+          "op": "read",
+          "target": "saved"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "result",
+          "value": "65"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "result",
+          "value": "66"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "result",
+          "value": "67"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "result",
+          "value": "68"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "result",
+          "value": "69"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "result",
+          "value": "70"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "result",
+          "value": "71"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "result",
+          "value": "72"
+        },
+        {
+          "index": 0,
+          "op": "mutate",
+          "target": "result",
+          "value": "detached"
+        },
+        {
+          "op": "read",
+          "target": "saved"
+        }
+      ],
+      "case": "leaves/helpers/append-sharing-across-go-size-class",
+      "discriminates": "At the pinned runtime a 32-element string slice grows to 71 slots, including GC-header size-class rounding. Appends through element 65 retain a captured header; the next growth detaches it.",
+      "operation": "tsc/internal/core/core.go:AppendIfUnique",
+      "order_sensitive": true,
+      "subject": "helpers.Slices"
+    },
+    {
+      "actions": [
+        {
+          "groups": [
+            [
+              "0",
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7",
+              "8",
+              "9",
+              "10",
+              "11",
+              "12",
+              "13",
+              "14",
+              "15",
+              "16",
+              "17",
+              "18",
+              "19",
+              "20",
+              "21",
+              "22",
+              "23",
+              "24",
+              "25",
+              "26",
+              "27",
+              "28",
+              "29",
+              "30",
+              "31",
+              "32"
+            ]
+          ],
+          "op": "flatten"
+        },
+        {
+          "op": "alias",
+          "other": "result",
+          "target": "saved"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "result",
+          "value": "33"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "result",
+          "value": "34"
+        },
+        {
+          "index": 0,
+          "op": "mutate",
+          "target": "result",
+          "value": "shared"
+        },
+        {
+          "op": "read",
+          "target": "saved"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "result",
+          "value": "35"
+        },
+        {
+          "index": 0,
+          "op": "mutate",
+          "target": "result",
+          "value": "detached"
+        },
+        {
+          "op": "read",
+          "target": "saved"
+        }
+      ],
+      "case": "leaves/helpers/flatten-batch-retained-capacity",
+      "discriminates": "Go appends each subarray as one batch. A 33-string batch has 35 slots at the pin; appending through slot 35 shares a saved header, and the next append detaches it. Per-element growth would incorrectly keep sharing.",
+      "operation": "tsc/internal/core/core.go:Flatten",
+      "order_sensitive": true,
+      "subject": "helpers.Slices"
     }
   ]
 }

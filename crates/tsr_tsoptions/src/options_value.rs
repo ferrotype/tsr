@@ -56,11 +56,10 @@ pub fn compiler_options_value(options: &CompilerOptions) -> V {
         custom_conditions,
         b"customConditions",
         V::Array(
-            options.custom_conditions.as_ref().map(|values| values
-                .iter()
-                .cloned()
-                .map(V::String)
-                .collect())
+            options
+                .custom_conditions
+                .as_ref()
+                .map(|values| values.iter().map(V::String).collect())
         )
     );
     field!(
@@ -207,7 +206,7 @@ pub fn compiler_options_value(options: &CompilerOptions) -> V {
             options
                 .lib
                 .as_ref()
-                .map(|values| values.iter().cloned().map(V::String).collect())
+                .map(|values| values.iter().map(V::String).collect())
         )
     );
     field!(
@@ -227,11 +226,10 @@ pub fn compiler_options_value(options: &CompilerOptions) -> V {
         module_suffixes,
         b"moduleSuffixes",
         V::Array(
-            options.module_suffixes.as_ref().map(|values| values
-                .iter()
-                .cloned()
-                .map(V::String)
-                .collect())
+            options
+                .module_suffixes
+                .as_ref()
+                .map(|values| values.iter().map(V::String).collect())
         )
     );
     field!(
@@ -326,15 +324,14 @@ pub fn compiler_options_value(options: &CompilerOptions) -> V {
                 .paths
                 .as_ref()
                 .expect("present paths")
+                .read()
                 .iter()
                 .map(|(key, values)| (
                     key.clone(),
                     V::Array(
-                        values.as_ref().map(|values| values
-                            .iter()
-                            .cloned()
-                            .map(V::String)
-                            .collect())
+                        values
+                            .as_ref()
+                            .map(|values| values.iter().map(V::String).collect())
                     )
                 ))
                 .collect()
@@ -386,11 +383,10 @@ pub fn compiler_options_value(options: &CompilerOptions) -> V {
         root_dirs,
         b"rootDirs",
         V::Array(
-            options.root_dirs.as_ref().map(|values| values
-                .iter()
-                .cloned()
-                .map(V::String)
-                .collect())
+            options
+                .root_dirs
+                .as_ref()
+                .map(|values| values.iter().map(V::String).collect())
         )
     );
     field!(
@@ -469,11 +465,10 @@ pub fn compiler_options_value(options: &CompilerOptions) -> V {
         type_roots,
         b"typeRoots",
         V::Array(
-            options.type_roots.as_ref().map(|values| values
-                .iter()
-                .cloned()
-                .map(V::String)
-                .collect())
+            options
+                .type_roots
+                .as_ref()
+                .map(|values| values.iter().map(V::String).collect())
         )
     );
     field!(
@@ -483,7 +478,7 @@ pub fn compiler_options_value(options: &CompilerOptions) -> V {
             options
                 .types
                 .as_ref()
-                .map(|values| values.iter().cloned().map(V::String).collect())
+                .map(|values| values.iter().map(V::String).collect())
         )
     );
     field!(
@@ -504,7 +499,13 @@ pub fn compiler_options_value(options: &CompilerOptions) -> V {
     field!(
         max_node_module_js_depth,
         b"maxNodeModuleJsDepth",
-        V::Integer(options.max_node_module_js_depth.expect("present number") as i64)
+        V::Integer(
+            options
+                .max_node_module_js_depth
+                .as_ref()
+                .expect("present number")
+                .get() as i64
+        )
     );
     field!(
         allow_synthetic_default_imports,
@@ -619,7 +620,7 @@ pub fn compiler_options_value(options: &CompilerOptions) -> V {
     field!(
         checkers,
         b"checkers",
-        V::Integer(options.checkers.expect("present number") as i64)
+        V::Integer(options.checkers.as_ref().expect("present number").get() as i64)
     );
     V::Object(values)
 }

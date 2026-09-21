@@ -9,7 +9,7 @@ mod pseudobigint;
 mod string;
 
 pub use bigint::parse_pseudo_big_int;
-pub use pseudobigint::PseudoBigInt;
+pub use pseudobigint::{parse_valid_big_int, PseudoBigInt};
 pub use string::from_string;
 
 /// An IEEE-754 JavaScript Number, including negative zero and non-finite values.

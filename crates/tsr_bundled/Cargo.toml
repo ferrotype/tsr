@@ -12,6 +12,9 @@ categories.workspace = true
 readme = "README.md"
 include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/licenses/**", "/bundled/**"]
 
+[features]
+test-support = []
+
 [dependencies]
 tsr_vfs = { version = "0.1.0", path = "../tsr_vfs" }
 tsr_jsstring = { version = "0.1.0", path = "../tsr_jsstring" }

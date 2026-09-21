@@ -18,6 +18,8 @@
     "crates/tsr_compiler/**/*",
     "crates/tsr_core/**/*",
     "crates/tsr_diagnostics/**/*",
+    "crates/tsr_json/**/*",
+    "crates/tsr_locale/**/*",
     "crates/tsr_embed/**/*",
     "crates/tsr_encoder/**/*",
     "crates/tsr_jsnum/**/*",

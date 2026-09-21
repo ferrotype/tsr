@@ -1424,3 +1424,135 @@ SHA-256:
 - config: `4f416b1c1d4c5e5438de7d553b6ab3d31c52db46fe01f919279f72efc9e7e8d2`
 
 No Rust implementation, compiler corpus or benchmark changed in this follow-up.
+
+### F1b foundation completion — 2026-09-21
+
+F1b's prepared implementation scope is complete: **230 / 230 leaf cases match
+pinned Go**, with no missing operations, differences, unavailable observations or
+harness failures. This closes the 120 missing rows and the compiler-options
+clone difference left by the prior increment. Five new native cases cover exact
+signed/unsigned integer encoding, heterogeneous object members, partial marshal
+output and two slice-growth alias boundaries. Expected observations come from
+the pinned probes, including error classes, offsets, pointers, partial state,
+callback traces and native panics; they were not rewritten to match Rust.
+
+The affected config consumer remains **176 match / 299 missing / 9 different**
+over its 484 cases. Its complete Rust observations are byte-for-byte identical
+to the prior packaging capture. Those remaining config/command-line and
+module-resolution obligations belong to F3b. Passing F1b does not complete F2b,
+F3b, the remaining preparation, all 309 baseline ports or Phase 1.
+
+#### Implementation and representation decisions
+
+- `tsr_json` now has a shared token state machine for typed values, raw values
+  and incremental `Read`/`Write` streams. It validates container state, member
+  position, duplicate names, depth and exact number syntax. Typed decode
+  preserves successful prior fields and allocation state on later failure.
+  Errors retain the native category, byte offset, JSON pointer, target type and
+  cause. `marshal_partial` exposes Go's partial-output contract; the existing
+  `marshal` convenience API discards failed output explicitly. No external JSON
+  dependency or second production value tree was added.
+- The encoder review is implemented: sequential tokens support heterogeneous
+  records; exact i64/u64 writes never round through f64; built-in scalar writes
+  avoid stack-growth checks while recursive container and custom-codec calls
+  remain guarded. Duplicate-name storage uses a decoded-name buffer plus
+  offsets, promoting larger namespaces to a map. Offsets into the flushable
+  output alone would lose names and confuse escaped equivalents. No protocol
+  performance claim is made from these leaf tests.
+- New core homes implement sets, concurrent maps/sets, multimaps, slice helpers,
+  range algebra and open-enum names. Callback-bearing slice helpers release
+  their read borrow before invoking user code. Concurrent map callbacks run
+  outside the lock. Memoization retries after an initializer panic. Existing
+  consumers use the common enum text and diagnostic format implementations.
+- `CompilerOptions::clone` now retains Go pointer fields and slice headers.
+  `SharedValue` distinguishes mutating a pointee from replacing a field;
+  `SharedSlice` retains backing, range and logical capacity. Paths use the
+  existing ordered map behind the shared pointer, with shared target slices.
+  Config substitution and module lookup use that representation directly.
+  Append models pinned Go element sizes and capacity rounding because growth
+  changes observable aliasing; Rust still allocates ordinary owned elements.
+  The two new native growth traces distinguish per-element and batch appends.
+  This representation is reserved for contracts that expose sharing; ordinary
+  vectors elsewhere remain ordinary vectors.
+- Text helpers preserve raw bytes, Go rune/simple-case comparisons and the
+  pinned character classes. Scanner identifier predicates and their generated
+  tables now live in the shared text crate; the scanner calls that same home.
+  Existing number/string arithmetic remains in its established crates.
+- `tsr_locale` owns BCP 47 recovery, canonicalization, context/default identity
+  and diagnostic-language fallback. Its matcher is specialized to the pinned
+  fourteen-language roster, not a new arbitrary-roster matching API. The
+  generator exports registry/CLDR data and the compiled matcher index from
+  pinned x/text; it refuses an unsupported index continuation after pin drift.
+  Additional generated native tests cover recovery and matching, including
+  transform extensions and excessive variants. The module cache and pinned
+  submodule are never edited.
+- `cargo xtask gen` now exports and verifies all thirteen localization assets.
+  `tsr_diagnostics` initializes each decoded table once and caches requested
+  locale outcomes, including untranslated tags; unspecified English bypasses
+  the caches. English/translated formatting, arbitrary argument bytes, missing
+  keys and ad-hoc messages are production operations used by the leaf driver.
+  The generated translations are uncompressed JSON string literals (about
+  4.3 MB before linking), decoded lazily. This avoids another compression
+  dependency; it is not a footprint optimization or a new performance result.
+- The bundled filesystem exposes the native walk/delegation and mutation
+  behavior. Its test-only source-directory accessor is feature-gated. The
+  complete asset roster and byte hashes are compared with native observations.
+- The raw package.json member stream is retained: it must preserve duplicate
+  fields and partial typed updates before normalization. Feeding it through an
+  ordered map first would erase those events. Its existing prepared native
+  comparisons remain unchanged; this batch does not claim a new decoder port
+  for the outstanding F3b package.json cases.
+
+`tsr_locale` is registered in the publication policy, public-package table and
+release order before diagnostics; JSON also precedes diagnostics and options.
+Package assets include the required Go/x/text attribution. No registry upload
+was made. Capture and ledger source lists that name crate closures explicitly
+now include both JSON and locale dependencies.
+
+#### Evidence and validation
+
+The final archive is `data/phase1/captures/f1b-foundations-complete.tar.gz`.
+It retains native/Rust observations, exact requests and provenance, without
+binaries, build trees or exported upstream sources. Older captures are kept.
+Reproduction commands (Go 1.27.1 on PATH):
+
+```sh
+python3 scripts/phase1.py capture --family leaves --output target/phase1/f1b/leaves
+python3 scripts/phase1.py compare --capture target/phase1/f1b/leaves --require-parity
+python3 scripts/phase1.py capture --family config --output target/phase1/f1b/config
+python3 scripts/phase1.py compare --capture target/phase1/f1b/config
+python3 scripts/generate_locale_tables.py --check
+cargo xtask gen --check
+python3 scripts/s05.py tables
+```
+
+Validation includes tests of the affected production crates, JSON stream/error
+regressions, the generated locale conformance test and generator negative
+fixtures; workspace clippy with all targets/features and warnings denied; fmt;
+Rust 1.96 checks for the changed foundation/options dependency closure; deny;
+package asset policy; script tests; tracker validation and committed views.
+The existing E4 string oracle was rerun and recorded on these inputs. No full
+checker corpus or performance benchmark was run.
+
+The S07 operation matrix was regenerated for new homes and relocated markers.
+Its Go operation data is unchanged; existing authenticated native source and
+loader observations replay with byte-identical selected cases and checker
+obligations. Only source mappings and their review chain change. Historical
+correctness/performance captures retain their original freshness state; the
+source review does not re-certify them.
+
+The final archive contains 46 JSON files, 501,966 compressed bytes, and replays
+successfully after extraction. SHA-256:
+
+- archive: `88e953aacace4f2428f8c8f02131d214ae574327c0c3b6ef23a2bf7fe46815e2`
+- leaf provenance: `e010b61328f41875187a7715007d661f0bd62c80b57532adaa35837b448aa482`
+- config provenance: `40795b67f528224b9bc1a987bbbe828ae518f27c1bd4cb0481369570d57b9c5c`
+
+Two preparation tests previously depended on live missing/different leaf rows.
+They now inject those states explicitly, so completion does not disable their
+negative checks. Port annotations on types/variables retain source references;
+generated stringers use file-level markers plus exact operation comments,
+matching the tracker's generated-source model.
+
+Final checks: **681 Python tests and 1,210 subtests pass**, with one existing
+skip. E4 records **76,001 probes, zero failures**.

@@ -1,10 +1,10 @@
 {
   "counts": {
-    "covered": 457,
+    "covered": 623,
     "equivalent_rust": 8,
-    "implemented_untested": 3164,
+    "implemented_untested": 3155,
     "later_phase": 18,
-    "missing": 1148
+    "missing": 991
   },
   "dispositions": [
     "covered",
@@ -135947,8 +135947,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/bundled/source-directory-access; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_bundled/src/lib.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/bundled/source-directory-access",
       "basis_kind": "rule",
       "cases": [
         "leaves/bundled/source-directory-access"
@@ -135960,7 +135962,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/bundled",
       "go_source": "tsc/internal/bundled/bundled.go",
       "id": "tsc/internal/bundled/bundled.go:TestingLibPath",
@@ -135984,11 +135986,12 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "witnessed by 2 exact link(s): leaves/bundled/case-sensitivity-forwarding, leaves/bundled/inner-filesystem-delegation",
+      "basis": "witnessed by 3 exact link(s): leaves/bundled/case-sensitivity-forwarding, leaves/bundled/inner-filesystem-delegation, leaves/bundled/walk-delegation-and-recursion",
       "basis_kind": "rule",
       "cases": [
         "leaves/bundled/case-sensitivity-forwarding",
-        "leaves/bundled/inner-filesystem-delegation"
+        "leaves/bundled/inner-filesystem-delegation",
+        "leaves/bundled/walk-delegation-and-recursion"
       ],
       "depends_on": [
         "internal/osutil",
@@ -136091,10 +136094,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "witnessed by 2 exact link(s): leaves/bundled/inner-filesystem-delegation, leaves/bundled/wrapper-read-paths",
+      "basis": "witnessed by 3 exact link(s): leaves/bundled/inner-filesystem-delegation, leaves/bundled/walk-delegation-and-recursion, leaves/bundled/wrapper-read-paths",
       "basis_kind": "rule",
       "cases": [
         "leaves/bundled/inner-filesystem-delegation",
+        "leaves/bundled/walk-delegation-and-recursion",
         "leaves/bundled/wrapper-read-paths"
       ],
       "depends_on": [
@@ -136196,9 +136200,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): leaves/bundled/walk-delegation-and-recursion",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/bundled/walk-delegation-and-recursion"
+      ],
       "depends_on": [
         "internal/osutil",
         "internal/tspath",
@@ -136206,7 +136212,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/bundled",
       "go_source": "tsc/internal/bundled/embed.go",
       "id": "tsc/internal/bundled/embed.go:fileInfo.Name",
@@ -136219,7 +136225,7 @@
       "membership_reason": "packaged library access",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [
@@ -136372,11 +136378,12 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "witnessed by 3 exact link(s): leaves/bundled/case-sensitivity-forwarding, leaves/bundled/inner-filesystem-delegation, leaves/bundled/wrapper-read-paths",
+      "basis": "witnessed by 4 exact link(s): leaves/bundled/case-sensitivity-forwarding, leaves/bundled/inner-filesystem-delegation, leaves/bundled/walk-delegation-and-recursion",
       "basis_kind": "rule",
       "cases": [
         "leaves/bundled/case-sensitivity-forwarding",
         "leaves/bundled/inner-filesystem-delegation",
+        "leaves/bundled/walk-delegation-and-recursion",
         "leaves/bundled/wrapper-read-paths"
       ],
       "depends_on": [
@@ -136410,11 +136417,13 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "witnessed by 2 exact link(s): leaves/bundled/case-sensitivity-forwarding, leaves/bundled/inner-filesystem-delegation",
+      "basis": "witnessed by 4 exact link(s): leaves/bundled/case-sensitivity-forwarding, leaves/bundled/inner-filesystem-delegation, leaves/bundled/walk-delegation-and-recursion",
       "basis_kind": "rule",
       "cases": [
         "leaves/bundled/case-sensitivity-forwarding",
-        "leaves/bundled/inner-filesystem-delegation"
+        "leaves/bundled/inner-filesystem-delegation",
+        "leaves/bundled/walk-delegation-and-recursion",
+        "leaves/bundled/wrapper-dispatch-surface"
       ],
       "depends_on": [
         "internal/osutil",
@@ -136446,10 +136455,14 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_bundled/src/lib.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/bundled/wrapper-dispatch-surface",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/bundled/wrapper-dispatch-surface"
+      ],
       "depends_on": [
         "internal/osutil",
         "internal/tspath",
@@ -136457,7 +136470,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/bundled",
       "go_source": "tsc/internal/bundled/embed.go",
       "id": "tsc/internal/bundled/embed.go:wrappedFS.AppendFile",
@@ -136470,7 +136483,7 @@
       "membership_reason": "packaged library access",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [
@@ -136480,10 +136493,14 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_bundled/src/lib.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/bundled/wrapper-dispatch-surface",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/bundled/wrapper-dispatch-surface"
+      ],
       "depends_on": [
         "internal/osutil",
         "internal/tspath",
@@ -136491,7 +136508,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/bundled",
       "go_source": "tsc/internal/bundled/embed.go",
       "id": "tsc/internal/bundled/embed.go:wrappedFS.Chtimes",
@@ -136504,7 +136521,7 @@
       "membership_reason": "packaged library access",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [
@@ -136700,10 +136717,14 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_bundled/src/lib.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/bundled/wrapper-dispatch-surface",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/bundled/wrapper-dispatch-surface"
+      ],
       "depends_on": [
         "internal/osutil",
         "internal/tspath",
@@ -136711,7 +136732,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/bundled",
       "go_source": "tsc/internal/bundled/embed.go",
       "id": "tsc/internal/bundled/embed.go:wrappedFS.Remove",
@@ -136724,7 +136745,7 @@
       "membership_reason": "packaged library access",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [
@@ -136807,10 +136828,13 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/bundled/wrapper-dispatch-surface; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_bundled/src/lib.rs"
+      ],
+      "basis": "witnessed by 2 exact link(s): leaves/bundled/walk-delegation-and-recursion, leaves/bundled/wrapper-dispatch-surface",
       "basis_kind": "rule",
       "cases": [
+        "leaves/bundled/walk-delegation-and-recursion",
         "leaves/bundled/wrapper-dispatch-surface"
       ],
       "depends_on": [
@@ -136820,7 +136844,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/bundled",
       "go_source": "tsc/internal/bundled/embed.go",
       "id": "tsc/internal/bundled/embed.go:wrappedFS.WalkDir",
@@ -136843,10 +136867,14 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_bundled/src/lib.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/bundled/wrapper-dispatch-surface",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/bundled/wrapper-dispatch-surface"
+      ],
       "depends_on": [
         "internal/osutil",
         "internal/tspath",
@@ -136854,7 +136882,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/bundled",
       "go_source": "tsc/internal/bundled/embed.go",
       "id": "tsc/internal/bundled/embed.go:wrappedFS.WriteFile",
@@ -136867,7 +136895,7 @@
       "membership_reason": "packaged library access",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [
@@ -136877,8 +136905,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/bundled/walk-delegation-and-recursion; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_bundled/src/lib.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/bundled/walk-delegation-and-recursion",
       "basis_kind": "rule",
       "cases": [
         "leaves/bundled/walk-delegation-and-recursion"
@@ -136890,7 +136920,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/bundled",
       "go_source": "tsc/internal/bundled/embed.go",
       "id": "tsc/internal/bundled/embed.go:wrappedFS.walkDir",
@@ -137423,8 +137453,10 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/multimap-group-by-remove-all-clear; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/multimap.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core-collections/multimap-group-by-remove-all-clear",
       "basis_kind": "rule",
       "cases": [
         "leaves/core-collections/multimap-group-by-remove-all-clear"
@@ -137433,7 +137465,7 @@
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/multimap.go",
       "id": "tsc/internal/collections/multimap.go:GroupBy",
@@ -137454,17 +137486,21 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/multimap-empty-and-size-hint; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/multimap.rs"
+      ],
+      "basis": "witnessed by 3 exact link(s): leaves/core-collections/multimap-empty-and-size-hint, leaves/core-collections/multimap-group-by-remove-all-clear, leaves/core-collections/multimap-remove-aliases-the-slice",
       "basis_kind": "rule",
       "cases": [
-        "leaves/core-collections/multimap-empty-and-size-hint"
+        "leaves/core-collections/multimap-empty-and-size-hint",
+        "leaves/core-collections/multimap-group-by-remove-all-clear",
+        "leaves/core-collections/multimap-remove-aliases-the-slice"
       ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/multimap.go",
       "id": "tsc/internal/collections/multimap.go:MultiMap.Add",
@@ -137485,15 +137521,19 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/multimap.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core-collections/multimap-group-by-remove-all-clear",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core-collections/multimap-group-by-remove-all-clear"
+      ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/multimap.go",
       "id": "tsc/internal/collections/multimap.go:MultiMap.Clear",
@@ -137506,7 +137546,7 @@
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -137514,15 +137554,21 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/multimap.rs"
+      ],
+      "basis": "witnessed by 3 exact link(s): leaves/core-collections/multimap-empty-and-size-hint, leaves/core-collections/multimap-group-by-remove-all-clear, leaves/core-collections/multimap-remove-aliases-the-slice",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core-collections/multimap-empty-and-size-hint",
+        "leaves/core-collections/multimap-group-by-remove-all-clear",
+        "leaves/core-collections/multimap-remove-aliases-the-slice"
+      ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/multimap.go",
       "id": "tsc/internal/collections/multimap.go:MultiMap.Get",
@@ -137535,7 +137581,7 @@
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -137543,15 +137589,21 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/multimap.rs"
+      ],
+      "basis": "witnessed by 3 exact link(s): leaves/core-collections/multimap-empty-and-size-hint, leaves/core-collections/multimap-group-by-remove-all-clear, leaves/core-collections/multimap-remove-aliases-the-slice",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core-collections/multimap-empty-and-size-hint",
+        "leaves/core-collections/multimap-group-by-remove-all-clear",
+        "leaves/core-collections/multimap-remove-aliases-the-slice"
+      ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/multimap.go",
       "id": "tsc/internal/collections/multimap.go:MultiMap.Has",
@@ -137564,7 +137616,7 @@
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -137572,15 +137624,20 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/multimap.rs"
+      ],
+      "basis": "witnessed by 2 exact link(s): leaves/core-collections/multimap-empty-and-size-hint, leaves/core-collections/multimap-group-by-remove-all-clear",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core-collections/multimap-empty-and-size-hint",
+        "leaves/core-collections/multimap-group-by-remove-all-clear"
+      ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/multimap.go",
       "id": "tsc/internal/collections/multimap.go:MultiMap.Keys",
@@ -137593,7 +137650,7 @@
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -137601,15 +137658,21 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/multimap.rs"
+      ],
+      "basis": "witnessed by 3 exact link(s): leaves/core-collections/multimap-empty-and-size-hint, leaves/core-collections/multimap-group-by-remove-all-clear, leaves/core-collections/multimap-remove-aliases-the-slice",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core-collections/multimap-empty-and-size-hint",
+        "leaves/core-collections/multimap-group-by-remove-all-clear",
+        "leaves/core-collections/multimap-remove-aliases-the-slice"
+      ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/multimap.go",
       "id": "tsc/internal/collections/multimap.go:MultiMap.Len",
@@ -137622,7 +137685,7 @@
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -137630,8 +137693,10 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/multimap-remove-aliases-the-slice; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/multimap.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core-collections/multimap-remove-aliases-the-slice",
       "basis_kind": "rule",
       "cases": [
         "leaves/core-collections/multimap-remove-aliases-the-slice"
@@ -137640,7 +137705,7 @@
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/multimap.go",
       "id": "tsc/internal/collections/multimap.go:MultiMap.Remove",
@@ -137661,15 +137726,19 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/multimap.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core-collections/multimap-group-by-remove-all-clear",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core-collections/multimap-group-by-remove-all-clear"
+      ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/multimap.go",
       "id": "tsc/internal/collections/multimap.go:MultiMap.RemoveAll",
@@ -137682,7 +137751,7 @@
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -137690,15 +137759,19 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/multimap.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core-collections/multimap-empty-and-size-hint",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core-collections/multimap-empty-and-size-hint"
+      ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/multimap.go",
       "id": "tsc/internal/collections/multimap.go:MultiMap.Values",
@@ -137711,7 +137784,7 @@
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -137719,15 +137792,19 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/multimap.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core-collections/multimap-empty-and-size-hint",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core-collections/multimap-empty-and-size-hint"
+      ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/multimap.go",
       "id": "tsc/internal/collections/multimap.go:NewMultiMapWithSizeHint",
@@ -137740,7 +137817,7 @@
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -138241,17 +138318,18 @@
       "annotated_home": [
         "crates/tsr_json/src/lib.rs"
       ],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/ordered-map-marshal-integer-keys, leaves/core-collections/ordered-map-marshal-member-order; witnessed by 2 prepared case(s)",
+      "basis": "witnessed by 3 exact link(s): leaves/core-collections/ordered-map-marshal-integer-keys, leaves/core-collections/ordered-map-marshal-member-order, leaves/core-collections/ordered-map-unmarshal-keeps-document-order",
       "basis_kind": "rule",
       "cases": [
         "leaves/core-collections/ordered-map-marshal-integer-keys",
-        "leaves/core-collections/ordered-map-marshal-member-order"
+        "leaves/core-collections/ordered-map-marshal-member-order",
+        "leaves/core-collections/ordered-map-unmarshal-keeps-document-order"
       ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/ordered_map.go",
       "id": "tsc/internal/collections/ordered_map.go:OrderedMap.MarshalJSONTo",
@@ -138358,8 +138436,10 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/ordered-map-unmarshal-keeps-document-order, leaves/core-collections/ordered-map-unmarshal-null-is-not-a-clear, leaves/core-collections/ordered-map-unmarshal-rejects-non-objects; witnessed by 3 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_json/src/decode.rs"
+      ],
+      "basis": "witnessed by 3 exact link(s): leaves/core-collections/ordered-map-unmarshal-keeps-document-order, leaves/core-collections/ordered-map-unmarshal-null-is-not-a-clear, leaves/core-collections/ordered-map-unmarshal-rejects-non-objects",
       "basis_kind": "rule",
       "cases": [
         "leaves/core-collections/ordered-map-unmarshal-keeps-document-order",
@@ -138370,7 +138450,7 @@
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/ordered_map.go",
       "id": "tsc/internal/collections/ordered_map.go:OrderedMap.UnmarshalJSONFrom",
@@ -138569,14 +138649,17 @@
     {
       "actual_home": "tsr_core and consumer-local collections",
       "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
+      "basis": "witnessed by 2 exact link(s): leaves/core-collections/ordered-map-marshal-integer-keys, leaves/core-collections/ordered-map-marshal-member-order",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core-collections/ordered-map-marshal-integer-keys",
+        "leaves/core-collections/ordered-map-marshal-member-order"
+      ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/ordered_map.go",
       "id": "tsc/internal/collections/ordered_map.go:resolveKeyName",
@@ -138589,7 +138672,7 @@
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [
@@ -138897,8 +138980,10 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/set-constructors; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/set.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core-collections/set-constructors",
       "basis_kind": "rule",
       "cases": [
         "leaves/core-collections/set-constructors"
@@ -138907,7 +138992,7 @@
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/set.go",
       "id": "tsc/internal/collections/set.go:NewSetFromItems",
@@ -138928,15 +139013,19 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/set.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core-collections/set-constructors",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core-collections/set-constructors"
+      ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/set.go",
       "id": "tsc/internal/collections/set.go:NewSetWithSizeHint",
@@ -138949,7 +139038,7 @@
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -138957,15 +139046,22 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/set.rs"
+      ],
+      "basis": "witnessed by 4 exact link(s): leaves/core-collections/set-constructors, leaves/core-collections/set-nil-receiver-guards, leaves/core-collections/set-union-clone-isolation",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core-collections/set-constructors",
+        "leaves/core-collections/set-nil-receiver-guards",
+        "leaves/core-collections/set-union-clone-isolation",
+        "leaves/core-collections/set-zero-value-keys-alias"
+      ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/set.go",
       "id": "tsc/internal/collections/set.go:Set.Add",
@@ -138978,7 +139074,7 @@
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -138986,15 +139082,19 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/set.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core-collections/set-zero-value-keys-alias",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core-collections/set-zero-value-keys-alias"
+      ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/set.go",
       "id": "tsc/internal/collections/set.go:Set.AddIfAbsent",
@@ -139007,7 +139107,7 @@
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -139015,15 +139115,20 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/set.rs"
+      ],
+      "basis": "witnessed by 2 exact link(s): leaves/core-collections/set-nil-receiver-guards, leaves/core-collections/set-zero-value-keys-alias",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core-collections/set-nil-receiver-guards",
+        "leaves/core-collections/set-zero-value-keys-alias"
+      ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/set.go",
       "id": "tsc/internal/collections/set.go:Set.Clear",
@@ -139036,7 +139141,7 @@
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -139044,17 +139149,20 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/set-union-clone-isolation; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/set.rs"
+      ],
+      "basis": "witnessed by 2 exact link(s): leaves/core-collections/set-nil-receiver-guards, leaves/core-collections/set-union-clone-isolation",
       "basis_kind": "rule",
       "cases": [
+        "leaves/core-collections/set-nil-receiver-guards",
         "leaves/core-collections/set-union-clone-isolation"
       ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/set.go",
       "id": "tsc/internal/collections/set.go:Set.Clone",
@@ -139075,15 +139183,20 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/set.rs"
+      ],
+      "basis": "witnessed by 2 exact link(s): leaves/core-collections/set-union-clone-isolation, leaves/core-collections/set-zero-value-keys-alias",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core-collections/set-union-clone-isolation",
+        "leaves/core-collections/set-zero-value-keys-alias"
+      ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/set.go",
       "id": "tsc/internal/collections/set.go:Set.Delete",
@@ -139096,7 +139209,7 @@
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -139104,15 +139217,21 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/set.rs"
+      ],
+      "basis": "witnessed by 3 exact link(s): leaves/core-collections/set-constructors, leaves/core-collections/set-nil-receiver-guards, leaves/core-collections/set-union-clone-isolation",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core-collections/set-constructors",
+        "leaves/core-collections/set-nil-receiver-guards",
+        "leaves/core-collections/set-union-clone-isolation"
+      ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/set.go",
       "id": "tsc/internal/collections/set.go:Set.Equals",
@@ -139125,7 +139244,7 @@
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -139133,15 +139252,20 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/set.rs"
+      ],
+      "basis": "witnessed by 2 exact link(s): leaves/core-collections/set-nil-receiver-guards, leaves/core-collections/set-zero-value-keys-alias",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core-collections/set-nil-receiver-guards",
+        "leaves/core-collections/set-zero-value-keys-alias"
+      ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/set.go",
       "id": "tsc/internal/collections/set.go:Set.Has",
@@ -139154,7 +139278,7 @@
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -139162,15 +139286,20 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/set.rs"
+      ],
+      "basis": "witnessed by 2 exact link(s): leaves/core-collections/set-nil-receiver-guards, leaves/core-collections/set-union-clone-isolation",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core-collections/set-nil-receiver-guards",
+        "leaves/core-collections/set-union-clone-isolation"
+      ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/set.go",
       "id": "tsc/internal/collections/set.go:Set.Intersects",
@@ -139183,7 +139312,7 @@
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -139191,15 +139320,20 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/set.rs"
+      ],
+      "basis": "witnessed by 2 exact link(s): leaves/core-collections/set-nil-receiver-guards, leaves/core-collections/set-union-clone-isolation",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core-collections/set-nil-receiver-guards",
+        "leaves/core-collections/set-union-clone-isolation"
+      ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/set.go",
       "id": "tsc/internal/collections/set.go:Set.IsSubsetOf",
@@ -139212,7 +139346,7 @@
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -139220,17 +139354,22 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/set-zero-value-keys-alias; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/set.rs"
+      ],
+      "basis": "witnessed by 4 exact link(s): leaves/core-collections/set-constructors, leaves/core-collections/set-nil-receiver-guards, leaves/core-collections/set-union-clone-isolation",
       "basis_kind": "rule",
       "cases": [
+        "leaves/core-collections/set-constructors",
+        "leaves/core-collections/set-nil-receiver-guards",
+        "leaves/core-collections/set-union-clone-isolation",
         "leaves/core-collections/set-zero-value-keys-alias"
       ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/set.go",
       "id": "tsc/internal/collections/set.go:Set.Keys",
@@ -139251,15 +139390,21 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/set.rs"
+      ],
+      "basis": "witnessed by 3 exact link(s): leaves/core-collections/set-constructors, leaves/core-collections/set-nil-receiver-guards, leaves/core-collections/set-zero-value-keys-alias",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core-collections/set-constructors",
+        "leaves/core-collections/set-nil-receiver-guards",
+        "leaves/core-collections/set-zero-value-keys-alias"
+      ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/set.go",
       "id": "tsc/internal/collections/set.go:Set.Len",
@@ -139272,7 +139417,7 @@
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -139280,17 +139425,20 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/set-nil-receiver-guards; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/set.rs"
+      ],
+      "basis": "witnessed by 2 exact link(s): leaves/core-collections/set-nil-receiver-guards, leaves/core-collections/set-union-clone-isolation",
       "basis_kind": "rule",
       "cases": [
-        "leaves/core-collections/set-nil-receiver-guards"
+        "leaves/core-collections/set-nil-receiver-guards",
+        "leaves/core-collections/set-union-clone-isolation"
       ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/set.go",
       "id": "tsc/internal/collections/set.go:Set.Union",
@@ -139311,15 +139459,20 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/set.rs"
+      ],
+      "basis": "witnessed by 2 exact link(s): leaves/core-collections/set-nil-receiver-guards, leaves/core-collections/set-union-clone-isolation",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core-collections/set-nil-receiver-guards",
+        "leaves/core-collections/set-union-clone-isolation"
+      ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/set.go",
       "id": "tsc/internal/collections/set.go:Set.UnionedWith",
@@ -139332,7 +139485,7 @@
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -139340,15 +139493,19 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/syncmap.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core-collections/syncmap-store-clone-clear",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core-collections/syncmap-store-clone-clear"
+      ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/syncmap.go",
       "id": "tsc/internal/collections/syncmap.go:SyncMap.Clear",
@@ -139361,7 +139518,7 @@
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -139369,8 +139526,10 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/syncmap-store-clone-clear; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/syncmap.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core-collections/syncmap-store-clone-clear",
       "basis_kind": "rule",
       "cases": [
         "leaves/core-collections/syncmap-store-clone-clear"
@@ -139379,7 +139538,7 @@
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/syncmap.go",
       "id": "tsc/internal/collections/syncmap.go:SyncMap.Clone",
@@ -139400,15 +139559,19 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/syncmap.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core-collections/syncmap-store-clone-clear",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core-collections/syncmap-store-clone-clear"
+      ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/syncmap.go",
       "id": "tsc/internal/collections/syncmap.go:SyncMap.Delete",
@@ -139421,7 +139584,7 @@
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -139429,15 +139592,20 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/syncmap.rs"
+      ],
+      "basis": "witnessed by 2 exact link(s): leaves/core-collections/syncmap-nil-value-contract, leaves/core-collections/syncmap-store-clone-clear",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core-collections/syncmap-nil-value-contract",
+        "leaves/core-collections/syncmap-store-clone-clear"
+      ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/syncmap.go",
       "id": "tsc/internal/collections/syncmap.go:SyncMap.Keys",
@@ -139450,7 +139618,7 @@
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -139458,17 +139626,20 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/syncmap-nil-value-contract; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/syncmap.rs"
+      ],
+      "basis": "witnessed by 2 exact link(s): leaves/core-collections/syncmap-nil-value-contract, leaves/core-collections/syncmap-store-clone-clear",
       "basis_kind": "rule",
       "cases": [
-        "leaves/core-collections/syncmap-nil-value-contract"
+        "leaves/core-collections/syncmap-nil-value-contract",
+        "leaves/core-collections/syncmap-store-clone-clear"
       ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/syncmap.go",
       "id": "tsc/internal/collections/syncmap.go:SyncMap.Load",
@@ -139489,15 +139660,20 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/syncmap.rs"
+      ],
+      "basis": "witnessed by 2 exact link(s): leaves/core-collections/syncmap-nil-value-contract, leaves/core-collections/syncmap-store-clone-clear",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core-collections/syncmap-nil-value-contract",
+        "leaves/core-collections/syncmap-store-clone-clear"
+      ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/syncmap.go",
       "id": "tsc/internal/collections/syncmap.go:SyncMap.LoadOrStore",
@@ -139510,7 +139686,7 @@
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -139518,17 +139694,20 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/syncmap-range-early-stop; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/syncmap.rs"
+      ],
+      "basis": "witnessed by 2 exact link(s): leaves/core-collections/syncmap-nil-value-contract, leaves/core-collections/syncmap-range-early-stop",
       "basis_kind": "rule",
       "cases": [
+        "leaves/core-collections/syncmap-nil-value-contract",
         "leaves/core-collections/syncmap-range-early-stop"
       ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/syncmap.go",
       "id": "tsc/internal/collections/syncmap.go:SyncMap.Range",
@@ -139549,15 +139728,21 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/syncmap.rs"
+      ],
+      "basis": "witnessed by 3 exact link(s): leaves/core-collections/syncmap-nil-value-contract, leaves/core-collections/syncmap-range-early-stop, leaves/core-collections/syncmap-store-clone-clear",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core-collections/syncmap-nil-value-contract",
+        "leaves/core-collections/syncmap-range-early-stop",
+        "leaves/core-collections/syncmap-store-clone-clear"
+      ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/syncmap.go",
       "id": "tsc/internal/collections/syncmap.go:SyncMap.Size",
@@ -139570,7 +139755,7 @@
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -139578,15 +139763,21 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/syncmap.rs"
+      ],
+      "basis": "witnessed by 3 exact link(s): leaves/core-collections/syncmap-nil-value-contract, leaves/core-collections/syncmap-range-early-stop, leaves/core-collections/syncmap-store-clone-clear",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core-collections/syncmap-nil-value-contract",
+        "leaves/core-collections/syncmap-range-early-stop",
+        "leaves/core-collections/syncmap-store-clone-clear"
+      ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/syncmap.go",
       "id": "tsc/internal/collections/syncmap.go:SyncMap.Store",
@@ -139599,7 +139790,7 @@
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -139607,15 +139798,21 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/syncmap.rs"
+      ],
+      "basis": "witnessed by 3 exact link(s): leaves/core-collections/syncmap-nil-value-contract, leaves/core-collections/syncmap-range-early-stop, leaves/core-collections/syncmap-store-clone-clear",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core-collections/syncmap-nil-value-contract",
+        "leaves/core-collections/syncmap-range-early-stop",
+        "leaves/core-collections/syncmap-store-clone-clear"
+      ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/syncmap.go",
       "id": "tsc/internal/collections/syncmap.go:SyncMap.ToMap",
@@ -139628,7 +139825,7 @@
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -139636,15 +139833,19 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/syncset.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core-collections/syncset-add-if-absent-and-early-stop",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core-collections/syncset-add-if-absent-and-early-stop"
+      ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/syncset.go",
       "id": "tsc/internal/collections/syncset.go:SyncSet.Add",
@@ -139657,7 +139858,7 @@
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -139665,8 +139866,10 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/syncset-add-if-absent-and-early-stop; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/syncset.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core-collections/syncset-add-if-absent-and-early-stop",
       "basis_kind": "rule",
       "cases": [
         "leaves/core-collections/syncset-add-if-absent-and-early-stop"
@@ -139675,7 +139878,7 @@
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/syncset.go",
       "id": "tsc/internal/collections/syncset.go:SyncSet.AddIfAbsent",
@@ -139696,15 +139899,19 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/syncset.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core-collections/syncset-add-if-absent-and-early-stop",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core-collections/syncset-add-if-absent-and-early-stop"
+      ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/syncset.go",
       "id": "tsc/internal/collections/syncset.go:SyncSet.Delete",
@@ -139717,7 +139924,7 @@
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -139725,15 +139932,19 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/syncset.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core-collections/syncset-add-if-absent-and-early-stop",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core-collections/syncset-add-if-absent-and-early-stop"
+      ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/syncset.go",
       "id": "tsc/internal/collections/syncset.go:SyncSet.Has",
@@ -139746,7 +139957,7 @@
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -139754,15 +139965,19 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/syncset.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core-collections/syncset-add-if-absent-and-early-stop",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core-collections/syncset-add-if-absent-and-early-stop"
+      ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/syncset.go",
       "id": "tsc/internal/collections/syncset.go:SyncSet.IsEmpty",
@@ -139775,7 +139990,7 @@
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -139783,15 +139998,19 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/syncset.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core-collections/syncset-add-if-absent-and-early-stop",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core-collections/syncset-add-if-absent-and-early-stop"
+      ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/syncset.go",
       "id": "tsc/internal/collections/syncset.go:SyncSet.Keys",
@@ -139804,7 +140023,7 @@
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -139812,15 +140031,19 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/syncset.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core-collections/syncset-add-if-absent-and-early-stop",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core-collections/syncset-add-if-absent-and-early-stop"
+      ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/syncset.go",
       "id": "tsc/internal/collections/syncset.go:SyncSet.Range",
@@ -139833,7 +140056,7 @@
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -139841,15 +140064,19 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/syncset.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core-collections/syncset-add-if-absent-and-early-stop",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core-collections/syncset-add-if-absent-and-early-stop"
+      ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/syncset.go",
       "id": "tsc/internal/collections/syncset.go:SyncSet.Size",
@@ -139862,7 +140089,7 @@
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -139870,15 +140097,19 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
+      "annotated_home": [
+        "crates/tsr_core/src/collections/syncset.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core-collections/syncset-add-if-absent-and-early-stop",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core-collections/syncset-add-if-absent-and-early-stop"
+      ],
       "depends_on": [
         "internal/json"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/collections",
       "go_source": "tsc/internal/collections/syncset.go",
       "id": "tsc/internal/collections/syncset.go:SyncSet.ToSlice",
@@ -139891,7 +140122,7 @@
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -163225,10 +163456,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "witnessed by 1 exact link(s): leaves/options/clone-field-roster",
+      "basis": "witnessed by 2 exact link(s): leaves/options/clone-field-roster, leaves/options/clone-shares-pointer-backed-fields",
       "basis_kind": "rule",
       "cases": [
-        "leaves/options/clone-field-roster"
+        "leaves/options/clone-field-roster",
+        "leaves/options/clone-shares-pointer-backed-fields"
       ],
       "depends_on": [
         "internal/collections",
@@ -164155,8 +164387,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/options/new-line-kind-from-text; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/names.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/options/new-line-kind-from-text",
       "basis_kind": "rule",
       "cases": [
         "leaves/options/new-line-kind-from-text"
@@ -164169,7 +164403,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/compileroptions.go",
       "id": "tsc/internal/core/compileroptions.go:GetNewLineKind",
@@ -164193,8 +164427,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/options/jsx-emit-text-domain; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/names.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/options/jsx-emit-text-domain",
       "basis_kind": "rule",
       "cases": [
         "leaves/options/jsx-emit-text-domain"
@@ -164207,7 +164443,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/compileroptions.go",
       "id": "tsc/internal/core/compileroptions.go:JsxEmit.String",
@@ -164311,8 +164547,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/options/module-resolution-text-domain; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/names.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/options/module-resolution-text-domain",
       "basis_kind": "rule",
       "cases": [
         "leaves/options/module-resolution-text-domain"
@@ -164325,7 +164563,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/compileroptions.go",
       "id": "tsc/internal/core/compileroptions.go:ModuleResolutionKind.String",
@@ -164349,8 +164587,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/options/new-line-character-default; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/names.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/options/new-line-character-default",
       "basis_kind": "rule",
       "cases": [
         "leaves/options/new-line-character-default"
@@ -164363,7 +164603,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/compileroptions.go",
       "id": "tsc/internal/core/compileroptions.go:NewLineKind.GetNewLineCharacter",
@@ -164591,11 +164831,15 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/helpers/append-if-unique-writes-into-spare-capacity; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/helpers.rs"
+      ],
+      "basis": "witnessed by 3 exact link(s): leaves/helpers/append-if-unique-writes-into-spare-capacity, leaves/helpers/append-sharing-across-go-size-class, leaves/helpers/flatten-batch-retained-capacity",
       "basis_kind": "rule",
       "cases": [
-        "leaves/helpers/append-if-unique-writes-into-spare-capacity"
+        "leaves/helpers/append-if-unique-writes-into-spare-capacity",
+        "leaves/helpers/append-sharing-across-go-size-class",
+        "leaves/helpers/flatten-batch-retained-capacity"
       ],
       "depends_on": [
         "internal/collections",
@@ -164605,7 +164849,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/core.go",
       "id": "tsc/internal/core/core.go:AppendIfUnique",
@@ -164881,8 +165125,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/helpers/concatenate-returns-an-operand; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/helpers.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/helpers/concatenate-returns-an-operand",
       "basis_kind": "rule",
       "cases": [
         "leaves/helpers/concatenate-returns-an-operand"
@@ -164895,7 +165141,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/core.go",
       "id": "tsc/internal/core/core.go:Concatenate",
@@ -164923,8 +165169,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/helpers/concatenate-seq-skips-a-nil-operand; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/helpers.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/helpers/concatenate-seq-skips-a-nil-operand",
       "basis_kind": "rule",
       "cases": [
         "leaves/helpers/concatenate-seq-skips-a-nil-operand"
@@ -164937,7 +165185,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/core.go",
       "id": "tsc/internal/core/core.go:ConcatenateSeq",
@@ -165045,8 +165293,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/helpers/deduplicate-keeps-the-first-occurrence; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/helpers.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/helpers/deduplicate-keeps-the-first-occurrence",
       "basis_kind": "rule",
       "cases": [
         "leaves/helpers/deduplicate-keeps-the-first-occurrence"
@@ -165059,7 +165309,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/core.go",
       "id": "tsc/internal/core/core.go:Deduplicate",
@@ -165373,8 +165623,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/helpers/filter-identity-and-empty-clone; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/helpers.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/helpers/filter-identity-and-empty-clone",
       "basis_kind": "rule",
       "cases": [
         "leaves/helpers/filter-identity-and-empty-clone"
@@ -165387,7 +165639,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/core.go",
       "id": "tsc/internal/core/core.go:Filter",
@@ -165495,8 +165747,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/helpers/find-zero-value-is-not-absence; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/helpers.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/helpers/find-zero-value-is-not-absence",
       "basis_kind": "rule",
       "cases": [
         "leaves/helpers/find-zero-value-is-not-absence"
@@ -165509,7 +165763,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/core.go",
       "id": "tsc/internal/core/core.go:Find",
@@ -165537,10 +165791,14 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_core/src/helpers.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/helpers/find-zero-value-is-not-absence",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/helpers/find-zero-value-is-not-absence"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/debug",
@@ -165549,7 +165807,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/core.go",
       "id": "tsc/internal/core/core.go:FindIndex",
@@ -165566,7 +165824,7 @@
       "membership_reason": "core helpers and option semantics",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [
@@ -165577,10 +165835,14 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_core/src/helpers.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/helpers/find-zero-value-is-not-absence",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/helpers/find-zero-value-is-not-absence"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/debug",
@@ -165589,7 +165851,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/core.go",
       "id": "tsc/internal/core/core.go:FindLast",
@@ -165606,7 +165868,7 @@
       "membership_reason": "core helpers and option semantics",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [
@@ -165737,8 +165999,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/helpers/first-and-last-or-nil; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/helpers.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/helpers/first-and-last-or-nil",
       "basis_kind": "rule",
       "cases": [
         "leaves/helpers/first-and-last-or-nil"
@@ -165751,7 +166015,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/core.go",
       "id": "tsc/internal/core/core.go:FirstOrNil",
@@ -165859,8 +166123,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/helpers/flatmap-and-flatten-nil-accumulator; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/helpers.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/helpers/flatmap-and-flatten-nil-accumulator",
       "basis_kind": "rule",
       "cases": [
         "leaves/helpers/flatmap-and-flatten-nil-accumulator"
@@ -165873,7 +166139,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/core.go",
       "id": "tsc/internal/core/core.go:FlatMap",
@@ -165901,10 +166167,15 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_core/src/helpers.rs"
+      ],
+      "basis": "witnessed by 2 exact link(s): leaves/helpers/flatmap-and-flatten-nil-accumulator, leaves/helpers/flatten-batch-retained-capacity",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/helpers/flatmap-and-flatten-nil-accumulator",
+        "leaves/helpers/flatten-batch-retained-capacity"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/debug",
@@ -165913,7 +166184,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/core.go",
       "id": "tsc/internal/core/core.go:Flatten",
@@ -165930,7 +166201,7 @@
       "membership_reason": "core helpers and option semantics",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [
@@ -166197,10 +166468,14 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_core/src/helpers.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/helpers/or-else-tests-the-value-not-a-flag",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/helpers/or-else-tests-the-value-not-a-flag"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/debug",
@@ -166209,7 +166484,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/core.go",
       "id": "tsc/internal/core/core.go:IfElse",
@@ -166226,7 +166501,7 @@
       "membership_reason": "core helpers and option semantics",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [
@@ -166319,10 +166594,14 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_core/src/helpers.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/helpers/first-and-last-or-nil",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/helpers/first-and-last-or-nil"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/debug",
@@ -166331,7 +166610,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/core.go",
       "id": "tsc/internal/core/core.go:LastOrNil",
@@ -166348,7 +166627,7 @@
       "membership_reason": "core helpers and option semantics",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [
@@ -166359,8 +166638,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/helpers/map-preserves-nil; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/helpers.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/helpers/map-preserves-nil",
       "basis_kind": "rule",
       "cases": [
         "leaves/helpers/map-preserves-nil"
@@ -166373,7 +166654,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/core.go",
       "id": "tsc/internal/core/core.go:Map",
@@ -166401,8 +166682,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/helpers/map-filtered-nil-accumulator; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/helpers.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/helpers/map-filtered-nil-accumulator",
       "basis_kind": "rule",
       "cases": [
         "leaves/helpers/map-filtered-nil-accumulator"
@@ -166415,7 +166698,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/core.go",
       "id": "tsc/internal/core/core.go:MapFiltered",
@@ -166443,10 +166726,14 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_core/src/helpers.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/helpers/map-preserves-nil",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/helpers/map-preserves-nil"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/debug",
@@ -166455,7 +166742,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/core.go",
       "id": "tsc/internal/core/core.go:MapIndex",
@@ -166472,7 +166759,7 @@
       "membership_reason": "core helpers and option semantics",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [
@@ -166523,8 +166810,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/helpers/memoize-runs-create-once; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/helpers.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/helpers/memoize-runs-create-once",
       "basis_kind": "rule",
       "cases": [
         "leaves/helpers/memoize-runs-create-once"
@@ -166537,7 +166826,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/core.go",
       "id": "tsc/internal/core/core.go:Memoize",
@@ -166605,8 +166894,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/helpers/must-panics-with-the-error-value; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/helpers.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/helpers/must-panics-with-the-error-value",
       "basis_kind": "rule",
       "cases": [
         "leaves/helpers/must-panics-with-the-error-value"
@@ -166619,7 +166910,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/core.go",
       "id": "tsc/internal/core/core.go:Must",
@@ -166687,8 +166978,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/helpers/or-else-tests-the-value-not-a-flag; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/helpers.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/helpers/or-else-tests-the-value-not-a-flag",
       "basis_kind": "rule",
       "cases": [
         "leaves/helpers/or-else-tests-the-value-not-a-flag"
@@ -166701,7 +166994,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/core.go",
       "id": "tsc/internal/core/core.go:OrElse",
@@ -166813,11 +167106,21 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/helpers/same-is-length-then-first-element; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/slices.rs"
+      ],
+      "basis": "witnessed by 9 exact link(s): leaves/helpers/append-if-unique-writes-into-spare-capacity, leaves/helpers/append-sharing-across-go-size-class, leaves/helpers/concatenate-returns-an-operand",
       "basis_kind": "rule",
       "cases": [
-        "leaves/helpers/same-is-length-then-first-element"
+        "leaves/helpers/append-if-unique-writes-into-spare-capacity",
+        "leaves/helpers/append-sharing-across-go-size-class",
+        "leaves/helpers/concatenate-returns-an-operand",
+        "leaves/helpers/deduplicate-keeps-the-first-occurrence",
+        "leaves/helpers/filter-identity-and-empty-clone",
+        "leaves/helpers/flatmap-and-flatten-nil-accumulator",
+        "leaves/helpers/map-preserves-nil",
+        "leaves/helpers/same-is-length-then-first-element",
+        "leaves/helpers/same-map-identity-and-call-count"
       ],
       "depends_on": [
         "internal/collections",
@@ -166827,7 +167130,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/core.go",
       "id": "tsc/internal/core/core.go:Same",
@@ -166855,8 +167158,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/helpers/same-map-identity-and-call-count; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/helpers.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/helpers/same-map-identity-and-call-count",
       "basis_kind": "rule",
       "cases": [
         "leaves/helpers/same-map-identity-and-call-count"
@@ -166869,7 +167174,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/core.go",
       "id": "tsc/internal/core/core.go:SameMap",
@@ -166977,8 +167282,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/helpers/single-element-slice-nil-and-pointer-identity; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/helpers.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/helpers/single-element-slice-nil-and-pointer-identity",
       "basis_kind": "rule",
       "cases": [
         "leaves/helpers/single-element-slice-nil-and-pointer-identity"
@@ -166991,7 +167298,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/core.go",
       "id": "tsc/internal/core/core.go:SingleElementSlice",
@@ -167019,8 +167326,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/helpers/some-stops-at-the-first-true; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/helpers.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/helpers/some-stops-at-the-first-true",
       "basis_kind": "rule",
       "cases": [
         "leaves/helpers/some-stops-at-the-first-true"
@@ -167033,7 +167342,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/core.go",
       "id": "tsc/internal/core/core.go:Some",
@@ -167104,7 +167413,7 @@
       "annotated_home": [
         "crates/tsr_tsoptions/src/config_json.rs"
       ],
-      "basis": "witnessed by 1 exact link(s): leaves/helpers/stringify-json-compact-escapes",
+      "basis": "witnessed by 2 exact link(s): leaves/helpers/stringify-json-compact-escapes, leaves/helpers/stringify-json-indent-arm",
       "basis_kind": "rule",
       "cases": [
         "leaves/helpers/stringify-json-compact-escapes",
@@ -167270,8 +167579,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/helpers/comparable-values-equal-is-address-equality; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/helpers.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/helpers/comparable-values-equal-is-address-equality",
       "basis_kind": "rule",
       "cases": [
         "leaves/helpers/comparable-values-equal-is-address-equality"
@@ -167284,7 +167595,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/core.go",
       "id": "tsc/internal/core/core.go:comparableValuesEqual",
@@ -167399,7 +167710,7 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core/language-variant-stringer-domain; witnessed by 1 prepared case(s)",
+      "basis": "witnessed by 1 exact link(s): leaves/core/language-variant-stringer-domain",
       "basis_kind": "rule",
       "cases": [
         "leaves/core/language-variant-stringer-domain"
@@ -167412,7 +167723,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/languagevariant_stringer_generated.go",
       "id": "tsc/internal/core/languagevariant_stringer_generated.go:LanguageVariant.String",
@@ -167665,7 +167976,7 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core/module-kind-stringer-gaps; witnessed by 1 prepared case(s)",
+      "basis": "witnessed by 1 exact link(s): leaves/core/module-kind-stringer-gaps",
       "basis_kind": "rule",
       "cases": [
         "leaves/core/module-kind-stringer-gaps"
@@ -167678,7 +167989,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/modulekind_stringer_generated.go",
       "id": "tsc/internal/core/modulekind_stringer_generated.go:ModuleKind.String",
@@ -168033,7 +168344,7 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core/script-kind-stringer-gap; witnessed by 1 prepared case(s)",
+      "basis": "witnessed by 1 exact link(s): leaves/core/script-kind-stringer-gap",
       "basis_kind": "rule",
       "cases": [
         "leaves/core/script-kind-stringer-gap"
@@ -168046,7 +168357,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/scriptkind_stringer_generated.go",
       "id": "tsc/internal/core/scriptkind_stringer_generated.go:ScriptKind.String",
@@ -168101,7 +168412,7 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core/script-target-stringer-gaps; witnessed by 1 prepared case(s)",
+      "basis": "witnessed by 1 exact link(s): leaves/core/script-target-stringer-gaps",
       "basis_kind": "rule",
       "cases": [
         "leaves/core/script-target-stringer-gaps"
@@ -168114,7 +168425,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/scripttarget_stringer_generated.go",
       "id": "tsc/internal/core/scripttarget_stringer_generated.go:ScriptTarget.String",
@@ -168465,10 +168776,14 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_core/src/ranges.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core/text-range-predicate-family-missing",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core/text-range-predicate-family-missing"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/debug",
@@ -168477,7 +168792,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/text.go",
       "id": "tsc/internal/core/text.go:CompareTextRanges",
@@ -168492,7 +168807,7 @@
       "membership_reason": "core helpers and option semantics",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [
@@ -168505,11 +168820,12 @@
       "annotated_home": [
         "crates/tsr_core/src/lib.rs"
       ],
-      "basis": "witnessed by 2 exact link(s): leaves/core/text-range-int32-narrowing, leaves/core/text-range-len-wraparound",
+      "basis": "witnessed by 3 exact link(s): leaves/core/text-range-int32-narrowing, leaves/core/text-range-len-wraparound, leaves/core/text-range-predicate-family-missing",
       "basis_kind": "rule",
       "cases": [
         "leaves/core/text-range-int32-narrowing",
-        "leaves/core/text-range-len-wraparound"
+        "leaves/core/text-range-len-wraparound",
+        "leaves/core/text-range-predicate-family-missing"
       ],
       "depends_on": [
         "internal/collections",
@@ -168544,10 +168860,14 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_core/src/ranges.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core/text-range-predicate-family-missing",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core/text-range-predicate-family-missing"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/debug",
@@ -168556,7 +168876,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/text.go",
       "id": "tsc/internal/core/text.go:TextRange.ContainedBy",
@@ -168571,7 +168891,7 @@
       "membership_reason": "core helpers and option semantics",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [
@@ -168581,10 +168901,14 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_core/src/ranges.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core/text-range-predicate-family-missing",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core/text-range-predicate-family-missing"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/debug",
@@ -168593,7 +168917,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/text.go",
       "id": "tsc/internal/core/text.go:TextRange.Contains",
@@ -168608,7 +168932,7 @@
       "membership_reason": "core helpers and option semantics",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [
@@ -168618,10 +168942,14 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_core/src/ranges.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core/text-range-predicate-family-missing",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core/text-range-predicate-family-missing"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/debug",
@@ -168630,7 +168958,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/text.go",
       "id": "tsc/internal/core/text.go:TextRange.ContainsExclusive",
@@ -168645,7 +168973,7 @@
       "membership_reason": "core helpers and option semantics",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [
@@ -168655,10 +168983,14 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_core/src/ranges.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core/text-range-predicate-family-missing",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core/text-range-predicate-family-missing"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/debug",
@@ -168667,7 +168999,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/text.go",
       "id": "tsc/internal/core/text.go:TextRange.ContainsInclusive",
@@ -168682,7 +169014,7 @@
       "membership_reason": "core helpers and option semantics",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [
@@ -168695,11 +169027,12 @@
       "annotated_home": [
         "crates/tsr_core/src/lib.rs"
       ],
-      "basis": "witnessed by 2 exact link(s): leaves/core/text-range-int32-narrowing, leaves/core/text-range-len-wraparound",
+      "basis": "witnessed by 3 exact link(s): leaves/core/text-range-int32-narrowing, leaves/core/text-range-len-wraparound, leaves/core/text-range-predicate-family-missing",
       "basis_kind": "rule",
       "cases": [
         "leaves/core/text-range-int32-narrowing",
-        "leaves/core/text-range-len-wraparound"
+        "leaves/core/text-range-len-wraparound",
+        "leaves/core/text-range-predicate-family-missing"
       ],
       "depends_on": [
         "internal/collections",
@@ -168734,10 +169067,14 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_core/src/ranges.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core/text-range-predicate-family-missing",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core/text-range-predicate-family-missing"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/debug",
@@ -168746,7 +169083,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/text.go",
       "id": "tsc/internal/core/text.go:TextRange.Intersects",
@@ -168761,7 +169098,7 @@
       "membership_reason": "core helpers and option semantics",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [
@@ -168771,8 +169108,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core/text-range-predicate-family-missing; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/ranges.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core/text-range-predicate-family-missing",
       "basis_kind": "rule",
       "cases": [
         "leaves/core/text-range-predicate-family-missing"
@@ -168785,7 +169124,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/text.go",
       "id": "tsc/internal/core/text.go:TextRange.IsValid",
@@ -168852,10 +169191,14 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_core/src/ranges.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core/text-range-predicate-family-missing",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core/text-range-predicate-family-missing"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/debug",
@@ -168864,7 +169207,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/text.go",
       "id": "tsc/internal/core/text.go:TextRange.Overlaps",
@@ -168879,7 +169222,7 @@
       "membership_reason": "core helpers and option semantics",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [
@@ -168892,11 +169235,12 @@
       "annotated_home": [
         "crates/tsr_core/src/lib.rs"
       ],
-      "basis": "witnessed by 2 exact link(s): leaves/core/text-range-int32-narrowing, leaves/core/text-range-len-wraparound",
+      "basis": "witnessed by 3 exact link(s): leaves/core/text-range-int32-narrowing, leaves/core/text-range-len-wraparound, leaves/core/text-range-predicate-family-missing",
       "basis_kind": "rule",
       "cases": [
         "leaves/core/text-range-int32-narrowing",
-        "leaves/core/text-range-len-wraparound"
+        "leaves/core/text-range-len-wraparound",
+        "leaves/core/text-range-predicate-family-missing"
       ],
       "depends_on": [
         "internal/collections",
@@ -168931,10 +169275,14 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_core/src/ranges.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core/text-range-predicate-family-missing",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core/text-range-predicate-family-missing"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/debug",
@@ -168943,7 +169291,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/text.go",
       "id": "tsc/internal/core/text.go:TextRange.WithEnd",
@@ -168958,7 +169306,7 @@
       "membership_reason": "core helpers and option semantics",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [
@@ -168968,10 +169316,14 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_core/src/ranges.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core/text-range-predicate-family-missing",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core/text-range-predicate-family-missing"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/debug",
@@ -168980,7 +169332,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/text.go",
       "id": "tsc/internal/core/text.go:TextRange.WithPos",
@@ -168995,7 +169347,7 @@
       "membership_reason": "core helpers and option semantics",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [
@@ -169005,10 +169357,14 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_core/src/ranges.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core/text-range-predicate-family-missing",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core/text-range-predicate-family-missing"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/debug",
@@ -169017,7 +169373,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/text.go",
       "id": "tsc/internal/core/text.go:UndefinedTextRange",
@@ -169032,7 +169388,7 @@
       "membership_reason": "core helpers and option semantics",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [
@@ -169375,8 +169731,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core/tristate-marshal-json; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/lib.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core/tristate-marshal-json",
       "basis_kind": "rule",
       "cases": [
         "leaves/core/tristate-marshal-json"
@@ -169389,7 +169747,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/tristate.go",
       "id": "tsc/internal/core/tristate.go:Tristate.MarshalJSON",
@@ -169412,8 +169770,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core/tristate-unmarshal-json; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/lib.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/core/tristate-unmarshal-json",
       "basis_kind": "rule",
       "cases": [
         "leaves/core/tristate-unmarshal-json"
@@ -169426,7 +169786,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/tristate.go",
       "id": "tsc/internal/core/tristate.go:Tristate.UnmarshalJSON",
@@ -169450,7 +169810,7 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core/tristate-stringer-domain; witnessed by 1 prepared case(s)",
+      "basis": "witnessed by 1 exact link(s): leaves/core/tristate-stringer-domain",
       "basis_kind": "rule",
       "cases": [
         "leaves/core/tristate-stringer-domain"
@@ -169463,7 +169823,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/tristate_stringer_generated.go",
       "id": "tsc/internal/core/tristate_stringer_generated.go:Tristate.String",
@@ -170091,8 +170451,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/diagnostics/category-name; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_diagnostics/src/lib.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/diagnostics/category-name",
       "basis_kind": "rule",
       "cases": [
         "leaves/diagnostics/category-name"
@@ -170105,7 +170467,7 @@
         "internal/locale"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/diagnostics",
       "go_source": "tsc/internal/diagnostics/diagnostics.go",
       "id": "tsc/internal/diagnostics/diagnostics.go:Category.Name",
@@ -170127,9 +170489,9 @@
     {
       "actual_home": null,
       "annotated_home": [
-        "crates/tsr_compiler/src/diagnostic_writer/mod.rs"
+        "crates/tsr_diagnostics/src/format.rs"
       ],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/diagnostics/format-invalid-utf8-arguments, leaves/diagnostics/format-missing-argument, leaves/diagnostics/format-multiline-and-control-arguments; witnessed by 6 prepared case(s)",
+      "basis": "witnessed by 6 exact link(s): leaves/diagnostics/format-invalid-utf8-arguments, leaves/diagnostics/format-missing-argument, leaves/diagnostics/format-multiline-and-control-arguments",
       "basis_kind": "rule",
       "cases": [
         "leaves/diagnostics/format-invalid-utf8-arguments",
@@ -170147,7 +170509,7 @@
         "internal/locale"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/diagnostics",
       "go_source": "tsc/internal/diagnostics/diagnostics.go",
       "id": "tsc/internal/diagnostics/diagnostics.go:Format",
@@ -170168,8 +170530,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/diagnostics/localize-by-key, leaves/diagnostics/localize-english-and-absent-locale, leaves/diagnostics/localize-missing-translation-key; witnessed by 8 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_diagnostics/src/localize.rs"
+      ],
+      "basis": "witnessed by 11 exact link(s): leaves/diagnostics/localize-by-key, leaves/diagnostics/localize-english-and-absent-locale, leaves/diagnostics/localize-missing-translation-key",
       "basis_kind": "rule",
       "cases": [
         "leaves/diagnostics/localize-by-key",
@@ -170178,7 +170542,10 @@
         "leaves/diagnostics/localize-shipped-tables",
         "leaves/diagnostics/localize-shipped-tables-with-argument",
         "leaves/diagnostics/localize-unknown-message",
+        "leaves/locale/default-cold-process",
+        "leaves/locale/translation-fallback-matching",
         "leaves/locale/translation-missing-key-english-fallback",
+        "leaves/locale/translation-repeated-and-changed",
         "leaves/locale/translation-shipped-locales"
       ],
       "depends_on": [
@@ -170189,7 +170556,7 @@
         "internal/locale"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/diagnostics",
       "go_source": "tsc/internal/diagnostics/diagnostics.go",
       "id": "tsc/internal/diagnostics/diagnostics.go:Localize",
@@ -170248,12 +170615,13 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "witnessed by 3 exact link(s): leaves/diagnostics/identity-code-bounds, leaves/diagnostics/identity-flags, leaves/diagnostics/identity-roster-fingerprint",
+      "basis": "witnessed by 4 exact link(s): leaves/diagnostics/identity-code-bounds, leaves/diagnostics/identity-flags, leaves/diagnostics/identity-roster-fingerprint",
       "basis_kind": "rule",
       "cases": [
         "leaves/diagnostics/identity-code-bounds",
         "leaves/diagnostics/identity-flags",
-        "leaves/diagnostics/identity-roster-fingerprint"
+        "leaves/diagnostics/identity-roster-fingerprint",
+        "leaves/locale/translation-placeholder-order"
       ],
       "depends_on": [
         "internal/collections",
@@ -170356,8 +170724,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/diagnostics/localize-argument-repair-through-message, leaves/locale/translation-placeholder-order; witnessed by 2 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_diagnostics/src/localize.rs"
+      ],
+      "basis": "witnessed by 2 exact link(s): leaves/diagnostics/localize-argument-repair-through-message, leaves/locale/translation-placeholder-order",
       "basis_kind": "rule",
       "cases": [
         "leaves/diagnostics/localize-argument-repair-through-message",
@@ -170371,7 +170741,7 @@
         "internal/locale"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/diagnostics",
       "go_source": "tsc/internal/diagnostics/diagnostics.go",
       "id": "tsc/internal/diagnostics/diagnostics.go:Message.Localize",
@@ -170500,8 +170870,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/diagnostics/adhoc-message; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_diagnostics/src/localize.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/diagnostics/adhoc-message",
       "basis_kind": "rule",
       "cases": [
         "leaves/diagnostics/adhoc-message"
@@ -170514,7 +170886,7 @@
         "internal/locale"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/diagnostics",
       "go_source": "tsc/internal/diagnostics/diagnostics.go",
       "id": "tsc/internal/diagnostics/diagnostics.go:NewAdHocMessage",
@@ -170535,8 +170907,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/diagnostics/stringify-argument-kinds; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_diagnostics/src/format.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/diagnostics/stringify-argument-kinds",
       "basis_kind": "rule",
       "cases": [
         "leaves/diagnostics/stringify-argument-kinds"
@@ -170549,7 +170923,7 @@
         "internal/locale"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/diagnostics",
       "go_source": "tsc/internal/diagnostics/diagnostics.go",
       "id": "tsc/internal/diagnostics/diagnostics.go:StringifyArgs",
@@ -170570,8 +170944,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/diagnostics/localize-cache-repeat, leaves/diagnostics/localize-fallback-choice, leaves/locale/translation-fallback-matching; witnessed by 4 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_diagnostics/src/localize.rs"
+      ],
+      "basis": "witnessed by 4 exact link(s): leaves/diagnostics/localize-cache-repeat, leaves/diagnostics/localize-fallback-choice, leaves/locale/translation-fallback-matching",
       "basis_kind": "rule",
       "cases": [
         "leaves/diagnostics/localize-cache-repeat",
@@ -170587,7 +170963,7 @@
         "internal/locale"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/diagnostics",
       "go_source": "tsc/internal/diagnostics/diagnostics.go",
       "id": "tsc/internal/diagnostics/diagnostics.go:getLocalizedMessages",
@@ -170609,7 +170985,7 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "witnessed by 2 exact link(s): leaves/diagnostics/identity-roster-fingerprint, leaves/diagnostics/identity-unknown-keys",
+      "basis": "witnessed by 3 exact link(s): leaves/diagnostics/identity-invalid-byte-key, leaves/diagnostics/identity-roster-fingerprint, leaves/diagnostics/identity-unknown-keys",
       "basis_kind": "rule",
       "cases": [
         "leaves/diagnostics/identity-invalid-byte-key",
@@ -170849,7 +171225,7 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/diagnostics/localize-table-coverage; witnessed by 1 prepared case(s)",
+      "basis": "witnessed by 1 exact link(s): leaves/diagnostics/localize-table-coverage",
       "basis_kind": "rule",
       "cases": [
         "leaves/diagnostics/localize-table-coverage"
@@ -170862,7 +171238,7 @@
         "internal/locale"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/diagnostics",
       "go_source": "tsc/internal/diagnostics/loc_generated.go",
       "id": "tsc/internal/diagnostics/loc_generated.go:loadLocaleData",
@@ -170884,7 +171260,7 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/diagnostics/category-stringer; witnessed by 1 prepared case(s)",
+      "basis": "witnessed by 1 exact link(s): leaves/diagnostics/category-stringer",
       "basis_kind": "rule",
       "cases": [
         "leaves/diagnostics/category-stringer"
@@ -170897,7 +171273,7 @@
         "internal/locale"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/diagnostics",
       "go_source": "tsc/internal/diagnostics/stringer_generated.go",
       "id": "tsc/internal/diagnostics/stringer_generated.go:Category.String",
@@ -173024,17 +173400,21 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_jsnum/src/arithmetic.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/text/jsnum-classifiers-and-rounding",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/jsnum-classifiers-and-rounding"
+      ],
       "depends_on": [
         "internal/json",
         "internal/stringutil",
         "internal/testutil/jstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/jsnum",
       "go_source": "tsc/internal/jsnum/jsnum.go",
       "id": "tsc/internal/jsnum/jsnum.go:Inf",
@@ -173047,7 +173427,7 @@
       "membership_reason": "number semantics",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -173055,17 +173435,21 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_jsnum/src/arithmetic.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/text/jsnum-classifiers-and-rounding",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/jsnum-classifiers-and-rounding"
+      ],
       "depends_on": [
         "internal/json",
         "internal/stringutil",
         "internal/testutil/jstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/jsnum",
       "go_source": "tsc/internal/jsnum/jsnum.go",
       "id": "tsc/internal/jsnum/jsnum.go:NaN",
@@ -173078,7 +173462,7 @@
       "membership_reason": "number semantics",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -173086,17 +173470,21 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_jsnum/src/arithmetic.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/text/jsnum-classifiers-and-rounding",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/jsnum-classifiers-and-rounding"
+      ],
       "depends_on": [
         "internal/json",
         "internal/stringutil",
         "internal/testutil/jstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/jsnum",
       "go_source": "tsc/internal/jsnum/jsnum.go",
       "id": "tsc/internal/jsnum/jsnum.go:Number.Abs",
@@ -173109,7 +173497,7 @@
       "membership_reason": "number semantics",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -173292,8 +173680,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/text/jsnum-classifiers-and-rounding; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_jsnum/src/arithmetic.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/text/jsnum-classifiers-and-rounding",
       "basis_kind": "rule",
       "cases": [
         "leaves/text/jsnum-classifiers-and-rounding"
@@ -173304,7 +173694,7 @@
         "internal/testutil/jstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/jsnum",
       "go_source": "tsc/internal/jsnum/jsnum.go",
       "id": "tsc/internal/jsnum/jsnum.go:Number.Floor",
@@ -173325,17 +173715,21 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_jsnum/src/arithmetic.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/text/jsnum-classifiers-and-rounding",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/jsnum-classifiers-and-rounding"
+      ],
       "depends_on": [
         "internal/json",
         "internal/stringutil",
         "internal/testutil/jstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/jsnum",
       "go_source": "tsc/internal/jsnum/jsnum.go",
       "id": "tsc/internal/jsnum/jsnum.go:Number.IsInf",
@@ -173348,7 +173742,7 @@
       "membership_reason": "number semantics",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -173356,17 +173750,21 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_jsnum/src/arithmetic.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/text/jsnum-classifiers-and-rounding",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/jsnum-classifiers-and-rounding"
+      ],
       "depends_on": [
         "internal/json",
         "internal/stringutil",
         "internal/testutil/jstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/jsnum",
       "go_source": "tsc/internal/jsnum/jsnum.go",
       "id": "tsc/internal/jsnum/jsnum.go:Number.IsNaN",
@@ -173379,7 +173777,7 @@
       "membership_reason": "number semantics",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -173565,16 +173963,18 @@
       "annotated_home": [
         "crates/tsr_jsnum/src/arithmetic.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): leaves/text/jsnum-classifiers-and-rounding",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/jsnum-classifiers-and-rounding"
+      ],
       "depends_on": [
         "internal/json",
         "internal/stringutil",
         "internal/testutil/jstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/jsnum",
       "go_source": "tsc/internal/jsnum/jsnum.go",
       "id": "tsc/internal/jsnum/jsnum.go:Number.toShiftCount",
@@ -173587,7 +173987,7 @@
       "membership_reason": "number semantics",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -173630,17 +174030,21 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_jsnum/src/arithmetic.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/text/jsnum-classifiers-and-rounding",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/jsnum-classifiers-and-rounding"
+      ],
       "depends_on": [
         "internal/json",
         "internal/stringutil",
         "internal/testutil/jstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/jsnum",
       "go_source": "tsc/internal/jsnum/jsnum.go",
       "id": "tsc/internal/jsnum/jsnum.go:Number.trunc",
@@ -173653,7 +174057,7 @@
       "membership_reason": "number semantics",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -173661,17 +174065,21 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_jsnum/src/arithmetic.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/text/jsnum-classifiers-and-rounding",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/jsnum-classifiers-and-rounding"
+      ],
       "depends_on": [
         "internal/json",
         "internal/stringutil",
         "internal/testutil/jstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/jsnum",
       "go_source": "tsc/internal/jsnum/jsnum.go",
       "id": "tsc/internal/jsnum/jsnum.go:isNonFinite",
@@ -173684,7 +174092,7 @@
       "membership_reason": "number semantics",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -173772,8 +174180,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/text/pseudo-bigint-sign-and-valid; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_jsnum/src/pseudobigint.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/text/pseudo-bigint-sign-and-valid",
       "basis_kind": "rule",
       "cases": [
         "leaves/text/pseudo-bigint-sign-and-valid"
@@ -173784,7 +174194,7 @@
         "internal/testutil/jstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/jsnum",
       "go_source": "tsc/internal/jsnum/pseudobigint.go",
       "id": "tsc/internal/jsnum/pseudobigint.go:ParseValidBigInt",
@@ -173810,17 +174220,21 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_jsnum/src/pseudobigint.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/text/pseudo-bigint-sign-and-valid",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/pseudo-bigint-sign-and-valid"
+      ],
       "depends_on": [
         "internal/json",
         "internal/stringutil",
         "internal/testutil/jstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/jsnum",
       "go_source": "tsc/internal/jsnum/pseudobigint.go",
       "id": "tsc/internal/jsnum/pseudobigint.go:PseudoBigInt.Sign",
@@ -173835,7 +174249,7 @@
       "membership_reason": "number semantics",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [
@@ -173849,10 +174263,11 @@
       "annotated_home": [
         "crates/tsr_jsnum/src/pseudobigint.rs"
       ],
-      "basis": "witnessed by 1 exact link(s): leaves/text/pseudo-bigint-parse",
+      "basis": "witnessed by 2 exact link(s): leaves/text/pseudo-bigint-parse, leaves/text/pseudo-bigint-sign-and-valid",
       "basis_kind": "rule",
       "cases": [
-        "leaves/text/pseudo-bigint-parse"
+        "leaves/text/pseudo-bigint-parse",
+        "leaves/text/pseudo-bigint-sign-and-valid"
       ],
       "depends_on": [
         "internal/json",
@@ -174448,7 +174863,7 @@
     {
       "actual_home": "no dedicated Rust home; order-sensitive readers live in their consumers",
       "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/json/marshal-raw-duplicate-names-allowed, leaves/json/unmarshal-duplicate-names-allowed; witnessed by 2 prepared case(s)",
+      "basis": "witnessed by 2 exact link(s): leaves/json/marshal-raw-duplicate-names-allowed, leaves/json/unmarshal-duplicate-names-allowed",
       "basis_kind": "rule",
       "cases": [
         "leaves/json/marshal-raw-duplicate-names-allowed",
@@ -174456,7 +174871,7 @@
       ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/json",
       "go_source": "tsc/internal/json/json.go",
       "id": "tsc/internal/json/json.go:AllowDuplicateNames",
@@ -174513,10 +174928,13 @@
       "annotated_home": [
         "crates/tsr_json/src/lib.rs"
       ],
-      "basis": "witnessed by 3 exact link(s): leaves/json/marshal-float-edge-values, leaves/json/marshal-string-invalid-utf8-byte, leaves/json/marshal-struct-missing-null-empty",
+      "basis": "witnessed by 12 exact link(s): leaves/json/marshal-exact-integers, leaves/json/marshal-float-edge-values, leaves/json/marshal-heterogeneous-integers",
       "basis_kind": "rule",
       "cases": [
+        "leaves/json/marshal-exact-integers",
         "leaves/json/marshal-float-edge-values",
+        "leaves/json/marshal-heterogeneous-integers",
+        "leaves/json/marshal-partial-failure",
         "leaves/json/marshal-raw-duplicate-names",
         "leaves/json/marshal-raw-escapes",
         "leaves/json/marshal-raw-invalid-utf8-byte",
@@ -174552,8 +174970,10 @@
     },
     {
       "actual_home": "no dedicated Rust home; order-sensitive readers live in their consumers",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/json/marshal-encode-inside-object-name, leaves/json/marshal-encode-successive-values; witnessed by 2 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_json/src/lib.rs"
+      ],
+      "basis": "witnessed by 2 exact link(s): leaves/json/marshal-encode-inside-object-name, leaves/json/marshal-encode-successive-values",
       "basis_kind": "rule",
       "cases": [
         "leaves/json/marshal-encode-inside-object-name",
@@ -174561,7 +174981,7 @@
       ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/json",
       "go_source": "tsc/internal/json/json.go",
       "id": "tsc/internal/json/json.go:MarshalEncode",
@@ -174587,14 +175007,14 @@
       "annotated_home": [
         "crates/tsr_json/src/lib.rs"
       ],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/json/marshal-indent-empty-is-compact; witnessed by 1 prepared case(s)",
+      "basis": "witnessed by 1 exact link(s): leaves/json/marshal-indent-empty-is-compact",
       "basis_kind": "rule",
       "cases": [
         "leaves/json/marshal-indent-empty-is-compact"
       ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/json",
       "go_source": "tsc/internal/json/json.go",
       "id": "tsc/internal/json/json.go:MarshalIndent",
@@ -174617,15 +175037,17 @@
     },
     {
       "actual_home": "no dedicated Rust home; order-sensitive readers live in their consumers",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/json/marshal-indent-write-fork; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_json/src/lib.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/json/marshal-indent-write-fork",
       "basis_kind": "rule",
       "cases": [
         "leaves/json/marshal-indent-write-fork"
       ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/json",
       "go_source": "tsc/internal/json/json.go",
       "id": "tsc/internal/json/json.go:MarshalIndentWrite",
@@ -174648,15 +175070,17 @@
     },
     {
       "actual_home": "no dedicated Rust home; order-sensitive readers live in their consumers",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/json/marshal-write-deterministic; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_json/src/lib.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/json/marshal-write-deterministic",
       "basis_kind": "rule",
       "cases": [
         "leaves/json/marshal-write-deterministic"
       ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/json",
       "go_source": "tsc/internal/json/json.go",
       "id": "tsc/internal/json/json.go:MarshalWrite",
@@ -174680,7 +175104,7 @@
     {
       "actual_home": "no dedicated Rust home; order-sensitive readers live in their consumers",
       "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/json/decoder-raw-name-token-walk, leaves/json/decoder-truncated-stream-position; witnessed by 2 prepared case(s)",
+      "basis": "witnessed by 2 exact link(s): leaves/json/decoder-raw-name-token-walk, leaves/json/decoder-truncated-stream-position",
       "basis_kind": "rule",
       "cases": [
         "leaves/json/decoder-raw-name-token-walk",
@@ -174688,7 +175112,7 @@
       ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/json",
       "go_source": "tsc/internal/json/json.go",
       "id": "tsc/internal/json/json.go:NewDecoder",
@@ -174711,8 +175135,10 @@
     },
     {
       "actual_home": "no dedicated Rust home; order-sensitive readers live in their consumers",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/json/unmarshal-duplicate-escaped-name, leaves/json/unmarshal-duplicate-names-rejected, leaves/json/unmarshal-invalid-utf8-byte-rejected; witnessed by 8 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_json/src/decode.rs"
+      ],
+      "basis": "witnessed by 8 exact link(s): leaves/json/unmarshal-duplicate-escaped-name, leaves/json/unmarshal-duplicate-names-rejected, leaves/json/unmarshal-invalid-utf8-byte-rejected",
       "basis_kind": "rule",
       "cases": [
         "leaves/json/unmarshal-duplicate-escaped-name",
@@ -174726,7 +175152,7 @@
       ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/json",
       "go_source": "tsc/internal/json/json.go",
       "id": "tsc/internal/json/json.go:Unmarshal",
@@ -174749,15 +175175,17 @@
     },
     {
       "actual_home": "no dedicated Rust home; order-sensitive readers live in their consumers",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/json/decoder-unmarshal-decode-stream; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_json/src/decode.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/json/decoder-unmarshal-decode-stream",
       "basis_kind": "rule",
       "cases": [
         "leaves/json/decoder-unmarshal-decode-stream"
       ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/json",
       "go_source": "tsc/internal/json/json.go",
       "id": "tsc/internal/json/json.go:UnmarshalDecode",
@@ -174780,15 +175208,17 @@
     },
     {
       "actual_home": "no dedicated Rust home; order-sensitive readers live in their consumers",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/json/unmarshal-read-chunk-boundaries; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_json/src/decode.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/json/unmarshal-read-chunk-boundaries",
       "basis_kind": "rule",
       "cases": [
         "leaves/json/unmarshal-read-chunk-boundaries"
       ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/json",
       "go_source": "tsc/internal/json/json.go",
       "id": "tsc/internal/json/json.go:UnmarshalRead",
@@ -174812,14 +175242,14 @@
     {
       "actual_home": "no dedicated Rust home; order-sensitive readers live in their consumers",
       "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/json/marshal-with-indent-option; witnessed by 1 prepared case(s)",
+      "basis": "witnessed by 1 exact link(s): leaves/json/marshal-with-indent-option",
       "basis_kind": "rule",
       "cases": [
         "leaves/json/marshal-with-indent-option"
       ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/json",
       "go_source": "tsc/internal/json/json.go",
       "id": "tsc/internal/json/json.go:WithIndent",
@@ -174842,13 +175272,18 @@
     },
     {
       "actual_home": "no Rust home at this pin",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (no Rust home at this pin)",
+      "annotated_home": [
+        "crates/tsr_locale/src/lib.rs"
+      ],
+      "basis": "witnessed by 2 exact link(s): leaves/locale/context-absent-explicit-and-default, leaves/locale/default-cold-process",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/locale/context-absent-explicit-and-default",
+        "leaves/locale/default-cold-process"
+      ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/locale",
       "go_source": "tsc/internal/locale/locale.go",
       "id": "tsc/internal/locale/locale.go:FromContext",
@@ -174861,7 +175296,7 @@
       "membership_reason": "locale parse, canonicalization and fallback",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -174869,13 +175304,18 @@
     },
     {
       "actual_home": "no Rust home at this pin",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (no Rust home at this pin)",
+      "annotated_home": [
+        "crates/tsr_locale/src/lib.rs"
+      ],
+      "basis": "witnessed by 2 exact link(s): leaves/locale/context-absent-explicit-and-default, leaves/locale/default-cold-process",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/locale/context-absent-explicit-and-default",
+        "leaves/locale/default-cold-process"
+      ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/locale",
       "go_source": "tsc/internal/locale/locale.go",
       "id": "tsc/internal/locale/locale.go:HasLocale",
@@ -174888,7 +175328,7 @@
       "membership_reason": "locale parse, canonicalization and fallback",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -174896,16 +175336,28 @@
     },
     {
       "actual_home": "no Rust home at this pin",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/locale/default-cold-process, leaves/locale/string-default-sentinel; witnessed by 2 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_locale/src/lib.rs"
+      ],
+      "basis": "witnessed by 12 exact link(s): leaves/locale/context-absent-explicit-and-default, leaves/locale/default-cold-process, leaves/locale/parse-aliases-and-legacy-tags",
       "basis_kind": "rule",
       "cases": [
+        "leaves/locale/context-absent-explicit-and-default",
         "leaves/locale/default-cold-process",
-        "leaves/locale/string-default-sentinel"
+        "leaves/locale/parse-aliases-and-legacy-tags",
+        "leaves/locale/parse-case-script-region-variants",
+        "leaves/locale/parse-malformed-and-unsupported",
+        "leaves/locale/parse-shipped-tags",
+        "leaves/locale/string-default-sentinel",
+        "leaves/locale/translation-fallback-matching",
+        "leaves/locale/translation-missing-key-english-fallback",
+        "leaves/locale/translation-placeholder-order",
+        "leaves/locale/translation-repeated-and-changed",
+        "leaves/locale/translation-shipped-locales"
       ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/locale",
       "go_source": "tsc/internal/locale/locale.go",
       "id": "tsc/internal/locale/locale.go:Locale.String",
@@ -174926,19 +175378,29 @@
     },
     {
       "actual_home": "no Rust home at this pin",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/locale/parse-aliases-and-legacy-tags, leaves/locale/parse-case-script-region-variants, leaves/locale/parse-malformed-and-unsupported; witnessed by 5 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_locale/src/lib.rs"
+      ],
+      "basis": "witnessed by 12 exact link(s): leaves/locale/context-absent-explicit-and-default, leaves/locale/default-cold-process, leaves/locale/parse-aliases-and-legacy-tags",
       "basis_kind": "rule",
       "cases": [
+        "leaves/locale/context-absent-explicit-and-default",
+        "leaves/locale/default-cold-process",
         "leaves/locale/parse-aliases-and-legacy-tags",
         "leaves/locale/parse-case-script-region-variants",
         "leaves/locale/parse-malformed-and-unsupported",
         "leaves/locale/parse-shipped-tags",
+        "leaves/locale/string-default-sentinel",
+        "leaves/locale/translation-fallback-matching",
+        "leaves/locale/translation-missing-key-english-fallback",
+        "leaves/locale/translation-placeholder-order",
+        "leaves/locale/translation-repeated-and-changed",
+        "leaves/locale/translation-shipped-locales",
         "pilot/locale/select-ja"
       ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/locale",
       "go_source": "tsc/internal/locale/locale.go",
       "id": "tsc/internal/locale/locale.go:Parse",
@@ -174959,15 +175421,17 @@
     },
     {
       "actual_home": "no Rust home at this pin",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/locale/context-absent-explicit-and-default; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_locale/src/lib.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/locale/context-absent-explicit-and-default",
       "basis_kind": "rule",
       "cases": [
         "leaves/locale/context-absent-explicit-and-default"
       ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/locale",
       "go_source": "tsc/internal/locale/locale.go",
       "id": "tsc/internal/locale/locale.go:WithLocale",
@@ -226150,15 +226614,18 @@
     },
     {
       "actual_home": "tsr_jsstring",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/text/string-comparers; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_jsstring/src/compare.rs"
+      ],
+      "basis": "witnessed by 2 exact link(s): leaves/text/eslint-comparer-lowercases, leaves/text/string-comparers",
       "basis_kind": "rule",
       "cases": [
+        "leaves/text/eslint-comparer-lowercases",
         "leaves/text/string-comparers"
       ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/stringutil",
       "go_source": "tsc/internal/stringutil/compare.go",
       "id": "tsc/internal/stringutil/compare.go:CompareStringsCaseInsensitive",
@@ -226179,15 +226646,17 @@
     },
     {
       "actual_home": "tsr_jsstring",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/text/eslint-comparer-lowercases; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_jsstring/src/compare.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/text/eslint-comparer-lowercases",
       "basis_kind": "rule",
       "cases": [
         "leaves/text/eslint-comparer-lowercases"
       ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/stringutil",
       "go_source": "tsc/internal/stringutil/compare.go",
       "id": "tsc/internal/stringutil/compare.go:CompareStringsCaseInsensitiveEslintCompatible",
@@ -226208,13 +226677,17 @@
     },
     {
       "actual_home": "tsr_jsstring",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_jsstring)",
+      "annotated_home": [
+        "crates/tsr_jsstring/src/compare.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/text/string-comparers",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/string-comparers"
+      ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/stringutil",
       "go_source": "tsc/internal/stringutil/compare.go",
       "id": "tsc/internal/stringutil/compare.go:CompareStringsCaseInsensitiveThenSensitive",
@@ -226227,7 +226700,7 @@
       "membership_reason": "string helpers; actual home is tsr_jsstring",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -226235,13 +226708,18 @@
     },
     {
       "actual_home": "tsr_jsstring",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_jsstring)",
+      "annotated_home": [
+        "crates/tsr_jsstring/src/compare.rs"
+      ],
+      "basis": "witnessed by 2 exact link(s): leaves/text/eslint-comparer-lowercases, leaves/text/string-comparers",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/eslint-comparer-lowercases",
+        "leaves/text/string-comparers"
+      ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/stringutil",
       "go_source": "tsc/internal/stringutil/compare.go",
       "id": "tsc/internal/stringutil/compare.go:CompareStringsCaseSensitive",
@@ -226254,7 +226732,7 @@
       "membership_reason": "string helpers; actual home is tsr_jsstring",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -226263,10 +226741,11 @@
     {
       "actual_home": "tsr_jsstring",
       "annotated_home": [],
-      "basis": "witnessed by 1 exact link(s): leaves/text/equate-case-insensitive-fold",
+      "basis": "witnessed by 2 exact link(s): leaves/text/equate-case-insensitive-fold, leaves/text/string-comparers",
       "basis_kind": "rule",
       "cases": [
-        "leaves/text/equate-case-insensitive-fold"
+        "leaves/text/equate-case-insensitive-fold",
+        "leaves/text/string-comparers"
       ],
       "depends_on": [],
       "destination_phase": 1,
@@ -226291,13 +226770,17 @@
     },
     {
       "actual_home": "tsr_jsstring",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_jsstring)",
+      "annotated_home": [
+        "crates/tsr_jsstring/src/compare.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/text/string-comparers",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/string-comparers"
+      ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/stringutil",
       "go_source": "tsc/internal/stringutil/compare.go",
       "id": "tsc/internal/stringutil/compare.go:EquateStringCaseSensitive",
@@ -226310,7 +226793,7 @@
       "membership_reason": "string helpers; actual home is tsr_jsstring",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -226318,13 +226801,17 @@
     },
     {
       "actual_home": "tsr_jsstring",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_jsstring)",
+      "annotated_home": [
+        "crates/tsr_jsstring/src/compare.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/text/string-comparers",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/string-comparers"
+      ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/stringutil",
       "go_source": "tsc/internal/stringutil/compare.go",
       "id": "tsc/internal/stringutil/compare.go:GetStringComparer",
@@ -226337,7 +226824,7 @@
       "membership_reason": "string helpers; actual home is tsr_jsstring",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -226345,13 +226832,17 @@
     },
     {
       "actual_home": "tsr_jsstring",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_jsstring)",
+      "annotated_home": [
+        "crates/tsr_jsstring/src/compare.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/text/string-comparers",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/string-comparers"
+      ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/stringutil",
       "go_source": "tsc/internal/stringutil/compare.go",
       "id": "tsc/internal/stringutil/compare.go:GetStringEqualityComparer",
@@ -226364,7 +226855,7 @@
       "membership_reason": "string helpers; actual home is tsr_jsstring",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -226372,15 +226863,17 @@
     },
     {
       "actual_home": "tsr_jsstring",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/text/prefix-suffix-byte-window; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_jsstring/src/compare.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/text/prefix-suffix-byte-window",
       "basis_kind": "rule",
       "cases": [
         "leaves/text/prefix-suffix-byte-window"
       ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/stringutil",
       "go_source": "tsc/internal/stringutil/compare.go",
       "id": "tsc/internal/stringutil/compare.go:HasPrefix",
@@ -226401,13 +226894,17 @@
     },
     {
       "actual_home": "tsr_jsstring",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_jsstring)",
+      "annotated_home": [
+        "crates/tsr_jsstring/src/compare.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/text/prefix-suffix-byte-window",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/prefix-suffix-byte-window"
+      ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/stringutil",
       "go_source": "tsc/internal/stringutil/compare.go",
       "id": "tsc/internal/stringutil/compare.go:HasPrefixAndSuffixWithoutOverlap",
@@ -226420,7 +226917,7 @@
       "membership_reason": "string helpers; actual home is tsr_jsstring",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -226428,13 +226925,17 @@
     },
     {
       "actual_home": "tsr_jsstring",
-      "annotated_home": [],
-      "basis": "unmapped in the audit input, but `has_suffix` is defined at crates/tsr_compiler/src/metadata.rs; needs a behavioral witness to become covered",
+      "annotated_home": [
+        "crates/tsr_jsstring/src/compare.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/text/prefix-suffix-byte-window",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/prefix-suffix-byte-window"
+      ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/stringutil",
       "go_source": "tsc/internal/stringutil/compare.go",
       "id": "tsc/internal/stringutil/compare.go:HasSuffix",
@@ -226447,7 +226948,7 @@
       "membership_reason": "string helpers; actual home is tsr_jsstring",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -226455,13 +226956,17 @@
     },
     {
       "actual_home": "tsr_jsstring",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_jsstring)",
+      "annotated_home": [
+        "crates/tsr_jsstring/src/identifier.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/text/unicode-identifier-predicates",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/unicode-identifier-predicates"
+      ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/stringutil",
       "go_source": "tsc/internal/stringutil/identifier.go",
       "id": "tsc/internal/stringutil/identifier.go:IsUnicodeIdentifierPart",
@@ -226474,7 +226979,7 @@
       "membership_reason": "string helpers; actual home is tsr_jsstring",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [],
@@ -226482,15 +226987,17 @@
     },
     {
       "actual_home": "tsr_jsstring",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/text/unicode-identifier-predicates; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_jsstring/src/identifier.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/text/unicode-identifier-predicates",
       "basis_kind": "rule",
       "cases": [
         "leaves/text/unicode-identifier-predicates"
       ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/stringutil",
       "go_source": "tsc/internal/stringutil/identifier.go",
       "id": "tsc/internal/stringutil/identifier.go:IsUnicodeIdentifierStart",
@@ -226793,13 +227300,17 @@
     },
     {
       "actual_home": "tsr_jsstring",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_jsstring)",
+      "annotated_home": [
+        "crates/tsr_jsstring/src/text.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/text/byte-order-marks",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/byte-order-marks"
+      ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/stringutil",
       "go_source": "tsc/internal/stringutil/util.go",
       "id": "tsc/internal/stringutil/util.go:AddUTF8ByteOrderMark",
@@ -226814,7 +227325,7 @@
       "membership_reason": "string helpers; actual home is tsr_jsstring",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [
@@ -226972,15 +227483,17 @@
     },
     {
       "actual_home": "tsr_jsstring",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/text/encode-uri; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_jsstring/src/text.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/text/encode-uri",
       "basis_kind": "rule",
       "cases": [
         "leaves/text/encode-uri"
       ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/stringutil",
       "go_source": "tsc/internal/stringutil/util.go",
       "id": "tsc/internal/stringutil/util.go:EncodeURI",
@@ -227006,13 +227519,17 @@
     },
     {
       "actual_home": "tsr_jsstring",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_jsstring)",
+      "annotated_home": [
+        "crates/tsr_jsstring/src/text.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/text/line-splitting-and-indentation",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/line-splitting-and-indentation"
+      ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/stringutil",
       "go_source": "tsc/internal/stringutil/util.go",
       "id": "tsc/internal/stringutil/util.go:GuessIndentation",
@@ -227027,7 +227544,7 @@
       "membership_reason": "string helpers; actual home is tsr_jsstring",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [
@@ -227038,13 +227555,17 @@
     },
     {
       "actual_home": "tsr_jsstring",
-      "annotated_home": [],
-      "basis": "unmapped in the audit input, but `is_ascii_letter` is defined at crates/tsr_scanner/src/utilities.rs; needs a behavioral witness to become covered",
+      "annotated_home": [
+        "crates/tsr_jsstring/src/classify.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/text/character-classes",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/character-classes"
+      ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/stringutil",
       "go_source": "tsc/internal/stringutil/util.go",
       "id": "tsc/internal/stringutil/util.go:IsASCIILetter",
@@ -227059,7 +227580,7 @@
       "membership_reason": "string helpers; actual home is tsr_jsstring",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [
@@ -227070,13 +227591,17 @@
     },
     {
       "actual_home": "tsr_jsstring",
-      "annotated_home": [],
-      "basis": "unmapped in the audit input, but `is_digit` is defined at crates/tsr_scanner/src/utilities.rs; needs a behavioral witness to become covered",
+      "annotated_home": [
+        "crates/tsr_jsstring/src/classify.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/text/character-classes",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/character-classes"
+      ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/stringutil",
       "go_source": "tsc/internal/stringutil/util.go",
       "id": "tsc/internal/stringutil/util.go:IsDigit",
@@ -227091,7 +227616,7 @@
       "membership_reason": "string helpers; actual home is tsr_jsstring",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [
@@ -227102,13 +227627,17 @@
     },
     {
       "actual_home": "tsr_jsstring",
-      "annotated_home": [],
-      "basis": "unmapped in the audit input, but `is_hex_digit` is defined at crates/tsr_scanner/src/utilities.rs; needs a behavioral witness to become covered",
+      "annotated_home": [
+        "crates/tsr_jsstring/src/classify.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/text/character-classes",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/character-classes"
+      ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/stringutil",
       "go_source": "tsc/internal/stringutil/util.go",
       "id": "tsc/internal/stringutil/util.go:IsHexDigit",
@@ -227123,7 +227652,7 @@
       "membership_reason": "string helpers; actual home is tsr_jsstring",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [
@@ -227171,14 +227700,16 @@
     {
       "actual_home": "tsr_jsstring",
       "annotated_home": [
-        "crates/tsr_scanner/src/utilities.rs"
+        "crates/tsr_jsstring/src/classify.rs"
       ],
-      "basis": "ledger maps the symbol and its source file carries 1 file-level producer metric(s), which do not witness this operation individually",
+      "basis": "witnessed by 1 exact link(s): leaves/text/character-classes",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/character-classes"
+      ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/stringutil",
       "go_source": "tsc/internal/stringutil/util.go",
       "id": "tsc/internal/stringutil/util.go:IsLineBreak",
@@ -227193,7 +227724,7 @@
       "membership_reason": "string helpers; actual home is tsr_jsstring",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [
@@ -227240,13 +227771,17 @@
     },
     {
       "actual_home": "tsr_jsstring",
-      "annotated_home": [],
-      "basis": "unmapped in the audit input, but `is_octal_digit` is defined at crates/tsr_scanner/src/utilities.rs; needs a behavioral witness to become covered",
+      "annotated_home": [
+        "crates/tsr_jsstring/src/classify.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/text/character-classes",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/character-classes"
+      ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/stringutil",
       "go_source": "tsc/internal/stringutil/util.go",
       "id": "tsc/internal/stringutil/util.go:IsOctalDigit",
@@ -227261,7 +227796,7 @@
       "membership_reason": "string helpers; actual home is tsr_jsstring",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [
@@ -227309,16 +227844,16 @@
     {
       "actual_home": "tsr_jsstring",
       "annotated_home": [
-        "crates/tsr_scanner/src/utilities.rs"
+        "crates/tsr_jsstring/src/classify.rs"
       ],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/text/character-classes; witnessed by 1 prepared case(s)",
+      "basis": "witnessed by 1 exact link(s): leaves/text/character-classes",
       "basis_kind": "rule",
       "cases": [
         "leaves/text/character-classes"
       ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/stringutil",
       "go_source": "tsc/internal/stringutil/util.go",
       "id": "tsc/internal/stringutil/util.go:IsWhiteSpaceLike",
@@ -227345,14 +227880,16 @@
     {
       "actual_home": "tsr_jsstring",
       "annotated_home": [
-        "crates/tsr_scanner/src/utilities.rs"
+        "crates/tsr_jsstring/src/classify.rs"
       ],
-      "basis": "ledger maps the symbol and its source file carries 1 file-level producer metric(s), which do not witness this operation individually",
+      "basis": "witnessed by 1 exact link(s): leaves/text/character-classes",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/character-classes"
+      ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/stringutil",
       "go_source": "tsc/internal/stringutil/util.go",
       "id": "tsc/internal/stringutil/util.go:IsWhiteSpaceSingleLine",
@@ -227367,7 +227904,7 @@
       "membership_reason": "string helpers; actual home is tsr_jsstring",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [
@@ -227415,15 +227952,17 @@
     },
     {
       "actual_home": "tsr_jsstring",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/text/byte-order-marks; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_jsstring/src/text.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/text/byte-order-marks",
       "basis_kind": "rule",
       "cases": [
         "leaves/text/byte-order-marks"
       ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/stringutil",
       "go_source": "tsc/internal/stringutil/util.go",
       "id": "tsc/internal/stringutil/util.go:RemoveByteOrderMark",
@@ -227449,15 +227988,17 @@
     },
     {
       "actual_home": "tsr_jsstring",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/text/line-splitting-and-indentation; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_jsstring/src/text.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/text/line-splitting-and-indentation",
       "basis_kind": "rule",
       "cases": [
         "leaves/text/line-splitting-and-indentation"
       ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/stringutil",
       "go_source": "tsc/internal/stringutil/util.go",
       "id": "tsc/internal/stringutil/util.go:SplitLines",
@@ -227483,15 +228024,17 @@
     },
     {
       "actual_home": "tsr_jsstring",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/text/quote-stripping; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_jsstring/src/text.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/text/quote-stripping",
       "basis_kind": "rule",
       "cases": [
         "leaves/text/quote-stripping"
       ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/stringutil",
       "go_source": "tsc/internal/stringutil/util.go",
       "id": "tsc/internal/stringutil/util.go:StripQuotes",
@@ -227591,14 +228134,17 @@
     {
       "actual_home": "tsr_jsstring",
       "annotated_home": [
-        "crates/tsr_checker/src/node_builder_names.rs"
+        "crates/tsr_checker/src/node_builder_names.rs",
+        "crates/tsr_jsstring/src/text.rs"
       ],
-      "basis": "ledger maps the symbol and its source file carries 1 file-level producer metric(s), which do not witness this operation individually",
+      "basis": "witnessed by 1 exact link(s): leaves/text/quote-stripping",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/quote-stripping"
+      ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/stringutil",
       "go_source": "tsc/internal/stringutil/util.go",
       "id": "tsc/internal/stringutil/util.go:UnquoteString",
@@ -227613,7 +228159,7 @@
       "membership_reason": "string helpers; actual home is tsr_jsstring",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [
@@ -227624,13 +228170,17 @@
     },
     {
       "actual_home": "tsr_jsstring",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_jsstring)",
+      "annotated_home": [
+        "crates/tsr_jsstring/src/text.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/text/byte-order-marks",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/byte-order-marks"
+      ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/stringutil",
       "go_source": "tsc/internal/stringutil/util.go",
       "id": "tsc/internal/stringutil/util.go:getByteOrderMarkLength",
@@ -227645,7 +228195,7 @@
       "membership_reason": "string helpers; actual home is tsr_jsstring",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [
@@ -227657,12 +228207,14 @@
     {
       "actual_home": "tsr_jsstring",
       "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_jsstring)",
+      "basis": "witnessed by 1 exact link(s): leaves/text/quote-stripping",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/quote-stripping"
+      ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/stringutil",
       "go_source": "tsc/internal/stringutil/util.go",
       "id": "tsc/internal/stringutil/util.go:matchSlashReplacer",
@@ -227677,7 +228229,7 @@
       "membership_reason": "string helpers; actual home is tsr_jsstring",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [
@@ -227688,13 +228240,17 @@
     },
     {
       "actual_home": "tsr_jsstring",
-      "annotated_home": [],
-      "basis": "unmapped and absent from the actual home for this package (tsr_jsstring)",
+      "annotated_home": [
+        "crates/tsr_jsstring/src/text.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): leaves/text/encode-uri",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/encode-uri"
+      ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/stringutil",
       "go_source": "tsc/internal/stringutil/util.go",
       "id": "tsc/internal/stringutil/util.go:shouldEscapeForEncodeURI",
@@ -227709,7 +228265,7 @@
       "membership_reason": "string helpers; actual home is tsr_jsstring",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [

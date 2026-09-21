@@ -273,7 +273,14 @@ impl IncludeReason {
                 }
             }
             IncludeReasonData::Lib { index: Some(index) } => {
-                args.push(options.lib.as_ref().expect("explicit library list")[*index].clone());
+                args.push(
+                    options
+                        .lib
+                        .as_ref()
+                        .expect("explicit library list")
+                        .get(*index)
+                        .expect("library index"),
+                );
                 d::Library_0_specified_in_compilerOptions
             }
             IncludeReasonData::Lib { index: None } => {
@@ -374,6 +381,7 @@ impl IncludeReason {
             return Ok(None);
         };
         let options = program.options();
+        let libraries = options.lib.as_ref().map(|values| values.read());
         let selection = match &self.data {
             IncludeReasonData::Root { index } => {
                 let file_name = path::absolute(
@@ -409,7 +417,7 @@ impl IncludeReason {
             IncludeReasonData::Lib { index: Some(index) } => Some((
                 program.include_explanations.compiler_options(program),
                 b"lib".as_slice(),
-                options.lib.as_ref().expect("explicit library list")[*index].as_bytes(),
+                libraries.as_ref().expect("explicit library list")[*index].as_bytes(),
                 d::File_is_library_specified_here,
             )),
             IncludeReasonData::Lib { index: None } => {
@@ -682,25 +690,7 @@ fn package_id_text(package: &PackageId) -> JsString {
 }
 // Stringer always returns a nonempty string, including open enum values.
 fn script_target_text(target: ScriptTarget) -> JsString {
-    let text = match target.0 {
-        0 => "None",
-        1 => "ES5",
-        2 => "ES2015",
-        3 => "ES2016",
-        4 => "ES2017",
-        5 => "ES2018",
-        6 => "ES2019",
-        7 => "ES2020",
-        8 => "ES2021",
-        9 => "ES2022",
-        10 => "ES2023",
-        11 => "ES2024",
-        12 => "ES2025",
-        99 => "ESNext",
-        100 => "JSON",
-        _ => return JsString::from_bytes(format!("ScriptTarget({})", target.0).into_bytes()),
-    };
-    JsString::from_bytes(text.as_bytes())
+    JsString::from_bytes(target.to_string().into_bytes())
 }
 /// port: tsc/internal/tsoptions/tsconfigparsing.go:GetCallbackForFindingPropertyAssignmentByValue
 fn find_array_value(

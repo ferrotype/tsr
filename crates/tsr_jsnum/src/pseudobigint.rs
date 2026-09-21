@@ -23,6 +23,17 @@ impl PseudoBigInt {
         }
     }
 
+    /// port: tsc/internal/jsnum/pseudobigint.go:PseudoBigInt.Sign
+    pub fn sign(&self) -> i32 {
+        if self.base10_value.is_empty() {
+            0
+        } else if self.negative {
+            -1
+        } else {
+            1
+        }
+    }
+
     /// The literal's text: `-` for negatives, `0` for zero.
     // port: tsc/internal/jsnum/pseudobigint.go:PseudoBigInt.String
     pub fn to_text(&self) -> Vec<u8> {
@@ -36,6 +47,14 @@ impl PseudoBigInt {
         text.extend_from_slice(&self.base10_value);
         text
     }
+}
+
+/// port: tsc/internal/jsnum/pseudobigint.go:ParseValidBigInt
+pub fn parse_valid_big_int(text: &[u8]) -> PseudoBigInt {
+    let (text, negative) = text
+        .strip_prefix(b"-")
+        .map_or((text, false), |rest| (rest, true));
+    PseudoBigInt::new(&crate::parse_pseudo_big_int(text), negative)
 }
 
 #[cfg(test)]

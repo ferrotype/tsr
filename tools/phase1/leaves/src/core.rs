@@ -1,11 +1,7 @@
 //! The `internal/core` leaf group: tri-state option semantics, signed source
 //! ranges, script kinds and single-wildcard patterns.
 //!
-//! Most of this group has a real production home, so it drives `tsr_core`
-//! directly and expects matches. The two subjects that do not — the tri-state
-//! JSON codec and the `TextRange` predicate family — are recorded as gaps
-//! naming the Go authority and the intended signature; nothing here emulates
-//! them.
+//! Each operation drives its production home in `tsr_core` or `tsr_json`.
 //!
 //! Byte payloads travel as hex in both directions, because a Go observation of
 //! a pattern's text cannot carry invalid UTF-8 through `encoding/json` and the
@@ -24,94 +20,33 @@ use tsr_core::{ScriptKind, TextRange, Tristate};
 
 use crate::api::{action_i64, action_op, action_str, actions, ordered, subject, Outcome};
 
-/// The five generated `String()` methods, each with the Rust home it does not
-/// have. The port never exposes any of them: the two renderings that do exist
-/// are private helpers of consumer crates, written for one call site, and one
-/// of them is deliberately partial. Preparation records that; it renders no
-/// name here.
-const STRINGERS: &[(&str, &str, &str, &str)] = &[
-    ("core.Tristate",
-     "tsc/internal/core/tristate_stringer_generated.go:Tristate.String",
-     "a Display impl or an as_str on tsr_core::Tristate rendering TSUnknown/TSFalse/TSTrue for \
-      0/1/2 and Tristate(n) for every other byte. Tristate is a Go byte, so the generated \
-      `i < 0` guard is dead and the fallback is reached only past the index table",
-     "crates/tsr_core/src/lib.rs (Tristate implements the five predicates and default_if_unknown; \
-      it has no Display, no as_str and no name table, and a repo-wide search for the string \
-      TSUnknown across crates/ finds nothing)"),
-    ("core.ScriptKind",
-     "tsc/internal/core/scriptkind_stringer_generated.go:ScriptKind.String",
-     "a Display impl or an as_str on tsr_core::ScriptKind rendering the untrimmed \
-      ScriptKindUnknown/JS/JSX/TS/TSX for 0..=4 and ScriptKindJSON for 6, with ScriptKind(n) for \
-      the unnamed 5 and for everything outside the domain",
-     "crates/tsr_core/src/lib.rs (ScriptKind implements from_file_name, ensure_from_file_name \
-      and default_extension only; a repo-wide search for the string ScriptKindJSON across \
-      crates/ finds nothing)"),
-    ("core.LanguageVariant",
-     "tsc/internal/core/languagevariant_stringer_generated.go:LanguageVariant.String",
-     "a Display impl or an as_str on tsr_core::LanguageVariant rendering the untrimmed \
-      LanguageVariantStandard and LanguageVariantJSX for 0 and 1, and LanguageVariant(n) for \
-      every other i32 including negatives",
-     "crates/tsr_core/src/lib.rs (LanguageVariant declares the two constants and nothing else; a \
-      repo-wide search for the string LanguageVariantStandard across crates/ finds nothing)"),
-    ("core.ModuleKind",
-     "tsc/internal/core/modulekind_stringer_generated.go:ModuleKind.String",
-     "one shared renderer on tsr_core::ModuleKind covering all three named runs -- 0..=7, \
-      99..=102 and 199..=200 -- with the trimmed names and ModuleKind(n) for the two numeric \
-      gaps between them and for everything outside",
-     "crates/tsr_core/src/compiler_options.rs (ModuleKind declares the constants, plus \
-      is_non_node_esm and supports_import_attributes at :363-374, and no renderer). The port renders this operation in one place only, and not on the type: \
-      crates/tsr_checker/src/emit_checks.rs:514 module_kind_text is pub(crate), names all \
-      fourteen values and is marked as this operation's source, while \
-      crates/tsr_compiler/src/verify_options.rs:584 module_name is a private helper whose only \
-      call site (:564) is guarded by (ModuleKind::NODE16..=ModuleKind::NODE_NEXT).contains(&module), \
-      so inside its reachable domain it agrees with the pin, including on the unnamed values within \
-      that range. Neither rendering is reachable from outside its crate"),
-    ("core.ScriptTarget",
-     "tsc/internal/core/scripttarget_stringer_generated.go:ScriptTarget.String",
-     "one shared renderer on tsr_core::ScriptTarget covering 0..=12 and 99..=100 with the \
-      trimmed names and ScriptTarget(n) for the gap between them and for everything outside; \
-      the aliases Latest and LatestStandard are ESNext and ES2025 and render as those",
-     "crates/tsr_core/src/lib.rs (ScriptTarget declares the constants and nothing else). The \
-      only rendering in the port is the private fn script_target_text at \
-      crates/tsr_compiler/src/include_reason.rs:684, written for one diagnostic argument and \
-      not reachable from outside that crate"),
-];
-
-/// Claims a case whose trace is entirely `String()` renderings and records the
-/// gap. A trace that mixed a rendering with an observable action could not be
-/// answered at all -- the result is one status per case -- so it is refused
-/// rather than half-answered.
-fn stringer(subject: &str, trace: &[Value]) -> Option<Outcome> {
-    let (_, authority, signature, home) = STRINGERS.iter().find(|(name, ..)| *name == subject)?;
-    let renderings = trace
-        .iter()
-        .filter(|action| action_op(action) == "string")
-        .count();
-    if renderings == 0 {
+pub fn observe(request: &Value) -> Option<Outcome> {
+    if !subject(request).starts_with("core.") {
         return None;
     }
-    if renderings != trace.len() {
-        return Some(Outcome::Failed(format!(
-            "a {subject} case mixes {renderings} String() action(s) with {} action(s) that have \
-             a production entry point; one case carries one result, so it is either wholly the \
-             recorded gap or wholly observed",
-            trace.len() - renderings,
-        )));
-    }
-    Some(Outcome::missing(*authority, authority, signature, home))
-}
-
-pub fn observe(request: &Value) -> Option<Outcome> {
-    if let Some(outcome) = stringer(subject(request), actions(request)) {
-        return Some(outcome);
+    if actions(request).iter().all(|a| action_op(a) == "string") {
+        let mut rows = Vec::new();
+        for action in actions(request) {
+            let value = action_i64(action, "enum_value");
+            let text = match subject(request) {
+                "core.Tristate" => Tristate(value as u8).to_string(),
+                "core.ScriptKind" => ScriptKind(value as i32).to_string(),
+                "core.LanguageVariant" => tsr_core::LanguageVariant(value as i32).to_string(),
+                "core.ModuleKind" => tsr_core::ModuleKind(value as i32).to_string(),
+                "core.ScriptTarget" => tsr_core::ScriptTarget(value as i32).to_string(),
+                _ => return None,
+            };
+            rows.push(json!({"op":"string","enum_value":value,"text":text}));
+        }
+        return Some(Outcome::Observed(ordered(rows)));
     }
     let replayed = match subject(request) {
         "core.Tristate" => Ok(tristate(actions(request))),
         "core.TextRange" => Ok(text_range(actions(request))),
         "core.ScriptKind" => script_kind(actions(request)),
         "core.Pattern" => pattern(actions(request)),
-        "core.TristateJson" => return Some(missing_tristate_json(request)),
-        "core.TextRangePredicates" => return Some(missing_text_range_predicates()),
+        "core.TristateJson" => tristate_json(actions(request)),
+        "core.TextRangePredicates" => range_predicates(actions(request)),
         _ => return None,
     };
     Some(match replayed {
@@ -120,56 +55,71 @@ pub fn observe(request: &Value) -> Option<Outcome> {
     })
 }
 
-fn missing_tristate_json(request: &Value) -> Outcome {
-    crate::api::missing_for_subject(
-        request,
-        &[
-            (
-                "core.TristateJson",
-                "tsc/internal/core/tristate.go:Tristate.MarshalJSON",
-            ),
-            (
-                "core.TristateJson",
-                "tsc/internal/core/tristate.go:Tristate.UnmarshalJSON",
-            ),
-        ],
-        "tsc/internal/core/tristate.go:Tristate.MarshalJSON and Tristate.UnmarshalJSON",
-        "a raw-bytes decoder plus a serde impl, because this group observes decoding at both the \
-         levels Go exposes it at. \
-         (1) An infallible raw-bytes decoder mirroring UnmarshalJSON(data []byte) error, say \
-         tsr_core::Tristate::unmarshal_json(&[u8]) -> Self, switching on the exact bytes: \
-         b\"true\" is TRUE, b\"false\" is FALSE and every other byte string is UNKNOWN, \
-         including b\" true\", b\"TRUE\", the quoted b\"\\\"true\\\"\" and the empty slice, and \
-         it never reports an error. A serde Deserialize impl cannot stand in for this: \
-         serde_json fixes the token bytes before the impl ever runs. (2) serde \
-         Serialize/Deserialize for tsr_core::Tristate, which is where the encoder and the \
-         encoding/json-mediated decode path live: \
-         TRUE serializes as true, FALSE as false and every other byte as null, and Deserialize \
-         accepts any well-formed JSON value, mapping the booleans true and false to TRUE and \
-         FALSE and everything else -- a JSON string, including \"true\", a number, null, an \
-         object -- to UNKNOWN without an error, while malformed input fails in the parser before \
-         the impl is reached",
-        "crates/tsr_core/src/lib.rs (Tristate has no codec; tsr_core has no serde dependency)",
-    )
+fn tristate_json(trace: &[Value]) -> Result<Vec<Value>, String> {
+    let mut rows = Vec::new();
+    for action in trace {
+        let op = action_op(action);
+        rows.push(match op {
+            "marshal" => {
+                let t = action_i64(action, "tristate");
+                let bytes = tsr_json::marshal(&Tristate(t as u8), tsr_json::Options::default())
+                    .map_err(|e| e.to_string())?;
+                json!({"op":op,"tristate":t,"json":String::from_utf8(bytes).unwrap(),"error":false})
+            }
+            "unmarshal" | "unmarshal_via_json" => {
+                let raw = action_str(action, "raw");
+                let mut t = Tristate::UNKNOWN;
+                let error = if op == "unmarshal" {
+                    t = Tristate::unmarshal_json(raw.as_bytes());
+                    false
+                } else {
+                    // encoding/json v1 validates the whole document before
+                    // invoking a custom UnmarshalJSON, unlike the incremental
+                    // v2 decoder. Retain the old tristate if validation fails.
+                    let mut value = tsr_json::RawValue::default();
+                    let result = tsr_json::unmarshal(
+                        raw.as_bytes(),
+                        &mut value,
+                        tsr_json::Options {
+                            allow_duplicate_names: Some(true),
+                            allow_invalid_utf8: Some(true),
+                            ..tsr_json::Options::default()
+                        },
+                    );
+                    if result.is_ok() {
+                        t = Tristate::unmarshal_json(&value.0);
+                    }
+                    result.is_err()
+                };
+                json!({"op":op,"raw":raw,"result":t.0,"error":error})
+            }
+            _ => return Err(format!("unknown tristate JSON action {op}")),
+        });
+    }
+    Ok(rows)
 }
-
-fn missing_text_range_predicates() -> Outcome {
-    Outcome::missing(
-        "tsc/internal/core/text.go:TextRange.IsValid",
-        "tsc/internal/core/text.go:TextRange.IsValid, Contains, ContainsInclusive, \
-         ContainsExclusive, ContainedBy, Overlaps, Intersects, WithPos, WithEnd, \
-         CompareTextRanges and UndefinedTextRange",
-        "tsr_core::TextRange::undefined/is_valid/contains/contains_inclusive/contains_exclusive/\
-         contained_by/overlaps/intersects/with_pos/with_end, plus a free \
-         compare(TextRange, TextRange) -> i64. The endpoints stay the stored i32 pair, but the \
-         position arguments and the compare result are machine ints, as they are in Go: \
-         contains/contains_inclusive/contains_exclusive take an i64 position and compare it \
-         against endpoints widened to i64, with_pos/with_end truncate an i64 argument to i32 the \
-         way new does, and compare subtracts widened endpoints so it never wraps -- unlike len, \
-         which subtracts in i32 first. Only contained_by/overlaps/intersects compare the stored \
-         i32 endpoints directly",
-        "crates/tsr_core/src/lib.rs (TextRange implements only new/pos/end/len/is_empty)",
-    )
+fn range_predicates(trace: &[Value]) -> Result<Vec<Value>, String> {
+    let mut first = TextRange::default();
+    let mut second = TextRange::default();
+    let mut rows = Vec::new();
+    for action in trace {
+        let op = action_op(action);
+        rows.push(match op {
+            "undefined"|"make"|"make2" => {
+                let range = match op {
+                    "undefined"=>TextRange::undefined(),
+                    "make"=>{ first=TextRange::new(action_i64(action,"pos"),action_i64(action,"end"));first },
+                    _=>{ second=TextRange::new(action_i64(action,"pos2"),action_i64(action,"end2"));second }
+                };
+                json!({"op":op,"pos":range.pos(),"end":range.end(),"is_valid":range.is_valid()})
+            }
+            "contains" => { let pos=action_i64(action,"pos");json!({"op":op,"pos":pos,"contains":first.contains(pos),"contains_inclusive":first.contains_inclusive(pos),"contains_exclusive":first.contains_exclusive(pos)}) }
+            "relate"=>json!({"op":op,"contained_by":first.contained_by(second),"overlaps":first.overlaps(second),"intersects":first.intersects(second),"compare":first.compare(second)}),
+            "with_pos"|"with_end"=>{let range=if op=="with_pos"{first.with_pos(action_i64(action,"pos"))}else{first.with_end(action_i64(action,"end"))};json!({"op":op,"pos":range.pos(),"end":range.end()})}
+            _=>return Err(format!("unknown range action {op}")),
+        });
+    }
+    Ok(rows)
 }
 
 fn tristate(trace: &[Value]) -> Vec<Value> {

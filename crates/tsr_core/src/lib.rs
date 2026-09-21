@@ -72,6 +72,23 @@ impl ScriptKind {
 pub struct Tristate(pub u8);
 
 impl Tristate {
+    /// Exact bytes, without JSON tokenization or whitespace trimming.
+    /// port: tsc/internal/core/tristate.go:Tristate.UnmarshalJSON
+    pub fn unmarshal_json(bytes: &[u8]) -> Self {
+        match bytes {
+            b"true" => Self::TRUE,
+            b"false" => Self::FALSE,
+            _ => Self::UNKNOWN,
+        }
+    }
+    /// port: tsc/internal/core/tristate.go:Tristate.MarshalJSON
+    pub fn marshal_json(self) -> &'static [u8] {
+        match self {
+            Self::TRUE => b"true",
+            Self::FALSE => b"false",
+            _ => b"null",
+        }
+    }
     pub const UNKNOWN: Self = Self(0);
     pub const FALSE: Self = Self(1);
     pub const TRUE: Self = Self(2);
@@ -188,3 +205,10 @@ mod go_sort;
 mod text_change;
 pub use go_sort::sort as sort_like_go;
 pub use text_change::{apply_bulk_edits, TextChange, UnappliableEdits};
+
+pub mod helpers;
+mod names;
+mod ranges;
+pub mod slices;
+
+pub mod shared;

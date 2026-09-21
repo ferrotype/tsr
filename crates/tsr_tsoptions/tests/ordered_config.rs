@@ -14,24 +14,29 @@ fn config_overwrite_preserves_order_and_paths_keep_nil_and_empty_values() {
     assert_eq!(stringify_json(&value).unwrap(), br#"{"b":[],"a":[]}"#);
     let paths = parse_string_map(&value).unwrap();
     assert_eq!(paths.get(b"b".as_slice()), Some(&None));
-    assert_eq!(paths.get(b"a".as_slice()), Some(&Some(vec![])));
+    assert_eq!(paths.get(b"a".as_slice()), Some(&Some(vec![].into())));
     let mut options = CompilerOptions {
-        paths: Some(paths),
+        paths: Some(paths.into()),
         ..Default::default()
     };
     assert_eq!(
         stringify_json(&compiler_options_value(&options)).unwrap(),
         br#"{"paths":{"b":[],"a":[]}}"#
     );
-    // The sharing difference already recorded by F1a stays visible: this
-    // migration must not make CompilerOptions::clone start sharing mutation.
+    // The pinned Clone retains the map pointer and the lists' backing arrays.
     let cloned = options.clone();
-    options.paths.as_mut().unwrap().insert(
-        JsString::from_bytes(b"b".as_slice()),
-        Some(vec![JsString::from_bytes(b"new".as_slice())]),
+    let changed = vec![JsString::from_bytes(b"new".as_slice())];
+    options.paths.as_ref().unwrap().update(|paths| {
+        paths.insert(
+            JsString::from_bytes(b"b".as_slice()),
+            Some(changed.clone().into()),
+        );
+    });
+    assert_eq!(
+        cloned.paths.as_ref().unwrap().read().get(b"b".as_slice()),
+        Some(&Some(changed.into()))
     );
-    assert_eq!(cloned.paths.unwrap().get(b"b".as_slice()), Some(&None));
-    options.paths = Some(tsr_core::PathMappings::default());
+    options.paths = Some(tsr_core::PathMappings::default().into());
     assert_eq!(
         stringify_json(&compiler_options_value(&options)).unwrap(),
         br#"{"paths":{}}"#

@@ -1,178 +1,89 @@
-//! Typed JSON encoding for compiler data. This is the first part of the pinned
-//! internal/json contract: raw JSON values and streaming decoding are not yet
-//! implemented. Strings accept arbitrary bytes and repair invalid UTF-8 exactly
-//! one invalid rune at a time; no HTML or JavaScript escaping is selected.
+//! Byte-oriented typed and token JSON. Go strings remain byte strings until a
+//! particular encode/decode operation applies its UTF-8 policy.
+mod decode;
+mod decoder;
+mod encoder;
+mod error;
+mod state;
+mod token;
+mod wire;
+pub use decode::{unmarshal, unmarshal_decode, unmarshal_read, Decode, DecodeKey};
+pub use decoder::Decoder;
+pub use encoder::Encoder;
+pub use error::{Error, SemanticError, SyntaxError};
+pub use token::{Kind, Token};
 
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use std::hash::{BuildHasher, Hash};
+use std::io::Write;
 use tsr_core::collections::OrderedMap;
-use tsr_jsstring::wtf8::{decode_utf8, RUNE_ERROR};
 use tsr_jsstring::JsString;
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum Error {
-    NonFiniteNumber,
-    DuplicateName,
-    NestingDepth,
-    InvalidIndent,
-}
-impl std::fmt::Display for Error {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{self:?}")
-    }
-}
-impl std::error::Error for Error {}
-
-/// Explicit options are applied after the wrapper defaults. None means compact;
-/// Some("") means multiline with zero indentation (unlike MarshalIndent("", "")).
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Copy, Debug, Default)]
 pub struct Options<'a> {
     pub indent: Option<&'a str>,
-    pub prefix: &'a str,
-    pub allow_duplicate_names: bool,
-    pub deterministic: bool,
+    pub prefix: Option<&'a str>,
+    pub allow_duplicate_names: Option<bool>,
+    pub deterministic: Option<bool>,
+    /// None leaves the caller's default: strict tokens/decoding, repairing
+    /// strings for the pinned Marshal wrappers.
+    pub allow_invalid_utf8: Option<bool>,
 }
 
-/// Implementations write their actual storage directly, without building a
-/// second JSON tree. Object members and array elements recurse through `value`.
+impl Options<'_> {
+    fn join(&mut self, other: &Self) {
+        if other.indent.is_some() {
+            self.indent = other.indent;
+        }
+        if other.prefix.is_some() {
+            self.prefix = other.prefix;
+        }
+        if other.allow_duplicate_names.is_some() {
+            self.allow_duplicate_names = other.allow_duplicate_names;
+        }
+        if other.deterministic.is_some() {
+            self.deterministic = other.deterministic;
+        }
+        if other.allow_invalid_utf8.is_some() {
+            self.allow_invalid_utf8 = other.allow_invalid_utf8;
+        }
+    }
+}
+
 pub trait Encode {
     fn encode(&self, out: &mut Encoder<'_>) -> Result<(), Error>;
-}
-
-pub struct Encoder<'a> {
-    bytes: Vec<u8>,
-    options: Options<'a>,
-    depth: usize,
-}
-impl Encoder<'_> {
-    pub fn value(&mut self, value: &(impl Encode + ?Sized)) -> Result<(), Error> {
-        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || value.encode(self))
+    fn type_name(&self) -> &'static str {
+        std::any::type_name::<Self>()
     }
-    pub fn null(&mut self) {
-        self.bytes.extend_from_slice(b"null");
-    }
-    pub fn boolean(&mut self, value: bool) {
-        self.bytes
-            .extend_from_slice(if value { b"true" } else { b"false" });
-    }
-    pub fn string(&mut self, bytes: &[u8]) {
-        append_string(&mut self.bytes, bytes);
-    }
-    pub fn number(&mut self, value: f64) -> Result<(), Error> {
-        if !value.is_finite() {
-            return Err(Error::NonFiniteNumber);
-        }
-        if value == 0.0 && value.is_sign_negative() {
-            self.bytes.extend_from_slice(b"-0");
-        } else {
-            self.bytes
-                .extend_from_slice(tsr_jsnum::Number::new(value).to_string().as_bytes());
-        }
-        Ok(())
-    }
-    fn begin(&mut self, token: u8) -> Result<(), Error> {
-        if self.depth >= 10_000 {
-            return Err(Error::NestingDepth);
-        }
-        self.bytes.push(token);
-        self.depth += 1;
-        Ok(())
-    }
-    fn newline(&mut self) {
-        if let Some(indent) = self.options.indent {
-            self.bytes.push(b'\n');
-            self.bytes.extend_from_slice(self.options.prefix.as_bytes());
-            for _ in 0..self.depth {
-                self.bytes.extend_from_slice(indent.as_bytes());
-            }
-        }
-    }
-    pub fn array<'a, T: Encode + ?Sized + 'a>(
-        &mut self,
-        values: impl IntoIterator<Item = &'a T>,
-    ) -> Result<(), Error> {
-        self.begin(b'[')?;
-        let mut empty = true;
-        let result = (|| {
-            for value in values {
-                if !empty {
-                    self.bytes.push(b',');
-                }
-                self.newline();
-                empty = false;
-                self.value(value)?;
-            }
-            Ok(())
-        })();
-        self.depth -= 1;
-        result?;
-        if !empty {
-            self.newline();
-        }
-        self.bytes.push(b']');
-        Ok(())
-    }
-    pub fn object<'a, T: Encode + ?Sized + 'a>(
-        &mut self,
-        entries: impl IntoIterator<Item = (&'a [u8], &'a T)>,
-    ) -> Result<(), Error> {
-        self.begin(b'{')?;
-        let mut names = HashSet::new();
-        let mut empty = true;
-        let result = (|| {
-            for (key, value) in entries {
-                if !empty {
-                    self.bytes.push(b',');
-                }
-                self.newline();
-                empty = false;
-                let start = self.bytes.len();
-                self.string(key);
-                // Invalid source bytes can repair to the same JSON name even
-                // though the original byte keys were distinct.
-                if !self.options.allow_duplicate_names
-                    && !names.insert(self.bytes[start..].to_vec())
-                {
-                    return Err(Error::DuplicateName);
-                }
-                self.bytes.push(b':');
-                if self.options.indent.is_some() {
-                    self.bytes.push(b' ');
-                }
-                self.value(value)?;
-            }
-            Ok(())
-        })();
-        self.depth -= 1;
-        result?;
-        if !empty {
-            self.newline();
-        }
-        self.bytes.push(b'}');
-        Ok(())
+    /// Custom recursive codecs are guarded even if they recurse without opening
+    /// a JSON container. Built-in scalar implementations bypass this query;
+    /// built-in containers guard the traversal instead.
+    fn encode_guarded(&self, out: &mut Encoder<'_>) -> Result<(), Error> {
+        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || self.encode(out))
     }
 }
 
-/// Typed values only: raw JSON token validation and its partial-error payload
-/// are still pending. A failed typed encoding returns no completed document.
-/// port: tsc/internal/json/json.go:Marshal
+/// Convenience wrapper for callers that discard incomplete output on error.
 pub fn marshal(value: &(impl Encode + ?Sized), options: Options<'_>) -> Result<Vec<u8>, Error> {
-    if !options.prefix.bytes().all(|b| matches!(b, b' ' | b'\t'))
-        || options
-            .indent
-            .is_some_and(|s| !s.bytes().all(|b| matches!(b, b' ' | b'\t')))
-    {
-        return Err(Error::InvalidIndent);
-    }
-    let mut out = Encoder {
-        bytes: Vec::new(),
-        options,
-        depth: 0,
-    };
-    out.value(value)?;
-    Ok(out.bytes)
+    let (bytes, result) = marshal_partial(value, options);
+    result.map(|()| bytes)
 }
-
+/// Return the committed prefix alongside an encoding failure, as Go Marshal
+/// does. Invalid options fail before any bytes are emitted.
+/// port: tsc/internal/json/json.go:Marshal
+pub fn marshal_partial(
+    value: &(impl Encode + ?Sized),
+    mut options: Options<'_>,
+) -> (Vec<u8>, Result<(), Error>) {
+    options.allow_invalid_utf8 = Some(options.allow_invalid_utf8.unwrap_or(true));
+    let mut out = match Encoder::new(options) {
+        Ok(out) => out,
+        Err(error) => return (Vec::new(), Err(error)),
+    };
+    out.omit_top_level_newline = true;
+    let result = out.value(value);
+    (out.into_bytes(), result)
+}
 /// port: tsc/internal/json/json.go:MarshalIndent
 pub fn marshal_indent(
     value: &(impl Encode + ?Sized),
@@ -183,76 +94,134 @@ pub fn marshal_indent(
         value,
         Options {
             indent: (!(prefix.is_empty() && indent.is_empty())).then_some(indent),
-            prefix,
+            prefix: Some(prefix),
             ..Options::default()
         },
     )
 }
+/// port: tsc/internal/json/json.go:MarshalWrite
+pub fn marshal_write(
+    out: &mut dyn Write,
+    value: &(impl Encode + ?Sized),
+    mut options: Options<'_>,
+) -> Result<(), Error> {
+    options.allow_invalid_utf8 = Some(options.allow_invalid_utf8.unwrap_or(true));
+    let mut encoder = Encoder::with_writer(out, options)?;
+    encoder.omit_top_level_newline = true;
+    encoder.value(value)?;
+    encoder.flush()
+}
+/// port: tsc/internal/json/json.go:MarshalIndentWrite
+pub fn marshal_indent_write(
+    out: &mut dyn Write,
+    value: &(impl Encode + ?Sized),
+    prefix: &str,
+    indent: &str,
+) -> Result<(), Error> {
+    marshal_write(
+        out,
+        value,
+        Options {
+            indent: (!(prefix.is_empty() && indent.is_empty())).then_some(indent),
+            prefix: Some(prefix),
+            ..Options::default()
+        },
+    )
+}
+/// port: tsc/internal/json/json.go:MarshalEncode
+pub fn marshal_encode<'a>(
+    out: &mut Encoder<'a>,
+    value: &(impl Encode + ?Sized),
+    options: Options<'a>,
+) -> Result<(), Error> {
+    out.marshal_encode(value, options)
+}
 
-fn append_string(out: &mut Vec<u8>, bytes: &[u8]) {
-    out.push(b'"');
-    let mut remaining = bytes;
-    while !remaining.is_empty() {
-        let (rune, width) = decode_utf8(remaining);
-        match rune {
-            8 => out.extend_from_slice(b"\\b"),
-            9 => out.extend_from_slice(b"\\t"),
-            10 => out.extend_from_slice(b"\\n"),
-            12 => out.extend_from_slice(b"\\f"),
-            13 => out.extend_from_slice(b"\\r"),
-            34 => out.extend_from_slice(b"\\\""),
-            92 => out.extend_from_slice(b"\\\\"),
-            0..=31 => {
-                const HEX: &[u8] = b"0123456789abcdef";
-                out.extend_from_slice(b"\\u00");
-                out.push(HEX[(rune / 16) as usize]);
-                out.push(HEX[(rune % 16) as usize]);
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct RawValue(pub Vec<u8>);
+impl RawValue {
+    pub fn kind(&self) -> Kind {
+        self.0
+            .iter()
+            .find(|b| !matches!(b, b' ' | b'\t' | b'\r' | b'\n'))
+            .map_or(Kind::Invalid, |&b| Kind::from_byte(b))
+    }
+}
+impl Encode for RawValue {
+    fn type_name(&self) -> &'static str {
+        "jsontext.Value"
+    }
+    fn encode(&self, out: &mut Encoder<'_>) -> Result<(), Error> {
+        out.write_value(&self.0)
+            .map_err(|e| out.semantic(self.type_name(), e))
+    }
+    fn encode_guarded(&self, out: &mut Encoder<'_>) -> Result<(), Error> {
+        self.encode(out)
+    }
+}
+macro_rules! scalar {
+    ($ty:ty,$name:literal,$method:ident,$convert:expr) => {
+        impl Encode for $ty {
+            fn type_name(&self) -> &'static str {
+                $name
             }
-            RUNE_ERROR if width == 1 => out.extend_from_slice("�".as_bytes()),
-            _ => out.extend_from_slice(&remaining[..width]),
+            fn encode(&self, out: &mut Encoder<'_>) -> Result<(), Error> {
+                out.$method(($convert)(self))
+            }
+            fn encode_guarded(&self, out: &mut Encoder<'_>) -> Result<(), Error> {
+                self.encode(out)
+            }
         }
-        remaining = &remaining[width..];
-    }
-    out.push(b'"');
+    };
 }
-
-impl Encode for JsString {
-    fn encode(&self, out: &mut Encoder<'_>) -> Result<(), Error> {
-        out.string(self.as_bytes());
-        Ok(())
-    }
-}
-impl<T: Encode + ?Sized> Encode for &T {
-    fn encode(&self, out: &mut Encoder<'_>) -> Result<(), Error> {
-        (*self).encode(out)
-    }
-}
+scalar!(bool, "bool", boolean, |v: &bool| *v);
+scalar!(f64, "float64", number, |v: &f64| *v);
+scalar!(i64, "int64", int, |v: &i64| *v);
+scalar!(u64, "uint64", uint, |v: &u64| *v);
+scalar!(i32, "int32", int, |v: &i32| i64::from(*v));
+scalar!(u32, "uint32", uint, |v: &u32| u64::from(*v));
 impl Encode for str {
+    fn type_name(&self) -> &'static str {
+        "string"
+    }
     fn encode(&self, out: &mut Encoder<'_>) -> Result<(), Error> {
-        out.string(self.as_bytes());
-        Ok(())
+        out.string(self.as_bytes())
+    }
+    fn encode_guarded(&self, out: &mut Encoder<'_>) -> Result<(), Error> {
+        self.encode(out)
     }
 }
 impl Encode for String {
+    fn type_name(&self) -> &'static str {
+        "string"
+    }
     fn encode(&self, out: &mut Encoder<'_>) -> Result<(), Error> {
         self.as_str().encode(out)
     }
-}
-impl Encode for bool {
-    fn encode(&self, out: &mut Encoder<'_>) -> Result<(), Error> {
-        out.boolean(*self);
-        Ok(())
+    fn encode_guarded(&self, out: &mut Encoder<'_>) -> Result<(), Error> {
+        self.encode(out)
     }
 }
-impl Encode for f64 {
+impl Encode for JsString {
+    fn type_name(&self) -> &'static str {
+        "string"
+    }
     fn encode(&self, out: &mut Encoder<'_>) -> Result<(), Error> {
-        out.number(*self)
+        out.string(self.as_bytes())
+    }
+    fn encode_guarded(&self, out: &mut Encoder<'_>) -> Result<(), Error> {
+        self.encode(out)
     }
 }
-impl Encode for i64 {
+impl<T: Encode + ?Sized> Encode for &T {
+    fn type_name(&self) -> &'static str {
+        (*self).type_name()
+    }
     fn encode(&self, out: &mut Encoder<'_>) -> Result<(), Error> {
-        out.bytes.extend_from_slice(self.to_string().as_bytes());
-        Ok(())
+        (*self).encode(out)
+    }
+    fn encode_guarded(&self, out: &mut Encoder<'_>) -> Result<(), Error> {
+        (*self).encode_guarded(out)
     }
 }
 impl<T: Encode> Encode for Option<T> {
@@ -260,40 +229,104 @@ impl<T: Encode> Encode for Option<T> {
         if let Some(value) = self {
             out.value(value)
         } else {
-            out.null();
-            Ok(())
+            out.null()
         }
+    }
+    fn encode_guarded(&self, out: &mut Encoder<'_>) -> Result<(), Error> {
+        self.encode(out)
     }
 }
 impl<T: Encode> Encode for [T] {
     fn encode(&self, out: &mut Encoder<'_>) -> Result<(), Error> {
         out.array(self)
     }
+    fn encode_guarded(&self, out: &mut Encoder<'_>) -> Result<(), Error> {
+        self.encode(out)
+    }
 }
 impl<T: Encode> Encode for Vec<T> {
     fn encode(&self, out: &mut Encoder<'_>) -> Result<(), Error> {
         self.as_slice().encode(out)
     }
-}
-impl<K: Eq + Hash + AsRef<[u8]>, V: Encode, S: BuildHasher> Encode for OrderedMap<K, V, S> {
-    /// String keys; integer/text-marshaler key conversion remains pending.
-    /// port: tsc/internal/collections/ordered_map.go:OrderedMap.MarshalJSONTo
-    fn encode(&self, out: &mut Encoder<'_>) -> Result<(), Error> {
-        out.object(self.entries().map(|(key, value)| (key.as_ref(), value)))
+    fn encode_guarded(&self, out: &mut Encoder<'_>) -> Result<(), Error> {
+        self.encode(out)
     }
 }
-impl<K: Eq + Hash + AsRef<[u8]>, V: Encode, S: BuildHasher> Encode for HashMap<K, V, S> {
+/// Key conversion is separate from value encoding: all names are JSON strings.
+pub trait Key {
+    fn json_key(&self) -> std::borrow::Cow<'_, [u8]>;
+}
+impl Key for String {
+    fn json_key(&self) -> std::borrow::Cow<'_, [u8]> {
+        self.as_bytes().into()
+    }
+}
+impl Key for JsString {
+    fn json_key(&self) -> std::borrow::Cow<'_, [u8]> {
+        self.as_bytes().into()
+    }
+}
+impl Key for str {
+    fn json_key(&self) -> std::borrow::Cow<'_, [u8]> {
+        self.as_bytes().into()
+    }
+}
+impl<T: Key + ?Sized> Key for &T {
+    fn json_key(&self) -> std::borrow::Cow<'_, [u8]> {
+        (*self).json_key()
+    }
+}
+macro_rules! integer_key {($($t:ty),*)=>{$(impl Key for $t {fn json_key(&self)->std::borrow::Cow<'_,[u8]> {self.to_string().into_bytes().into()}})*};}
+integer_key!(i8, i16, i32, i64, isize, u8, u16, u32, u64, usize);
+impl<K: Eq + Hash + Key, V: Encode, S: BuildHasher> Encode for OrderedMap<K, V, S> {
+    /// port: tsc/internal/collections/ordered_map.go:OrderedMap.MarshalJSONTo
     fn encode(&self, out: &mut Encoder<'_>) -> Result<(), Error> {
-        if out.options.deterministic {
-            let mut entries: Vec<_> = self.iter().collect();
-            entries.sort_unstable_by(|a, b| a.0.as_ref().cmp(b.0.as_ref()));
-            out.object(
-                entries
-                    .into_iter()
-                    .map(|(key, value)| (key.as_ref(), value)),
-            )
-        } else {
-            out.object(self.iter().map(|(key, value)| (key.as_ref(), value)))
+        out.write_token(Token::BeginObject)?;
+        for (key, value) in self.entries() {
+            out.string(&key.json_key())?;
+            out.value(value)?;
         }
+        out.write_token(Token::EndObject)
+    }
+}
+impl<K: Eq + Hash + Key, V: Encode, S: BuildHasher> Encode for HashMap<K, V, S> {
+    fn encode(&self, out: &mut Encoder<'_>) -> Result<(), Error> {
+        out.write_token(Token::BeginObject)?;
+        if out.options.deterministic.unwrap_or(false) {
+            let mut entries: Vec<_> = self.iter().map(|(k, v)| (k.json_key(), v)).collect();
+            entries.sort_unstable_by(|a, b| a.0.cmp(&b.0));
+            for (key, value) in entries {
+                out.string(&key)?;
+                out.value(value)?;
+            }
+        } else {
+            for (key, value) in self {
+                out.string(&key.json_key())?;
+                out.value(value)?;
+            }
+        }
+        out.write_token(Token::EndObject)
+    }
+}
+
+// JSON glue lives above core to keep core independent of the codec crate.
+impl Encode for tsr_core::Tristate {
+    fn encode(&self, out: &mut Encoder<'_>) -> Result<(), Error> {
+        if self.is_true() {
+            out.boolean(true)
+        } else if self.is_false() {
+            out.boolean(false)
+        } else {
+            out.null()
+        }
+    }
+    fn encode_guarded(&self, out: &mut Encoder<'_>) -> Result<(), Error> {
+        self.encode(out)
+    }
+}
+impl Decode for tsr_core::Tristate {
+    fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
+        *self = Self::unmarshal_json(&input.read_value()?);
+        Ok(())
     }
 }

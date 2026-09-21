@@ -26,7 +26,7 @@ def digest(path):
 def inputs():
     paths = [CASES, Path(__file__), ROOT/'Cargo.lock', ROOT/'Cargo.toml', ROOT/'rust-toolchain.toml']
     for name in ('tsr_binder','tsr_parser','tsr_scanner','tsr_ast','tsr_arena','tsr_core',
-                 'tsr_diagnostics','tsr_jsstring','tsr_jsnum','tsr_unicode'):
+                 'tsr_diagnostics', 'tsr_json', 'tsr_locale','tsr_jsstring','tsr_jsnum','tsr_unicode'):
         crate = ROOT/'crates'/name
         if crate.is_dir():
             paths += list(crate.rglob('*.rs')) + [crate/'Cargo.toml']

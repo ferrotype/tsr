@@ -45,15 +45,15 @@
             "2"
           ],
           [
-            "\ue000",
+            "",
             "3"
           ],
           [
-            "\ud800\udc00",
+            "𐀀",
             "4"
           ],
           [
-            "a\u00e9",
+            "aé",
             "5"
           ],
           [
@@ -916,6 +916,61 @@
       "operation": "tsc/internal/json/json.go:NewDecoder",
       "order_sensitive": true,
       "subject": "json.NewDecoder"
+    },
+    {
+      "actions": [
+        {
+          "op": "marshal",
+          "value_kind": "int64",
+          "value_text": "-9223372036854775808"
+        },
+        {
+          "op": "marshal",
+          "value_kind": "int64",
+          "value_text": "9223372036854775807"
+        },
+        {
+          "op": "marshal",
+          "value_kind": "uint64",
+          "value_text": "18446744073709551615"
+        },
+        {
+          "op": "marshal",
+          "value_kind": "uint64",
+          "value_text": "9007199254740993"
+        }
+      ],
+      "case": "leaves/json/marshal-exact-integers",
+      "discriminates": "Signed and unsigned integers retain every bit, including values beyond binary64 exact precision",
+      "operation": "tsc/internal/json/json.go:Marshal",
+      "order_sensitive": true,
+      "subject": "json.Marshal"
+    },
+    {
+      "actions": [
+        {
+          "op": "marshal",
+          "value_kind": "integer_record"
+        }
+      ],
+      "case": "leaves/json/marshal-heterogeneous-integers",
+      "discriminates": "Sequential token writes represent heterogeneous struct fields with an exact uint64 member",
+      "operation": "tsc/internal/json/json.go:Marshal",
+      "order_sensitive": true,
+      "subject": "json.Marshal"
+    },
+    {
+      "actions": [
+        {
+          "op": "marshal",
+          "value_kind": "float_list"
+        }
+      ],
+      "case": "leaves/json/marshal-partial-failure",
+      "discriminates": "A later nonfinite array element returns both the committed prefix and its structured semantic failure",
+      "operation": "tsc/internal/json/json.go:Marshal",
+      "order_sensitive": true,
+      "subject": "json.Marshal"
     }
   ],
   "version": 1

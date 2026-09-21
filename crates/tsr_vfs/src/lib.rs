@@ -6,8 +6,10 @@ use std::{
         Arc,
     },
 };
+mod walk;
 use tsr_jsstring::{JsString, SourceText};
 use tsr_tspath as path;
+pub use walk::{WalkCallback, WalkControl, WalkEntry};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Error {
@@ -79,6 +81,16 @@ pub trait FileSystem: Send + Sync {
     }
     fn directory_exists(&self, path: &[u8]) -> Result<bool, Error> {
         Ok(self.stat(path)?.is_some_and(|f| f.directory))
+    }
+    fn entry(&self, path: &[u8]) -> Result<Option<WalkEntry>, Error> {
+        Ok(self.stat(path)?.map(|info| WalkEntry {
+            name: JsString::from_bytes(path.rsplit(|&byte| byte == b'/').next().unwrap_or(path)),
+            info,
+            symlink: false,
+        }))
+    }
+    fn walk_dir(&self, root: &[u8], visit: &mut WalkCallback<'_>) -> Result<(), Error> {
+        walk::walk(self, root, visit)
     }
     fn write_file(&self, _path: &[u8], _data: &[u8]) -> Result<(), Error> {
         Err(Error::Unsupported("immutable filesystem write"))

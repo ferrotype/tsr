@@ -15,7 +15,13 @@ impl Resolver {
         extensions: u8,
         esm: bool,
     ) -> Result<Option<ResolvedModule>, Error> {
-        if !path::is_relative(name) && self.options.paths.as_ref().is_some_and(|p| !p.is_empty()) {
+        if !path::is_relative(name)
+            && self
+                .options
+                .paths
+                .as_ref()
+                .is_some_and(|p| !p.read().is_empty())
+        {
             trace!(self,diagnostics::X_paths_option_is_specified_looking_for_a_pattern_to_match_module_name_0,name);
             // Retain only while the recursive loader borrows self mutably; the
             // option vectors remain borrowed and are never copied per candidate.
@@ -26,12 +32,12 @@ impl Resolver {
                     .paths_base_path(self.cwd.as_bytes())
                     .to_vec()
                     .as_slice(),
-                options.paths.as_ref().unwrap(),
+                &options.paths.as_ref().unwrap().read(),
                 extensions,
                 esm,
             )? {
                 return Ok(Some(result));
-            }
+            };
         }
         if is_relative(name)
             && self
@@ -102,7 +108,7 @@ impl Resolver {
             trace!(
                 self,
                 diagnostics::Trying_substitution_0_candidate_module_location_Colon_1,
-                substitution,
+                &substitution,
                 &replacement
             );
             let ext = extension(substitution.as_bytes());
@@ -178,7 +184,7 @@ impl Resolver {
         trace!(self, diagnostics::Trying_other_entries_in_rootDirs);
         let suffix = &candidate[length..];
         for root in roots {
-            if root == &roots[index] {
+            if Some(root.clone()) == roots.get(index) {
                 continue;
             }
             let candidate = path::combine(&path::normalize(root.as_bytes()), &[suffix]);

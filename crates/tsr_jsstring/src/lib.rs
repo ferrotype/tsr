@@ -25,3 +25,10 @@ pub use line_map::LspLineMap;
 pub use lsp::{LspPosition, PositionEncoding};
 pub use position_map::PositionMap;
 pub use source_text::SourceText;
+
+pub mod classify;
+pub mod compare;
+pub mod text;
+
+pub mod identifier;
+mod identifier_generated;

@@ -1,13 +1,6 @@
 //! The diagnostics leaf group.
 //!
-//! `tsr_diagnostics` supplies the generated identities and the English message
-//! text, so the identity cases call the real production lookup and can produce
-//! a genuine match. Everything the crate's own documentation defers -- argument
-//! substitution, locale negotiation, the translated tables, the reporting
-//! category words and runtime-owned ad-hoc messages -- is a recorded gap, one
-//! per subject, each naming the pinned Go authority and the signature the port
-//! is expected to carry. Nothing here emulates a missing algorithm to make a
-//! comparison run.
+//! All formatting and locale actions call the shared production leaf APIs.
 //!
 //! Byte payloads travel as lowercase hex, matching the Go probe: message text
 //! is compared as raw bytes, and a JSON string would hide a difference that
@@ -18,104 +11,14 @@ use serde_json::{json, Map, Value};
 use crate::api::{self, Outcome};
 use tsr_diagnostics::Message;
 
-/// Subjects whose production Rust entry point does not exist. One row per
-/// boundary, so a `not_implemented` result names the exact operation F1b owes
-/// rather than "diagnostics".
-const MISSING: &[(&str, &str, &str, &str)] = &[
-    ("diagnostics.identity-bytes",
-     "tsc/internal/diagnostics/diagnostics_generated.go:keyToMessage",
-     "pub fn by_key_bytes(key: &[u8]) -> Option<&'static Message>: Go's Key is a byte string, so a non-UTF-8 key is a legal lookup that resolves to nothing, and by_key(&str) cannot be handed one",
-     "crates/tsr_diagnostics/src/lib.rs (by_key takes &str; no byte-keyed lookup exists)"),
-    ("diagnostics.category",
-     "tsc/internal/diagnostics/diagnostics.go:Category.Name",
-     "impl Category { pub fn name(self) -> &'static str } returning warning/error/suggestion/message, plus the generated stringer's separate CategoryWarning.. form and its Category(n) rendering of an out-of-range ordinal",
-     "crates/tsr_diagnostics/src/lib.rs (Category derives Debug only; neither the reporting word nor the stringer form exists)"),
-    ("diagnostics.format",
-     "tsc/internal/diagnostics/diagnostics.go:Format",
-     "pub fn format(text: &[u8], args: &[&[u8]]) -> Vec<u8>: replace every {(\\d+)} whose index is in range, return the text unchanged when args is empty, repair each argument the way Go's strings.ToValidUTF8 does by collapsing a run of invalid bytes to one U+FFFD, and fail on an index at or past args.len()",
-     "crates/tsr_diagnostics/src/lib.rs (absent; a private partial port exists at crates/tsr_compiler/src/diagnostic_writer/mod.rs::localized, which is not a public API and is not this crate's)"),
-    ("diagnostics.localize",
-     "tsc/internal/diagnostics/diagnostics.go:Localize",
-     "pub fn localize(locale: Locale, message: Option<&Message>, key: &str, args: &[&[u8]]) -> Vec<u8>: resolve a missing message through the key table, select the translated text for the negotiated locale, then substitute",
-     "crates/tsr_diagnostics/src/lib.rs (absent; the crate documents formatting and locale negotiation as later slices)"),
-    ("diagnostics.message-localize",
-     "tsc/internal/diagnostics/diagnostics.go:Message.Localize",
-     "impl Message { pub fn localize(&self, locale: Locale, args: &[Arg]) -> Vec<u8> }: the caller-facing path, which takes Go's ...any, renders it the way StringifyArgs does and then runs Localize's by-pointer branch, so an invalid-UTF-8 string argument still reaches Format's repair",
-     "crates/tsr_diagnostics/src/lib.rs (absent; neither the method nor the argument rendering it runs first exists)"),
-    ("diagnostics.table",
-     "tsc/internal/diagnostics/diagnostics.go:getLocalizedMessages",
-     "a generated table set for the 13 shipped translations behind a language matcher over 14 tags, each table lazily decoded once and memoised per tag, with the undefined locale short-circuited to no table",
-     "crates/tsr_diagnostics/src/generated.rs carries English identities only; xtask's diagnostics generator emits no translation table"),
-    ("diagnostics.stringify",
-     "tsc/internal/diagnostics/diagnostics.go:StringifyArgs",
-     "pub fn stringify_args(args: &[Arg]) -> Option<Vec<Vec<u8>>>: no arguments yields None rather than an empty list, a string passes through byte for byte, and everything else takes Go's %v rendering",
-     "crates/tsr_diagnostics/src/lib.rs (absent)"),
-    ("diagnostics.adhoc",
-     "tsc/internal/diagnostics/diagnostics.go:NewAdHocMessage",
-     "pub fn new_ad_hoc(text: impl Into<Box<[u8]>>) -> Message with code -1, Category::Error and key \"-1\", carrying runtime-owned text through the same substitution path",
-     "crates/tsr_diagnostics/src/lib.rs (Message is Copy over &'static str fields and cannot hold runtime text)"),
-];
-
-// Reviewed entry points of the absent APIs above; the request must match
-// both subject and identity before it can report a gap.
-const MISSING_OPERATIONS: &[(&str, &str)] = &[
-    (
-        "diagnostics.adhoc",
-        "tsc/internal/diagnostics/diagnostics.go:NewAdHocMessage",
-    ),
-    (
-        "diagnostics.category",
-        "tsc/internal/diagnostics/diagnostics.go:Category.Name",
-    ),
-    (
-        "diagnostics.category",
-        "tsc/internal/diagnostics/stringer_generated.go:Category.String",
-    ),
-    (
-        "diagnostics.format",
-        "tsc/internal/diagnostics/diagnostics.go:Format",
-    ),
-    (
-        "diagnostics.identity-bytes",
-        "tsc/internal/diagnostics/diagnostics_generated.go:keyToMessage",
-    ),
-    (
-        "diagnostics.localize",
-        "tsc/internal/diagnostics/diagnostics.go:Localize",
-    ),
-    (
-        "diagnostics.message-localize",
-        "tsc/internal/diagnostics/diagnostics.go:Message.Localize",
-    ),
-    (
-        "diagnostics.stringify",
-        "tsc/internal/diagnostics/diagnostics.go:StringifyArgs",
-    ),
-    (
-        "diagnostics.table",
-        "tsc/internal/diagnostics/diagnostics.go:getLocalizedMessages",
-    ),
-    (
-        "diagnostics.table",
-        "tsc/internal/diagnostics/loc_generated.go:loadLocaleData",
-    ),
-];
-
+mod replay;
+pub(super) use replay::panic_text;
 pub fn observe(request: &Value) -> Option<Outcome> {
     match api::subject(request) {
         "diagnostics.roster" => Some(roster(request)),
         "diagnostics.identity" => Some(identity(request)),
-        subject => MISSING.iter().find(|(name, _, _, _)| *name == subject).map(
-            |(_, authority, signature, home)| {
-                crate::api::missing_for_subject(
-                    request,
-                    MISSING_OPERATIONS,
-                    authority,
-                    signature,
-                    home,
-                )
-            },
-        ),
+        subject if subject.starts_with("diagnostics.") => Some(replay::observe(request)),
+        _ => None,
     }
 }
 

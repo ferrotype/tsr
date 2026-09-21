@@ -436,6 +436,7 @@ dependencies = [
  "tsr_jsnum",
  "tsr_json",
  "tsr_jsstring",
+ "tsr_locale",
  "tsr_module",
  "tsr_semver",
  "tsr_tsoptions",
@@ -876,6 +877,11 @@ dependencies = [
 [[package]]
 name = "tsr_diagnostics"
 version = "0.1.0"
+dependencies = [
+ "tsr_core",
+ "tsr_json",
+ "tsr_locale",
+]
 
 [[package]]
 name = "tsr_embed"
@@ -948,6 +954,10 @@ dependencies = [
  "serde",
  "serde_json",
 ]
+
+[[package]]
+name = "tsr_locale"
+version = "0.1.0"
 
 [[package]]
 name = "tsr_module"

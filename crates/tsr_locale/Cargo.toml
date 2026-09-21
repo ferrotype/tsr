@@ -1,0 +1,16 @@
+[package]
+name = "tsr_locale"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = ["crates-io"]
+description = "Pinned TypeScript locale parsing and diagnostic language matching"
+repository.workspace = true
+keywords.workspace = true
+categories.workspace = true
+readme = "README.md"
+include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/licenses/**"]
+
+[lints]
+workspace = true

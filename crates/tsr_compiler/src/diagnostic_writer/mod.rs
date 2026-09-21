@@ -283,7 +283,7 @@ fn styled(out: &mut Vec<u8>, bytes: &[u8], style: &[u8], pretty: bool) {
 
 /// Default-locale formatting uses Go ToValidUTF8 on substituted arguments.
 /// Stored arguments and unformatted external messages remain byte-exact.
-/// port: tsc/internal/diagnostics/diagnostics.go:Format
+/// Uses the shared diagnostics::Format port for the default locale.
 fn localized(d: &Diagnostic) -> Result<Vec<u8>> {
     if d.message.is_none() && !d.message_text.is_empty() {
         return Ok(d.message_text.as_bytes().to_vec());
@@ -296,39 +296,12 @@ fn localized(d: &Diagnostic) -> Result<Vec<u8>> {
                 .and_then(tsr_diagnostics::by_key)
         })
         .ok_or(Error::Unsupported("unknown diagnostic localization key"))?;
-    let bytes = message.text.as_bytes();
-    if d.message_args.is_empty() {
-        return Ok(bytes.to_vec());
-    }
-    let mut out = Vec::new();
-    let mut i = 0;
-    while i < bytes.len() {
-        if bytes[i] == b'{' {
-            if let Some(end) = bytes[i + 1..]
-                .iter()
-                .position(|&b| b == b'}')
-                .map(|j| j + i + 1)
-            {
-                let digits = &bytes[i + 1..end];
-                if !digits.is_empty() && digits.iter().all(u8::is_ascii_digit) {
-                    let index = std::str::from_utf8(digits)
-                        .unwrap()
-                        .parse::<usize>()
-                        .map_err(|_| Error::Unsupported("diagnostic placeholder overflow"))?;
-                    let arg = d
-                        .message_args
-                        .get(index)
-                        .ok_or(Error::Unsupported("diagnostic placeholder lacks argument"))?;
-                    out.extend_from_slice(&valid_argument(arg.as_bytes()));
-                    i = end + 1;
-                    continue;
-                }
-            }
-        }
-        out.push(bytes[i]);
-        i += 1;
-    }
-    Ok(out)
+    let args: Vec<_> = d
+        .message_args
+        .iter()
+        .map(tsr_jsstring::JsString::as_bytes)
+        .collect();
+    tsr_diagnostics::try_format(message.text.as_bytes(), &args).map_err(Error::Unsupported)
 }
 /// Flatten already-resolved default-locale messages. This leaf operation does
 /// not translate content-mapper aliases; file-aware formatting rejects that
@@ -355,25 +328,4 @@ pub fn flattened(d: &Diagnostic, new_line: &[u8]) -> Result<Vec<u8>> {
         );
     }
     Ok(out)
-}
-
-// strings.ToValidUTF8 replaces each consecutive run of invalid bytes once.
-fn valid_argument(bytes: &[u8]) -> Vec<u8> {
-    let mut out = Vec::new();
-    let mut offset = 0;
-    let mut invalid = false;
-    while offset < bytes.len() {
-        let (rune, width) = tsr_jsstring::wtf8::decode_utf8(&bytes[offset..]);
-        if rune == 0xfffd && width == 1 {
-            if !invalid {
-                out.extend_from_slice(b"\xef\xbf\xbd");
-            }
-            invalid = true;
-        } else {
-            out.extend_from_slice(&bytes[offset..offset + width]);
-            invalid = false;
-        }
-        offset += width;
-    }
-    out
 }

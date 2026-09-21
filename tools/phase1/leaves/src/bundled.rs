@@ -261,50 +261,10 @@ pub fn observe(request: &Value) -> Option<Outcome> {
         "BundledLibPath" => Some(lib_path()),
         "BundledDelegation" => Some(delegation(request)),
         "BundledCaseSensitivity" => Some(case_sensitivity(request)),
-        // The walk has no counterpart to call. `tsr_vfs::FileSystem` declares
-        // no walk method at all (crates/tsr_vfs/src/lib.rs:70-95), so neither
-        // the bundled tree nor the delegated root can be walked from here, and
-        // emulating the traversal in this driver would compare the harness
-        // against the pin rather than the port against the pin.
-        "BundledWalk" => Some(Outcome::missing(
-            "tsc/internal/bundled/embed.go:wrappedFS.walkDir",
-            "tsc/internal/bundled/embed.go:wrappedFS.walkDir, reached through wrappedFS.WalkDir",
-            "a walk operation on tsr_vfs::FileSystem, say \
-             walk_dir(&self, root: &[u8], visit: &mut dyn FnMut(&[u8], &Entry) -> Walk) -> \
-             Result<(), Error>, with a Walk control value carrying io/fs.SkipDir's and \
-             fs.SkipAll's two distinct meanings, plus the BundledFs override: a bundled root \
-             yields the scheme root's single `libs` directory entry and then the libraries, \
-             joining rest + \"/\" + name onto a scheme that already ends in a slash, never \
-             emits the root itself, treats any other bundled remainder as an empty walk rather \
-             than an error, and forwards a non-bundled root to the inner filesystem unchanged",
-            "crates/tsr_bundled/src/lib.rs (BundledFs implements read_file/stat/\
-             directory_exists/entries/realpath and no traversal; crates/tsr_vfs/src/lib.rs has \
-             no walk method for it to override)",
-        )),
-        // Reads are exercised separately. This mixed trace also needs the
-        // absent walk API and Go-compatible mutation refusal/delegation.
-        "BundledWrapper" => Some(Outcome::missing(
-            "tsc/internal/bundled/embed.go:wrappedFS.WalkDir",
-            "tsc/internal/bundled/embed.go:wrappedFS.WalkDir and mutating methods",
-            "a FileSystem walk operation and bundled mutation refusal/delegation; reads are already exercised by BundledReads and BundledLookup",
-            "crates/tsr_bundled/src/lib.rs (FileSystem has no walk method; bundled mutations currently inherit Unsupported defaults)",
-        )),
-        // Reported as a gap rather than answered. The Go accessor resolves the
-        // package's own source directory through runtime.Caller(0); the Rust
-        // crate compiles its assets in from a crate-local copy, so there is no
-        // checkout path for a counterpart to return. Recording that as a named
-        // missing operation is the accurate classification, not an admission
-        // that packaged access is unimplemented: the asset-index case is where
-        // checkout-independent access is actually witnessed.
-        "BundledSourceDir" => Some(Outcome::missing(
-            "tsc/internal/bundled/bundled.go:TestingLibPath",
-            "tsc/internal/bundled/bundled.go:TestingLibPath",
-            "none by construction: the Go accessor returns its own source directory from \
-             runtime.Caller(0), while crates/tsr_bundled embeds bundled/libs with \
-             include_bytes! and ships it through the Cargo `include` list, so a packaged \
-             consumer has no source directory to locate",
-            "crates/tsr_bundled/src/lib.rs (LIBRARIES; no source-directory accessor intended)",
-        )),
+        "BundledWalk" => Some(extra::walk(request)),
+        "BundledWrapper" => Some(extra::wrapper()),
+        "BundledSourceDir" => Some(extra::source_dir()),
         _ => None,
     }
 }
+mod extra;

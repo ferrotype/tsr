@@ -297,7 +297,7 @@ pub use config_parse::{
 };
 
 pub mod config_json;
-pub use config_json::stringify_json;
+pub use config_json::{stringify_json, stringify_json_indent};
 
 mod options_value;
 pub use options_value::compiler_options_value;
