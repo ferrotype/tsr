@@ -1,270 +1,649 @@
-//! The `iovfs` adapter group: the io/fs-backed filesystem.
+//! The `vfs/iovfs` group: the compiler filesystem over an `io/fs` backing, and
+//! the root dispatcher beneath it.
 //!
-//! Every operation in this group is a recorded gap. `crates/` has exactly two
-//! `impl FileSystem` -- `MemorySnapshot` (crates/tsr_vfs/src/lib.rs:215) and
-//! `BundledFs` (crates/tsr_bundled/src/lib.rs:455) -- and neither is an adapter
-//! over a foreign filesystem: `MemorySnapshot` owns its own `BTreeMap` of
-//! entries and `BundledFs` delegates to another `FileSystem`. Nothing in
-//! `crates/` takes a host filesystem abstraction and wraps it, nothing probes
-//! it for optional capabilities, and nothing hands the wrapped value back.
-//! `ScopedOsFs` (crates/tsr_vfs/src/os.rs:6) reads a real directory into a
-//! `MemorySnapshot` once; it does not implement `FileSystem` and it is not an
-//! adapter.
-//!
-//! A same-named trait method is not a counterpart. `FileSystem::file_exists`
-//! and `directory_exists` (lib.rs:77-82) have the derived-from-stat shape this
-//! group tests, but there is no way to obtain one over an `fs.FS`-shaped
-//! backing, which is what every case here constructs; the four mutations
-//! (lib.rs:83-94) are provided methods that return `Error::Unsupported`, which
-//! is a different contract from the pin's five distinct panics; and
-//! `change_times` takes no times at all, so the argument-order case has no
-//! signature to call.
-//!
-//! Preparation records the gap; it never emulates the adapter to make a
-//! comparison run, and it never reads an expected result. Each row names the
-//! pinned Go authority, the signature the port is expected to carry and the
-//! file that does not have it yet.
+//! Every action drives `tsr_vfs::iovfs`. The native probe hands the adapter
+//! five kinds of backing to show which capability selects which behaviour; this
+//! replay builds the same five over the production `MapFs` and `TestFs`, with
+//! the spy recording what reached it. Nothing here emulates the adapter.
 
-use crate::api::Outcome;
-use serde_json::Value;
+use std::sync::{Arc, Mutex};
 
-/// The action vocabulary, with the keys each action must carry.
-///
-/// An unknown action, or an action missing a key, is a harness failure on both
-/// sides rather than an observation -- the Go probe panics, this module fails.
-/// A defaulted key would let the two sides agree on a row neither of them
-/// executed, which is exactly the agreement these cases exist to refuse.
-const ACTIONS: &[(&str, &[(&str, Kind)])] = &[
-    (
-        "new_fs",
-        &[
-            ("backing", Kind::Str),
-            ("case_sensitive", Kind::Bool),
-            ("files", Kind::Array),
-        ],
-    ),
-    ("use_case_sensitive_file_names", &[]),
-    ("file_exists", &[("path", Kind::Str)]),
-    ("directory_exists", &[("path", Kind::Str)]),
-    ("stat", &[("path", Kind::Str)]),
-    ("read_file", &[("path", Kind::Str)]),
-    ("entries", &[("path", Kind::Str)]),
-    ("realpath", &[("path", Kind::Str)]),
-    ("walk", &[("root", Kind::Str)]),
-    ("write_file", &[("path", Kind::Str), ("content", Kind::Str)]),
-    (
-        "append_file",
-        &[("path", Kind::Str), ("content", Kind::Str)],
-    ),
-    ("remove", &[("path", Kind::Str)]),
-    (
-        "chtimes",
-        &[
-            ("path", Kind::Str),
-            ("atime", Kind::Str),
-            ("mtime", Kind::Str),
-        ],
-    ),
-    ("fsys_kind", &[]),
-    ("fsys_identity", &[("path", Kind::Str)]),
-    ("fsys_read", &[("path", Kind::Str)]),
-    ("backing_mod_time", &[("path", Kind::Str)]),
-    ("spy_log", &[]),
+use serde_json::{json, Value};
+use tsr_vfs::{
+    iofs::{self, FileMode, Fs, Handle, IoError, MapFile, MapFs, Time, WalkError},
+    iovfs::{self, Backing, IoVfs, RealpathFs, WritableFs},
+    vfstest::{self, Clock, InputFile, TestFs},
+    Entries,
+};
+
+use crate::api::{action_op, actions, ordered, subject, Outcome};
+
+const SUBJECTS: &[&str] = &[
+    "iovfs.From",
+    "iovfs.Read",
+    "iovfs.Entries",
+    "iovfs.Realpath",
+    "iovfs.Walk",
+    "iovfs.Mutate",
+    "iovfs.Identity",
 ];
-
-#[derive(Clone, Copy)]
-enum Kind {
-    Str,
-    Bool,
-    Array,
-}
-
-impl Kind {
-    fn accepts(self, value: &Value) -> bool {
-        match self {
-            Kind::Str => value.is_string(),
-            Kind::Bool => value.is_boolean(),
-            Kind::Array => value.is_array(),
-        }
-    }
-
-    fn name(self) -> &'static str {
-        match self {
-            Kind::Str => "a string",
-            Kind::Bool => "a boolean",
-            Kind::Array => "an array",
-        }
-    }
-}
-
-/// The pinned authority, the signature the port is expected to carry and the
-/// file that does not have it yet, one row per operation id.
-const MISSING: &[(&str, &str, &str, &str)] = &[
-    ("tsc/internal/vfs/iovfs/iofs.go:From",
-     "tsc/internal/vfs/iovfs/iofs.go:From",
-     "pub fn from_io_fs(fsys: Arc<dyn IoFs>, use_case_sensitive_file_names: bool) -> Arc<dyn FsWithSys>, \
-      detecting two OPTIONAL capabilities on the backing separately -- a realpath capability and a \
-      writable capability -- and binding six closures: a realpath that strips a leading `/`, calls the \
-      backing and puts the `/` back (or the identity when the backing has none), and write/append/mkdir/\
-      remove/chtimes that strip a leading `/` and pass perm 0o666, 0o666, 0o777 (or panic with the five \
-      literal texts `writeFile not supported`, `appendFile not supported`, `mkdirAll not supported`, \
-      `remove not supported`, `chtimes not supported`), plus a root_for that returns the backing for `/`, \
-      a sub-filesystem for any other root, None for a URL root and a panic otherwise",
-     "crates/tsr_vfs/src/lib.rs (absent: the two `impl FileSystem` at lib.rs:215 and \
-      crates/tsr_bundled/src/lib.rs:455 own or delegate their storage; no adapter over a foreign \
-      filesystem exists, and no trait models an optional backing capability)"),
-    ("tsc/internal/vfs/iovfs/iofs.go:ioFS.AppendFile",
-     "tsc/internal/vfs/iovfs/iofs.go:ioFS.AppendFile, through :writeFileEnsuringDir",
-     "fn append_file(&self, path: &[u8], data: &[u8]) -> Result<(), Error> on the io/fs-backed \
-      adapter, creating a missing file with content == data, extending an existing one, following a \
-      directory symlink, and going through the shared ensure-directory body",
-     "crates/tsr_vfs/src/lib.rs:86-88 has only the trait default `Err(Error::Unsupported(\"immutable \
-      filesystem append\"))`; no implementor overrides it and no adapter exists to override it on"),
-    ("tsc/internal/vfs/iovfs/iofs.go:ioFS.Chtimes",
-     "tsc/internal/vfs/iovfs/iofs.go:ioFS.Chtimes",
-     "fn change_times(&self, path: &[u8], atime: SystemTime, mtime: SystemTime) -> Result<(), Error>, \
-      asserting the path is rooted before the backing sees it and forwarding BOTH times in order",
-     "crates/tsr_vfs/src/lib.rs:92-94 declares `change_times(&self, _path: &[u8])`, which takes no \
-      times at all, so the signature cannot carry this operation even once an adapter exists"),
-    ("tsc/internal/vfs/iovfs/iofs.go:ioFS.DirectoryExists",
-     "tsc/internal/vfs/iovfs/iofs.go:ioFS.DirectoryExists, through internal.Common.DirectoryExists",
-     "fn directory_exists(&self, path: &[u8]) -> Result<bool, Error> on the io/fs-backed adapter, \
-      derived from stat so it inherits absent-means-false and the rooted-path assertion",
-     "crates/tsr_vfs/src/lib.rs:80-82 has the derived shape as a trait default, but no io/fs-backed \
-      implementor exists to call it on"),
-    ("tsc/internal/vfs/iovfs/iofs.go:ioFS.FSys",
-     "tsc/internal/vfs/iovfs/iofs.go:ioFS.FSys",
-     "fn fsys(&self) -> Arc<dyn IoFs> returning the EXACT backing handed to the constructor -- never a \
-      copy, never a sub-filesystem, never the adapter itself -- so the adapter stays an alias of a live \
-      backing rather than a snapshot of it",
-     "crates/tsr_vfs/src/ (absent: nothing in crates/ hands back the source a filesystem was built over; \
-      `BundledFs` stores `inner: Arc<dyn FileSystem>` at crates/tsr_bundled/src/lib.rs:451 and exposes \
-      no accessor for it)"),
-    ("tsc/internal/vfs/iovfs/iofs.go:ioFS.FileExists",
-     "tsc/internal/vfs/iovfs/iofs.go:ioFS.FileExists, through internal.Common.FileExists",
-     "fn file_exists(&self, path: &[u8]) -> Result<bool, Error> on the io/fs-backed adapter, derived \
-      from stat so a directory answers FALSE and a dangling symlink answers false",
-     "crates/tsr_vfs/src/lib.rs:77-79 has the derived shape as a trait default, but no io/fs-backed \
-      implementor exists to call it on"),
-    ("tsc/internal/vfs/iovfs/iofs.go:ioFS.GetAccessibleEntries",
-     "tsc/internal/vfs/iovfs/iofs.go:ioFS.GetAccessibleEntries, through internal.Common.GetAccessibleEntries",
-     "fn entries(&self, path: &[u8]) -> Result<Entries, Error> on the io/fs-backed adapter, listing the \
-      backing's directory in the backing's own order, dropping an entry that is neither a directory nor a \
-      regular file after following it, dropping a dangling link entirely, and always answering a \
-      present-but-possibly-empty symlink set",
-     "crates/tsr_vfs/src/lib.rs:250-282 implements it only for `MemorySnapshot`, over that snapshot's own \
-      `BTreeMap`; there is no io/fs-backed implementor"),
-    ("tsc/internal/vfs/iovfs/iofs.go:ioFS.ReadFile",
-     "tsc/internal/vfs/iovfs/iofs.go:ioFS.ReadFile, through internal.Common.ReadFile and :decodeBytes",
-     "fn read_file(&self, path: &[u8]) -> Result<Option<FileContent>, Error> on the io/fs-backed adapter, \
-      answering present-with-empty for a zero-length file before any decoding, absent for a missing path, \
-      a directory or an unreadable one, and otherwise decoding a UTF-16 BOM, stripping a UTF-8 BOM and \
-      passing the remaining bytes through unvalidated",
-     "crates/tsr_vfs/src/lib.rs:222-230 implements it only for `MemorySnapshot`, which returns a \
-      pre-decoded `FileContent` from its own map; there is no io/fs-backed implementor and no adapter-\
-      level byte decoder"),
-    ("tsc/internal/vfs/iovfs/iofs.go:ioFS.Realpath",
-     "tsc/internal/vfs/iovfs/iofs.go:ioFS.Realpath, with the closure bound at :44-61",
-     "fn realpath(&self, path: &[u8]) -> Result<JsString, Error> on the io/fs-backed adapter, splitting \
-      and normalizing the path first, then either resolving it through the backing's optional realpath \
-      capability or returning the normalized path unchanged, and returning the RAW argument when the \
-      backing errors",
-     "crates/tsr_vfs/src/lib.rs:283-288 implements it only for `MemorySnapshot`; there is no io/fs-backed \
-      implementor and no notion of a backing that may or may not resolve real paths"),
-    ("tsc/internal/vfs/iovfs/iofs.go:ioFS.Remove",
-     "tsc/internal/vfs/iovfs/iofs.go:ioFS.Remove",
-     "fn remove(&self, path: &[u8]) -> Result<(), Error> on the io/fs-backed adapter, asserting the path \
-      is rooted and then forwarding the raw path to the backing",
-     "crates/tsr_vfs/src/lib.rs:89-91 has only the trait default `Err(Error::Unsupported(\"immutable \
-      filesystem remove\"))`; `MemoryBuilder::remove` (lib.rs:158) mutates a builder, not a filesystem, \
-      and is not reachable through the trait"),
-    ("tsc/internal/vfs/iovfs/iofs.go:ioFS.Stat",
-     "tsc/internal/vfs/iovfs/iofs.go:ioFS.Stat, with the rooted-path assertion at :168",
-     "fn stat(&self, path: &[u8]) -> Result<Option<FileInfo>, Error> on the io/fs-backed adapter, \
-      carrying the entry's name, size, directory flag, mode and modification time, asserting the RAW \
-      path is rooted before normalization, and answering absent rather than an error for a missing path \
-      or a URL root",
-     "crates/tsr_vfs/src/lib.rs:231-249 implements it only for `MemorySnapshot`, and its `FileInfo` \
-      (lib.rs:64-67) carries only `directory` and `size` -- no name, no mode and no modification time, \
-      so three quarters of this case's observation has no field to land in"),
-    ("tsc/internal/vfs/iovfs/iofs.go:ioFS.UseCaseSensitiveFileNames",
-     "tsc/internal/vfs/iovfs/iofs.go:ioFS.UseCaseSensitiveFileNames",
-     "fn use_case_sensitive_file_names(&self) -> bool on the io/fs-backed adapter, returning the stored \
-      constructor argument verbatim and NEVER governing lookup inside the adapter: the backing decides \
-      whether names fold",
-     "crates/tsr_vfs/src/lib.rs:71 declares the method and lib.rs:216-218 returns `MemorySnapshot`'s \
-      stored flag, but there the same flag also drives the snapshot's own canonicalisation, so no type \
-      in crates/ separates the reported flag from the folding the way this adapter does"),
-    ("tsc/internal/vfs/iovfs/iofs.go:ioFS.WalkDir",
-     "tsc/internal/vfs/iovfs/iofs.go:ioFS.WalkDir, through internal.Common.WalkDir",
-     "fn walk_dir(&self, root: &[u8], f: &mut dyn FnMut(&[u8], Option<&DirEntry>, Option<Error>) -> \
-      WalkDecision) -> Result<(), Error>, visiting in the backing's own order, rewriting the root row's \
-      path from `.` to the root name, passing an absent entry together with an error, and honouring \
-      skip-directory, skip-all and a callback error",
-     "crates/tsr_vfs/src/lib.rs:70-95 lists eleven trait methods and none of them walks; no crate in \
-      crates/ carries a directory walk over a `FileSystem`"),
-    ("tsc/internal/vfs/iovfs/iofs.go:ioFS.WriteFile",
-     "tsc/internal/vfs/iovfs/iofs.go:ioFS.WriteFile, through :writeFileEnsuringDir",
-     "fn write_file(&self, path: &[u8], data: &[u8]) -> Result<(), Error> on the io/fs-backed adapter, \
-      replacing rather than extending, keeping a file that is written empty, following a directory \
-      symlink, and going through the shared ensure-directory body",
-     "crates/tsr_vfs/src/lib.rs:83-85 has only the trait default `Err(Error::Unsupported(\"immutable \
-      filesystem write\"))`; no implementor overrides it and no adapter exists to override it on"),
-    ("tsc/internal/vfs/iovfs/iofs.go:ioFS.writeFileEnsuringDir",
-     "tsc/internal/vfs/iovfs/iofs.go:ioFS.writeFileEnsuringDir",
-     "a private shared body behind write_file and append_file: assert the RAW path is rooted, call the \
-      backing once with the RAW path, and only if that fails create the directory of the NORMALIZED path \
-      and call the backing a second time with the RAW path again -- two different spellings of the same \
-      path in one function, and exactly one retry",
-     "crates/tsr_vfs/src/lib.rs (absent, and the behaviour has no analogue either: write_file and \
-      append_file at lib.rs:83-88 are trait defaults that return an error without touching any storage, \
-      so there is no directory-creating retry anywhere in crates/)"),
-];
-
-fn problem(request: &Value) -> Option<String> {
-    for (index, action) in crate::api::actions(request).iter().enumerate() {
-        let op = crate::api::action_op(action);
-        let Some((_, keys)) = ACTIONS.iter().find(|(name, _)| *name == op) else {
-            return Some(format!("action {index} is an unsupported action: {op:?}"));
-        };
-        for (key, kind) in *keys {
-            match action.get(*key) {
-                None => {
-                    return Some(format!(
-                        "action {index} ({op}) requires {key}; an absent key must fail rather than default"
-                    ))
-                }
-                Some(value) if !kind.accepts(value) => {
-                    return Some(format!(
-                        "action {index} ({op}) needs {key} to be {}",
-                        kind.name()
-                    ))
-                }
-                Some(_) => {}
-            }
-        }
-    }
-    None
-}
+const WALK_STOP: &str = "phase1: walk callback stop";
+const SPY_MKDIR_REFUSED: &str = "phase1: spy refused the mkdir";
 
 pub fn observe(request: &Value) -> Option<Outcome> {
-    if !crate::api::subject(request).starts_with("iovfs.") {
+    if !SUBJECTS.contains(&subject(request)) {
         return None;
     }
-    if let Some(reason) = problem(request) {
-        return Some(Outcome::Failed(reason));
+    let mut state = None;
+    let rows: Result<Vec<Value>, String> = actions(request)
+        .iter()
+        .map(|a| row(&mut state, a))
+        .collect();
+    Some(match rows {
+        Ok(rows) => Outcome::Observed(ordered(rows)),
+        Err(problem) => Outcome::Failed(problem),
+    })
+}
+
+/// 2023-11-14T22:13:20Z plus one second per reading.
+struct FixedClock(Mutex<i64>);
+impl Clock for FixedClock {
+    fn now(&self) -> Time {
+        let mut ticks = self
+            .0
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
+        *ticks += 1;
+        Time::from_unix(1_700_000_000 + *ticks, 0)
     }
-    let operation = request
-        .get("operation")
-        .and_then(Value::as_str)
-        .unwrap_or_default();
-    let Some((identity, authority, signature, home)) =
-        MISSING.iter().find(|(id, _, _, _)| *id == operation)
-    else {
-        return Some(Outcome::Failed(format!(
-            "no recorded gap for operation {operation:?}; the iovfs group answers only the \
-             fifteen operations of tsc/internal/vfs/iovfs/iofs.go"
-        )));
+}
+
+#[derive(Default)]
+struct Spy {
+    calls: Vec<Value>,
+    write_attempts: i64,
+    fail_writes: i64,
+    fail_mkdir: bool,
+}
+/// One backing type for the five native kinds: what it serves, and which of the
+/// two optional capabilities it declares.
+struct Driven {
+    files: Served,
+    resolves: bool,
+    spy: Option<Mutex<Spy>>,
+}
+enum Served {
+    Plain(MapFs),
+    Test(TestFs),
+}
+impl Fs for Driven {
+    fn open(&self, name: &[u8]) -> Result<Handle, IoError> {
+        match &self.files {
+            Served::Plain(fs) => fs.open(name),
+            Served::Test(fs) => fs.open(name),
+        }
+    }
+}
+impl Backing for Driven {
+    fn as_realpath(&self) -> Option<&dyn RealpathFs> {
+        (self.resolves || matches!(self.files, Served::Test(_))).then_some(self as &dyn RealpathFs)
+    }
+    fn as_writable(&self) -> Option<&dyn WritableFs> {
+        (self.spy.is_some() || matches!(self.files, Served::Test(_)))
+            .then_some(self as &dyn WritableFs)
+    }
+}
+impl RealpathFs for Driven {
+    fn realpath(&self, p: &[u8]) -> Result<Vec<u8>, IoError> {
+        if let Served::Test(fs) = &self.files {
+            return fs.realpath(p);
+        }
+        if p.windows(4).any(|window| window == b"boom") {
+            return Err(IoError::NotExist);
+        }
+        Ok([b"RP<".as_slice(), p, b">"].concat())
+    }
+}
+impl Driven {
+    fn spy(&self) -> std::sync::MutexGuard<'_, Spy> {
+        self.spy
+            .as_ref()
+            .expect("a spy backing")
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner)
+    }
+    fn refuse_write(&self) -> Result<(), IoError> {
+        let mut spy = self.spy();
+        spy.write_attempts += 1;
+        if spy.fail_writes > 0 {
+            spy.fail_writes -= 1;
+            return Err(IoError::message(format!(
+                "phase1: spy refused write {}: phase1: spy refused the write",
+                spy.write_attempts
+            )));
+        }
+        Ok(())
+    }
+    fn record(&self, row: Value) {
+        self.spy().calls.push(row);
+    }
+}
+impl WritableFs for Driven {
+    fn write_file(&self, p: &[u8], data: &[u8], perm: u32) -> Result<(), IoError> {
+        if let Served::Test(fs) = &self.files {
+            return fs.write_file(p, data, perm);
+        }
+        let result = self.refuse_write();
+        self.record(json!([
+            "WriteFile",
+            text(p),
+            hex(data),
+            perm_octal(perm),
+            error_class(result.as_ref().err())
+        ]));
+        result
+    }
+    fn append_file(&self, p: &[u8], data: &[u8], perm: u32) -> Result<(), IoError> {
+        if let Served::Test(fs) = &self.files {
+            return fs.append_file(p, data, perm);
+        }
+        let result = self.refuse_write();
+        self.record(json!([
+            "AppendFile",
+            text(p),
+            hex(data),
+            perm_octal(perm),
+            error_class(result.as_ref().err())
+        ]));
+        result
+    }
+    fn mkdir_all(&self, p: &[u8], perm: u32) -> Result<(), IoError> {
+        if let Served::Test(fs) = &self.files {
+            return fs.mkdir_all(p, perm);
+        }
+        let result = if self.spy().fail_mkdir {
+            Err(IoError::message(SPY_MKDIR_REFUSED))
+        } else {
+            Ok(())
+        };
+        self.record(json!([
+            "MkdirAll",
+            text(p),
+            "",
+            perm_octal(perm),
+            error_class(result.as_ref().err())
+        ]));
+        result
+    }
+    fn remove(&self, p: &[u8]) -> Result<(), IoError> {
+        if let Served::Test(fs) = &self.files {
+            return fs.remove(p);
+        }
+        self.record(json!(["Remove", text(p), "", "", ""]));
+        Ok(())
+    }
+    fn chtimes(&self, p: &[u8], a_time: Time, m_time: Time) -> Result<(), IoError> {
+        if let Served::Test(fs) = &self.files {
+            return fs.chtimes(p, a_time, m_time);
+        }
+        self.record(json!([
+            "Chtimes",
+            text(p),
+            a_time.format_rfc3339_nano(),
+            m_time.format_rfc3339_nano(),
+            ""
+        ]));
+        Ok(())
+    }
+}
+
+struct State {
+    kind: String,
+    adapter: Arc<IoVfs<Driven>>,
+    handed: Arc<Driven>,
+    pointer_backing: bool,
+}
+
+fn build(a: &Value) -> Result<State, String> {
+    let kind = string(a, "backing")?;
+    let sensitive = a
+        .get("case_sensitive")
+        .and_then(Value::as_bool)
+        .ok_or("new_fs requires case_sensitive")?;
+    let files = a
+        .get("files")
+        .and_then(Value::as_array)
+        .ok_or("new_fs requires files")?;
+    let spy = || {
+        Some(Mutex::new(Spy {
+            fail_writes: a.get("fail_writes").and_then(Value::as_i64).unwrap_or(0),
+            fail_mkdir: a
+                .get("fail_mkdir")
+                .and_then(Value::as_bool)
+                .unwrap_or(false),
+            ..Spy::default()
+        }))
     };
-    Some(Outcome::missing(*identity, authority, signature, home))
+    let driven = match kind.as_str() {
+        "fstest_map" => Driven {
+            files: Served::Plain(plain_map(files)?),
+            resolves: false,
+            spy: None,
+        },
+        "realpath_only" => Driven {
+            files: Served::Plain(plain_map(files)?),
+            resolves: true,
+            spy: None,
+        },
+        "writable_only" => Driven {
+            files: Served::Plain(plain_map(files)?),
+            resolves: false,
+            spy: spy(),
+        },
+        "spy_realpath" => Driven {
+            files: Served::Plain(plain_map(files)?),
+            resolves: true,
+            spy: spy(),
+        },
+        "vfstest_map" => {
+            let mut seeded = std::collections::BTreeMap::new();
+            for entry in files {
+                let (path, file) = seed_file(entry)?;
+                seeded.insert(path, InputFile::File(file));
+            }
+            let fs = vfstest::from_map_with_clock(
+                &seeded,
+                sensitive,
+                Arc::new(FixedClock(Mutex::new(0))),
+            );
+            Driven {
+                files: Served::Test(fs),
+                resolves: true,
+                spy: None,
+            }
+        }
+        other => return Err(format!("unsupported backing: {other}")),
+    };
+    let handed = Arc::new(driven);
+    Ok(State {
+        pointer_backing: kind != "fstest_map",
+        kind,
+        adapter: Arc::new(iovfs::from(handed.clone(), sensitive)),
+        handed,
+    })
+}
+
+fn row(state: &mut Option<State>, a: &Value) -> Result<Value, String> {
+    let op = action_op(a);
+    if op == "new_fs" {
+        let built = build(a)?;
+        let result = json!([
+            built.kind,
+            built.handed.as_realpath().is_some(),
+            built.handed.as_writable().is_some(),
+            built.adapter.use_case_sensitive_file_names()
+        ]);
+        *state = Some(built);
+        return Ok(json!({ "op": op, "result": result }));
+    }
+    let s = state
+        .as_ref()
+        .ok_or_else(|| format!("action {op} ran before new_fs"))?;
+    let adapter = s.adapter.clone();
+    let mut out = json!({ "op": op });
+    let path = a.get("path").and_then(Value::as_str).map(str::to_owned);
+    let need_path = || {
+        path.clone()
+            .ok_or_else(|| format!("action {op} requires path"))
+    };
+    let (value, panicked) = match op {
+        "use_case_sensitive_file_names" => {
+            guarded(move || json!([adapter.use_case_sensitive_file_names()]))
+        }
+        "file_exists" => {
+            let p = need_path()?;
+            guarded(move || json!([adapter.file_exists(p.as_bytes())]))
+        }
+        "directory_exists" => {
+            let p = need_path()?;
+            guarded(move || json!([adapter.directory_exists(p.as_bytes())]))
+        }
+        "stat" => {
+            let p = need_path()?;
+            guarded(move || match adapter.stat(p.as_bytes()) {
+                None => json!([false]),
+                Some(info) => json!([
+                    true,
+                    text(&info.name),
+                    info.size,
+                    info.is_dir(),
+                    mode_class(info.mode),
+                    perm_octal(info.mode.perm()),
+                    info.mod_time.format_rfc3339_nano()
+                ]),
+            })
+        }
+        "read_file" => {
+            let p = need_path()?;
+            guarded(move || {
+                let contents = adapter.read_file(p.as_bytes());
+                let bytes = contents.clone().unwrap_or_default();
+                json!([contents.is_some(), hex(&bytes), bytes.len()])
+            })
+        }
+        "entries" => {
+            let p = need_path()?;
+            guarded(move || entries_row(&adapter.get_accessible_entries(p.as_bytes())))
+        }
+        "realpath" => {
+            let p = need_path()?;
+            guarded(move || json!([text(&adapter.realpath(p.as_bytes()))]))
+        }
+        "walk" => {
+            let root = string(a, "root")?;
+            let control = walk_decisions(a)?;
+            out["root"] = json!(root);
+            guarded(move || walk_once(&adapter, root.as_bytes(), &control))
+        }
+        "write_file" | "append_file" => {
+            let (p, content) = (need_path()?, string(a, "content")?);
+            let append = op == "append_file";
+            guarded(move || {
+                let result = if append {
+                    adapter.append_file(p.as_bytes(), content.as_bytes())
+                } else {
+                    adapter.write_file(p.as_bytes(), content.as_bytes())
+                };
+                json!([error_class(result.as_ref().err())])
+            })
+        }
+        "remove" => {
+            let p = need_path()?;
+            guarded(move || json!([error_class(adapter.remove(p.as_bytes()).as_ref().err())]))
+        }
+        "chtimes" => {
+            let p = need_path()?;
+            let (a_time, m_time) = (time(a, "atime")?, time(a, "mtime")?);
+            guarded(move || {
+                json!([error_class(
+                    adapter.chtimes(p.as_bytes(), a_time, m_time).as_ref().err()
+                )])
+            })
+        }
+        // The backing handed to `from` is never itself an adapter.
+        "fsys_kind" => (json!([s.kind, false]), Value::Null),
+        "fsys_identity" => {
+            let p = need_path()?;
+            let (handed, comparable) = (s.handed.clone(), s.pointer_backing);
+            guarded(move || {
+                let got = adapter.fsys().clone();
+                let reached = match iofs::stat(&*got, p.as_bytes()) {
+                    Ok(info) => json!(["", text(&info.name), info.size, mode_class(info.mode)]),
+                    Err(error) => json!([error_class(Some(&error))]),
+                };
+                if comparable {
+                    json!(["comparable", Arc::ptr_eq(&got, &handed), reached])
+                } else {
+                    json!(["not_comparable", reached])
+                }
+            })
+        }
+        "fsys_read" => {
+            let p = need_path()?;
+            guarded(
+                move || match iofs::read_file(&**adapter.fsys(), p.as_bytes()) {
+                    Ok(data) => json!(["", hex(&data), data.len()]),
+                    Err(error) => json!([error_class(Some(&error)), "", 0]),
+                },
+            )
+        }
+        "backing_mod_time" => {
+            let p = need_path()?;
+            let Served::Test(fs) = &s.handed.files else {
+                return Err(format!(
+                    "action {op} needs a vfstest backing, got {}",
+                    s.kind
+                ));
+            };
+            (
+                json!([fs.get_mod_time(p.as_bytes()).format_rfc3339_nano()]),
+                Value::Null,
+            )
+        }
+        "spy_log" => {
+            if s.handed.spy.is_none() {
+                return Err(format!("action {op} needs a spy backing, got {}", s.kind));
+            }
+            let calls = std::mem::take(&mut s.handed.spy().calls);
+            return Ok(json!({ "op": op, "result": calls }));
+        }
+        other => return Err(format!("unsupported action: {other}")),
+    };
+    if let Some(p) = path.filter(|_| op != "walk") {
+        out["path"] = json!(p);
+    }
+    out["result"] = value;
+    out["panic"] = panicked;
+    Ok(out)
+}
+
+fn walk_once(adapter: &IoVfs<Driven>, root: &[u8], control: &[(String, String)]) -> Value {
+    let mut rows = Vec::new();
+    let outcome = adapter.walk_dir(root, &mut |path, entry, walk_error| {
+        let spelled = text(path);
+        let decision = control
+            .iter()
+            .find(|(at, _)| *at == spelled)
+            .map_or("continue", |(_, d)| d.as_str());
+        let (name, directory, class) = entry.map_or((String::new(), false, "nil"), |entry| {
+            (
+                text(&entry.name),
+                entry.is_dir(),
+                mode_class(entry.mode.file_type()),
+            )
+        });
+        rows.push(json!([
+            spelled,
+            name,
+            directory,
+            class,
+            error_class(walk_error.as_ref()),
+            decision
+        ]));
+        match decision {
+            "skip_dir" => Err(WalkError::SkipDir),
+            "skip_all" => Err(WalkError::SkipAll),
+            "error" => Err(WalkError::Other(IoError::message(WALK_STOP))),
+            "propagate" => walk_error.map_or(Ok(()), |error| Err(WalkError::Other(error))),
+            _ => Ok(()),
+        }
+    });
+    json!([rows, error_class(outcome.as_ref().err())])
+}
+fn walk_decisions(a: &Value) -> Result<Vec<(String, String)>, String> {
+    let Some(control) = a.get("control").filter(|value| !value.is_null()) else {
+        return Ok(Vec::new());
+    };
+    control
+        .as_array()
+        .ok_or("control is not an array")?
+        .iter()
+        .map(|pair| {
+            let cell = |index: usize| pair.get(index).and_then(Value::as_str).map(str::to_owned);
+            match (cell(0), cell(1)) {
+                (Some(at), Some(decision))
+                    if ["continue", "skip_dir", "skip_all", "error", "propagate"]
+                        .contains(&decision.as_str()) =>
+                {
+                    Ok((at, decision))
+                }
+                _ => Err("malformed walk control entry".to_string()),
+            }
+        })
+        .collect()
+}
+fn entries_row(got: &Entries) -> Value {
+    let names = |list: &[tsr_jsstring::JsString]| {
+        list.iter()
+            .map(|name| text(name.as_bytes()))
+            .collect::<Vec<_>>()
+    };
+    let links: Vec<String> = got
+        .symlinks
+        .iter()
+        .flatten()
+        .map(|name| text(name.as_bytes()))
+        .collect();
+    json!([
+        names(&got.files),
+        names(&got.directories),
+        links,
+        got.symlinks.is_none()
+    ])
+}
+fn error_class(error: Option<&IoError>) -> String {
+    let Some(error) = error else {
+        return String::new();
+    };
+    let sentence = error.to_string();
+    if sentence.contains("parent path exists but is not a directory") {
+        "parent_not_a_directory".into()
+    } else if sentence.contains("path exists but is not a directory") {
+        "not_a_directory".into()
+    } else if sentence.contains("path exists but is not a regular file") {
+        "not_a_regular_file".into()
+    } else if sentence.contains("broken symlink") {
+        "broken_symlink".into()
+    } else if sentence == WALK_STOP {
+        "walk_sentinel".into()
+    } else if let Some(rest) = sentence.strip_prefix("phase1: spy refused write ") {
+        format!("spy_refused_write:{}", rest.split(':').next().unwrap_or(""))
+    } else if sentence == SPY_MKDIR_REFUSED {
+        "spy_refused_mkdir".into()
+    } else if error.is_not_exist() {
+        "not_exist".into()
+    } else if matches!(error, IoError::Invalid)
+        || matches!(error, IoError::Path { source, .. } if **source == IoError::Invalid)
+    {
+        "invalid".into()
+    } else {
+        format!("other:{sentence}")
+    }
+}
+fn mode_class(mode: FileMode) -> &'static str {
+    if mode.is_dir() {
+        "dir"
+    } else if mode.is_regular() {
+        "regular"
+    } else if mode.is_symlink() {
+        "symlink"
+    } else if mode.is_irregular() {
+        "irregular"
+    } else {
+        "other"
+    }
+}
+fn perm_octal(perm: u32) -> String {
+    format!("0o{:03o}", perm & 0o777)
+}
+fn seed_file(entry: &Value) -> Result<(Vec<u8>, MapFile), String> {
+    let cell = |index: usize| {
+        entry
+            .get(index)
+            .and_then(Value::as_str)
+            .ok_or("file entries are [path, kind, content]")
+    };
+    let (path, kind, content) = (cell(0)?, cell(1)?, cell(2)?);
+    let file = match kind {
+        "file" => MapFile {
+            data: content.as_bytes().into(),
+            ..MapFile::default()
+        },
+        "hex" => MapFile {
+            data: unhex(content)?.into(),
+            ..MapFile::default()
+        },
+        "symlink" => vfstest::symlink(content.as_bytes()),
+        "dir" => MapFile {
+            mode: FileMode::DIR | FileMode(0o755),
+            ..MapFile::default()
+        },
+        other => return Err(format!("unsupported file kind: {other}")),
+    };
+    Ok((path.as_bytes().to_vec(), file))
+}
+fn plain_map(files: &[Value]) -> Result<MapFs, String> {
+    let mut out = std::collections::BTreeMap::new();
+    for entry in files {
+        let (path, file) = seed_file(entry)?;
+        out.insert(
+            path.strip_prefix(b"/").unwrap_or(&path).to_vec(),
+            Arc::new(file),
+        );
+    }
+    Ok(MapFs(out))
+}
+/// The probe's panic vocabulary: a class for runtime and sub-tree failures, the
+/// literal text for a sentence the pinned source raises itself.
+fn guarded(operation: impl FnOnce() -> Value) -> (Value, Value) {
+    let hook = std::panic::take_hook();
+    std::panic::set_hook(Box::new(|_| {}));
+    let outcome = std::panic::catch_unwind(std::panic::AssertUnwindSafe(operation));
+    std::panic::set_hook(hook);
+    match outcome {
+        Ok(value) => (value, Value::Null),
+        Err(payload) => {
+            let message = payload
+                .downcast_ref::<String>()
+                .cloned()
+                .or_else(|| {
+                    payload
+                        .downcast_ref::<&str>()
+                        .map(|text| (*text).to_string())
+                })
+                .unwrap_or_default();
+            const SUB_FAILED: &str = "vfs: failed to create sub file system for ";
+            let class = if let Some(rest) = message.strip_prefix(SUB_FAILED) {
+                match rest.find("\": ") {
+                    Some(end) => json!(["class", format!("sub_failed:{}", &rest[..=end])]),
+                    None => json!(["class", "sub_failed"]),
+                }
+            } else if message.contains("out of range") {
+                json!(["class", "index_out_of_range"])
+            } else if message.contains("interface conversion") {
+                json!(["class", "interface_conversion"])
+            } else {
+                json!(["literal", message])
+            };
+            (Value::Null, class)
+        }
+    }
+}
+fn string(a: &Value, key: &str) -> Result<String, String> {
+    a.get(key)
+        .and_then(Value::as_str)
+        .map(str::to_owned)
+        .ok_or_else(|| format!("action requires {key}"))
+}
+fn time(a: &Value, key: &str) -> Result<Time, String> {
+    Time::parse_rfc3339(&string(a, key)?).ok_or_else(|| format!("unparsable {key}"))
+}
+fn text(bytes: &[u8]) -> String {
+    String::from_utf8_lossy(bytes).into_owned()
+}
+fn hex(bytes: &[u8]) -> String {
+    use std::fmt::Write;
+    bytes.iter().fold(String::new(), |mut out, byte| {
+        write!(out, "{byte:02x}").expect("writing to a String is infallible");
+        out
+    })
+}
+fn unhex(value: &str) -> Result<Vec<u8>, String> {
+    (0..value.len())
+        .step_by(2)
+        .map(|i| {
+            u8::from_str_radix(value.get(i..i + 2).unwrap_or(""), 16)
+                .map_err(|_| "unparsable hex".to_string())
+        })
+        .collect()
 }

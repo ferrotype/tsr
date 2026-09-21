@@ -470,10 +470,7 @@ impl BundledFs {
         if rest.is_empty() {
             let entry = WalkEntry {
                 name: JsString::from_bytes(b"libs".as_slice()),
-                info: FileInfo {
-                    directory: true,
-                    size: 0,
-                },
+                info: FileInfo::basic(true, 0),
                 symlink: false,
             };
             match visit(b"bundled:////libs", Some(&entry), None)? {
@@ -488,10 +485,7 @@ impl BundledFs {
                 path.extend_from_slice(name.as_bytes());
                 let entry = WalkEntry {
                     name: JsString::from_bytes(name.as_bytes()),
-                    info: FileInfo {
-                        directory: false,
-                        size: bytes.len() as u64,
-                    },
+                    info: FileInfo::basic(false, bytes.len() as u64),
                     symlink: false,
                 };
                 // The embedded implementation treats SkipDir on a file as
@@ -523,17 +517,11 @@ impl FileSystem for BundledFs {
     fn stat(&self, path: &[u8]) -> Result<Option<FileInfo>, Error> {
         if let Some(rest) = path.strip_prefix(b"bundled:///") {
             return Ok(if rest == b"libs" || rest.is_empty() {
-                Some(FileInfo {
-                    directory: true,
-                    size: 0,
-                })
+                Some(FileInfo::basic(true, 0))
             } else {
                 rest.strip_prefix(b"libs/")
                     .and_then(library)
-                    .map(|bytes| FileInfo {
-                        directory: false,
-                        size: bytes.len() as u64,
-                    })
+                    .map(|bytes| FileInfo::basic(false, bytes.len() as u64))
             });
         }
         self.inner.stat(path)
@@ -585,12 +573,17 @@ impl FileSystem for BundledFs {
         self.inner.remove(path)
     }
     /// port: tsc/internal/bundled/embed.go:wrappedFS.Chtimes
-    fn change_times(&self, path: &[u8]) -> Result<(), Error> {
+    fn change_times(
+        &self,
+        path: &[u8],
+        a_time: tsr_vfs::iofs::Time,
+        m_time: tsr_vfs::iofs::Time,
+    ) -> Result<(), Error> {
         assert!(
             !is_bundled(path),
             "cannot change times on embedded file system"
         );
-        self.inner.change_times(path)
+        self.inner.change_times(path, a_time, m_time)
     }
     fn realpath(&self, path: &[u8]) -> Result<JsString, Error> {
         if is_bundled(path) {
