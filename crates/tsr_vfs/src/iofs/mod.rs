@@ -120,7 +120,8 @@ impl IoError {
     pub fn is_broken_symlink(&self) -> bool {
         match self {
             Self::BrokenSymlink { .. } => true,
-            Self::Message {
+            Self::Path { source, .. }
+            | Self::Message {
                 source: Some(source),
                 ..
             } => source.is_broken_symlink(),
@@ -128,6 +129,7 @@ impl IoError {
         }
     }
 }
+
 impl fmt::Display for IoError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
@@ -394,5 +396,26 @@ impl Fs for SubFs {
             }
             other => other,
         })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::IoError;
+
+    #[test]
+    fn broken_symlink_detection_unwraps_path_and_message_errors() {
+        // vfstest.isBrokenSymlinkError uses errors.AsType, including fs.PathError.Unwrap.
+        let cause = IoError::BrokenSymlink {
+            from: b"link".to_vec(),
+            to: b"missing".to_vec(),
+        };
+        let wrapped = IoError::Message {
+            text: "opening fixture".into(),
+            source: Some(Box::new(IoError::path("open", b"link", cause))),
+        };
+        assert!(wrapped.is_broken_symlink());
+        assert!(!wrapped.is_not_exist());
+        assert!(!IoError::path("open", b"missing", IoError::NotExist).is_broken_symlink());
     }
 }

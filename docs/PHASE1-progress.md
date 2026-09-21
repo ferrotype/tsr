@@ -1735,6 +1735,27 @@ provenance SHA-256 is
 comparing the extracted archive reproduces 122 match, 232 not_implemented,
 4 different and 1 native_unavailable.
 
-Tracker views (`STATUS.md`, `status.json`, `docs/status.html`) are **not
-regenerated** in this batch: regenerating rewrites tracked status files, which
-is left for the owner.
+#### PR #47 review corrections — 2026-09-21
+
+The review fixed the new timestamp's zero semantics: Go's zero time is the
+year-one instant, not an absent value. Parsing that instant, comparison,
+clock advancement and conversion to `SystemTime` now agree. `Time::unix`
+returns its seconds/nanoseconds pair directly, including for zero, and
+`from_unix` normalizes excess nanoseconds.
+
+RFC3339 parsing now rejects malformed separators, invalid dates and out-of-range
+time fields. It retains the pinned parser's permissive cases (one-digit hours,
+comma fractions, truncation beyond nanoseconds and inclusive 24/60 offset
+components). A Go 1.27.1 probe supplied the timestamp expectations; all three
+new timestamp tests failed before the fix. Broken-symlink classification also
+unwraps path errors, as the pin's `errors.AsType` does, with a regression for
+a nested message/path wrapper.
+
+The focused VFS suite passes (five unit tests and three integration tests),
+and VFS clippy with warnings denied is clean. A fresh filesystem capture was
+recorded and archived as `data/phase1/captures/f2b-review.tar.gz` (47 JSON
+files, 1,359,496 compressed bytes; provenance SHA-256
+`ac92576946f9145db306be11225d45dded3648bb48bc0631197518fdd9a8a001`).
+Every native and Rust observation is identical to the first-batch archive;
+the counts and four unwaived differences above are unchanged. The original
+archive is preserved. Tracker views are regenerated for the reviewed sources.
