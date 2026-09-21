@@ -1,6 +1,6 @@
 # Rust package preparation
 
-The publication policy currently includes 29 public libraries and 20 private
+The publication policy currently includes 31 public libraries and 20 private
 packages, all named explicitly in [packages.json](packages.json). The workspace
 defaults to `publish = false`. This policy and the dependency order below track
 the current source tree; they are not a record of registry releases. The Node
@@ -45,7 +45,7 @@ does not satisfy a dependency on `0.1.0`.
 ## Content and private harnesses
 
 Package manifests include source, README, license and notice files explicitly;
-`tsr_bundled` also includes its pinned assets and `tsr_core`, `tsr_json` and `tsr_locale` their Go BSD license.
+`tsr_bundled` also includes its pinned assets and `tsr_core`, `tsr_glob`, `tsr_json` and `tsr_locale` their Go BSD license.
 Repository examples, integration tests, capture archives and fixture corpora
 are excluded. Each package has a description and the current repository URL.
 Tests embedded under `src` can still reference repository fixtures: running a
@@ -107,35 +107,36 @@ This order includes retained internal development dependencies as well as normal
 build and optional dependencies. It is for a later, explicitly authorized release:
 
 1. `tsr_jsstring`
-2. `tsr_arena`
-3. `tsr_core`
-4. `tsr_locale`
-5. `tsr_jsnum`
-6. `tsr_json`
-7. `tsr_diagnostics`
-8. `tsr_ast`
-9. `tsr_scanner`
-10. `tsr_encoder`
-11. `tsr_parser`
-12. `tsr_binder`
-13. `tsr_semver`
-14. `tsr_tspath`
-15. `tsr_vfs`
-16. `tsr_bundled`
-17. `tsr_tsoptions`
-18. `tsr_module`
-19. `tsr_nodebuilder`
-20. `tsr_printer`
-21. `tsr_pseudochecker`
-22. `tsr_checker`
-23. `tsr_astnav`
-24. `tsr_format`
-25. `tsr_transformers`
-26. `tsr_compiler`
-27. `tsr_project`
-28. `tsr_api`
-29. `tsr_embed`
-30. `tsr_wasm`
+2. `tsr_glob`
+3. `tsr_arena`
+4. `tsr_core`
+5. `tsr_locale`
+6. `tsr_jsnum`
+7. `tsr_json`
+8. `tsr_diagnostics`
+9. `tsr_ast`
+10. `tsr_scanner`
+11. `tsr_encoder`
+12. `tsr_parser`
+13. `tsr_binder`
+14. `tsr_semver`
+15. `tsr_tspath`
+16. `tsr_vfs`
+17. `tsr_bundled`
+18. `tsr_tsoptions`
+19. `tsr_module`
+20. `tsr_nodebuilder`
+21. `tsr_printer`
+22. `tsr_pseudochecker`
+23. `tsr_checker`
+24. `tsr_astnav`
+25. `tsr_format`
+26. `tsr_transformers`
+27. `tsr_compiler`
+28. `tsr_project`
+29. `tsr_api`
+30. `tsr_embed`
+31. `tsr_wasm`
 
 ## Package policy
 
@@ -159,6 +160,7 @@ build and optional dependencies. It is for a later, explicitly authorized releas
 | `tsr_embed` | Prepared | Rust library and its public dependency closure |
 | `tsr_encoder` | Prepared | Rust library and its public dependency closure |
 | `tsr_format` | Prepared | Rust library and its public dependency closure |
+| `tsr_glob` | Prepared | Rust library and its public dependency closure |
 | `tsr_jsnum` | Prepared | Rust library and its public dependency closure |
 | `tsr_json` | Prepared | Rust library and its public dependency closure |
 | `tsr_jsstring` | Prepared | Rust library and its public dependency closure |

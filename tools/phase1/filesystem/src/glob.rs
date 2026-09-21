@@ -1,109 +1,36 @@
-//! The LSP glob group: `tsc/internal/glob`, which has no Rust home at all.
+//! The LSP glob group: `tsc/internal/glob`, ported as `tsr_glob`.
 //!
-//! Every one of this group's fifteen operations is a recorded gap. The port
-//! has one glob file, `crates/tsr_tsoptions/src/glob.rs`, and it is the OTHER
-//! dialect: its first line reads "Pinned vfsmatch patterns", every port marker
-//! in it names `vfs/vfsmatch/vfsmatch.go`, and its element vocabulary
-//! (`Segment::Literal/Star/Question`, `Component::Literal/Wildcard/DoubleAsterisk`
-//! at :21-31) has no alternation, no character range and no separator element,
-//! so it could not represent `{a,b}`, `[a-z]` or `a//b` even as data. A
-//! repository-wide search for `internal/glob` across `crates/` finds nothing.
+//! Every action drives the production crate. The driver claims only the
+//! subjects it owns, refuses a request tagged with the other dialect, and
+//! validates the action vocabulary before replaying it. The two grammars agree
+//! on almost nothing, so a request answered by the wrong adapter would compare
+//! two different languages and call the result parity; an untagged request is
+//! refused for the same reason.
 //!
-//! So this module never emulates the grammar to make a comparison run. It does
-//! three things: it claims only the subjects it owns, it refuses a request
-//! tagged with the other dialect, and it validates the action vocabulary before
-//! recording the gap.
-//!
-//! The dialect refusal is the point of the tag. The two grammars agree on
-//! almost nothing -- `*` here spans a whole path segment and then cannot meet
-//! the separator that follows it, while vfsmatch's star is per-component -- so
-//! a request answered by the wrong adapter would compare two different
-//! languages and call the result parity. Neither side may dispatch to the other
-//! silently, and an untagged request is refused for the same reason: a default
-//! would pick a grammar the request never named.
-//!
-//! The vocabulary check is the second half. An action this group does not
-//! define, or one missing a payload key, is a harness failure on both sides:
-//! the Go probe panics on it and this driver fails on it, so a malformed
-//! request can never become a row the two sides agree on without executing
-//! anything. It never inspects a value's meaning -- there is nothing here to
-//! run it against -- only that the request is well formed.
+//! Two Go-only shapes have no production form. A nil `*Glob` is an absent
+//! receiver here, and an action that needs one reports the native nil-pointer
+//! class, as the ordered-collection driver does. An element of a foreign Go type
+//! cannot be built at all, because `tsr_glob::Element` is a closed enum: that
+//! row reports `unrepresentable_element` and stays a visible difference rather
+//! than imitating the pin's defensive panic.
 
-use serde_json::Value;
+use serde_json::{json, Value};
+use tsr_glob::{Element, Glob};
 
-use crate::api::{action_op, actions, subject, Outcome};
+use crate::api::{action_op, actions, ordered, subject, Outcome};
 
 /// The grammar this group owns. `vfsmatch` is the configuration matcher and
 /// belongs to a different adapter.
 const DIALECT: &str = "lsp";
 
-/// The subjects of this group, each with the Rust home it does not have.
-///
-/// `tsr_glob` is the crate the ledger reserves for this package (scope.json
-/// records `ledger_crate: tsr_glob`, `ledger_status: planned` for all fifteen
-/// operations); no such directory exists under `crates/`.
-const MISSING: &[(&str, &str, &str, &str)] = &[
-    ("glob.Glob",
-     "tsc/internal/glob/glob.go:Glob",
-     "pub struct Glob holding an ordered element list, with a parse entry point returning \
-      Result<Glob, GlobError> over the four pinned errors, a Display rendering the element list \
-      back to the pattern text, and a matches(&[u8]) -> bool. Patterns and inputs are bytes, not \
-      str: the pin accepts a literal 0xff and matches it byte-wise, and it accepts [<U+FFFD>-a] \
-      while rejecting [\\xff-\\xff]",
-     "crates/tsr_glob (absent; the crate the ledger reserves for internal/glob). \
-      crates/tsr_tsoptions/src/glob.rs is the vfsmatch dialect and has no Display for its \
-      Pattern, no parse that returns an error and no element type for a separator run"),
-    ("glob.element",
-     "tsc/internal/glob/glob.go:element",
-     "a closed element enum -- Slash, Literal(Vec<u8>), Star, AnyChar, StarStar, \
-      Group(Vec<Glob>), CharRange { negate, low, high } -- each rendering itself: the four \
-      constants \"/\", \"*\", \"?\" and \"**\", a literal rendering its bytes unchanged, a group \
-      rendering its members joined with ',' inside braces including empty members, and a range \
-      rendering \"[low-high]\" WITHOUT the negate flag it stores",
-     "crates/tsr_glob (absent). crates/tsr_tsoptions/src/glob.rs:21-31 declares the vfsmatch \
-      Segment and Component enums, which have no alternation, no character range and no \
-      separator variant, and neither enum implements Display"),
-    ("glob.match",
-     "tsc/internal/glob/glob.go:match",
-     "a free recursive matcher over an element slice and an input, backtracking on Star within \
-      one segment and on StarStar across segments, trying each Group alternative with the \
-      remaining elements appended, and consuming a whole separator run per Slash element",
-     "crates/tsr_glob (absent). No Rust function anywhere takes an element list and an input and \
-      recurses over it in this dialect; crates/tsr_tsoptions/src/glob.rs:65 Pattern::matches_parts \
-      walks vfsmatch path parts instead"),
-    ("glob.parse",
-     "tsc/internal/glob/glob.go:parse",
-     "the internal parser behind the entry point, taking a grouping flag and returning the glob, \
-      the unconsumed residual and an error: under the flag it stops at '}' or ',' and hands both \
-      back, which is what makes a group parseable at all",
-     "crates/tsr_glob (absent). No Rust function in either glob file takes a nested flag or \
-      returns a residual"),
-    ("glob.parseLiteral",
-     "tsc/internal/glob/glob.go:Glob.parseLiteral",
-     "a literal scanner that appends exactly one literal element -- possibly empty -- and returns \
-      the unconsumed tail, with a special-character set that includes '}' and ',' only under the \
-      grouping flag",
-     "crates/tsr_glob (absent). crates/tsr_tsoptions/src/glob.rs:200 parse_component is the \
-      nearest shape and is not a counterpart: it splits a whole vfsmatch component into segments \
-      at '*' and '?', appends no empty literal and has no residual"),
-    ("glob.readRangeRune",
-     "tsc/internal/glob/glob.go:readRangeRune",
-     "a range-bound decoder returning (code point, byte size, error) where the VALUE gates the \
-      error and the size only then selects it (glob.go:140 `if r == utf8.RuneError`, :142-147): a \
-      RuneError decode of size 0 is the bad-range error, of size 1 is the invalid-UTF-8 error, \
-      and of any larger size is accepted -- that larger size is the properly encoded U+FFFD. A \
-      decode that is NOT RuneError never errors whatever its size, so every ASCII bound returns \
-      size 1 and no error; a port that switched on the size alone would reject `[a-z]`",
-     "crates/tsr_glob (absent). crates/tsr_tsoptions/src/glob.rs does no rune-range decoding; \
-      vfsmatch has no [x-y] construct"),
-    ("glob.split",
-     "tsc/internal/glob/glob.go:split",
-     "a total splitter returning the bytes before the first separator and the bytes after the \
-      last separator of that run, so a trailing run yields an empty remainder",
-     "crates/tsr_glob (absent). crates/tsr_tsoptions/src/glob.rs:228 next_path_part_single and \
-      :248 next_path_part_parts are the vfsmatch part walkers: they return an offset into a \
-      prefix/suffix pair rather than two substrings, and they are reached by the other dialect's \
-      matcher"),
+const SUBJECTS: &[&str] = &[
+    "glob.Glob",
+    "glob.element",
+    "glob.match",
+    "glob.parse",
+    "glob.parseLiteral",
+    "glob.readRangeRune",
+    "glob.split",
 ];
 
 /// The whole action vocabulary, with the payload keys each action requires.
@@ -123,39 +50,321 @@ const VOCABULARY: &[(&str, &[&str])] = &[
     ("use_nil", &[]),
 ];
 
-// Missing entry points, qualified by the subject that owns them.
-const MISSING_OPERATIONS: &[(&str, &str)] = &[
-    ("glob.Glob", "tsc/internal/glob/glob.go:Glob.Match"),
-    ("glob.Glob", "tsc/internal/glob/glob.go:Glob.String"),
-    ("glob.Glob", "tsc/internal/glob/glob.go:Parse"),
-    ("glob.element", "tsc/internal/glob/glob.go:charRange.String"),
-    ("glob.match", "tsc/internal/glob/glob.go:match"),
-    ("glob.parse", "tsc/internal/glob/glob.go:parse"),
-    (
-        "glob.parseLiteral",
-        "tsc/internal/glob/glob.go:Glob.parseLiteral",
-    ),
-    (
-        "glob.readRangeRune",
-        "tsc/internal/glob/glob.go:readRangeRune",
-    ),
-    ("glob.split", "tsc/internal/glob/glob.go:split"),
-];
-
 pub fn observe(request: &Value) -> Option<Outcome> {
-    let (_, authority, signature, home) = MISSING
-        .iter()
-        .find(|(name, ..)| *name == subject(request))?;
+    if !SUBJECTS.contains(&subject(request)) {
+        return None;
+    }
     if let Err(problem) = check(request) {
         return Some(Outcome::Failed(problem));
     }
-    Some(crate::api::missing_for_subject(
-        request,
-        MISSING_OPERATIONS,
-        authority,
-        signature,
-        home,
-    ))
+    Some(match replay(actions(request)) {
+        Ok(rows) => Outcome::Observed(ordered(rows)),
+        Err(problem) => Outcome::Failed(problem),
+    })
+}
+
+/// The glob an action would call. `Nil` is Go's nil receiver after `use_nil`;
+/// `Unrepresentable` is a built list holding a kind the closed enum cannot carry.
+#[derive(Default)]
+enum Receiver {
+    #[default]
+    Unset,
+    Nil,
+    Unrepresentable,
+    Glob(Glob),
+}
+
+#[derive(Default)]
+struct State {
+    glob: Receiver,
+    elements: Option<Vec<Built>>,
+}
+
+/// A built element list entry: a production element, or the Go-only foreign kind.
+enum Built {
+    Element(Element),
+    Foreign,
+}
+
+fn replay(trace: &[Value]) -> Result<Vec<Value>, String> {
+    let mut state = State::default();
+    trace.iter().map(|action| row(&mut state, action)).collect()
+}
+
+fn row(state: &mut State, action: &Value) -> Result<Value, String> {
+    let op = action_op(action);
+    Ok(match op {
+        "parse" => {
+            let parsed = Glob::parse(&payload(action, "pattern_hex")?);
+            let row = parse_row(op, parsed.as_ref().map_err(|e| *e), None);
+            if let Ok(glob) = parsed {
+                state.elements = Some(glob.elements.iter().cloned().map(Built::Element).collect());
+                state.glob = Receiver::Glob(glob);
+            } else {
+                state.glob = Receiver::Unset;
+            }
+            row
+        }
+        "parse_nested" => {
+            let pattern = payload(action, "pattern_hex")?;
+            match tsr_glob::parse(&pattern, flag(action, "nested")?) {
+                Ok((glob, residual)) => parse_row(op, Ok(&glob), Some(residual)),
+                Err(error) => parse_row(op, Err(error), Some(b"")),
+            }
+        }
+        "parse_literal" => {
+            let pattern = payload(action, "pattern_hex")?;
+            let mut fresh = Glob::default();
+            let residual = fresh
+                .parse_literal(&pattern, flag(action, "nested")?)
+                .to_vec();
+            json!({ "op": op, "appended": fresh.elements.len(), "elems": kinds(&fresh.elements),
+                    "residual_hex": hex(&residual) })
+        }
+        "read_range_rune" => match tsr_glob::read_range_rune(&payload(action, "input_hex")?) {
+            Ok((rune, size)) => json!({ "op": op, "rune": rune, "size": size, "error": "" }),
+            // The pin returns the decoded value and size alongside the error.
+            Err(error) => {
+                let input = payload(action, "input_hex")?;
+                let (rune, size) = tsr_jsstring::wtf8::decode_utf8(&input);
+                json!({ "op": op, "rune": rune, "size": size, "error": error.to_string() })
+            }
+        },
+        "split" => {
+            let input = payload(action, "input_hex")?;
+            let (first, rest) = tsr_glob::split(&input);
+            json!({ "op": op, "first_hex": hex(first), "rest_hex": hex(rest) })
+        }
+        "build_elems" => {
+            let specs = action
+                .get("elems")
+                .and_then(Value::as_array)
+                .ok_or("build_elems needs elems")?;
+            let built = specs.iter().map(build).collect::<Result<Vec<_>, _>>()?;
+            let rendered = built_kinds(&built);
+            state.glob = production(&built).map_or(Receiver::Unrepresentable, |elements| {
+                Receiver::Glob(Glob { elements })
+            });
+            let count = built.len();
+            state.elements = Some(built);
+            json!({ "op": op, "count": count, "elems": rendered })
+        }
+        "use_nil" => {
+            state.glob = Receiver::Nil;
+            state.elements = None;
+            json!({ "op": op })
+        }
+        "string" => match &state.glob {
+            Receiver::Glob(glob) => {
+                json!({ "op": op, "string_hex": hex(&glob.to_bytes()), "panic": "" })
+            }
+            Receiver::Nil => json!({ "op": op, "string_hex": null, "panic": NIL }),
+            Receiver::Unrepresentable => {
+                json!({ "op": op, "string_hex": null, "panic": UNREPRESENTABLE })
+            }
+            Receiver::Unset => return Err("action needs a glob".into()),
+        },
+        "string_elems" => {
+            let elements = state
+                .elements
+                .as_ref()
+                .ok_or("action needs an element list")?;
+            let rendered: Vec<Value> = elements
+                .iter()
+                .map(|built| match built {
+                    Built::Element(element) => Value::String(hex(&element.to_bytes())),
+                    Built::Foreign => Value::String(UNREPRESENTABLE.into()),
+                })
+                .collect();
+            json!({ "op": op, "rendered": rendered })
+        }
+        "match" => {
+            let input = payload(action, "input_hex")?;
+            match &state.glob {
+                Receiver::Glob(glob) => {
+                    let glob = glob.clone();
+                    let (value, panicked) = guarded(move || glob.matches(&input));
+                    json!({ "op": op, "result": value, "panic": panicked })
+                }
+                Receiver::Nil => json!({ "op": op, "result": null, "panic": NIL }),
+                Receiver::Unrepresentable => {
+                    json!({ "op": op, "result": null, "panic": UNREPRESENTABLE })
+                }
+                Receiver::Unset => return Err("action needs a glob".into()),
+            }
+        }
+        "match_elems" => {
+            let input = payload(action, "input_hex")?;
+            let elements = state
+                .elements
+                .as_ref()
+                .ok_or("action needs an element list")?;
+            match production(elements) {
+                Some(elements) => {
+                    let (value, panicked) =
+                        guarded(move || tsr_glob::match_elements(&elements, &input));
+                    json!({ "op": op, "result": value, "panic": panicked })
+                }
+                None => json!({ "op": op, "result": null, "panic": UNREPRESENTABLE }),
+            }
+        }
+        other => return Err(format!("unsupported action {other:?}")),
+    })
+}
+
+const NIL: &str = "nil_pointer_dereference";
+const UNREPRESENTABLE: &str = "unrepresentable_element";
+
+fn parse_row(op: &str, parsed: Result<&Glob, tsr_glob::Error>, residual: Option<&[u8]>) -> Value {
+    let mut row = match parsed {
+        Ok(glob) => {
+            json!({ "op": op, "accepted": true, "error": "", "elems": kinds(&glob.elements) })
+        }
+        Err(error) => {
+            json!({ "op": op, "accepted": false, "error": error.to_string(), "elems": [] })
+        }
+    };
+    if let Some(residual) = residual {
+        row["residual_hex"] = Value::String(hex(residual));
+    }
+    row
+}
+
+/// The probe's structural vocabulary for an element list.
+fn kinds(elements: &[Element]) -> Value {
+    Value::Array(elements.iter().map(kind).collect())
+}
+fn kind(element: &Element) -> Value {
+    match element {
+        Element::Slash => json!("slash"),
+        Element::Star => json!("star"),
+        Element::StarStar => json!("star_star"),
+        Element::AnyChar => json!("any_char"),
+        Element::Literal(bytes) => json!(["literal", hex(bytes)]),
+        Element::CharRange { negate, low, high } => json!(["char_range", negate, low, high]),
+        Element::Group(members) => {
+            let members: Vec<Value> = members.iter().map(|m| kinds(&m.elements)).collect();
+            json!(["group", members])
+        }
+    }
+}
+fn built_kinds(built: &[Built]) -> Value {
+    Value::Array(
+        built
+            .iter()
+            .map(|entry| match entry {
+                Built::Element(element) => kind(element),
+                Built::Foreign => json!("foreign"),
+            })
+            .collect(),
+    )
+}
+/// The production list, or `None` when it holds a kind the enum cannot represent.
+fn production(built: &[Built]) -> Option<Vec<Element>> {
+    built
+        .iter()
+        .map(|entry| match entry {
+            Built::Element(element) => Some(element.clone()),
+            Built::Foreign => None,
+        })
+        .collect()
+}
+fn build(spec: &Value) -> Result<Built, String> {
+    let kind = spec
+        .get("kind")
+        .and_then(Value::as_str)
+        .ok_or("an element spec must name its kind")?;
+    Ok(Built::Element(match kind {
+        "slash" => Element::Slash,
+        "star" => Element::Star,
+        "star_star" => Element::StarStar,
+        "any_char" => Element::AnyChar,
+        "literal" => Element::Literal(payload(spec, "literal_hex")?),
+        "char_range" => Element::CharRange {
+            negate: flag(spec, "negate")?,
+            low: point(spec, "low")?,
+            high: point(spec, "high")?,
+        },
+        // A nil group and an empty one differ only in memory.
+        "group_nil" => Element::Group(Vec::new()),
+        "group" => {
+            let members = spec
+                .get("members")
+                .and_then(Value::as_array)
+                .ok_or("group needs members")?;
+            let mut globs = Vec::new();
+            for member in members {
+                let specs = member
+                    .as_array()
+                    .ok_or("a group member is an element list")?;
+                let built = specs.iter().map(build).collect::<Result<Vec<_>, _>>()?;
+                let elements = production(&built).ok_or("a foreign element inside a group")?;
+                globs.push(Glob { elements });
+            }
+            Element::Group(globs)
+        }
+        "foreign" => return Ok(Built::Foreign),
+        other => return Err(format!("unsupported element kind {other:?}")),
+    }))
+}
+fn point(spec: &Value, key: &str) -> Result<i32, String> {
+    spec.get(key)
+        .and_then(Value::as_i64)
+        .and_then(|value| i32::try_from(value).ok())
+        .ok_or_else(|| format!("a char_range element needs {key}"))
+}
+fn flag(action: &Value, key: &str) -> Result<bool, String> {
+    action
+        .get(key)
+        .and_then(Value::as_bool)
+        .ok_or_else(|| format!("missing boolean {key}"))
+}
+fn payload(action: &Value, key: &str) -> Result<Vec<u8>, String> {
+    let text = action
+        .get(key)
+        .and_then(Value::as_str)
+        .ok_or_else(|| format!("missing {key}"))?;
+    (0..text.len())
+        .step_by(2)
+        .map(|i| {
+            u8::from_str_radix(text.get(i..i + 2).unwrap_or(""), 16)
+                .map_err(|_| format!("{key} is not hex"))
+        })
+        .collect()
+}
+fn hex(bytes: &[u8]) -> String {
+    use std::fmt::Write;
+    bytes.iter().fold(String::new(), |mut out, byte| {
+        write!(out, "{byte:02x}").expect("writing to a String is infallible");
+        out
+    })
+}
+/// Records the class of a panic the pinned matcher raises by design.
+fn guarded(operation: impl FnOnce() -> bool + std::panic::UnwindSafe) -> (Value, String) {
+    let hook = std::panic::take_hook();
+    std::panic::set_hook(Box::new(|_| {}));
+    let outcome = std::panic::catch_unwind(operation);
+    std::panic::set_hook(hook);
+    match outcome {
+        Ok(value) => (Value::Bool(value), String::new()),
+        Err(payload) => {
+            let message = payload
+                .downcast_ref::<String>()
+                .cloned()
+                .or_else(|| {
+                    payload
+                        .downcast_ref::<&str>()
+                        .map(|text| (*text).to_string())
+                })
+                .unwrap_or_default();
+            let class = if message.contains("out of range") || message.contains("out of bounds") {
+                "index_out_of_range".to_string()
+            } else {
+                format!("other:{message}")
+            };
+            (Value::Null, class)
+        }
+    }
 }
 
 fn check(request: &Value) -> Result<(), String> {

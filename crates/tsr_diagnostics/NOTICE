@@ -22,9 +22,12 @@ Copyright 2020 The Go Authors. All rights reserved.
 The locale parser, matcher and generated registry/CLDR tables in crates/tsr_locale
 derive from golang.org/x/text v0.38.0 (CLDR 32).
 Copyright 2009, 2013 The Go Authors. All rights reserved.
-Both are licensed under the BSD 3-Clause License; see licenses/GO-BSD-3-Clause.txt.
+The language-server glob grammar in crates/tsr_glob derives from the Go tools glob
+package as carried by the pinned compiler at tsc/internal/glob.
+Copyright 2023 The Go Authors. All rights reserved.
+All three are licensed under the BSD 3-Clause License; see licenses/GO-BSD-3-Clause.txt.
 
 Paths above identify source files in the ts-rust repository. Distributed Rust
-packages carry this NOTICE and the Apache license locally. The tsr_core, tsr_json and tsr_locale packages
+packages carry this NOTICE and the Apache license locally. The tsr_core, tsr_glob, tsr_json and tsr_locale packages
 also include licenses/GO-BSD-3-Clause.txt; tsr_bundled includes the pinned
 TypeScript library copyright notice beside its library files.

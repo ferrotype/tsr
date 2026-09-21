@@ -411,6 +411,7 @@ version = "0.1.0"
 dependencies = [
  "phase1_harness",
  "serde_json",
+ "tsr_glob",
  "tsr_jsstring",
  "tsr_tsoptions",
  "tsr_tspath",
@@ -925,6 +926,13 @@ dependencies = [
  "tsr_jsstring",
  "tsr_parser",
  "tsr_scanner",
+]
+
+[[package]]
+name = "tsr_glob"
+version = "0.1.0"
+dependencies = [
+ "tsr_jsstring",
 ]
 
 [[package]]
