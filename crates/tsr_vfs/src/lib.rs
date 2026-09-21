@@ -6,6 +6,8 @@ use std::{
         Arc,
     },
 };
+pub mod iofs;
+pub mod vfstest;
 mod walk;
 use tsr_jsstring::{JsString, SourceText};
 use tsr_tspath as path;
