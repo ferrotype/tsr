@@ -269,6 +269,7 @@ FAMILIES = {
             "data/phase1/requests/config-commandline.json",
             "data/phase1/requests/config-tsconfigparsing.json",
             "data/phase1/requests/config-host.json",
+            "data/phase1/requests/config-diagwriter.json",
         ],
         "native_probes": [
             # The 53 + 27 `tsoptions/commandLineParsing` outputs. It compiles
@@ -299,6 +300,9 @@ FAMILIES = {
             {"name": "host", "package": "tsoptions/tsoptionstest",
              "probe": "tools/phase1/config/tsoptionstest_probe_test.go",
              "test": "TestPhase1ConfigHost"},
+            {"name": "diagwriter", "package": "diagnosticwriter",
+             "probe": "tools/phase1/config/diagwriter_probe_test.go",
+             "test": "TestPhase1ConfigDiagnosticWriter"},
         ],
         "rust_package": "phase1_config",
         "rust_target_kind": "bin",

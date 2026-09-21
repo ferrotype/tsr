@@ -394,6 +394,8 @@ name = "phase1_config"
 version = "0.1.0"
 dependencies = [
  "serde_json",
+ "tsr_ast",
+ "tsr_compiler",
  "tsr_core",
  "tsr_jsstring",
  "tsr_module",

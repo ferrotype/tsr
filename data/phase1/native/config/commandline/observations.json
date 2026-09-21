@@ -2431,8 +2431,116 @@
       "operation": "tsoptionstest.parseConfigHost",
       "reason": "operation is not served by the command-line baseline probe",
       "result": "native_unavailable"
+    },
+    {
+      "case": "config/diagwriter/flatten-indents-each-chain-level-by-two-more-spaces",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:FlattenDiagnosticMessage",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/diagwriter/write-flattened-ast-replaces-each-invalid-utf8-run-once",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:WriteFlattenedASTDiagnosticMessage",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/diagwriter/resolve-takes-a-different-arm-for-each-kind-of-diagnostic",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.resolve",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/diagwriter/source-selects-the-prefix-shown-before-the-code",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.Source",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/diagwriter/message-chain-appends-a-note-only-for-synthesized-virtual-code",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.MessageChain",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/diagwriter/original-text-file-presents-the-untransformed-text",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:newOriginalTextFile",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/diagwriter/renamed-file-shows-the-canonical-name-over-the-virtual-text",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:renamedFile.FileName",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/diagwriter/related-information-rewraps-every-entry",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.RelatedInformation",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/diagwriter/the-category-format-and-the-style-writer-are-the-colour-vocabulary",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:getCategoryFormat",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/diagwriter/the-tabular-display-pads-the-count-column-and-relativises-the-path",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:writeTabularErrorsDisplay",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/diagwriter/wrap-ast-diagnostic-keeps-the-pointer-it-was-given",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:WrapASTDiagnostic",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/diagwriter/wrap-ast-diagnostics-allocates-one-wrapper-per-input",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:WrapASTDiagnostics",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/diagwriter/from-ast-diagnostics-returns-interface-values-over-the-same-pointers",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:FromASTDiagnostics",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/diagwriter/to-diagnostics-widens-without-rewrapping",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:ToDiagnostics",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/diagwriter/compare-ast-diagnostics-unwraps-and-delegates",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:CompareASTDiagnostics",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/diagwriter/the-coloured-status-line-brackets-a-caller-supplied-time",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:FormatDiagnosticsStatusWithColorAndTime",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/diagwriter/the-plain-status-line-joins-time-and-message-with-a-spaced-dash",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:FormatDiagnosticsStatusAndTime",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/diagwriter/try-clear-screen-needs-a-watch-code-and-three-quiet-flags",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:TryClearScreen",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
     }
   ],
-  "request_sha256": "227f28d614f1acb6e61557864e15c80ac4ac2611fab15f620b6800a98e9feea6",
+  "request_sha256": "231aa660b2fa8c2b07ad2172365ba1ef8c8d94ac30ef51586e379b3df3746a52",
   "version": 1
 }

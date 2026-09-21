@@ -1,0 +1,1448 @@
+{
+  "family": "config",
+  "requests": [
+    {
+      "actions": [
+        {
+          "diagnostic": {
+            "args": [
+              "A",
+              "B"
+            ],
+            "category": 1,
+            "chain": [
+              {
+                "args": [
+                  "x"
+                ],
+                "category": 1,
+                "chain": [
+                  {
+                    "args": [
+                      "y"
+                    ],
+                    "category": 1,
+                    "code": 2304,
+                    "end": 0,
+                    "file": "",
+                    "message_key": "Cannot_find_name_0_2304",
+                    "message_text": "",
+                    "pos": 0,
+                    "source": ""
+                  }
+                ],
+                "code": 2304,
+                "end": 0,
+                "file": "",
+                "message_key": "Cannot_find_name_0_2304",
+                "message_text": "",
+                "pos": 0,
+                "source": ""
+              }
+            ],
+            "code": 2322,
+            "end": 0,
+            "file": "",
+            "message_key": "Type_0_is_not_assignable_to_type_1_2322",
+            "message_text": "",
+            "pos": 0,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "chained"
+        },
+        {
+          "new_line": "\n",
+          "op": "flatten",
+          "target": "chained"
+        },
+        {
+          "new_line": "\r\n",
+          "op": "flatten",
+          "target": "chained"
+        }
+      ],
+      "case": "config/diagwriter/flatten-indents-each-chain-level-by-two-more-spaces",
+      "discriminates": "A port that indents a nested chain by a fixed two spaces instead of two per level, or that emits the newline after the child message instead of before it. The chain is two deep, so level 1 and level 2 must differ by exactly two spaces, and the whole rendering is taken twice with different newlines so a port that hard-codes \\n is visible in the second row and not the first. The arguments are substituted from the message TABLE via the key, not from a message pointer the probe chose: both diagnostics are built through ast.NewDiagnosticFromSerialized (ast/diagnostic.go:166), which leaves `message` nil, so Localize resolves by key (ast/diagnostic.go:117-122).",
+      "host_applicability": "any",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:FlattenDiagnosticMessage",
+      "order_sensitive": true,
+      "subject": "diagnosticWriter"
+    },
+    {
+      "actions": [
+        {
+          "diagnostic": {
+            "args_hex": [
+              "61ff62ffff63"
+            ],
+            "category": 1,
+            "code": 2304,
+            "end": 0,
+            "file": "",
+            "message_key": "Cannot_find_name_0_2304",
+            "message_text": "",
+            "pos": 0,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "bad"
+        },
+        {
+          "new_line": "\n",
+          "op": "write_flattened_ast",
+          "target": "bad"
+        },
+        {
+          "diagnostic": {
+            "category": 0,
+            "code": 9001,
+            "end": 0,
+            "file": "",
+            "message_key": "",
+            "message_text": "mapper said {0} about this",
+            "pos": 0,
+            "source": "vue"
+          },
+          "op": "define_diagnostic",
+          "target": "already_localized"
+        },
+        {
+          "new_line": "\n",
+          "op": "write_flattened_ast",
+          "target": "already_localized"
+        }
+      ],
+      "case": "config/diagwriter/write-flattened-ast-replaces-each-invalid-utf8-run-once",
+      "discriminates": "Two independent ports of Localize's byte handling. The first argument is \"a\\xffb\\xff\\xffc\": Go substitutes it through strings.ToValidUTF8 (diagnostics/diagnostics.go:122-125), which replaces each consecutive RUN of invalid bytes with one U+FFFD, so the answer has two replacement characters and not three -- a port that replaces per byte produces three. The second diagnostic carries already-localized text, so Localize returns it verbatim (ast/diagnostic.go:118-120) and the literal \"{0}\" must survive UNSUBSTITUTED; a port that formats every message substitutes or panics on it.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:WriteFlattenedASTDiagnosticMessage",
+      "order_sensitive": true,
+      "subject": "diagnosticWriter"
+    },
+    {
+      "actions": [
+        {
+          "file_name": "/src/plain.ts",
+          "op": "define_file",
+          "target": "plain",
+          "text": "const a = 1;\nconst b = 2;\n"
+        },
+        {
+          "file_name": "/src/a.vue",
+          "op": "define_file",
+          "target": "canonical",
+          "text": "let x = 1\nlet y = 2\n"
+        },
+        {
+          "canonical": "canonical",
+          "content_mapper": "vue",
+          "file_name": "/src/a.vue.ts",
+          "op": "define_file",
+          "original_text": "let x = 1\nlet y = 2\n",
+          "segments": [
+            [
+              13,
+              25,
+              10,
+              19,
+              1
+            ]
+          ],
+          "target": "virtual",
+          "text": "const x = 1;\nconst y = 2;\n"
+        },
+        {
+          "diagnostic": {
+            "args": [
+              "x"
+            ],
+            "category": 1,
+            "code": 2304,
+            "end": -1,
+            "file": "",
+            "message_key": "Cannot_find_name_0_2304",
+            "message_text": "",
+            "pos": -1,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "nofile"
+        },
+        {
+          "op": "astdiag_positions",
+          "target": "nofile"
+        },
+        {
+          "diagnostic": {
+            "args": [
+              "a"
+            ],
+            "category": 1,
+            "code": 2304,
+            "end": 7,
+            "file": "plain",
+            "message_key": "Cannot_find_name_0_2304",
+            "message_text": "",
+            "pos": 6,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "plainloc"
+        },
+        {
+          "op": "astdiag_positions",
+          "target": "plainloc"
+        },
+        {
+          "diagnostic": {
+            "category": 1,
+            "code": 9001,
+            "end": 4,
+            "file": "virtual",
+            "message_key": "",
+            "message_text": "mapper error",
+            "pos": 1,
+            "source": "vue"
+          },
+          "op": "define_diagnostic",
+          "target": "ext"
+        },
+        {
+          "op": "astdiag_positions",
+          "target": "ext"
+        },
+        {
+          "diagnostic": {
+            "args": [
+              "y"
+            ],
+            "category": 1,
+            "code": 2304,
+            "end": 25,
+            "file": "virtual",
+            "message_key": "Cannot_find_name_0_2304",
+            "message_text": "",
+            "pos": 13,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "mapped"
+        },
+        {
+          "op": "astdiag_positions",
+          "target": "mapped"
+        },
+        {
+          "diagnostic": {
+            "args": [
+              "x"
+            ],
+            "category": 1,
+            "code": 2304,
+            "end": 5,
+            "file": "virtual",
+            "message_key": "Cannot_find_name_0_2304",
+            "message_text": "",
+            "pos": 0,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "synth"
+        },
+        {
+          "op": "astdiag_positions",
+          "target": "synth"
+        }
+      ],
+      "case": "config/diagwriter/resolve-takes-a-different-arm-for-each-kind-of-diagnostic",
+      "discriminates": "A port that reads a diagnostic's raw range instead of its resolved one. All four arms of resolve (diagnosticwriter.go:94-110) are taken in one trace and only two of them return the range the diagnostic was built with. The mapper's own diagnostic keeps [1,4) because Source is non-empty; the compiler diagnostic at [13,25) is mapped back through the atom segment to the ORIGINAL [10,19), so its length changes from 12 to 9; and the compiler diagnostic at [0,5), which lies in a synthesized gap, keeps [0,5) although the file has a span map. A port that maps unconditionally moves the synthesized one to [0,0); a port that never maps leaves the mapped one at [13,25).",
+      "host_applicability": "any",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.resolve",
+      "order_sensitive": true,
+      "subject": "diagnosticWriter"
+    },
+    {
+      "actions": [
+        {
+          "diagnostic": {
+            "args": [
+              "x"
+            ],
+            "category": 1,
+            "code": 2304,
+            "end": 0,
+            "file": "",
+            "message_key": "Cannot_find_name_0_2304",
+            "message_text": "",
+            "pos": 0,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "compiler"
+        },
+        {
+          "op": "astdiag_source",
+          "target": "compiler"
+        },
+        {
+          "op": "astdiag_prefix",
+          "target": "compiler"
+        },
+        {
+          "diagnostic": {
+            "category": 1,
+            "code": 9001,
+            "end": 0,
+            "file": "",
+            "message_key": "",
+            "message_text": "mapper error",
+            "pos": 0,
+            "source": "vue"
+          },
+          "op": "define_diagnostic",
+          "target": "mapper"
+        },
+        {
+          "op": "astdiag_source",
+          "target": "mapper"
+        },
+        {
+          "op": "astdiag_prefix",
+          "target": "mapper"
+        },
+        {
+          "diagnostic": {
+            "category": 1,
+            "code": 9002,
+            "end": 0,
+            "file": "",
+            "message_key": "",
+            "message_text": "mapper error with no source",
+            "pos": 0,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "empty_source"
+        },
+        {
+          "op": "astdiag_source",
+          "target": "empty_source"
+        },
+        {
+          "op": "astdiag_prefix",
+          "target": "empty_source"
+        }
+      ],
+      "case": "config/diagwriter/source-selects-the-prefix-shown-before-the-code",
+      "discriminates": "A port that decides the prefix from whether the message is already localized rather than from Source. The third diagnostic carries external message TEXT with an EMPTY source, which is the case that separates the two rules: diagnosticPrefix (diagnosticwriter.go:375-380) looks only at Source, so it answers \"TS\", while a port keyed on \"is this external\" answers something else.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.Source",
+      "order_sensitive": true,
+      "subject": "diagnosticWriter"
+    },
+    {
+      "actions": [
+        {
+          "file_name": "/src/a.vue",
+          "op": "define_file",
+          "target": "canonical",
+          "text": "let x = 1\nlet y = 2\n"
+        },
+        {
+          "canonical": "canonical",
+          "content_mapper": "vue",
+          "file_name": "/src/a.vue.ts",
+          "op": "define_file",
+          "original_text": "let x = 1\nlet y = 2\n",
+          "segments": [
+            [
+              13,
+              25,
+              10,
+              19,
+              1
+            ]
+          ],
+          "target": "virtual",
+          "text": "const x = 1;\nconst y = 2;\n"
+        },
+        {
+          "diagnostic": {
+            "args": [
+              "y"
+            ],
+            "category": 1,
+            "chain": [
+              {
+                "args": [
+                  "A",
+                  "B"
+                ],
+                "category": 1,
+                "code": 2322,
+                "end": 0,
+                "file": "",
+                "message_key": "Type_0_is_not_assignable_to_type_1_2322",
+                "message_text": "",
+                "pos": 0,
+                "source": ""
+              }
+            ],
+            "code": 2304,
+            "end": 25,
+            "file": "virtual",
+            "message_key": "Cannot_find_name_0_2304",
+            "message_text": "",
+            "pos": 13,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "mapped"
+        },
+        {
+          "op": "astdiag_message_chain",
+          "target": "mapped"
+        },
+        {
+          "diagnostic": {
+            "args": [
+              "x"
+            ],
+            "category": 1,
+            "chain": [
+              {
+                "args": [
+                  "A",
+                  "B"
+                ],
+                "category": 1,
+                "code": 2322,
+                "end": 0,
+                "file": "",
+                "message_key": "Type_0_is_not_assignable_to_type_1_2322",
+                "message_text": "",
+                "pos": 0,
+                "source": ""
+              }
+            ],
+            "code": 2304,
+            "end": 5,
+            "file": "virtual",
+            "message_key": "Cannot_find_name_0_2304",
+            "message_text": "",
+            "pos": 0,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "synth"
+        },
+        {
+          "op": "astdiag_message_chain",
+          "target": "synth"
+        }
+      ],
+      "case": "config/diagwriter/message-chain-appends-a-note-only-for-synthesized-virtual-code",
+      "discriminates": "The synthesized-code note (diagnosticwriter.go:148-157). Both diagnostics sit on the SAME content-mapped file and carry the SAME one-entry chain; the only difference is that one range maps back through a segment and the other lies in a gap. The second therefore grows a second chain entry, code 100030, naming the content mapper, and the first does not. A port that appends the note whenever the file is mapped, or never, fails on one of the two rows. Neither of the 24 cases behind witness/s08-p5-errors-rust reaches this arm, because their source files carry no content-mapper info at all.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.MessageChain",
+      "order_sensitive": true,
+      "subject": "diagnosticWriter"
+    },
+    {
+      "actions": [
+        {
+          "file_name": "/src/plain.ts",
+          "op": "define_file",
+          "target": "plain",
+          "text": "const a = 1;\nconst b = 2;\n"
+        },
+        {
+          "file_name": "/src/a.vue",
+          "op": "define_file",
+          "target": "canonical",
+          "text": "let x = 1\nlet y = 2\n"
+        },
+        {
+          "canonical": "canonical",
+          "content_mapper": "vue",
+          "file_name": "/src/a.vue.ts",
+          "op": "define_file",
+          "original_text": "let x = 1\nlet y = 2\n",
+          "segments": [
+            [
+              13,
+              25,
+              10,
+              19,
+              1
+            ]
+          ],
+          "target": "virtual",
+          "text": "const x = 1;\nconst y = 2;\n"
+        },
+        {
+          "file_name": "/src/a.vue",
+          "op": "new_original_text_file",
+          "target": "virtual"
+        },
+        {
+          "file_name": "/src/plain.ts",
+          "op": "new_original_text_file",
+          "target": "plain"
+        },
+        {
+          "diagnostic": {
+            "category": 1,
+            "code": 9001,
+            "end": 4,
+            "file": "virtual",
+            "message_key": "",
+            "message_text": "mapper error",
+            "pos": 1,
+            "source": "vue"
+          },
+          "op": "define_diagnostic",
+          "target": "ext"
+        },
+        {
+          "op": "astdiag_file",
+          "target": "ext"
+        }
+      ],
+      "case": "config/diagwriter/original-text-file-presents-the-untransformed-text",
+      "discriminates": "A wrapper that presents the virtual text under the original's name. The virtual file's text is 26 bytes over two lines starting at 0 and 13; its original is 20 bytes over two lines starting at 0 and 10, and newOriginalTextFile computes its OWN line map from the original (diagnosticwriter.go:319-327), so the two line maps cannot coincide. The second call is on a file with no content mapper at all, where OriginalText falls back to Text (ast/ast.go:2548-2553), and the third reaches the same wrapper through ASTDiagnostic.File's useOriginal arm rather than directly.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:newOriginalTextFile",
+      "order_sensitive": true,
+      "subject": "diagnosticWriter"
+    },
+    {
+      "actions": [
+        {
+          "file_name": "/src/a.vue",
+          "op": "define_file",
+          "target": "canonical",
+          "text": "let x = 1\nlet y = 2\n"
+        },
+        {
+          "canonical": "canonical",
+          "content_mapper": "vue",
+          "file_name": "/src/a.vue.ts",
+          "op": "define_file",
+          "original_text": "let x = 1\nlet y = 2\n",
+          "segments": [
+            [
+              13,
+              25,
+              10,
+              19,
+              1
+            ]
+          ],
+          "target": "virtual",
+          "text": "const x = 1;\nconst y = 2;\n"
+        },
+        {
+          "file_name": "/src/a.vue",
+          "op": "renamed_file",
+          "target": "virtual"
+        },
+        {
+          "diagnostic": {
+            "args": [
+              "x"
+            ],
+            "category": 1,
+            "code": 2304,
+            "end": 5,
+            "file": "virtual",
+            "message_key": "Cannot_find_name_0_2304",
+            "message_text": "",
+            "pos": 0,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "synth"
+        },
+        {
+          "op": "astdiag_file",
+          "target": "synth"
+        }
+      ],
+      "case": "config/diagwriter/renamed-file-shows-the-canonical-name-over-the-virtual-text",
+      "discriminates": "The rename arm, which is the mirror image of the previous case: renamedFile answers the canonical NAME but delegates Text and ECMALineMap to the virtual file (diagnosticwriter.go:332-339), so it must report /src/a.vue with 26 bytes and line starts [0,13] -- the exact opposite pairing to originalTextFile. Row 5 shows the arm is reachable from a diagnostic at all: the file has a span map, so it takes the rename arm only because the range is synthesized and useOriginal is therefore false (diagnosticwriter.go:64-71). No case behind witness/s08-p5-errors-rust reaches it.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:renamedFile.FileName",
+      "order_sensitive": true,
+      "subject": "diagnosticWriter"
+    },
+    {
+      "actions": [
+        {
+          "file_name": "/src/plain.ts",
+          "op": "define_file",
+          "target": "plain",
+          "text": "const a = 1;\nconst b = 2;\n"
+        },
+        {
+          "diagnostic": {
+            "args": [
+              "a"
+            ],
+            "category": 1,
+            "code": 2304,
+            "end": 7,
+            "file": "plain",
+            "message_key": "Cannot_find_name_0_2304",
+            "message_text": "",
+            "pos": 6,
+            "related": [
+              {
+                "args": [
+                  "b"
+                ],
+                "category": 1,
+                "code": 2304,
+                "end": 20,
+                "file": "plain",
+                "message_key": "Cannot_find_name_0_2304",
+                "message_text": "",
+                "pos": 19,
+                "source": ""
+              },
+              {
+                "category": 1,
+                "code": 9003,
+                "end": -1,
+                "file": "",
+                "message_key": "",
+                "message_text": "related from the mapper",
+                "pos": -1,
+                "source": "vue"
+              }
+            ],
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "withrelated"
+        },
+        {
+          "op": "astdiag_related",
+          "target": "withrelated"
+        },
+        {
+          "diagnostic": {
+            "args": [
+              "a"
+            ],
+            "category": 1,
+            "code": 2304,
+            "end": 7,
+            "file": "plain",
+            "message_key": "Cannot_find_name_0_2304",
+            "message_text": "",
+            "pos": 6,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "norelated"
+        },
+        {
+          "op": "astdiag_related",
+          "target": "norelated"
+        }
+      ],
+      "case": "config/diagwriter/related-information-rewraps-every-entry",
+      "discriminates": "A port that hands back the raw related slice instead of re-wrapping it. The pin allocates a NEW []Diagnostic of *ASTDiagnostic (diagnosticwriter.go:47-54), which is what makes each entry's own File and resolve run later; the second entry has no file and a non-empty Source, so an unwrapped entry would answer a different Source and a different File than a wrapped one. The second diagnostic has no related information at all, which separates \"empty slice\" from \"nil\".",
+      "host_applicability": "any",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.RelatedInformation",
+      "order_sensitive": true,
+      "subject": "diagnosticWriter"
+    },
+    {
+      "actions": [
+        {
+          "category": 0,
+          "op": "category_format"
+        },
+        {
+          "category": 1,
+          "op": "category_format"
+        },
+        {
+          "category": 2,
+          "op": "category_format"
+        },
+        {
+          "category": 3,
+          "op": "category_format"
+        },
+        {
+          "category": 4,
+          "op": "category_format"
+        },
+        {
+          "category": -1,
+          "op": "category_format"
+        },
+        {
+          "op": "style_and_reset",
+          "style": "\u001b[91m",
+          "text": "error"
+        },
+        {
+          "op": "style_and_reset",
+          "style": "\u001b[96m",
+          "text": ""
+        },
+        {
+          "op": "style_and_reset",
+          "style": "",
+          "text": "no style"
+        }
+      ],
+      "case": "config/diagwriter/the-category-format-and-the-style-writer-are-the-colour-vocabulary",
+      "discriminates": "The exact escape vocabulary, which no higher-level rendering pins down on its own: warning is 93m, error is 91m, suggestion is 90m and message is 94m (diagnosticwriter.go:203-207, 382-392), so a port that reuses one colour for two categories still renders plausible output. Categories 4 and -1 take the arm the pin PANICS on (:393), and the recovered value is recorded rather than failing the probe, because the panic is that arm's behaviour. The style writer is taken with an empty text and with an empty style: the pin emits the reset sequence unconditionally (:399-403), so an empty style still produces a bare reset and an empty text still produces style followed by reset.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:getCategoryFormat",
+      "order_sensitive": true,
+      "subject": "diagnosticWriter"
+    },
+    {
+      "actions": [
+        {
+          "file_name": "/src/plain.ts",
+          "op": "define_file",
+          "target": "plain",
+          "text": "const a = 1;\nconst b = 2;\n"
+        },
+        {
+          "file_name": "/src/other.ts",
+          "op": "define_file",
+          "target": "other",
+          "text": "const c = 3;\n"
+        },
+        {
+          "diagnostic": {
+            "args": [
+              "a"
+            ],
+            "category": 1,
+            "code": 2304,
+            "end": 7,
+            "file": "plain",
+            "message_key": "Cannot_find_name_0_2304",
+            "message_text": "",
+            "pos": 6,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "p1"
+        },
+        {
+          "diagnostic": {
+            "args": [
+              "b"
+            ],
+            "category": 1,
+            "code": 2304,
+            "end": 20,
+            "file": "plain",
+            "message_key": "Cannot_find_name_0_2304",
+            "message_text": "",
+            "pos": 19,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "p2"
+        },
+        {
+          "diagnostic": {
+            "args": [
+              "c"
+            ],
+            "category": 1,
+            "code": 2304,
+            "end": 7,
+            "file": "other",
+            "message_key": "Cannot_find_name_0_2304",
+            "message_text": "",
+            "pos": 6,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "o1"
+        },
+        {
+          "case_sensitive": true,
+          "current_directory": "/src",
+          "errors": [
+            "p2",
+            "p1"
+          ],
+          "new_line": "\n",
+          "op": "pretty_path",
+          "target": "plain"
+        },
+        {
+          "case_sensitive": true,
+          "current_directory": "",
+          "errors": [
+            "p1"
+          ],
+          "new_line": "\n",
+          "op": "pretty_path",
+          "target": "plain"
+        },
+        {
+          "case_sensitive": true,
+          "current_directory": "/src",
+          "new_line": "\n",
+          "op": "pretty_path_nil_file"
+        },
+        {
+          "case_sensitive": true,
+          "current_directory": "/src",
+          "files": [
+            [
+              "other",
+              "o1"
+            ],
+            [
+              "plain",
+              "p1",
+              "p2"
+            ]
+          ],
+          "new_line": "\n",
+          "op": "tabular_errors"
+        },
+        {
+          "case_sensitive": true,
+          "current_directory": "",
+          "files": [
+            [
+              "plain",
+              "p1",
+              "p2"
+            ]
+          ],
+          "new_line": "\n",
+          "op": "tabular_errors"
+        }
+      ],
+      "case": "config/diagwriter/the-tabular-display-pads-the-count-column-and-relativises-the-path",
+      "discriminates": "Three separable rules the summary text hides. First, the count column is padded to max(len(\"Errors\"), digits) = 6 and the header itself is padded by max(digits-6, 0) = 0, so every count is right-aligned in six columns (diagnosticwriter.go:522-528) -- a port that pads to the widest count writes one column. Second, the line number comes from the FIRST entry of the file's error slice in the order it was given, not the smallest position: row 6 hands the two plain-file errors in the order p2 then p1 and must report p2's line, 2, not 1. Third, the relative conversion happens only when the file name and the current directory are BOTH absolute (:548-551), so row 7 with an empty current directory keeps the absolute /src/plain.ts while row 6 shortens it to plain.ts. The summary is assembled by this probe, not by getErrorSummary, so the grouping and sorting that normally precede the renderer are not part of the observation.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:writeTabularErrorsDisplay",
+      "order_sensitive": true,
+      "subject": "diagnosticWriter"
+    },
+    {
+      "actions": [
+        {
+          "diagnostic": {
+            "args": [
+              "x"
+            ],
+            "category": 1,
+            "code": 2304,
+            "end": 0,
+            "file": "",
+            "message_key": "Cannot_find_name_0_2304",
+            "message_text": "",
+            "pos": 0,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "one"
+        },
+        {
+          "op": "wrap_one",
+          "target": "one"
+        }
+      ],
+      "case": "config/diagwriter/wrap-ast-diagnostic-keeps-the-pointer-it-was-given",
+      "discriminates": "The wrapper embeds the *ast.Diagnostic rather than copying it (diagnosticwriter.go:42-44, 158-160), so the embedded pointer is identical to the input. A port that reconstructs a diagnostic instead would not be identical, and every later mutation through the original pointer would stop being visible.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:WrapASTDiagnostic",
+      "order_sensitive": true,
+      "subject": "diagnosticWriter"
+    },
+    {
+      "actions": [
+        {
+          "diagnostic": {
+            "args": [
+              "a"
+            ],
+            "category": 1,
+            "code": 2304,
+            "end": 0,
+            "file": "",
+            "message_key": "Cannot_find_name_0_2304",
+            "message_text": "",
+            "pos": 0,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "a"
+        },
+        {
+          "diagnostic": {
+            "args": [
+              "b"
+            ],
+            "category": 1,
+            "code": 2304,
+            "end": 0,
+            "file": "",
+            "message_key": "Cannot_find_name_0_2304",
+            "message_text": "",
+            "pos": 0,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "b"
+        },
+        {
+          "diagnostic": {
+            "args": [
+              "c"
+            ],
+            "category": 1,
+            "code": 2304,
+            "end": 0,
+            "file": "",
+            "message_key": "Cannot_find_name_0_2304",
+            "message_text": "",
+            "pos": 0,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "c"
+        },
+        {
+          "op": "wrap_many",
+          "targets": [
+            "a",
+            "b",
+            "c"
+          ]
+        },
+        {
+          "op": "wrap_many",
+          "targets": []
+        }
+      ],
+      "case": "config/diagwriter/wrap-ast-diagnostics-allocates-one-wrapper-per-input",
+      "discriminates": "Length and order preservation plus per-element identity (diagnosticwriter.go:162-168). The empty input is taken separately because the pin allocates a zero-length slice rather than returning nil, which a port returning nil would not reproduce in a length observation.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:WrapASTDiagnostics",
+      "order_sensitive": true,
+      "subject": "diagnosticWriter"
+    },
+    {
+      "actions": [
+        {
+          "diagnostic": {
+            "args": [
+              "a"
+            ],
+            "category": 1,
+            "code": 2304,
+            "end": 0,
+            "file": "",
+            "message_key": "Cannot_find_name_0_2304",
+            "message_text": "",
+            "pos": 0,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "a"
+        },
+        {
+          "diagnostic": {
+            "args": [
+              "b"
+            ],
+            "category": 1,
+            "code": 2304,
+            "end": 0,
+            "file": "",
+            "message_key": "Cannot_find_name_0_2304",
+            "message_text": "",
+            "pos": 0,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "b"
+        },
+        {
+          "op": "from_ast",
+          "targets": [
+            "a",
+            "b"
+          ]
+        },
+        {
+          "op": "from_ast",
+          "targets": []
+        }
+      ],
+      "case": "config/diagwriter/from-ast-diagnostics-returns-interface-values-over-the-same-pointers",
+      "discriminates": "FromASTDiagnostics differs from WrapASTDiagnostics only in the STATIC type it returns -- []Diagnostic rather than []*ASTDiagnostic (diagnosticwriter.go:170-176) -- so the observation records both that each element's dynamic type is *ASTDiagnostic and that it still points at its input. A port that collapsed the two functions into one would be invisible to a rendering but not to this.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:FromASTDiagnostics",
+      "order_sensitive": true,
+      "subject": "diagnosticWriter"
+    },
+    {
+      "actions": [
+        {
+          "diagnostic": {
+            "args": [
+              "a"
+            ],
+            "category": 1,
+            "code": 2304,
+            "end": 0,
+            "file": "",
+            "message_key": "Cannot_find_name_0_2304",
+            "message_text": "",
+            "pos": 0,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "a"
+        },
+        {
+          "diagnostic": {
+            "args": [
+              "b"
+            ],
+            "category": 1,
+            "code": 2304,
+            "end": 0,
+            "file": "",
+            "message_key": "Cannot_find_name_0_2304",
+            "message_text": "",
+            "pos": 0,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "b"
+        },
+        {
+          "op": "to_diagnostics",
+          "targets": [
+            "a",
+            "b"
+          ]
+        },
+        {
+          "op": "to_diagnostics",
+          "targets": []
+        }
+      ],
+      "case": "config/diagwriter/to-diagnostics-widens-without-rewrapping",
+      "discriminates": "ToDiagnostics is a generic widening: it copies already-wrapped values into a []Diagnostic and creates no new wrapper (diagnosticwriter.go:178-184). The observation is that element i of the result is the SAME *ASTDiagnostic the caller already held, not merely one pointing at the same diagnostic, which is what separates widening from re-wrapping.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:ToDiagnostics",
+      "order_sensitive": true,
+      "subject": "diagnosticWriter"
+    },
+    {
+      "actions": [
+        {
+          "file_name": "/src/plain.ts",
+          "op": "define_file",
+          "target": "plain",
+          "text": "const a = 1;\nconst b = 2;\n"
+        },
+        {
+          "file_name": "/src/other.ts",
+          "op": "define_file",
+          "target": "other",
+          "text": "const c = 3;\n"
+        },
+        {
+          "diagnostic": {
+            "args": [
+              "a"
+            ],
+            "category": 1,
+            "code": 2304,
+            "end": 7,
+            "file": "plain",
+            "message_key": "Cannot_find_name_0_2304",
+            "message_text": "",
+            "pos": 6,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "base"
+        },
+        {
+          "diagnostic": {
+            "args": [
+              "a"
+            ],
+            "category": 1,
+            "code": 2304,
+            "end": 7,
+            "file": "other",
+            "message_key": "Cannot_find_name_0_2304",
+            "message_text": "",
+            "pos": 6,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "other_file_same_loc"
+        },
+        {
+          "diagnostic": {
+            "args": [
+              "a"
+            ],
+            "category": 1,
+            "code": 2304,
+            "end": 20,
+            "file": "plain",
+            "message_key": "Cannot_find_name_0_2304",
+            "message_text": "",
+            "pos": 19,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "later_pos"
+        },
+        {
+          "diagnostic": {
+            "args": [
+              "a"
+            ],
+            "category": 1,
+            "code": 2322,
+            "end": 7,
+            "file": "plain",
+            "message_key": "Cannot_find_name_0_2304",
+            "message_text": "",
+            "pos": 6,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "higher_code"
+        },
+        {
+          "diagnostic": {
+            "args": [
+              "a"
+            ],
+            "category": 3,
+            "code": 2304,
+            "end": 7,
+            "file": "plain",
+            "message_key": "Cannot_find_name_0_2304",
+            "message_text": "",
+            "pos": 6,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "other_category"
+        },
+        {
+          "diagnostic": {
+            "args": [
+              "a"
+            ],
+            "category": 1,
+            "code": 2304,
+            "end": 7,
+            "file": "plain",
+            "message_key": "Cannot_find_name_0_2304",
+            "message_text": "",
+            "pos": 6,
+            "source": "vue"
+          },
+          "op": "define_diagnostic",
+          "target": "with_source"
+        },
+        {
+          "diagnostic": {
+            "args": [
+              "b"
+            ],
+            "category": 1,
+            "code": 2304,
+            "end": 7,
+            "file": "plain",
+            "message_key": "Cannot_find_name_0_2304",
+            "message_text": "",
+            "pos": 6,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "other_args"
+        },
+        {
+          "diagnostic": {
+            "args": [
+              "a"
+            ],
+            "category": 1,
+            "chain": [
+              {
+                "args": [
+                  "A",
+                  "B"
+                ],
+                "category": 1,
+                "code": 2322,
+                "end": 0,
+                "file": "",
+                "message_key": "Type_0_is_not_assignable_to_type_1_2322",
+                "message_text": "",
+                "pos": 0,
+                "source": ""
+              }
+            ],
+            "code": 2304,
+            "end": 7,
+            "file": "plain",
+            "message_key": "Cannot_find_name_0_2304",
+            "message_text": "",
+            "pos": 6,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "with_chain"
+        },
+        {
+          "left": "base",
+          "op": "compare",
+          "right": "base"
+        },
+        {
+          "left": "base",
+          "op": "compare",
+          "right": "other_file_same_loc"
+        },
+        {
+          "left": "base",
+          "op": "compare",
+          "right": "later_pos"
+        },
+        {
+          "left": "base",
+          "op": "compare",
+          "right": "higher_code"
+        },
+        {
+          "left": "base",
+          "op": "compare",
+          "right": "other_category"
+        },
+        {
+          "left": "base",
+          "op": "compare",
+          "right": "with_source"
+        },
+        {
+          "left": "base",
+          "op": "compare",
+          "right": "other_args"
+        },
+        {
+          "left": "base",
+          "op": "compare",
+          "right": "with_chain"
+        }
+      ],
+      "case": "config/diagwriter/compare-ast-diagnostics-unwraps-and-delegates",
+      "discriminates": "The key order of the comparison, one discriminator at a time: file name first, then pos, end, code, category, source, message identity, arguments, chain size, chain content, related information (ast/diagnostic.go:482-527, reached through diagnosticwriter.go:186-188). Each row differs from the base in exactly one field, and every row is taken in both directions, so a port that compares the right fields in the wrong order, or that returns an unsymmetric result, is visible. Note the chain-size rule is INVERTED -- len(c2)-len(c1) (ast/diagnostic.go:439) -- so the diagnostic WITH a chain sorts before the one without.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:CompareASTDiagnostics",
+      "order_sensitive": true,
+      "subject": "diagnosticWriter"
+    },
+    {
+      "actions": [
+        {
+          "diagnostic": {
+            "category": 3,
+            "code": 6031,
+            "end": 0,
+            "file": "",
+            "message_key": "Starting_compilation_in_watch_mode_6031",
+            "message_text": "",
+            "pos": 0,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "starting"
+        },
+        {
+          "case_sensitive": true,
+          "current_directory": "/src",
+          "new_line": "\n",
+          "op": "status_with_color_and_time",
+          "target": "starting",
+          "time": "12:00:00 AM"
+        },
+        {
+          "case_sensitive": true,
+          "current_directory": "/src",
+          "new_line": "\r\n",
+          "op": "status_with_color_and_time",
+          "target": "starting",
+          "time": ""
+        }
+      ],
+      "case": "config/diagwriter/the-coloured-status-line-brackets-a-caller-supplied-time",
+      "discriminates": "The bracket-and-grey rendering: \"[\", the time styled grey and reset, \"] \", then the flattened message (diagnosticwriter.go:581-586). The timestamp is the caller's string, never a clock, so the observation is deterministic; the second row passes an EMPTY time, which still emits the grey escape and the reset around nothing -- a port that skips the styling for an empty string is visible there and nowhere else.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:FormatDiagnosticsStatusWithColorAndTime",
+      "order_sensitive": true,
+      "subject": "diagnosticWriter"
+    },
+    {
+      "actions": [
+        {
+          "diagnostic": {
+            "category": 3,
+            "code": 6032,
+            "end": 0,
+            "file": "",
+            "message_key": "File_change_detected_Starting_incremental_compilation_6032",
+            "message_text": "",
+            "pos": 0,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "changed"
+        },
+        {
+          "case_sensitive": true,
+          "current_directory": "/src",
+          "new_line": "\n",
+          "op": "status_and_time",
+          "target": "changed",
+          "time": "12:00:00 AM"
+        },
+        {
+          "case_sensitive": true,
+          "current_directory": "/src",
+          "new_line": "\n",
+          "op": "status_and_time",
+          "target": "changed",
+          "time": ""
+        }
+      ],
+      "case": "config/diagwriter/the-plain-status-line-joins-time-and-message-with-a-spaced-dash",
+      "discriminates": "The uncoloured variant is not the coloured one with the escapes removed. It uses fmt.Fprint with TWO operands (diagnosticwriter.go:588-591), and Go's Fprint inserts a space between operands only when neither is a string -- both are -- so the separator is exactly the literal \" - \" with no added space, and there are no brackets at all. The empty-time row shows the dash is emitted regardless.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:FormatDiagnosticsStatusAndTime",
+      "order_sensitive": true,
+      "subject": "diagnosticWriter"
+    },
+    {
+      "actions": [
+        {
+          "diagnostic": {
+            "category": 3,
+            "code": 6031,
+            "end": 0,
+            "file": "",
+            "message_key": "Starting_compilation_in_watch_mode_6031",
+            "message_text": "",
+            "pos": 0,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "starting"
+        },
+        {
+          "diagnostic": {
+            "category": 3,
+            "code": 6032,
+            "end": 0,
+            "file": "",
+            "message_key": "File_change_detected_Starting_incremental_compilation_6032",
+            "message_text": "",
+            "pos": 0,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "changed"
+        },
+        {
+          "diagnostic": {
+            "args": [
+              "x"
+            ],
+            "category": 1,
+            "code": 2304,
+            "end": 0,
+            "file": "",
+            "message_key": "Cannot_find_name_0_2304",
+            "message_text": "",
+            "pos": 0,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "unrelated"
+        },
+        {
+          "diagnostics": 0,
+          "extended_diagnostics": 0,
+          "op": "try_clear_screen",
+          "preserve_watch_output": 0,
+          "target": "starting"
+        },
+        {
+          "diagnostics": 1,
+          "extended_diagnostics": 1,
+          "op": "try_clear_screen",
+          "preserve_watch_output": 1,
+          "target": "changed"
+        },
+        {
+          "diagnostics": 0,
+          "extended_diagnostics": 0,
+          "op": "try_clear_screen",
+          "preserve_watch_output": 0,
+          "target": "unrelated"
+        },
+        {
+          "diagnostics": 0,
+          "extended_diagnostics": 0,
+          "op": "try_clear_screen",
+          "preserve_watch_output": 2,
+          "target": "starting"
+        },
+        {
+          "diagnostics": 0,
+          "extended_diagnostics": 2,
+          "op": "try_clear_screen",
+          "preserve_watch_output": 0,
+          "target": "starting"
+        },
+        {
+          "diagnostics": 2,
+          "extended_diagnostics": 0,
+          "op": "try_clear_screen",
+          "preserve_watch_output": 0,
+          "target": "starting"
+        }
+      ],
+      "case": "config/diagwriter/try-clear-screen-needs-a-watch-code-and-three-quiet-flags",
+      "discriminates": "The three options are read with IsTrue, so UNSET and explicitly FALSE both permit the clear (core/tristate.go:16-18, diagnosticwriter.go:602-605) -- a port that treats the tristate as a plain bool defaulting to true suppresses row 4. Only the two codes in ScreenStartingCodes qualify (:597-600), so the ordinary error in row 6 does not clear even with every flag unset, and rows 7, 8 and 9 turn on exactly one flag each to show all three are independent vetoes. The escape written is the three-part sequence 2J 3J H, not a bare 2J.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:TryClearScreen",
+      "order_sensitive": true,
+      "subject": "diagnosticWriter"
+    }
+  ]
+}

@@ -961,6 +961,409 @@
       "operations": []
     },
     {
+      "expected_contract": "Row 11 is (0,0). Rows 12-17 are (-1,1). Row 18 is (-1,1) on arguments. Row 19 is (1,-1): the longer chain sorts first.",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/diagwriter/compare-ast-diagnostics-unwraps-and-delegates",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:CompareASTDiagnostics"
+      ],
+      "native_authority": "tools/phase1/config/diagwriter_probe_test.go: an in-package overlay over the pinned internal/diagnosticwriter, which has no test file of its own",
+      "operation_actions": {
+        "compare": [
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:CompareASTDiagnostics"
+        ]
+      },
+      "operations": [
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:CompareASTDiagnostics"
+      ]
+    },
+    {
+      "coverage_operations": [
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:FlattenDiagnosticMessage",
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:flattenDiagnosticMessageChain"
+      ],
+      "expected_contract": "Row 2 is the parent message with two chain lines appended, the first prefixed by newline plus two spaces and the second by newline plus four. Row 3 is the same text with every newline replaced by CRLF and the same indents.",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/diagwriter/flatten-indents-each-chain-level-by-two-more-spaces",
+      "last_result": "match",
+      "native_authority": "tools/phase1/config/diagwriter_probe_test.go: an in-package overlay over the pinned internal/diagnosticwriter, which has no test file of its own",
+      "operation_actions": {
+        "flatten": [
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:FlattenDiagnosticMessage",
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:flattenDiagnosticMessageChain"
+        ]
+      },
+      "operations": [
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:FlattenDiagnosticMessage",
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:flattenDiagnosticMessageChain"
+      ]
+    },
+    {
+      "expected_contract": "Row 3 reports length 2 with two (true, true) pairs; row 4 reports length 0.",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/diagwriter/from-ast-diagnostics-returns-interface-values-over-the-same-pointers",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:FromASTDiagnostics"
+      ],
+      "native_authority": "tools/phase1/config/diagwriter_probe_test.go: an in-package overlay over the pinned internal/diagnosticwriter, which has no test file of its own",
+      "operation_actions": {
+        "from_ast": [
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:FromASTDiagnostics",
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:WrapASTDiagnostic"
+        ]
+      },
+      "operations": [
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:FromASTDiagnostics",
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:WrapASTDiagnostic"
+      ]
+    },
+    {
+      "expected_contract": "Row 4 has one chain entry, code 2322. Row 6 has two: code 2322 and then code 100030, whose text names the mapper 'vue'.",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/diagwriter/message-chain-appends-a-note-only-for-synthesized-virtual-code",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.MessageChain"
+      ],
+      "native_authority": "tools/phase1/config/diagwriter_probe_test.go: an in-package overlay over the pinned internal/diagnosticwriter, which has no test file of its own",
+      "operation_actions": {
+        "astdiag_message_chain": [
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.MessageChain",
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.resolve",
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:WrapASTDiagnostic"
+        ]
+      },
+      "operations": [
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.MessageChain",
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.resolve",
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:WrapASTDiagnostic"
+      ]
+    },
+    {
+      "expected_contract": "Row 4 carries name /src/a.vue, the 20-byte original text and line starts [0,10]. Row 5 carries name /src/plain.ts, the 26-byte plain text and line starts [0,13]. Row 7 reports kind original_text_file, name /src/a.vue, text length 20 and the same line starts as row 4.",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/diagwriter/original-text-file-presents-the-untransformed-text",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:newOriginalTextFile"
+      ],
+      "native_authority": "tools/phase1/config/diagwriter_probe_test.go: an in-package overlay over the pinned internal/diagnosticwriter, which has no test file of its own",
+      "operation_actions": {
+        "astdiag_file": [
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:newOriginalTextFile",
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:originalTextFile.ECMALineMap",
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:originalTextFile.FileName",
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:originalTextFile.Text"
+        ],
+        "new_original_text_file": [
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:newOriginalTextFile",
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:originalTextFile.ECMALineMap",
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:originalTextFile.FileName",
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:originalTextFile.Text"
+        ]
+      },
+      "operations": [
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:newOriginalTextFile",
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:originalTextFile.ECMALineMap",
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:originalTextFile.FileName",
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:originalTextFile.Text"
+      ]
+    },
+    {
+      "expected_contract": "Row 3 reports length 2 with entries (2304, source \"\", has file true) and (9003, source \"vue\", has file false). Row 5 reports length 0.",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/diagwriter/related-information-rewraps-every-entry",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.RelatedInformation"
+      ],
+      "native_authority": "tools/phase1/config/diagwriter_probe_test.go: an in-package overlay over the pinned internal/diagnosticwriter, which has no test file of its own",
+      "operation_actions": {
+        "astdiag_related": [
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.RelatedInformation",
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.Source"
+        ]
+      },
+      "operations": [
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.RelatedInformation",
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.Source"
+      ]
+    },
+    {
+      "expected_contract": "Rows 3 and 5 both carry name /src/a.vue, text length 26 and line starts [0,13]; row 5 reports kind renamed_file.",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/diagwriter/renamed-file-shows-the-canonical-name-over-the-virtual-text",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:renamedFile.FileName"
+      ],
+      "native_authority": "tools/phase1/config/diagwriter_probe_test.go: an in-package overlay over the pinned internal/diagnosticwriter, which has no test file of its own",
+      "operation_actions": {
+        "astdiag_file": [
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:renamedFile.ECMALineMap",
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:renamedFile.FileName",
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:renamedFile.Text"
+        ],
+        "renamed_file": [
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:renamedFile.ECMALineMap",
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:renamedFile.FileName",
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:renamedFile.Text"
+        ]
+      },
+      "operations": [
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:renamedFile.ECMALineMap",
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:renamedFile.FileName",
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:renamedFile.Text"
+      ]
+    },
+    {
+      "expected_contract": "Rows 5, 7, 9, 11, 13 are (pos,end,len) = (-1,-1,0), (6,7,1), (1,4,3), (10,19,9) and (0,5,5).",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/diagwriter/resolve-takes-a-different-arm-for-each-kind-of-diagnostic",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.resolve"
+      ],
+      "native_authority": "tools/phase1/config/diagwriter_probe_test.go: an in-package overlay over the pinned internal/diagnosticwriter, which has no test file of its own",
+      "operation_actions": {
+        "astdiag_positions": [
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.End",
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.Len",
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.Pos",
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.resolve"
+        ]
+      },
+      "operations": [
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.End",
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.Len",
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.Pos",
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.resolve"
+      ]
+    },
+    {
+      "expected_contract": "Rows 2, 5, 8 are sources \"\", \"vue\", \"\"; rows 3, 6, 9 are prefixes \"TS\", \"vue\", \"TS\".",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/diagwriter/source-selects-the-prefix-shown-before-the-code",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.Source"
+      ],
+      "native_authority": "tools/phase1/config/diagwriter_probe_test.go: an in-package overlay over the pinned internal/diagnosticwriter, which has no test file of its own",
+      "operation_actions": {
+        "astdiag_prefix": [
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.Source",
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:diagnosticPrefix"
+        ],
+        "astdiag_source": [
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.Source"
+        ]
+      },
+      "operations": [
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.Source",
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:diagnosticPrefix"
+      ]
+    },
+    {
+      "expected_contract": "Rows 1-4 are the four escapes above with the matching category names warning, error, suggestion, message. Rows 5 and 6 report panicked with the message \"Unhandled diagnostic category\". Row 7 is 91m + \"error\" + 0m, row 8 is 96m + 0m, row 9 is \"no style\" + 0m.",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/diagwriter/the-category-format-and-the-style-writer-are-the-colour-vocabulary",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:getCategoryFormat"
+      ],
+      "native_authority": "tools/phase1/config/diagwriter_probe_test.go: an in-package overlay over the pinned internal/diagnosticwriter, which has no test file of its own",
+      "operation_actions": {
+        "category_format": [
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:getCategoryFormat"
+        ],
+        "style_and_reset": [
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:writeWithStyleAndReset"
+        ]
+      },
+      "operations": [
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:getCategoryFormat",
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:writeWithStyleAndReset"
+      ]
+    },
+    {
+      "expected_contract": "Row 2 is \"[\" + 90m + \"12:00:00 AM\" + 0m + \"] \" + \"Starting compilation in watch mode...\". Row 3 is the same with no time between the escapes.",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/diagwriter/the-coloured-status-line-brackets-a-caller-supplied-time",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:FormatDiagnosticsStatusWithColorAndTime"
+      ],
+      "native_authority": "tools/phase1/config/diagwriter_probe_test.go: an in-package overlay over the pinned internal/diagnosticwriter, which has no test file of its own",
+      "operation_actions": {
+        "status_with_color_and_time": [
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:FormatDiagnosticsStatusWithColorAndTime",
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:writeWithStyleAndReset"
+        ]
+      },
+      "operations": [
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:FormatDiagnosticsStatusWithColorAndTime",
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:writeWithStyleAndReset"
+      ]
+    },
+    {
+      "expected_contract": "Row 2 is \"12:00:00 AM - File change detected. Starting incremental compilation...\". Row 3 is \" - \" followed by the same message.",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/diagwriter/the-plain-status-line-joins-time-and-message-with-a-spaced-dash",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:FormatDiagnosticsStatusAndTime"
+      ],
+      "native_authority": "tools/phase1/config/diagwriter_probe_test.go: an in-package overlay over the pinned internal/diagnosticwriter, which has no test file of its own",
+      "operation_actions": {
+        "status_and_time": [
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:FormatDiagnosticsStatusAndTime"
+        ]
+      },
+      "operations": [
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:FormatDiagnosticsStatusAndTime"
+      ]
+    },
+    {
+      "expected_contract": "Row 6 is \"plain.ts\" + 90m + \":2\" + 0m; row 7 is \"/src/plain.ts\" + 90m + \":1\" + 0m; row 8 is empty. Row 9 is \"Errors  Files\" then two lines with the count right-aligned in six columns, other.ts first with 1 and plain.ts with 2, each followed by its grey line suffix. Row 10 is the header and one line, with the absolute path.",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/diagwriter/the-tabular-display-pads-the-count-column-and-relativises-the-path",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:writeTabularErrorsDisplay"
+      ],
+      "native_authority": "tools/phase1/config/diagwriter_probe_test.go: an in-package overlay over the pinned internal/diagnosticwriter, which has no test file of its own",
+      "operation_actions": {
+        "pretty_path": [
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:prettyPathForFileError"
+        ],
+        "pretty_path_nil_file": [
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:prettyPathForFileError"
+        ],
+        "tabular_errors": [
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:prettyPathForFileError",
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:writeTabularErrorsDisplay"
+        ]
+      },
+      "operations": [
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:prettyPathForFileError",
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:writeTabularErrorsDisplay"
+      ]
+    },
+    {
+      "expected_contract": "Row 3 reports length 2 with two (true, true) pairs; row 4 reports length 0.",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/diagwriter/to-diagnostics-widens-without-rewrapping",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:ToDiagnostics"
+      ],
+      "native_authority": "tools/phase1/config/diagwriter_probe_test.go: an in-package overlay over the pinned internal/diagnosticwriter, which has no test file of its own",
+      "operation_actions": {
+        "to_diagnostics": [
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:ToDiagnostics"
+        ]
+      },
+      "operations": [
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:ToDiagnostics"
+      ]
+    },
+    {
+      "expected_contract": "Rows 4 and 5 report cleared true with the escape \"\\x1b[2J\\x1b[3J\\x1b[H\"; rows 6, 7, 8 and 9 report cleared false and empty output.",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/diagwriter/try-clear-screen-needs-a-watch-code-and-three-quiet-flags",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:TryClearScreen"
+      ],
+      "native_authority": "tools/phase1/config/diagwriter_probe_test.go: an in-package overlay over the pinned internal/diagnosticwriter, which has no test file of its own",
+      "operation_actions": {
+        "try_clear_screen": [
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:TryClearScreen"
+        ]
+      },
+      "operations": [
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:TryClearScreen"
+      ]
+    },
+    {
+      "expected_contract": "Row 2 reports not_nil true and same_pointer true.",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/diagwriter/wrap-ast-diagnostic-keeps-the-pointer-it-was-given",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:WrapASTDiagnostic"
+      ],
+      "native_authority": "tools/phase1/config/diagwriter_probe_test.go: an in-package overlay over the pinned internal/diagnosticwriter, which has no test file of its own",
+      "operation_actions": {
+        "wrap_one": [
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:WrapASTDiagnostic"
+        ]
+      },
+      "operations": [
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:WrapASTDiagnostic"
+      ]
+    },
+    {
+      "expected_contract": "Row 4 reports length 3 with three true identities; row 5 reports length 0.",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/diagwriter/wrap-ast-diagnostics-allocates-one-wrapper-per-input",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:WrapASTDiagnostics"
+      ],
+      "native_authority": "tools/phase1/config/diagwriter_probe_test.go: an in-package overlay over the pinned internal/diagnosticwriter, which has no test file of its own",
+      "operation_actions": {
+        "wrap_many": [
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:WrapASTDiagnostic",
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:WrapASTDiagnostics"
+        ]
+      },
+      "operations": [
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:WrapASTDiagnostic",
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:WrapASTDiagnostics"
+      ]
+    },
+    {
+      "coverage_operations": [
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:WriteFlattenedASTDiagnosticMessage"
+      ],
+      "expected_contract": "Row 2 is \"Cannot find name 'a\\uFFFDb\\uFFFDc'.\" as UTF-8 bytes. Row 4 is \"mapper said {0} about this\" exactly, braces included.",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/diagwriter/write-flattened-ast-replaces-each-invalid-utf8-run-once",
+      "last_result": "match",
+      "native_authority": "tools/phase1/config/diagwriter_probe_test.go: an in-package overlay over the pinned internal/diagnosticwriter, which has no test file of its own",
+      "operation_actions": {
+        "write_flattened_ast": [
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:WrapASTDiagnostic",
+          "tsc/internal/diagnosticwriter/diagnosticwriter.go:WriteFlattenedASTDiagnosticMessage"
+        ]
+      },
+      "operations": [
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:WrapASTDiagnostic",
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go:WriteFlattenedASTDiagnosticMessage"
+      ]
+    },
+    {
       "expected_contract": "the factory builds a case-sensitive host over the declared map: the three declared paths are files, their directory is a directory, an undeclared path is neither, and the host reports the current directory it was given",
       "family": "config",
       "host_applicability": "any",

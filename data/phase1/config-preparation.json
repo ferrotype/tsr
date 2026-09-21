@@ -1,5 +1,5 @@
 {
-  "accounted_operations": 97,
+  "accounted_operations": 127,
   "complete": false,
   "exempt_by_category": {
     "go_test_harness": 17,
@@ -16,156 +16,6 @@
     "total_outputs": 167
   },
   "pending": [
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.End",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.Len",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.MessageChain",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.Pos",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.RelatedInformation",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.Source",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.resolve",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:CompareASTDiagnostics",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:FlattenDiagnosticMessage",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:FormatDiagnosticsStatusAndTime",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:FormatDiagnosticsStatusWithColorAndTime",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:FromASTDiagnostics",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:ToDiagnostics",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:TryClearScreen",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:WrapASTDiagnostic",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:WrapASTDiagnostics",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:WriteFlattenedASTDiagnosticMessage",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:diagnosticPrefix",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:flattenDiagnosticMessageChain",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:getCategoryFormat",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:newOriginalTextFile",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:originalTextFile.ECMALineMap",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:originalTextFile.FileName",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:originalTextFile.Text",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:prettyPathForFileError",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:renamedFile.ECMALineMap",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:renamedFile.FileName",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:renamedFile.Text",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:writeTabularErrorsDisplay",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:writeWithStyleAndReset",
-      "rust_home": []
-    },
     {
       "disposition": "missing",
       "operation": "tsc/internal/module/cache.go:getRedirectConfigName",
@@ -3092,7 +2942,7 @@
     }
   ],
   "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
-  "prepared_operations": 5,
+  "prepared_operations": 35,
   "roster_problems": [],
   "step": "config",
   "total_operations": 402,

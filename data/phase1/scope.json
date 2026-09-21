@@ -1,10 +1,10 @@
 {
   "counts": {
-    "covered": 255,
+    "covered": 258,
     "equivalent_rust": 8,
     "implemented_untested": 3232,
     "later_phase": 18,
-    "missing": 1282
+    "missing": 1279
   },
   "dispositions": [
     "covered",
@@ -166007,9 +166007,11 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "a prepared case runs and reports the Rust entry point absent: config/diagwriter/message-chain-appends-a-note-only-for-synthesized-virtual-code; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/diagwriter/message-chain-appends-a-note-only-for-synthesized-virtual-code"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/core",
@@ -166033,7 +166035,7 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [],
@@ -166075,9 +166077,11 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "a prepared case runs and reports the Rust entry point absent: config/diagwriter/related-information-rewraps-every-entry; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/diagwriter/related-information-rewraps-every-entry"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/core",
@@ -166101,7 +166105,7 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [],
@@ -166109,9 +166113,11 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "a prepared case runs and reports the Rust entry point absent: config/diagwriter/source-selects-the-prefix-shown-before-the-code; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/diagwriter/source-selects-the-prefix-shown-before-the-code"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/core",
@@ -166135,7 +166141,7 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [],
@@ -166143,9 +166149,11 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "a prepared case runs and reports the Rust entry point absent: config/diagwriter/resolve-takes-a-different-arm-for-each-kind-of-diagnostic; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/diagwriter/resolve-takes-a-different-arm-for-each-kind-of-diagnostic"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/core",
@@ -166169,7 +166177,7 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [],
@@ -166177,9 +166185,11 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "a prepared case runs and reports the Rust entry point absent: config/diagwriter/compare-ast-diagnostics-unwraps-and-delegates; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/diagwriter/compare-ast-diagnostics-unwraps-and-delegates"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/core",
@@ -166203,7 +166213,7 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [],
@@ -166211,9 +166221,11 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): config/diagwriter/flatten-indents-each-chain-level-by-two-more-spaces",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/diagwriter/flatten-indents-each-chain-level-by-two-more-spaces"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/core",
@@ -166224,7 +166236,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/diagnosticwriter",
       "go_source": "tsc/internal/diagnosticwriter/diagnosticwriter.go",
       "id": "tsc/internal/diagnosticwriter/diagnosticwriter.go:FlattenDiagnosticMessage",
@@ -166237,7 +166249,7 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [],
@@ -166281,9 +166293,11 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "a prepared case runs and reports the Rust entry point absent: config/diagwriter/the-plain-status-line-joins-time-and-message-with-a-spaced-dash; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/diagwriter/the-plain-status-line-joins-time-and-message-with-a-spaced-dash"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/core",
@@ -166307,7 +166321,7 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [],
@@ -166315,9 +166329,11 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "a prepared case runs and reports the Rust entry point absent: config/diagwriter/the-coloured-status-line-brackets-a-caller-supplied-time; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/diagwriter/the-coloured-status-line-brackets-a-caller-supplied-time"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/core",
@@ -166341,7 +166357,7 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [],
@@ -166385,9 +166401,11 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "a prepared case runs and reports the Rust entry point absent: config/diagwriter/from-ast-diagnostics-returns-interface-values-over-the-same-pointers; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/diagwriter/from-ast-diagnostics-returns-interface-values-over-the-same-pointers"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/core",
@@ -166411,7 +166429,7 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [],
@@ -166419,9 +166437,11 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "a prepared case runs and reports the Rust entry point absent: config/diagwriter/to-diagnostics-widens-without-rewrapping; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/diagwriter/to-diagnostics-widens-without-rewrapping"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/core",
@@ -166445,7 +166465,7 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [],
@@ -166453,9 +166473,11 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "a prepared case runs and reports the Rust entry point absent: config/diagwriter/try-clear-screen-needs-a-watch-code-and-three-quiet-flags; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/diagwriter/try-clear-screen-needs-a-watch-code-and-three-quiet-flags"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/core",
@@ -166479,7 +166501,7 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [],
@@ -166487,9 +166509,11 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "a prepared case runs and reports the Rust entry point absent: config/diagwriter/wrap-ast-diagnostic-keeps-the-pointer-it-was-given; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/diagwriter/wrap-ast-diagnostic-keeps-the-pointer-it-was-given"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/core",
@@ -166513,7 +166537,7 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [],
@@ -166521,9 +166545,11 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "a prepared case runs and reports the Rust entry point absent: config/diagwriter/wrap-ast-diagnostics-allocates-one-wrapper-per-input; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/diagwriter/wrap-ast-diagnostics-allocates-one-wrapper-per-input"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/core",
@@ -166547,7 +166573,7 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [],
@@ -166591,9 +166617,11 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): config/diagwriter/write-flattened-ast-replaces-each-invalid-utf8-run-once",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/diagwriter/write-flattened-ast-replaces-each-invalid-utf8-run-once"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/core",
@@ -166604,7 +166632,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/diagnosticwriter",
       "go_source": "tsc/internal/diagnosticwriter/diagnosticwriter.go",
       "id": "tsc/internal/diagnosticwriter/diagnosticwriter.go:WriteFlattenedASTDiagnosticMessage",
@@ -166617,7 +166645,7 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [],
@@ -166803,9 +166831,11 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): config/diagwriter/flatten-indents-each-chain-level-by-two-more-spaces",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/diagwriter/flatten-indents-each-chain-level-by-two-more-spaces"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/core",
@@ -166816,7 +166846,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/diagnosticwriter",
       "go_source": "tsc/internal/diagnosticwriter/diagnosticwriter.go",
       "id": "tsc/internal/diagnosticwriter/diagnosticwriter.go:flattenDiagnosticMessageChain",
@@ -166829,7 +166859,7 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [],
@@ -166837,9 +166867,11 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "a prepared case runs and reports the Rust entry point absent: config/diagwriter/the-category-format-and-the-style-writer-are-the-colour-vocabulary; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/diagwriter/the-category-format-and-the-style-writer-are-the-colour-vocabulary"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/core",
@@ -166863,7 +166895,7 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [],
@@ -166907,9 +166939,11 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "a prepared case runs and reports the Rust entry point absent: config/diagwriter/original-text-file-presents-the-untransformed-text; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/diagwriter/original-text-file-presents-the-untransformed-text"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/core",
@@ -166933,7 +166967,7 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [],
@@ -167111,9 +167145,11 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "a prepared case runs and reports the Rust entry point absent: config/diagwriter/renamed-file-shows-the-canonical-name-over-the-virtual-text; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/diagwriter/renamed-file-shows-the-canonical-name-over-the-virtual-text"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/core",
@@ -167137,7 +167173,7 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [],
@@ -167215,9 +167251,11 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "a prepared case runs and reports the Rust entry point absent: config/diagwriter/the-tabular-display-pads-the-count-column-and-relativises-the-path; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/diagwriter/the-tabular-display-pads-the-count-column-and-relativises-the-path"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/core",
@@ -167241,7 +167279,7 @@
       "membership_reason": "the formatting slice the config baselines render through",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [],
