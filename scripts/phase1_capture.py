@@ -264,6 +264,30 @@ FAMILIES = {
         "rust_example": "phase1_filesystem",
         "rust_target": "tools/phase1/filesystem/src/main.rs",
     },
+    "config": {
+        "requests": [
+            "data/phase1/requests/config-commandline.json",
+        ],
+        "native_probes": [
+            # The 53 + 27 `tsoptions/commandLineParsing` outputs. It compiles
+            # into the pinned `tsoptions_test` package so it can call that
+            # package's own `formatNewBaseline` and `formatNewBaselineBuild`
+            # rather than restating their assembly, and the pinned
+            # `createVerifyNullForNonNullIncluded` for the eight outputs that
+            # need a synthesised option declaration. That package links
+            # internal/testutil/baseline, whose init calls repo.TestDataPath(),
+            # and repo panics under -trimpath, so the flag is dropped here as
+            # it is for the F0 pilot's command-line probe.
+            {"name": "commandline", "package": "tsoptions",
+             "probe": "tools/phase1/config/commandline_probe_test.go",
+             "test": "TestPhase1ConfigCommandLine",
+             "trimpath": False},
+        ],
+        "rust_package": "phase1_config",
+        "rust_target_kind": "bin",
+        "rust_example": "phase1_config",
+        "rust_target": "tools/phase1/config/src/main.rs",
+    },
 }
 # The six command families the plan names. Only `pilot` is wired at F0; the
 # rest are registered so `inventory --check` can report them as unprepared

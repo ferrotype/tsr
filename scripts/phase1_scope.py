@@ -708,11 +708,14 @@ def leaf_preparation(scope: dict, cases: dict, step: str = "leaves") -> dict:
     gap_problems = gap_record_problems({"cases": [
         case for case in cases.get("cases", []) if case.get("family") in families
     ]})
+    # A step that prepares reference outputs as well as operations is held to
+    # both. Written over the shared table so F3a's 80 command-line outputs get
+    # F2a's gate rather than a new one; a step with no outputs reports none.
     outputs = None
-    if step == "filesystem":
-        from phase1_baselines import matchfiles_preparation
+    from phase1_baselines import STEP_OUTPUT_GROUPS, output_preparation
 
-        outputs = matchfiles_preparation(cases)
+    if step in STEP_OUTPUT_GROUPS:
+        outputs = output_preparation(cases, step)
     return {
         "version": 2,
         "step": step,

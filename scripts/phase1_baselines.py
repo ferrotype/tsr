@@ -362,42 +362,78 @@ def verify_written_subfolders() -> list[str]:
     return problems
 
 
-def matchfiles_preparation(cases: dict) -> dict:
-    """F2a prepares outputs as well as operations, including excepted outputs.
+# Which step prepares which baseline groups, and where that step's frozen
+# native observations live. A group belongs to exactly one step, so the 309
+# outputs are partitioned rather than double counted: F2a carries the 142
+# `config/matchFiles` outputs, F3a the other 167.
+STEP_OUTPUT_GROUPS: dict[str, tuple[str, str, tuple[tuple[str, str], ...]]] = {
+    # step: (case family, frozen native family directory, ((group, probe), ...))
+    "filesystem": ("filesystem", "filesystem", (("matchFiles", "matchfiles"),)),
+    "config": ("config", "config", (
+        ("parseCommandLine", "commandline"),
+        ("parseBuildOptions", "commandline"),
+    )),
+}
 
-    Frozen native observations authenticate the carried renderer's bytes. A
-    baseline exception waives equality with the historical file, not the native
-    observation or the runnable Rust comparison. Do not let operations=[] make
-    these 142 cases disappear from the preparation gate.
+
+def output_preparation(cases: dict, step: str) -> dict:
+    """A step prepares outputs as well as operations, including excepted ones.
+
+    Frozen native observations authenticate the rendered bytes. A baseline
+    exception waives equality with the historical file, not the native
+    observation or the runnable Rust comparison. Do not let `operations: []`
+    make an output case disappear from the preparation gate: that is exactly
+    what it would do, since an output case credits no operation by design.
+
+    Written once over STEP_OUTPUT_GROUPS rather than per step, so F3a's 80
+    command-line outputs are held to the bar F2a's 142 were, including the rule
+    that an exception is refused on an output the index also marks rendered.
     """
+    family, native_family, groups = STEP_OUTPUT_GROUPS[step]
     index = json.loads((ROOT / "data/phase1/config-baselines.json").read_text())
-    expected = {"config/matchFiles/" + row["name"]: row
-                for row in index["groups"]["matchFiles"]["outputs"]}
+    expected: dict[str, dict] = {}
+    for group, _probe in groups:
+        subdirectory = GROUPS[group][0]
+        for row in index["groups"][group]["outputs"]:
+            expected[f"{subdirectory}/{row['name']}"] = row
     problems = exception_problems(index)
-    directory = ROOT / "data/phase1/native/filesystem"
-    native = directory / "matchfiles/observations.json"
-    provenance = directory / "capture-provenance.json"
+    directory = ROOT / "data/phase1/native" / native_family
+    provenance_path = directory / "capture-provenance.json"
     rows: dict[str, dict] = {}
-    if not native.is_file() or not provenance.is_file():
-        problems.append("matchFiles has no frozen native observations and provenance")
+    recorded = None
+    if not provenance_path.is_file():
+        problems.append(f"{step} has no frozen native capture provenance")
     else:
-        recorded = json.loads(provenance.read_text())
-        probe = recorded.get("native_probes", {}).get("matchfiles", {})
-        if recorded.get("pin") != pin() or digest(native.read_bytes()) != probe.get("observations_sha256"):
-            problems.append("matchFiles native observations disagree with their pin or digest")
-        else:
-            for row in json.loads(native.read_text())["observations"]:
-                if row["case"] in rows:
-                    problems.append(f"matchFiles duplicates native row {row['case']}")
-                rows[row["case"]] = row
+        recorded = json.loads(provenance_path.read_text())
+        if recorded.get("pin") != pin():
+            problems.append(f"{step} native observations disagree with the pin")
+            recorded = None
+    for group, probe in sorted({(g, p) for g, p in groups}):
+        if recorded is None:
+            break
+        native = directory / probe / "observations.json"
+        declared = recorded.get("native_probes", {}).get(probe, {})
+        if not native.is_file():
+            problems.append(f"{group} has no frozen native observations")
+            continue
+        if digest(native.read_bytes()) != declared.get("observations_sha256"):
+            problems.append(f"{group} native observations disagree with their digest")
+            continue
+        for row in json.loads(native.read_text())["observations"]:
+            if row["case"] in rows:
+                continue
+            rows[row["case"]] = row
     by_output: dict[str, list[dict]] = {}
     for case in cases.get("cases", []):
-        if case.get("family") == "filesystem" and case.get("baseline"):
+        if case.get("family") == family and case.get("baseline"):
             by_output.setdefault(case["baseline"], []).append(case)
     for unknown in sorted(set(by_output) - set(expected)):
-        problems.append(f"matchFiles prepares unknown output {unknown}")
-    exceptions_by_name = {"config/matchFiles/" + name: entry
-                          for name, entry in exceptions_by_output().items()}
+        problems.append(f"{step} prepares unknown output {unknown}")
+    exceptions_by_name = {
+        f"{GROUPS[entry['group']][0]}/{name}": entry
+        for name, entry in exceptions_by_output().items()
+        if entry.get("group") in GROUPS
+    }
     exact = excepted = 0
     for name, expected_row in expected.items():
         linked = by_output.get(name, [])
@@ -429,6 +465,12 @@ def matchfiles_preparation(cases: dict) -> dict:
             excepted += 1
         else:
             problems.append(f"{name}: rendering differs without an approved exception")
+    declared_total = sum(GROUPS[group][1] for group, _probe in groups)
     return {"total_outputs": len(expected), "exact_outputs": exact,
             "excepted_outputs": excepted, "problems": problems,
-            "complete": len(expected) == GROUPS["matchFiles"][1] and not problems}
+            "complete": len(expected) == declared_total and not problems}
+
+
+def matchfiles_preparation(cases: dict) -> dict:
+    """F2a's share of the 309: the 142 carried `config/matchFiles` outputs."""
+    return output_preparation(cases, "filesystem")

@@ -408,8 +408,13 @@ class DispatcherTests(unittest.TestCase):
         self.assertNotEqual(result["ok"], result["f0_complete"])
 
     def test_unprepared_family_is_refused_with_the_declared_list(self):
+        # A family the plan declares but no step has built yet. `config` was
+        # this test's subject until F3a built it; the check is about the
+        # declared-but-unbuilt state, so it moves to the next such family
+        # rather than disappearing when one is finished.
+        unbuilt = next(f for f in capture.DECLARED_FAMILIES if f not in capture.FAMILIES)
         with self.assertRaisesRegex(ValueError, "has no adapter yet"):
-            capture.capture("config", Path(tempfile.mkdtemp()) / "out")
+            capture.capture(unbuilt, Path(tempfile.mkdtemp()) / "out")
 
 
 class SourceClosureTests(unittest.TestCase):
@@ -1461,13 +1466,17 @@ class FilesystemPreparationTests(unittest.TestCase):
         self.assertEqual(report["excepted_outputs"], 74)
 
     def test_removing_output_cases_cannot_leave_filesystem_prepared(self):
-        self.cases["cases"] = [c for c in self.cases["cases"] if not c.get("baseline")]
+        self.cases["cases"] = [
+            c for c in self.cases["cases"]
+            if not (c.get("baseline") and c.get("family") == "filesystem")
+        ]
         report = scope.leaf_preparation(self.scope, self.cases, "filesystem")
         self.assertFalse(report["complete"])
         self.assertEqual(len(report["outputs"]["problems"]), 142)
 
     def test_an_excepted_output_still_needs_a_prepared_comparison(self):
-        case = next(c for c in self.cases["cases"] if c.get("baseline"))
+        case = next(c for c in self.cases["cases"]
+                    if c.get("baseline") and c.get("family") == "filesystem")
         case["last_result"] = "not_run"
         report = baselines.matchfiles_preparation(self.cases)
         self.assertFalse(report["complete"])

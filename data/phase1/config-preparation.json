@@ -4,6 +4,13 @@
   "exempt_by_category": {},
   "exempt_operations": 0,
   "gap_problems": [],
+  "outputs": {
+    "complete": true,
+    "exact_outputs": 80,
+    "excepted_outputs": 0,
+    "problems": [],
+    "total_outputs": 80
+  },
   "pending": [
     {
       "disposition": "missing",
