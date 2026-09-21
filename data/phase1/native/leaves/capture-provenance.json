@@ -117,8 +117,8 @@
   "partial": false,
   "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
   "requests_sha256": "dc8d9b68dd9a36996c755282bdd77c73358ffb12032b7c906de2f803d7395105",
-  "rust_binary_sha256": "418aeadcae5dd5756fd197442765a2f3d374b3ed3dc6d15fe7b548b69ca64fb0",
-  "rust_observations_sha256": "db87d12dcd070bd2467b24edbf10e5c17a5d2d15ab7fdd71a3eec049ccfc9525",
+  "rust_binary_sha256": "0d78332951c878cedba3ad16669df061427da484937b7dec742826ba65104807",
+  "rust_observations_sha256": "1c1f63e6dc219e5c2bff33fdf25298740d7c9c391925038e21568bf44a1f7f54",
   "selected_cases": [
     "leaves/bundled/asset-index-complete",
     "leaves/bundled/asset-name-resolution",
@@ -791,7 +791,7 @@
     "crates/tsr_tspath/NOTICE": "c920c6e51ee08f6cb2c76d168b65a8916c3557ffafad5ee103894427daa80ec0",
     "crates/tsr_tspath/README.md": "773f7b7d6ec3b6023380c3cc4652279d8280c75315345014875aba620c1cd31a",
     "crates/tsr_tspath/src/comparison.rs": "479cd36dc9399e9e6f5cc2a450ae59ab40f8edf30f8d705ae44115a0b230c5a5",
-    "crates/tsr_tspath/src/lib.rs": "b9beae1402afc9c1d091a1ab2376c48318eff2f2dc9944b2b387e809c102b493",
+    "crates/tsr_tspath/src/lib.rs": "f6171fb7e10a453be900e03c63d577647ebd0a89cc79602ee96695a6a9eeaf8b",
     "crates/tsr_tspath/tests/go_observations.rs": "a202f28c6d480df18b9af9ef16ccf905fa7cceefe0a4c9b5d8ab8e8eac77d3c9",
     "crates/tsr_vfs/Cargo.toml": "367ede29e794827d57426d33973fe6501341b026b286187b66ee23a9a219308b",
     "crates/tsr_vfs/LICENSE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
@@ -841,7 +841,7 @@
     "tools/phase1/leaves/src/json_contract.rs": "2d5c530b054d138dfbc58c2ad1e099219ab42dcd149c4e900bb24fed05e55bd2",
     "tools/phase1/leaves/src/locale.rs": "b74c5396110244ff40e9a5808954d830b0a6bf139456edf100b9f7c9e4f3d101",
     "tools/phase1/leaves/src/main.rs": "73a502062142cf71a52aebd0e1e5fe3f8bd5acbc6c488d2266ecea2ffc9882ad",
-    "tools/phase1/leaves/src/options.rs": "b2dbeaab9630657d1d631af47a26a0c5a22159d7191a57f9d4f8af8b008ef849",
+    "tools/phase1/leaves/src/options.rs": "e443ec6e5fe76984a2071c99908e35daf18b929049db833264cdf80e01551b49",
     "tools/phase1/leaves/src/text.rs": "776e1e13b330e1537f159ae0f4fd553c2fffc396d4a1f8806a659c89de10fbf3",
     "tools/phase1/leaves/text_probe_test.go": "3ae17afb257080edb931c1cb66f59e100d8f775c459b46e6e92dad44f44d11e3"
   },

@@ -538,16 +538,16 @@ fn clone_roster(trace: &[Value]) -> Result<Vec<Value>, String> {
                         );
                     }
                 }
+                // Through the roster's own renderers, not a second copy of
+                // them: an absent slice is null here exactly as it is in the
+                // field rows, which is what the Go probe's nil-returning
+                // phase1OptionStrings answers. Rendering it as an empty list
+                // instead made the no-mutation control differ on its own
+                // account, which is worse than having no control.
                 let read_back = |options: &CompilerOptions| {
                     json!([
-                        options.checkers.map_or(Value::Null, |value| json!(value)),
-                        options.types.as_ref().map_or_else(
-                            || json!([]),
-                            |values| json!(values
-                                .iter()
-                                .map(|value| String::from_utf8_lossy(value.as_bytes()).into_owned())
-                                .collect::<Vec<_>>()),
-                        ),
+                        field_get!(count, options.checkers),
+                        field_get!(texts, options.types),
                     ])
                 };
                 json!({
