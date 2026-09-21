@@ -1545,6 +1545,19 @@ class PortAnnotationTests(unittest.TestCase):
         for row in annotated:
             self.assertEqual(row["rust_home"], [], "the ledger still claims nothing here")
 
+    def test_an_annotated_home_is_a_production_home(self):
+        # A `port:` marker outside a crate's src/ claims a production home for
+        # code that is not one. crates/tsr_compiler/examples/p2/baseline.rs
+        # carries the same marker as the production flattener, so two bodies
+        # answer to one marker and nothing compares them. It is reported, not
+        # silently folded into the home.
+        for files in scope.annotated_homes().values():
+            for path in files:
+                self.assertIn("/src/", path)
+        outside = scope.annotations_outside_src()
+        self.assertTrue(outside, "the drift this check exists for is present at this pin")
+        self.assertTrue(any(a["file"].endswith("examples/p2/baseline.rs") for a in outside))
+
 
 class ConfigRosterTests(unittest.TestCase):
     def test_the_committed_config_ledger_validates(self):

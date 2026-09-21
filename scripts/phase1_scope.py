@@ -284,11 +284,36 @@ def annotated_homes() -> dict[str, list[str]]:
     """
     homes: dict[str, set[str]] = {}
     for path in sorted((ROOT / "crates").rglob("*.rs")):
+        if "/src/" not in str(path.as_posix()):
+            continue
         text = path.read_text(errors="replace")
         rel = str(path.relative_to(ROOT))
         for operation, _name in _PORT_ANNOTATION.findall(text):
             homes.setdefault(operation, set()).add(rel)
     return {operation: sorted(files) for operation, files in homes.items()}
+
+
+def annotations_outside_src() -> list[dict]:
+    """`port:` annotations that do not live in a crate's `src/`.
+
+    A `port:` marker is a claim that this code IS the port of a pinned
+    operation. Outside `src/` it cannot be: an example binary or a test file is
+    not a production home. Every one of these is therefore either a second,
+    independent implementation carrying the production marker -- a drift risk,
+    because two bodies now answer to one marker and nothing compares them -- or
+    a marker that should say it is a re-implementation. Reported rather than
+    refused: these predate this step, and turning someone else's drift into a
+    hard failure here would be the wrong place to do it.
+    """
+    found: list[dict] = []
+    for path in sorted((ROOT / "crates").rglob("*.rs")):
+        if "/src/" in str(path.as_posix()):
+            continue
+        text = path.read_text(errors="replace")
+        rel = str(path.relative_to(ROOT))
+        for operation, name in _PORT_ANNOTATION.findall(text):
+            found.append({"file": rel, "rust_fn": name, "operation": operation})
+    return found
 
 
 def classify(

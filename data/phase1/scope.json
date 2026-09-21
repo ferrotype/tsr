@@ -158768,7 +158768,6 @@
     {
       "actual_home": null,
       "annotated_home": [
-        "crates/tsr_compiler/examples/p2/diagnostics.rs",
         "crates/tsr_compiler/src/program_diagnostics.rs"
       ],
       "basis": "ledger maps the symbol but records no verification link",
@@ -169789,7 +169788,6 @@
     {
       "actual_home": null,
       "annotated_home": [
-        "crates/tsr_compiler/examples/p2/baseline.rs",
         "crates/tsr_compiler/src/diagnostic_writer/mod.rs"
       ],
       "basis": "a prepared case runs and reports the Rust entry point absent: leaves/diagnostics/format-invalid-utf8-arguments, leaves/diagnostics/format-missing-argument, leaves/diagnostics/format-multiline-and-control-arguments; witnessed by 6 prepared case(s)",
@@ -171392,7 +171390,6 @@
     {
       "actual_home": null,
       "annotated_home": [
-        "crates/tsr_compiler/examples/p2/baseline.rs",
         "crates/tsr_compiler/src/diagnostic_writer/mod.rs"
       ],
       "basis": "witnessed by 1 exact link(s): witness/s08-p5-errors-rust",
