@@ -328,12 +328,20 @@ def package_dependencies() -> dict[str, list[str]]:
     return {k: sorted(v) for k, v in dependencies.items()}
 
 
-# A committed artifact only witnesses Rust coverage when a producer actually
-# runs Rust against it. `data/s07/path-observations.json` and
-# `semver-observations.json` look like witnesses and are not: their producers
+# A committed artifact only witnesses Rust coverage when something actually runs
+# Rust against it. That is usually the producer, and for
+# `data/s07/path-observations.json` and `semver-observations.json` the producers
 # (`s07_path_helpers.py`, `s07_semver.py`) invoke `go test` only and never
-# execute Rust, so they are native authorities. Counting them would mark ~24
-# operations covered on the strength of a Go-only run.
+# execute Rust, so on the producer's account they are native authorities and
+# counting them would mark ~24 operations covered on the strength of a Go-only
+# run.
+#
+# A CONSUMER can gate just as well, which the first pass over this missed:
+# crates/tsr_tspath/tests/go_observations.rs reads the frozen path requests and
+# observations through include_str! and asserts the Rust answers equal them, so
+# `cargo test` gates eight tspath operations against that same artifact. Both
+# records exist, and they are about different things: the kind describes what
+# runs, not what the file is.
 WITNESS_KINDS = ("rust_gated", "rust_ungated", "native_authority")
 COVERING_WITNESS_KINDS = ("rust_gated",)
 
@@ -370,7 +378,17 @@ def cases_by_operation() -> dict[str, list[str]]:
 
 
 def witnessed_gaps() -> dict[str, list[str]]:
-    """Operations whose prepared case runs but reports a missing Rust entry point."""
+    """Operations whose prepared case runs and reports a missing Rust entry point.
+
+    A case PREPARES every operation it reaches and WITNESSES ABSENT only the
+    ones the Rust driver actually reported missing, which is not the same list:
+    a trace may drive five operations and find one of them unported. Falling
+    back to `operations` folded the two together and marked an operation
+    `missing` on the strength of a neighbour's gap -- an over-claim in the
+    direction of saying the port has less than it does. So the narrower list is
+    required rather than defaulted, and `record` derives it from the capture's
+    own rust rows.
+    """
     path = ROOT / "data/phase1/cases.json"
     if not path.is_file():
         return {}
@@ -379,9 +397,34 @@ def witnessed_gaps() -> dict[str, list[str]]:
     for case in document.get("cases", []):
         if case.get("last_result") != "not_implemented":
             continue
-        for operation in case.get("missing_operations", case.get("operations", [])):
+        for operation in case.get("missing_operations", []):
             gaps.setdefault(operation, []).append(case["id"])
     return {k: sorted(v) for k, v in gaps.items()}
+
+
+def gap_record_problems(cases: dict) -> list[str]:
+    """A case reporting `not_implemented` must name what the driver found absent."""
+    problems: list[str] = []
+    for case in cases.get("cases", []):
+        if case.get("last_result") != "not_implemented":
+            if case.get("missing_operations"):
+                problems.append(
+                    f"{case['id']}: records missing_operations but its last result is "
+                    f"{case.get('last_result')!r}"
+                )
+            continue
+        missing = case.get("missing_operations")
+        if not missing:
+            problems.append(
+                f"{case['id']}: reports not_implemented without naming which operation the "
+                "driver found absent; run `phase1.py record --write` against a capture"
+            )
+            continue
+        if not set(missing) <= set(case.get("operations", [])):
+            problems.append(
+                f"{case['id']}: names a missing operation the case does not claim to reach"
+            )
+    return problems
 
 
 def witness_problems() -> list[str]:

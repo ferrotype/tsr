@@ -1,5 +1,5 @@
 {
-  "accounted_operations": 1,
+  "accounted_operations": 9,
   "complete": false,
   "exempt_by_category": {},
   "exempt_operations": 0,
@@ -401,16 +401,6 @@
       ]
     },
     {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/tspath/path.go:ComparePaths",
-      "rust_home": [
-        "crates/tsr_core/src/path.rs",
-        "crates/tsr_parser/src/references.rs",
-        "crates/tsr_tspath/src/comparison.rs",
-        "crates/tsr_tspath/src/lib.rs"
-      ]
-    },
-    {
       "disposition": "missing",
       "operation": "tsc/internal/tspath/path.go:ComparePathsCaseInsensitive",
       "rust_home": [
@@ -443,16 +433,6 @@
     {
       "disposition": "missing",
       "operation": "tsc/internal/tspath/path.go:ComparePathsOptions.getEqualityComparer",
-      "rust_home": [
-        "crates/tsr_core/src/path.rs",
-        "crates/tsr_parser/src/references.rs",
-        "crates/tsr_tspath/src/comparison.rs",
-        "crates/tsr_tspath/src/lib.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/tspath/path.go:ContainsPath",
       "rust_home": [
         "crates/tsr_core/src/path.rs",
         "crates/tsr_parser/src/references.rs",
@@ -621,16 +601,6 @@
       ]
     },
     {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/tspath/path.go:GetNormalizedPathComponents",
-      "rust_home": [
-        "crates/tsr_core/src/path.rs",
-        "crates/tsr_parser/src/references.rs",
-        "crates/tsr_tspath/src/comparison.rs",
-        "crates/tsr_tspath/src/lib.rs"
-      ]
-    },
-    {
       "disposition": "missing",
       "operation": "tsc/internal/tspath/path.go:GetPathComponents",
       "rust_home": [
@@ -643,36 +613,6 @@
     {
       "disposition": "missing",
       "operation": "tsc/internal/tspath/path.go:GetPathComponentsRelativeTo",
-      "rust_home": [
-        "crates/tsr_core/src/path.rs",
-        "crates/tsr_parser/src/references.rs",
-        "crates/tsr_tspath/src/comparison.rs",
-        "crates/tsr_tspath/src/lib.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/tspath/path.go:GetPathFromPathComponents",
-      "rust_home": [
-        "crates/tsr_core/src/path.rs",
-        "crates/tsr_parser/src/references.rs",
-        "crates/tsr_tspath/src/comparison.rs",
-        "crates/tsr_tspath/src/lib.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/tspath/path.go:GetRelativePathFromDirectory",
-      "rust_home": [
-        "crates/tsr_core/src/path.rs",
-        "crates/tsr_parser/src/references.rs",
-        "crates/tsr_tspath/src/comparison.rs",
-        "crates/tsr_tspath/src/lib.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/tspath/path.go:GetRelativePathFromFile",
       "rust_home": [
         "crates/tsr_core/src/path.rs",
         "crates/tsr_parser/src/references.rs",
@@ -851,16 +791,6 @@
       ]
     },
     {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/tspath/path.go:PathIsRelative",
-      "rust_home": [
-        "crates/tsr_core/src/path.rs",
-        "crates/tsr_parser/src/references.rs",
-        "crates/tsr_tspath/src/comparison.rs",
-        "crates/tsr_tspath/src/lib.rs"
-      ]
-    },
-    {
       "disposition": "missing",
       "operation": "tsc/internal/tspath/path.go:RemoveTrailingDirectorySeparator",
       "rust_home": [
@@ -933,16 +863,6 @@
     {
       "disposition": "implemented_untested",
       "operation": "tsc/internal/tspath/path.go:ToPath",
-      "rust_home": [
-        "crates/tsr_core/src/path.rs",
-        "crates/tsr_parser/src/references.rs",
-        "crates/tsr_tspath/src/comparison.rs",
-        "crates/tsr_tspath/src/lib.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/tspath/path.go:TrimFilePathPrefix",
       "rust_home": [
         "crates/tsr_core/src/path.rs",
         "crates/tsr_parser/src/references.rs",
@@ -2086,5 +2006,5 @@
   "step": "filesystem",
   "total_operations": 316,
   "version": 2,
-  "witnessed_operations": 0
+  "witnessed_operations": 8
 }

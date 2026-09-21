@@ -1,8 +1,8 @@
 {
   "counts": {
-    "covered": 151,
+    "covered": 159,
     "equivalent_rust": 8,
-    "implemented_untested": 3339,
+    "implemented_untested": 3331,
     "later_phase": 18,
     "missing": 1279
   },
@@ -132085,8 +132085,7 @@
       "basis_kind": "rule",
       "cases": [
         "leaves/bundled/case-sensitivity-forwarding",
-        "leaves/bundled/inner-filesystem-delegation",
-        "leaves/bundled/walk-delegation-and-recursion"
+        "leaves/bundled/inner-filesystem-delegation"
       ],
       "depends_on": [
         "internal/osutil",
@@ -132190,7 +132189,6 @@
       "basis_kind": "rule",
       "cases": [
         "leaves/bundled/inner-filesystem-delegation",
-        "leaves/bundled/walk-delegation-and-recursion",
         "leaves/bundled/wrapper-read-paths"
       ],
       "depends_on": [
@@ -132289,11 +132287,9 @@
     },
     {
       "actual_home": null,
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/bundled/walk-delegation-and-recursion; witnessed by 1 prepared case(s)",
+      "basis": "unmapped in the audit input and absent from every Rust crate by name",
       "basis_kind": "rule",
-      "cases": [
-        "leaves/bundled/walk-delegation-and-recursion"
-      ],
+      "cases": [],
       "depends_on": [
         "internal/osutil",
         "internal/tspath",
@@ -132314,7 +132310,7 @@
       "membership_reason": "packaged library access",
       "roster": {
         "owner": null,
-        "state": "prepared",
+        "state": "pending",
         "step": "leaves"
       },
       "rust_home": [
@@ -132467,7 +132463,6 @@
       "cases": [
         "leaves/bundled/case-sensitivity-forwarding",
         "leaves/bundled/inner-filesystem-delegation",
-        "leaves/bundled/walk-delegation-and-recursion",
         "leaves/bundled/wrapper-read-paths"
       ],
       "depends_on": [
@@ -132505,7 +132500,7 @@
       "cases": [
         "leaves/bundled/case-sensitivity-forwarding",
         "leaves/bundled/inner-filesystem-delegation",
-        "leaves/bundled/walk-delegation-and-recursion"
+        "leaves/bundled/wrapper-dispatch-surface"
       ],
       "depends_on": [
         "internal/osutil",
@@ -132537,11 +132532,9 @@
     },
     {
       "actual_home": null,
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/bundled/wrapper-dispatch-surface; witnessed by 1 prepared case(s)",
+      "basis": "unmapped in the audit input and absent from every Rust crate by name",
       "basis_kind": "rule",
-      "cases": [
-        "leaves/bundled/wrapper-dispatch-surface"
-      ],
+      "cases": [],
       "depends_on": [
         "internal/osutil",
         "internal/tspath",
@@ -132562,7 +132555,7 @@
       "membership_reason": "packaged library access",
       "roster": {
         "owner": null,
-        "state": "prepared",
+        "state": "pending",
         "step": "leaves"
       },
       "rust_home": [
@@ -132572,11 +132565,9 @@
     },
     {
       "actual_home": null,
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/bundled/wrapper-dispatch-surface; witnessed by 1 prepared case(s)",
+      "basis": "unmapped in the audit input and absent from every Rust crate by name",
       "basis_kind": "rule",
-      "cases": [
-        "leaves/bundled/wrapper-dispatch-surface"
-      ],
+      "cases": [],
       "depends_on": [
         "internal/osutil",
         "internal/tspath",
@@ -132597,7 +132588,7 @@
       "membership_reason": "packaged library access",
       "roster": {
         "owner": null,
-        "state": "prepared",
+        "state": "pending",
         "step": "leaves"
       },
       "rust_home": [
@@ -132788,11 +132779,9 @@
     },
     {
       "actual_home": null,
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/bundled/wrapper-dispatch-surface; witnessed by 1 prepared case(s)",
+      "basis": "unmapped in the audit input and absent from every Rust crate by name",
       "basis_kind": "rule",
-      "cases": [
-        "leaves/bundled/wrapper-dispatch-surface"
-      ],
+      "cases": [],
       "depends_on": [
         "internal/osutil",
         "internal/tspath",
@@ -132813,7 +132802,7 @@
       "membership_reason": "packaged library access",
       "roster": {
         "owner": null,
-        "state": "prepared",
+        "state": "pending",
         "step": "leaves"
       },
       "rust_home": [
@@ -132894,12 +132883,9 @@
     },
     {
       "actual_home": null,
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/bundled/walk-delegation-and-recursion, leaves/bundled/wrapper-dispatch-surface; witnessed by 2 prepared case(s)",
+      "basis": "unmapped in the audit input and absent from every Rust crate by name",
       "basis_kind": "rule",
-      "cases": [
-        "leaves/bundled/walk-delegation-and-recursion",
-        "leaves/bundled/wrapper-dispatch-surface"
-      ],
+      "cases": [],
       "depends_on": [
         "internal/osutil",
         "internal/tspath",
@@ -132920,7 +132906,7 @@
       "membership_reason": "packaged library access",
       "roster": {
         "owner": null,
-        "state": "prepared",
+        "state": "pending",
         "step": "leaves"
       },
       "rust_home": [
@@ -132930,11 +132916,9 @@
     },
     {
       "actual_home": null,
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/bundled/wrapper-dispatch-surface; witnessed by 1 prepared case(s)",
+      "basis": "unmapped in the audit input and absent from every Rust crate by name",
       "basis_kind": "rule",
-      "cases": [
-        "leaves/bundled/wrapper-dispatch-surface"
-      ],
+      "cases": [],
       "depends_on": [
         "internal/osutil",
         "internal/tspath",
@@ -132955,7 +132939,7 @@
       "membership_reason": "packaged library access",
       "roster": {
         "owner": null,
-        "state": "prepared",
+        "state": "pending",
         "step": "leaves"
       },
       "rust_home": [
@@ -133793,10 +133777,9 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/ordered-map-diff-callback-sequence, leaves/core-collections/ordered-map-diff-func-uses-the-callback; witnessed by 2 prepared case(s)",
+      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/ordered-map-diff-func-uses-the-callback; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
       "cases": [
-        "leaves/core-collections/ordered-map-diff-callback-sequence",
         "leaves/core-collections/ordered-map-diff-func-uses-the-callback"
       ],
       "depends_on": [
@@ -133914,11 +133897,10 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/ordered-map-clone-isolation, leaves/core-collections/ordered-map-clone-tolerates-nil, leaves/core-collections/ordered-map-clone-write-back; witnessed by 3 prepared case(s)",
+      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/ordered-map-clone-isolation, leaves/core-collections/ordered-map-clone-write-back; witnessed by 2 prepared case(s)",
       "basis_kind": "rule",
       "cases": [
         "leaves/core-collections/ordered-map-clone-isolation",
-        "leaves/core-collections/ordered-map-clone-tolerates-nil",
         "leaves/core-collections/ordered-map-clone-write-back"
       ],
       "depends_on": [
@@ -133977,12 +133959,9 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/ordered-map-diff-callback-sequence, leaves/core-collections/ordered-map-diff-func-uses-the-callback; witnessed by 2 prepared case(s)",
+      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
       "basis_kind": "rule",
-      "cases": [
-        "leaves/core-collections/ordered-map-diff-callback-sequence",
-        "leaves/core-collections/ordered-map-diff-func-uses-the-callback"
-      ],
+      "cases": [],
       "depends_on": [
         "internal/json"
       ],
@@ -134000,7 +133979,7 @@
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
         "owner": null,
-        "state": "prepared",
+        "state": "pending",
         "step": "leaves"
       },
       "rust_home": [],
@@ -134038,13 +134017,9 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/ordered-map-diff-callback-sequence, leaves/core-collections/ordered-map-diff-func-uses-the-callback, leaves/core-collections/ordered-map-get-or-zero-hides-absence; witnessed by 3 prepared case(s)",
+      "basis": "unmapped and absent from the actual home for this package (tsr_core and consumer-local collections)",
       "basis_kind": "rule",
-      "cases": [
-        "leaves/core-collections/ordered-map-diff-callback-sequence",
-        "leaves/core-collections/ordered-map-diff-func-uses-the-callback",
-        "leaves/core-collections/ordered-map-get-or-zero-hides-absence"
-      ],
+      "cases": [],
       "depends_on": [
         "internal/json"
       ],
@@ -134062,7 +134037,7 @@
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
         "owner": null,
-        "state": "prepared",
+        "state": "pending",
         "step": "leaves"
       },
       "rust_home": [],
@@ -134128,11 +134103,10 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/ordered-map-early-stop, leaves/core-collections/ordered-map-from-list-repeated-keys; witnessed by 2 prepared case(s)",
+      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/ordered-map-early-stop; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
       "cases": [
-        "leaves/core-collections/ordered-map-early-stop",
-        "leaves/core-collections/ordered-map-from-list-repeated-keys"
+        "leaves/core-collections/ordered-map-early-stop"
       ],
       "depends_on": [
         "internal/json"
@@ -134159,12 +134133,10 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/ordered-map-marshal-integer-keys, leaves/core-collections/ordered-map-marshal-member-order, leaves/core-collections/ordered-map-unmarshal-keeps-document-order; witnessed by 3 prepared case(s)",
+      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/ordered-map-marshal-member-order; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
       "cases": [
-        "leaves/core-collections/ordered-map-marshal-integer-keys",
-        "leaves/core-collections/ordered-map-marshal-member-order",
-        "leaves/core-collections/ordered-map-unmarshal-keeps-document-order"
+        "leaves/core-collections/ordered-map-marshal-member-order"
       ],
       "depends_on": [
         "internal/json"
@@ -134191,10 +134163,9 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/ordered-map-from-list-repeated-keys, leaves/core-collections/ordered-map-insert-overwrite; witnessed by 2 prepared case(s)",
+      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/ordered-map-insert-overwrite; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
       "cases": [
-        "leaves/core-collections/ordered-map-from-list-repeated-keys",
         "leaves/core-collections/ordered-map-insert-overwrite"
       ],
       "depends_on": [
@@ -134429,11 +134400,10 @@
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/ordered-map-marshal-integer-keys, leaves/core-collections/ordered-map-marshal-member-order; witnessed by 2 prepared case(s)",
+      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/ordered-map-marshal-integer-keys; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
       "cases": [
-        "leaves/core-collections/ordered-map-marshal-integer-keys",
-        "leaves/core-collections/ordered-map-marshal-member-order"
+        "leaves/core-collections/ordered-map-marshal-integer-keys"
       ],
       "depends_on": [
         "internal/json"
@@ -160705,11 +160675,9 @@
     },
     {
       "actual_home": null,
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/helpers/find-zero-value-is-not-absence; witnessed by 1 prepared case(s)",
+      "basis": "unmapped in the audit input and absent from every Rust crate by name",
       "basis_kind": "rule",
-      "cases": [
-        "leaves/helpers/find-zero-value-is-not-absence"
-      ],
+      "cases": [],
       "depends_on": [
         "internal/collections",
         "internal/debug",
@@ -160735,7 +160703,7 @@
       "membership_reason": "core helpers and option semantics",
       "roster": {
         "owner": null,
-        "state": "prepared",
+        "state": "pending",
         "step": "leaves"
       },
       "rust_home": [
@@ -160746,11 +160714,9 @@
     },
     {
       "actual_home": null,
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/helpers/find-zero-value-is-not-absence; witnessed by 1 prepared case(s)",
+      "basis": "unmapped in the audit input and absent from every Rust crate by name",
       "basis_kind": "rule",
-      "cases": [
-        "leaves/helpers/find-zero-value-is-not-absence"
-      ],
+      "cases": [],
       "depends_on": [
         "internal/collections",
         "internal/debug",
@@ -160776,7 +160742,7 @@
       "membership_reason": "core helpers and option semantics",
       "roster": {
         "owner": null,
-        "state": "prepared",
+        "state": "pending",
         "step": "leaves"
       },
       "rust_home": [
@@ -161064,11 +161030,9 @@
     },
     {
       "actual_home": null,
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/helpers/flatmap-and-flatten-nil-accumulator; witnessed by 1 prepared case(s)",
+      "basis": "unmapped in the audit input and absent from every Rust crate by name",
       "basis_kind": "rule",
-      "cases": [
-        "leaves/helpers/flatmap-and-flatten-nil-accumulator"
-      ],
+      "cases": [],
       "depends_on": [
         "internal/collections",
         "internal/debug",
@@ -161094,7 +161058,7 @@
       "membership_reason": "core helpers and option semantics",
       "roster": {
         "owner": null,
-        "state": "prepared",
+        "state": "pending",
         "step": "leaves"
       },
       "rust_home": [
@@ -161347,11 +161311,9 @@
     },
     {
       "actual_home": null,
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/helpers/or-else-tests-the-value-not-a-flag; witnessed by 1 prepared case(s)",
+      "basis": "unmapped in the audit input and absent from every Rust crate by name",
       "basis_kind": "rule",
-      "cases": [
-        "leaves/helpers/or-else-tests-the-value-not-a-flag"
-      ],
+      "cases": [],
       "depends_on": [
         "internal/collections",
         "internal/debug",
@@ -161377,7 +161339,7 @@
       "membership_reason": "core helpers and option semantics",
       "roster": {
         "owner": null,
-        "state": "prepared",
+        "state": "pending",
         "step": "leaves"
       },
       "rust_home": [
@@ -161468,11 +161430,9 @@
     },
     {
       "actual_home": null,
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/helpers/first-and-last-or-nil; witnessed by 1 prepared case(s)",
+      "basis": "unmapped in the audit input and absent from every Rust crate by name",
       "basis_kind": "rule",
-      "cases": [
-        "leaves/helpers/first-and-last-or-nil"
-      ],
+      "cases": [],
       "depends_on": [
         "internal/collections",
         "internal/debug",
@@ -161498,7 +161458,7 @@
       "membership_reason": "core helpers and option semantics",
       "roster": {
         "owner": null,
-        "state": "prepared",
+        "state": "pending",
         "step": "leaves"
       },
       "rust_home": [
@@ -161591,11 +161551,9 @@
     },
     {
       "actual_home": null,
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/helpers/map-preserves-nil; witnessed by 1 prepared case(s)",
+      "basis": "unmapped in the audit input and absent from every Rust crate by name",
       "basis_kind": "rule",
-      "cases": [
-        "leaves/helpers/map-preserves-nil"
-      ],
+      "cases": [],
       "depends_on": [
         "internal/collections",
         "internal/debug",
@@ -161621,7 +161579,7 @@
       "membership_reason": "core helpers and option semantics",
       "roster": {
         "owner": null,
-        "state": "prepared",
+        "state": "pending",
         "step": "leaves"
       },
       "rust_home": [
@@ -161952,17 +161910,10 @@
     },
     {
       "actual_home": null,
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/helpers/append-if-unique-writes-into-spare-capacity, leaves/helpers/concatenate-returns-an-operand, leaves/helpers/deduplicate-keeps-the-first-occurrence; witnessed by 8 prepared case(s)",
+      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/helpers/same-is-length-then-first-element; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
       "cases": [
-        "leaves/helpers/append-if-unique-writes-into-spare-capacity",
-        "leaves/helpers/concatenate-returns-an-operand",
-        "leaves/helpers/deduplicate-keeps-the-first-occurrence",
-        "leaves/helpers/filter-identity-and-empty-clone",
-        "leaves/helpers/flatmap-and-flatten-nil-accumulator",
-        "leaves/helpers/map-preserves-nil",
-        "leaves/helpers/same-is-length-then-first-element",
-        "leaves/helpers/same-map-identity-and-call-count"
+        "leaves/helpers/same-is-length-then-first-element"
       ],
       "depends_on": [
         "internal/collections",
@@ -240070,14 +240021,16 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-path-observations-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-path-observations-rust"
+      ],
       "depends_on": [
         "internal/stringutil"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/tspath",
       "go_source": "tsc/internal/tspath/path.go",
       "id": "tsc/internal/tspath/path.go:ComparePaths",
@@ -240090,7 +240043,7 @@
       "membership_reason": "path operations",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "filesystem"
       },
       "rust_home": [
@@ -240235,14 +240188,16 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-path-observations-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-path-observations-rust"
+      ],
       "depends_on": [
         "internal/stringutil"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/tspath",
       "go_source": "tsc/internal/tspath/path.go",
       "id": "tsc/internal/tspath/path.go:ContainsPath",
@@ -240255,7 +240210,7 @@
       "membership_reason": "path operations",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "filesystem"
       },
       "rust_home": [
@@ -240796,14 +240751,16 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-path-observations-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-path-observations-rust"
+      ],
       "depends_on": [
         "internal/stringutil"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/tspath",
       "go_source": "tsc/internal/tspath/path.go",
       "id": "tsc/internal/tspath/path.go:GetNormalizedPathComponents",
@@ -240816,7 +240773,7 @@
       "membership_reason": "path operations",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "filesystem"
       },
       "rust_home": [
@@ -240895,14 +240852,16 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-path-observations-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-path-observations-rust"
+      ],
       "depends_on": [
         "internal/stringutil"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/tspath",
       "go_source": "tsc/internal/tspath/path.go",
       "id": "tsc/internal/tspath/path.go:GetPathFromPathComponents",
@@ -240915,7 +240874,7 @@
       "membership_reason": "path operations",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "filesystem"
       },
       "rust_home": [
@@ -240928,14 +240887,16 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-path-observations-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-path-observations-rust"
+      ],
       "depends_on": [
         "internal/stringutil"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/tspath",
       "go_source": "tsc/internal/tspath/path.go",
       "id": "tsc/internal/tspath/path.go:GetRelativePathFromDirectory",
@@ -240948,7 +240909,7 @@
       "membership_reason": "path operations",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "filesystem"
       },
       "rust_home": [
@@ -240961,14 +240922,16 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-path-observations-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-path-observations-rust"
+      ],
       "depends_on": [
         "internal/stringutil"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/tspath",
       "go_source": "tsc/internal/tspath/path.go",
       "id": "tsc/internal/tspath/path.go:GetRelativePathFromFile",
@@ -240981,7 +240944,7 @@
       "membership_reason": "path operations",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "filesystem"
       },
       "rust_home": [
@@ -241555,14 +241518,16 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-path-observations-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-path-observations-rust"
+      ],
       "depends_on": [
         "internal/stringutil"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/tspath",
       "go_source": "tsc/internal/tspath/path.go",
       "id": "tsc/internal/tspath/path.go:PathIsRelative",
@@ -241575,7 +241540,7 @@
       "membership_reason": "path operations",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "filesystem"
       },
       "rust_home": [
@@ -241852,14 +241817,16 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-path-observations-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-path-observations-rust"
+      ],
       "depends_on": [
         "internal/stringutil"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/tspath",
       "go_source": "tsc/internal/tspath/path.go",
       "id": "tsc/internal/tspath/path.go:TrimFilePathPrefix",
@@ -241872,7 +241839,7 @@
       "membership_reason": "path operations",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "filesystem"
       },
       "rust_home": [

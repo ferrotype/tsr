@@ -1,0 +1,1460 @@
+{
+  "family": "filesystem",
+  "requests": [
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "clock_start": "2020-01-01T00:00:00Z",
+          "files": {
+            "/root/a.ts": "A",
+            "/root/sub/b.ts": "B"
+          },
+          "inner": "mock_over_mapfs",
+          "op": "new_tracking",
+          "silent_methods": [],
+          "symlinks": {}
+        },
+        {
+          "op": "read_file",
+          "path": "/root/a.ts"
+        },
+        {
+          "op": "read_file",
+          "path": "/root/missing.ts"
+        },
+        {
+          "op": "read_file",
+          "path": "/root/a.ts"
+        },
+        {
+          "op": "read_file",
+          "path": "/root/sub/../a.ts"
+        },
+        {
+          "op": "read_file",
+          "path": "/root/sub"
+        },
+        {
+          "op": "read_file",
+          "path": "/ROOT/A.TS"
+        }
+      ],
+      "case": "filesystem/wrapvfs/tracking-read-file-records-every-path",
+      "discriminates": "trackingvfs records the path argument verbatim, before delegating, and whatever the inner answers (trackingvfs.go:24-27). Three wrong ports are caught: one that records only successful reads (step 3 reads a path that does not exist and must still be a member -- the package doc names this case exactly, 'including non-existent paths from failed module resolution', trackingvfs.go:1-4); one that normalises, canonicalises or realpaths the key before recording (step 5 reads through '..' and must appear in the set unnormalised, beside the normalised spelling from step 2); and one that folds case before recording on a case-sensitive host (step 7). The inner is mock_over_mapfs, which answers, so each row also pins the forwarded argument and the forwarded answer.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.ReadFile",
+      "order_sensitive": true,
+      "subject": "trackingvfs.FS"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "clock_start": "2020-01-01T00:00:00Z",
+          "files": {
+            "/root/a.ts": "A",
+            "/root/sub/b.ts": "B"
+          },
+          "inner": "mock_over_mapfs",
+          "op": "new_tracking",
+          "silent_methods": [],
+          "symlinks": {}
+        },
+        {
+          "op": "file_exists",
+          "path": "/root/a.ts"
+        },
+        {
+          "op": "file_exists",
+          "path": "/root/sub"
+        },
+        {
+          "op": "file_exists",
+          "path": "/root/missing.ts"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/root/sub"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/root/a.ts"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/root/nope"
+        },
+        {
+          "op": "file_exists",
+          "path": "/root/sub"
+        }
+      ],
+      "case": "filesystem/wrapvfs/tracking-existence-predicates-are-two-inner-calls",
+      "discriminates": "FileExists and DirectoryExists are separate tracked methods (trackingvfs.go:29-32 and :50-53), each recording its own argument and each forwarding to its own inner method. The trace asks both about the same three paths, where the two answers disagree, so a port that answers both from one shared stat-derived predicate shows one inner call where the pin shows two of different names. Rust makes that hazard concrete: file_exists and directory_exists are both default trait methods over stat (crates/tsr_vfs/src/lib.rs:77-82), so a wrapper that overrides stat alone inherits both. It also catches result-gated recording -- every one of the six probes is recorded whatever it answered, including the three that answered false -- and a port that records a path's parent directory as well, which seen_size would expose.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.FileExists",
+      "order_sensitive": true,
+      "subject": "trackingvfs.FS"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "clock_start": "2020-01-01T00:00:00Z",
+          "files": {
+            "/root/a.ts": "A"
+          },
+          "inner": "mock_over_mapfs",
+          "op": "new_tracking",
+          "silent_methods": [],
+          "symlinks": {
+            "/root/link.ts": "/root/a.ts"
+          }
+        },
+        {
+          "op": "realpath",
+          "path": "/root/link.ts"
+        },
+        {
+          "op": "realpath",
+          "path": "/root/missing.ts"
+        },
+        {
+          "op": "realpath",
+          "path": "/root/a.ts"
+        }
+      ],
+      "case": "filesystem/wrapvfs/tracking-realpath-records-the-argument-not-the-resolution",
+      "discriminates": "The single most likely wrong implementation is recording the resolved path. The pin records the argument and then delegates (trackingvfs.go:73-76), so after step 2 the set holds '/root/link.ts' and NOT its target, and after step 4 it holds both with size 3. It also catches a port that resolves first and records afterwards, and one that declines to record when the inner leaves the path unchanged (step 3 asks about a path that does not exist, where iovfs.Realpath returns the input verbatim, iofs.go:190-199).",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.Realpath",
+      "order_sensitive": true,
+      "subject": "trackingvfs.FS"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "clock_start": "2020-01-01T00:00:00Z",
+          "files": {
+            "/root/a.ts": "A",
+            "/root/sub/b.ts": "B"
+          },
+          "inner": "mock_over_mapfs",
+          "op": "new_tracking",
+          "silent_methods": [],
+          "symlinks": {}
+        },
+        {
+          "op": "stat",
+          "path": "/root/a.ts"
+        },
+        {
+          "op": "stat",
+          "path": "/root/sub"
+        },
+        {
+          "op": "stat",
+          "path": "/root/missing.ts"
+        },
+        {
+          "op": "stat",
+          "path": "/root"
+        }
+      ],
+      "case": "filesystem/wrapvfs/tracking-stat-records-including-the-nil-answer",
+      "discriminates": "Two ports fail here. One skips recording when Stat answers nil: the pin records before it delegates (trackingvfs.go:60-63), so step 4's missing path is a member. The other reconstructs the FileInfo instead of forwarding the inner's interface value -- Rust's FileInfo is {directory, size} (crates/tsr_vfs/src/lib.rs:62-66), so Name, Mode, ModTime and Sys have nowhere to go, and each row records all of them. The inner carries a fixed clock, so every ModTime is exactly the instant the request named and the recorded value is stated rather than observed.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.Stat",
+      "order_sensitive": true,
+      "subject": "trackingvfs.FS"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "clock_start": "2020-01-01T00:00:00Z",
+          "files": {
+            "/root/a.ts": "A",
+            "/root/m.ts": "M",
+            "/root/sub/b.ts": "B"
+          },
+          "inner": "mock_over_mapfs",
+          "op": "new_tracking",
+          "silent_methods": [],
+          "symlinks": {
+            "/root/link.ts": "/root/a.ts"
+          }
+        },
+        {
+          "op": "entries",
+          "path": "/root"
+        },
+        {
+          "op": "entries",
+          "path": "/root/a.ts"
+        },
+        {
+          "op": "entries",
+          "path": "/root/missing"
+        }
+      ],
+      "case": "filesystem/wrapvfs/tracking-entries-records-only-the-directory",
+      "discriminates": "The sharpest tracking distinction in the package. GetAccessibleEntries records ONLY its argument (trackingvfs.go:55-58) while WalkDir records every callback path (:65-71), so after step 2 the set has exactly one member and not one per listed child. A port with a single 'record everything we touched' helper gets one of the two wrong. It also catches result-gated recording: steps 3 and 4 list a file and a path that does not exist, both answer an empty Entries, and both are members. Note a correction to the survey draft: a nil Symlinks map cannot come from this inner, because internal.Common.GetAccessibleEntries assigns `result.Symlinks = map[string]struct{}{}` before it starts (vfs/internal/internal.go:69); the nil case is reachable only through a replacement, and lives in wrap-entries-are-forwarded-verbatim.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.GetAccessibleEntries",
+      "order_sensitive": true,
+      "subject": "trackingvfs.FS"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "clock_start": "2020-01-01T00:00:00Z",
+          "files": {
+            "/root/A.ts": "A"
+          },
+          "inner": "mock_over_mapfs",
+          "op": "new_tracking",
+          "silent_methods": [],
+          "symlinks": {}
+        },
+        {
+          "op": "use_case_sensitive_file_names"
+        },
+        {
+          "op": "read_file",
+          "path": "/root/A.ts"
+        },
+        {
+          "op": "use_case_sensitive_file_names"
+        },
+        {
+          "case_sensitive": false,
+          "clock_start": "2020-01-01T00:00:00Z",
+          "files": {
+            "/root/A.ts": "A"
+          },
+          "inner": "mock_over_mapfs",
+          "op": "new_tracking",
+          "silent_methods": [],
+          "symlinks": {}
+        },
+        {
+          "op": "use_case_sensitive_file_names"
+        }
+      ],
+      "case": "filesystem/wrapvfs/tracking-use-case-sensitive-file-names-is-untracked",
+      "discriminates": "The one read-shaped method the wrapper does NOT track (trackingvfs.go:34), and a one-line method easy to copy from its tracked neighbours. A port that records every call, including the zero-argument ones, fails at steps 2, 4 and 6, where the set must stay exactly as the reads left it. A port that caches or hardcodes the case policy at construction fails too: every call must reach the inner, which the ordered inner log pins, and the second constructor answers the opposite.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.UseCaseSensitiveFileNames",
+      "order_sensitive": true,
+      "subject": "trackingvfs.FS"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "clock_start": "2020-01-01T00:00:00Z",
+          "files": {
+            "/root/a.ts": "A"
+          },
+          "inner": "mock_over_mapfs",
+          "op": "new_tracking",
+          "silent_methods": [],
+          "symlinks": {}
+        },
+        {
+          "data": "X",
+          "op": "write_file",
+          "path": "/root/out.js"
+        },
+        {
+          "op": "read_file",
+          "path": "/root/out.js"
+        },
+        {
+          "data": "Z",
+          "op": "write_file",
+          "path": "/root/a.ts"
+        },
+        {
+          "op": "read_file",
+          "path": "/root/a.ts"
+        }
+      ],
+      "case": "filesystem/wrapvfs/tracking-write-file-is-untracked",
+      "discriminates": "The doc comment says writes 'represent outputs, not dependencies' (trackingvfs.go:14-16) and WriteFile forwards without recording (:36-38). A port that tracks outputs leaves '/root/out.js' in the set after step 2, which is how an emitted file becomes a watched input. A port that reads the file before writing -- through its own ReadFile, which would also record -- is caught by the ordered inner log, which must hold exactly one WriteFile and no ReadFile at steps 2 and 4.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.WriteFile",
+      "order_sensitive": true,
+      "subject": "trackingvfs.FS"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "clock_start": "2020-01-01T00:00:00Z",
+          "files": {
+            "/root/a.ts": "A"
+          },
+          "inner": "mock_over_mapfs",
+          "op": "new_tracking",
+          "silent_methods": [],
+          "symlinks": {}
+        },
+        {
+          "data": "B",
+          "op": "append_file",
+          "path": "/root/a.ts"
+        },
+        {
+          "op": "read_file",
+          "path": "/root/a.ts"
+        },
+        {
+          "data": "N",
+          "op": "append_file",
+          "path": "/root/new.ts"
+        },
+        {
+          "op": "read_file",
+          "path": "/root/new.ts"
+        }
+      ],
+      "case": "filesystem/wrapvfs/tracking-append-file-is-not-read-then-write",
+      "discriminates": "The porting hazard this case exists for: implementing append as 'read the file, then write it back' routed through the wrapper's own ReadFile, which would record the appended-to path as a dependency and turn an output into a watched input. The pin forwards AppendFile untracked (trackingvfs.go:40-42), so step 2 must leave SeenFiles empty and must produce exactly one inner call, named AppendFile, with no ReadFile and no WriteFile beside it. Rust invites the wrong shape, since write_file and append_file are both defaults returning Err(Error::Unsupported(..)) (crates/tsr_vfs/src/lib.rs:83-88) and read-then-write is the obvious first implementation.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.AppendFile",
+      "order_sensitive": true,
+      "subject": "trackingvfs.FS"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "clock_start": "2020-01-01T00:00:00Z",
+          "files": {
+            "/root/a.ts": "A",
+            "/root/sub/b.ts": "B",
+            "/root/sub/deep/c.ts": "C"
+          },
+          "inner": "mock_over_mapfs",
+          "op": "new_tracking",
+          "silent_methods": [],
+          "symlinks": {}
+        },
+        {
+          "op": "remove",
+          "path": "/root/a.ts"
+        },
+        {
+          "op": "file_exists",
+          "path": "/root/a.ts"
+        },
+        {
+          "op": "remove",
+          "path": "/root/sub"
+        },
+        {
+          "op": "file_exists",
+          "path": "/root/sub/deep/c.ts"
+        },
+        {
+          "op": "remove",
+          "path": "/root/gone.ts"
+        }
+      ],
+      "case": "filesystem/wrapvfs/tracking-remove-is-untracked",
+      "discriminates": "The tempting wrong idea is recording the removed path 'so watch mode learns about the deletion'. The pin does not: Remove forwards untracked (trackingvfs.go:44). Three ports fail. One records the removal, and step 2 must leave SeenFiles empty. One probes existence before removing, which would both leak a member and show an extra inner FileExists or Stat at step 2. One expands a directory to its subtree before dispatching, which step 4 catches: the inner must see one Remove with the directory path verbatim, and the subtree disappears because the inner did that itself (vfstest.go:214-235).",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.Remove",
+      "order_sensitive": true,
+      "subject": "trackingvfs.FS"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "clock_start": "2020-01-01T00:00:00Z",
+          "files": {
+            "/root/a.ts": "A"
+          },
+          "inner": "mock_over_mapfs",
+          "op": "new_tracking",
+          "silent_methods": [],
+          "symlinks": {}
+        },
+        {
+          "a_time": "2001-02-03T04:05:06Z",
+          "m_time": "2009-08-07T06:05:04Z",
+          "op": "chtimes",
+          "path": "/root/a.ts"
+        },
+        {
+          "op": "stat",
+          "path": "/root/a.ts"
+        },
+        {
+          "a_time": "2001-02-03T04:05:06Z",
+          "m_time": "2009-08-07T06:05:04Z",
+          "op": "chtimes",
+          "path": "/root/missing.ts"
+        },
+        {
+          "op": "stat",
+          "path": "/root/a.ts"
+        }
+      ],
+      "case": "filesystem/wrapvfs/tracking-chtimes-forwards-both-instants-untracked",
+      "discriminates": "The plan's lost-timestamp-arguments control on the tracking adapter. The two instants differ and are deliberately non-chronological, so a port that drops aTime, passes mTime in both positions, or swaps them is caught by the ordered inner call at step 2, which carries both arguments. A correction to the survey draft: the store cannot witness aTime at all, because the pinned vfstest MapFS.Chtimes assigns only `fileInfo.ModTime = mTime` (vfstest.go:605-617), so the forwarded call is the only place both instants are visible and step 3 pins which one reached the store. Chtimes is also a write-class method and is untracked (trackingvfs.go:46-48), so steps 2 and 5 must leave SeenFiles alone. Rust has no expression for this at all: change_times(&self, _path) takes no instants (crates/tsr_vfs/src/lib.rs:92-94).",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.Chtimes",
+      "order_sensitive": true,
+      "subject": "trackingvfs.FS"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "files": {
+            "/root/a.ts": "A"
+          },
+          "inner": "mock_over_readonly_iofs",
+          "op": "new_tracking",
+          "silent_methods": [],
+          "symlinks": {}
+        },
+        {
+          "op": "read_file",
+          "path": "/root/a.ts"
+        },
+        {
+          "data": "X",
+          "op": "write_file",
+          "path": "/root/out.js"
+        },
+        {
+          "data": "B",
+          "op": "append_file",
+          "path": "/root/a.ts"
+        },
+        {
+          "op": "remove",
+          "path": "/root/a.ts"
+        },
+        {
+          "a_time": "2001-02-03T04:05:06Z",
+          "m_time": "2009-08-07T06:05:04Z",
+          "op": "chtimes",
+          "path": "/root/a.ts"
+        },
+        {
+          "op": "read_file",
+          "path": "/root/a.ts"
+        }
+      ],
+      "case": "filesystem/wrapvfs/tracking-write-class-capability-failure-is-forwarded",
+      "discriminates": "The forwarded capability failure. Over an inner that is an io/fs without iovfs.WritableFS, all four write-class methods panic from iovfs's own unsupported stubs (iofs.go:91-103) with literal pinned text, and the tracking wrapper adds nothing: it neither recovers them, nor records anything, nor answers in the inner's place. A Rust port that leaves write_file, append_file, remove and change_times to the trait's defaults (crates/tsr_vfs/src/lib.rs:83-94) answers Err(Error::Unsupported(..)) from the WRAPPER without ever reaching the inner, which is a different observation even though it also fails. Step 7 shows the store is untouched.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.WriteFile",
+      "order_sensitive": true,
+      "subject": "trackingvfs.FS"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "clock_start": "2020-01-01T00:00:00Z",
+          "files": {
+            "/root/a.ts": "A",
+            "/root/sub/b.ts": "B",
+            "/root/sub/deep/c.ts": "C"
+          },
+          "inner": "mock_over_mapfs",
+          "op": "new_tracking",
+          "silent_methods": [],
+          "symlinks": {}
+        },
+        {
+          "callback": "collect",
+          "op": "walk_dir",
+          "path": "/root"
+        }
+      ],
+      "case": "filesystem/wrapvfs/tracking-walkdir-records-every-arrival",
+      "discriminates": "The plan's swapped-walk-callback control. WalkDir records the root and then hands the inner its OWN closure, which records each arriving path before calling the caller's walkFn (trackingvfs.go:65-71). A port that passes the caller's walkFn straight through leaves SeenFiles holding only the root, which this trace makes unmissable: the set must hold the root and all five descendants. It is also the deliberate contrast with GetAccessibleEntries, which records its argument and nothing it listed. There is no Rust expression yet -- the trait has no walk_dir (crates/tsr_vfs/src/lib.rs:70-95) -- so there is no callback to wrap.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.WalkDir",
+      "order_sensitive": true,
+      "subject": "trackingvfs.FS"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "clock_start": "2020-01-01T00:00:00Z",
+          "files": {
+            "/root/a.ts": "A",
+            "/root/sub/b.ts": "B",
+            "/root/sub/deep/c.ts": "C",
+            "/root/z.ts": "Z"
+          },
+          "inner": "mock_over_mapfs",
+          "op": "new_tracking",
+          "silent_methods": [],
+          "symlinks": {}
+        },
+        {
+          "at": "/root/sub",
+          "callback": "skip_dir_at",
+          "op": "walk_dir",
+          "path": "/root"
+        }
+      ],
+      "case": "filesystem/wrapvfs/tracking-walkdir-skipdir-still-records-the-skipped-directory",
+      "discriminates": "The recording happens BEFORE the caller's walkFn runs (trackingvfs.go:67-69), so a directory the caller skips is still a dependency and is still recorded. A port that records after walkFn returns, or that declines to record when the callback returns a sentinel, loses '/root/sub' from the set. A port that records the skipped directory's children as well is caught in the other direction: '/root/sub/b.ts' and '/root/sub/deep/c.ts' were never visited and must not be members. '/root/z.ts' is in the tree so that the sentinel itself is pinned rather than merely 'some early stop': SkipDir returned from a directory is nilled by io/fs walk.go:73-78 and the walk resumes at the following sibling, so '/root/z.ts' must arrive fourth -- where a port that mapped SkipDir onto SkipAll would end the walk at three (walk.go:124-126 absorbs both sentinels, so the returned error class cannot tell them apart and only the extra arrival can).",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.WalkDir",
+      "order_sensitive": true,
+      "subject": "trackingvfs.FS"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "clock_start": "2020-01-01T00:00:00Z",
+          "files": {
+            "/root/a.ts": "A",
+            "/root/sub/b.ts": "B",
+            "/root/sub/deep/c.ts": "C",
+            "/root/z.ts": "Z"
+          },
+          "inner": "mock_over_mapfs",
+          "op": "new_tracking",
+          "silent_methods": [],
+          "symlinks": {}
+        },
+        {
+          "at": "/root/sub/b.ts",
+          "callback": "skip_all_at",
+          "op": "walk_dir",
+          "path": "/root"
+        },
+        {
+          "case_sensitive": true,
+          "clock_start": "2020-01-01T00:00:00Z",
+          "files": {
+            "/root/a.ts": "A",
+            "/root/sub/b.ts": "B",
+            "/root/sub/deep/c.ts": "C",
+            "/root/z.ts": "Z"
+          },
+          "inner": "mock_over_mapfs",
+          "op": "new_tracking",
+          "silent_methods": [],
+          "symlinks": {}
+        },
+        {
+          "at": "/root/sub",
+          "callback": "error_at",
+          "op": "walk_dir",
+          "path": "/root"
+        }
+      ],
+      "case": "filesystem/wrapvfs/tracking-walkdir-stop-sentinels-still-record",
+      "discriminates": "The two early stops that io/fs treats differently from SkipDir, on one tree, each with a fresh tracker so the sets do not blend. SkipAll is absorbed by fs.WalkDir and the walk returns nil; a callback error is not and reaches the caller. Both leave the terminating path in SeenFiles, because trackingvfs records before it calls walkFn (trackingvfs.go:67-69). The stop points are chosen so the sentinel is load-bearing rather than incidental: '/root/sub/b.ts' is below the walk root and has a following uncle in '/root/z.ts', so SkipAll ends the walk after four arrivals where SkipDir would break out of '/root/sub' only (io/fs walk.go:73-78 leaves SkipDir unnilled on a non-directory and walk.go:96-97 breaks the parent loop) and resume at '/root/z.ts' for a fifth. A port that treats any non-nil callback return as 'do not record' fails both walks; a port that maps SkipAll onto SkipDir arrives at '/root/z.ts' and records a fifth member at step 2, which is the only signal there is, since walk.go:124-126 absorbs both sentinels into a nil walk error; a port that swallows the callback's own error reports an empty walk error class at step 4, where the pin propagates it and does not resume at '/root/z.ts' either.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.WalkDir",
+      "order_sensitive": true,
+      "subject": "trackingvfs.FS"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "clock_start": "2020-01-01T00:00:00Z",
+          "files": {
+            "/root/a.ts": "A",
+            "/root/sub/b.ts": "B"
+          },
+          "inner": "mock_over_mapfs",
+          "op": "wrap",
+          "replace": [],
+          "silent_methods": [],
+          "symlinks": {
+            "/root/link.ts": "/root/a.ts"
+          }
+        },
+        {
+          "op": "use_case_sensitive_file_names"
+        },
+        {
+          "op": "file_exists",
+          "path": "/root/a.ts"
+        },
+        {
+          "op": "read_file",
+          "path": "/root/a.ts"
+        },
+        {
+          "data": "X",
+          "op": "write_file",
+          "path": "/root/out.js"
+        },
+        {
+          "data": "Y",
+          "op": "append_file",
+          "path": "/root/out.js"
+        },
+        {
+          "op": "remove",
+          "path": "/root/out.js"
+        },
+        {
+          "a_time": "2001-02-03T04:05:06Z",
+          "m_time": "2009-08-07T06:05:04Z",
+          "op": "chtimes",
+          "path": "/root/a.ts"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/root/sub"
+        },
+        {
+          "op": "entries",
+          "path": "/root"
+        },
+        {
+          "op": "stat",
+          "path": "/root/a.ts"
+        },
+        {
+          "callback": "collect",
+          "op": "walk_dir",
+          "path": "/root"
+        },
+        {
+          "op": "realpath",
+          "path": "/root/link.ts"
+        }
+      ],
+      "case": "filesystem/wrapvfs/wrap-empty-table-forwards-every-method",
+      "discriminates": "Wrap with an empty Replacements is a pure passthrough, and this is the forwarding trace for all twelve methods: each is called exactly once, in the order the interface declares them, and each row must show exactly one inner call of the matching name with the arguments verbatim. The inner is mock_over_mapfs with no silent methods, so it answers everything and a missing forward would be visible as an empty inner log rather than as a panic. It catches a port that routes several methods through one -- file_exists and directory_exists through stat, which is what the Rust trait's defaults do (crates/tsr_vfs/src/lib.rs:77-82); append through read plus write; entries through a walk -- and a port that answers anything from a cache instead of the inner.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/wrapvfs/wrapvfs.go:Wrap",
+      "order_sensitive": true,
+      "subject": "wrapvfs.Wrap"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "clock_start": "2020-01-01T00:00:00Z",
+          "files": {
+            "/root/a.ts": "A"
+          },
+          "inner": "mock_over_mapfs",
+          "op": "wrap",
+          "replace": [
+            {
+              "behavior": "constant_text",
+              "method": "Realpath",
+              "text": "/elsewhere/renamed.ts"
+            }
+          ],
+          "silent_methods": [
+            "Realpath"
+          ],
+          "symlinks": {
+            "/root/link.ts": "/root/a.ts"
+          }
+        },
+        {
+          "op": "realpath",
+          "path": "/root/link.ts"
+        },
+        {
+          "op": "realpath",
+          "path": "/root/missing.ts"
+        },
+        {
+          "op": "read_file",
+          "path": "/root/a.ts"
+        },
+        {
+          "op": "stat",
+          "path": "/root/a.ts"
+        }
+      ],
+      "case": "filesystem/wrapvfs/wrap-replacement-answers-and-the-inner-is-never-consulted",
+      "discriminates": "The most plausible misreading of 'wrap' is consulting the inner first and using the replacement only when the inner returns a zero value or an error. The pin does the opposite: an installed replacement answers and the inner is not consulted at all (wrapvfs.go:125-130). The inner's Realpath Func is deliberately left nil here, so any forwarding panics with the generated mock's own sentence rather than quietly producing the right answer -- the case proves a call was NOT forwarded rather than just that the answer came from elsewhere. Steps 4 and 5 catch the other misreading, a port that treats a Realpath replacement as a path-mapping layer applied to every method. That is the exact production shape: the pin's only wrapvfs caller replaces Realpath alone for module resolution (tsc/internal/ls/autoimport/util.go:319), where rewriting the other methods' arguments would be wrong.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.Realpath",
+      "order_sensitive": true,
+      "subject": "wrapvfs.Wrap"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "clock_start": "2020-01-01T00:00:00Z",
+          "files": {
+            "/root/a.ts": "A"
+          },
+          "inner": "mock_over_mapfs",
+          "op": "wrap",
+          "replace": [
+            {
+              "behavior": "constant_text",
+              "method": "Realpath",
+              "text": "/first"
+            }
+          ],
+          "silent_methods": [
+            "Realpath"
+          ],
+          "symlinks": {}
+        },
+        {
+          "op": "realpath",
+          "path": "/root/a.ts"
+        },
+        {
+          "op": "mutate_replacements",
+          "replace": [
+            {
+              "behavior": "constant_text",
+              "method": "Realpath",
+              "text": "/second"
+            }
+          ]
+        },
+        {
+          "op": "realpath",
+          "path": "/root/a.ts"
+        }
+      ],
+      "case": "filesystem/wrapvfs/wrap-takes-the-replacement-table-by-value",
+      "discriminates": "Wrap copies Replacements into wrappedFS (wrapvfs.go:24-29), so editing the caller's own table afterwards cannot reach the wrapper. Step 3 rewrites exactly the Realpath field of the same variable that was handed to Wrap -- it mutates in place rather than rebinding -- so a port that stored a pointer, an Rc or any live reference answers '/second' at step 4 where the pin still answers '/first'. The inner's Realpath Func is nil, so a port that instead dropped the replacement entirely is distinguished too: it would panic rather than answer either string.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/wrapvfs/wrapvfs.go:Wrap",
+      "order_sensitive": true,
+      "subject": "wrapvfs.Wrap"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "clock_start": "2020-01-01T00:00:00Z",
+          "files": {
+            "/root/a.ts": "A"
+          },
+          "inner": "mock_over_mapfs",
+          "op": "wrap",
+          "replace": [
+            {
+              "behavior": "read_table",
+              "method": "ReadFile",
+              "reads": [
+                {
+                  "contents": "",
+                  "ok": true,
+                  "path": "/root/empty-ok.ts"
+                },
+                {
+                  "contents": "X",
+                  "ok": false,
+                  "path": "/root/full-notok.ts"
+                },
+                {
+                  "contents": "REPLACED",
+                  "ok": true,
+                  "path": "/root/a.ts"
+                }
+              ]
+            }
+          ],
+          "silent_methods": [
+            "ReadFile"
+          ],
+          "symlinks": {}
+        },
+        {
+          "op": "read_file",
+          "path": "/root/empty-ok.ts"
+        },
+        {
+          "op": "read_file",
+          "path": "/root/full-notok.ts"
+        },
+        {
+          "op": "read_file",
+          "path": "/root/a.ts"
+        },
+        {
+          "op": "read_file",
+          "path": "/root/unknown.ts"
+        }
+      ],
+      "case": "filesystem/wrapvfs/wrap-read-file-pair-is-independent",
+      "discriminates": "The representation hazard worth freezing. Go's ReadFile contract is an independent pair (contents string, ok bool) (vfs.go:19-21), so (\"\", true) and (\"X\", false) are both legal and distinct, and the wrapper returns the replacement's pair verbatim (wrapvfs.go:53-58). Rust's read_file returns Result<Option<FileContent>, Error> (crates/tsr_vfs/src/lib.rs:73), which cannot express (\"X\", false) at all and collapses (\"\", true) and a miss onto neighbouring shapes. It also catches a port that falls back to the inner when ok is false or the contents are empty: the inner's ReadFile Func is nil, so any forwarding panics instead of answering.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.ReadFile",
+      "order_sensitive": true,
+      "subject": "wrapvfs.Wrap"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "clock_start": "2020-01-01T00:00:00Z",
+          "files": {
+            "/root/a.ts": "A",
+            "/root/sub/b.ts": "B"
+          },
+          "inner": "mock_over_mapfs",
+          "op": "wrap",
+          "replace": [
+            {
+              "behavior": "true_for",
+              "method": "FileExists",
+              "paths": [
+                "/root/ghost.ts"
+              ]
+            }
+          ],
+          "silent_methods": [],
+          "symlinks": {}
+        },
+        {
+          "op": "file_exists",
+          "path": "/root/ghost.ts"
+        },
+        {
+          "op": "file_exists",
+          "path": "/root/a.ts"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/root/sub"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/root/a.ts"
+        },
+        {
+          "case_sensitive": true,
+          "clock_start": "2020-01-01T00:00:00Z",
+          "files": {
+            "/root/a.ts": "A",
+            "/root/sub/b.ts": "B"
+          },
+          "inner": "mock_over_mapfs",
+          "op": "wrap",
+          "replace": [
+            {
+              "behavior": "true_for",
+              "method": "DirectoryExists",
+              "paths": [
+                "/root/a.ts"
+              ]
+            }
+          ],
+          "silent_methods": [],
+          "symlinks": {}
+        },
+        {
+          "op": "directory_exists",
+          "path": "/root/a.ts"
+        },
+        {
+          "op": "file_exists",
+          "path": "/root/a.ts"
+        }
+      ],
+      "case": "filesystem/wrapvfs/wrap-existence-predicates-are-separate-entries",
+      "discriminates": "FileExists and DirectoryExists are separate entries in the table (wrapvfs.go:11 and :17) and separate methods (:45-50 and :93-98). The first wrapper replaces FileExists with the exact inverse of the inner and leaves DirectoryExists forwarding; the second does the reverse. A port that falls back to the inner when a bool replacement answers false is caught at step 3, where false is the answer rather than 'no answer'. A port that shares one existence predicate between the two methods is caught at steps 4, 5, 7 and 8, where the two disagree on the same path. Rust makes that concrete: both are default trait methods over stat (crates/tsr_vfs/src/lib.rs:77-82), so a wrapper written by overriding stat alone inherits both defaults and neither replacement can ever fire.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.FileExists",
+      "order_sensitive": true,
+      "subject": "wrapvfs.Wrap"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "clock_start": "2020-01-01T00:00:00Z",
+          "files": {
+            "/root/a.ts": "A"
+          },
+          "inner": "mock_over_mapfs",
+          "op": "wrap",
+          "replace": [
+            {
+              "behavior": "record_and_fail",
+              "method": "WriteFile"
+            }
+          ],
+          "silent_methods": [],
+          "symlinks": {}
+        },
+        {
+          "data": "REPLACED",
+          "op": "write_file",
+          "path": "/root/a.ts"
+        },
+        {
+          "op": "read_file",
+          "path": "/root/a.ts"
+        },
+        {
+          "data": "N",
+          "op": "write_file",
+          "path": "/root/new.ts"
+        },
+        {
+          "op": "file_exists",
+          "path": "/root/new.ts"
+        }
+      ],
+      "case": "filesystem/wrapvfs/wrap-write-file-replacement-is-not-a-hook",
+      "discriminates": "A replacement answers instead of the inner, it does not observe on the way past (wrapvfs.go:61-66). Three ports fail. One calls the replacement and also writes through: steps 3 and 5 read the inner back and find it untouched. One treats a non-nil replacement error as a reason to retry against the inner: step 2's empty inner_calls list forbids it. One substitutes its own error rather than returning the replacement's: the sentinel's identity is recorded as a class, so any other error reads differently.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.WriteFile",
+      "order_sensitive": true,
+      "subject": "wrapvfs.Wrap"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "clock_start": "2020-01-01T00:00:00Z",
+          "files": {
+            "/root/a.ts": "A"
+          },
+          "inner": "mock_over_mapfs",
+          "op": "wrap",
+          "replace": [
+            {
+              "behavior": "record_and_fail",
+              "method": "WriteFile"
+            }
+          ],
+          "silent_methods": [],
+          "symlinks": {}
+        },
+        {
+          "data": "B",
+          "op": "append_file",
+          "path": "/root/a.ts"
+        },
+        {
+          "op": "read_file",
+          "path": "/root/a.ts"
+        },
+        {
+          "case_sensitive": true,
+          "clock_start": "2020-01-01T00:00:00Z",
+          "files": {
+            "/root/a.ts": "A"
+          },
+          "inner": "mock_over_mapfs",
+          "op": "wrap",
+          "replace": [
+            {
+              "behavior": "record_and_succeed",
+              "method": "AppendFile"
+            }
+          ],
+          "silent_methods": [
+            "AppendFile"
+          ],
+          "symlinks": {}
+        },
+        {
+          "data": "C",
+          "op": "append_file",
+          "path": "/root/a.ts"
+        },
+        {
+          "op": "read_file",
+          "path": "/root/a.ts"
+        }
+      ],
+      "case": "filesystem/wrapvfs/wrap-append-is-not-read-then-write",
+      "discriminates": "The specific wrong implementation this case exists for: append written as 'read the file, then call the wrapper's own WriteFile'. The first wrapper replaces WriteFile ONLY and leaves AppendFile forwarding, so step 2 catches that port twice over -- the WriteFile replacement would fire, and the inner would see a WriteFile or a ReadFile rather than a single AppendFile. Rust invites exactly this, since write_file and append_file are both defaults returning Err(Error::Unsupported(..)) (crates/tsr_vfs/src/lib.rs:83-88). The second wrapper replaces AppendFile over an inner whose AppendFile Func is nil, so a port that also forwards after the replacement answered panics instead of succeeding.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.AppendFile",
+      "order_sensitive": true,
+      "subject": "wrapvfs.Wrap"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "clock_start": "2020-01-01T00:00:00Z",
+          "files": {
+            "/root/a.ts": "A",
+            "/root/sub/b.ts": "B"
+          },
+          "inner": "mock_over_mapfs",
+          "op": "wrap",
+          "replace": [
+            {
+              "behavior": "record_and_succeed",
+              "method": "Remove"
+            }
+          ],
+          "silent_methods": [],
+          "symlinks": {}
+        },
+        {
+          "op": "remove",
+          "path": "/root/a.ts"
+        },
+        {
+          "op": "file_exists",
+          "path": "/root/a.ts"
+        },
+        {
+          "op": "remove",
+          "path": "/root/sub"
+        },
+        {
+          "op": "file_exists",
+          "path": "/root/sub/b.ts"
+        }
+      ],
+      "case": "filesystem/wrapvfs/wrap-remove-replacement-suppresses-the-inner",
+      "discriminates": "A replacement that reports success without doing anything is exactly the shape where an 'and also do the real thing' port looks correct, so step 3 is the assertion: the file is still there. Step 4 pins the verbatim single argument against a port that expands a directory to its subtree before dispatching -- the pin passes the path through unchanged (wrapvfs.go:77-82) and it is the inner, not the wrapper, that removes a subtree (vfstest.go:214-235). Step 5 shows the subtree survived because the inner was never asked.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.Remove",
+      "order_sensitive": true,
+      "subject": "wrapvfs.Wrap"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "clock_start": "2020-01-01T00:00:00Z",
+          "files": {
+            "/root/a.ts": "A"
+          },
+          "inner": "mock_over_mapfs",
+          "op": "wrap",
+          "replace": [
+            {
+              "behavior": "record_and_succeed",
+              "method": "Chtimes"
+            }
+          ],
+          "silent_methods": [
+            "Chtimes"
+          ],
+          "symlinks": {}
+        },
+        {
+          "a_time": "2001-02-03T04:05:06.000000007Z",
+          "m_time": "2009-08-07T06:05:04Z",
+          "op": "chtimes",
+          "path": "/root/a.ts"
+        },
+        {
+          "op": "stat",
+          "path": "/root/a.ts"
+        },
+        {
+          "case_sensitive": true,
+          "clock_start": "2020-01-01T00:00:00Z",
+          "files": {
+            "/root/a.ts": "A"
+          },
+          "inner": "mock_over_mapfs",
+          "op": "wrap",
+          "replace": [],
+          "silent_methods": [],
+          "symlinks": {}
+        },
+        {
+          "a_time": "2001-02-03T04:05:06.000000007Z",
+          "m_time": "2009-08-07T06:05:04Z",
+          "op": "chtimes",
+          "path": "/root/a.ts"
+        },
+        {
+          "op": "stat",
+          "path": "/root/a.ts"
+        }
+      ],
+      "case": "filesystem/wrapvfs/wrap-chtimes-carries-both-instants",
+      "discriminates": "The plan's lost-timestamp-arguments control on the wrapping adapter, on both arms. The two instants differ, are non-chronological and one carries a nanosecond, so a port that drops aTime, duplicates mTime into both positions, swaps them or truncates sub-second precision fails at step 2 (the replacement's recorded arguments) or step 5 (the forwarded call). Step 3 shows a replacement really did suppress the inner: the stored ModTime is still the constructor's clock instant. Step 6 records what the pinned store actually keeps -- vfstest MapFS.Chtimes assigns only `fileInfo.ModTime = mTime` (vfstest.go:605-617) and never stores aTime -- so a case that claimed to read aTime back would be claiming something the pin does not do. Rust cannot express this control at all: change_times(&self, _path) has no instants (crates/tsr_vfs/src/lib.rs:92-94).",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.Chtimes",
+      "order_sensitive": true,
+      "subject": "wrapvfs.Wrap"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "clock_start": "2020-01-01T00:00:00Z",
+          "files": {
+            "/root/a.ts": "A"
+          },
+          "inner": "mock_over_mapfs",
+          "op": "wrap",
+          "replace": [
+            {
+              "behavior": "constant_info",
+              "dir": true,
+              "method": "Stat",
+              "mod_time": "1999-12-31T23:59:58Z",
+              "name": "sentinel-name",
+              "perm": 493,
+              "size": 4242
+            }
+          ],
+          "silent_methods": [
+            "Stat"
+          ],
+          "symlinks": {}
+        },
+        {
+          "op": "stat",
+          "path": "/root/a.ts"
+        },
+        {
+          "op": "stat",
+          "path": "/root/missing.ts"
+        },
+        {
+          "case_sensitive": true,
+          "clock_start": "2020-01-01T00:00:00Z",
+          "files": {
+            "/root/a.ts": "A"
+          },
+          "inner": "mock_over_mapfs",
+          "op": "wrap",
+          "replace": [
+            {
+              "behavior": "nil_info",
+              "method": "Stat"
+            }
+          ],
+          "silent_methods": [
+            "Stat"
+          ],
+          "symlinks": {}
+        },
+        {
+          "op": "stat",
+          "path": "/root/a.ts"
+        },
+        {
+          "case_sensitive": true,
+          "clock_start": "2020-01-01T00:00:00Z",
+          "files": {
+            "/root/a.ts": "A"
+          },
+          "inner": "mock_over_mapfs",
+          "op": "wrap",
+          "replace": [],
+          "silent_methods": [],
+          "symlinks": {}
+        },
+        {
+          "op": "stat",
+          "path": "/root/a.ts"
+        }
+      ],
+      "case": "filesystem/wrapvfs/wrap-stat-forwards-the-interface-value",
+      "discriminates": "The wrapper returns the replacement's vfs.FileInfo interface value verbatim, nil included (wrapvfs.go:109-114). Two ports fail. One reconstructs the FileInfo: Rust's FileInfo is {directory, size} (crates/tsr_vfs/src/lib.rs:62-66), so Name, Mode, ModTime and Sys are silently dropped -- and ModTime is the field watch mode reads. Every one of the five fields is deliberately distinctive at step 2 and contradicts the path that was asked about. One treats a nil FileInfo as 'the replacement declined' and falls back to the inner: step 5 forbids it, and nil is the ordinary answer for a missing path (vfs/internal/internal.go:46-56). The last arm records the inner's own info for contrast.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.Stat",
+      "order_sensitive": true,
+      "subject": "wrapvfs.Wrap"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "clock_start": "2020-01-01T00:00:00Z",
+          "files": {
+            "/root/a.ts": "A",
+            "/root/m.ts": "M"
+          },
+          "inner": "mock_over_mapfs",
+          "op": "wrap",
+          "replace": [
+            {
+              "behavior": "constant_entries",
+              "directories": [
+                "zz",
+                "aa"
+              ],
+              "files": [
+                "z.ts",
+                "a.ts"
+              ],
+              "method": "GetAccessibleEntries",
+              "nil_symlinks": true,
+              "symlinks": []
+            }
+          ],
+          "silent_methods": [
+            "GetAccessibleEntries"
+          ],
+          "symlinks": {
+            "/root/link.ts": "/root/a.ts"
+          }
+        },
+        {
+          "op": "entries",
+          "path": "/root"
+        },
+        {
+          "op": "entries",
+          "path": "/root/missing"
+        },
+        {
+          "case_sensitive": true,
+          "clock_start": "2020-01-01T00:00:00Z",
+          "files": {
+            "/root/a.ts": "A",
+            "/root/m.ts": "M"
+          },
+          "inner": "mock_over_mapfs",
+          "op": "wrap",
+          "replace": [],
+          "silent_methods": [],
+          "symlinks": {
+            "/root/link.ts": "/root/a.ts"
+          }
+        },
+        {
+          "op": "entries",
+          "path": "/root"
+        }
+      ],
+      "case": "filesystem/wrapvfs/wrap-entries-are-forwarded-verbatim",
+      "discriminates": "The wrapper returns the replacement's vfs.Entries struct verbatim (wrapvfs.go:101-106). Two ports fail. One sorts or de-duplicates on the way out: the stub's Files and Directories are deliberately unsorted and must survive in that order. One normalises a nil Symlinks map to empty, which the pinned interface forbids -- nil means 'symlink information is not available and the entries may need to be re-checked for symlinks' (vfs.go:55-60) and empty means there are none. Rust cannot carry either property: Entries.symlinks is Option<BTreeSet<JsString>> (crates/tsr_vfs/src/lib.rs:58-62), which keeps the nil distinction but sorts, while files and directories are plain Vecs that a sorting port would silently reorder. The last arm records the inner's own answer, which always has a non-nil Symlinks because internal.Common.GetAccessibleEntries assigns an empty map first (vfs/internal/internal.go:69).",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.GetAccessibleEntries",
+      "order_sensitive": true,
+      "subject": "wrapvfs.Wrap"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "clock_start": "2020-01-01T00:00:00Z",
+          "files": {
+            "/root/a.ts": "A"
+          },
+          "inner": "mock_over_mapfs",
+          "op": "wrap",
+          "replace": [],
+          "silent_methods": [],
+          "symlinks": {}
+        },
+        {
+          "op": "use_case_sensitive_file_names"
+        },
+        {
+          "case_sensitive": true,
+          "clock_start": "2020-01-01T00:00:00Z",
+          "files": {
+            "/root/a.ts": "A"
+          },
+          "inner": "mock_over_mapfs",
+          "op": "wrap",
+          "replace": [
+            {
+              "behavior": "constant_bool",
+              "flag": false,
+              "method": "UseCaseSensitiveFileNames"
+            }
+          ],
+          "silent_methods": [
+            "UseCaseSensitiveFileNames"
+          ],
+          "symlinks": {}
+        },
+        {
+          "op": "use_case_sensitive_file_names"
+        },
+        {
+          "op": "use_case_sensitive_file_names"
+        },
+        {
+          "op": "use_case_sensitive_file_names"
+        }
+      ],
+      "case": "filesystem/wrapvfs/wrap-use-case-sensitive-file-names-replacement-is-zero-argument",
+      "discriminates": "This is the only replacement whose signature is func() bool (wrapvfs.go:10) and the only one a path-keyed dispatch table would silently drop, so step 4 catches a port that ignores it for having no path to dispatch on. Steps 4 to 6 catch a port that resolves the answer once at construction and caches it: the replacement must be called each time, which the stub log counts. The inner's Func is nil on the second wrapper, so a port that consults the inner as well panics rather than agreeing by accident. Step 2 records the forwarding arm for contrast, where the inner answers the opposite.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.UseCaseSensitiveFileNames",
+      "order_sensitive": true,
+      "subject": "wrapvfs.Wrap"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "clock_start": "2020-01-01T00:00:00Z",
+          "files": {
+            "/root/a.ts": "A",
+            "/root/sub/b.ts": "B"
+          },
+          "inner": "mock_over_mapfs",
+          "op": "wrap",
+          "replace": [
+            {
+              "arrivals": [
+                {
+                  "is_dir": true,
+                  "name": "one",
+                  "path": "/synthetic/one"
+                },
+                {
+                  "is_dir": false,
+                  "name": "two",
+                  "path": "/synthetic/two"
+                }
+              ],
+              "behavior": "replay_arrivals",
+              "method": "WalkDir"
+            }
+          ],
+          "silent_methods": [
+            "WalkDir"
+          ],
+          "symlinks": {}
+        },
+        {
+          "at": "/synthetic/one",
+          "callback": "skip_dir_at",
+          "op": "walk_dir",
+          "path": "/root"
+        },
+        {
+          "case_sensitive": true,
+          "clock_start": "2020-01-01T00:00:00Z",
+          "files": {
+            "/root/a.ts": "A",
+            "/root/sub/b.ts": "B"
+          },
+          "inner": "mock_over_mapfs",
+          "op": "wrap",
+          "replace": [
+            {
+              "arrivals": [
+                {
+                  "is_dir": true,
+                  "name": "one",
+                  "path": "/synthetic/one"
+                },
+                {
+                  "is_dir": false,
+                  "name": "two",
+                  "path": "/synthetic/two"
+                }
+              ],
+              "behavior": "replay_arrivals_then_fail",
+              "method": "WalkDir"
+            }
+          ],
+          "silent_methods": [
+            "WalkDir"
+          ],
+          "symlinks": {}
+        },
+        {
+          "callback": "collect",
+          "op": "walk_dir",
+          "path": "/root"
+        },
+        {
+          "case_sensitive": true,
+          "clock_start": "2020-01-01T00:00:00Z",
+          "files": {
+            "/root/a.ts": "A",
+            "/root/sub/b.ts": "B"
+          },
+          "inner": "mock_over_mapfs",
+          "op": "wrap",
+          "replace": [],
+          "silent_methods": [],
+          "symlinks": {}
+        },
+        {
+          "callback": "collect",
+          "op": "walk_dir",
+          "path": "/root"
+        }
+      ],
+      "case": "filesystem/wrapvfs/wrap-walkdir-passes-the-callback-through-unchanged",
+      "discriminates": "The swapped-walk-callback control in the direction opposite to trackingvfs. wrapvfs hands the caller's walkFn through UNCHANGED, to the replacement and to the inner alike (wrapvfs.go:117-122), while trackingvfs must substitute its own recording closure (trackingvfs.go:65-71); a port with one shared 'wrap the walk' helper gets one of the two wrong. Step 2 sees it directly: the stub records the sentinel the walkFn returned for each synthetic arrival, and that must be exactly what the caller's own callback produced. Step 4 catches a port that swallows or reclassifies the replacement's returned error, and the inner's WalkDir Func is nil on both replaced wrappers, so a port that also forwards panics. There is no Rust expression at all: the trait has no walk_dir, no DirEntry and no SkipDir/SkipAll vocabulary (crates/tsr_vfs/src/lib.rs:70-95).",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.WalkDir",
+      "order_sensitive": true,
+      "subject": "wrapvfs.Wrap"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "files": {
+            "/root/a.ts": "A"
+          },
+          "inner": "mock_over_readonly_iofs",
+          "op": "wrap",
+          "replace": [
+            {
+              "behavior": "record_and_succeed",
+              "method": "Remove"
+            }
+          ],
+          "silent_methods": [],
+          "symlinks": {}
+        },
+        {
+          "op": "read_file",
+          "path": "/root/a.ts"
+        },
+        {
+          "data": "X",
+          "op": "write_file",
+          "path": "/root/out.js"
+        },
+        {
+          "data": "B",
+          "op": "append_file",
+          "path": "/root/a.ts"
+        },
+        {
+          "a_time": "2001-02-03T04:05:06Z",
+          "m_time": "2009-08-07T06:05:04Z",
+          "op": "chtimes",
+          "path": "/root/a.ts"
+        },
+        {
+          "op": "remove",
+          "path": "/root/a.ts"
+        },
+        {
+          "op": "read_file",
+          "path": "/root/a.ts"
+        }
+      ],
+      "case": "filesystem/wrapvfs/wrap-unreplaced-write-class-forwards-the-capability-failure",
+      "discriminates": "Over an inner that is an io/fs without iovfs.WritableFS, the unreplaced write-class methods forward the inner's own panicking stubs (iofs.go:91-103) with their literal text, while the one replaced method suppresses that failure entirely. Step 6 is the sharp one: it proves a replacement answers INSTEAD of the inner, on an inner that would have panicked loudly had it been consulted at all. A Rust port that leaves write_file, append_file, remove and change_times to the trait's defaults (crates/tsr_vfs/src/lib.rs:83-94) answers Err(Error::Unsupported(..)) from the wrapper without reaching the inner, so it would report the same thing for step 6 as for steps 3 to 5 and diverge on all four.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.WriteFile",
+      "order_sensitive": true,
+      "subject": "wrapvfs.Wrap"
+    }
+  ]
+}

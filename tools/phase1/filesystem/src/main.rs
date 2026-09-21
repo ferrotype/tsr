@@ -14,10 +14,22 @@ use std::error::Error;
 
 use serde_json::{json, Map, Value};
 
-// The group modules land one per adapter surface; until they do, the shared
-// request helpers in `api` have no caller and the dispatch table is empty.
+// The group modules land one per adapter surface. The trace helpers in `api`
+// still have no caller: the carried matchFiles group answers whole baselines
+// rather than action traces, and the adapter groups that will use them are not
+// written yet.
 #[allow(dead_code)]
 mod api;
+mod cachedvfs;
+mod glob;
+mod iovfs;
+mod matchfiles;
+mod osvfs;
+mod tspath;
+mod vfsmatch;
+mod vfsmock;
+mod vfstest;
+mod wrapvfs;
 
 use api::Outcome;
 
@@ -25,7 +37,18 @@ use api::Outcome;
 type GroupHandler = fn(&Value) -> Option<Outcome>;
 
 /// Group modules, tried in order. The first to claim a request answers it.
-const GROUPS: &[(&str, GroupHandler)] = &[];
+const GROUPS: &[(&str, GroupHandler)] = &[
+    ("cachedvfs", cachedvfs::observe),
+    ("glob", glob::observe),
+    ("iovfs", iovfs::observe),
+    ("matchfiles", matchfiles::observe),
+    ("osvfs", osvfs::observe),
+    ("tspath", tspath::observe),
+    ("vfsmatch", vfsmatch::observe),
+    ("vfsmock", vfsmock::observe),
+    ("vfstest", vfstest::observe),
+    ("wrapvfs", wrapvfs::observe),
+];
 
 fn observe(request: &Value) -> Map<String, Value> {
     let mut row = Map::new();

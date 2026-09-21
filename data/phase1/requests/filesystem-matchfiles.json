@@ -1,0 +1,1141 @@
+{
+  "family": "filesystem",
+  "requests": [
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/Expands z to z/starstart/star with json api.js",
+      "case": "filesystem/matchfiles/expands-z-to-z-starstart-star-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/Expands z to z/starstart/star with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/expands-z-to-z-starstart-star-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/always include literal files with json api.js",
+      "case": "filesystem/matchfiles/always-include-literal-files-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/always include literal files with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/always-include-literal-files-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/and empty exclude with json api.js",
+      "case": "filesystem/matchfiles/and-empty-exclude-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/and empty exclude with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/and-empty-exclude-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/and exclusions with json api.js",
+      "case": "filesystem/matchfiles/and-exclusions-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/and exclusions with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/and-exclusions-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/and explicit recursive include with json api.js",
+      "case": "filesystem/matchfiles/and-explicit-recursive-include-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/and explicit recursive include with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/and-explicit-recursive-include-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/and explicit wildcard include with json api.js",
+      "case": "filesystem/matchfiles/and-explicit-wildcard-include-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/and explicit wildcard include with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/and-explicit-wildcard-include-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/and no exclusions with json api.js",
+      "case": "filesystem/matchfiles/and-no-exclusions-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/and no exclusions with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/and-no-exclusions-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/and wildcard include with json api.js",
+      "case": "filesystem/matchfiles/and-wildcard-include-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/and wildcard include with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/and-wildcard-include-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/are not removed due to excludes with json api.js",
+      "case": "filesystem/matchfiles/are-not-removed-due-to-excludes-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/are not removed due to excludes with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/are-not-removed-due-to-excludes-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/can exclude dirs whose pattern starts with starstar with json api.js",
+      "case": "filesystem/matchfiles/can-exclude-dirs-whose-pattern-starts-with-starstar-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/can exclude dirs whose pattern starts with starstar with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/can-exclude-dirs-whose-pattern-starts-with-starstar-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/can include dirs whose pattern starts with starstart with json api.js",
+      "case": "filesystem/matchfiles/can-include-dirs-whose-pattern-starts-with-starstart-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/can include dirs whose pattern starts with starstart with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/can-include-dirs-whose-pattern-starts-with-starstart-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/can include files in the same order on multiple platforms case insensitive with json api.js",
+      "case": "filesystem/matchfiles/can-include-files-in-the-same-order-on-multiple-platforms-case-insensitive-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/can include files in the same order on multiple platforms case insensitive with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/can-include-files-in-the-same-order-on-multiple-platforms-case-insensitive-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/can include files in the same order on multiple platforms case sensitive with json api.js",
+      "case": "filesystem/matchfiles/can-include-files-in-the-same-order-on-multiple-platforms-case-sensitive-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/can include files in the same order on multiple platforms case sensitive with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/can-include-files-in-the-same-order-on-multiple-platforms-case-sensitive-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/case sensitive with json api.js",
+      "case": "filesystem/matchfiles/case-sensitive-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/case sensitive with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/case-sensitive-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/exclude .js files when allowJs=false with json api.js",
+      "case": "filesystem/matchfiles/exclude-js-files-when-allowjs-false-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/exclude .js files when allowJs=false with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/exclude-js-files-when-allowjs-false-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/exclude .min.js files using wildcards with json api.js",
+      "case": "filesystem/matchfiles/exclude-min-js-files-using-wildcards-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/exclude .min.js files using wildcards with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/exclude-min-js-files-using-wildcards-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/exclude files with .. in their name with json api.js",
+      "case": "filesystem/matchfiles/exclude-files-with-in-their-name-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/exclude files with .. in their name with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/exclude-files-with-in-their-name-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/exclude folders with json api.js",
+      "case": "filesystem/matchfiles/exclude-folders-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/exclude folders with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/exclude-folders-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/exclude paths outside of the project using relative paths with json api.js",
+      "case": "filesystem/matchfiles/exclude-paths-outside-of-the-project-using-relative-paths-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/exclude paths outside of the project using relative paths with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/exclude-paths-outside-of-the-project-using-relative-paths-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/in excludes after a subdirectory with json api.js",
+      "case": "filesystem/matchfiles/in-excludes-after-a-subdirectory-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/in excludes after a subdirectory with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/in-excludes-after-a-subdirectory-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/in excludes immediately after with json api.js",
+      "case": "filesystem/matchfiles/in-excludes-immediately-after-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/in excludes immediately after with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/in-excludes-immediately-after-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/in excludes with json api.js",
+      "case": "filesystem/matchfiles/in-excludes-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/in excludes with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/in-excludes-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/in excludes with trailing recursive directory with json api.js",
+      "case": "filesystem/matchfiles/in-excludes-with-trailing-recursive-directory-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/in excludes with trailing recursive directory with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/in-excludes-with-trailing-recursive-directory-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/in includes after a subdirectory with json api.js",
+      "case": "filesystem/matchfiles/in-includes-after-a-subdirectory-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/in includes after a subdirectory with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/in-includes-after-a-subdirectory-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/in includes immediately after with json api.js",
+      "case": "filesystem/matchfiles/in-includes-immediately-after-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/in includes immediately after with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/in-includes-immediately-after-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/in includes with multiple recursive directory patterns with json api.js",
+      "case": "filesystem/matchfiles/in-includes-with-multiple-recursive-directory-patterns-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/in includes with multiple recursive directory patterns with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/in-includes-with-multiple-recursive-directory-patterns-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/in includes with trailing recursive directory with json api.js",
+      "case": "filesystem/matchfiles/in-includes-with-trailing-recursive-directory-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/in includes with trailing recursive directory with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/in-includes-with-trailing-recursive-directory-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/include .js files when allowJs=true with json api.js",
+      "case": "filesystem/matchfiles/include-js-files-when-allowjs-true-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/include .js files when allowJs=true with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/include-js-files-when-allowjs-true-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/include explicitly listed .min.js files when allowJs=true with json api.js",
+      "case": "filesystem/matchfiles/include-explicitly-listed-min-js-files-when-allowjs-true-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/include explicitly listed .min.js files when allowJs=true with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/include-explicitly-listed-min-js-files-when-allowjs-true-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/include files with .. in their name with json api.js",
+      "case": "filesystem/matchfiles/include-files-with-in-their-name-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/include files with .. in their name with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/include-files-with-in-their-name-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/include paths outside of the project using relative paths with json api.js",
+      "case": "filesystem/matchfiles/include-paths-outside-of-the-project-using-relative-paths-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/include paths outside of the project using relative paths with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/include-paths-outside-of-the-project-using-relative-paths-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/include paths outside of the project with json api.js",
+      "case": "filesystem/matchfiles/include-paths-outside-of-the-project-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/include paths outside of the project with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/include-paths-outside-of-the-project-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/is sorted in include order, then in alphabetical order with json api.js",
+      "case": "filesystem/matchfiles/is-sorted-in-include-order-then-in-alphabetical-order-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/is sorted in include order, then in alphabetical order with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/is-sorted-in-include-order-then-in-alphabetical-order-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/missing files are still present with json api.js",
+      "case": "filesystem/matchfiles/missing-files-are-still-present-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/missing files are still present with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/missing-files-are-still-present-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/question matches only a single character with json api.js",
+      "case": "filesystem/matchfiles/question-matches-only-a-single-character-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/question matches only a single character with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/question-matches-only-a-single-character-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/same named declarations are excluded with json api.js",
+      "case": "filesystem/matchfiles/same-named-declarations-are-excluded-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/same named declarations are excluded with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/same-named-declarations-are-excluded-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/same named declarations with include dts tsx with json api.js",
+      "case": "filesystem/matchfiles/same-named-declarations-with-include-dts-tsx-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/same named declarations with include dts tsx with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/same-named-declarations-with-include-dts-tsx-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/same named declarations with include ts dts with json api.js",
+      "case": "filesystem/matchfiles/same-named-declarations-with-include-ts-dts-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/same named declarations with include ts dts with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/same-named-declarations-with-include-ts-dts-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/same named declarations with include ts tsx with json api.js",
+      "case": "filesystem/matchfiles/same-named-declarations-with-include-ts-tsx-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/same named declarations with include ts tsx with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/same-named-declarations-with-include-ts-tsx-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/same named declarations with include ts with json api.js",
+      "case": "filesystem/matchfiles/same-named-declarations-with-include-ts-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/same named declarations with include ts with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/same-named-declarations-with-include-ts-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/same named declarations with include tsx dts with json api.js",
+      "case": "filesystem/matchfiles/same-named-declarations-with-include-tsx-dts-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/same named declarations with include tsx dts with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/same-named-declarations-with-include-tsx-dts-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/same named declarations with include tsx ts with json api.js",
+      "case": "filesystem/matchfiles/same-named-declarations-with-include-tsx-ts-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/same named declarations with include tsx ts with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/same-named-declarations-with-include-tsx-ts-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/same named declarations with include tsx with json api.js",
+      "case": "filesystem/matchfiles/same-named-declarations-with-include-tsx-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/same named declarations with include tsx with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/same-named-declarations-with-include-tsx-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/star matches only ts files with json api.js",
+      "case": "filesystem/matchfiles/star-matches-only-ts-files-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/star matches only ts files with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/star-matches-only-ts-files-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/that are not explicitly included with json api.js",
+      "case": "filesystem/matchfiles/that-are-not-explicitly-included-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/that are not explicitly included with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/that-are-not-explicitly-included-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/when recursive symlinked directories are present with json api.js",
+      "case": "filesystem/matchfiles/when-recursive-symlinked-directories-are-present-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/when recursive symlinked directories are present with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/when-recursive-symlinked-directories-are-present-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/with case sensitive exclude with json api.js",
+      "case": "filesystem/matchfiles/with-case-sensitive-exclude-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/with case sensitive exclude with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/with-case-sensitive-exclude-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/with common package folders and empty exclude with json api.js",
+      "case": "filesystem/matchfiles/with-common-package-folders-and-empty-exclude-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/with common package folders and empty exclude with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/with-common-package-folders-and-empty-exclude-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/with common package folders and exclusions with json api.js",
+      "case": "filesystem/matchfiles/with-common-package-folders-and-exclusions-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/with common package folders and exclusions with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/with-common-package-folders-and-exclusions-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/with common package folders and no exclusions with json api.js",
+      "case": "filesystem/matchfiles/with-common-package-folders-and-no-exclusions-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/with common package folders and no exclusions with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/with-common-package-folders-and-no-exclusions-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/with defaults with json api.js",
+      "case": "filesystem/matchfiles/with-defaults-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/with defaults with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/with-defaults-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/with jsx=none, allowJs=false with json api.js",
+      "case": "filesystem/matchfiles/with-jsx-none-allowjs-false-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/with jsx=none, allowJs=false with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/with-jsx-none-allowjs-false-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/with jsx=none, allowJs=true with json api.js",
+      "case": "filesystem/matchfiles/with-jsx-none-allowjs-true-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/with jsx=none, allowJs=true with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/with-jsx-none-allowjs-true-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/with jsx=preserve, allowJs=false with json api.js",
+      "case": "filesystem/matchfiles/with-jsx-preserve-allowjs-false-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/with jsx=preserve, allowJs=false with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/with-jsx-preserve-allowjs-false-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/with jsx=preserve, allowJs=true with json api.js",
+      "case": "filesystem/matchfiles/with-jsx-preserve-allowjs-true-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/with jsx=preserve, allowJs=true with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/with-jsx-preserve-allowjs-true-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/with jsx=react-native, allowJs=false with json api.js",
+      "case": "filesystem/matchfiles/with-jsx-react-native-allowjs-false-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/with jsx=react-native, allowJs=false with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/with-jsx-react-native-allowjs-false-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/with jsx=react-native, allowJs=true with json api.js",
+      "case": "filesystem/matchfiles/with-jsx-react-native-allowjs-true-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/with jsx=react-native, allowJs=true with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/with-jsx-react-native-allowjs-true-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/with literal excludes with json api.js",
+      "case": "filesystem/matchfiles/with-literal-excludes-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/with literal excludes with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/with-literal-excludes-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/with missing files are excluded with literal include list with json api.js",
+      "case": "filesystem/matchfiles/with-missing-files-are-excluded-with-literal-include-list-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/with missing files are excluded with literal include list with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/with-missing-files-are-excluded-with-literal-include-list-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/with missing files are excluded with wildcard include list with json api.js",
+      "case": "filesystem/matchfiles/with-missing-files-are-excluded-with-wildcard-include-list-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/with missing files are excluded with wildcard include list with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/with-missing-files-are-excluded-with-wildcard-include-list-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/with multiple recursive directories with json api.js",
+      "case": "filesystem/matchfiles/with-multiple-recursive-directories-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/with multiple recursive directories with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/with-multiple-recursive-directories-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/with non .ts file extensions are excluded with json api.js",
+      "case": "filesystem/matchfiles/with-non-ts-file-extensions-are-excluded-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/with non .ts file extensions are excluded with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/with-non-ts-file-extensions-are-excluded-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/with recursive directory with json api.js",
+      "case": "filesystem/matchfiles/with-recursive-directory-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/with recursive directory with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/with-recursive-directory-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/with recursive excludes with json api.js",
+      "case": "filesystem/matchfiles/with-recursive-excludes-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/with recursive excludes with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/with-recursive-excludes-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/with recursive wildcards that match directories with json api.js",
+      "case": "filesystem/matchfiles/with-recursive-wildcards-that-match-directories-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/with recursive wildcards that match directories with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/with-recursive-wildcards-that-match-directories-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/with recursive wildcards that match nothing with json api.js",
+      "case": "filesystem/matchfiles/with-recursive-wildcards-that-match-nothing-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/with recursive wildcards that match nothing with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/with-recursive-wildcards-that-match-nothing-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/with wildcard excludes that implicitly exclude dotted files with json api.js",
+      "case": "filesystem/matchfiles/with-wildcard-excludes-that-implicitly-exclude-dotted-files-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/with wildcard excludes that implicitly exclude dotted files with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/with-wildcard-excludes-that-implicitly-exclude-dotted-files-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/with wildcard excludes with json api.js",
+      "case": "filesystem/matchfiles/with-wildcard-excludes-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/with wildcard excludes with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/with-wildcard-excludes-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/without exclusions with literal file list with json api.js",
+      "case": "filesystem/matchfiles/without-exclusions-with-literal-file-list-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/without exclusions with literal file list with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/without-exclusions-with-literal-file-list-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/without exclusions with literal include list with json api.js",
+      "case": "filesystem/matchfiles/without-exclusions-with-literal-include-list-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/without exclusions with literal include list with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/without-exclusions-with-literal-include-list-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "json",
+      "baseline": "config/matchFiles/without wildcards with json api.js",
+      "case": "filesystem/matchfiles/without-wildcards-json-api",
+      "entry_point": "tsoptions.ParseJsonConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    },
+    {
+      "api": "jsonSourceFile",
+      "baseline": "config/matchFiles/without wildcards with jsonSourceFile api.js",
+      "case": "filesystem/matchfiles/without-wildcards-jsonsourcefile-api",
+      "entry_point": "tsoptions.ParseJsonSourceFileConfigFileContent",
+      "operation": "tsoptions.matchFilesBaseline",
+      "subject": "matchFilesBaseline"
+    }
+  ]
+}

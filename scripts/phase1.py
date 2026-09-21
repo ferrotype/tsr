@@ -73,8 +73,10 @@ def inventory_check() -> dict:
     problems += scope_module.verify(scope)
     problems += scope_module.witness_problems()
     problems += scope_module.roster_problems(scope, cases)
+    problems += scope_module.gap_record_problems(cases)
     problems += baselines.verify(index)
     problems += baselines.verify_written_subfolders()
+    problems += baselines.exception_problems(index)
 
     pin = json.loads((ROOT / "data/upstream.json").read_text())["pin"]
     for name, document in (("scope", scope), ("cases", cases), ("config-baselines", index)):
@@ -233,10 +235,43 @@ def record_results(capture: Path, write: bool) -> dict:
             f"not run ({', '.join(missing[:3])}), {len(extra)} run but not declared "
             f"({', '.join(extra[:3])})"
         )
+    # What the driver actually found absent, per case. A case may drive several
+    # operations and find one unported; folding the two together would mark the
+    # neighbours missing too.
+    absent = {
+        row["case"]: (row.get("missing_operation") or {}).get("operation")
+        for row in report["rows"]
+        if row["result"] == "not_implemented"
+    }
+    # A driver names the absent entry point with the request's `operation`
+    # field. The leaf and filesystem families put a pinned operation id there;
+    # the F0 pilot predates that convention and puts a logical action name
+    # ("locale.selectTranslation"), which is not a scope id and so cannot be a
+    # witnessed gap. Where the reported name is not one the case claims to
+    # reach and the case claims exactly one operation, that one is what the
+    # driver meant and there is nothing to guess. Where it claims several, the
+    # reported name has to be resolved rather than picked, so it is left as it
+    # is and gap_record_problems reports it.
+    resolved: dict[str, str] = {}
+    renamed: list[dict] = []
+    declared = {case["id"]: case.get("operations", []) for case in document["cases"]}
+    for case_id, named in absent.items():
+        claimed = declared.get(case_id, [])
+        if named in claimed or len(claimed) != 1:
+            resolved[case_id] = named
+            continue
+        resolved[case_id] = claimed[0]
+        renamed.append({"case": case_id, "driver_reported": named, "resolved_to": claimed[0]})
+    absent = resolved
     changed = []
     for case in document["cases"]:
         if case.get("family") != family:
             continue
+        named = absent.get(case["id"])
+        if named:
+            case["missing_operations"] = [named]
+        else:
+            case.pop("missing_operations", None)
         if case.get("last_result") != observed[case["id"]]:
             changed.append({
                 "case": case["id"],
@@ -254,6 +289,7 @@ def record_results(capture: Path, write: bool) -> dict:
         "cases": len(observed),
         "counts": dict(sorted(counts.items())),
         "changed": changed,
+        "resolved_gap_names": renamed,
         "written": write,
     }
 

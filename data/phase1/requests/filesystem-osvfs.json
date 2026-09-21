@@ -1,0 +1,1651 @@
+{
+  "family": "filesystem",
+  "requests": [
+    {
+      "actions": [
+        {
+          "input_hex": "",
+          "op": "swap_case"
+        },
+        {
+          "input_hex": "6141",
+          "op": "swap_case"
+        },
+        {
+          "input_hex": "48656c6c6f2c20576f726c6421",
+          "op": "swap_case"
+        },
+        {
+          "input_hex": "30313233",
+          "op": "swap_case"
+        },
+        {
+          "input_hex": "5f2d2f3a",
+          "op": "swap_case"
+        },
+        {
+          "input_hex": "2f5661722f546d702f50726f62652e442e5453",
+          "op": "swap_case"
+        },
+        {
+          "input_hex": "c39f",
+          "op": "swap_case"
+        },
+        {
+          "input_hex": "efac81",
+          "op": "swap_case"
+        },
+        {
+          "input_hex": "c785",
+          "op": "swap_case"
+        },
+        {
+          "input_hex": "e1bebc",
+          "op": "swap_case"
+        },
+        {
+          "input_hex": "c4b0",
+          "op": "swap_case"
+        },
+        {
+          "input_hex": "c4b1",
+          "op": "swap_case"
+        },
+        {
+          "input_hex": "e284aa",
+          "op": "swap_case"
+        },
+        {
+          "input_hex": "c2b5",
+          "op": "swap_case"
+        },
+        {
+          "input_hex": "cea3cf83cf82",
+          "op": "swap_case"
+        },
+        {
+          "input_hex": "f09090a8",
+          "op": "swap_case"
+        },
+        {
+          "input_hex": "c385e284ab",
+          "op": "swap_case"
+        },
+        {
+          "input_hex": "ff41",
+          "op": "swap_case"
+        },
+        {
+          "input_hex": "80",
+          "op": "swap_case"
+        },
+        {
+          "input_hex": "48656c6c6f2c20576f726c6421",
+          "op": "swap_case_round_trip"
+        },
+        {
+          "input_hex": "c4b0",
+          "op": "swap_case_round_trip"
+        },
+        {
+          "input_hex": "ff41",
+          "op": "swap_case_round_trip"
+        }
+      ],
+      "case": "filesystem/osvfs/swap-case-unicode",
+      "discriminates": "a Rust port built on char::to_uppercase/to_lowercase, which are FULL case mappings: U+00DF becomes \"SS\" and U+FB01 becomes \"FI\" where Go's simple unicode.ToUpper leaves both alone, and U+0130 becomes \"i\" plus a combining dot where Go gives the single rune 'i'. Also a port written as `if is_lowercase { upper } else { lower }`, which diverges on the TITLECASE letter U+01C5 (hex c785): the pin's test is `ToUpper(r) != r`, not a category test, so it yields U+01C4 where the category test yields U+01C6. VERIFIED on go1.27.1 that this is the ONLY fixture that separates the two: U+1FBC, the other Lt fixture, has ToUpper as the identity and both ports lower it, U+00B5 and U+0131 ARE lowercase by unicode.IsLower, and U+212A maps the same way under either test. Also a port that walks bytes rather than runes: strings.Map decodes an invalid byte as U+FFFD and writes the replacement back, so ff41 grows from two bytes to four. No ASCII fixture catches any of these.",
+      "host_applicability": "any: a pure total function over a string, with no I/O",
+      "operation": "tsc/internal/vfs/osvfs/os.go:swapCase",
+      "order_sensitive": true,
+      "subject": "osvfs.swapCase"
+    },
+    {
+      "actions": [
+        {
+          "op": "host"
+        },
+        {
+          "op": "use_case_sensitive_file_names"
+        },
+        {
+          "op": "swap_case_of_executable"
+        },
+        {
+          "created": "Probe.TS",
+          "op": "cross_check_on_disk",
+          "probed": "probe.ts"
+        },
+        {
+          "op": "use_case_sensitive_file_names"
+        }
+      ],
+      "case": "filesystem/osvfs/use-case-sensitive-file-names",
+      "discriminates": "(a) a port that hardcodes true, which matches linux CI and is WRONG on a default macOS volume -- the recorded answer here is false. (b) a port that answers per path or per volume rather than once per process: the getter is read again after the case has written into a different volume's temporary root and must not change. (c) a port that derives the answer by case-folding a name instead of by probing the filesystem: the cross-check creates Probe.TS and asks for probe.ts, which is the volume's own answer and must agree with the getter.",
+      "host_applicability": "host-specific: the boolean IS the host volume's answer. darwin/arm64 on a default case-insensitive APFS volume records false; a linux capture records true. Neither certifies the other, and a case-sensitive macOS volume would record true here.",
+      "operation": "tsc/internal/vfs/osvfs/os.go:osFS.UseCaseSensitiveFileNames",
+      "order_sensitive": true,
+      "subject": "osvfs.UseCaseSensitiveFileNames"
+    },
+    {
+      "actions": [
+        {
+          "op": "args_class"
+        },
+        {
+          "op": "args_repeat_identical"
+        },
+        {
+          "op": "executable_class"
+        },
+        {
+          "op": "executable_stable_across_chdir"
+        }
+      ],
+      "case": "filesystem/osvfs/osutil-process-identity",
+      "discriminates": "a port that answers Executable with argv[0] -- but ONLY when the launcher wrote a relative or bare argv[0], which is exactly what the pinned Termux special case at os_android.go:10-19 exists to repair. STATED PLAINLY, because it is a limit of this capture and not a guarantee: under `go test` argv[0] IS the absolute binary path, so on the recorded rows `is_absolute`, `exists` and the chdir row all answer the same for both, and this case does NOT separate them here. An `argv[0] equals Executable` element was recorded and has been WITHDRAWN rather than repaired: it is a property of how the process was LAUNCHED, not of either accessor, so a faithful port reached through PATH, a shell wrapper or `cargo run` would score different for a reason that is not the operation -- and since os_other.go:7-9 is a verbatim `return os.Args`, no wrong implementation of Args could have made it false either. What the chdir row does pin is real and narrower: os.Executable resolves through the kernel and does not move when the working directory does. Args is the pass-through half: on the non-android build os_other.go:7-9 returns os.Args verbatim INCLUDING argv[0], so a port that stripped the launcher unconditionally shortens the slice. NOTE, against the survey that proposed this case: std::env::current_exe() does NOT canonicalize on macOS. Measured on this host it returns the /var/... spelling, and the symlink spelling of the binary when launched through a symlink, exactly as os.Executable does -- so the symlink-resolution row is a host property rather than a language difference, and the case records it as a class on both sides.",
+      "host_applicability": "posix, and the executable-resolution row is host-divergent: darwin's os.Executable is NOT symlink-resolved -- verified on this host, where it answers a /var/... path whose resolved spelling is /private/var/... -- while linux reads /proc/self/exe, which IS fully resolved. The recorded equals_own_realpath is therefore false here and would be true on linux, so only the classes are recorded and neither host's row certifies the other.",
+      "operation": "tsc/internal/osutil/osutil.go:Executable",
+      "order_sensitive": true,
+      "subject": "osutil.ProcessIdentity"
+    },
+    {
+      "actions": [
+        {
+          "op": "acquire"
+        },
+        {
+          "op": "acquire"
+        },
+        {
+          "content": "one",
+          "handle": 0,
+          "op": "write",
+          "path": "x.ts"
+        },
+        {
+          "handle": 1,
+          "op": "read",
+          "path": "x.ts"
+        },
+        {
+          "content": "two",
+          "handle": 1,
+          "op": "write",
+          "path": "x.ts"
+        },
+        {
+          "handle": 0,
+          "op": "read",
+          "path": "x.ts"
+        },
+        {
+          "op": "symlink",
+          "path": "link.ts",
+          "target": "x.ts"
+        },
+        {
+          "handle": 0,
+          "op": "entries",
+          "path": ""
+        },
+        {
+          "handle": 1,
+          "op": "read",
+          "path": "link.ts"
+        }
+      ],
+      "case": "filesystem/osvfs/fs-live-shared-handle",
+      "discriminates": "a port that backs FS() with a snapshot -- ScopedOsFs::new(..).snapshot() is the only OS-aware construct in crates/tsr_vfs -- so handle a keeps serving pre-mutation bytes after handle b writes. For a live OS adapter, snapshot isolation is the bug. It also catches a port that returns a NEW object per call with per-object state: the pin returns the one package-level osVFS every time, so the two handles are the same value.",
+      "host_applicability": "posix, non-root: both active native targets run these paths, but the results recorded here are darwin/arm64's and do not certify linux",
+      "operation": "tsc/internal/vfs/osvfs/os.go:FS",
+      "order_sensitive": true,
+      "subject": "osvfs.FS"
+    },
+    {
+      "actions": [
+        {
+          "content_hex": "68656c6c6f",
+          "op": "write_bytes",
+          "path": "ascii.ts"
+        },
+        {
+          "op": "read",
+          "path": "ascii.ts"
+        },
+        {
+          "content_hex": "",
+          "op": "write_bytes",
+          "path": "empty.ts"
+        },
+        {
+          "op": "read",
+          "path": "empty.ts"
+        },
+        {
+          "content_hex": "efbbbf6162",
+          "op": "write_bytes",
+          "path": "bom8.ts"
+        },
+        {
+          "op": "read",
+          "path": "bom8.ts"
+        },
+        {
+          "content_hex": "fffe61006200",
+          "op": "write_bytes",
+          "path": "u16le.ts"
+        },
+        {
+          "op": "read",
+          "path": "u16le.ts"
+        },
+        {
+          "content_hex": "feff00610062",
+          "op": "write_bytes",
+          "path": "u16be.ts"
+        },
+        {
+          "op": "read",
+          "path": "u16be.ts"
+        },
+        {
+          "content_hex": "fffe610062",
+          "op": "write_bytes",
+          "path": "u16odd.ts"
+        },
+        {
+          "op": "read",
+          "path": "u16odd.ts"
+        },
+        {
+          "content_hex": "efbbbf",
+          "op": "write_bytes",
+          "path": "barebom8.ts"
+        },
+        {
+          "op": "read",
+          "path": "barebom8.ts"
+        },
+        {
+          "content_hex": "fffe",
+          "op": "write_bytes",
+          "path": "barebom16.ts"
+        },
+        {
+          "op": "read",
+          "path": "barebom16.ts"
+        },
+        {
+          "content_hex": "ff41",
+          "op": "write_bytes",
+          "path": "invalid.ts"
+        },
+        {
+          "op": "read",
+          "path": "invalid.ts"
+        },
+        {
+          "content_hex": "610062",
+          "op": "write_bytes",
+          "path": "embedded_nul.ts"
+        },
+        {
+          "op": "read",
+          "path": "embedded_nul.ts"
+        },
+        {
+          "content_hex": "ef",
+          "op": "write_bytes",
+          "path": "onebyte.ts"
+        },
+        {
+          "op": "read",
+          "path": "onebyte.ts"
+        },
+        {
+          "content_hex": "7a",
+          "op": "write_bytes",
+          "path": "noread.ts"
+        },
+        {
+          "op": "read",
+          "path": "noread.ts"
+        },
+        {
+          "mode": 0,
+          "op": "chmod",
+          "path": "noread.ts"
+        },
+        {
+          "op": "read",
+          "path": "noread.ts"
+        },
+        {
+          "op": "read",
+          "path": "no_such_file.ts"
+        },
+        {
+          "fixture": "kinds",
+          "op": "fixture"
+        },
+        {
+          "op": "read",
+          "path": "link_to_file"
+        },
+        {
+          "op": "read",
+          "path": "dangling"
+        },
+        {
+          "op": "read",
+          "path": "real_dir"
+        },
+        {
+          "op": "read",
+          "path": "denied/hidden.ts"
+        },
+        {
+          "op": "read",
+          "path": "hard.ts"
+        },
+        {
+          "literal": "relative/path.ts",
+          "op": "read_literal"
+        },
+        {
+          "literal": "c:/x",
+          "op": "read_literal"
+        },
+        {
+          "literal": "^/untitled/ts-nul-authority/Untitled-1",
+          "op": "read_literal"
+        }
+      ],
+      "case": "filesystem/osvfs/read-file-decoding",
+      "discriminates": "(a) a port that cannot tell an EMPTY file from a MISSING one: both give empty contents and only the boolean separates them, and collapsing them is the commonest shortcut. A bare UTF-8 BOM and a bare UTF-16 BOM join the same trap -- three distinct files all answer (\"\", true) while the missing one answers (\"\", false). (b) a port that replaces or rejects invalid UTF-8: ff41 comes back as the two raw bytes, which is why every payload here travels as hex. (c) a port that drops the odd trailing byte of a UTF-16LE file by erroring rather than by decoding one unit fewer. (d) a port that treats a denied or unreadable file as an error rather than as (\"\", false): a directory, a dangling symlink and a 0o000 file all collapse to the same one answer by design.",
+      "host_applicability": "posix, non-root: both active native targets run these paths, but the results recorded here are darwin/arm64's and do not certify linux",
+      "operation": "tsc/internal/vfs/osvfs/os.go:osFS.ReadFile",
+      "order_sensitive": true,
+      "subject": "osvfs.ReadFile"
+    },
+    {
+      "actions": [
+        {
+          "op": "umask"
+        },
+        {
+          "fixture": "kinds",
+          "op": "fixture"
+        },
+        {
+          "op": "stat",
+          "path": "real_file.ts"
+        },
+        {
+          "op": "stat",
+          "path": "empty.ts"
+        },
+        {
+          "op": "stat",
+          "path": "real_dir"
+        },
+        {
+          "op": "stat",
+          "path": "no_such_file.ts"
+        },
+        {
+          "op": "stat",
+          "path": "link_to_file"
+        },
+        {
+          "op": "stat",
+          "path": "link_to_dir"
+        },
+        {
+          "op": "stat",
+          "path": "dangling"
+        },
+        {
+          "op": "stat",
+          "path": "fifo"
+        },
+        {
+          "op": "stat",
+          "path": "hard.ts"
+        },
+        {
+          "op": "stat",
+          "path": "denied"
+        },
+        {
+          "op": "stat",
+          "path": "denied/hidden.ts"
+        },
+        {
+          "op": "stat",
+          "path": ""
+        },
+        {
+          "op": "stat_root_trailing_slash"
+        },
+        {
+          "literal": "relative/path.ts",
+          "op": "stat_literal"
+        },
+        {
+          "literal": "c:/x",
+          "op": "stat_literal"
+        },
+        {
+          "literal": "^/untitled/ts-nul-authority/Untitled-1",
+          "op": "stat_literal"
+        },
+        {
+          "literal": "https://example.com/x",
+          "op": "stat_literal"
+        },
+        {
+          "literal": "//server/share/x",
+          "op": "stat_literal"
+        }
+      ],
+      "case": "filesystem/osvfs/stat-shape",
+      "discriminates": "(a) a port that returns an error for the denied case: the pin makes 'denied' indistinguishable from 'missing' -- both are nil -- and a port that preserved the distinction diverges at every caller. (b) a port whose Name is the full path rather than the io/fs basename; the symlink rows sharpen it, because Name is the LINK's basename even though every other field describes the target. (c) a port that uses lstat: link_to_file and link_to_dir flip their IsDir and their mode, and dangling flips from nil to present. (d) a port that answers 'not a file' for the fifo rather than a non-directory of size 0. (e) a port that returns None instead of panicking on a path tspath does not root: the assert is internal.RootLength's, and its text is the contract.",
+      "host_applicability": "posix, non-root: both active native targets run these paths, but the results recorded here are darwin/arm64's and do not certify linux. Seven of the nine recorded mode components are the fixture's os.MkdirAll(0o777) and os.WriteFile(0o666)/mkfifo(0o666) masked by the process UMASK (the other two, the 0o000 denied directory and the 0o700 temporary root, are set explicitly), which is why the first action records that mask: on a host with umask 002 or 077 the bits differ for identical, correct behavior, and only the mask makes them readable.",
+      "operation": "tsc/internal/vfs/osvfs/os.go:osFS.Stat",
+      "order_sensitive": true,
+      "subject": "osvfs.Stat"
+    },
+    {
+      "actions": [
+        {
+          "fixture": "kinds",
+          "op": "fixture"
+        },
+        {
+          "op": "exists",
+          "path": "real_file.ts"
+        },
+        {
+          "op": "exists",
+          "path": "empty.ts"
+        },
+        {
+          "op": "exists",
+          "path": "real_dir"
+        },
+        {
+          "op": "exists",
+          "path": "no_such_file.ts"
+        },
+        {
+          "op": "exists",
+          "path": "link_to_file"
+        },
+        {
+          "op": "exists",
+          "path": "link_to_dir"
+        },
+        {
+          "op": "exists",
+          "path": "dangling"
+        },
+        {
+          "op": "exists",
+          "path": "fifo"
+        },
+        {
+          "op": "exists",
+          "path": "hard.ts"
+        },
+        {
+          "op": "exists",
+          "path": "denied"
+        },
+        {
+          "op": "exists",
+          "path": "denied/hidden.ts"
+        },
+        {
+          "op": "exists",
+          "path": ""
+        },
+        {
+          "op": "exists_root_trailing_slash"
+        },
+        {
+          "literal": "relative/path.ts",
+          "op": "exists_literal"
+        },
+        {
+          "literal": "c:/x",
+          "op": "exists_literal"
+        },
+        {
+          "op": "remove_and_recheck",
+          "path": "real_file.ts"
+        }
+      ],
+      "case": "filesystem/osvfs/file-and-directory-exists",
+      "discriminates": "(a) a port written as Rust's `metadata.is_file()`: the FIFO flips to false, because Go's predicate is `!stat.IsDir()` and Rust's is_file() means REGULAR file. Two APIs that read as synonyms, one real divergence, and only a non-regular fixture finds it. (b) a port using lstat/symlink_metadata -- which is what crates/tsr_vfs/src/os.rs:31 already reaches for -- flips link_to_file, link_to_dir and dangling all at once. (c) a port that propagates a permission error instead of answering false for a path inside a 0o000 directory. (d) a port that caches: the last action asks the same path twice with a real removal in between.",
+      "host_applicability": "posix, non-root: both active native targets run these paths, but the results recorded here are darwin/arm64's and do not certify linux",
+      "operation": "tsc/internal/vfs/osvfs/os.go:osFS.FileExists",
+      "order_sensitive": true,
+      "subject": "osvfs.Exists"
+    },
+    {
+      "actions": [
+        {
+          "fixture": "entries",
+          "op": "fixture"
+        },
+        {
+          "op": "entries",
+          "path": "link"
+        },
+        {
+          "op": "entries",
+          "path": "target"
+        },
+        {
+          "op": "entries",
+          "path": ""
+        },
+        {
+          "op": "entries",
+          "path": "empty_dir"
+        },
+        {
+          "op": "entries",
+          "path": "no_such_dir"
+        },
+        {
+          "op": "entries",
+          "path": "blocked"
+        },
+        {
+          "op": "entries",
+          "path": "plain.ts"
+        },
+        {
+          "literal": "relative/dir",
+          "op": "entries_literal"
+        },
+        {
+          "literal": "c:/x",
+          "op": "entries_literal"
+        }
+      ],
+      "case": "filesystem/osvfs/get-accessible-entries",
+      "discriminates": "(a) a port that reports a DANGLING symlink as a file. This is the natural implementation -- readdir hands you the entry and only the follow-up stat reveals it is dead -- and the pin omits it from Files, Directories AND Symlinks, because internal.go:95 drops the entry when Stat returns nil. (b) a port that lists a FIFO: internal.go:71-83 adds an entry only when the mode IsDir or IsRegular, so a named pipe is dropped entirely, while FileExists says TRUE for the same path. (c) a port that returns nil/None or an error for a missing or denied directory: the pin returns empty lists with a non-nil empty Symlinks map, and the doc comment at vfs.go:55-60 makes nil mean 'information unavailable', a different answer. (d) a port that reports a HARD link as a symlink. (e) a port that returns raw read_dir order rather than sorting by name: internal.go:123 calls io/fs.ReadDir, os.DirFS satisfies fs.ReadDirFS, and os.ReadDir sorts by name (os/dir.go:122-124), so Files and Directories are each sorted -- separately, since the pin never merges the two lists.",
+      "host_applicability": "posix, non-root: both active native targets run these paths, but the results recorded here are darwin/arm64's and do not certify linux",
+      "operation": "tsc/internal/vfs/osvfs/os.go:osFS.GetAccessibleEntries",
+      "order_sensitive": true,
+      "subject": "osvfs.GetAccessibleEntries"
+    },
+    {
+      "actions": [
+        {
+          "fixture": "links",
+          "op": "fixture"
+        },
+        {
+          "left": "target/file",
+          "op": "realpath_equal",
+          "right": "link/file"
+        },
+        {
+          "op": "realpath",
+          "path": "target/file"
+        },
+        {
+          "op": "realpath",
+          "path": "link3/file"
+        },
+        {
+          "op": "realpath",
+          "path": ""
+        },
+        {
+          "op": "realpath",
+          "path": "self"
+        },
+        {
+          "op": "realpath_case_swapped",
+          "path": "target/file",
+          "swapped": "TARGET/FILE"
+        },
+        {
+          "op": "remembered_count"
+        },
+        {
+          "op": "stable_repeat",
+          "path": "target/file"
+        }
+      ],
+      "case": "filesystem/osvfs/realpath-symlink-resolution",
+      "discriminates": "(a) a port implemented as std::fs::canonicalize. VERIFIED on this host: for the same input spelled TARGET/FILE on a case-insensitive volume, canonicalize returns the on-disk casing target/file while filepath.EvalSymlinks returns the spelling it was given. The vfs.FS doc comment makes the returned string a caller-visible identity, so the two ports disagree about whether two paths are the same file. (b) a port that resolves only one level of a symlink chain. (c) a port that leaves the temp root's own /var -> /private/var indirection unresolved at the root while resolving it for children.",
+      "host_applicability": "host-specific: the resolved spelling is the host's. This darwin host resolves the temporary root through /var -> /private/var, which is why every row is recorded relative to <root> or <realroot> rather than as a path; the case-swap row is valid only on a case-insensitive volume and records that volume's answer",
+      "operation": "tsc/internal/vfs/osvfs/os.go:osFS.Realpath",
+      "order_sensitive": true,
+      "subject": "osvfs.Realpath"
+    },
+    {
+      "actions": [
+        {
+          "fixture": "links",
+          "op": "fixture"
+        },
+        {
+          "op": "realpath_direct",
+          "path": "target/file"
+        },
+        {
+          "op": "realpath_direct",
+          "path": "dangling"
+        },
+        {
+          "op": "realpath_direct",
+          "path": "no_such_file.ts"
+        },
+        {
+          "op": "realpath_direct",
+          "path": "loop_a"
+        },
+        {
+          "op": "realpath",
+          "path": "dangling"
+        },
+        {
+          "literal": "c:/x",
+          "op": "realpath_literal"
+        },
+        {
+          "literal": "//server/share/x",
+          "op": "realpath_literal"
+        },
+        {
+          "literal": "^/untitled/ts-nul-authority/Untitled-1",
+          "op": "realpath_literal"
+        },
+        {
+          "literal": "file:///c:/x",
+          "op": "realpath_literal"
+        },
+        {
+          "literal": "https://example.com/x",
+          "op": "realpath_literal"
+        },
+        {
+          "literal": "relative/path.ts",
+          "op": "realpath_literal"
+        }
+      ],
+      "case": "filesystem/osvfs/realpath-total-on-failure",
+      "discriminates": "(a) a port that returns an error, an Option or an empty string when resolution fails. Both failure branches of os.go:159-173 return the UNTOUCHED input, and callers such as bundled/noembed.go:28 `exe = osvfs.FS().Realpath(exe)` depend on getting a usable path back; a Result-returning Rust signature destroys exactly that. (b) a port that returns the post-FromSlash spelling on failure rather than `orig`: on a posix host FromSlash is the identity, so only a windows capture separates those two, which is why this case records `equals_input` rather than a path. (c) a port that rejects a root form it does not recognise: a DOS root, a UNC root, an untitled root and a URL root are all rooted to tspath.GetEncodedRootLength, so RootLength does not panic and each comes back unchanged. (d) a port that silently accepts a relative path: that one DOES panic, with the pinned text.",
+      "host_applicability": "host-specific for the three on-disk rows; the five root-form rows are host-independent on any posix host, and windows would differ because filepath.FromSlash is not the identity there",
+      "operation": "tsc/internal/vfs/osvfs/os.go:osFSRealpath",
+      "order_sensitive": true,
+      "subject": "osvfs.Realpath"
+    },
+    {
+      "actions": [
+        {
+          "op": "build"
+        },
+        {
+          "fixture": "links",
+          "op": "fixture"
+        },
+        {
+          "op": "realpath",
+          "path": "target/file"
+        },
+        {
+          "op": "realpath",
+          "path": "link/file"
+        },
+        {
+          "op": "realpath",
+          "path": "link3/file"
+        },
+        {
+          "op": "realpath",
+          "path": "dangling"
+        },
+        {
+          "op": "realpath",
+          "path": "no_such_file.ts"
+        },
+        {
+          "op": "realpath",
+          "path": "loop_a"
+        },
+        {
+          "op": "realpath_trailing_slash",
+          "path": "target"
+        },
+        {
+          "op": "realpath_relative",
+          "path": "target/file"
+        },
+        {
+          "depth": 5,
+          "op": "realpath_long",
+          "segment": "very-long-directory-name-to-push-the-resolved-path-past-the-buffer-abcdefgh"
+        },
+        {
+          "literal": "c:/x",
+          "op": "realpath_literal"
+        }
+      ],
+      "case": "filesystem/osvfs/nativepath-realpath-eval-symlinks",
+      "discriminates": "this is the arm that pins the error IDENTITY the two builds disagree about. VERIFIED here: for a dangling link the !windows && !linux build reports a *PathError with Op \"lstat\", where realpath_linux.go:48 reports Op \"open\" for the same input; and a symlink CYCLE comes back as a bare *errors.errorString (\"too many links\"), not a *PathError at all, so a port that models every failure as one error type cannot reproduce either. The relative row is the other half: filepath.EvalSymlinks leaves a relative input RELATIVE, which is why osFSRealpath has to call filepath.Abs afterwards -- a port that absolutised here would make that call dead and would change nothing visible until a caller passed a relative path.",
+      "host_applicability": "host-specific: darwin (and any !windows && !linux). On linux this row set is recorded as native_unavailable, because the pinned file is not compiled there.",
+      "operation": "tsc/internal/nativepath/realpath_other.go:Realpath",
+      "order_sensitive": true,
+      "subject": "nativepath.Realpath"
+    },
+    {
+      "actions": [
+        {
+          "op": "build"
+        },
+        {
+          "fixture": "links",
+          "op": "fixture"
+        },
+        {
+          "op": "realpath",
+          "path": "target/file"
+        },
+        {
+          "op": "realpath",
+          "path": "link/file"
+        },
+        {
+          "op": "realpath",
+          "path": "link3/file"
+        },
+        {
+          "op": "realpath",
+          "path": "dangling"
+        },
+        {
+          "op": "realpath",
+          "path": "no_such_file.ts"
+        },
+        {
+          "op": "realpath",
+          "path": "loop_a"
+        },
+        {
+          "op": "realpath_trailing_slash",
+          "path": "target"
+        },
+        {
+          "op": "realpath_relative",
+          "path": "target/file"
+        },
+        {
+          "depth": 5,
+          "op": "realpath_long",
+          "segment": "very-long-directory-name-to-push-the-resolved-path-past-the-buffer-abcdefgh"
+        },
+        {
+          "literal": "c:/x",
+          "op": "realpath_literal"
+        }
+      ],
+      "case": "filesystem/osvfs/nativepath-realpath-linux-procfs",
+      "discriminates": "the linux build resolves through open(O_PATH) plus readlink(/proc/self/fd/N) rather than per-component lstat, and it fails DIFFERENTLY: a dangling or missing path is a *PathError with Op \"open\" (realpath_linux.go:48) where the EvalSymlinks build says \"lstat\", and a readlink failure says Op \"readlink\" (:63), an Op the other build never produces. The long row drives the resolved path past 256 bytes so the doubling loop at :65-68 runs more than once -- a port that sized its buffer once and truncated would pass every short path and silently cut a deep node_modules path. A port that unified the two builds behind one error shape passes the caller-level test, because osFSRealpath discards the error and returns the original path, and fails only here.",
+      "host_applicability": "host-specific: linux only, by realpath_linux.go having no build constraint while realpath_other.go excludes linux. On this darwin capture the row is native_unavailable and is NOT replaced by the darwin answer: one host's results never certify the other.",
+      "operation": "tsc/internal/nativepath/realpath_linux.go:Realpath",
+      "order_sensitive": true,
+      "subject": "nativepath.RealpathLinux"
+    },
+    {
+      "actions": [
+        {
+          "fixture": "kinds",
+          "op": "fixture"
+        },
+        {
+          "name": "back\\slash_link",
+          "op": "make_backslash_name"
+        },
+        {
+          "op": "predicate",
+          "path": "real_dir"
+        },
+        {
+          "op": "predicate",
+          "path": "real_file.ts"
+        },
+        {
+          "op": "predicate",
+          "path": "link_to_file"
+        },
+        {
+          "op": "predicate",
+          "path": "link_to_dir"
+        },
+        {
+          "op": "predicate",
+          "path": "dangling"
+        },
+        {
+          "op": "predicate",
+          "path": "hard.ts"
+        },
+        {
+          "op": "predicate",
+          "path": "fifo"
+        },
+        {
+          "op": "predicate",
+          "path": "no_such_file.ts"
+        },
+        {
+          "op": "predicate",
+          "path": "denied"
+        },
+        {
+          "op": "predicate",
+          "path": ""
+        },
+        {
+          "op": "predicate",
+          "path": "back\\slash_link"
+        },
+        {
+          "literal": "",
+          "op": "predicate_literal"
+        },
+        {
+          "literal": "relative/path.ts",
+          "op": "predicate_literal"
+        },
+        {
+          "literal": "c:/x",
+          "op": "predicate_literal"
+        }
+      ],
+      "case": "filesystem/osvfs/is-symlink-or-reparse-point",
+      "discriminates": "(a) a port built on std::fs::metadata or Path::exists rather than symlink_metadata: it follows the link and answers false for EVERY symlink, and false for the dangling one for the wrong reason. The dangling input is the one that cannot be passed by accident -- lstat succeeds on the link itself, so the pin answers TRUE where a following implementation errors. (b) a port that propagates the Lstat error instead of answering false: symlink_other.go:9 is `err == nil && ...`, and the caller (internal.go:105) has no error channel at all. (c) a port that treats a HARD link or a FIFO as a reparse point. (d) a port that translates separators inside osvfs.isReparsePoint: os.go:176 applies filepath.FromSlash, which is the IDENTITY on posix, so a link whose own NAME contains a backslash must still be found; a port that rewrote the name would miss it, and a windows port must not.",
+      "host_applicability": "posix: symlink_other.go is //go:build !windows, so these rows certify the posix arm only. The windows arm (GetFileAttributesEx and FILE_ATTRIBUTE_REPARSE_POINT, which also answers true for a junction) is a different operation id and is not reached here.",
+      "operation": "tsc/internal/nativepath/symlink_other.go:IsSymlinkOrReparsePoint",
+      "order_sensitive": true,
+      "subject": "nativepath.IsSymlinkOrReparsePoint"
+    },
+    {
+      "actions": [
+        {
+          "op": "umask"
+        },
+        {
+          "content": "one",
+          "op": "write",
+          "path": "a.txt"
+        },
+        {
+          "content": "xy",
+          "op": "write",
+          "path": "a.txt"
+        },
+        {
+          "content": "",
+          "op": "write",
+          "path": "a.txt"
+        },
+        {
+          "content": "made",
+          "op": "write",
+          "path": "nested/deep/b.txt"
+        },
+        {
+          "op": "parent_absent",
+          "path": "nested/deep"
+        },
+        {
+          "fixture": "kinds",
+          "op": "fixture"
+        },
+        {
+          "content": "x",
+          "op": "write",
+          "path": "real_dir"
+        },
+        {
+          "content": "via",
+          "op": "write",
+          "path": "link_to_file"
+        },
+        {
+          "op": "lstat_kind",
+          "path": "link_to_file"
+        },
+        {
+          "op": "inspect",
+          "path": "real_file.ts"
+        },
+        {
+          "content": "ghost",
+          "op": "write",
+          "path": "dangling"
+        },
+        {
+          "op": "lstat_kind",
+          "path": "no_such_target"
+        },
+        {
+          "content": "z",
+          "op": "write",
+          "path": "denied/new.txt"
+        },
+        {
+          "content": "z",
+          "literal": "relative/x.txt",
+          "op": "write_literal"
+        }
+      ],
+      "case": "filesystem/osvfs/write-file-truncate-and-create",
+      "discriminates": "(a) a port that writes without O_TRUNC: 'one' is longer than 'xy', so a non-truncating write leaves 'xye' and the third action's empty write leaves the file untouched instead of emptying it. These are the minimal inputs that catch it. (b) a port that does not create missing parents: os.go:212 hands O_CREATE to writeFileEnsuringDir, whose second attempt is what makes nested/deep/b.txt work. (c) a port that creates the file 0o600 or 0o644 outright rather than 0o666 under the umask -- the umask row is recorded so the mode row can be read. (d) a port that writes through a symlink by REPLACING it: the pin follows it, the target changes and the link is still a link; via a DANGLING link the pin creates the target. (e) a port that answers Err for a path tspath does not root instead of panicking with the pinned text.",
+      "host_applicability": "posix, non-root: both active native targets run these paths, but the results recorded here are darwin/arm64's and do not certify linux",
+      "operation": "tsc/internal/vfs/osvfs/os.go:osFS.WriteFile",
+      "order_sensitive": true,
+      "subject": "osvfs.WriteFile"
+    },
+    {
+      "actions": [
+        {
+          "op": "umask"
+        },
+        {
+          "content": "one",
+          "op": "append",
+          "path": "a.txt"
+        },
+        {
+          "content": "two",
+          "op": "append",
+          "path": "a.txt"
+        },
+        {
+          "content": "",
+          "op": "append",
+          "path": "a.txt"
+        },
+        {
+          "op": "truncate_externally",
+          "path": "a.txt"
+        },
+        {
+          "content": "tail",
+          "op": "append",
+          "path": "a.txt"
+        },
+        {
+          "content": "made",
+          "op": "append",
+          "path": "nested/deep/c.txt"
+        },
+        {
+          "fixture": "kinds",
+          "op": "fixture"
+        },
+        {
+          "content": "x",
+          "op": "append",
+          "path": "real_dir"
+        },
+        {
+          "content": "more",
+          "op": "append",
+          "path": "link_to_file"
+        },
+        {
+          "op": "inspect",
+          "path": "real_file.ts"
+        },
+        {
+          "content": "z",
+          "literal": "relative/x.txt",
+          "op": "append_literal"
+        }
+      ],
+      "case": "filesystem/osvfs/append-file-concatenates",
+      "discriminates": "(a) a port that opens with O_TRUNC and re-writes the concatenation it read. The EMPTY append is the minimal input that catches it: the pin leaves the file at six bytes, a truncating implementation leaves it at zero. (b) a port that fails instead of creating a missing file (os.go:216 passes O_CREATE) or a missing parent directory. (c) a port that keeps its own notion of the end of the file: the external truncate between the two appends means the next append must start at zero, not at six, because O_APPEND asks the kernel each time. (d) a port that appends through a symlink by replacing it.",
+      "host_applicability": "posix, non-root: both active native targets run these paths, but the results recorded here are darwin/arm64's and do not certify linux",
+      "operation": "tsc/internal/vfs/osvfs/os.go:osFS.AppendFile",
+      "order_sensitive": true,
+      "subject": "osvfs.WriteFile"
+    },
+    {
+      "actions": [
+        {
+          "op": "umask"
+        },
+        {
+          "content": "one",
+          "flag": "wronly_create_trunc",
+          "op": "write_with_flag",
+          "path": "a.txt"
+        },
+        {
+          "content": "xy",
+          "flag": "wronly_create_trunc",
+          "op": "write_with_flag",
+          "path": "a.txt"
+        },
+        {
+          "content": "zz",
+          "flag": "wronly_create_append",
+          "op": "write_with_flag",
+          "path": "a.txt"
+        },
+        {
+          "content": "one",
+          "flag": "wronly_create_append",
+          "op": "write_with_flag",
+          "path": "b.txt"
+        },
+        {
+          "content": "x",
+          "flag": "wronly_create_trunc",
+          "op": "write_with_flag",
+          "path": "missing/dir/c.txt"
+        },
+        {
+          "op": "directory_snapshot",
+          "path": ""
+        },
+        {
+          "content": "x",
+          "flag": "wronly_create_excl",
+          "op": "write_with_flag",
+          "path": "a.txt"
+        },
+        {
+          "content": "x",
+          "flag": "rdonly",
+          "op": "write_with_flag",
+          "path": "a.txt"
+        },
+        {
+          "content": "z",
+          "flag": "wronly_create_trunc",
+          "literal": "phase1-no-such-directory/relative.txt",
+          "op": "write_with_flag_literal"
+        },
+        {
+          "op": "directory_snapshot",
+          "path": ""
+        }
+      ],
+      "case": "filesystem/osvfs/write-file-with-flag-direct",
+      "discriminates": "(a) a port that folds this layer into WriteFile. The bottom layer does NOT create missing parents (the missing/dir row fails and the directory snapshot shows nothing was made) and does NOT assert rootedness (the relative row fails with an ordinary ENOENT and no panic, where writeFileEnsuringDir panics on the same spelling). Both rows fail a merged implementation while every single-write test passes it. (b) a port that models the flag as a boolean append/overwrite: O_EXCL must refuse an existing file and a read-only handle must refuse the write at WriteString rather than at open, which no two-valued flag can express. (c) a port that softens the OS error: os.go:182-192 returns the raw *PathError from OpenFile and from WriteString unchanged, unlike every read-side method in the file.",
+      "host_applicability": "posix, non-root: both active native targets run these paths, but the results recorded here are darwin/arm64's and do not certify linux",
+      "operation": "tsc/internal/vfs/osvfs/os.go:osFS.writeFileWithFlag",
+      "order_sensitive": true,
+      "subject": "osvfs.WriteLayers"
+    },
+    {
+      "actions": [
+        {
+          "op": "umask"
+        },
+        {
+          "op": "ensure_directory",
+          "path": "one"
+        },
+        {
+          "op": "ensure_directory",
+          "path": "a/b/c"
+        },
+        {
+          "mode": 511,
+          "op": "mkdir",
+          "path": "strict"
+        },
+        {
+          "mode": 448,
+          "op": "chmod",
+          "path": "strict"
+        },
+        {
+          "op": "ensure_directory",
+          "path": "strict"
+        },
+        {
+          "content": "q",
+          "mode": 438,
+          "op": "write_file_raw",
+          "path": "afile"
+        },
+        {
+          "op": "ensure_directory",
+          "path": "afile"
+        },
+        {
+          "op": "ensure_directory",
+          "path": "afile/sub"
+        },
+        {
+          "op": "symlink",
+          "path": "linkone",
+          "target": "one"
+        },
+        {
+          "op": "ensure_directory",
+          "path": "linkone"
+        },
+        {
+          "mode": 511,
+          "op": "mkdir",
+          "path": "rodir"
+        },
+        {
+          "mode": 320,
+          "op": "chmod",
+          "path": "rodir"
+        },
+        {
+          "op": "ensure_directory",
+          "path": "rodir/sub"
+        },
+        {
+          "mode": 448,
+          "op": "chmod",
+          "path": "rodir"
+        },
+        {
+          "op": "ensure_directory",
+          "path": ""
+        },
+        {
+          "op": "ensure_directory_relative",
+          "path": "relative_dir/nested"
+        }
+      ],
+      "case": "filesystem/osvfs/ensure-directory-exists-direct",
+      "discriminates": "(a) a port built on create_dir rather than create_dir_all: it errors on a directory that already exists, which is what every repeated write hits, and it cannot make a three-level path in one call. (b) a port that CHMODs an existing directory to 0o777: os.MkdirAll leaves an existing directory's permissions alone, and the 0o700 row records that the mode did not move. (c) a port that passes the 0o777 literally instead of through the umask -- the umask row is recorded so the created mode can be read. (d) a port that asserts rootedness at this layer: os.go:195-198 does not, and the relative row proves it by creating a directory relative to the working directory, which is exactly why the layer above has to assert. (e) a port that treats a symlink to a directory as something to replace rather than as already existing.",
+      "host_applicability": "posix, non-root: both active native targets run these paths, but the results recorded here are darwin/arm64's and do not certify linux",
+      "operation": "tsc/internal/vfs/osvfs/os.go:osFS.ensureDirectoryExists",
+      "order_sensitive": true,
+      "subject": "osvfs.WriteLayers"
+    },
+    {
+      "actions": [
+        {
+          "op": "umask"
+        },
+        {
+          "mode": 511,
+          "op": "mkdir",
+          "path": "present"
+        },
+        {
+          "op": "directory_snapshot",
+          "path": "present"
+        },
+        {
+          "content": "one",
+          "flag": "wronly_create_trunc",
+          "op": "write_ensuring_dir",
+          "path": "present/a.txt"
+        },
+        {
+          "op": "directory_snapshot",
+          "path": "present"
+        },
+        {
+          "content": "two",
+          "flag": "wronly_create_trunc",
+          "op": "write_ensuring_dir",
+          "path": "made/deep/b.txt"
+        },
+        {
+          "op": "directory_snapshot",
+          "path": "made"
+        },
+        {
+          "content": "q",
+          "mode": 438,
+          "op": "write_file_raw",
+          "path": "afile"
+        },
+        {
+          "content": "x",
+          "flag": "wronly_create_trunc",
+          "op": "write_ensuring_dir",
+          "path": "afile/c.txt"
+        },
+        {
+          "mode": 511,
+          "op": "mkdir",
+          "path": "adir"
+        },
+        {
+          "content": "x",
+          "flag": "wronly_create_trunc",
+          "op": "write_ensuring_dir",
+          "path": "adir"
+        },
+        {
+          "content": "app",
+          "flag": "wronly_create_append",
+          "op": "write_ensuring_dir",
+          "path": "present/a.txt"
+        },
+        {
+          "content": "z",
+          "flag": "wronly_create_trunc",
+          "literal": "relative/x.txt",
+          "op": "write_ensuring_dir_literal"
+        }
+      ],
+      "case": "filesystem/osvfs/write-file-ensuring-dir-layering",
+      "discriminates": "the ORDER of the two layers, which os.go:200-209 fixes as write-first and ensure-only-on-failure. (a) a port that creates the directory unconditionally before writing passes the nested row and fails the snapshot pair around the first row, where the pin never calls MkdirAll at all. (b) a port that returns the first error rather than the second: when the parent is a FILE, the pin's write fails with Op \"open\"/ENOTDIR, MkdirAll then fails with Op \"mkdir\"/ENOTDIR, and :205-207 returns the MKDIR error -- so the recorded Op is \"mkdir\", and a write-only port records \"open\". (c) a port that skips the SECOND write when MkdirAll succeeds: writing onto a directory makes MkdirAll succeed (the parent exists) and the retry fail again, so the returned error is the second write's. (d) a port that drops the rootedness assert this layer adds and the layer below does not have.",
+      "host_applicability": "posix, non-root: both active native targets run these paths, but the results recorded here are darwin/arm64's and do not certify linux",
+      "operation": "tsc/internal/vfs/osvfs/os.go:osFS.writeFileEnsuringDir",
+      "order_sensitive": true,
+      "subject": "osvfs.WriteLayers"
+    },
+    {
+      "actions": [
+        {
+          "fixture": "kinds",
+          "op": "fixture"
+        },
+        {
+          "op": "remove",
+          "path": "link_to_file",
+          "survivors": [
+            "real_file.ts"
+          ]
+        },
+        {
+          "op": "remove",
+          "path": "link_to_dir",
+          "survivors": [
+            "real_dir"
+          ]
+        },
+        {
+          "op": "remove",
+          "path": "dangling",
+          "survivors": []
+        },
+        {
+          "op": "remove",
+          "path": "fifo",
+          "survivors": []
+        },
+        {
+          "op": "remove",
+          "path": "real_file.ts",
+          "survivors": [
+            "hard.ts"
+          ]
+        },
+        {
+          "op": "remove",
+          "path": "real_dir",
+          "survivors": []
+        },
+        {
+          "op": "remove",
+          "path": "no_such_file.ts",
+          "survivors": []
+        },
+        {
+          "op": "remove",
+          "path": "denied",
+          "survivors": [
+            "denied"
+          ]
+        },
+        {
+          "mode": 448,
+          "op": "chmod",
+          "path": "denied"
+        },
+        {
+          "op": "remove",
+          "path": "denied",
+          "survivors": []
+        },
+        {
+          "fixture": "tree",
+          "op": "fixture"
+        },
+        {
+          "op": "remove",
+          "path": "tree",
+          "survivors": [
+            "tree",
+            "other/z"
+          ]
+        },
+        {
+          "mode": 448,
+          "op": "chmod",
+          "path": "tree/adenied"
+        },
+        {
+          "op": "remove",
+          "path": "tree",
+          "survivors": [
+            "other/z",
+            "other/x/y"
+          ]
+        },
+        {
+          "op": "exists",
+          "path": "tree"
+        },
+        {
+          "op": "remove_empty_path"
+        }
+      ],
+      "case": "filesystem/osvfs/remove-recursive-and-symlinks",
+      "discriminates": "(a) a port that errors on a MISSING path. Every std::fs::remove_file-shaped implementation does, and os.RemoveAll returning nil for a path that was never there is the divergence a caller hits constantly. (b) a NON-RECURSIVE port, which is what lifting MemoryBuilder::remove would give: the populated tree row fails immediately. (c) a port that FOLLOWS a symlink and deletes the target: both symlink rows carry the survivor check, and getting this wrong deletes a user's real directory. (d) a port that refuses a non-regular file (the fifo). (e) a port that reports success after a PARTIAL removal: the 0o000 subdirectory makes RemoveAll stop with a permission error part-way, and the row records both the error and what is left.",
+      "host_applicability": "posix, non-root: both active native targets run these paths, but the results recorded here are darwin/arm64's and do not certify linux",
+      "operation": "tsc/internal/vfs/osvfs/os.go:osFS.Remove",
+      "order_sensitive": true,
+      "subject": "osvfs.Remove"
+    },
+    {
+      "actions": [
+        {
+          "fixture": "kinds",
+          "op": "fixture"
+        },
+        {
+          "op": "times_class",
+          "path": "real_file.ts"
+        },
+        {
+          "atime": "2001-02-03T04:05:06.123456789Z",
+          "mtime": "2002-03-04T05:06:07.987654321Z",
+          "op": "chtimes",
+          "path": "real_file.ts"
+        },
+        {
+          "atime": "zero",
+          "mtime": "2003-01-01T00:00:00Z",
+          "op": "chtimes",
+          "path": "real_file.ts"
+        },
+        {
+          "atime": "2004-05-06T07:08:09.5Z",
+          "mtime": "zero",
+          "op": "chtimes",
+          "path": "real_file.ts"
+        },
+        {
+          "atime": "zero",
+          "mtime": "zero",
+          "op": "chtimes",
+          "path": "real_file.ts"
+        },
+        {
+          "nanoseconds": 123456789,
+          "op": "precision",
+          "path": "real_file.ts"
+        },
+        {
+          "atime": "2005-06-07T08:09:10Z",
+          "mtime": "2006-07-08T09:10:11Z",
+          "op": "chtimes",
+          "path": "real_dir"
+        },
+        {
+          "atime": "2007-08-09T10:11:12Z",
+          "mtime": "2008-09-10T11:12:13Z",
+          "op": "chtimes",
+          "path": "link_to_dir"
+        },
+        {
+          "link": "link_to_dir",
+          "op": "link_times",
+          "target": "real_dir"
+        },
+        {
+          "atime": "2001-02-03T04:05:06Z",
+          "mtime": "2001-02-03T04:05:06Z",
+          "op": "chtimes",
+          "path": "no_such_file.ts"
+        },
+        {
+          "atime": "1960-01-01T00:00:00Z",
+          "mtime": "1960-01-01T00:00:00Z",
+          "op": "chtimes",
+          "path": "real_file.ts"
+        },
+        {
+          "atime": "2200-01-01T00:00:00Z",
+          "mtime": "2200-01-01T00:00:00Z",
+          "op": "chtimes",
+          "path": "real_file.ts"
+        },
+        {
+          "atime": "2500-01-01T00:00:00Z",
+          "mtime": "2500-01-01T00:00:00Z",
+          "op": "chtimes",
+          "path": "real_file.ts"
+        },
+        {
+          "atime": "2001-02-03T04:05:06Z",
+          "literal": "phase1-no-such-directory/relative.txt",
+          "mtime": "2001-02-03T04:05:06Z",
+          "op": "chtimes_literal"
+        }
+      ],
+      "case": "filesystem/osvfs/chtimes-two-arguments",
+      "discriminates": "the lost-argument control. (a) a port that passes mTime for both parameters, or derives one from the other, sets atime == mtime and fails the very first row, where the two stamps are distinct constants. The Rust signature it would be built on is already wrong in this exact way: crates/tsr_vfs/src/lib.rs:92 declares `fn change_times(&self, _path: &[u8])` with NO time parameters at all. (b) a port that treats a zero time as 'the epoch' rather than 'leave this stamp unchanged' clobbers the other stamp on rows 2, 3 and 4 -- and the zero/zero row is the one an implementation is most likely to turn into a touch. (c) a port that truncates to seconds: the precision row records what nanosecond remainder survived instead of sleeping for one. (d) a port that uses lutimes: Chtimes FOLLOWS a symlink, so the target's stamps move and the link's own do not. (e) a port with a wider representable range: the pinned stack converts through Time.UnixNano (os/file_posix.go:188-200), so a stamp outside roughly 1678..2262 WRAPS -- the 2200 row round-trips and the 2500 row comes back negative -- and a port built on seconds-plus-nanoseconds would store 2500 correctly and diverge. The stamps are recorded as separate seconds and nanoseconds so the wrap is visible rather than hidden inside an overflowed single integer.",
+      "host_applicability": "host-specific: timestamp resolution is a filesystem property, not a language one. This darwin/APFS host keeps the full nanosecond remainder; an ext4 host with a small inode, or a FAT volume, keeps less, and the precision row is what says so rather than the case failing.",
+      "operation": "tsc/internal/vfs/osvfs/os.go:osFS.Chtimes",
+      "order_sensitive": true,
+      "subject": "osvfs.Chtimes"
+    },
+    {
+      "actions": [
+        {
+          "fixture": "tree",
+          "op": "fixture"
+        },
+        {
+          "decision": "nil",
+          "op": "walk",
+          "path": "tree"
+        },
+        {
+          "decision": "skipdir_on:a",
+          "op": "walk",
+          "path": "tree"
+        },
+        {
+          "decision": "skipdir_on:a1",
+          "op": "walk",
+          "path": "tree"
+        },
+        {
+          "decision": "skipall_on:a1",
+          "op": "walk",
+          "path": "tree"
+        },
+        {
+          "decision": "error_on:b",
+          "op": "walk",
+          "path": "tree"
+        },
+        {
+          "decision": "skipdir_on_error",
+          "op": "walk",
+          "path": "tree"
+        },
+        {
+          "decision": "error_on_error",
+          "op": "walk",
+          "path": "tree"
+        },
+        {
+          "decision": "nil",
+          "op": "walk",
+          "path": "tree/b"
+        },
+        {
+          "decision": "nil",
+          "op": "walk",
+          "path": "linkdir"
+        },
+        {
+          "decision": "nil",
+          "op": "walk",
+          "path": "no_such_root"
+        },
+        {
+          "decision": "nil",
+          "literal": "c:/x",
+          "op": "walk_literal"
+        },
+        {
+          "decision": "nil",
+          "literal": "relative/tree",
+          "op": "walk_literal"
+        },
+        {
+          "mode": 448,
+          "op": "chmod",
+          "path": "tree/adenied"
+        },
+        {
+          "decision": "nil",
+          "op": "walk",
+          "path": "tree"
+        }
+      ],
+      "case": "filesystem/osvfs/walkdir-order-and-skip",
+      "discriminates": "(a) a port that collects a flat sorted list and replays it: it fails the SkipDir rows, the SkipAll row, the error row and the denied rows at once, because none of those decisions can be taken after the traversal. (b) a port that treats SkipDir returned from a FILE callback as a no-op. io/fs's least intuitive rule -- walk.go:93-100 breaks out of the containing directory's loop -- means a1 returning SkipDir skips a2 and resumes at b; almost no port gets this right without reading it. (c) a port that reports an unreadable directory ONCE. The pin calls back TWICE for the same path: first as an ordinary directory entry with a nil error, then again with the ReadDir error (walk.go:81-91), and a port that merged them loses the first row. (d) a port that follows a symlink ENTRY inside the tree: linkc is reported with IsDir false and is not descended, yet a symlink used as the ROOT is followed and its target walked. (e) a port that prefixes the root path wrongly: internal.go:136-141 rewrites \".\" to \"\" and prepends the root name, so the first row is the root itself with no trailing slash, and every row's entry name is the last segment of its own path.",
+      "host_applicability": "posix, non-root: both active native targets run these paths, but the results recorded here are darwin/arm64's and do not certify linux",
+      "operation": "tsc/internal/vfs/osvfs/os.go:osFS.WalkDir",
+      "order_sensitive": true,
+      "subject": "osvfs.WalkDir"
+    },
+    {
+      "actions": [
+        {
+          "fixture": "tree",
+          "op": "fixture"
+        },
+        {
+          "callback": "A",
+          "op": "walk_counted",
+          "others": [
+            "B"
+          ],
+          "path": "tree"
+        },
+        {
+          "callback": "B",
+          "op": "walk_counted",
+          "others": [
+            "A"
+          ],
+          "path": "other"
+        },
+        {
+          "callbacks": [
+            "A",
+            "B"
+          ],
+          "op": "counts"
+        },
+        {
+          "at": "a",
+          "nested": "other",
+          "op": "walk_nested",
+          "path": "tree"
+        },
+        {
+          "depth": 3,
+          "op": "walk_reentrant",
+          "path": "other"
+        },
+        {
+          "callback": "C",
+          "op": "acquire_wrapper"
+        },
+        {
+          "callback": "C",
+          "error": "no",
+          "literal": "<probe>/deep/entry.ts",
+          "op": "invoke_wrapper"
+        },
+        {
+          "callback": "C",
+          "error": "yes",
+          "literal": "<probe>/deep/entry.ts",
+          "op": "invoke_wrapper"
+        },
+        {
+          "op": "release_wrapper"
+        },
+        {
+          "callback": "D",
+          "op": "acquire_wrapper"
+        },
+        {
+          "callback": "D",
+          "error": "no",
+          "literal": "<probe>/second.ts",
+          "op": "invoke_wrapper"
+        },
+        {
+          "op": "release_wrapper"
+        },
+        {
+          "callbacks": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "op": "counts"
+        }
+      ],
+      "case": "filesystem/osvfs/walkdir-callback-binding",
+      "discriminates": "the swapped-callback control. A port that binds the walk callback into shared state -- a thread-local, a cached boxed closure, or one reused wrapper field, all plausible Rust ways to avoid a boxed closure per walk -- passes any single sequential walk and then delivers rows to the PREVIOUS walk's callback. The counted rows catch it directly: callback A's count must not move while B walks. The nested row catches the narrower version, where an inner walk started from inside the outer callback rebinds the one wrapper and the outer walk finishes into the inner callback. The wrapper rows catch it at the source: after putLimitedWalkDirFunc the `inner` field is nil (os.go:134) while `walk` is still set, because the pool's New assigned w.walk = w.walker once (os.go:120-125) and release does not clear it; a port that cleared both would rebuild the closure per walk, and a port that cleared neither would hand the next walk a stale callback. The direct invocation also pins walker's forwarding: os.go:143-146 passes path, d and err through unchanged and returns what inner returned, so a port that passed the entry NAME instead of the path, or dropped the error argument, differs in the one row where d is nil and err is not.",
+      "host_applicability": "posix, non-root: the binding and release contract is itself host-independent, but three of the five observing actions replay a real walk over the `tree` fixture, which contains a 0o000 directory and symlinks. Run as root that directory is readable, so io/fs never delivers the second (error) callback for it and its child is visited instead, changing the recorded row lists. The tree rows are recorded relative to <root>.",
+      "operation": "tsc/internal/vfs/osvfs/os.go:getLimitedWalkDirFunc",
+      "order_sensitive": true,
+      "subject": "osvfs.WalkBinding"
+    },
+    {
+      "actions": [
+        {
+          "op": "host"
+        },
+        {
+          "op": "location_shape"
+        },
+        {
+          "op": "location_repeat_identical"
+        },
+        {
+          "expected_suffix": "7.1",
+          "op": "version_tail"
+        }
+      ],
+      "case": "filesystem/osvfs/global-typings-cache-location",
+      "discriminates": "(a) the current Rust answer, which is not a port of this at all: crates/tsr_compiler/src/checker_host.rs:357 returns JsString::default(), an empty string, and the case turns that silent behavioral hole into a named gap. (b) a port that appends the FULL version \"7.1.0-dev\" rather than core.VersionMajorMinor()'s \"7.1\": os.go:242 uses the major.minor, and the version_tail row is the only place that shows it. (c) a port that uses the temp directory unconditionally, which passes on any machine whose cache lookup happens to fail and is wrong everywhere else -- the row records both prefixes so the two are distinguishable. (d) a port that joins with the platform separator rather than through tspath.CombinePaths: the result must contain no backslash and no doubled slash on any host. (e) a port that uses the windows subdir \"Microsoft/TypeScript\" on a posix host, or vice versa; the middle component is recorded beside the is_windows predicate for that reason.",
+      "host_applicability": "host-specific: the leading component is the host's user cache directory -- $HOME/Library/Caches on this darwin host, $XDG_CACHE_HOME or $HOME/.cache on linux -- so only the decomposition is recorded and never the path. The middle component also differs by platform (os.go:237-241), which is why the `host` row travels beside it; that row records the PREDICATES the pin branches on (is_windows, is_linux, is_wasm) rather than runtime.GOOS, whose literal spelling -- \"darwin\" here -- is Go's own vocabulary and is not a value a Rust port can be expected to reproduce.",
+      "operation": "tsc/internal/vfs/osvfs/os.go:GetGlobalTypingsCacheLocation",
+      "order_sensitive": true,
+      "subject": "osvfs.GetGlobalTypingsCacheLocation"
+    }
+  ],
+  "version": 1
+}

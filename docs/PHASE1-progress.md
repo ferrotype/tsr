@@ -109,11 +109,24 @@ wrapper gives 69 covered operations. The asset-content index does not cover
 `wrappedFS.WalkDir`; it remains a named missing API. ReadFile coverage now
 comes from calling `BundledFs::read_file`, not its backing asset table.
 
-The same rule applies to existing artifacts. `data/s07/path-observations.json`
-and `semver-observations.json` look like Rust witnesses and are not: their
-producers run `go test` and never execute Rust. They are recorded as
-`native_authority`, which confers nothing; counting them would have reported 113
-operations covered on the strength of a Go-only run.
+The same rule applies to existing artifacts, with a correction F2a's survey
+forced. `data/s07/path-observations.json` and `semver-observations.json` look
+like Rust witnesses because of how they are produced, and on that reading they
+are not: their producers run `go test` and never execute Rust, so they are
+recorded as `native_authority`, and counting them on the producer's account
+would have reported 113 operations covered on the strength of a Go-only run.
+
+But a producer is not the only thing that can gate a port against an artifact.
+`crates/tsr_tspath/tests/go_observations.rs` *consumes* the frozen path
+observations: it compiles the 4,096 requests and their Go answers in with
+`include_str!`, calls `tsr_tspath` for each, and asserts the whole row equal, so
+`cargo test` gates eight tspath operations against them after all. That is
+recorded separately as `witness/s07-path-observations-rust`, `rust_gated`, and
+it names the eight the Go adapter actually drives and the Rust test actually
+calls rather than the artifact's whole 88-operation surface. The original
+`native_authority` entry stays, because the statement it makes about the
+producer is still true. `semver-observations.json` has no such consumer, so it
+is unchanged.
 
 | Disposition | Count |
 | --- | ---: |

@@ -13,6 +13,7 @@ docs/PHASE1-progress.md.
 from __future__ import annotations
 
 import hashlib
+import json
 import re
 from pathlib import Path
 
@@ -188,6 +189,98 @@ def pin() -> str:
     import json
 
     return json.loads((ROOT / "data/upstream.json").read_text())["pin"]
+
+
+EXCEPTIONS = ROOT / "data/phase1/baseline-exceptions.json"
+
+# The owner's amendment to the requirement that all 309 reference outputs be
+# reproduced exactly.
+#
+# A carried renderer can fail to reproduce a frozen baseline for three quite
+# different reasons, and collapsing them loses the only one worth acting on:
+#
+#   upstream            the frozen bytes and the pinned Go genuinely disagree,
+#                       because the baseline predates a change the port made.
+#                       Nothing we write can reconcile them without
+#                       reimplementing the TypeScript behavior the bytes came
+#                       from, which would fabricate agreement with something
+#                       that is not the pin.
+#   renderer_defect     our renderer is wrong and could produce the bytes.
+#   missing_observation the pin can produce it and the renderer does not ask.
+#
+# Only `upstream` may be excepted, only individually, and only with the pinned
+# line that establishes it. An exception is NOT a pass: the output keeps its
+# original file and hash, records what the pin actually produces, and is
+# counted in its own bucket. And it keeps its Go-versus-Rust semantic
+# comparison, because what the exception waives is the rendered byte
+# comparison, never the question of whether the port behaves like the pin.
+EXCEPTION_KINDS = ("upstream",)
+
+
+def exceptions() -> dict:
+    if not EXCEPTIONS.is_file():
+        return {"version": 1, "exceptions": []}
+    return json.loads(EXCEPTIONS.read_text())
+
+
+def exceptions_by_output() -> dict[str, dict]:
+    return {entry["output"]: entry for entry in exceptions().get("exceptions", [])}
+
+
+def exception_problems(index: dict) -> list[str]:
+    """Validate the exception ledger against the index it amends."""
+    document = exceptions()
+    problems: list[str] = []
+    if not EXCEPTIONS.is_file():
+        return problems
+    if document.get("pin") != pin():
+        problems.append(
+            f"baseline-exceptions.json records pin {document.get('pin')!r}, not {pin()!r}"
+        )
+    if not document.get("approved_by"):
+        problems.append("baseline-exceptions.json records no owner approval")
+    if not document.get("amends"):
+        problems.append(
+            "baseline-exceptions.json does not say which requirement it amends; an exception "
+            "that does not name what it changes is a quiet reinterpretation"
+        )
+    known = {
+        row["name"]: (group, row)
+        for group, committed in index.get("groups", {}).items()
+        for row in committed["outputs"]
+    }
+    seen: set[str] = set()
+    for entry in document.get("exceptions", []):
+        name = entry.get("output", "<unnamed>")
+        if name in seen:
+            problems.append(f"baseline-exceptions: duplicate entry for {name}")
+        seen.add(name)
+        if name not in known:
+            problems.append(f"baseline-exceptions: {name} is not an output in the committed index")
+            continue
+        group, row = known[name]
+        if entry.get("kind") not in EXCEPTION_KINDS:
+            problems.append(
+                f"baseline-exceptions: {name} has kind {entry.get('kind')!r}; only "
+                f"{', '.join(EXCEPTION_KINDS)} may be excepted, because the other attributions "
+                "name work rather than a fact about the baseline"
+            )
+        for field in ("reason", "evidence", "pin_produces", "baseline_records", "semantic_comparison"):
+            if not entry.get(field):
+                problems.append(f"baseline-exceptions: {name} records no {field}")
+        if entry.get("original_sha256") != row["sha256"]:
+            problems.append(
+                f"baseline-exceptions: {name} records a hash that is not the pin's, so the "
+                "original file it claims to retain is not the one indexed"
+            )
+        # An excepted output is not a passing one. Claiming both would put it in
+        # two buckets and inflate the verified count.
+        if row.get("rendering_verified"):
+            problems.append(
+                f"baseline-exceptions: {name} is excepted but the index also records its "
+                "rendering as verified; an exception is not a pass"
+            )
+    return problems
 
 
 def verify(index: dict) -> list[str]:
