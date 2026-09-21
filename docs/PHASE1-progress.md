@@ -1427,6 +1427,10 @@ No Rust implementation, compiler corpus or benchmark changed in this follow-up.
 
 ### F1b foundation completion — 2026-09-21
 
+This is the pre-review result. The ownership correction below supersedes the
+compiler-options representation and the exact-match count, retaining one
+owner-approved difference.
+
 F1b's prepared implementation scope is complete: **230 / 230 leaf cases match
 pinned Go**, with no missing operations, differences, unavailable observations or
 harness failures. This closes the 120 missing rows and the compiler-options
@@ -1556,3 +1560,48 @@ matching the tracker's generated-source model.
 
 Final checks: **681 Python tests and 1,210 subtests pass**, with one existing
 skip. E4 records **76,001 probes, zero failures**.
+
+### F1b aliasing audit and ownership correction — 2026-09-21
+
+The [completed audit](PHASE1-aliasing-audit.md) restores all nine compiler-option
+fields to owned containers/scalars and removes `SharedValue`. The owner approved
+the clone-isolation divergence; the original native observation remains intact.
+The broad sharing change had also broken `${configDir}` substitution: it changed
+the original through a clone, whereas Go copies the affected containers first.
+Regression tests now cover all nine fields and substitution isolation.
+
+The remaining `SharedSlice` users are the explicitly alias-observing generic
+helpers and multimap, their adapters, and tests. No production Rust compiler
+consumer uses them. The audit accounts for all fourteen slice-register cases
+and three multimap cases. Identity is used by real Go checker callers;
+mutation after retaining a multimap view is also independently observed. These
+contracts retain their existing sharing. The Go growth model remains confined
+to this opt-in compatibility API because two native traces observe its detach
+boundary through values. It no longer affects options or module resolution.
+Unused write-lock callback APIs were removed. No blanket aliasing waiver was
+introduced.
+
+Fresh full-family captures report **229 exact leaf matches / one approved
+difference**, with no missing, failed, unavailable or unrun cases. Only
+`leaves/options/clone-shares-pointer-backed-fields` changed its Rust observation;
+every other leaf observation is identical to the prior completion capture.
+The raw comparator still reports `different` and rejects `--require-parity`.
+The no-mutation control still agrees. Config remains **176 match / 299 missing /
+9 different**, with its entire Rust observation document unchanged.
+
+The archive is `data/phase1/captures/f1b-aliasing-audit.tar.gz`: 46 JSON files,
+507,451 compressed bytes, excluding binaries/build trees. Reproduction uses the
+same family capture/compare commands above, without `--require-parity` for the
+leaf family. SHA-256:
+
+- archive: `8cc1d88c85dadb40ddf7d06da9c8d6a0f9b09a4f580f3891f4c664def63d8fe8`
+- leaf provenance: `90b5593770aab7db83d352a390543351c7077f49d42f5bf045e163c3ff9c8f83`
+- config provenance: `8c20cf1f1b65ea294d69f3bbafdaf310bafdb832399c9d9e339a47967ebb9ba1`
+
+Validation: 37 core/options/module Rust tests; compiler and both driver builds;
+clippy on those packages and dependencies, all targets/features with warnings
+denied; fmt; 163 Phase 1 Python tests plus 30 subtests. The operation inventory
+moves 35 Rust mapping anchors only. Authenticated native source/loader replay
+preserves byte-identical selected cases and checker obligations. Historical
+correctness/performance captures are not re-certified; no benchmark or full
+checker corpus was run.

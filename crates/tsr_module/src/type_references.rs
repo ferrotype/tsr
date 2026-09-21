@@ -31,7 +31,7 @@ pub(super) struct TypeKey {
 /// port: tsc/internal/core/compileroptions.go:CompilerOptions.GetEffectiveTypeRoots
 pub fn effective_type_roots(options: &CompilerOptions, cwd: &[u8]) -> (Vec<JsString>, bool) {
     if let Some(roots) = &options.type_roots {
-        return (roots.to_vec(), true);
+        return (roots.clone(), true);
     }
     let base = if options.config_file_path.is_empty() {
         assert!(
@@ -387,11 +387,7 @@ impl Resolver {
     pub fn automatic_type_directive_names(&mut self) -> Result<Vec<JsString>, Error> {
         let options = self.options.clone();
         if !options.uses_wildcard_types() {
-            return Ok(options
-                .types
-                .as_ref()
-                .map(tsr_core::slices::SharedSlice::to_vec)
-                .unwrap_or_default());
+            return Ok(options.types.clone().unwrap_or_default());
         }
         let (roots, _) = effective_type_roots(&options, self.cwd.as_bytes());
         let mut wildcard = Vec::new();
@@ -433,7 +429,7 @@ impl Resolver {
             let names = if name.as_bytes() == b"*" {
                 wildcard.as_slice()
             } else {
-                std::slice::from_ref(&name)
+                std::slice::from_ref(name)
             };
             for name in names {
                 if seen.insert(name.clone()) {

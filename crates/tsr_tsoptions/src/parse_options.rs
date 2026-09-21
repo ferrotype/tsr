@@ -33,7 +33,7 @@ pub fn parse_string_map(value: &ConfigValue) -> Option<PathMappings> {
     value.as_object().map(|entries| {
         entries
             .iter()
-            .map(|(name, value)| (name.clone(), parse_string_array(value).map(Into::into)))
+            .map(|(name, value)| (name.clone(), parse_string_array(value)))
             .collect()
     })
 }
@@ -79,9 +79,7 @@ pub fn parse_compiler_options(key: &[u8], value: &ConfigValue, options: &mut Com
         b"baseUrl" => options.base_url = parse_string(value),
         b"build" => options.build = parse_tristate(value),
         b"checkJs" => options.check_js = parse_tristate(value),
-        b"customConditions" => {
-            options.custom_conditions = parse_string_array(value).map(Into::into);
-        }
+        b"customConditions" => options.custom_conditions = parse_string_array(value),
         b"composite" => options.composite = parse_tristate(value),
         b"declarationDir" => options.declaration_dir = parse_string(value),
         b"deduplicatePackages" => options.deduplicate_packages = parse_tristate(value),
@@ -126,7 +124,7 @@ pub fn parse_compiler_options(key: &[u8], value: &ConfigValue, options: &mut Com
         b"jsxFactory" => options.jsx_factory = parse_string(value),
         b"jsxFragmentFactory" => options.jsx_fragment_factory = parse_string(value),
         b"jsxImportSource" => options.jsx_import_source = parse_string(value),
-        b"lib" => options.lib = parse_string_array(value).map(Into::into),
+        b"lib" => options.lib = parse_string_array(value),
         b"libReplacement" => options.lib_replacement = parse_tristate(value),
         b"listEmittedFiles" => options.list_emitted_files = parse_tristate(value),
         b"listFiles" => options.list_files = parse_tristate(value),
@@ -137,7 +135,7 @@ pub fn parse_compiler_options(key: &[u8], value: &ConfigValue, options: &mut Com
         b"moduleResolution" => {
             options.module_resolution = tsr_core::ModuleResolutionKind(parse_enum(value));
         }
-        b"moduleSuffixes" => options.module_suffixes = parse_string_array(value).map(Into::into),
+        b"moduleSuffixes" => options.module_suffixes = parse_string_array(value),
         b"moduleDetection" | b"moduleDetectionKind" => {
             options.module_detection = tsr_core::ModuleDetectionKind(parse_enum(value));
         }
@@ -165,7 +163,7 @@ pub fn parse_compiler_options(key: &[u8], value: &ConfigValue, options: &mut Com
         }
         b"outFile" => options.out_file = parse_string(value),
         b"noResolve" => options.no_resolve = parse_tristate(value),
-        b"paths" => options.paths = parse_string_map(value).map(Into::into),
+        b"paths" => options.paths = parse_string_map(value),
         b"preserveWatchOutput" => options.preserve_watch_output = parse_tristate(value),
         b"preserveConstEnums" => options.preserve_const_enums = parse_tristate(value),
         b"preserveSymlinks" => options.preserve_symlinks = parse_tristate(value),
@@ -183,7 +181,7 @@ pub fn parse_compiler_options(key: &[u8], value: &ConfigValue, options: &mut Com
             options.rewrite_relative_import_extensions = parse_tristate(value);
         }
         b"rootDir" => options.root_dir = parse_string(value),
-        b"rootDirs" => options.root_dirs = parse_string_array(value).map(Into::into),
+        b"rootDirs" => options.root_dirs = parse_string_array(value),
         b"removeComments" => options.remove_comments = parse_tristate(value),
         b"stableTypeOrdering" => options.stable_type_ordering = parse_tristate(value),
         b"strict" => options.strict = parse_tristate(value),
@@ -204,8 +202,8 @@ pub fn parse_compiler_options(key: &[u8], value: &ConfigValue, options: &mut Com
         b"target" => options.target = tsr_core::ScriptTarget(parse_enum(value)),
         b"traceResolution" => options.trace_resolution = parse_tristate(value),
         b"tsBuildInfoFile" => options.ts_build_info_file = parse_string(value),
-        b"typeRoots" => options.type_roots = parse_string_array(value).map(Into::into),
-        b"types" => options.types = parse_string_array(value).map(Into::into),
+        b"typeRoots" => options.type_roots = parse_string_array(value),
+        b"types" => options.types = parse_string_array(value),
         b"useDefineForClassFields" => options.use_define_for_class_fields = parse_tristate(value),
         b"useUnknownInCatchVariables" => {
             options.use_unknown_in_catch_variables = parse_tristate(value);
@@ -214,9 +212,7 @@ pub fn parse_compiler_options(key: &[u8], value: &ConfigValue, options: &mut Com
         b"version" => options.version = parse_tristate(value),
         b"help" => options.help = parse_tristate(value),
         b"all" => options.all = parse_tristate(value),
-        b"maxNodeModuleJsDepth" => {
-            options.max_node_module_js_depth = parse_number(value).map(Into::into);
-        }
+        b"maxNodeModuleJsDepth" => options.max_node_module_js_depth = parse_number(value),
         b"skipLibCheck" => options.skip_lib_check = parse_tristate(value),
         b"noEmit" => options.no_emit = parse_tristate(value),
         b"showConfig" => options.show_config = parse_tristate(value),
@@ -229,7 +225,7 @@ pub fn parse_compiler_options(key: &[u8], value: &ConfigValue, options: &mut Com
         b"pprofDir" => options.pprof_dir = parse_string(value),
         b"singleThreaded" => options.single_threaded = parse_tristate(value),
         b"quiet" => options.quiet = parse_tristate(value),
-        b"checkers" => options.checkers = parse_number(value).map(Into::into),
+        b"checkers" => options.checkers = parse_number(value),
         b"runExternalCode" => options.run_external_code = parse_tristate(value),
         _ => {}
     }

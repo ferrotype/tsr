@@ -284,13 +284,7 @@ impl<'a> Loader<'a> {
         }
         self.config.root_file_names = roots;
         while let Some(task) = self.pending.pop() {
-            if task.elide
-                && task.depth
-                    > self
-                        .options
-                        .max_node_module_js_depth
-                        .as_ref()
-                        .map_or(0, tsr_core::shared::SharedValue::get)
+            if task.elide && task.depth > self.options.max_node_module_js_depth.unwrap_or_default()
             {
                 continue;
             }

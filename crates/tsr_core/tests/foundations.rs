@@ -2,28 +2,71 @@ use tsr_core::{helpers, slices::SharedSlice, CompilerOptions};
 use tsr_jsstring::JsString;
 
 #[test]
-fn option_clone_retains_pointees_but_replacing_a_field_does_not() {
+fn option_clone_isolates_all_nine_formerly_shared_fields() {
+    let text = || vec![JsString::from_bytes(b"original".as_slice())];
     let mut source = CompilerOptions {
-        checkers: Some(3.into()),
-        types: Some(vec![JsString::from_bytes(b"a".as_slice())].into()),
+        checkers: Some(3),
+        max_node_module_js_depth: Some(2),
+        types: Some(text()),
+        lib: Some(text()),
+        custom_conditions: Some(text()),
+        module_suffixes: Some(text()),
+        root_dirs: Some(text()),
+        type_roots: Some(text()),
+        paths: Some(
+            [(JsString::from_bytes(b"*".as_slice()), Some(text()))]
+                .into_iter()
+                .collect(),
+        ),
         ..Default::default()
     };
-    let copy = source.clone();
-    source.checkers.as_ref().unwrap().set(7);
+    let copy = std::sync::Arc::new(source.clone());
+    *source.checkers.as_mut().unwrap() = 7;
+    *source.max_node_module_js_depth.as_mut().unwrap() = 9;
+    for field in [
+        &mut source.types,
+        &mut source.lib,
+        &mut source.custom_conditions,
+        &mut source.module_suffixes,
+        &mut source.root_dirs,
+        &mut source.type_roots,
+    ] {
+        field.as_mut().unwrap()[0] = JsString::from_bytes(b"changed".as_slice());
+        field
+            .as_mut()
+            .unwrap()
+            .push(JsString::from_bytes(b"appended".as_slice()));
+    }
     source
-        .types
+        .paths
         .as_mut()
         .unwrap()
-        .set(0, JsString::from_bytes(b"b".as_slice()));
-    assert_eq!(copy.checkers.as_ref().unwrap().get(), 7);
+        .get_mut(b"*".as_slice())
+        .unwrap()
+        .as_mut()
+        .unwrap()[0] = JsString::from_bytes(b"changed".as_slice());
+    source
+        .paths
+        .as_mut()
+        .unwrap()
+        .insert(JsString::from_bytes(b"extra".as_slice()), None);
+    assert_eq!(copy.checkers, Some(3));
+    assert_eq!(copy.max_node_module_js_depth, Some(2));
+    for field in [
+        &copy.types,
+        &copy.lib,
+        &copy.custom_conditions,
+        &copy.module_suffixes,
+        &copy.root_dirs,
+        &copy.type_roots,
+    ] {
+        assert_eq!(field.as_ref().unwrap(), &text());
+    }
+    assert_eq!(copy.paths.as_ref().unwrap().len(), 1);
     assert_eq!(
-        copy.types.as_ref().unwrap().first().unwrap().as_bytes(),
-        b"b"
+        copy.paths.as_ref().unwrap().get(b"*".as_slice()),
+        Some(&Some(text()))
     );
-    source.checkers = Some(11.into());
-    source.types = None;
-    assert_eq!(copy.checkers.unwrap().get(), 7);
-    assert_eq!(copy.types.unwrap().len(), 1);
 }
 
 #[test]

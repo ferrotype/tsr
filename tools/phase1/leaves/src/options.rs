@@ -22,7 +22,6 @@
 use std::panic::AssertUnwindSafe;
 
 use serde_json::{json, Value};
-use tsr_core::{shared::SharedValue, slices::SharedSlice};
 use tsr_core::{CompilerOptions, ModuleKind, PathMappings, Tristate};
 use tsr_core::{JsxEmit, ModuleResolutionKind, NewLineKind};
 use tsr_jsstring::JsString;
@@ -70,8 +69,8 @@ macro_rules! field_get {
         texts_value(($slot).as_ref())
     };
     (count, $slot:expr) => {
-        match $slot.as_ref() {
-            Some(value) => json!(value.get()),
+        match $slot {
+            Some(value) => json!(value),
             None => Value::Null,
         }
     };
@@ -478,20 +477,21 @@ fn clone_roster(trace: &[Value]) -> Result<Vec<Value>, String> {
                 })
             }
             "clone_then_mutate_source" => {
-                // Both the pointer and slice backing are shared by the pinned
-                // shallow clone; replacing the field itself would not test it.
+                // The pinned Clone copies a pointer-backed field as the pointer
+                // and a slice as its header, so a write through the source
+                // afterwards is visible in the clone. The derived Clone here
+                // owns its data, so it is not. The field comparison above
+                // cannot see the difference, because at the instant of the
+                // clone the two agree.
                 let (mut source, applied) = build(action)?;
                 let copy = source.clone();
-                if let Some(checkers) = &source.checkers {
-                    checkers.set(action_i64(action, "mutate_checkers") as isize);
+                if source.checkers.is_some() {
+                    source.checkers = Some(action_i64(action, "mutate_checkers") as isize);
                 }
                 if let Some(types) = source.types.as_mut() {
-                    if !types.is_empty() {
-                        types.set(
-                            0,
-                            JsString::from_bytes(
-                                action_str(action, "mutate_type").as_bytes().to_vec(),
-                            ),
+                    if let Some(first) = types.first_mut() {
+                        *first = JsString::from_bytes(
+                            action_str(action, "mutate_type").as_bytes().to_vec(),
                         );
                     }
                 }
@@ -569,18 +569,17 @@ fn text(value: &[u8]) -> Value {
     Value::String(String::from_utf8_lossy(value).into_owned())
 }
 
-fn texts_value(slot: Option<&SharedSlice<JsString>>) -> Value {
+fn texts_value(slot: Option<&Vec<JsString>>) -> Value {
     match slot {
         Some(items) => Value::Array(items.iter().map(|item| text(item.as_bytes())).collect()),
         None => Value::Null,
     }
 }
 
-fn paths_value(slot: Option<&SharedValue<PathMappings>>) -> Value {
+fn paths_value(slot: Option<&PathMappings>) -> Value {
     match slot {
         Some(entries) => Value::Array(
             entries
-                .read()
                 .iter()
                 .map(|(key, values)| json!([text(key.as_bytes()), texts_value(values.as_ref())]))
                 .collect(),
@@ -624,7 +623,7 @@ fn set_text(slot: &mut JsString, value: &Value) -> Result<(), String> {
 
 /// A Go `[]string` option. `null` is the nil slice and `[]` the empty non-nil
 /// one, which several getters tell apart.
-fn set_texts(slot: &mut Option<SharedSlice<JsString>>, value: &Value) -> Result<(), String> {
+fn set_texts(slot: &mut Option<Vec<JsString>>, value: &Value) -> Result<(), String> {
     if value.is_null() {
         *slot = None;
         return Ok(());
@@ -636,11 +635,11 @@ fn set_texts(slot: &mut Option<SharedSlice<JsString>>, value: &Value) -> Result<
     for item in items {
         out.push(as_text("a string-list option", item)?);
     }
-    *slot = Some(out.into());
+    *slot = Some(out);
     Ok(())
 }
 
-fn set_count(slot: &mut Option<SharedValue<isize>>, value: &Value) -> Result<(), String> {
+fn set_count(slot: &mut Option<isize>, value: &Value) -> Result<(), String> {
     if value.is_null() {
         *slot = None;
         return Ok(());
@@ -648,15 +647,14 @@ fn set_count(slot: &mut Option<SharedValue<isize>>, value: &Value) -> Result<(),
     let number = as_i64("a count option", value)?;
     *slot = Some(
         isize::try_from(number)
-            .map_err(|_| format!("count {number} is outside the machine int it is stored in"))?
-            .into(),
+            .map_err(|_| format!("count {number} is outside the machine int it is stored in"))?,
     );
     Ok(())
 }
 
 /// The `paths` map, carried as an entry list so its insertion order survives
 /// the request and a nil value list stays distinguishable from an empty one.
-fn set_paths(slot: &mut Option<SharedValue<PathMappings>>, value: &Value) -> Result<(), String> {
+fn set_paths(slot: &mut Option<PathMappings>, value: &Value) -> Result<(), String> {
     if value.is_null() {
         *slot = None;
         return Ok(());
@@ -681,11 +679,11 @@ fn set_paths(slot: &mut Option<SharedValue<PathMappings>>, value: &Value) -> Res
             for item in items {
                 values.push(as_text("a `paths` value", item)?);
             }
-            Some(values.into())
+            Some(values)
         };
         out.insert(key, values);
     }
-    *slot = Some(out.into());
+    *slot = Some(out);
     Ok(())
 }
 

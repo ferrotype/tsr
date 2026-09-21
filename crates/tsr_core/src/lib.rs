@@ -210,5 +210,3 @@ pub mod helpers;
 mod names;
 mod ranges;
 pub mod slices;
-
-pub mod shared;

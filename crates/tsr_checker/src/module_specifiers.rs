@@ -296,7 +296,7 @@ impl Generation<'_> {
             .filter(|_| paths_only || non_relative.is_empty())
         {
             non_relative =
-                self.module_name_from_paths(&relative_to_base, &paths.read(), &endings, &base)?;
+                self.module_name_from_paths(&relative_to_base, paths, &endings, &base)?;
         }
         if paths_only {
             return Ok(non_relative);

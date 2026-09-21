@@ -16,7 +16,7 @@ fn paths_mappings_do_not_intercept_relative_backslash_imports() {
             paths: Some(
                 [(
                     JsString::from_bytes(b"*".as_slice()),
-                    Some(vec![JsString::from_bytes(b"/mapped.ts".as_slice())].into()),
+                    Some(vec![JsString::from_bytes(b"/mapped.ts".as_slice())]),
                 )]
                 .into_iter()
                 .collect(),
@@ -62,7 +62,7 @@ fn paths_keep_source_order_on_equal_prefixes_but_exact_matches_win() {
     .map(|(key, path)| {
         (
             JsString::from_bytes(key.as_bytes()),
-            Some(vec![JsString::from_bytes(path.as_bytes())].into()),
+            Some(vec![JsString::from_bytes(path.as_bytes())]),
         )
     })
     .collect();

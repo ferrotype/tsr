@@ -29122,11 +29122,11 @@
       ]
     },
     {
-      "expected_contract": "Pins that the pinned Clone is shallow where the field is pointer backed or a slice: after cloning, a write through the source's *int and through the first element of its []string is read back by the clone. The port's derived Clone owns its data and does not see either write, so this case is expected to report `different` until F1b decides how the port represents a shared option field. The third action sets neither field, so the mutation is a no-op there and both sides agree, which keeps the difference attributable to the sharing rather than to the action.",
+      "expected_contract": "The pinned Clone shallow-copies pointer and slice fields; Rust intentionally owns independent option containers. Source mutation after cloning is visible to the Go clone and invisible to the Rust clone. The owner approved this bounded ownership divergence on 2026-09-21; see docs/PHASE1-aliasing-audit.md. Keep the native observation and raw different result. The no-mutation control must still agree; this is not permission to ignore other option values, order, nilness, or compiler behavior.",
       "family": "leaves",
       "host_applicability": "any",
       "id": "leaves/options/clone-shares-pointer-backed-fields",
-      "last_result": "match",
+      "last_result": "different",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operation_actions": {
         "clone_then_mutate_source": [

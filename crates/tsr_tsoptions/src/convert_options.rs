@@ -261,7 +261,7 @@ pub fn default_compiler_options(config_file_name: &[u8]) -> CompilerOptions {
     let mut options = CompilerOptions::default();
     if tsr_tspath::base_name(config_file_name) == b"jsconfig.json" {
         options.allow_js = Tristate::TRUE;
-        options.max_node_module_js_depth = Some(2.into());
+        options.max_node_module_js_depth = Some(2);
         options.skip_lib_check = Tristate::TRUE;
         options.no_emit = Tristate::TRUE;
     }

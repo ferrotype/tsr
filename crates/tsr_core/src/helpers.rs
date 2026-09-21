@@ -1,3 +1,7 @@
+//! Slice-header compatibility helpers; see docs/PHASE1-aliasing-audit.md.
+//! Identity-returning operations intentionally retain mutable backing. Ordinary
+//! production transforms should use borrows/owned results and an explicit
+//! changed flag where those preserve their caller contract.
 use crate::slices::{GoSliceElement, SharedSlice};
 
 /// port: tsc/internal/core/core.go:Filter

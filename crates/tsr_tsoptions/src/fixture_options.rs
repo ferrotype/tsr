@@ -318,9 +318,9 @@ pub fn apply_fixture_settings(
         .into_iter()
         .flatten()
     {
-        values.update_each(|value| {
+        for value in values {
             *value = JsString::from_bytes(tsr_tspath::absolute(value.as_bytes(), cwd));
-        });
+        }
     }
     Ok((case_sensitive, errors))
 }

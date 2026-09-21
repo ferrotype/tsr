@@ -75,7 +75,7 @@ pub fn compiler_options(value: &Value) -> Result<CompilerOptions, Error> {
                     None => Tristate::UNKNOWN,
                 }
             }
-            "customConditions" => result.custom_conditions = Some(texts(value, key)?.into()),
+            "customConditions" => result.custom_conditions = Some(texts(value, key)?),
             "composite" => {
                 result.composite = match value.as_bool() {
                     Some(value) => Tristate::from(value),
@@ -225,7 +225,7 @@ pub fn compiler_options(value: &Value) -> Result<CompilerOptions, Error> {
             "jsxFactory" => result.jsx_factory = text(value, key)?,
             "jsxFragmentFactory" => result.jsx_fragment_factory = text(value, key)?,
             "jsxImportSource" => result.jsx_import_source = text(value, key)?,
-            "lib" => result.lib = Some(texts(value, key)?.into()),
+            "lib" => result.lib = Some(texts(value, key)?),
             "libReplacement" => {
                 result.lib_replacement = match value.as_bool() {
                     Some(value) => Tristate::from(value),
@@ -246,7 +246,7 @@ pub fn compiler_options(value: &Value) -> Result<CompilerOptions, Error> {
                         .map_err(|_| Error::InvalidField(key.clone()))?,
                 );
             }
-            "moduleSuffixes" => result.module_suffixes = Some(texts(value, key)?.into()),
+            "moduleSuffixes" => result.module_suffixes = Some(texts(value, key)?),
             "moduleDetection" => {
                 result.module_detection = ModuleDetectionKind(
                     i32::try_from(integer(value, key)?)
@@ -374,7 +374,7 @@ pub fn compiler_options(value: &Value) -> Result<CompilerOptions, Error> {
                                 if value.is_null() {
                                     None
                                 } else {
-                                    Some(texts(value, key)?.into())
+                                    Some(texts(value, key)?)
                                 },
                             ))
                         })
@@ -426,7 +426,7 @@ pub fn compiler_options(value: &Value) -> Result<CompilerOptions, Error> {
             }
             "reactNamespace" => result.react_namespace = text(value, key)?,
             "rootDir" => result.root_dir = text(value, key)?,
-            "rootDirs" => result.root_dirs = Some(texts(value, key)?.into()),
+            "rootDirs" => result.root_dirs = Some(texts(value, key)?),
             "skipLibCheck" => {
                 result.skip_lib_check = match value.as_bool() {
                     Some(value) => Tristate::from(value),
@@ -513,8 +513,8 @@ pub fn compiler_options(value: &Value) -> Result<CompilerOptions, Error> {
                 }
             }
             "tsBuildInfoFile" => result.ts_build_info_file = text(value, key)?,
-            "typeRoots" => result.type_roots = Some(texts(value, key)?.into()),
-            "types" => result.types = Some(texts(value, key)?.into()),
+            "typeRoots" => result.type_roots = Some(texts(value, key)?),
+            "types" => result.types = Some(texts(value, key)?),
             "useDefineForClassFields" => {
                 result.use_define_for_class_fields = match value.as_bool() {
                     Some(value) => Tristate::from(value),
@@ -536,8 +536,7 @@ pub fn compiler_options(value: &Value) -> Result<CompilerOptions, Error> {
             "maxNodeModuleJsDepth" => {
                 result.max_node_module_js_depth = Some(
                     isize::try_from(integer(value, key)?)
-                        .map_err(|_| Error::InvalidField(key.clone()))?
-                        .into(),
+                        .map_err(|_| Error::InvalidField(key.clone()))?,
                 );
             }
             "allowSyntheticDefaultImports" => {
@@ -688,8 +687,7 @@ pub fn compiler_options(value: &Value) -> Result<CompilerOptions, Error> {
             "checkers" => {
                 result.checkers = Some(
                     isize::try_from(integer(value, key)?)
-                        .map_err(|_| Error::InvalidField(key.clone()))?
-                        .into(),
+                        .map_err(|_| Error::InvalidField(key.clone()))?,
                 );
             }
             _ => return Err(Error::UnknownField(key.clone())),

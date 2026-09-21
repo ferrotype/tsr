@@ -888,6 +888,6 @@ pub fn get_conditions(options: &CompilerOptions, mut mode: ModuleKind) -> Vec<Js
     if resolution != ModuleResolutionKind::BUNDLER {
         result.push(JsString::from_bytes(b"node".as_slice()));
     }
-    result.extend(options.custom_conditions.iter().flatten());
+    result.extend(options.custom_conditions.iter().flatten().cloned());
     result
 }

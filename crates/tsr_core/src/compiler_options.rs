@@ -1,5 +1,4 @@
 //! Immutable-input compiler option values from the pinned core package.
-use crate::{shared::SharedValue, slices::SharedSlice};
 use crate::{ScriptTarget, Tristate};
 use tsr_jsstring::JsString;
 
@@ -58,12 +57,12 @@ impl NewLineKind {
 }
 pub type ResolutionMode = ModuleKind;
 
-pub type PathMappings = crate::collections::OrderedMap<JsString, Option<SharedSlice<JsString>>>;
+pub type PathMappings = crate::collections::OrderedMap<JsString, Option<Vec<JsString>>>;
 
 /// Slices preserve nil versus nonnil empty; paths preserve insertion order.
-/// The derived Clone is the pinned reflective CompilerOptions.Clone: scalar
-/// fields copy, slice headers retain their backing, and pointer fields retain
-/// their pointee. Mutating a pointee differs from replacing a field.
+/// Cloning owns independent option containers, unlike Go's shallow pointer and
+/// slice-header copy. This owner-approved difference keeps published program
+/// inputs immutable; see docs/PHASE1-aliasing-audit.md.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct CompilerOptions {
     pub allow_js: Tristate,
@@ -75,7 +74,7 @@ pub struct CompilerOptions {
     pub allow_unused_labels: Tristate,
     pub assume_changes_only_affect_direct_dependencies: Tristate,
     pub check_js: Tristate,
-    pub custom_conditions: Option<SharedSlice<JsString>>,
+    pub custom_conditions: Option<Vec<JsString>>,
     pub composite: Tristate,
     pub emit_declaration_only: Tristate,
     pub emit_bom: Tristate,
@@ -105,13 +104,13 @@ pub struct CompilerOptions {
     pub jsx_factory: JsString,
     pub jsx_fragment_factory: JsString,
     pub jsx_import_source: JsString,
-    pub lib: Option<SharedSlice<JsString>>,
+    pub lib: Option<Vec<JsString>>,
     pub lib_replacement: Tristate,
     pub locale: JsString,
     pub map_root: JsString,
     pub module: ModuleKind,
     pub module_resolution: ModuleResolutionKind,
-    pub module_suffixes: Option<SharedSlice<JsString>>,
+    pub module_suffixes: Option<Vec<JsString>>,
     pub module_detection: ModuleDetectionKind,
     pub new_line: NewLineKind,
     pub no_emit: Tristate,
@@ -132,7 +131,7 @@ pub struct CompilerOptions {
     pub no_implicit_override: Tristate,
     pub no_unchecked_side_effect_imports: Tristate,
     pub out_dir: JsString,
-    pub paths: Option<SharedValue<PathMappings>>,
+    pub paths: Option<PathMappings>,
     pub preserve_const_enums: Tristate,
     pub preserve_symlinks: Tristate,
     pub project: JsString,
@@ -143,7 +142,7 @@ pub struct CompilerOptions {
     pub rewrite_relative_import_extensions: Tristate,
     pub react_namespace: JsString,
     pub root_dir: JsString,
-    pub root_dirs: Option<SharedSlice<JsString>>,
+    pub root_dirs: Option<Vec<JsString>>,
     pub skip_lib_check: Tristate,
     pub stable_type_ordering: Tristate,
     pub strict: Tristate,
@@ -160,12 +159,12 @@ pub struct CompilerOptions {
     pub target: ScriptTarget,
     pub trace_resolution: Tristate,
     pub ts_build_info_file: JsString,
-    pub type_roots: Option<SharedSlice<JsString>>,
-    pub types: Option<SharedSlice<JsString>>,
+    pub type_roots: Option<Vec<JsString>>,
+    pub types: Option<Vec<JsString>>,
     pub use_define_for_class_fields: Tristate,
     pub use_unknown_in_catch_variables: Tristate,
     pub verbatim_module_syntax: Tristate,
-    pub max_node_module_js_depth: Option<SharedValue<isize>>,
+    pub max_node_module_js_depth: Option<isize>,
     pub allow_synthetic_default_imports: Tristate,
     pub always_strict: Tristate,
     pub base_url: JsString,
@@ -196,7 +195,7 @@ pub struct CompilerOptions {
     pub pprof_dir: JsString,
     pub single_threaded: Tristate,
     pub quiet: Tristate,
-    pub checkers: Option<SharedValue<isize>>,
+    pub checkers: Option<isize>,
 }
 
 impl CompilerOptions {
@@ -355,11 +354,7 @@ impl CompilerOptions {
     }
     /// port: tsc/internal/core/compileroptions.go:CompilerOptions.GetPathsBasePath
     pub fn paths_base_path<'a>(&'a self, current_directory: &'a [u8]) -> &'a [u8] {
-        if self
-            .paths
-            .as_ref()
-            .is_none_or(|paths| paths.read().is_empty())
-        {
+        if self.paths.as_ref().is_none_or(PathMappings::is_empty) {
             b""
         } else if !self.paths_base_path.is_empty() {
             self.paths_base_path.as_bytes()

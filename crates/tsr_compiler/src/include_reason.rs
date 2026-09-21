@@ -279,7 +279,8 @@ impl IncludeReason {
                         .as_ref()
                         .expect("explicit library list")
                         .get(*index)
-                        .expect("library index"),
+                        .expect("library index")
+                        .clone(),
                 );
                 d::Library_0_specified_in_compilerOptions
             }
@@ -381,7 +382,6 @@ impl IncludeReason {
             return Ok(None);
         };
         let options = program.options();
-        let libraries = options.lib.as_ref().map(|values| values.read());
         let selection = match &self.data {
             IncludeReasonData::Root { index } => {
                 let file_name = path::absolute(
@@ -417,7 +417,7 @@ impl IncludeReason {
             IncludeReasonData::Lib { index: Some(index) } => Some((
                 program.include_explanations.compiler_options(program),
                 b"lib".as_slice(),
-                libraries.as_ref().expect("explicit library list")[*index].as_bytes(),
+                options.lib.as_ref().expect("explicit library list")[*index].as_bytes(),
                 d::File_is_library_specified_here,
             )),
             IncludeReasonData::Lib { index: None } => {

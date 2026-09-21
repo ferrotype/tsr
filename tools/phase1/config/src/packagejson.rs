@@ -371,10 +371,7 @@ fn render_mappings(paths: &tsr_core::PathMappings) -> Vec<Value> {
     paths
         .iter()
         .map(|(key, values)| match values {
-            Some(values) => json!([
-                text(key),
-                values.iter().map(|value| text(&value)).collect::<Vec<_>>()
-            ]),
+            Some(values) => json!([text(key), values.iter().map(text).collect::<Vec<_>>()]),
             // The pin cannot produce this: GetPaths always stores a slice. It
             // is rendered rather than flattened so a port that lost the values
             // is visible instead of looking empty.

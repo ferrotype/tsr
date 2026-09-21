@@ -296,8 +296,7 @@ fn initial_options(v: &mut Verifier<'_>, options: &CompilerOptions) {
 }
 
 fn path_and_emit_options(v: &mut Verifier<'_>, options: &CompilerOptions) {
-    let paths = options.paths.as_ref().map(|value| value.read());
-    for (key, values) in paths.as_deref().into_iter().flatten() {
+    for (key, values) in options.paths.iter().flatten() {
         let key = key.as_bytes();
         if !has_zero_or_one_asterisk(key) {
             v.path(
@@ -316,10 +315,7 @@ fn path_and_emit_options(v: &mut Verifier<'_>, options: &CompilerOptions) {
                 d::Substitutions_for_pattern_0_should_be_an_array,
                 &[key],
             );
-        } else if values
-            .as_ref()
-            .is_some_and(tsr_core::slices::SharedSlice::is_empty)
-        {
+        } else if values.as_ref().is_some_and(Vec::is_empty) {
             v.path(
                 false,
                 key,

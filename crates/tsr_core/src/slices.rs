@@ -1,6 +1,10 @@
 //! Retained slice headers for ports where identity, aliasing and nil are part
 //! of the API. Ordinary slices/Vec remain preferable when those properties
 //! are not observable. Cloning this handle retains the backing and range.
+//!
+//! This is an opt-in compatibility API, not storage for compiler options or
+//! published program inputs. See docs/PHASE1-aliasing-audit.md for the audited
+//! callers and native witnesses. Drop read guards before mutating an alias.
 use std::{
     ops::{Deref, Range},
     sync::{Arc, RwLock, RwLockReadGuard},
@@ -121,27 +125,6 @@ impl<T> SharedSlice<T> {
             }),
             start: self.start,
             len: self.len,
-        }
-    }
-    /// Mutation callbacks must not recursively read or write this backing.
-    pub fn update<R>(&mut self, update: impl FnOnce(&mut [T]) -> R) -> R {
-        if let Some(backing) = &self.backing {
-            let mut values = backing
-                .write()
-                .unwrap_or_else(std::sync::PoisonError::into_inner);
-            update(&mut values[self.start..self.start + self.len])
-        } else {
-            update(&mut [])
-        }
-    }
-    pub fn update_each(&mut self, mut update: impl FnMut(&mut T)) {
-        if let Some(backing) = &self.backing {
-            let mut values = backing
-                .write()
-                .unwrap_or_else(std::sync::PoisonError::into_inner);
-            for value in &mut values[self.start..self.start + self.len] {
-                update(value);
-            }
         }
     }
     #[must_use]

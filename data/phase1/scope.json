@@ -135970,7 +135970,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "packaged library access",
       "roster": {
@@ -136478,7 +136478,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "packaged library access",
       "roster": {
@@ -136516,7 +136516,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "packaged library access",
       "roster": {
@@ -136740,7 +136740,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "packaged library access",
       "roster": {
@@ -136852,7 +136852,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "packaged library access",
       "roster": {
@@ -136890,7 +136890,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "packaged library access",
       "roster": {
@@ -136928,7 +136928,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "packaged library access",
       "roster": {
@@ -137473,7 +137473,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -137508,7 +137508,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -137541,7 +137541,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -137576,7 +137576,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -137611,7 +137611,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -137645,7 +137645,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -137680,7 +137680,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -137713,7 +137713,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -137746,7 +137746,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -137779,7 +137779,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -137812,7 +137812,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -138458,7 +138458,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -139000,7 +139000,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -139033,7 +139033,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -139069,7 +139069,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -139102,7 +139102,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -139136,7 +139136,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -139170,7 +139170,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -139204,7 +139204,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -139239,7 +139239,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -139273,7 +139273,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -139307,7 +139307,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -139341,7 +139341,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -139377,7 +139377,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -139412,7 +139412,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -139446,7 +139446,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -139480,7 +139480,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -139513,7 +139513,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -139546,7 +139546,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -139579,7 +139579,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -139613,7 +139613,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -139647,7 +139647,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -139681,7 +139681,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -139715,7 +139715,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -139750,7 +139750,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -139785,7 +139785,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -139820,7 +139820,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -139853,7 +139853,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -139886,7 +139886,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -139919,7 +139919,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -139952,7 +139952,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -139985,7 +139985,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -140018,7 +140018,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -140051,7 +140051,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -140084,7 +140084,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -140117,7 +140117,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -163456,11 +163456,10 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "witnessed by 2 exact link(s): leaves/options/clone-field-roster, leaves/options/clone-shares-pointer-backed-fields",
+      "basis": "witnessed by 1 exact link(s): leaves/options/clone-field-roster",
       "basis_kind": "rule",
       "cases": [
-        "leaves/options/clone-field-roster",
-        "leaves/options/clone-shares-pointer-backed-fields"
+        "leaves/options/clone-field-roster"
       ],
       "depends_on": [
         "internal/collections",
@@ -164451,7 +164450,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "core helpers and option semantics",
       "roster": {
@@ -164571,7 +164570,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "core helpers and option semantics",
       "roster": {
@@ -164611,7 +164610,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "core helpers and option semantics",
       "roster": {
@@ -164861,7 +164860,7 @@
         "run.e4.utf16_positions == true",
         "run.scanner.regexp_parity == 1"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "core helpers and option semantics",
       "roster": {
@@ -165153,7 +165152,7 @@
         "run.e4.utf16_positions == true",
         "run.scanner.regexp_parity == 1"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "core helpers and option semantics",
       "roster": {
@@ -165197,7 +165196,7 @@
         "run.e4.utf16_positions == true",
         "run.scanner.regexp_parity == 1"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "core helpers and option semantics",
       "roster": {
@@ -165321,7 +165320,7 @@
         "run.e4.utf16_positions == true",
         "run.scanner.regexp_parity == 1"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "core helpers and option semantics",
       "roster": {
@@ -165651,7 +165650,7 @@
         "run.e4.utf16_positions == true",
         "run.scanner.regexp_parity == 1"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "core helpers and option semantics",
       "roster": {
@@ -165775,7 +165774,7 @@
         "run.e4.utf16_positions == true",
         "run.scanner.regexp_parity == 1"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "core helpers and option semantics",
       "roster": {
@@ -165819,7 +165818,7 @@
         "run.e4.utf16_positions == true",
         "run.scanner.regexp_parity == 1"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "core helpers and option semantics",
       "roster": {
@@ -165863,7 +165862,7 @@
         "run.e4.utf16_positions == true",
         "run.scanner.regexp_parity == 1"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "core helpers and option semantics",
       "roster": {
@@ -166027,7 +166026,7 @@
         "run.e4.utf16_positions == true",
         "run.scanner.regexp_parity == 1"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "core helpers and option semantics",
       "roster": {
@@ -166151,7 +166150,7 @@
         "run.e4.utf16_positions == true",
         "run.scanner.regexp_parity == 1"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "core helpers and option semantics",
       "roster": {
@@ -166196,7 +166195,7 @@
         "run.e4.utf16_positions == true",
         "run.scanner.regexp_parity == 1"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "core helpers and option semantics",
       "roster": {
@@ -166496,7 +166495,7 @@
         "run.e4.utf16_positions == true",
         "run.scanner.regexp_parity == 1"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "core helpers and option semantics",
       "roster": {
@@ -166622,7 +166621,7 @@
         "run.e4.utf16_positions == true",
         "run.scanner.regexp_parity == 1"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "core helpers and option semantics",
       "roster": {
@@ -166666,7 +166665,7 @@
         "run.e4.utf16_positions == true",
         "run.scanner.regexp_parity == 1"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "core helpers and option semantics",
       "roster": {
@@ -166710,7 +166709,7 @@
         "run.e4.utf16_positions == true",
         "run.scanner.regexp_parity == 1"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "core helpers and option semantics",
       "roster": {
@@ -166754,7 +166753,7 @@
         "run.e4.utf16_positions == true",
         "run.scanner.regexp_parity == 1"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "core helpers and option semantics",
       "roster": {
@@ -166838,7 +166837,7 @@
         "run.e4.utf16_positions == true",
         "run.scanner.regexp_parity == 1"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "core helpers and option semantics",
       "roster": {
@@ -166922,7 +166921,7 @@
         "run.e4.utf16_positions == true",
         "run.scanner.regexp_parity == 1"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "core helpers and option semantics",
       "roster": {
@@ -167006,7 +167005,7 @@
         "run.e4.utf16_positions == true",
         "run.scanner.regexp_parity == 1"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "core helpers and option semantics",
       "roster": {
@@ -167142,7 +167141,7 @@
         "run.e4.utf16_positions == true",
         "run.scanner.regexp_parity == 1"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "core helpers and option semantics",
       "roster": {
@@ -167186,7 +167185,7 @@
         "run.e4.utf16_positions == true",
         "run.scanner.regexp_parity == 1"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "core helpers and option semantics",
       "roster": {
@@ -167310,7 +167309,7 @@
         "run.e4.utf16_positions == true",
         "run.scanner.regexp_parity == 1"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "core helpers and option semantics",
       "roster": {
@@ -167354,7 +167353,7 @@
         "run.e4.utf16_positions == true",
         "run.scanner.regexp_parity == 1"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "core helpers and option semantics",
       "roster": {
@@ -167607,7 +167606,7 @@
         "run.e4.utf16_positions == true",
         "run.scanner.regexp_parity == 1"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "core helpers and option semantics",
       "roster": {
@@ -168802,7 +168801,7 @@
       "ledger_verification": [
         "run.scanner.parity == 1"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "core helpers and option semantics",
       "roster": {
@@ -168886,7 +168885,7 @@
       "ledger_verification": [
         "run.scanner.parity == 1"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "core helpers and option semantics",
       "roster": {
@@ -168927,7 +168926,7 @@
       "ledger_verification": [
         "run.scanner.parity == 1"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "core helpers and option semantics",
       "roster": {
@@ -168968,7 +168967,7 @@
       "ledger_verification": [
         "run.scanner.parity == 1"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "core helpers and option semantics",
       "roster": {
@@ -169009,7 +169008,7 @@
       "ledger_verification": [
         "run.scanner.parity == 1"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "core helpers and option semantics",
       "roster": {
@@ -169093,7 +169092,7 @@
       "ledger_verification": [
         "run.scanner.parity == 1"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "core helpers and option semantics",
       "roster": {
@@ -169134,7 +169133,7 @@
       "ledger_verification": [
         "run.scanner.parity == 1"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "core helpers and option semantics",
       "roster": {
@@ -169217,7 +169216,7 @@
       "ledger_verification": [
         "run.scanner.parity == 1"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "core helpers and option semantics",
       "roster": {
@@ -169301,7 +169300,7 @@
       "ledger_verification": [
         "run.scanner.parity == 1"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "core helpers and option semantics",
       "roster": {
@@ -169342,7 +169341,7 @@
       "ledger_verification": [
         "run.scanner.parity == 1"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "core helpers and option semantics",
       "roster": {
@@ -169383,7 +169382,7 @@
       "ledger_verification": [
         "run.scanner.parity == 1"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "core helpers and option semantics",
       "roster": {
@@ -169755,7 +169754,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "core helpers and option semantics",
       "roster": {
@@ -169794,7 +169793,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "core helpers and option semantics",
       "roster": {
@@ -170475,7 +170474,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "generated message identities and localization",
       "roster": {
@@ -170564,7 +170563,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "generated message identities and localization",
       "roster": {
@@ -170749,7 +170748,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "generated message identities and localization",
       "roster": {
@@ -170894,7 +170893,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "generated message identities and localization",
       "roster": {
@@ -170931,7 +170930,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "generated message identities and localization",
       "roster": {
@@ -170971,7 +170970,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "generated message identities and localization",
       "roster": {
@@ -173422,7 +173421,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "number semantics",
       "roster": {
@@ -173457,7 +173456,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "number semantics",
       "roster": {
@@ -173492,7 +173491,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "number semantics",
       "roster": {
@@ -173702,7 +173701,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "number semantics",
       "roster": {
@@ -173737,7 +173736,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "number semantics",
       "roster": {
@@ -173772,7 +173771,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "number semantics",
       "roster": {
@@ -174052,7 +174051,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "number semantics",
       "roster": {
@@ -174087,7 +174086,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "number semantics",
       "roster": {
@@ -174204,7 +174203,7 @@
       "ledger_verification": [
         "run.scanner.parity == 1"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "number semantics",
       "roster": {
@@ -174244,7 +174243,7 @@
       "ledger_verification": [
         "run.scanner.parity == 1"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "number semantics",
       "roster": {
@@ -174989,7 +174988,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "caller-visible JSON contract",
       "roster": {
@@ -175055,7 +175054,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "caller-visible JSON contract",
       "roster": {
@@ -175088,7 +175087,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "caller-visible JSON contract",
       "roster": {
@@ -175160,7 +175159,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "caller-visible JSON contract",
       "roster": {
@@ -175193,7 +175192,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "caller-visible JSON contract",
       "roster": {
@@ -175226,7 +175225,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "caller-visible JSON contract",
       "roster": {
@@ -175291,7 +175290,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "locale parse, canonicalization and fallback",
       "roster": {
@@ -175323,7 +175322,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "locale parse, canonicalization and fallback",
       "roster": {
@@ -175365,7 +175364,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "locale parse, canonicalization and fallback",
       "roster": {
@@ -175408,7 +175407,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "locale parse, canonicalization and fallback",
       "roster": {
@@ -175439,7 +175438,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "locale parse, canonicalization and fallback",
       "roster": {
@@ -226633,7 +226632,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "string helpers; actual home is tsr_jsstring",
       "roster": {
@@ -226664,7 +226663,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "string helpers; actual home is tsr_jsstring",
       "roster": {
@@ -226695,7 +226694,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "string helpers; actual home is tsr_jsstring",
       "roster": {
@@ -226727,7 +226726,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "string helpers; actual home is tsr_jsstring",
       "roster": {
@@ -226788,7 +226787,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "string helpers; actual home is tsr_jsstring",
       "roster": {
@@ -226819,7 +226818,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "string helpers; actual home is tsr_jsstring",
       "roster": {
@@ -226850,7 +226849,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "string helpers; actual home is tsr_jsstring",
       "roster": {
@@ -226881,7 +226880,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "string helpers; actual home is tsr_jsstring",
       "roster": {
@@ -226912,7 +226911,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "string helpers; actual home is tsr_jsstring",
       "roster": {
@@ -226943,7 +226942,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "string helpers; actual home is tsr_jsstring",
       "roster": {
@@ -226974,7 +226973,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "string helpers; actual home is tsr_jsstring",
       "roster": {
@@ -227005,7 +227004,7 @@
       "ledger_phase": 1,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "string helpers; actual home is tsr_jsstring",
       "roster": {
@@ -227320,7 +227319,7 @@
       "ledger_verification": [
         "run.e4.helper_semantics == true"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "string helpers; actual home is tsr_jsstring",
       "roster": {
@@ -227503,7 +227502,7 @@
       "ledger_verification": [
         "run.e4.helper_semantics == true"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "string helpers; actual home is tsr_jsstring",
       "roster": {
@@ -227539,7 +227538,7 @@
       "ledger_verification": [
         "run.e4.helper_semantics == true"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "string helpers; actual home is tsr_jsstring",
       "roster": {
@@ -227575,7 +227574,7 @@
       "ledger_verification": [
         "run.e4.helper_semantics == true"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "string helpers; actual home is tsr_jsstring",
       "roster": {
@@ -227611,7 +227610,7 @@
       "ledger_verification": [
         "run.e4.helper_semantics == true"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "string helpers; actual home is tsr_jsstring",
       "roster": {
@@ -227647,7 +227646,7 @@
       "ledger_verification": [
         "run.e4.helper_semantics == true"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "string helpers; actual home is tsr_jsstring",
       "roster": {
@@ -227791,7 +227790,7 @@
       "ledger_verification": [
         "run.e4.helper_semantics == true"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "string helpers; actual home is tsr_jsstring",
       "roster": {
@@ -227972,7 +227971,7 @@
       "ledger_verification": [
         "run.e4.helper_semantics == true"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "string helpers; actual home is tsr_jsstring",
       "roster": {
@@ -228008,7 +228007,7 @@
       "ledger_verification": [
         "run.e4.helper_semantics == true"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "string helpers; actual home is tsr_jsstring",
       "roster": {
@@ -228044,7 +228043,7 @@
       "ledger_verification": [
         "run.e4.helper_semantics == true"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "string helpers; actual home is tsr_jsstring",
       "roster": {
@@ -228190,7 +228189,7 @@
       "ledger_verification": [
         "run.e4.helper_semantics == true"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "string helpers; actual home is tsr_jsstring",
       "roster": {
@@ -228260,7 +228259,7 @@
       "ledger_verification": [
         "run.e4.helper_semantics == true"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "string helpers; actual home is tsr_jsstring",
       "roster": {
