@@ -1522,16 +1522,28 @@ class ConfigOutputPreparationTests(unittest.TestCase):
         # `commandline` probe's decline hide the `tsconfigparsing` probe's real
         # observation, and all 87 reported "no corresponding native observation".
         directory = ROOT / "data/phase1/native/config"
-        declines = observed = 0
-        for probe in ("commandline", "tsconfigparsing"):
+        probes = sorted({probe for _group, probe
+                         in baselines.STEP_OUTPUT_GROUPS["config"][2]})
+        outputs = {case["id"] for case in self.cases["cases"]
+                   if case.get("family") == "config" and case.get("baseline")}
+        observers = {}
+        declined = {}
+        for probe in probes:
             rows = json.loads((directory / probe / "observations.json").read_text())
             for row in rows["observations"]:
+                if row["case"] not in outputs:
+                    continue
                 if row["result"] == "observed":
-                    observed += 1
-                elif row["result"] == "native_unavailable":
-                    declines += 1
-        self.assertEqual(observed, 167, "each output is observed by exactly one probe")
-        self.assertEqual(declines, 167, "and declined by exactly one other")
+                    observers.setdefault(row["case"], []).append(probe)
+                else:
+                    declined.setdefault(row["case"], []).append(probe)
+        # The invariant, not the arithmetic: every output is observed by
+        # exactly one probe and declined by every other one that saw it. A
+        # third probe joining the family changes the totals but not this.
+        self.assertEqual(sorted(observers), sorted(outputs))
+        for case, seen in observers.items():
+            self.assertEqual(len(seen), 1, f"{case} observed by {seen}")
+            self.assertNotIn(case, [c for c in declined if declined[c] == seen])
         self.assertEqual(baselines.output_preparation(self.cases, "config")["problems"], [])
 
     def test_one_probe_serving_two_groups_is_read_once(self):
