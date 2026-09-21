@@ -11,5 +11,12 @@ upstream/tsc/LICENSE and upstream/NOTICE.txt.
 Third-party attribution notices from the upstream NOTICE.txt that pertain to
 a ported component are copied below as that component is ported.
 
+The source-compatible sorter in crates/tsr_core/src/go_sort.rs derives from
+Go 1.27.1's slices sorting implementation.
+Copyright 2022 The Go Authors. All rights reserved.
+Licensed under the BSD 3-Clause License; see licenses/GO-BSD-3-Clause.txt.
+
 Paths above identify source files in the ts-rust repository. Distributed Rust
-packages carry this NOTICE and the Apache license locally.
+packages carry this NOTICE and the Apache license locally. The tsr_core package
+also includes licenses/GO-BSD-3-Clause.txt; tsr_bundled includes the pinned
+TypeScript library copyright notice beside its library files.

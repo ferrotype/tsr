@@ -1,10 +1,10 @@
 # Rust package preparation
 
-This is publishing preparation on top of PR #34, not a release. The 28 public
-packages remain version `0.1.0`; no crates.io upload has been performed. The
-workspace defaults to `publish = false`. Package policy is explicit in
-[packages.json](packages.json), including all 38 `tsr_` packages and six private
-packages with other names. The Node addon is a separate distribution artifact.
+The publication policy currently includes 29 public libraries and 20 private
+packages, all named explicitly in [packages.json](packages.json). The workspace
+defaults to `publish = false`. This policy and the dependency order below track
+the current source tree; they are not a record of registry releases. The Node
+addon is a separate distribution artifact.
 
 ## Reproduction
 
@@ -23,7 +23,7 @@ changed pin, unlisted packages and unpublishable dependencies. CI runs this
 check before tracker validation. The manifest under `tsr_bundled/bundled/`
 records all upstream asset sizes and SHA-256 digests.
 
-`package_verify.py` asks Cargo to list and create the 28 actual normalized
+`package_verify.py` asks Cargo to list and create all public packages' normalized
 archives with `--no-verify`, then extracts them to a temporary directory. It
 builds every library with all features, runs an external parser/checker/ownership
 consumer, builds the parser-only embedding surface and builds wasm in parser and
@@ -39,8 +39,8 @@ file lists, archive hashes and `verified.json` under `target/publishing-prep/`.
 A failed rerun deletes the earlier passing summary. This verifies package
 self-containment; it does not certify that dependencies already exist in the
 public registry. A registry-only `cargo publish --dry-run` remains a release-time
-check as sibling `0.1.0` versions become available. The four `0.0.0` placeholders
-(`tsr_ast`, `tsr_checker`, `tsr_parser`, `tsr_wasm`) do not satisfy those versions.
+check as sibling `0.1.0` versions become available. A `0.0.0` name reservation
+does not satisfy a dependency on `0.1.0`.
 
 ## Content and private harnesses
 
@@ -76,7 +76,7 @@ and exports stay unchanged. Old captures retain their own archived ABI wrappers.
 
 The project branding is **tsr**; `tsr_embed` is the application entry point.
 A `tsr` facade that re-exports the public embedding surface remains a separate follow-up; neither
-`tsr` nor `tsrust` is added to this 28-package release set. All package READMEs
+`tsr` nor `tsrust` is added to this 29-package release set. All package READMEs
 state the Rust 1.96 minimum, and package metadata includes search keywords and
 the compiler category.
 
@@ -86,7 +86,7 @@ Generate release archives after this update so their immutable manifests contain
 the final URL. Historical pull-request and Actions links in `docs/` retain their
 original addresses and resolve through GitHub redirects.
 
-Do not schedule the first release as 28 immediate uploads. crates.io's current
+Do not schedule the first release as 29 immediate uploads. crates.io's recorded
 [default limiter](https://github.com/rust-lang/crates.io/blob/5723cfaf552efd5e870d25c71f2bb5193b21a958/src/rate_limiter.rs)
 allows five new crates in a burst and replenishes one slot per ten minutes.
 Updates have a separate default allowance. If 24 of these names are still new
@@ -120,25 +120,30 @@ build and optional dependencies. It is for a later, explicitly authorized releas
 12. `tsr_tspath`
 13. `tsr_vfs`
 14. `tsr_bundled`
-15. `tsr_tsoptions`
-16. `tsr_module`
-17. `tsr_nodebuilder`
-18. `tsr_printer`
-19. `tsr_pseudochecker`
-20. `tsr_checker`
-21. `tsr_astnav`
-22. `tsr_format`
-23. `tsr_transformers`
-24. `tsr_compiler`
-25. `tsr_project`
-26. `tsr_api`
-27. `tsr_embed`
-28. `tsr_wasm`
+15. `tsr_json`
+16. `tsr_tsoptions`
+17. `tsr_module`
+18. `tsr_nodebuilder`
+19. `tsr_printer`
+20. `tsr_pseudochecker`
+21. `tsr_checker`
+22. `tsr_astnav`
+23. `tsr_format`
+24. `tsr_transformers`
+25. `tsr_compiler`
+26. `tsr_project`
+27. `tsr_api`
+28. `tsr_embed`
+29. `tsr_wasm`
 
 ## Package policy
 
 | Package | crates.io | Reason |
 | --- | --- | --- |
+| `phase1_config` | Private | Repository-only benchmark, experiment, test or capture tool |
+| `phase1_filesystem` | Private | Repository-only benchmark, experiment, test or capture tool |
+| `phase1_harness` | Private | Repository-only benchmark, experiment, test or capture tool |
+| `phase1_leaves` | Private | Repository-only Phase 1 foundation test harness |
 | `tsr_api` | Prepared | Rust library and its public dependency closure |
 | `tsr_arena` | Prepared | Rust library and its public dependency closure |
 | `tsr_ast` | Prepared | Rust library and its public dependency closure |
@@ -154,6 +159,7 @@ build and optional dependencies. It is for a later, explicitly authorized releas
 | `tsr_encoder` | Prepared | Rust library and its public dependency closure |
 | `tsr_format` | Prepared | Rust library and its public dependency closure |
 | `tsr_jsnum` | Prepared | Rust library and its public dependency closure |
+| `tsr_json` | Prepared | Rust library and its public dependency closure |
 | `tsr_jsstring` | Prepared | Rust library and its public dependency closure |
 | `tsr_module` | Prepared | Rust library and its public dependency closure |
 | `tsr_node` | Private | Node addon distributed separately; not a Rust library package |

@@ -1389,3 +1389,38 @@ closure, selected variants and checker-obligation bytes are unchanged. Historica
 producer evidence was not relabeled or refreshed. No compiler corpus or
 performance benchmark was run. F1b remains in progress; the remaining JSON
 contracts and the other recorded leaf gaps remain on its implementation queue.
+
+### F1b packaging and encoder review — 2026-09-21
+
+The new public JSON crate was missing from the publication policy. Added
+`tsr_json` to `tools/packaging/packages.json`, the package table and the release
+order (after its dependencies, before `tsr_tsoptions`). Synced its NOTICE through
+`package_assets.py`; the standard copy had been shortened incorrectly. The
+check now verifies 169 assets for 29 public / 49 total packages. A direct audit
+also confirms that the documented policy names every package exactly once and
+that every retained internal dependency precedes its dependent in release order.
+The Cargo archive contains the exact source, LICENSE and NOTICE and normalized
+dependencies without local paths. Publication remains deferred by the owner;
+no name reservation or release was uploaded.
+
+The [encoder continuation review](PHASE1-implementation-plan.md#json-encoder-continuation-review--2026-09-21)
+records the next batch: shared token state, structured errors, exact unsigned
+integers, container-scoped stack growth and decoded-name storage. Mixed member
+types already work via `&dyn Encode`; sequential writes remove the temporary
+member list. Pinned Go copies names into a separate decoded-name buffer too, so
+using output-buffer offsets without a flush/escape strategy is not adopted.
+These are planned changes, not new claims of JSON coverage in this increment.
+
+The NOTICE edit invalidates the authenticated leaf/config inputs. Both prepared
+families were re-captured and recorded, with every Rust observation unchanged:
+leaves **104 match / 120 missing / 1 different**, config **176 match / 299 missing
+/ 9 different**, no harness failures or unavailable/unrun cases. The previous
+archive is retained. The new
+`data/phase1/captures/f1b-typed-json-packaging.tar.gz` contains 46 JSON files,
+491,287 compressed bytes, and replays from its extracted contents. Provenance
+SHA-256:
+
+- leaves: `48714d2f16e791c994488dc3fa0ba7d5d6bcc0cb74bcd862b9f3321ec83668aa`
+- config: `4f416b1c1d4c5e5438de7d553b6ab3d31c52db46fe01f919279f72efc9e7e8d2`
+
+No Rust implementation, compiler corpus or benchmark changed in this follow-up.
