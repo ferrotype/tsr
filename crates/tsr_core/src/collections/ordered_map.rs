@@ -36,6 +36,70 @@ impl<K, V, S: Default> Default for OrderedMap<K, V, S> {
     }
 }
 
+// Equality retains the sequence contract of config objects and path mappings:
+// maps with the same entries in different orders can resolve patterns differently.
+impl<K: Eq + Hash, V: PartialEq, S: BuildHasher> PartialEq for OrderedMap<K, V, S> {
+    fn eq(&self, other: &Self) -> bool {
+        self.keys == other.keys && self.values == other.values
+    }
+}
+impl<K: Eq + Hash, V: Eq, S: BuildHasher> Eq for OrderedMap<K, V, S> {}
+
+/// Borrowed entries in insertion order. Neither keys nor values are cloned.
+pub struct Iter<'a, K, V, S> {
+    keys: std::collections::vec_deque::Iter<'a, K>,
+    values: &'a HashMap<K, V, S>,
+}
+impl<'a, K: Eq + Hash, V, S: BuildHasher> Iterator for Iter<'a, K, V, S> {
+    type Item = (&'a K, &'a V);
+    fn next(&mut self) -> Option<Self::Item> {
+        self.keys.next().map(|key| (key, &self.values[key]))
+    }
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        self.keys.size_hint()
+    }
+}
+impl<K: Eq + Hash, V, S: BuildHasher> ExactSizeIterator for Iter<'_, K, V, S> {}
+impl<'a, K: Eq + Hash, V, S: BuildHasher> IntoIterator for &'a OrderedMap<K, V, S> {
+    type Item = (&'a K, &'a V);
+    type IntoIter = Iter<'a, K, V, S>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+
+/// Owned entries in insertion order. Dropping this iterator drops the unvisited
+/// values normally; consumption needs no intermediate vector or value clones.
+pub struct IntoIter<K, V, S> {
+    keys: std::collections::vec_deque::IntoIter<K>,
+    values: HashMap<K, V, S>,
+}
+impl<K: Eq + Hash, V, S: BuildHasher> Iterator for IntoIter<K, V, S> {
+    type Item = (K, V);
+    fn next(&mut self) -> Option<Self::Item> {
+        let key = self.keys.next()?;
+        let value = self
+            .values
+            .remove(&key)
+            .expect("every ordered key has one value");
+        Some((key, value))
+    }
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        self.keys.size_hint()
+    }
+}
+impl<K: Eq + Hash, V, S: BuildHasher> ExactSizeIterator for IntoIter<K, V, S> {}
+impl<K: Eq + Hash, V, S: BuildHasher> IntoIterator for OrderedMap<K, V, S> {
+    type Item = (K, V);
+    type IntoIter = IntoIter<K, V, S>;
+    fn into_iter(self) -> Self::IntoIter {
+        IntoIter {
+            keys: self.keys.into_iter(),
+            values: self.values,
+        }
+    }
+}
+
 /// One ordered diff notification. Added keys follow the new map's order;
 /// modified and removed keys then follow the old map's order.
 #[derive(Debug, PartialEq, Eq)]
@@ -104,6 +168,26 @@ impl<K: Eq + Hash, V, S: BuildHasher> OrderedMap<K, V, S> {
     pub fn entry_at(&self, index: isize) -> Option<(&K, &V)> {
         let key = self.keys.get(usize::try_from(index).ok()?)?;
         Some((key, &self.values[key]))
+    }
+
+    pub fn iter(&self) -> Iter<'_, K, V, S> {
+        Iter {
+            keys: self.keys.iter(),
+            values: &self.values,
+        }
+    }
+
+    /// Mutate values in insertion order without exposing mutable keys. The
+    /// callback cannot structurally change this map during the traversal.
+    pub fn for_each_value_mut(&mut self, mut visit: impl FnMut(&K, &mut V)) {
+        for key in &self.keys {
+            visit(
+                key,
+                self.values
+                    .get_mut(key)
+                    .expect("every ordered key has one value"),
+            );
+        }
     }
 
     /// port: tsc/internal/collections/ordered_map.go:OrderedMap.Entries

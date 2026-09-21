@@ -709,7 +709,7 @@ fn set_paths(slot: &mut Option<PathMappings>, value: &Value) -> Result<(), Strin
     let entries = value
         .as_array()
         .ok_or_else(|| format!("`paths` needs an entry list or null, not {value}"))?;
-    let mut out = Vec::with_capacity(entries.len());
+    let mut out = PathMappings::with_capacity(entries.len());
     for entry in entries {
         let pair = entry
             .as_array()
@@ -728,7 +728,7 @@ fn set_paths(slot: &mut Option<PathMappings>, value: &Value) -> Result<(), Strin
             }
             Some(values)
         };
-        out.push((key, values));
+        out.insert(key, values);
     }
     *slot = Some(out);
     Ok(())

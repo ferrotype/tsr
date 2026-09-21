@@ -1,10 +1,10 @@
 {
   "counts": {
-    "covered": 455,
+    "covered": 457,
     "equivalent_rust": 8,
     "implemented_untested": 3164,
     "later_phase": 18,
-    "missing": 1150
+    "missing": 1148
   },
   "dispositions": [
     "covered",
@@ -137777,7 +137777,8 @@
         "step": "leaves"
       },
       "rust_home": [
-        "crates/tsr_core/src/collections/ordered_map.rs"
+        "crates/tsr_core/src/collections/ordered_map.rs",
+        "crates/tsr_json/src/lib.rs"
       ],
       "symbol": "DiffOrderedMaps"
     },
@@ -137813,7 +137814,8 @@
         "step": "leaves"
       },
       "rust_home": [
-        "crates/tsr_core/src/collections/ordered_map.rs"
+        "crates/tsr_core/src/collections/ordered_map.rs",
+        "crates/tsr_json/src/lib.rs"
       ],
       "symbol": "DiffOrderedMapsFunc"
     },
@@ -137848,7 +137850,8 @@
         "step": "leaves"
       },
       "rust_home": [
-        "crates/tsr_core/src/collections/ordered_map.rs"
+        "crates/tsr_core/src/collections/ordered_map.rs",
+        "crates/tsr_json/src/lib.rs"
       ],
       "symbol": "NewOrderedMapFromList"
     },
@@ -137883,7 +137886,8 @@
         "step": "leaves"
       },
       "rust_home": [
-        "crates/tsr_core/src/collections/ordered_map.rs"
+        "crates/tsr_core/src/collections/ordered_map.rs",
+        "crates/tsr_json/src/lib.rs"
       ],
       "symbol": "NewOrderedMapWithSizeHint"
     },
@@ -137919,7 +137923,8 @@
         "step": "leaves"
       },
       "rust_home": [
-        "crates/tsr_core/src/collections/ordered_map.rs"
+        "crates/tsr_core/src/collections/ordered_map.rs",
+        "crates/tsr_json/src/lib.rs"
       ],
       "symbol": "OrderedMap.Clear"
     },
@@ -137957,7 +137962,8 @@
         "step": "leaves"
       },
       "rust_home": [
-        "crates/tsr_core/src/collections/ordered_map.rs"
+        "crates/tsr_core/src/collections/ordered_map.rs",
+        "crates/tsr_json/src/lib.rs"
       ],
       "symbol": "OrderedMap.Clone"
     },
@@ -137994,7 +138000,8 @@
         "step": "leaves"
       },
       "rust_home": [
-        "crates/tsr_core/src/collections/ordered_map.rs"
+        "crates/tsr_core/src/collections/ordered_map.rs",
+        "crates/tsr_json/src/lib.rs"
       ],
       "symbol": "OrderedMap.Delete"
     },
@@ -138039,7 +138046,8 @@
         "step": "leaves"
       },
       "rust_home": [
-        "crates/tsr_core/src/collections/ordered_map.rs"
+        "crates/tsr_core/src/collections/ordered_map.rs",
+        "crates/tsr_json/src/lib.rs"
       ],
       "symbol": "OrderedMap.Entries"
     },
@@ -138074,7 +138082,8 @@
         "step": "leaves"
       },
       "rust_home": [
-        "crates/tsr_core/src/collections/ordered_map.rs"
+        "crates/tsr_core/src/collections/ordered_map.rs",
+        "crates/tsr_json/src/lib.rs"
       ],
       "symbol": "OrderedMap.EntryAt"
     },
@@ -138112,7 +138121,8 @@
         "step": "leaves"
       },
       "rust_home": [
-        "crates/tsr_core/src/collections/ordered_map.rs"
+        "crates/tsr_core/src/collections/ordered_map.rs",
+        "crates/tsr_json/src/lib.rs"
       ],
       "symbol": "OrderedMap.Get"
     },
@@ -138147,7 +138157,8 @@
         "step": "leaves"
       },
       "rust_home": [
-        "crates/tsr_core/src/collections/ordered_map.rs"
+        "crates/tsr_core/src/collections/ordered_map.rs",
+        "crates/tsr_json/src/lib.rs"
       ],
       "symbol": "OrderedMap.GetOrZero"
     },
@@ -138182,7 +138193,8 @@
         "step": "leaves"
       },
       "rust_home": [
-        "crates/tsr_core/src/collections/ordered_map.rs"
+        "crates/tsr_core/src/collections/ordered_map.rs",
+        "crates/tsr_json/src/lib.rs"
       ],
       "symbol": "OrderedMap.Has"
     },
@@ -138219,13 +138231,16 @@
         "step": "leaves"
       },
       "rust_home": [
-        "crates/tsr_core/src/collections/ordered_map.rs"
+        "crates/tsr_core/src/collections/ordered_map.rs",
+        "crates/tsr_json/src/lib.rs"
       ],
       "symbol": "OrderedMap.Keys"
     },
     {
       "actual_home": "tsr_core and consumer-local collections",
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_json/src/lib.rs"
+      ],
       "basis": "a prepared case runs and reports the Rust entry point absent: leaves/core-collections/ordered-map-marshal-integer-keys, leaves/core-collections/ordered-map-marshal-member-order; witnessed by 2 prepared case(s)",
       "basis_kind": "rule",
       "cases": [
@@ -138253,7 +138268,8 @@
         "step": "leaves"
       },
       "rust_home": [
-        "crates/tsr_core/src/collections/ordered_map.rs"
+        "crates/tsr_core/src/collections/ordered_map.rs",
+        "crates/tsr_json/src/lib.rs"
       ],
       "symbol": "OrderedMap.MarshalJSONTo"
     },
@@ -138296,7 +138312,8 @@
         "step": "leaves"
       },
       "rust_home": [
-        "crates/tsr_core/src/collections/ordered_map.rs"
+        "crates/tsr_core/src/collections/ordered_map.rs",
+        "crates/tsr_json/src/lib.rs"
       ],
       "symbol": "OrderedMap.Set"
     },
@@ -138334,7 +138351,8 @@
         "step": "leaves"
       },
       "rust_home": [
-        "crates/tsr_core/src/collections/ordered_map.rs"
+        "crates/tsr_core/src/collections/ordered_map.rs",
+        "crates/tsr_json/src/lib.rs"
       ],
       "symbol": "OrderedMap.Size"
     },
@@ -138369,7 +138387,8 @@
         "step": "leaves"
       },
       "rust_home": [
-        "crates/tsr_core/src/collections/ordered_map.rs"
+        "crates/tsr_core/src/collections/ordered_map.rs",
+        "crates/tsr_json/src/lib.rs"
       ],
       "symbol": "OrderedMap.UnmarshalJSONFrom"
     },
@@ -138405,7 +138424,8 @@
         "step": "leaves"
       },
       "rust_home": [
-        "crates/tsr_core/src/collections/ordered_map.rs"
+        "crates/tsr_core/src/collections/ordered_map.rs",
+        "crates/tsr_json/src/lib.rs"
       ],
       "symbol": "OrderedMap.Values"
     },
@@ -138440,7 +138460,8 @@
         "step": "leaves"
       },
       "rust_home": [
-        "crates/tsr_core/src/collections/ordered_map.rs"
+        "crates/tsr_core/src/collections/ordered_map.rs",
+        "crates/tsr_json/src/lib.rs"
       ],
       "symbol": "OrderedMap.clone"
     },
@@ -138476,7 +138497,8 @@
         "step": "leaves"
       },
       "rust_home": [
-        "crates/tsr_core/src/collections/ordered_map.rs"
+        "crates/tsr_core/src/collections/ordered_map.rs",
+        "crates/tsr_json/src/lib.rs"
       ],
       "symbol": "newMapWithSizeHint"
     },
@@ -138507,7 +138529,8 @@
         "step": "leaves"
       },
       "rust_home": [
-        "crates/tsr_core/src/collections/ordered_map.rs"
+        "crates/tsr_core/src/collections/ordered_map.rs",
+        "crates/tsr_json/src/lib.rs"
       ],
       "symbol": "noCopy.Lock"
     },
@@ -138538,7 +138561,8 @@
         "step": "leaves"
       },
       "rust_home": [
-        "crates/tsr_core/src/collections/ordered_map.rs"
+        "crates/tsr_core/src/collections/ordered_map.rs",
+        "crates/tsr_json/src/lib.rs"
       ],
       "symbol": "noCopy.Unlock"
     },
@@ -138569,7 +138593,8 @@
         "step": "leaves"
       },
       "rust_home": [
-        "crates/tsr_core/src/collections/ordered_map.rs"
+        "crates/tsr_core/src/collections/ordered_map.rs",
+        "crates/tsr_json/src/lib.rs"
       ],
       "symbol": "resolveKeyName"
     },
@@ -174437,7 +174462,7 @@
       "id": "tsc/internal/json/json.go:AllowDuplicateNames",
       "ledger_crate": "tsr_json",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "in-progress",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
@@ -174447,26 +174472,28 @@
         "state": "prepared",
         "step": "leaves"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_json/src/lib.rs"
+      ],
       "symbol": "AllowDuplicateNames"
     },
     {
       "actual_home": "no dedicated Rust home; order-sensitive readers live in their consumers",
       "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/json/marshal-map-deterministic; witnessed by 1 prepared case(s)",
+      "basis": "witnessed by 1 exact link(s): leaves/json/marshal-map-deterministic",
       "basis_kind": "rule",
       "cases": [
         "leaves/json/marshal-map-deterministic"
       ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/json",
       "go_source": "tsc/internal/json/json.go",
       "id": "tsc/internal/json/json.go:Deterministic",
       "ledger_crate": "tsr_json",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "in-progress",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
@@ -174476,13 +174503,17 @@
         "state": "prepared",
         "step": "leaves"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_json/src/lib.rs"
+      ],
       "symbol": "Deterministic"
     },
     {
       "actual_home": "no dedicated Rust home; order-sensitive readers live in their consumers",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/json/marshal-float-edge-values, leaves/json/marshal-raw-duplicate-names, leaves/json/marshal-raw-escapes; witnessed by 10 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_json/src/lib.rs"
+      ],
+      "basis": "witnessed by 3 exact link(s): leaves/json/marshal-float-edge-values, leaves/json/marshal-string-invalid-utf8-byte, leaves/json/marshal-struct-missing-null-empty",
       "basis_kind": "rule",
       "cases": [
         "leaves/json/marshal-float-edge-values",
@@ -174498,13 +174529,13 @@
       ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/json",
       "go_source": "tsc/internal/json/json.go",
       "id": "tsc/internal/json/json.go:Marshal",
       "ledger_crate": "tsr_json",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "in-progress",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
@@ -174514,7 +174545,9 @@
         "state": "prepared",
         "step": "leaves"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_json/src/lib.rs"
+      ],
       "symbol": "Marshal"
     },
     {
@@ -174534,7 +174567,7 @@
       "id": "tsc/internal/json/json.go:MarshalEncode",
       "ledger_crate": "tsr_json",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "in-progress",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
@@ -174544,12 +174577,16 @@
         "state": "prepared",
         "step": "leaves"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_json/src/lib.rs"
+      ],
       "symbol": "MarshalEncode"
     },
     {
       "actual_home": "no dedicated Rust home; order-sensitive readers live in their consumers",
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_json/src/lib.rs"
+      ],
       "basis": "a prepared case runs and reports the Rust entry point absent: leaves/json/marshal-indent-empty-is-compact; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
       "cases": [
@@ -174563,7 +174600,7 @@
       "id": "tsc/internal/json/json.go:MarshalIndent",
       "ledger_crate": "tsr_json",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "in-progress",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
@@ -174573,7 +174610,9 @@
         "state": "prepared",
         "step": "leaves"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_json/src/lib.rs"
+      ],
       "symbol": "MarshalIndent"
     },
     {
@@ -174592,7 +174631,7 @@
       "id": "tsc/internal/json/json.go:MarshalIndentWrite",
       "ledger_crate": "tsr_json",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "in-progress",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
@@ -174602,7 +174641,9 @@
         "state": "prepared",
         "step": "leaves"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_json/src/lib.rs"
+      ],
       "symbol": "MarshalIndentWrite"
     },
     {
@@ -174621,7 +174662,7 @@
       "id": "tsc/internal/json/json.go:MarshalWrite",
       "ledger_crate": "tsr_json",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "in-progress",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
@@ -174631,7 +174672,9 @@
         "state": "prepared",
         "step": "leaves"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_json/src/lib.rs"
+      ],
       "symbol": "MarshalWrite"
     },
     {
@@ -174651,7 +174694,7 @@
       "id": "tsc/internal/json/json.go:NewDecoder",
       "ledger_crate": "tsr_json",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "in-progress",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
@@ -174661,7 +174704,9 @@
         "state": "prepared",
         "step": "leaves"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_json/src/lib.rs"
+      ],
       "symbol": "NewDecoder"
     },
     {
@@ -174687,7 +174732,7 @@
       "id": "tsc/internal/json/json.go:Unmarshal",
       "ledger_crate": "tsr_json",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "in-progress",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
@@ -174697,7 +174742,9 @@
         "state": "prepared",
         "step": "leaves"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_json/src/lib.rs"
+      ],
       "symbol": "Unmarshal"
     },
     {
@@ -174716,7 +174763,7 @@
       "id": "tsc/internal/json/json.go:UnmarshalDecode",
       "ledger_crate": "tsr_json",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "in-progress",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
@@ -174726,7 +174773,9 @@
         "state": "prepared",
         "step": "leaves"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_json/src/lib.rs"
+      ],
       "symbol": "UnmarshalDecode"
     },
     {
@@ -174745,7 +174794,7 @@
       "id": "tsc/internal/json/json.go:UnmarshalRead",
       "ledger_crate": "tsr_json",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "in-progress",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
@@ -174755,7 +174804,9 @@
         "state": "prepared",
         "step": "leaves"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_json/src/lib.rs"
+      ],
       "symbol": "UnmarshalRead"
     },
     {
@@ -174774,7 +174825,7 @@
       "id": "tsc/internal/json/json.go:WithIndent",
       "ledger_crate": "tsr_json",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "in-progress",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
@@ -174784,7 +174835,9 @@
         "state": "prepared",
         "step": "leaves"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_json/src/lib.rs"
+      ],
       "symbol": "WithIndent"
     },
     {

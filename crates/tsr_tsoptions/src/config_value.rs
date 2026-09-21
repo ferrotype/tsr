@@ -1,5 +1,6 @@
 //! Values crossing the Go config parser's `any` boundary. Text stays byte exact;
 //! arrays and object insertion order preserve source traversal and diagnostics.
+use tsr_core::collections::OrderedMap;
 use tsr_jsstring::JsString;
 
 #[derive(Clone, Debug, Default, PartialEq)]
@@ -16,7 +17,7 @@ pub enum ConfigValue {
     Enum(i32),
     String(JsString),
     Array(Option<Vec<Self>>),
-    Object(Vec<(JsString, Self)>),
+    Object(OrderedMap<JsString, Self>),
 }
 impl ConfigValue {
     pub fn as_string(&self) -> Option<&JsString> {
@@ -33,7 +34,7 @@ impl ConfigValue {
             None
         }
     }
-    pub fn as_object(&self) -> Option<&[(JsString, Self)]> {
+    pub fn as_object(&self) -> Option<&OrderedMap<JsString, Self>> {
         if let Self::Object(value) = self {
             Some(value)
         } else {
@@ -41,22 +42,13 @@ impl ConfigValue {
         }
     }
     pub fn get(&self, key: &[u8]) -> Option<&Self> {
-        self.as_object()?
-            .iter()
-            .find_map(|(name, value)| (name.as_bytes() == key).then_some(value))
+        self.as_object()?.get(key)
     }
     pub fn set(&mut self, key: JsString, value: Self) {
         let Self::Object(entries) = self else {
             panic!("config property assignment requires an object")
         };
-        if let Some((_, target)) = entries
-            .iter_mut()
-            .find(|(name, _)| name.as_bytes() == key.as_bytes())
-        {
-            *target = value;
-        } else {
-            entries.push((key, value));
-        }
+        entries.insert(key, value);
     }
     pub fn is_null(&self) -> bool {
         matches!(self, Self::Null)

@@ -28,11 +28,11 @@ pub fn substitute_strings(values: &mut [JsString], base: &[u8]) {
 /// port: tsc/internal/tsoptions/tsconfigparsing.go:handleOptionConfigDirTemplateSubstitution
 pub fn substitute_options(options: &mut CompilerOptions, base: &[u8]) {
     if let Some(paths) = &mut options.paths {
-        for (_, values) in paths {
+        paths.for_each_value_mut(|_, values| {
             if let Some(values) = values {
                 substitute_strings(values, base);
             }
-        }
+        });
     }
     for values in [&mut options.root_dirs, &mut options.type_roots]
         .into_iter()

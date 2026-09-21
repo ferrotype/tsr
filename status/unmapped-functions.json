@@ -1950,7 +1950,6 @@
       "tsc/internal/collections/multimap.go:MultiMap.RemoveAll",
       "tsc/internal/collections/multimap.go:MultiMap.Values",
       "tsc/internal/collections/multimap.go:NewMultiMapWithSizeHint",
-      "tsc/internal/collections/ordered_map.go:OrderedMap.MarshalJSONTo",
       "tsc/internal/collections/ordered_map.go:OrderedMap.UnmarshalJSONFrom",
       "tsc/internal/collections/ordered_map.go:noCopy.Lock",
       "tsc/internal/collections/ordered_map.go:noCopy.Unlock",
@@ -3249,9 +3248,7 @@
     "internal/json": [
       "tsc/internal/json/json.go:AllowDuplicateNames",
       "tsc/internal/json/json.go:Deterministic",
-      "tsc/internal/json/json.go:Marshal",
       "tsc/internal/json/json.go:MarshalEncode",
-      "tsc/internal/json/json.go:MarshalIndent",
       "tsc/internal/json/json.go:MarshalIndentWrite",
       "tsc/internal/json/json.go:MarshalWrite",
       "tsc/internal/json/json.go:NewDecoder",

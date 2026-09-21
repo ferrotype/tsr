@@ -1318,3 +1318,74 @@ queries, targeted clippy with warnings denied, and 161 Phase 1 Python tests plus
 17 subtests. No benchmark or full compiler corpus was run. The regenerated S07
 inventory changes only 11 marker anchors; replay preserves the selected cases
 and checker-obligation bytes, without refreshing historical producer evidence.
+
+### F1b ordered config storage and typed JSON — 2026-09-21
+
+This continuation implements the next part of the ordered-storage decision.
+`ConfigValue::Object` and `CompilerOptions::PathMappings` now use the shared
+`OrderedMap`. Source-property overwrite keeps its first position. ConfigDir
+substitution borrows and mutates values in order; resolution borrows the winning
+path substitutions directly and keeps first-insertion precedence on equal
+wildcard prefixes. Empty/nil maps and target lists keep their existing public
+representations. CompilerOptions cloning still copies its values; the single
+unapproved Go shallow-sharing difference remains visible. Package.json's raw
+member stream remains duplicate-preserving, as previously decided.
+
+The new `tsr_json` crate owns typed `Encode` and `Encoder` APIs above `tsr_core`.
+Production `StringifyJson` now delegates to it, and `ConfigValue` implements the
+trait over its actual fields. This removes the separate config-only encoder.
+Ordered-map encoding walks borrowed keys/values; deterministic ordinary-map
+encoding sorts borrowed entries by the original key bytes. Neither builds a
+second JSON value tree. Ordered consumption and mutation APIs do not clone
+payloads. Equality retains the old order-sensitive config/path contract.
+
+This is a **typed-write increment, not completion of the JSON contract**.
+It supports byte strings, finite numbers (including negative zero), booleans,
+optional values, lists, string-keyed ordered/unordered maps, compact output and
+typed indentation. Typed nil slices remain the caller's explicit list encoding,
+not the generic `Option<T>` null encoding. Invalid UTF-8 is repaired per rune;
+key uniqueness is checked after repair. The 10,000-container depth limit runs
+with stack growth and is exercised on a 512 KiB thread stack.
+
+The write implementation reuses the existing byte/rune and number code instead
+of selecting another JSON value library: `serde_json::Value` cannot carry the
+byte-string inputs, duplicate member stream or raw-number spellings this
+contract requires. No new third-party dependency is added. This does **not**
+settle the decoder's implementation. Raw JSON token encoding, streaming I/O and
+encoder state, decoder offsets/partial destination writes, typed key conversion
+and ordered-map decoding are still named gaps. Failed typed encoding currently
+returns an error without a partial output document; native partial-error state
+is not claimed. The leaf adapter projects only the supported top-level float
+error into the Go observation schema; it supplies no raw/nested error positions.
+
+The final prepared-family comparisons are:
+
+| Family | Match | Missing | Different | Harness/unavailability/unrun |
+| --- | ---: | ---: | ---: | ---: |
+| Leaves | 104 | 120 | 1 | 0 |
+| Config | 176 | 299 | 9 | 0 |
+
+Four JSON cases changed from missing to matching: deterministic string-map
+order, invalid UTF-8 strings, binary64 edge values/nonfinite rejection, and the
+sample struct's missing/null/empty fields. **Every previously observed Rust
+payload in both families is byte-identical after decoding** to the PR #44
+capture. The real F3 config adapters exercise the new storage/writer; this does
+not claim all 309 baseline outputs pass. Original Go config-mapper JSON,
+package.json, config-resolution and module-resolution trace tests also pass.
+
+`data/phase1/captures/f1b-typed-json.tar.gz` contains 46 JSON files, 495,314
+compressed bytes, with no binaries, exported upstream tree or duplicate
+per-probe request copies. Both families replay successfully from its extraction.
+Provenance SHA-256:
+
+- leaves: `58a8bdbeec13995e886e947c9a0153fd3af03cbf825e61c4bcf39d3dc0f9b347`
+- config: `27fd6b439f3d441dccaacad98abc7ccafb9aa3907b0323d8fc87ca12c4b5ce0a`
+
+Validation: 35 affected Rust tests, targeted clippy with warnings denied,
+Rust 1.96 checks for the new JSON crate and its options consumer, formatting,
+and 161 Phase 1 script tests plus 17 subtests. The S07 operation inventory gains
+two typed JSON wrapper homes and moves twelve marker anchors; its source call
+closure, selected variants and checker-obligation bytes are unchanged. Historical
+producer evidence was not relabeled or refreshed. No compiler corpus or
+performance benchmark was run. F1b remains in progress; the remaining JSON
+contracts and the other recorded leaf gaps remain on its implementation queue.

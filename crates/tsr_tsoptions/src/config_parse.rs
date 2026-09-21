@@ -435,7 +435,7 @@ fn parse_config(
     let mut stack = stack.to_vec();
     stack.push(resolved);
     let mut options = CompilerOptions::default();
-    let mut inherited = ConfigValue::Object(vec![]);
+    let mut inherited = ConfigValue::Object(tsr_core::collections::OrderedMap::default());
     let mut compile_on_save = false;
     for path in extended {
         // ParseExtendedConfig returns a source-file record even when ReadFile

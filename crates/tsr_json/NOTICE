@@ -1,0 +1,15 @@
+ts-rust
+Copyright (c) 2026 Cristian Ianto
+
+This product is a Rust port of the TypeScript compiler. It derives from and
+incorporates software developed by Microsoft Corporation as part of TypeScript
+(https://github.com/microsoft/TypeScript), licensed under the Apache License,
+Version 2.0. The pinned upstream commit is recorded in data/upstream.json and
+.gitmodules; its license and NOTICE texts are at upstream/LICENSE.txt,
+upstream/tsc/LICENSE and upstream/NOTICE.txt.
+
+Third-party attribution notices from the upstream NOTICE.txt that pertain to
+a ported component are copied below as that component is ported.
+
+Paths above identify source files in the ts-rust repository. Distributed Rust
+packages carry this NOTICE and the Apache license locally.
