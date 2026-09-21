@@ -73,8 +73,10 @@ def inventory_check() -> dict:
     problems += scope_module.verify(scope)
     problems += scope_module.witness_problems()
     problems += scope_module.roster_problems(scope, cases)
+    problems += scope_module.gap_record_problems(cases)
     problems += baselines.verify(index)
     problems += baselines.verify_written_subfolders()
+    problems += baselines.exception_problems(index)
 
     pin = json.loads((ROOT / "data/upstream.json").read_text())["pin"]
     for name, document in (("scope", scope), ("cases", cases), ("config-baselines", index)):
@@ -131,12 +133,16 @@ def inventory_check() -> dict:
             f"{unlinked} operations carry file-level producer metrics but no exact "
             "operation-level coverage link"
         )
-    preparation = scope_module.leaf_preparation(scope, cases)
-    if preparation["pending"]:
-        outstanding.append(
-            f"{len(preparation['pending'])} leaf operation(s) have neither a prepared case, "
-            "a verified witness nor a reviewed roster exemption"
-        )
+    preparation = {
+        step: scope_module.leaf_preparation(scope, cases, step)
+        for step in scope_module.STEP_PACKAGES
+    }
+    for step, report in preparation.items():
+        if report["pending"]:
+            outstanding.append(
+                f"{len(report['pending'])} {step} operation(s) have neither a prepared case, "
+                "a verified witness nor a reviewed roster exemption"
+            )
     return {
         "pin": pin,
         "operations": scope["total_operations"],
@@ -151,11 +157,11 @@ def inventory_check() -> dict:
         "ok": not problems,
         "f0_complete": not outstanding,
         "f0_outstanding": outstanding,
-        "f1a_preparation": preparation,
-        # The published F1a result. True only when every leaf operation is
-        # linked to a prepared case or a verified witness, or removed from the
-        # roster by a ledger entry that itself validates.
-        "leaves_prepared": preparation["complete"],
+        "preparation": preparation,
+        # One published result per preparation step. True only when every
+        # operation on that step's roster is linked to a prepared case or a
+        # verified witness, or removed by a ledger entry that itself validates.
+        **{f"{step}_prepared": report["complete"] for step, report in preparation.items()},
     }
 
 
@@ -173,17 +179,21 @@ def inventory_write() -> dict:
     scope = scope_module.build()
     SCOPE.write_text(json.dumps(scope, indent=2, sort_keys=True) + "\n")
     cases = load(CASES)
-    preparation = scope_module.leaf_preparation(scope, cases)
-    PREPARATION.write_text(json.dumps(preparation, indent=2, sort_keys=True) + "\n")
+    wrote = [str(SCOPE.relative_to(ROOT))]
+    prepared, pending = {}, {}
+    for step in scope_module.STEP_PACKAGES:
+        report = scope_module.leaf_preparation(scope, cases, step)
+        path = ROOT / f"data/phase1/{step}-preparation.json"
+        path.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
+        wrote.append(str(path.relative_to(ROOT)))
+        prepared[f"{step}_prepared"] = report["complete"]
+        pending[step] = len(report["pending"])
     return {
-        "wrote": [
-            str(SCOPE.relative_to(ROOT)),
-            str(PREPARATION.relative_to(ROOT)),
-        ],
+        "wrote": wrote,
         "operations": scope["total_operations"],
         "counts": scope["counts"],
-        "leaves_prepared": preparation["complete"],
-        "pending": len(preparation["pending"]),
+        "pending": pending,
+        **prepared,
     }
 
 
@@ -225,10 +235,35 @@ def record_results(capture: Path, write: bool) -> dict:
             f"not run ({', '.join(missing[:3])}), {len(extra)} run but not declared "
             f"({', '.join(extra[:3])})"
         )
+    # What the driver actually found absent, per case. A case may drive several
+    # operations and find one unported; folding the two together would mark the
+    # neighbours missing too.
+    absent = {
+        row["case"]: (row.get("missing_operation") or {}).get("operation")
+        for row in report["rows"]
+        if row["result"] == "not_implemented"
+    }
+    # Identities are supplied by the handler that found the gap. An unknown
+    # identity is a broken driver contract, even when a case names only one
+    # operation: replacing it with that operation would fabricate evidence.
+    declared = {case["id"]: case.get("operations", []) for case in document["cases"]}
+    for case_id, named in absent.items():
+        claimed = declared[case_id]
+        if not isinstance(named, str) or not named or (claimed and named not in claimed):
+            raise ValueError(f"{case_id}: driver names unclaimed missing operation {named!r}")
     changed = []
     for case in document["cases"]:
         if case.get("family") != family:
             continue
+        named = absent.get(case["id"])
+        # A case preparing an output rather than an operation has no operation
+        # for a gap to name; the driver still reports one, as a logical label.
+        if named and not case.get("operations"):
+            named = None
+        if named:
+            case["missing_operations"] = [named]
+        else:
+            case.pop("missing_operations", None)
         if case.get("last_result") != observed[case["id"]]:
             changed.append({
                 "case": case["id"],
@@ -236,6 +271,9 @@ def record_results(capture: Path, write: bool) -> dict:
                 "now": observed[case["id"]],
             })
             case["last_result"] = observed[case["id"]]
+    problems = scope_module.gap_record_problems(document)
+    if problems:
+        raise ValueError("invalid gap records: " + "; ".join(problems[:5]))
     if write:
         CASES.write_text(json.dumps(document, indent=2, sort_keys=True) + "\n")
     counts: dict[str, int] = {}

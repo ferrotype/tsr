@@ -11,10 +11,12 @@
     "unused_at_pin": 4
   },
   "exempt_operations": 108,
+  "gap_problems": [],
   "pending": [],
   "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
   "prepared_operations": 342,
   "roster_problems": [],
+  "step": "leaves",
   "total_operations": 460,
   "version": 2,
   "witnessed_operations": 10

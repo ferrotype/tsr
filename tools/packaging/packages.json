@@ -2,6 +2,48 @@
   "version": 1,
   "packages": [
     {
+      "name": "phase1_filesystem",
+      "manifest": "tools/phase1/filesystem/Cargo.toml",
+      "publish": false,
+      "reason": "Repository-only benchmark, experiment, test or capture tool"
+    },
+    {
+      "name": "phase1_leaves",
+      "manifest": "tools/phase1/leaves/Cargo.toml",
+      "publish": false,
+      "reason": "Repository-only Phase 1 foundation test harness"
+    },
+    {
+      "name": "s08_relater_prototype",
+      "manifest": "tools/s08/relater-prototype/Cargo.toml",
+      "publish": false,
+      "reason": "Repository-only benchmark, experiment, test or capture tool"
+    },
+    {
+      "name": "s09_format_harness",
+      "manifest": "tools/s09/format-harness/Cargo.toml",
+      "publish": false,
+      "reason": "Repository-only benchmark, experiment, test or capture tool"
+    },
+    {
+      "name": "s10_corpus",
+      "manifest": "tools/s10/corpus-adapter/Cargo.toml",
+      "publish": false,
+      "reason": "Repository-only benchmark, experiment, test or capture tool"
+    },
+    {
+      "name": "s10_rust_consumer",
+      "manifest": "tools/s10/rust-consumer/Cargo.toml",
+      "publish": false,
+      "reason": "Repository-only benchmark, experiment, test or capture tool"
+    },
+    {
+      "name": "s10_wasm_corpus",
+      "manifest": "tools/s10/wasm-corpus/Cargo.toml",
+      "publish": false,
+      "reason": "Repository-only benchmark, experiment, test or capture tool"
+    },
+    {
       "name": "tsr_api",
       "manifest": "crates/tsr_api/Cargo.toml",
       "publish": true,
@@ -62,6 +104,12 @@
       "reason": "Rust library and its public dependency closure"
     },
     {
+      "name": "tsr_cpu_profile",
+      "manifest": "tools/s07/cpu-profile/rust/Cargo.toml",
+      "publish": false,
+      "reason": "Repository-only benchmark, experiment, test or capture tool"
+    },
+    {
       "name": "tsr_diagnostics",
       "manifest": "crates/tsr_diagnostics/Cargo.toml",
       "publish": true,
@@ -96,6 +144,12 @@
       "manifest": "crates/tsr_jsstring/Cargo.toml",
       "publish": true,
       "reason": "Rust library and its public dependency closure"
+    },
+    {
+      "name": "tsr_memory_profile",
+      "manifest": "tools/s07/memory-profile/rust/Cargo.toml",
+      "publish": false,
+      "reason": "Repository-only benchmark, experiment, test or capture tool"
     },
     {
       "name": "tsr_module",
@@ -138,6 +192,36 @@
       "manifest": "crates/tsr_pseudochecker/Cargo.toml",
       "publish": true,
       "reason": "Rust library and its public dependency closure"
+    },
+    {
+      "name": "tsr_s07_access_trace_native_verify",
+      "manifest": "tools/s07/performance-experiments/access-trace-native-verify/Cargo.toml",
+      "publish": false,
+      "reason": "Repository-only benchmark, experiment, test or capture tool"
+    },
+    {
+      "name": "tsr_s07_bis_access_trace",
+      "manifest": "tools/s07/performance-experiments/access-trace/Cargo.toml",
+      "publish": false,
+      "reason": "Repository-only benchmark, experiment, test or capture tool"
+    },
+    {
+      "name": "tsr_s07_bis_owner_census",
+      "manifest": "tools/s07/performance-experiments/owner-census/Cargo.toml",
+      "publish": false,
+      "reason": "Repository-only benchmark, experiment, test or capture tool"
+    },
+    {
+      "name": "tsr_s07_bis_phases",
+      "manifest": "tools/s07/performance-experiments/phases/Cargo.toml",
+      "publish": false,
+      "reason": "Repository-only benchmark, experiment, test or capture tool"
+    },
+    {
+      "name": "tsr_s07_storage_pilot",
+      "manifest": "tools/s07/performance-experiments/storage-pilot/Cargo.toml",
+      "publish": false,
+      "reason": "Repository-only benchmark, experiment, test or capture tool"
     },
     {
       "name": "tsr_scanner",
@@ -186,84 +270,6 @@
       "manifest": "crates/tsr_wasm/Cargo.toml",
       "publish": true,
       "reason": "Rust library and its public dependency closure"
-    },
-    {
-      "name": "phase1_leaves",
-      "manifest": "tools/phase1/leaves/Cargo.toml",
-      "publish": false,
-      "reason": "Repository-only Phase 1 foundation test harness"
-    },
-    {
-      "name": "tsr_cpu_profile",
-      "manifest": "tools/s07/cpu-profile/rust/Cargo.toml",
-      "publish": false,
-      "reason": "Repository-only benchmark, experiment, test or capture tool"
-    },
-    {
-      "name": "tsr_memory_profile",
-      "manifest": "tools/s07/memory-profile/rust/Cargo.toml",
-      "publish": false,
-      "reason": "Repository-only benchmark, experiment, test or capture tool"
-    },
-    {
-      "name": "tsr_s07_access_trace_native_verify",
-      "manifest": "tools/s07/performance-experiments/access-trace-native-verify/Cargo.toml",
-      "publish": false,
-      "reason": "Repository-only benchmark, experiment, test or capture tool"
-    },
-    {
-      "name": "tsr_s07_bis_access_trace",
-      "manifest": "tools/s07/performance-experiments/access-trace/Cargo.toml",
-      "publish": false,
-      "reason": "Repository-only benchmark, experiment, test or capture tool"
-    },
-    {
-      "name": "tsr_s07_bis_owner_census",
-      "manifest": "tools/s07/performance-experiments/owner-census/Cargo.toml",
-      "publish": false,
-      "reason": "Repository-only benchmark, experiment, test or capture tool"
-    },
-    {
-      "name": "tsr_s07_bis_phases",
-      "manifest": "tools/s07/performance-experiments/phases/Cargo.toml",
-      "publish": false,
-      "reason": "Repository-only benchmark, experiment, test or capture tool"
-    },
-    {
-      "name": "tsr_s07_storage_pilot",
-      "manifest": "tools/s07/performance-experiments/storage-pilot/Cargo.toml",
-      "publish": false,
-      "reason": "Repository-only benchmark, experiment, test or capture tool"
-    },
-    {
-      "name": "s08_relater_prototype",
-      "manifest": "tools/s08/relater-prototype/Cargo.toml",
-      "publish": false,
-      "reason": "Repository-only benchmark, experiment, test or capture tool"
-    },
-    {
-      "name": "s09_format_harness",
-      "manifest": "tools/s09/format-harness/Cargo.toml",
-      "publish": false,
-      "reason": "Repository-only benchmark, experiment, test or capture tool"
-    },
-    {
-      "name": "s10_corpus",
-      "manifest": "tools/s10/corpus-adapter/Cargo.toml",
-      "publish": false,
-      "reason": "Repository-only benchmark, experiment, test or capture tool"
-    },
-    {
-      "name": "s10_rust_consumer",
-      "manifest": "tools/s10/rust-consumer/Cargo.toml",
-      "publish": false,
-      "reason": "Repository-only benchmark, experiment, test or capture tool"
-    },
-    {
-      "name": "s10_wasm_corpus",
-      "manifest": "tools/s10/wasm-corpus/Cargo.toml",
-      "publish": false,
-      "reason": "Repository-only benchmark, experiment, test or capture tool"
     },
     {
       "name": "xtask",

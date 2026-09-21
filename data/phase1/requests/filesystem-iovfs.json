@@ -1,0 +1,2081 @@
+{
+  "family": "filesystem",
+  "requests": [
+    {
+      "actions": [
+        {
+          "backing": "fstest_map",
+          "case_sensitive": true,
+          "files": [
+            [
+              "/present.ts",
+              "file",
+              "p"
+            ],
+            [
+              "/dir/x.ts",
+              "file",
+              "x"
+            ]
+          ],
+          "op": "new_fs"
+        },
+        {
+          "op": "realpath",
+          "path": "/dir/./"
+        },
+        {
+          "content": "ab",
+          "op": "write_file",
+          "path": "/w.ts"
+        },
+        {
+          "content": "cd",
+          "op": "append_file",
+          "path": "/w.ts"
+        },
+        {
+          "op": "remove",
+          "path": "/present.ts"
+        },
+        {
+          "atime": "2021-01-02T03:04:05.000000006Z",
+          "mtime": "2022-11-12T13:14:15.000000016Z",
+          "op": "chtimes",
+          "path": "/dir/x.ts"
+        },
+        {
+          "backing": "realpath_only",
+          "case_sensitive": true,
+          "files": [
+            [
+              "/present.ts",
+              "file",
+              "p"
+            ],
+            [
+              "/dir/x.ts",
+              "file",
+              "x"
+            ]
+          ],
+          "op": "new_fs"
+        },
+        {
+          "op": "realpath",
+          "path": "/dir/./"
+        },
+        {
+          "content": "ab",
+          "op": "write_file",
+          "path": "/w.ts"
+        },
+        {
+          "content": "cd",
+          "op": "append_file",
+          "path": "/w.ts"
+        },
+        {
+          "op": "remove",
+          "path": "/present.ts"
+        },
+        {
+          "atime": "2021-01-02T03:04:05.000000006Z",
+          "mtime": "2022-11-12T13:14:15.000000016Z",
+          "op": "chtimes",
+          "path": "/dir/x.ts"
+        },
+        {
+          "backing": "writable_only",
+          "case_sensitive": true,
+          "files": [
+            [
+              "/present.ts",
+              "file",
+              "p"
+            ],
+            [
+              "/dir/x.ts",
+              "file",
+              "x"
+            ]
+          ],
+          "op": "new_fs"
+        },
+        {
+          "op": "realpath",
+          "path": "/dir/./"
+        },
+        {
+          "content": "ab",
+          "op": "write_file",
+          "path": "/w.ts"
+        },
+        {
+          "content": "cd",
+          "op": "append_file",
+          "path": "/w.ts"
+        },
+        {
+          "op": "remove",
+          "path": "/present.ts"
+        },
+        {
+          "atime": "2021-01-02T03:04:05.000000006Z",
+          "mtime": "2022-11-12T13:14:15.000000016Z",
+          "op": "chtimes",
+          "path": "/dir/x.ts"
+        },
+        {
+          "op": "spy_log"
+        },
+        {
+          "backing": "spy_realpath",
+          "case_sensitive": true,
+          "files": [
+            [
+              "/present.ts",
+              "file",
+              "p"
+            ],
+            [
+              "/dir/x.ts",
+              "file",
+              "x"
+            ]
+          ],
+          "op": "new_fs"
+        },
+        {
+          "op": "realpath",
+          "path": "/dir/./"
+        },
+        {
+          "content": "ab",
+          "op": "write_file",
+          "path": "/w.ts"
+        },
+        {
+          "content": "cd",
+          "op": "append_file",
+          "path": "/w.ts"
+        },
+        {
+          "op": "remove",
+          "path": "/present.ts"
+        },
+        {
+          "atime": "2021-01-02T03:04:05.000000006Z",
+          "mtime": "2022-11-12T13:14:15.000000016Z",
+          "op": "chtimes",
+          "path": "/dir/x.ts"
+        },
+        {
+          "op": "spy_log"
+        },
+        {
+          "backing": "vfstest_map",
+          "case_sensitive": true,
+          "files": [
+            [
+              "/present.ts",
+              "file",
+              "p"
+            ],
+            [
+              "/dir/x.ts",
+              "file",
+              "x"
+            ]
+          ],
+          "op": "new_fs"
+        },
+        {
+          "op": "realpath",
+          "path": "/dir/./"
+        },
+        {
+          "content": "ab",
+          "op": "write_file",
+          "path": "/w.ts"
+        },
+        {
+          "content": "cd",
+          "op": "append_file",
+          "path": "/w.ts"
+        },
+        {
+          "op": "remove",
+          "path": "/present.ts"
+        },
+        {
+          "atime": "2021-01-02T03:04:05.000000006Z",
+          "mtime": "2022-11-12T13:14:15.000000016Z",
+          "op": "chtimes",
+          "path": "/dir/x.ts"
+        }
+      ],
+      "case": "filesystem/iovfs/from-capability-matrix",
+      "discriminates": "(1) An implementation with one `writable` flag covering both capabilities: `realpath_only` and `writable_only` force RealpathFS and WritableFS apart, and either bundling answers wrong for one of them. (2) An implementation that refuses construction over a read-only backing: the pin constructs successfully over `fstest_map` and only panics at the call site, with five DISTINCT literal texts (iofs.go:91-103), so a port that raises one shared 'unsupported' error is caught by the texts alone. (3) An implementation that derives realpath support from write support, or that falls back to identity when a backing is writable: `realpath_only` and `writable_only` answer the same `realpath` action differently.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/iovfs/iofs.go:From",
+      "order_sensitive": true,
+      "subject": "iovfs.From"
+    },
+    {
+      "actions": [
+        {
+          "backing": "writable_only",
+          "case_sensitive": true,
+          "fail_mkdir": false,
+          "fail_writes": 0,
+          "files": [
+            [
+              "/present.ts",
+              "file",
+              "p"
+            ]
+          ],
+          "op": "new_fs"
+        },
+        {
+          "content": "A",
+          "op": "write_file",
+          "path": "/deep/./x.ts"
+        },
+        {
+          "op": "spy_log"
+        },
+        {
+          "backing": "writable_only",
+          "case_sensitive": true,
+          "fail_mkdir": false,
+          "fail_writes": 1,
+          "files": [
+            [
+              "/present.ts",
+              "file",
+              "p"
+            ]
+          ],
+          "op": "new_fs"
+        },
+        {
+          "content": "A",
+          "op": "write_file",
+          "path": "/deep/./x.ts"
+        },
+        {
+          "op": "spy_log"
+        },
+        {
+          "backing": "writable_only",
+          "case_sensitive": true,
+          "fail_mkdir": false,
+          "fail_writes": 2,
+          "files": [
+            [
+              "/present.ts",
+              "file",
+              "p"
+            ]
+          ],
+          "op": "new_fs"
+        },
+        {
+          "content": "A",
+          "op": "write_file",
+          "path": "/deep/./x.ts"
+        },
+        {
+          "op": "spy_log"
+        },
+        {
+          "backing": "writable_only",
+          "case_sensitive": true,
+          "fail_mkdir": true,
+          "fail_writes": 1,
+          "files": [
+            [
+              "/present.ts",
+              "file",
+              "p"
+            ]
+          ],
+          "op": "new_fs"
+        },
+        {
+          "content": "A",
+          "op": "write_file",
+          "path": "/deep/./x.ts"
+        },
+        {
+          "op": "spy_log"
+        },
+        {
+          "backing": "writable_only",
+          "case_sensitive": true,
+          "fail_mkdir": false,
+          "fail_writes": 1,
+          "files": [
+            [
+              "/present.ts",
+              "file",
+              "p"
+            ]
+          ],
+          "op": "new_fs"
+        },
+        {
+          "content": "A",
+          "op": "append_file",
+          "path": "/deep/./x.ts"
+        },
+        {
+          "op": "spy_log"
+        },
+        {
+          "backing": "writable_only",
+          "case_sensitive": true,
+          "fail_mkdir": false,
+          "fail_writes": 0,
+          "files": [
+            [
+              "/present.ts",
+              "file",
+              "p"
+            ]
+          ],
+          "op": "new_fs"
+        },
+        {
+          "content": "A",
+          "op": "write_file",
+          "path": "rel.ts"
+        },
+        {
+          "op": "spy_log"
+        }
+      ],
+      "case": "filesystem/iovfs/write-file-ensuring-dir-control-flow",
+      "discriminates": "(1) An implementation that normalizes the path once and uses it for BOTH the write and the mkdir: the spy log shows the write receiving the raw `deep/./x.ts` while mkdirAll receives the normalized `deep` (iofs.go:203 passes `path`, :206 passes GetDirectoryPath(NormalizePath(path))), so a port that normalizes once cannot produce this pair. (2) An implementation that calls mkdirAll unconditionally: fail_writes=0 records a single write and no mkdir. (3) An implementation that retries more than once, or that returns the FIRST write's error rather than the second: fail_writes=2 refuses both attempts, the spy log's length catches a third attempt, and the refusal class carries the attempt ordinal, so the pin's `spy_refused_write:2` -- the error the second call returned (iofs.go:209) -- is a different row from `spy_refused_write:1`. (4) An implementation that attempts the second write after mkdirAll failed: fail_mkdir. (5) An implementation that passes a different perm: the pin passes 0o666 for both write and append and 0o777 for mkdirAll (iofs.go:71, :75, :79). (6) An implementation that asserts rootedness after calling the backing: the last block panics with the raw path and the spy log is empty.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/iovfs/iofs.go:ioFS.writeFileEnsuringDir",
+      "order_sensitive": true,
+      "subject": "iovfs.Mutate"
+    },
+    {
+      "actions": [
+        {
+          "backing": "vfstest_map",
+          "case_sensitive": true,
+          "files": [
+            [
+              "/a/keep.ts",
+              "file",
+              "keep"
+            ],
+            [
+              "/d/a.ts",
+              "file",
+              "a"
+            ],
+            [
+              "/d/sub/b.ts",
+              "file",
+              "b"
+            ],
+            [
+              "/dd/x.ts",
+              "file",
+              "x"
+            ],
+            [
+              "/real/t.ts",
+              "file",
+              "t"
+            ],
+            [
+              "/linkdir",
+              "symlink",
+              "/real"
+            ],
+            [
+              "/w.ts",
+              "file",
+              "seed"
+            ]
+          ],
+          "op": "new_fs"
+        },
+        {
+          "content": "N",
+          "op": "write_file",
+          "path": "/a/new.ts"
+        },
+        {
+          "op": "entries",
+          "path": "/a"
+        },
+        {
+          "op": "read_file",
+          "path": "/a/new.ts"
+        },
+        {
+          "content": "N",
+          "op": "write_file",
+          "path": "/deep/nested/n.ts"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/deep"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/deep/nested"
+        },
+        {
+          "op": "read_file",
+          "path": "/deep/nested/n.ts"
+        },
+        {
+          "content": "N",
+          "op": "write_file",
+          "path": "/x2/./y.ts"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/x2"
+        },
+        {
+          "op": "file_exists",
+          "path": "/x2/y.ts"
+        },
+        {
+          "op": "file_exists",
+          "path": "/x2/./y.ts"
+        },
+        {
+          "content": "N",
+          "op": "write_file",
+          "path": "/a/keep.ts/child.ts"
+        },
+        {
+          "op": "file_exists",
+          "path": "/a/keep.ts/child.ts"
+        },
+        {
+          "content": "Z",
+          "op": "write_file",
+          "path": "/d"
+        },
+        {
+          "content": "Z",
+          "op": "append_file",
+          "path": "/dd"
+        },
+        {
+          "op": "entries",
+          "path": "/."
+        }
+      ],
+      "case": "filesystem/iovfs/write-file-ensuring-dir-live",
+      "discriminates": "(1) The same normalize-once mistake as the spy case, but in its observable form: `/x2/./y.ts` FAILS to write and yet leaves `/x2` created, because mkdirAll normalized and the retried write did not. A port that 'fixes' this writes the file. (2) An implementation that pre-creates the directory before the first write: `/a/new.ts` must succeed without creating anything. (3) An implementation that returns the write's error rather than mkdirAll's when the parent is a file: `/a/keep.ts/child.ts`. (4) An implementation that guards the root: a failed first write at a root-level path drives mkdirAll(\"/\") into the pinned `panic(\"empty path\")` (vfstest.go:327), which a port with a rooted-mkdir guard would never reach.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/iovfs/iofs.go:ioFS.WriteFile",
+      "order_sensitive": true,
+      "subject": "iovfs.Mutate"
+    },
+    {
+      "actions": [
+        {
+          "backing": "vfstest_map",
+          "case_sensitive": true,
+          "files": [
+            [
+              "/a/keep.ts",
+              "file",
+              "keep"
+            ],
+            [
+              "/d/a.ts",
+              "file",
+              "a"
+            ],
+            [
+              "/d/sub/b.ts",
+              "file",
+              "b"
+            ],
+            [
+              "/dd/x.ts",
+              "file",
+              "x"
+            ],
+            [
+              "/real/t.ts",
+              "file",
+              "t"
+            ],
+            [
+              "/linkdir",
+              "symlink",
+              "/real"
+            ],
+            [
+              "/w.ts",
+              "file",
+              "seed"
+            ]
+          ],
+          "op": "new_fs"
+        },
+        {
+          "op": "stat",
+          "path": "/w.ts"
+        },
+        {
+          "content": "abc",
+          "op": "write_file",
+          "path": "/w.ts"
+        },
+        {
+          "op": "read_file",
+          "path": "/w.ts"
+        },
+        {
+          "op": "stat",
+          "path": "/w.ts"
+        },
+        {
+          "content": "d",
+          "op": "write_file",
+          "path": "/w.ts"
+        },
+        {
+          "op": "read_file",
+          "path": "/w.ts"
+        },
+        {
+          "op": "stat",
+          "path": "/w.ts"
+        },
+        {
+          "content": "",
+          "op": "write_file",
+          "path": "/w.ts"
+        },
+        {
+          "op": "read_file",
+          "path": "/w.ts"
+        },
+        {
+          "op": "file_exists",
+          "path": "/w.ts"
+        },
+        {
+          "content": "ab",
+          "op": "append_file",
+          "path": "/new.ts"
+        },
+        {
+          "op": "read_file",
+          "path": "/new.ts"
+        },
+        {
+          "op": "stat",
+          "path": "/new.ts"
+        },
+        {
+          "content": "cd",
+          "op": "append_file",
+          "path": "/new.ts"
+        },
+        {
+          "op": "read_file",
+          "path": "/new.ts"
+        },
+        {
+          "content": "z",
+          "op": "write_file",
+          "path": "/new.ts"
+        },
+        {
+          "content": "y",
+          "op": "append_file",
+          "path": "/new.ts"
+        },
+        {
+          "op": "read_file",
+          "path": "/new.ts"
+        },
+        {
+          "content": "Z",
+          "op": "append_file",
+          "path": "/linkdir/t.ts"
+        },
+        {
+          "op": "read_file",
+          "path": "/real/t.ts"
+        },
+        {
+          "op": "entries",
+          "path": "/."
+        }
+      ],
+      "case": "filesystem/iovfs/write-and-append-semantics",
+      "discriminates": "(1) An implementation that appends instead of replacing, or merges rather than truncating: the second write of `/w.ts` must read back as `d`, never `abcd`. (2) An implementation that treats an empty write as a delete: `/w.ts` must still exist and read back as ('', true). (3) An implementation that refuses to append to a missing file rather than creating it with content == data: `/new.ts`. (4) An implementation that overwrites on append: the second append must read back `abcd`. (5) An implementation where append does not follow a preceding replacement: write `z` then append `y` must be `zy`. (6) An implementation that does not follow a directory symlink on write: `/linkdir/t.ts` must land on `/real/t.ts`. (7) An implementation that reports the stored mode from its own default rather than from the perm the adapter passed: a seeded entry stats with no permission bits and a written one with 0o666 &^ umask.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/iovfs/iofs.go:ioFS.AppendFile",
+      "order_sensitive": true,
+      "subject": "iovfs.Mutate"
+    },
+    {
+      "actions": [
+        {
+          "backing": "vfstest_map",
+          "case_sensitive": true,
+          "files": [
+            [
+              "/a/keep.ts",
+              "file",
+              "keep"
+            ],
+            [
+              "/d/a.ts",
+              "file",
+              "a"
+            ],
+            [
+              "/d/sub/b.ts",
+              "file",
+              "b"
+            ],
+            [
+              "/dd/x.ts",
+              "file",
+              "x"
+            ],
+            [
+              "/real/t.ts",
+              "file",
+              "t"
+            ],
+            [
+              "/linkdir",
+              "symlink",
+              "/real"
+            ],
+            [
+              "/w.ts",
+              "file",
+              "seed"
+            ]
+          ],
+          "op": "new_fs"
+        },
+        {
+          "op": "remove",
+          "path": "/missing.ts"
+        },
+        {
+          "op": "file_exists",
+          "path": "/missing.ts"
+        },
+        {
+          "op": "remove",
+          "path": "/d"
+        },
+        {
+          "op": "file_exists",
+          "path": "/d/a.ts"
+        },
+        {
+          "op": "file_exists",
+          "path": "/d/sub/b.ts"
+        },
+        {
+          "op": "file_exists",
+          "path": "/dd/x.ts"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/d"
+        },
+        {
+          "op": "entries",
+          "path": "/."
+        },
+        {
+          "op": "remove",
+          "path": "/dd/"
+        },
+        {
+          "op": "file_exists",
+          "path": "/dd/x.ts"
+        },
+        {
+          "op": "remove",
+          "path": "/linkdir"
+        },
+        {
+          "op": "file_exists",
+          "path": "/real/t.ts"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/linkdir"
+        },
+        {
+          "op": "remove",
+          "path": "rel.ts"
+        },
+        {
+          "op": "entries",
+          "path": "/."
+        }
+      ],
+      "case": "filesystem/iovfs/remove-semantics",
+      "discriminates": "(1) An implementation that returns NotFound for a missing path: the pin answers no error at all (vfstest.go:617-621 via iofs.go:180-183), and every OS remove errors there, so this is the likeliest port mistake. (2) An implementation that removes a directory by raw prefix match without the separator: removing `/d` must leave `/dd/x.ts` alive. (3) An implementation that normalizes the path: `/dd/` with a trailing separator must remove nothing. (4) An implementation that follows a directory symlink and deletes the target: removing `/linkdir` must leave `/real/t.ts` alive. (5) An implementation that asserts rootedness inside the backing rather than in the adapter: the unrooted remove panics with the raw path (iofs.go:181).",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/iovfs/iofs.go:ioFS.Remove",
+      "order_sensitive": true,
+      "subject": "iovfs.Mutate"
+    },
+    {
+      "actions": [
+        {
+          "backing": "vfstest_map",
+          "case_sensitive": true,
+          "files": [
+            [
+              "/a/keep.ts",
+              "file",
+              "keep"
+            ],
+            [
+              "/d/a.ts",
+              "file",
+              "a"
+            ],
+            [
+              "/d/sub/b.ts",
+              "file",
+              "b"
+            ],
+            [
+              "/dd/x.ts",
+              "file",
+              "x"
+            ],
+            [
+              "/real/t.ts",
+              "file",
+              "t"
+            ],
+            [
+              "/linkdir",
+              "symlink",
+              "/real"
+            ],
+            [
+              "/w.ts",
+              "file",
+              "seed"
+            ]
+          ],
+          "op": "new_fs"
+        },
+        {
+          "op": "stat",
+          "path": "/w.ts"
+        },
+        {
+          "atime": "2021-01-02T03:04:05.000000006Z",
+          "mtime": "2022-11-12T13:14:15.000000016Z",
+          "op": "chtimes",
+          "path": "/w.ts"
+        },
+        {
+          "op": "stat",
+          "path": "/w.ts"
+        },
+        {
+          "atime": "2021-01-02T03:04:05.000000006Z",
+          "mtime": "2022-11-12T13:14:15.000000016Z",
+          "op": "chtimes",
+          "path": "/missing.ts"
+        },
+        {
+          "atime": "2021-01-02T03:04:05.000000006Z",
+          "mtime": "2022-11-12T13:14:15.000000016Z",
+          "op": "chtimes",
+          "path": "/linkdir"
+        },
+        {
+          "op": "backing_mod_time",
+          "path": "/linkdir"
+        },
+        {
+          "op": "backing_mod_time",
+          "path": "/real"
+        },
+        {
+          "atime": "2021-01-02T03:04:05.000000006Z",
+          "mtime": "2022-11-12T13:14:15.000000016Z",
+          "op": "chtimes",
+          "path": "/d/"
+        },
+        {
+          "atime": "2021-01-02T03:04:05.000000006Z",
+          "mtime": "2022-11-12T13:14:15.000000016Z",
+          "op": "chtimes",
+          "path": "rel.ts"
+        },
+        {
+          "backing": "writable_only",
+          "case_sensitive": true,
+          "fail_mkdir": false,
+          "fail_writes": 0,
+          "files": [
+            [
+              "/present.ts",
+              "file",
+              "p"
+            ]
+          ],
+          "op": "new_fs"
+        },
+        {
+          "atime": "2021-01-02T03:04:05.000000006Z",
+          "mtime": "2022-11-12T13:14:15.000000016Z",
+          "op": "chtimes",
+          "path": "/s.ts"
+        },
+        {
+          "op": "spy_log"
+        }
+      ],
+      "case": "filesystem/iovfs/chtimes-arguments-and-effect",
+      "discriminates": "(1) An implementation that swaps the two time arguments: the spy log is the only honest place to check it on this adapter, because the vfstest backing drops aTime by design (vfstest.go:615 assigns only ModTime), and the stat after the vfstest chtimes must show the MODIFICATION time. (2) An implementation that answers a missing path with no error the way Remove does: Chtimes returns fs.ErrNotExist (vfstest.go:611-614) where Remove returns nil, and the two live three lines apart in this trace. (3) An implementation that follows symlinks: the pin stamps the LINK, which only the backing's own non-following accessor can see. (4) An implementation that normalizes: `/d/` with a trailing separator must miss. (5) An implementation that asserts rootedness in the backing rather than at iofs.go:186.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/iovfs/iofs.go:ioFS.Chtimes",
+      "order_sensitive": true,
+      "subject": "iovfs.Mutate"
+    },
+    {
+      "actions": [
+        {
+          "backing": "fstest_map",
+          "case_sensitive": true,
+          "files": [
+            [
+              "/plain.ts",
+              "file",
+              "hello"
+            ],
+            [
+              "/empty.ts",
+              "file",
+              ""
+            ],
+            [
+              "/bomonly.ts",
+              "hex",
+              "efbbbf"
+            ],
+            [
+              "/bomtext.ts",
+              "hex",
+              "efbbbf68690a"
+            ],
+            [
+              "/u16le.ts",
+              "hex",
+              "fffe680069000a00"
+            ],
+            [
+              "/u16be.ts",
+              "hex",
+              "feff00680069000a"
+            ],
+            [
+              "/u16odd.ts",
+              "hex",
+              "fffe680069000a"
+            ],
+            [
+              "/u16bom.ts",
+              "hex",
+              "fffe"
+            ],
+            [
+              "/one.ts",
+              "hex",
+              "41"
+            ],
+            [
+              "/two.ts",
+              "hex",
+              "4142"
+            ],
+            [
+              "/raw.ts",
+              "hex",
+              "ff00ff"
+            ],
+            [
+              "/dir1/f.ts",
+              "file",
+              "x"
+            ]
+          ],
+          "op": "new_fs"
+        },
+        {
+          "op": "read_file",
+          "path": "/plain.ts"
+        },
+        {
+          "op": "read_file",
+          "path": "/missing.ts"
+        },
+        {
+          "op": "read_file",
+          "path": "/empty.ts"
+        },
+        {
+          "op": "read_file",
+          "path": "/dir1"
+        },
+        {
+          "op": "read_file",
+          "path": "/"
+        },
+        {
+          "op": "read_file",
+          "path": "/bomonly.ts"
+        },
+        {
+          "op": "read_file",
+          "path": "/bomtext.ts"
+        },
+        {
+          "op": "read_file",
+          "path": "/u16le.ts"
+        },
+        {
+          "op": "read_file",
+          "path": "/u16be.ts"
+        },
+        {
+          "op": "read_file",
+          "path": "/u16odd.ts"
+        },
+        {
+          "op": "read_file",
+          "path": "/u16bom.ts"
+        },
+        {
+          "op": "read_file",
+          "path": "/one.ts"
+        },
+        {
+          "op": "read_file",
+          "path": "/two.ts"
+        },
+        {
+          "op": "read_file",
+          "path": "/raw.ts"
+        },
+        {
+          "op": "read_file",
+          "path": "a/../b.ts"
+        }
+      ],
+      "case": "filesystem/iovfs/read-file-decoding",
+      "discriminates": "(1) An implementation that conflates empty with missing: the pin answers ('', true) for an empty file (internal.go:161-163, before any decode) and ('', false) for a missing one. (2) An implementation that reports a decode failure as missing: the odd-length UTF-16 input and the bare BOM both answer ok=true. (3) An implementation that strips a UTF-8 BOM but keeps a UTF-16 one, or that decodes UTF-16 with the wrong endianness: the LE and BE inputs carry the same text. (4) An implementation that errors on a directory instead of answering ('', false). (5) An implementation that validates UTF-8 on the passthrough branch: `/raw.ts` is not valid UTF-8 and the pin returns its bytes unchanged, which is why this trace records hex. (6) An implementation that asserts rootedness at the adapter: ReadFile has NO such guard (iofs.go:172-174), so the panic quotes the NORMALIZED path from internal.SplitPath, unlike Stat's.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/iovfs/iofs.go:ioFS.ReadFile",
+      "order_sensitive": true,
+      "subject": "iovfs.Read"
+    },
+    {
+      "actions": [
+        {
+          "backing": "vfstest_map",
+          "case_sensitive": true,
+          "files": [
+            [
+              "/foo.ts",
+              "file",
+              "hello, world"
+            ],
+            [
+              "/dir1/file1.ts",
+              "file",
+              "export const foo = 42;"
+            ],
+            [
+              "/dir1/file2.ts",
+              "file",
+              "export const foo = 42;"
+            ],
+            [
+              "/dir2/file1.ts",
+              "file",
+              "export const foo = 42;"
+            ],
+            [
+              "/real/t.ts",
+              "file",
+              "target"
+            ],
+            [
+              "/linkfile",
+              "symlink",
+              "/foo.ts"
+            ],
+            [
+              "/linkdir",
+              "symlink",
+              "/real"
+            ],
+            [
+              "/dangling",
+              "symlink",
+              "/nowhere"
+            ]
+          ],
+          "op": "new_fs"
+        },
+        {
+          "op": "stat",
+          "path": "/foo.ts"
+        },
+        {
+          "op": "stat",
+          "path": "/dir1"
+        },
+        {
+          "op": "stat",
+          "path": "/"
+        },
+        {
+          "op": "stat",
+          "path": "/missing.ts"
+        },
+        {
+          "op": "stat",
+          "path": "/dir1/"
+        },
+        {
+          "op": "stat",
+          "path": "/dir1/./"
+        },
+        {
+          "op": "stat",
+          "path": "\\dir1"
+        },
+        {
+          "op": "stat",
+          "path": "/linkfile"
+        },
+        {
+          "op": "stat",
+          "path": "/linkdir"
+        },
+        {
+          "op": "stat",
+          "path": "/dangling"
+        },
+        {
+          "op": "stat",
+          "path": "^/untitled/x"
+        },
+        {
+          "op": "stat",
+          "path": "http://server/x"
+        },
+        {
+          "op": "stat",
+          "path": "//server/share"
+        },
+        {
+          "op": "stat",
+          "path": "a/../b.ts"
+        },
+        {
+          "op": "stat",
+          "path": ""
+        },
+        {
+          "backing": "vfstest_map",
+          "case_sensitive": true,
+          "files": [
+            [
+              "c:/foo.ts",
+              "file",
+              "dos"
+            ],
+            [
+              "c:/dir/x.ts",
+              "file",
+              "y"
+            ]
+          ],
+          "op": "new_fs"
+        },
+        {
+          "op": "stat",
+          "path": "c:/foo.ts"
+        },
+        {
+          "op": "stat",
+          "path": "c:/"
+        },
+        {
+          "op": "stat",
+          "path": "c:/dir"
+        },
+        {
+          "op": "stat",
+          "path": "c:/missing.ts"
+        }
+      ],
+      "case": "filesystem/iovfs/stat-path-forms-and-roots",
+      "discriminates": "(1) An implementation that returns an error for a missing path rather than the absent value: the pin's whole read surface is built on nil-means-absent (internal.go:46-56) and FileExists/DirectoryExists are derived from it. (2) An implementation that treats a URL root and a UNC root alike: RootFor answers nil for the URL and PANICS for the UNC (iofs.go:116-121), so one is an absent value and the other is not a value at all. (3) An implementation that shares one rootedness assertion across the read surface: Stat has its own at iofs.go:168 and it fires on the RAW path, while ReadFile's comes from internal.SplitPath and quotes the NORMALIZED one -- `a/../b.ts` is quoted two different ways by the two operations, which no shared guard can reproduce. (4) An implementation that reports the root's name as `/`: the pin reports `.`. (5) An implementation that does not follow symlinks, or that treats a dangling link as present. (6) An implementation that cannot open a DOS root: `c:/` goes through fs.Sub(fsys, \"c:\") rather than the fsys itself.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/iovfs/iofs.go:ioFS.Stat",
+      "order_sensitive": true,
+      "subject": "iovfs.Read"
+    },
+    {
+      "actions": [
+        {
+          "backing": "vfstest_map",
+          "case_sensitive": true,
+          "files": [
+            [
+              "/foo.ts",
+              "file",
+              "hello, world"
+            ],
+            [
+              "/dir1/file1.ts",
+              "file",
+              "export const foo = 42;"
+            ],
+            [
+              "/dir1/file2.ts",
+              "file",
+              "export const foo = 42;"
+            ],
+            [
+              "/dir2/file1.ts",
+              "file",
+              "export const foo = 42;"
+            ],
+            [
+              "/real/t.ts",
+              "file",
+              "target"
+            ],
+            [
+              "/linkfile",
+              "symlink",
+              "/foo.ts"
+            ],
+            [
+              "/linkdir",
+              "symlink",
+              "/real"
+            ],
+            [
+              "/dangling",
+              "symlink",
+              "/nowhere"
+            ]
+          ],
+          "op": "new_fs"
+        },
+        {
+          "op": "file_exists",
+          "path": "/foo.ts"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/foo.ts"
+        },
+        {
+          "op": "file_exists",
+          "path": "/dir1"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/dir1"
+        },
+        {
+          "op": "file_exists",
+          "path": "/"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/"
+        },
+        {
+          "op": "file_exists",
+          "path": "/missing.ts"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/missing.ts"
+        },
+        {
+          "op": "file_exists",
+          "path": "/dir1/"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/dir1/"
+        },
+        {
+          "op": "file_exists",
+          "path": "/dir1/./"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/dir1/./"
+        },
+        {
+          "op": "file_exists",
+          "path": "/dir1//"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/dir1//"
+        },
+        {
+          "op": "file_exists",
+          "path": "\\dir1"
+        },
+        {
+          "op": "directory_exists",
+          "path": "\\dir1"
+        },
+        {
+          "op": "file_exists",
+          "path": "/linkfile"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/linkfile"
+        },
+        {
+          "op": "file_exists",
+          "path": "/linkdir"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/linkdir"
+        },
+        {
+          "op": "file_exists",
+          "path": "/dangling"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/dangling"
+        },
+        {
+          "op": "file_exists",
+          "path": "c:/foo.ts"
+        },
+        {
+          "op": "directory_exists",
+          "path": "c:/foo.ts"
+        },
+        {
+          "op": "file_exists",
+          "path": "^/untitled/x"
+        },
+        {
+          "op": "directory_exists",
+          "path": "^/untitled/x"
+        }
+      ],
+      "case": "filesystem/iovfs/exists-cross-polarity",
+      "discriminates": "(1) An implementation of FileExists as `stat != nil`: `/dir1` is the only path that catches it, and no pinned test covers it (iofs_test.go:52-57 asks only for a file and a missing name). (2) The mirror mistake in DirectoryExists: `/foo.ts`. Both polarities are asked for every path in the list, so a port cannot pass one by accident. (3) An implementation that does not follow symlinks (`/linkfile`, `/linkdir`) or that treats a dangling link as existing, which is what a port built on an lstat-shaped primitive would do. (4) An implementation that does not normalize before splitting: `/dir1/`, `/dir1/./`, `/dir1//` and the backslash root `\\dir1` each fail independently. (5) An implementation that answers true for a DOS path on a POSIX backing.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/iovfs/iofs.go:ioFS.FileExists",
+      "order_sensitive": true,
+      "subject": "iovfs.Read"
+    },
+    {
+      "actions": [
+        {
+          "backing": "vfstest_map",
+          "case_sensitive": true,
+          "files": [
+            [
+              "/o/A.ts",
+              "file",
+              "a"
+            ],
+            [
+              "/o/_z.ts",
+              "file",
+              "b"
+            ],
+            [
+              "/o/a.ts",
+              "file",
+              "c"
+            ],
+            [
+              "/o/b.ts",
+              "file",
+              "d"
+            ],
+            [
+              "/o/Zd/k.ts",
+              "file",
+              "e"
+            ],
+            [
+              "/o/ad/k.ts",
+              "file",
+              "f"
+            ],
+            [
+              "/sub/tgt.ts",
+              "file",
+              "t"
+            ],
+            [
+              "/sub/d/x.ts",
+              "file",
+              "x"
+            ],
+            [
+              "/sub/lfile",
+              "symlink",
+              "/sub/tgt.ts"
+            ],
+            [
+              "/sub/ldir",
+              "symlink",
+              "/sub/d"
+            ],
+            [
+              "/sub/dead",
+              "symlink",
+              "/sub/nope"
+            ],
+            [
+              "/empty",
+              "dir",
+              ""
+            ]
+          ],
+          "op": "new_fs"
+        },
+        {
+          "op": "entries",
+          "path": "/o"
+        },
+        {
+          "op": "entries",
+          "path": "/sub"
+        },
+        {
+          "op": "entries",
+          "path": "/empty"
+        },
+        {
+          "op": "entries",
+          "path": "/missing"
+        },
+        {
+          "op": "entries",
+          "path": "/o/A.ts"
+        },
+        {
+          "op": "entries",
+          "path": "/sub/"
+        },
+        {
+          "op": "entries",
+          "path": "/sub/ldir"
+        },
+        {
+          "op": "entries",
+          "path": "rel"
+        },
+        {
+          "op": "entries",
+          "path": "/"
+        }
+      ],
+      "case": "filesystem/iovfs/entries-order-and-symlinks",
+      "discriminates": "(1) An implementation that sorts case-insensitively or by insertion: `/o` holds A.ts, Zd, _z.ts, a.ts, ad, b.ts, whose byte order differs from both. (2) An implementation that merges files and directories into one list, or that emits a directory under Files: the two lists are recorded separately and in order. (3) An implementation that reports `symlinks: None` for an empty result: the pin assigns a non-nil map unconditionally (internal.go:69) and nil is specified to mean 'not available' (vfs.go:56-60), so absent and present-and-empty are different answers and `/empty` separates them. (4) An implementation that lists a DANGLING link: the pin drops it entirely (the Stat at internal.go:95 returns nil and the entry is never added), so it appears in neither list nor in Symlinks. (5) An implementation that records the link TARGET's name rather than the link name in Symlinks. (6) An implementation that errors on a file or a missing path instead of answering the same empty-but-not-nil shape.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/iovfs/iofs.go:ioFS.GetAccessibleEntries",
+      "order_sensitive": true,
+      "subject": "iovfs.Entries"
+    },
+    {
+      "actions": [
+        {
+          "backing": "vfstest_map",
+          "case_sensitive": true,
+          "files": [
+            [
+              "/foo.ts",
+              "file",
+              "hello"
+            ],
+            [
+              "/linkfile",
+              "symlink",
+              "/foo.ts"
+            ]
+          ],
+          "op": "new_fs"
+        },
+        {
+          "op": "entries",
+          "path": "/"
+        },
+        {
+          "op": "entries",
+          "path": "/."
+        },
+        {
+          "op": "entries",
+          "path": "/./"
+        },
+        {
+          "op": "file_exists",
+          "path": "/linkfile"
+        },
+        {
+          "op": "stat",
+          "path": "/linkfile"
+        }
+      ],
+      "case": "filesystem/iovfs/entries-root-symlink-panic",
+      "discriminates": "A pinned defect of the root path, not a capability error. GetAccessibleEntries builds each child's path as `path + \"/\" + name` (internal.go:95) without a separator guard, so over a root of `/` a symlink child is statted as `//link`, which GetEncodedRootLength reads as a UNC root and RootFor turns into a panic (iofs.go:120). It catches (1) an implementation that joins paths correctly -- it would return the entry instead of panicking; and (2) an implementation that normalizes the argument, because `/.` and `/./` name the SAME directory and do not panic. The `file_exists` and `stat` actions show the link itself resolves fine, so the defect is in the concatenation and nowhere else.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/iovfs/iofs.go:ioFS.GetAccessibleEntries",
+      "order_sensitive": true,
+      "subject": "iovfs.Entries"
+    },
+    {
+      "actions": [
+        {
+          "backing": "realpath_only",
+          "case_sensitive": true,
+          "files": [
+            [
+              "/dir1/f.ts",
+              "file",
+              "x"
+            ],
+            [
+              "/a/b/c.ts",
+              "file",
+              "y"
+            ]
+          ],
+          "op": "new_fs"
+        },
+        {
+          "op": "realpath",
+          "path": "/dir1/./"
+        },
+        {
+          "op": "realpath",
+          "path": "/a//b/"
+        },
+        {
+          "op": "realpath",
+          "path": "/dir1"
+        },
+        {
+          "op": "realpath",
+          "path": "/missing/./x.ts"
+        },
+        {
+          "op": "realpath",
+          "path": "/"
+        },
+        {
+          "op": "realpath",
+          "path": "c:/foo/bar"
+        },
+        {
+          "op": "realpath",
+          "path": "/boom/x.ts"
+        },
+        {
+          "op": "realpath",
+          "path": "/boom/./x.ts"
+        },
+        {
+          "op": "realpath",
+          "path": "rel.ts"
+        },
+        {
+          "backing": "fstest_map",
+          "case_sensitive": true,
+          "files": [
+            [
+              "/dir1/f.ts",
+              "file",
+              "x"
+            ],
+            [
+              "/a/b/c.ts",
+              "file",
+              "y"
+            ]
+          ],
+          "op": "new_fs"
+        },
+        {
+          "op": "realpath",
+          "path": "/dir1/./"
+        },
+        {
+          "op": "realpath",
+          "path": "/a//b/"
+        },
+        {
+          "op": "realpath",
+          "path": "/missing/./x.ts"
+        },
+        {
+          "op": "realpath",
+          "path": "/"
+        },
+        {
+          "op": "realpath",
+          "path": "c:/foo/bar"
+        },
+        {
+          "backing": "vfstest_map",
+          "case_sensitive": true,
+          "files": [
+            [
+              "/foo.ts",
+              "file",
+              "hello, world"
+            ],
+            [
+              "/dir1/file1.ts",
+              "file",
+              "export const foo = 42;"
+            ],
+            [
+              "/dir1/file2.ts",
+              "file",
+              "export const foo = 42;"
+            ],
+            [
+              "/dir2/file1.ts",
+              "file",
+              "export const foo = 42;"
+            ],
+            [
+              "/real/t.ts",
+              "file",
+              "target"
+            ],
+            [
+              "/linkfile",
+              "symlink",
+              "/foo.ts"
+            ],
+            [
+              "/linkdir",
+              "symlink",
+              "/real"
+            ],
+            [
+              "/dangling",
+              "symlink",
+              "/nowhere"
+            ]
+          ],
+          "op": "new_fs"
+        },
+        {
+          "op": "realpath",
+          "path": "/linkfile"
+        },
+        {
+          "op": "realpath",
+          "path": "/linkdir/t.ts"
+        },
+        {
+          "op": "realpath",
+          "path": "/dangling"
+        },
+        {
+          "op": "realpath",
+          "path": "/dir1/./"
+        },
+        {
+          "op": "realpath",
+          "path": "/"
+        },
+        {
+          "op": "realpath",
+          "path": "/missing.ts"
+        }
+      ],
+      "case": "filesystem/iovfs/realpath-capability-modes",
+      "discriminates": "The pair of modes is the point. (1) An implementation that returns the input unchanged when realpath is unsupported: the pin still normalizes through internal.SplitPath, so `/dir1/./` becomes `/dir1` even with no RealpathFS -- invisible to the pinned test, which only asks for an already-canonical path (iofs_test.go:125-126). (2) An implementation that forgets the leading-separator round trip: the marker backing shows the adapter hands over `dir1` and puts the `/` back (iofs.go:47-55), and a DOS-rooted path takes the `hadSlash == false` branch and comes back with no separator added. (3) An implementation that returns the NORMALIZED path when the backing errors: the pin returns the raw argument (iofs.go:195-197), so `/boom/./x.ts` comes back with its `.` intact in the RealpathFS mode and normalized away in the other -- the same input, two answers, decided by a capability. (4) An implementation that answers an error for a missing path instead of echoing it back.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/iovfs/iofs.go:ioFS.Realpath",
+      "order_sensitive": true,
+      "subject": "iovfs.Realpath"
+    },
+    {
+      "actions": [
+        {
+          "backing": "vfstest_map",
+          "case_sensitive": true,
+          "files": [
+            [
+              "/o/A.ts",
+              "file",
+              "a"
+            ],
+            [
+              "/o/_z.ts",
+              "file",
+              "b"
+            ],
+            [
+              "/o/a.ts",
+              "file",
+              "c"
+            ],
+            [
+              "/o/b.ts",
+              "file",
+              "d"
+            ],
+            [
+              "/o/Zd/k.ts",
+              "file",
+              "e"
+            ],
+            [
+              "/o/ad/k.ts",
+              "file",
+              "f"
+            ],
+            [
+              "/sub/tgt.ts",
+              "file",
+              "t"
+            ],
+            [
+              "/sub/d/x.ts",
+              "file",
+              "x"
+            ],
+            [
+              "/sub/lfile",
+              "symlink",
+              "/sub/tgt.ts"
+            ],
+            [
+              "/sub/ldir",
+              "symlink",
+              "/sub/d"
+            ],
+            [
+              "/sub/dead",
+              "symlink",
+              "/sub/nope"
+            ],
+            [
+              "/empty",
+              "dir",
+              ""
+            ]
+          ],
+          "op": "new_fs"
+        },
+        {
+          "op": "walk",
+          "root": "/"
+        },
+        {
+          "control": [
+            [
+              "/o",
+              "skip_dir"
+            ]
+          ],
+          "op": "walk",
+          "root": "/"
+        },
+        {
+          "control": [
+            [
+              "/o/Zd",
+              "skip_all"
+            ]
+          ],
+          "op": "walk",
+          "root": "/"
+        },
+        {
+          "control": [
+            [
+              "/o/a.ts",
+              "error"
+            ]
+          ],
+          "op": "walk",
+          "root": "/o"
+        },
+        {
+          "op": "walk",
+          "root": "/sub"
+        },
+        {
+          "op": "walk",
+          "root": "/o/A.ts"
+        },
+        {
+          "op": "walk",
+          "root": "/empty"
+        }
+      ],
+      "case": "filesystem/iovfs/walkdir-order-and-controls",
+      "discriminates": "(1) Swapped or reordered callback arguments: every row carries the path and the entry name separately, so a port that passes the basename as the path, or the full path as the name, is caught on the first row. (2) An implementation that emits `/.` or `` for the first row: the `path == \".\" -> \"\"` rewrite at internal.go:137-139 makes the root row exactly the root name, while the entry's own Name() stays `.`. (3) An implementation that walks in insertion or case-folded order rather than byte order. (4) An implementation that treats SkipDir as SkipAll, or that applies SkipDir to the parent rather than to the entry that returned it. (5) An implementation that swallows a callback error instead of returning it. (6) An implementation that refuses a file root: a file walks with exactly one callback. (7) An implementation that classifies a symlink entry as its target's type: the walk reports the link's own type, unlike GetAccessibleEntries.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/iovfs/iofs.go:ioFS.WalkDir",
+      "order_sensitive": true,
+      "subject": "iovfs.Walk"
+    },
+    {
+      "actions": [
+        {
+          "backing": "vfstest_map",
+          "case_sensitive": true,
+          "files": [
+            [
+              "/o/A.ts",
+              "file",
+              "a"
+            ],
+            [
+              "/o/_z.ts",
+              "file",
+              "b"
+            ],
+            [
+              "/o/a.ts",
+              "file",
+              "c"
+            ],
+            [
+              "/o/b.ts",
+              "file",
+              "d"
+            ],
+            [
+              "/o/Zd/k.ts",
+              "file",
+              "e"
+            ],
+            [
+              "/o/ad/k.ts",
+              "file",
+              "f"
+            ],
+            [
+              "/sub/tgt.ts",
+              "file",
+              "t"
+            ],
+            [
+              "/sub/d/x.ts",
+              "file",
+              "x"
+            ],
+            [
+              "/sub/lfile",
+              "symlink",
+              "/sub/tgt.ts"
+            ],
+            [
+              "/sub/ldir",
+              "symlink",
+              "/sub/d"
+            ],
+            [
+              "/sub/dead",
+              "symlink",
+              "/sub/nope"
+            ],
+            [
+              "/empty",
+              "dir",
+              ""
+            ]
+          ],
+          "op": "new_fs"
+        },
+        {
+          "op": "walk",
+          "root": "/missing"
+        },
+        {
+          "control": [
+            [
+              "/missing",
+              "propagate"
+            ]
+          ],
+          "op": "walk",
+          "root": "/missing"
+        },
+        {
+          "op": "walk",
+          "root": "http://server/x"
+        },
+        {
+          "op": "walk",
+          "root": "//server/share"
+        },
+        {
+          "op": "walk",
+          "root": "rel"
+        },
+        {
+          "op": "walk",
+          "root": "/o/"
+        },
+        {
+          "op": "walk",
+          "root": "^/untitled"
+        }
+      ],
+      "case": "filesystem/iovfs/walkdir-roots-and-errors",
+      "discriminates": "(1) An implementation that dereferences the DirEntry: a missing root produces one row whose entry is NIL and whose error is not-exist, and the walk still returns nil unless the callback propagates. (2) An implementation that treats an unwalkable root uniformly: a URL root walks with ZERO callbacks and returns nil (internal.go:132-135), a UNC root PANICS out of RootFor, and an unrooted root panics from the rootedness assertion -- three different outcomes for three unusable roots. (3) An implementation that reports the root row's path with the trailing separator it was given: `/o/` and `/o` must produce identical traces.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/iovfs/iofs.go:ioFS.WalkDir",
+      "order_sensitive": true,
+      "subject": "iovfs.Walk"
+    },
+    {
+      "actions": [
+        {
+          "backing": "vfstest_map",
+          "case_sensitive": true,
+          "files": [
+            [
+              "/a/keep.ts",
+              "file",
+              "keep"
+            ],
+            [
+              "/d/a.ts",
+              "file",
+              "a"
+            ],
+            [
+              "/d/sub/b.ts",
+              "file",
+              "b"
+            ],
+            [
+              "/dd/x.ts",
+              "file",
+              "x"
+            ],
+            [
+              "/real/t.ts",
+              "file",
+              "t"
+            ],
+            [
+              "/linkdir",
+              "symlink",
+              "/real"
+            ],
+            [
+              "/w.ts",
+              "file",
+              "seed"
+            ]
+          ],
+          "op": "new_fs"
+        },
+        {
+          "op": "fsys_kind"
+        },
+        {
+          "op": "fsys_identity",
+          "path": "w.ts"
+        },
+        {
+          "op": "fsys_read",
+          "path": "w.ts"
+        },
+        {
+          "content": "A",
+          "op": "write_file",
+          "path": "/x.ts"
+        },
+        {
+          "op": "fsys_read",
+          "path": "x.ts"
+        },
+        {
+          "op": "remove",
+          "path": "/w.ts"
+        },
+        {
+          "op": "fsys_read",
+          "path": "w.ts"
+        },
+        {
+          "backing": "fstest_map",
+          "case_sensitive": true,
+          "files": [
+            [
+              "/present.ts",
+              "file",
+              "p"
+            ]
+          ],
+          "op": "new_fs"
+        },
+        {
+          "op": "fsys_kind"
+        },
+        {
+          "op": "fsys_identity",
+          "path": "present.ts"
+        },
+        {
+          "op": "fsys_read",
+          "path": "present.ts"
+        }
+      ],
+      "case": "filesystem/iovfs/fsys-identity-and-aliasing",
+      "discriminates": "(1) An implementation that snapshots or copies the backing at construction: over the writable `vfstest_map` segment, a write through the ADAPTER must be visible to a read taken straight off the value FSys handed back, and a remove must be too. The only Rust FileSystem in this repo today is a snapshot, so this is the live risk and that segment runs the usual 'a mutation must not leak into an old snapshot' control in its mirror direction. (2) An implementation that hands back a wrapper or a sub-FS rather than the un-subbed original: FSys returns the exact value passed to From (iofs.go:220-222). The `vfstest_map` segment tests that directly with `==` on a pointer backing; the `fstest_map` segment cannot, because comparing two interfaces holding a Go map panics, so it records the not-comparable answer together with a stat taken THROUGH the returned value for a seeded path -- which shows the value resolves the backing's own path space and is not a sub-FS, but says nothing about aliasing. (3) Aliasing is observed ONLY over `vfstest_map`, and cannot be observed over `fstest_map`: `testing/fstest.MapFS` implements none of WritableFS's five methods, so From binds the panic closures (iofs.go:89-105) and a write or remove in that segment would panic rather than mutate. That corner is pinned by filesystem/iovfs/from-capability-matrix, not here. (4) An implementation that re-wraps the backing in the adapter type: fsys_kind records whether the value FSys returned is itself an adapter.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/iovfs/iofs.go:ioFS.FSys",
+      "order_sensitive": true,
+      "subject": "iovfs.Identity"
+    },
+    {
+      "actions": [
+        {
+          "backing": "fstest_map",
+          "case_sensitive": false,
+          "files": [
+            [
+              "/foo.ts",
+              "file",
+              "hello"
+            ]
+          ],
+          "op": "new_fs"
+        },
+        {
+          "op": "use_case_sensitive_file_names"
+        },
+        {
+          "op": "file_exists",
+          "path": "/foo.ts"
+        },
+        {
+          "op": "file_exists",
+          "path": "/FOO.TS"
+        },
+        {
+          "op": "read_file",
+          "path": "/FOO.TS"
+        },
+        {
+          "backing": "vfstest_map",
+          "case_sensitive": false,
+          "files": [
+            [
+              "/foo.ts",
+              "file",
+              "hello"
+            ]
+          ],
+          "op": "new_fs"
+        },
+        {
+          "op": "use_case_sensitive_file_names"
+        },
+        {
+          "op": "file_exists",
+          "path": "/FOO.TS"
+        },
+        {
+          "op": "read_file",
+          "path": "/FOO.TS"
+        },
+        {
+          "backing": "vfstest_map",
+          "case_sensitive": true,
+          "files": [
+            [
+              "/foo.ts",
+              "file",
+              "hello"
+            ]
+          ],
+          "op": "new_fs"
+        },
+        {
+          "op": "use_case_sensitive_file_names"
+        },
+        {
+          "op": "file_exists",
+          "path": "/FOO.TS"
+        },
+        {
+          "backing": "fstest_map",
+          "case_sensitive": true,
+          "files": [
+            [
+              "/foo.ts",
+              "file",
+              "hello"
+            ]
+          ],
+          "op": "new_fs"
+        },
+        {
+          "op": "use_case_sensitive_file_names"
+        },
+        {
+          "op": "file_exists",
+          "path": "/foo.ts"
+        }
+      ],
+      "case": "filesystem/iovfs/use-case-sensitive-file-names",
+      "discriminates": "(1) An implementation that derives the flag from the backing rather than storing the argument verbatim (iofs.go:151-153). (2) An implementation that makes the flag govern lookup INSIDE the adapter: over a backing that does not fold, `false` must still miss `/FOO.TS`, and over one that does, `false` must hit it -- the pinned doc is explicit that From does not handle case-insensitivity itself (iofs.go:41-42). That is exactly the mistake a port would make coming from the current Rust MemorySnapshot, where the flag and the lookup live in the same object. (3) An implementation that ignores the flag when the backing folds: `true` over a folding backing must miss.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/iovfs/iofs.go:ioFS.UseCaseSensitiveFileNames",
+      "order_sensitive": true,
+      "subject": "iovfs.Identity"
+    }
+  ]
+}

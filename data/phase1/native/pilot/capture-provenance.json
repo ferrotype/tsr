@@ -10,6 +10,7 @@
       "go": "go1.27.1",
       "goarch": "arm64",
       "goos": "darwin",
+      "helper": null,
       "observations_sha256": "cb015d1f5bf13a3590b76b33d85dadb741679965e0e33c6495af710f19fed50a",
       "package": "tsoptions",
       "trimpath": false
@@ -19,6 +20,7 @@
       "go": "go1.27.1",
       "goarch": "arm64",
       "goos": "darwin",
+      "helper": null,
       "observations_sha256": "f2c93614f17acbe46ac2092a69cb3f5f477709b820f75b4b60f061284a1749d0",
       "package": "json",
       "trimpath": true
@@ -28,6 +30,7 @@
       "go": "go1.27.1",
       "goarch": "arm64",
       "goos": "darwin",
+      "helper": null,
       "observations_sha256": "3638090dc67fa77fad2ed144b2485f36004af2de87594212d7173956ac088489",
       "package": "locale",
       "trimpath": true
@@ -37,6 +40,7 @@
       "go": "go1.27.1",
       "goarch": "arm64",
       "goos": "darwin",
+      "helper": null,
       "observations_sha256": "df4751685ab9fa28b39b833aa3919f757986ce413768adc0034c4b40c7eaf0b1",
       "package": "vfs/vfsmatch",
       "trimpath": true
@@ -45,8 +49,8 @@
   "partial": false,
   "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
   "requests_sha256": "f69d61200bac4dde13a2fc0165188be9f17d861582047700c5f4daeb0c90486a",
-  "rust_binary_sha256": "0174202c5c4b85bdcbc6374be74d89e8d7b5e306c6d9dd2e7826019f80b799a3",
-  "rust_observations_sha256": "8bd04cfe5c492d6a7442b583aecc502bf52406d6dbade92b0cbf23654ba8d149",
+  "rust_binary_sha256": "ec05b3a39822611ee3ff82c4b4475eeedf219a5a2435def3677a16a1f8e54d88",
+  "rust_observations_sha256": "2b442a808b65bcad16c609d05528af386b016b8dd496934c06121b918d5fd32c",
   "selected_cases": [
     "pilot/commandline/parse-build-verbose",
     "pilot/commandline/parse-composite-false",
@@ -57,8 +61,8 @@
   ],
   "source_closure": {
     ".cargo/config.toml": "716b49c90c25aeeebc4b0359b111a62927d166a1d7f02c4fe83b89d55fb74887",
-    "Cargo.lock": "947253433e52420c9954ffbd4a02404c8ab7feb8d17b1db83b2a354ebc983e80",
-    "Cargo.toml": "85df18867b35da1fa6b1cc46128cbf0d8703b6b07294a3243610c12abd4f96a0",
+    "Cargo.lock": "96db358f220318eb613c8f7f5c891003898730cb6fcc9e53b21a24894c93a5ab",
+    "Cargo.toml": "b1591b91dc03d022441071477b91d88e4a50b04393b5f66571b7c7a81e520a00",
     "crates/tsr_arena/Cargo.toml": "8cd7ae2a89f36e001d7614393ffc16b080686adbefa2879c4ae14e07973615d8",
     "crates/tsr_arena/LICENSE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
     "crates/tsr_arena/NOTICE": "c920c6e51ee08f6cb2c76d168b65a8916c3557ffafad5ee103894427daa80ec0",
@@ -475,7 +479,7 @@
     "crates/tsr_tspath/NOTICE": "c920c6e51ee08f6cb2c76d168b65a8916c3557ffafad5ee103894427daa80ec0",
     "crates/tsr_tspath/README.md": "773f7b7d6ec3b6023380c3cc4652279d8280c75315345014875aba620c1cd31a",
     "crates/tsr_tspath/src/comparison.rs": "479cd36dc9399e9e6f5cc2a450ae59ab40f8edf30f8d705ae44115a0b230c5a5",
-    "crates/tsr_tspath/src/lib.rs": "1fe1043c8bc8f6c47831f7a0d0c06401b51a8be9001bb452235f3f7a50cd2edf",
+    "crates/tsr_tspath/src/lib.rs": "f6171fb7e10a453be900e03c63d577647ebd0a89cc79602ee96695a6a9eeaf8b",
     "crates/tsr_tspath/tests/go_observations.rs": "a202f28c6d480df18b9af9ef16ccf905fa7cceefe0a4c9b5d8ab8e8eac77d3c9",
     "crates/tsr_vfs/Cargo.toml": "367ede29e794827d57426d33973fe6501341b026b286187b66ee23a9a219308b",
     "crates/tsr_vfs/LICENSE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
@@ -487,8 +491,8 @@
     "data/s04/toolchains.toml": "f7f747f45b0570c179771ba0e01e37a3fc3c1ca7e98dbf042b7eabf6d9f9c0be",
     "data/upstream.json": "d241c9d2b55d96bdff6b732efc646d57eeb61e4c04106a893daf667121ac15ac",
     "rust-toolchain.toml": "cdc04b5e11c4baaf96bac0569ea6680c4a598a5f4025338d7216d57187a60e7e",
-    "scripts/phase1.py": "50d02061e2dd24cef6718d5ad317096d9d097efe9abacf3c8247373c4a18d689",
-    "scripts/phase1_capture.py": "a71d66e04385fb542da2e4633c75ae4d6a088a3b0ca6056c3cf43ac6a7cbcf75",
+    "scripts/phase1.py": "12281ede53182b3115febce834cc49ab56781afa339cb9aa0c57a4ebc6463e17",
+    "scripts/phase1_capture.py": "d30709483bae34852a214c4eec88f8aa3b70c3b55e21de5b172dbdbac3cd32ca",
     "scripts/phase1_invocations.py": "4ed33ccba902292bae6f93a0ae4c108eb3cd44f8c038e43a59e65e360b391bdb",
     "scripts/s04.py": "552e676a31ef745c77b1c06304e2ef0153c83c3752a045347bc1a0f7c58e554a",
     "scripts/s04_common.py": "0c9ff31e34d83cbd9c500bb9462631b862a221acfb6f85e4816d1aedbb6a68d7",
@@ -498,7 +502,7 @@
     "tools/phase1/pilot/commandline_probe_test.go": "41760b1053844f95d088bbe07da4f61fb796b8e24ea317ee9a232328fd7991a2",
     "tools/phase1/pilot/json_probe_test.go": "9e3c9ba9bf6c261a6f63b941de6fb74ba03dae0987be620a0fecffd8d855b343",
     "tools/phase1/pilot/locale_probe_test.go": "459f942fbbed385c71dc5a503f760b07d300153ec2f69adc26e80b288582d7f0",
-    "tools/phase1/pilot/rust_observation.rs": "c3325a0c217c55367ec47a48007b200ccb7aa2c92c2600e8b48e0cc3dcf8ce1a",
+    "tools/phase1/pilot/rust_observation.rs": "1f6fdd8965f50d97274dd2a2aff6ebc50d4042baaa3ca5bd83ce28e2a5ce9cb3",
     "tools/phase1/pilot/vfsmatch_probe_test.go": "9a000fc980c32e87d79d1fb28a4375e5ea0ff0d01248cd480dd00d3fc5c4b69b"
   },
   "source_closure_size": 444,

@@ -1,0 +1,689 @@
+{
+  "requests": [
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "files": [],
+          "op": "wrap"
+        },
+        {
+          "op": "zero_mock_fields"
+        },
+        {
+          "op": "interface_methods"
+        },
+        {
+          "case_sensitive": true,
+          "files": [
+            {
+              "content": "A",
+              "kind": "file",
+              "path": "/a/x.ts"
+            }
+          ],
+          "files_other": [
+            {
+              "content": "B",
+              "kind": "file",
+              "path": "/a/x.ts"
+            }
+          ],
+          "op": "rebind_source",
+          "path": "/a/x.ts"
+        },
+        {
+          "data": "A2",
+          "op": "mutate_source",
+          "path": "/a/x.ts"
+        }
+      ],
+      "case": "filesystem/vfsmock/wrap-wires-every-interface-method",
+      "discriminates": "A port whose wrapper wires eleven of the twelve members, or that grows a thirteenth FileSystem member without a matching recorded delegate. The observation is a count and a boolean, not a name list: the interface's member count (12) beside the live wrapper's wired and unwired counts, against a zero FSMock that wires none, so `every_member_wired` is produced by something that can also answer false. Counts rather than names because the names would be Go's generated `AppendFileFunc`, `ChtimesFunc`, ... struct fields and the `vfs.FS` method set, which a Rust recorder has no counterpart for -- a port could only match them by writing Go identifiers into Rust, which is reading the expected value. The count is what the pinned wrapper_test.go:TestWrap asserts field by field, in the form a port can answer about its own trait. The last two actions separate three wrappers an effect comparison cannot: one bound to the caller's variable (reassigning the source after Wrap must not redirect it, so the read still answers \"A\"), one holding a snapshot (a write made straight to the wrapped filesystem must still be visible through the wrapper, so the read answers \"A2\"), and one holding the delegate live, which is the pin.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/vfsmock/wrapper.go:Wrap",
+      "order_sensitive": true,
+      "subject": "vfsmock.FSMock"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "files": [
+            {
+              "content": "gee",
+              "kind": "file",
+              "path": "/a/b/g.ts"
+            }
+          ],
+          "op": "wrap"
+        },
+        {
+          "op": "read_append_file_calls"
+        },
+        {
+          "data": " more",
+          "op": "append_file",
+          "path": "/a/b/g.ts"
+        },
+        {
+          "data": "x",
+          "op": "append_file",
+          "path": "/a/b/g.ts/child.ts"
+        },
+        {
+          "data": "new",
+          "op": "append_file",
+          "path": "/a/fresh/deep.ts"
+        },
+        {
+          "op": "read_append_file_calls"
+        },
+        {
+          "op": "inner_read_file",
+          "path": "/a/b/g.ts"
+        },
+        {
+          "op": "inner_entry_names",
+          "root": "/"
+        },
+        {
+          "data": "d",
+          "op": "unconfigured_append_file",
+          "path": "/p"
+        },
+        {
+          "data": "d",
+          "op": "panicking_append_file",
+          "path": "/p"
+        }
+      ],
+      "case": "filesystem/vfsmock/append-file-records-before-delegating",
+      "discriminates": "A recorder that appends after the delegate returns, or only for calls that succeeded. The pinned order is nil-check, append, call (mock_generated.go:187-202), so an unwired method panics with an empty log while a delegate that panics leaves its arguments recorded; a port that logged around the call instead of before it inverts both, and one that logged only successes drops the middle append, whose parent is a file. The unwired panic is recorded as the class `unwired_method` and what it pins is the empty log, i.e. that the nil check precedes the append. Its literal text -- mock_generated.go:189 raises `panic(\"FSMock.AppendFileFunc: method is nil but FS.AppendFile was just called\")` -- is documented here rather than frozen as an expected value: the sentence names a generated per-method function field, and the Rust shape this group asks for takes the delegate whole and so has no \"method is nil\" state to report, which would leave a port copying the string out of the capture. The append to /a/fresh/deep.ts catches a wrapper that retried at its own layer: the delegate's own mkdirAll retry (iofs.go:201-213, reached through AppendFile at :216) creates two directories and a file, and must still be a single log entry.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/vfsmock/mock_generated.go:FSMock.AppendFile",
+      "order_sensitive": true,
+      "subject": "vfsmock.FSMock"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "files": [
+            {
+              "content": "hello",
+              "kind": "file",
+              "path": "/a/b/f.ts"
+            }
+          ],
+          "op": "wrap"
+        },
+        {
+          "op": "read_chtimes_calls"
+        },
+        {
+          "atime": "2001-01-01T00:00:00Z",
+          "mtime": "2002-02-02T00:00:00Z",
+          "op": "chtimes",
+          "path": "/a/b/f.ts"
+        },
+        {
+          "atime": "2003-03-03T00:00:00Z",
+          "mtime": "2004-04-04T00:00:00Z",
+          "op": "chtimes",
+          "path": "/a/missing.ts"
+        },
+        {
+          "op": "read_chtimes_calls"
+        },
+        {
+          "atime": "2001-01-01T00:00:00Z",
+          "mtime": "2002-02-02T00:00:00Z",
+          "op": "inner_modtime_class",
+          "path": "/a/b/f.ts"
+        }
+      ],
+      "case": "filesystem/vfsmock/chtimes-keeps-the-access-time-the-write-discards",
+      "discriminates": "A port whose recorded call carries fewer fields than the pin's. This is the lost-timestamp control in its instrumented form: the pinned log keeps both instants for both calls, including the one that failed because the file does not exist, while the implementation underneath keeps only the modification time (vfstest.go:605-616 assigns ModTime and nothing else, which the last action confirms). tsr_vfs::FileSystem::change_times is fn change_times(&self, _path: &[u8]) (crates/tsr_vfs/src/lib.rs:92) and takes neither instant, so a port built on it can record neither; this is the one committed place where that decision is visible as data rather than as an absence, because the value the implementation drops is still sitting in the log.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/vfsmock/mock_generated.go:FSMock.Chtimes",
+      "order_sensitive": true,
+      "subject": "vfsmock.FSMock"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "files": [
+            {
+              "content": "hello",
+              "kind": "file",
+              "path": "/a/b/f.ts"
+            },
+            {
+              "content": "gee",
+              "kind": "file",
+              "path": "/a/b/g.ts"
+            },
+            {
+              "content": "aitch",
+              "kind": "file",
+              "path": "/a/b/sub/h.ts"
+            },
+            {
+              "content": "see",
+              "kind": "file",
+              "path": "/a/c.ts"
+            },
+            {
+              "kind": "symlink",
+              "path": "/a/link-to-dir",
+              "target": "/a/b"
+            },
+            {
+              "kind": "symlink",
+              "path": "/a/link-to-file",
+              "target": "/a/b/f.ts"
+            },
+            {
+              "kind": "symlink",
+              "path": "/a/dangling",
+              "target": "/a/nope"
+            }
+          ],
+          "op": "wrap"
+        },
+        {
+          "op": "read_file_exists_calls"
+        },
+        {
+          "op": "read_directory_exists_calls"
+        },
+        {
+          "op": "read_stat_calls"
+        },
+        {
+          "op": "file_exists",
+          "path": "/a/b/f.ts"
+        },
+        {
+          "op": "file_exists",
+          "path": "/a/b"
+        },
+        {
+          "op": "file_exists",
+          "path": "/a/link-to-file"
+        },
+        {
+          "op": "file_exists",
+          "path": "/a/dangling"
+        },
+        {
+          "op": "file_exists",
+          "path": "/a/nothing"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/a/b"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/a/b/f.ts"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/a/link-to-dir"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/a/nothing"
+        },
+        {
+          "op": "stat",
+          "path": "/a/b/f.ts"
+        },
+        {
+          "op": "stat",
+          "path": "/a/b"
+        },
+        {
+          "op": "stat",
+          "path": "/a/link-to-dir"
+        },
+        {
+          "op": "stat",
+          "path": "/a/link-to-file"
+        },
+        {
+          "op": "stat",
+          "path": "/a/nothing"
+        },
+        {
+          "op": "read_file_exists_calls"
+        },
+        {
+          "op": "read_directory_exists_calls"
+        },
+        {
+          "op": "read_stat_calls"
+        }
+      ],
+      "case": "filesystem/vfsmock/predicate-dispatch-is-independent-of-stat",
+      "discriminates": "A port whose file_exists and directory_exists are stat-derived defaults. In the pin the three are independent dispatch sites and the three logs come out 5, 4 and 5; a recorder over tsr_vfs's trait defaults (crates/tsr_vfs/src/lib.rs:77-82) logs a stat for every predicate, so the stat count absorbs the other two and reads 14 while both predicate logs read 0. Reading the three logs in one trace is what makes that visible: one log alone cannot distinguish a predicate that forwarded from one that was derived. The counts are the whole of what the predicate rows discriminate, and the booleans are not: the pin's own FileExists is `stat := vfs.Stat(path); return stat != nil && !stat.IsDir()` (internal.go:58-61) and DirectoryExists its mirror (:63-66), which is exactly the tsr_vfs trait default at crates/tsr_vfs/src/lib.rs:77-82, so the derived predicate reproduces all nine booleans -- directory, dangling symlink and missing path alike -- and the sequence adds no classification boundary. The five paths are there to give the log an ordered argument list a memoising or reordering recorder cannot fake, not to separate the answers. The stat rows settle which FileInfo members survive the wrapper: the pin exposes Name (the resolved target's base name, so a stat through /a/link-to-dir reports \"b\"), Size, IsDir, a non-zero ModTime, a nil Sys and a mode string, where tsr_vfs::FileInfo carries directory and size only (crates/tsr_vfs/src/lib.rs:65-68).",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/vfsmock/mock_generated.go:FSMock.FileExists",
+      "order_sensitive": true,
+      "subject": "vfsmock.FSMock"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "files": [
+            {
+              "content": "hello",
+              "kind": "file",
+              "path": "/a/b/f.ts"
+            },
+            {
+              "content": "gee",
+              "kind": "file",
+              "path": "/a/b/g.ts"
+            },
+            {
+              "content": "aitch",
+              "kind": "file",
+              "path": "/a/b/sub/h.ts"
+            },
+            {
+              "content": "see",
+              "kind": "file",
+              "path": "/a/c.ts"
+            },
+            {
+              "kind": "symlink",
+              "path": "/a/link-to-dir",
+              "target": "/a/b"
+            },
+            {
+              "kind": "symlink",
+              "path": "/a/link-to-file",
+              "target": "/a/b/f.ts"
+            },
+            {
+              "kind": "symlink",
+              "path": "/a/dangling",
+              "target": "/a/nope"
+            }
+          ],
+          "op": "wrap"
+        },
+        {
+          "op": "read_read_file_calls"
+        },
+        {
+          "op": "read_file",
+          "path": "/a/b/f.ts"
+        },
+        {
+          "op": "read_file",
+          "path": "/a/nothing"
+        },
+        {
+          "op": "read_file",
+          "path": "/a/b/f.ts"
+        },
+        {
+          "op": "read_file",
+          "path": "/a/link-to-file"
+        },
+        {
+          "op": "read_read_file_calls"
+        },
+        {
+          "op": "read_realpath_calls"
+        },
+        {
+          "op": "realpath",
+          "path": "/a/b/f.ts"
+        },
+        {
+          "op": "realpath",
+          "path": "/A/B/F.TS"
+        },
+        {
+          "op": "realpath",
+          "path": "/a/link-to-file"
+        },
+        {
+          "op": "realpath",
+          "path": "/a/nothing"
+        },
+        {
+          "op": "realpath",
+          "path": "/a/../a/b/f.ts"
+        },
+        {
+          "op": "realpath",
+          "path": "/a/b/f.ts"
+        },
+        {
+          "op": "read_realpath_calls"
+        }
+      ],
+      "case": "filesystem/vfsmock/read-and-realpath-log-every-request",
+      "discriminates": "A caching adapter, which returned bytes alone cannot expose: a read served from a cache shows as a missing log entry and a cache that failed to serve as an extra one. The deliberate repeat of /a/b/f.ts must produce a third read entry and the repeated realpath argument a sixth realpath entry; a memoising port produces three and five. The realpath rows catch two further ports. One that normalises before it forwards: the pin logs the caller's own \"/a/../a/b/f.ts\" while answering \"/a/b/f.ts\", because normalisation happens inside the delegate (iofs.go:188-196). And one whose realpath can fail: the pinned operation is total at this layer and returns the caller's path unchanged for a missing path and for a case-varied path on a case-sensitive filesystem, where MemorySnapshot::realpath (crates/tsr_vfs/src/lib.rs:283-290) answers with its own normalised form.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/vfsmock/mock_generated.go:FSMock.ReadFile",
+      "order_sensitive": true,
+      "subject": "vfsmock.FSMock"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "files": [
+            {
+              "content": "hello",
+              "kind": "file",
+              "path": "/a/b/f.ts"
+            },
+            {
+              "content": "gee",
+              "kind": "file",
+              "path": "/a/b/g.ts"
+            },
+            {
+              "content": "aitch",
+              "kind": "file",
+              "path": "/a/b/sub/h.ts"
+            },
+            {
+              "content": "see",
+              "kind": "file",
+              "path": "/a/c.ts"
+            },
+            {
+              "kind": "symlink",
+              "path": "/a/link-to-dir",
+              "target": "/a/b"
+            },
+            {
+              "kind": "symlink",
+              "path": "/a/link-to-file",
+              "target": "/a/b/f.ts"
+            },
+            {
+              "kind": "symlink",
+              "path": "/a/dangling",
+              "target": "/a/nope"
+            }
+          ],
+          "op": "wrap"
+        },
+        {
+          "op": "read_get_accessible_entries_calls"
+        },
+        {
+          "op": "get_accessible_entries",
+          "path": "/a/b"
+        },
+        {
+          "op": "get_accessible_entries",
+          "path": "/a"
+        },
+        {
+          "op": "get_accessible_entries",
+          "path": "/a/b"
+        },
+        {
+          "op": "get_accessible_entries",
+          "path": "/a/link-to-dir"
+        },
+        {
+          "op": "get_accessible_entries",
+          "path": "/a/nothing"
+        },
+        {
+          "op": "read_get_accessible_entries_calls"
+        }
+      ],
+      "case": "filesystem/vfsmock/entries-listing-is-not-memoised",
+      "discriminates": "A wrapper that memoises a listing: the five requests name four distinct paths, so the log must hold five entries and a caching port holds four. That is the instrument the cached adapter cases reuse to show a cache hit did not reach the inner filesystem. The recorded Entries also settle which members can be absent, and correct the expectation that this substrate exercises the nil-versus-empty Symlinks tri-state: it does not. internal.go:69 assigns Symlinks an empty map before anything is read, so through iovfs it is never nil -- not even for the missing directory -- while Files and Directories come back nil for that same missing directory. tsr_vfs::Entries is the mirror image (crates/tsr_vfs/src/lib.rs:59-64): symlinks is the one field that can express absence and files/directories are plain Vecs, so a port reproduces the absent members on exactly the wrong field. The listings themselves pin the symlink classification: a symlink to a file lands in Files and in Symlinks, a symlink to a directory in Directories and in Symlinks, and a dangling symlink is dropped from all three.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/vfsmock/mock_generated.go:FSMock.GetAccessibleEntries",
+      "order_sensitive": true,
+      "subject": "vfsmock.FSMock"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "files": [
+            {
+              "content": "hello",
+              "kind": "file",
+              "path": "/a/b/f.ts"
+            },
+            {
+              "content": "gee",
+              "kind": "file",
+              "path": "/a/b/g.ts"
+            },
+            {
+              "content": "aitch",
+              "kind": "file",
+              "path": "/a/b/sub/h.ts"
+            },
+            {
+              "content": "see",
+              "kind": "file",
+              "path": "/a/c.ts"
+            }
+          ],
+          "op": "wrap"
+        },
+        {
+          "op": "read_remove_calls"
+        },
+        {
+          "op": "inner_entry_names",
+          "root": "/"
+        },
+        {
+          "op": "remove",
+          "path": "/a/b"
+        },
+        {
+          "op": "inner_entry_names",
+          "root": "/"
+        },
+        {
+          "op": "remove",
+          "path": "/a/nothing"
+        },
+        {
+          "op": "remove",
+          "path": "/a/c.ts"
+        },
+        {
+          "op": "inner_entry_names",
+          "root": "/"
+        },
+        {
+          "op": "read_remove_calls"
+        }
+      ],
+      "case": "filesystem/vfsmock/remove-is-one-call-per-request",
+      "discriminates": "A port that implemented recursive removal by re-entering the public remove once per child. The pin logs one call for /a/b and the entry listings either side of it show five entries gone with that single call -- the directory, two files, a subdirectory and its file -- so any count above one is the failure, and the log and the effect view are recorded in the same trace so neither can be read alone. The missing path pins the other half: MapFS.remove returns nil when the entry is absent (vfstest.go:214-221), so removing something that is not there is not an error, and a port that answered not-found diverges on the return while still having to log the attempt.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/vfsmock/mock_generated.go:FSMock.Remove",
+      "order_sensitive": true,
+      "subject": "vfsmock.FSMock"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "files": [
+            {
+              "content": "hello",
+              "kind": "file",
+              "path": "/a/b/f.ts"
+            }
+          ],
+          "op": "wrap"
+        },
+        {
+          "op": "read_write_file_calls"
+        },
+        {
+          "data": "one",
+          "op": "write_file",
+          "path": "/a/b/f.ts"
+        },
+        {
+          "data": "two",
+          "op": "write_file",
+          "path": "/a/deep/deeper/n.ts"
+        },
+        {
+          "op": "inner_entry_names",
+          "root": "/a"
+        },
+        {
+          "data": "three",
+          "op": "write_file",
+          "path": "/a/b/f.ts/child.ts"
+        },
+        {
+          "op": "read_write_file_calls"
+        },
+        {
+          "op": "inner_read_file",
+          "path": "/a/deep/deeper/n.ts"
+        }
+      ],
+      "case": "filesystem/vfsmock/write-file-logs-once-through-the-mkdirall-retry",
+      "discriminates": "A wrapper that retried at its own layer. The pinned ioFS.writeFileEnsuringDir writes, and on failure calls mkdirAll and writes again (iofs.go:201-213), all inside the delegate: the write to /a/deep/deeper/n.ts succeeds after that retry, creates /a/deep, /a/deep/deeper and the file, and is still one log entry, so a port whose wrapper performed the retry logs two. The write to /a/b/f.ts/child.ts, whose parent is a regular file, catches a recorder that logs only successes: both attempts fail there and it must still be the third entry. Between them the count separates 'the adapter forwarded once' from 'the adapter retried', which the resulting file contents cannot.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/vfsmock/mock_generated.go:FSMock.WriteFile",
+      "order_sensitive": true,
+      "subject": "vfsmock.FSMock"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "files": [
+            {
+              "content": "hello",
+              "kind": "file",
+              "path": "/a/b/f.ts"
+            },
+            {
+              "content": "gee",
+              "kind": "file",
+              "path": "/a/b/g.ts"
+            },
+            {
+              "content": "aitch",
+              "kind": "file",
+              "path": "/a/b/sub/h.ts"
+            },
+            {
+              "content": "see",
+              "kind": "file",
+              "path": "/a/c.ts"
+            },
+            {
+              "kind": "symlink",
+              "path": "/a/link-to-dir",
+              "target": "/a/b"
+            },
+            {
+              "kind": "symlink",
+              "path": "/a/dangling",
+              "target": "/a/nope"
+            }
+          ],
+          "op": "wrap"
+        },
+        {
+          "op": "walk_dir",
+          "root": "/",
+          "stop_at": "",
+          "stop_kind": "none"
+        },
+        {
+          "op": "walk_dir",
+          "root": "/",
+          "stop_at": "/a/b",
+          "stop_kind": "skip_dir"
+        },
+        {
+          "op": "walk_dir",
+          "root": "/",
+          "stop_at": "/a/b",
+          "stop_kind": "skip_all"
+        },
+        {
+          "op": "walk_dir",
+          "root": "/a/nothing",
+          "stop_at": "",
+          "stop_kind": "none"
+        },
+        {
+          "op": "read_walk_dir_calls"
+        }
+      ],
+      "case": "filesystem/vfsmock/walk-dir-records-the-supplied-callback",
+      "discriminates": "A wrapper that substituted its own callback and broke the pass-through, which no effect-based comparison sees. Because the pinned log records the function value the caller handed in, each recorded callback is invoked afterwards with a sentinel path, a nil entry and a not-exist error, and the row keeps three things: whether it reached the recorder this trace built, the arguments that recorder was handed, and the class of the answer that came back. That catches a recorded callback that never reaches the caller's, one handed a rewritten path or a dropped error, and one whose SkipAll is swallowed on the way back. It is explicitly not an identity check: a tracking adapter that wraps the caller's callback and forwards (path, entry, err) unchanged reaches the same recorder with the same arguments and passes, and nothing short of serialising a function value would separate it from the pin. The three walks over the same tree pin the callback's return as control flow -- SkipDir at /a/b prunes its three descendants while the walk continues, SkipAll at /a/b ends it -- and separate a port that treated the two as the same. The walk rooted at a missing path pins that the error reaches the callback with no directory entry while WalkDir itself returns success, which a port that surfaced the error as the walk's return gets backwards. The walk also does not follow symlinks: /a/link-to-dir is visited as a leaf.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/vfsmock/mock_generated.go:FSMock.WalkDir",
+      "order_sensitive": true,
+      "subject": "vfsmock.FSMock"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "files": [],
+          "op": "wrap"
+        },
+        {
+          "op": "read_use_case_sensitive_file_names_calls"
+        },
+        {
+          "op": "use_case_sensitive_file_names"
+        },
+        {
+          "op": "use_case_sensitive_file_names"
+        },
+        {
+          "op": "read_use_case_sensitive_file_names_calls"
+        },
+        {
+          "case_sensitive": false,
+          "files": [],
+          "op": "wrap"
+        },
+        {
+          "op": "read_use_case_sensitive_file_names_calls"
+        },
+        {
+          "op": "use_case_sensitive_file_names"
+        },
+        {
+          "op": "read_use_case_sensitive_file_names_calls"
+        }
+      ],
+      "case": "filesystem/vfsmock/case-sensitivity-query-is-counted-not-cached",
+      "discriminates": "A wrapper that memoised an argument-free query, or that skipped logging one. The pinned log element is struct{} (mock_generated.go:154), so the count is the entire payload: two calls must give 2 and a memoising port gives 1, while a recorder keyed by arguments -- the natural optimisation once a call has none -- gives 0. Re-wrapping with the opposite flag pins the rest: a fresh Wrap starts from its own empty log, so a port whose recorder shared a log across wrappers reads 2 and 3 where this trace reads 0 and 1, and the answer follows the newly wrapped filesystem's flag rather than a constant. What the 0, 2, 0, 1 sequence does not separate is a per-call query from a flag captured at construction: the pinned delegate captures it at construction -- ioFS.UseCaseSensitiveFileNames returns the useCaseSensitiveFileNames field (iofs.go:151-153, declared at :139 and assigned once in From at :125) -- and the counts come from FSMock's log, not from the delegate, so a port that read the flag once at construction produces this sequence exactly. It is the smallest honest discriminator available for this member.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/vfs/vfsmock/mock_generated.go:FSMock.UseCaseSensitiveFileNames",
+      "order_sensitive": true,
+      "subject": "vfsmock.FSMock"
+    }
+  ]
+}

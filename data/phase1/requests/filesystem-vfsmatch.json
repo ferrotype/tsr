@@ -1,0 +1,2790 @@
+{
+  "family": "filesystem",
+  "requests": [
+    {
+      "actions": [
+        {
+          "op": "usage_string",
+          "value": 0
+        },
+        {
+          "op": "usage_string",
+          "value": 1
+        },
+        {
+          "op": "usage_string",
+          "value": 2
+        },
+        {
+          "op": "usage_string",
+          "value": 3
+        },
+        {
+          "op": "usage_string",
+          "value": -1
+        },
+        {
+          "op": "usage_string",
+          "value": 127
+        },
+        {
+          "op": "usage_string",
+          "value": -128
+        }
+      ],
+      "case": "filesystem/vfsmatch/usage-string-domain",
+      "dialect": "vfsmatch",
+      "discriminates": "a port that renders the Rust path-qualified form (Usage::Files), the untrimmed Go constant name (UsageFiles), a lower-cased form, or that reorders the three names against the pinned discriminants; and, in the last four rows, a port with no representation for an out-of-domain Usage at all. The generated guard is `if i < 0 || idx >= len(_Usage_index)-1` (stringer_generated.go:20-23) over the table _Usage_name = \"FilesDirectoriesExclude\" with offsets {0,5,16,23}, so 3 and 127 leave through the high arm and -1 and -128 through the low one, all four rendering Usage(n) with the signed decimal.",
+      "operation": "tsc/internal/vfs/vfsmatch/stringer_generated.go:Usage.String",
+      "order_sensitive": true,
+      "subject": "vfsmatch.Usage"
+    },
+    {
+      "actions": [
+        {
+          "component": "foo",
+          "op": "is_implicit_glob"
+        },
+        {
+          "component": "foo.ts",
+          "op": "is_implicit_glob"
+        },
+        {
+          "component": "fo*o",
+          "op": "is_implicit_glob"
+        },
+        {
+          "component": "fo?o",
+          "op": "is_implicit_glob"
+        },
+        {
+          "component": "a.b.c",
+          "op": "is_implicit_glob"
+        },
+        {
+          "component": "",
+          "op": "is_implicit_glob"
+        },
+        {
+          "component": ".",
+          "op": "is_implicit_glob"
+        },
+        {
+          "component": "..",
+          "op": "is_implicit_glob"
+        },
+        {
+          "component": ".hidden",
+          "op": "is_implicit_glob"
+        },
+        {
+          "component": "node_modules",
+          "op": "is_implicit_glob"
+        },
+        {
+          "component": "**",
+          "op": "is_implicit_glob"
+        },
+        {
+          "component": "src",
+          "op": "is_implicit_glob"
+        },
+        {
+          "component": "src/foo",
+          "op": "is_implicit_glob"
+        },
+        {
+          "component": "\u65e5\u672c\u8a9e",
+          "op": "is_implicit_glob"
+        },
+        {
+          "component": "**/*.ts",
+          "op": "is_implicit_glob"
+        },
+        {
+          "component_hex": "eda080",
+          "op": "is_implicit_glob_hex"
+        },
+        {
+          "component_hex": "80",
+          "op": "is_implicit_glob_hex"
+        },
+        {
+          "component_hex": "ff2e",
+          "op": "is_implicit_glob_hex"
+        },
+        {
+          "component_hex": "ffffffffffffffffff",
+          "op": "is_implicit_glob_hex"
+        },
+        {
+          "component_hex": "ffffffffffffffff2a",
+          "op": "is_implicit_glob_hex"
+        },
+        {
+          "component_hex": "ffffffffffffffff2e",
+          "op": "is_implicit_glob_hex"
+        }
+      ],
+      "case": "filesystem/vfsmatch/is-implicit-glob-domain",
+      "dialect": "vfsmatch",
+      "discriminates": "a port that (a) tests only `.` and forgets `*` and `?`, so a component like fo*o is taken for a literal directory and silently gains an implicit /**/* ; (b) uses host extension semantics (Path::extension) instead of a raw character scan, so .hidden answers false where the pin answers false for the same reason but `..` and `.` would diverge; (c) special-cases the empty string, which the pin answers true for -- and that answer is load-bearing, because compileGlobPattern calls it on core.LastOrNil(parts), which is the empty string when the spec has no parts; (d) rejects or repairs invalid UTF-8. The `src/foo` row pins that the predicate scans whatever string it is handed and has no last-component logic of its own: the caller at vfsmatch.go:153 is what passes only the last part.",
+      "operation": "tsc/internal/vfs/vfsmatch/vfsmatch.go:IsImplicitGlob",
+      "order_sensitive": true,
+      "subject": "vfsmatch.IsImplicitGlob"
+    },
+    {
+      "actions": [
+        {
+          "basePath": "/base",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/a.ts"
+          ],
+          "specs": [],
+          "usage": 0
+        },
+        {
+          "basePath": "/base",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/a.ts"
+          ],
+          "specs": [
+            "**"
+          ],
+          "usage": 0
+        },
+        {
+          "basePath": "/base",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/a.ts"
+          ],
+          "specs": [
+            "**"
+          ],
+          "usage": 1
+        },
+        {
+          "basePath": "/base",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/a.ts",
+            "/base"
+          ],
+          "specs": [
+            "**"
+          ],
+          "usage": 2
+        },
+        {
+          "basePath": "/base",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/a.ts",
+            "/base/a.js"
+          ],
+          "specs": [
+            "**",
+            "*.ts"
+          ],
+          "usage": 0
+        },
+        {
+          "basePath": "/base",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/a.ts"
+          ],
+          "specs": [
+            "*.ts",
+            "**"
+          ],
+          "usage": 0
+        },
+        {
+          "basePath": "/base",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/a.ts"
+          ],
+          "specs": [
+            "**",
+            "**",
+            "*.ts"
+          ],
+          "usage": 0
+        }
+      ],
+      "case": "filesystem/vfsmatch/spec-matcher-compile-drop-and-index",
+      "dialect": "vfsmatch",
+      "discriminates": "the index shift. A spec whose compilation fails is DROPPED from the pattern list (vfsmatch.go:708-712) rather than holding a placeholder slot, so with specs=[\"**\",\"*.ts\"] under UsageFiles the surviving pattern occupies index 0 and MatchIndex answers 0; a port that keeps a slot answers 1, and with three specs and two drops it answers 2. The first four rows separate the two independent nil arms: an empty spec list returns nil at :704-706 before compiling anything, while a spec list where nothing compiles returns nil at :713-715 -- and the same \"**\" that compiles to nothing under Files and Directories compiles fine under Exclude, because the `**`-tail drop at :145 is gated on usage != UsageExclude.",
+      "operation": "tsc/internal/vfs/vfsmatch/vfsmatch.go:NewSpecMatcher",
+      "order_sensitive": true,
+      "subject": "vfsmatch.SpecMatcher"
+    },
+    {
+      "actions": [
+        {
+          "basePath": "/dev",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/dev/src/a.ts",
+            "/dev/a.ts",
+            "/dev/a.js"
+          ],
+          "specs": [
+            "**/*.ts",
+            "src/*.ts"
+          ],
+          "usage": 0
+        },
+        {
+          "basePath": "/dev",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/dev/src/a.ts",
+            "/dev/a.ts"
+          ],
+          "specs": [
+            "src/*.ts",
+            "**/*.ts"
+          ],
+          "usage": 0
+        },
+        {
+          "basePath": "/dev",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/dev/b/x.ts",
+            "/dev/a/x.ts",
+            "/dev/c/x.ts"
+          ],
+          "specs": [
+            "a/*.ts",
+            "b/*.ts",
+            "**/*.ts"
+          ],
+          "usage": 0
+        }
+      ],
+      "case": "filesystem/vfsmatch/spec-matcher-first-match-wins",
+      "dialect": "vfsmatch",
+      "discriminates": "first-match-wins, which a port using a find-then-max, a sort by specificity or a set lookup loses. With specs=[\"**/*.ts\",\"src/*.ts\"] and path /dev/src/a.ts BOTH patterns match and the pin answers 0 (vfsmatch.go:692-698 returns on the first match); a port that answers 1 is caught. The second row is the same two specs reversed, where /dev/src/a.ts must now answer 0 for the other pattern and /dev/a.ts must answer 1 -- so a port that always answers 0, or that answers by pattern identity rather than position, fails one of the two. The third row places the only matching spec at index 1 and then at index 2, and ends with a path no spec matches, which must be -1 rather than 0.",
+      "operation": "tsc/internal/vfs/vfsmatch/vfsmatch.go:SpecMatcher.MatchIndex",
+      "order_sensitive": true,
+      "subject": "vfsmatch.SpecMatcher"
+    },
+    {
+      "actions": [
+        {
+          "basePath": "/base",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/src/a.ts",
+            "/base/src/a/b.ts"
+          ],
+          "specs": [
+            "src/*.ts"
+          ],
+          "usage": 0
+        },
+        {
+          "basePath": "/base",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/src/a.ts",
+            "/base/src/a/b.ts"
+          ],
+          "specs": [
+            "src/*.ts"
+          ],
+          "usage": 2
+        },
+        {
+          "basePath": "/base",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/src",
+            "/base/src/a.ts",
+            "/base/src/deep/a.ts"
+          ],
+          "specs": [
+            "src"
+          ],
+          "usage": 2
+        },
+        {
+          "basePath": "/base",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/src",
+            "/base/src/a.ts",
+            "/base/src/deep/a.ts"
+          ],
+          "specs": [
+            "src"
+          ],
+          "usage": 0
+        },
+        {
+          "basePath": "/base",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/a",
+            "/base/a/x",
+            "/base/a/x/y.ts"
+          ],
+          "specs": [
+            "a/**"
+          ],
+          "usage": 2
+        },
+        {
+          "basePath": "/base",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/a",
+            "/base/a/b",
+            "/base/a/x/b"
+          ],
+          "specs": [
+            "a/**/b"
+          ],
+          "usage": 2
+        },
+        {
+          "basePath": "/base",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/a"
+          ],
+          "specs": [
+            "a/**/**"
+          ],
+          "usage": 2
+        },
+        {
+          "basePath": "/base",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/a",
+            "/base/a/b",
+            "/base/a/b/c"
+          ],
+          "specs": [
+            "a/b"
+          ],
+          "usage": 2
+        }
+      ],
+      "case": "filesystem/vfsmatch/spec-matcher-spent-pattern-tail",
+      "dialect": "vfsmatch",
+      "discriminates": "the two halves of the spent-pattern rule, which are the sharpest include/exclude asymmetry in the file and which a port is likely to collapse into one. When the PATH runs out first, patternSatisfied (vfsmatch.go:283-292) is consulted and the comment at :285 says explicitly that the rule is the SAME for includes and excludes -- only trailing ** may match nothing -- so exclude a/**/b against /base/a must be FALSE and a port that special-cases excludes here is following an intuition the pin rejects. When the PATTERN runs out first, :246-248 returns isExclude && !prefixOnly, so include src/*.ts must NOT match /base/src/a/b.ts while exclude src/*.ts must. Rows 3 and 4 pin the symmetry rather than an asymmetry, and under the pin they are byte-identical. Both usages expand src to src/**/*, and for /base/src it is the PATH that runs out, so patternSatisfied is exactly what answers: the tail is [**, *], which :286-290 refuses because * is not kindDoubleAsterisk, and the exclude and the include both answer /base/src -> false. The asymmetry that does exist around this tail is not patternSatisfied's: :145 drops any include spec whose last component is **, so an include can never present an all-** tail at all and the true arm over a non-empty tail (rows 5 and 7) is reachable for excludes only. What rows 3 and 4 catch is a port that branched on isExclude inside patternSatisfied for this tail; what no row here can catch is the reverse, an include that wrongly accepts an all-** tail, because no such include compiles.",
+      "operation": "tsc/internal/vfs/vfsmatch/vfsmatch.go:globPattern.patternSatisfied",
+      "order_sensitive": true,
+      "subject": "vfsmatch.SpecMatcher"
+    },
+    {
+      "actions": [
+        {
+          "basePath": "/base",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/a.ts",
+            "/base/.hidden",
+            "/base/.."
+          ],
+          "specs": [
+            "*"
+          ],
+          "usage": 0
+        },
+        {
+          "basePath": "/base",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/a.ts",
+            "/base/.hidden"
+          ],
+          "specs": [
+            "*"
+          ],
+          "usage": 2
+        },
+        {
+          "basePath": "/base",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/.hidden",
+            "/base/a.ts"
+          ],
+          "specs": [
+            ".*"
+          ],
+          "usage": 0
+        },
+        {
+          "basePath": "/base",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/.x",
+            "/base/ax"
+          ],
+          "specs": [
+            "?x"
+          ],
+          "usage": 0
+        },
+        {
+          "basePath": "/base",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/.x"
+          ],
+          "specs": [
+            "?x"
+          ],
+          "usage": 2
+        },
+        {
+          "basePath": "/base",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/a.ts",
+            "/base/.a.ts",
+            "/base/ts",
+            "/base/a.tsx"
+          ],
+          "specs": [
+            "*.ts"
+          ],
+          "usage": 0
+        },
+        {
+          "basePath": "/base",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/a.ts",
+            "/base/a.tsx",
+            "/base/a.t"
+          ],
+          "specs": [
+            "*.t?"
+          ],
+          "usage": 0
+        },
+        {
+          "basePath": "/base",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/abc",
+            "/base/aXbYc",
+            "/base/aXXXbYYYc",
+            "/base/aXbY"
+          ],
+          "specs": [
+            "a*b*c"
+          ],
+          "usage": 0
+        }
+      ],
+      "case": "filesystem/vfsmatch/spec-matcher-wildcard-hidden-refusal",
+      "dialect": "vfsmatch",
+      "discriminates": "two things at once. First, the hidden refusal at vfsmatch.go:363 is conditioned on the FIRST SEGMENT being a star or a question, not on the pattern containing one: spec `.*` parses to [Literal(\".\"), Star] so its first segment is a literal and it MUST match .hidden, while spec `*` must not -- a port that refuses hidden names whenever the pattern has a wildcard anywhere fails the `.*` row, and one that refuses whenever the NAME is hidden fails it too. Second, the refusal is include-only (!p.isExclude), so the same `*` and `?x` under UsageExclude must match .hidden and .x -- a port that applies the skip to excludes silently stops excluding dot directories. The a*b*c row needs real backtracking: aXXXbYYYc only matches if the first star gives characters back, which a greedy-first or regex-translating port gets wrong, and aXbY pins the negative.",
+      "operation": "tsc/internal/vfs/vfsmatch/vfsmatch.go:globPattern.matchWildcard",
+      "order_sensitive": true,
+      "subject": "vfsmatch.SpecMatcher"
+    },
+    {
+      "actions": [
+        {
+          "basePath": "/base",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/a.js",
+            "/base/a.min.js",
+            "/base/A.MIN.JS",
+            "/base/b.Min.Js"
+          ],
+          "specs": [
+            "*.js"
+          ],
+          "usage": 0
+        },
+        {
+          "basePath": "/base",
+          "caseSensitive": false,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/a.js",
+            "/base/a.min.js",
+            "/base/A.MIN.JS",
+            "/base/b.Min.Js"
+          ],
+          "specs": [
+            "*.js"
+          ],
+          "usage": 0
+        },
+        {
+          "basePath": "/base",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/A.MIN.JS",
+            "/base/A.JS"
+          ],
+          "specs": [
+            "*.JS"
+          ],
+          "usage": 0
+        },
+        {
+          "basePath": "/base",
+          "caseSensitive": false,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/A.MIN.JS",
+            "/base/A.JS"
+          ],
+          "specs": [
+            "*.JS"
+          ],
+          "usage": 0
+        },
+        {
+          "basePath": "/base",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/a.min.js"
+          ],
+          "specs": [
+            "*.min.js"
+          ],
+          "usage": 0
+        },
+        {
+          "basePath": "/base",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/a.min.js"
+          ],
+          "specs": [
+            "*.min.*"
+          ],
+          "usage": 0
+        },
+        {
+          "basePath": "/base",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/A.MIN.JS",
+            "/base/a.min.js"
+          ],
+          "specs": [
+            "*.MIN.js"
+          ],
+          "usage": 0
+        },
+        {
+          "basePath": "/base",
+          "caseSensitive": false,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/A.MIN.JS",
+            "/base/a.min.js"
+          ],
+          "specs": [
+            "*.MIN.js"
+          ],
+          "usage": 0
+        },
+        {
+          "basePath": "/base",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/a.min.js"
+          ],
+          "specs": [
+            "a.min.js"
+          ],
+          "usage": 0
+        },
+        {
+          "basePath": "/base",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/amin.js",
+            "/base/a.min.js"
+          ],
+          "specs": [
+            "*min.js"
+          ],
+          "usage": 0
+        },
+        {
+          "basePath": "/base",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/a.min.js"
+          ],
+          "specs": [
+            "*.js"
+          ],
+          "usage": 2
+        },
+        {
+          "basePath": "/base",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/a.min.js"
+          ],
+          "specs": [
+            "*.js"
+          ],
+          "usage": 1
+        }
+      ],
+      "case": "filesystem/vfsmatch/spec-matcher-min-js-opt-in",
+      "dialect": "vfsmatch",
+      "discriminates": "three wrong implementations. (a) A port that searches the FILENAME for .min. instead of the pattern's literal segments: then every .min.js file opts itself back in and the default exclusion never fires at all. (b) A port that accepts only the literal \".min.js\" and not the shorter \".min.\": vfsmatch.go:472 tests both and the second is what lets *.min.* opt in, which is the row that catches it. (c) A port that folds case always or never: hasMinJsSuffix (:451-461) uses HasSuffix when caseSensitive and EqualFold otherwise, so A.MIN.JS is INCLUDED by spec *.JS on a case-sensitive matcher and EXCLUDED on a case-insensitive one, from the same spec. The spec has to be *.JS and not *.js for that pair to say anything: under a case-sensitive matcher the lower-case spec never matches the upper-case name at all, so the first two rows are about the fast-path suffix compare and only the *.JS pair reaches the two arms of hasMinJsSuffix. patternMentionsMinSuffix lower-cases the literal only in the insensitive arm (:469-471), so spec *.MIN.js opts in on one and not the other, and spec *min.js opts in on neither -- :472 tests Contains(\".min.\"), with the leading dot, so a suffix that merely contains min.js is not a mention. The last two rows pin the usage gate: excludeMinJs is set only for UsageFiles (:160), so the identical spec under Exclude and under Directories keeps a.min.js.",
+      "operation": "tsc/internal/vfs/vfsmatch/vfsmatch.go:globPattern.patternMentionsMinSuffix",
+      "order_sensitive": true,
+      "subject": "vfsmatch.SpecMatcher"
+    },
+    {
+      "actions": [
+        {
+          "basePath": "/dev",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/dev/src/a.ts",
+            "/dev/node_modules/b.ts",
+            "/dev/NODE_MODULES/b.ts",
+            "/dev/node_modules2/b.ts",
+            "/dev/node_module/b.ts",
+            "/dev/jspm_packages/b.ts",
+            "/dev/bower_components/b.ts"
+          ],
+          "specs": [
+            "*/*.ts"
+          ],
+          "usage": 0
+        },
+        {
+          "basePath": "/dev",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/dev/node_modules/b.ts"
+          ],
+          "specs": [
+            "node_modules/b.ts"
+          ],
+          "usage": 0
+        },
+        {
+          "basePath": "/dev",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/dev/a.ts",
+            "/dev/node_modules/b.ts",
+            "/dev/.hidden/a.ts",
+            "/dev/.a.ts"
+          ],
+          "specs": [
+            "**/*.ts"
+          ],
+          "usage": 0
+        },
+        {
+          "basePath": "/dev",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/dev/node_modules/b.ts",
+            "/dev/.hidden/a.ts",
+            "/dev/.a.ts"
+          ],
+          "specs": [
+            "**/*.ts"
+          ],
+          "usage": 2
+        },
+        {
+          "basePath": "/dev",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/dev/node_modules/b.ts"
+          ],
+          "specs": [
+            "*/*.ts"
+          ],
+          "usage": 2
+        }
+      ],
+      "case": "filesystem/vfsmatch/spec-matcher-package-and-hidden-descent",
+      "dialect": "vfsmatch",
+      "discriminates": "the literal escape hatch and the case rule, both of which a port is likely to get wrong in opposite directions. A wildcard include must SKIP package folders (vfsmatch.go:269-271 sets skipPackageFolders for include wildcards only) while a LITERAL include must reach into them -- parseComponent never sets the flag on a literal, which is why :262-264 is an unreachable panic rather than a skip. And isPackageFolder (:493-503) switches on LENGTH and then compares with EqualFold unconditionally, ignoring the pattern's own caseSensitive flag: NODE_MODULES must be skipped even here, where the matcher is case-sensitive, while node_modules2 and node_module must not be, because their lengths miss all three arms. A port that routed this through stringsEqual would keep NODE_MODULES; a port that used a prefix or contains test would drop node_modules2 as well.",
+      "operation": "tsc/internal/vfs/vfsmatch/vfsmatch.go:isPackageFolder",
+      "order_sensitive": true,
+      "subject": "vfsmatch.SpecMatcher"
+    },
+    {
+      "actions": [
+        {
+          "basePath": "/",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/a.x",
+            "/a.x/",
+            "//a.x",
+            "a.x",
+            "/"
+          ],
+          "specs": [
+            "a.x"
+          ],
+          "usage": 2
+        },
+        {
+          "basePath": "/",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/a.x/b.y",
+            "/a.x//b.y",
+            "/a.x/b.y/",
+            "/a.x///b.y",
+            "/a.x/b.y//"
+          ],
+          "specs": [
+            "a.x/b.y"
+          ],
+          "usage": 2
+        },
+        {
+          "basePath": "/dev",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/dev//foo///bar/x.ts",
+            "/dev/foo/bar/x.ts"
+          ],
+          "specs": [
+            "**/*.ts"
+          ],
+          "usage": 0
+        },
+        {
+          "basePath": "",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "a.x",
+            "/a.x"
+          ],
+          "specs": [
+            "a.x"
+          ],
+          "usage": 2
+        }
+      ],
+      "case": "filesystem/vfsmatch/spec-matcher-path-part-separators",
+      "dialect": "vfsmatch",
+      "discriminates": "three rows a split('/') port fails, in three different directions. (a) The leading empty root part: vfsmatch.go:299-301 returns an EMPTY part and an offset of 1 for a path starting with /, and compileGlobPattern's :150 trims the root component to the empty string too, so the two line up; a port that drops the empty part matches a.x against the root and then has nothing left, and the fourth row shows the same empty root component appearing for a RELATIVE base path, where the relative path a.x must still fail against it. (b) Consecutive separators collapse: the skip loop at :302-304 runs before the scan, so //a.x and /a.x///b.y yield the same parts as their single-separator forms, where a split port yields empty strings between the separators and each of those then fails a literal comparison. (c) A trailing separator TERMINATES rather than yielding an empty final part -- :305-307 returns ok=false once the skip runs off the end -- so /a.x/ matches spec a.x, and a port that emits a final empty part has one component too many.",
+      "operation": "tsc/internal/vfs/vfsmatch/vfsmatch.go:nextPathPartSingle",
+      "order_sensitive": true,
+      "subject": "vfsmatch.SpecMatcher"
+    },
+    {
+      "actions": [
+        {
+          "basePath_hex": "2f",
+          "caseSensitive": true,
+          "op": "spec_matcher_hex",
+          "paths_hex": [
+            "2f612e7473",
+            "2fc3a92e7473",
+            "2fe4b8ad2e7473",
+            "2ff09f8e892e7473",
+            "2f2e7473",
+            "2f61622e7473"
+          ],
+          "specs_hex": [
+            "3f2e7473"
+          ],
+          "usage": 0
+        },
+        {
+          "basePath_hex": "2f",
+          "caseSensitive": true,
+          "op": "spec_matcher_hex",
+          "paths_hex": [
+            "2f61622e7473",
+            "2fc3a9e4b8ad2e7473",
+            "2ff09f8e89c3a92e7473",
+            "2f612e7473",
+            "2f6162632e7473"
+          ],
+          "specs_hex": [
+            "3f3f2e7473"
+          ],
+          "usage": 0
+        },
+        {
+          "basePath_hex": "2f",
+          "caseSensitive": true,
+          "op": "spec_matcher_hex",
+          "paths_hex": [
+            "2fc3a92e7473",
+            "2f636166c3a92e7473",
+            "2f636166652e7473"
+          ],
+          "specs_hex": [
+            "2ac3a92e7473"
+          ],
+          "usage": 0
+        },
+        {
+          "basePath_hex": "2f",
+          "caseSensitive": true,
+          "op": "spec_matcher_hex",
+          "paths_hex": [
+            "2ff09f8e89",
+            "2f61f09f8e8962",
+            "2f616263"
+          ],
+          "specs_hex": [
+            "2af09f8e892a"
+          ],
+          "usage": 0
+        },
+        {
+          "basePath_hex": "2f62",
+          "caseSensitive": true,
+          "op": "spec_matcher_hex",
+          "paths_hex": [
+            "2f622f80",
+            "2f622feda080",
+            "2f622fc3a9",
+            "2f622f8080"
+          ],
+          "specs_hex": [
+            "3f"
+          ],
+          "usage": 0
+        },
+        {
+          "basePath_hex": "2f62",
+          "caseSensitive": true,
+          "op": "spec_matcher_hex",
+          "paths_hex": [
+            "2f622f61f09f8e8963",
+            "2f622f6163",
+            "2f622f618063"
+          ],
+          "specs_hex": [
+            "612a63"
+          ],
+          "usage": 0
+        },
+        {
+          "basePath_hex": "2f62",
+          "caseSensitive": true,
+          "op": "spec_matcher_hex",
+          "paths_hex": [
+            "2f622ff09f8e89"
+          ],
+          "specs_hex": [
+            "f09f8e89"
+          ],
+          "usage": 0
+        }
+      ],
+      "case": "filesystem/vfsmatch/spec-matcher-rune-and-byte-advance",
+      "dialect": "vfsmatch",
+      "discriminates": "a byte-stepping port. Both `?` (vfsmatch.go:397-403) and the star's backtrack (:414-420) advance by utf8.DecodeRuneInString's width, not by one byte, so `?.ts` must match a four-byte emoji exactly as it matches one ASCII character and `??.ts` must REFUSE /abc.ts -- a byte-stepping port accepts the emoji row against `??` and the three-ASCII row against `??`, which is the same bug seen twice. The first four rows are the pinned expectations at vfsmatch_test.go:1822-1868 lifted out of the unexported compileGlobPattern and driven through NewSpecMatcher instead. The last three rows leave UTF-8 altogether: a lone continuation byte and an unpaired surrogate each decode to RuneError with width 1 in Go, so `?` consumes exactly one byte of them and two such bytes need two questions -- a port whose decoder widened an invalid sequence, or repaired it, steps differently. They travel as hex because a Go observation cannot carry those bytes through encoding/json.",
+      "operation": "tsc/internal/vfs/vfsmatch/vfsmatch.go:globPattern.matchSegments",
+      "order_sensitive": true,
+      "subject": "vfsmatch.SpecMatcher"
+    },
+    {
+      "actions": [
+        {
+          "basePath": "/base",
+          "caseSensitive": false,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/\u212a/x.ts",
+            "/base/K/x.ts",
+            "/base/k/x.ts"
+          ],
+          "specs": [
+            "k/x.ts"
+          ],
+          "usage": 2
+        },
+        {
+          "basePath": "/base",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/\u212a/x.ts",
+            "/base/K/x.ts",
+            "/base/k/x.ts"
+          ],
+          "specs": [
+            "k/x.ts"
+          ],
+          "usage": 2
+        },
+        {
+          "basePath": "/base",
+          "caseSensitive": false,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/STRASSE/x.ts",
+            "/base/STRA\u00dfE/x.ts",
+            "/base/stra\u00dfe/x.ts"
+          ],
+          "specs": [
+            "stra\u00dfe/x.ts"
+          ],
+          "usage": 2
+        },
+        {
+          "basePath": "/base",
+          "caseSensitive": false,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/i/x.ts",
+            "/base/\u0131/x.ts",
+            "/base/\u0130/x.ts"
+          ],
+          "specs": [
+            "I/x.ts"
+          ],
+          "usage": 2
+        },
+        {
+          "basePath": "/base",
+          "caseSensitive": false,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/a.ts"
+          ],
+          "specs": [
+            "*.TS"
+          ],
+          "usage": 2
+        },
+        {
+          "basePath": "/base",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/a.ts"
+          ],
+          "specs": [
+            "*.TS"
+          ],
+          "usage": 2
+        }
+      ],
+      "case": "filesystem/vfsmatch/spec-matcher-case-fold-literal",
+      "dialect": "vfsmatch",
+      "discriminates": "an ASCII-only fold, and a fold that is too eager. strings.EqualFold applies Unicode SIMPLE folding, so the Kelvin sign U+212A folds to k and must match the literal component k on a case-insensitive matcher -- and the two differ in BYTE length, 3 against 1, so any port that short-circuits on a.len() != b.len() before folding fails this row while passing every ASCII one. The stra\u00dfe row is the other side: simple folding does NOT equate \u00df with ss, so STRASSE must NOT match, which catches a port that reached for a full case-folding or a lowercase-both-sides comparison. The dotless \u0131 and dotted \u0130 rows pin the same boundary for the Turkish pair: only i matches I. The last two rows carry the same question into the matchWildcard fast path, where the suffix comparison at :370 also goes through stringsEqual, so a port that folded literal components but not the wildcard suffix is caught.",
+      "operation": "tsc/internal/vfs/vfsmatch/vfsmatch.go:globPattern.stringsEqual",
+      "order_sensitive": true,
+      "subject": "vfsmatch.SpecMatcher"
+    },
+    {
+      "actions": [
+        {
+          "basePath": "/base",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/ab/x.ts",
+            "/base/aXb/x.ts",
+            "/base/a/b/x.ts"
+          ],
+          "specs": [
+            "a**b/x.ts"
+          ],
+          "usage": 2
+        },
+        {
+          "basePath": "/base",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/x/y.ts",
+            "/base/aax/y.ts",
+            "/base/a/x/y.ts"
+          ],
+          "specs": [
+            "**x/y.ts"
+          ],
+          "usage": 2
+        },
+        {
+          "basePath": "/base",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/x/y.ts",
+            "/base/xab/y.ts",
+            "/base/x/a/y.ts"
+          ],
+          "specs": [
+            "x**/y.ts"
+          ],
+          "usage": 2
+        },
+        {
+          "basePath": "/base",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/x.ts",
+            "/base/a/b/x.ts"
+          ],
+          "specs": [
+            "**/x.ts"
+          ],
+          "usage": 2
+        },
+        {
+          "basePath": "/base",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/src.d/x.ts",
+            "/base/srcXd/x.ts"
+          ],
+          "specs": [
+            "src.d/x.ts"
+          ],
+          "usage": 2
+        },
+        {
+          "basePath": "/base",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/a",
+            "/base/ab"
+          ],
+          "specs": [
+            "*?*"
+          ],
+          "usage": 2
+        },
+        {
+          "basePath": "/base",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/axbc",
+            "/base/axbyyc",
+            "/base/abc"
+          ],
+          "specs": [
+            "a?b*c"
+          ],
+          "usage": 2
+        },
+        {
+          "basePath": "/base",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/aXbY",
+            "/base/ab",
+            "/base/aXb"
+          ],
+          "specs": [
+            "a*b*"
+          ],
+          "usage": 2
+        },
+        {
+          "basePath": "/base",
+          "caseSensitive": true,
+          "op": "spec_matcher",
+          "paths": [
+            "/base/a",
+            "/base/xa"
+          ],
+          "specs": [
+            "**a"
+          ],
+          "usage": 2
+        }
+      ],
+      "case": "filesystem/vfsmatch/spec-matcher-component-and-segment-parsing",
+      "dialect": "vfsmatch",
+      "discriminates": "two structural errors that are invisible until a specific input. (a) The EXACT-match rule for `**`: vfsmatch.go:173 tests s == \"**\", so a**b, **x, x** and **a are WILDCARD components and not recursive descents -- a port that tests contains(\"**\") turns x**/y.ts into a cross-directory match and quietly changes what a tsconfig includes, which the /base/x/a/y.ts row catches. (b) Empty literal segments between adjacent wildcards: parseSegments only emits a literal when i > start (:201-203), so a**b parses to [Lit(a), Star, Star, Lit(b)] with no empties. An empty literal would match at every position and turn matchSegments' backtracking loop into a different language, which the *?* and a*b* rows are sized to expose. The src.d row is the literal/wildcard boundary itself, and it is load-bearing elsewhere: a component with no * or ? becomes a Literal, and only Literals reach into package folders.",
+      "operation": "tsc/internal/vfs/vfsmatch/vfsmatch.go:parseComponent",
+      "order_sensitive": true,
+      "subject": "vfsmatch.SpecMatcher"
+    },
+    {
+      "actions": [
+        {
+          "currentDirectory": "/root",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/out/z/a.ts"
+          ],
+          "includes": [
+            "/out/z/*.ts",
+            "/out/./z/*.ts"
+          ],
+          "op": "read_directory",
+          "path": "/root",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/root",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/out/z/a.ts"
+          ],
+          "includes": [
+            "/out/./z/*.ts",
+            "/out/z/*.ts"
+          ],
+          "op": "read_directory",
+          "path": "/root",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/root",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/Other/a.ts",
+            "/other/a.ts"
+          ],
+          "includes": [
+            "../Other/**/*.ts",
+            "../other/**/*.ts"
+          ],
+          "op": "read_directory",
+          "path": "/root",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/root",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/other/a.ts"
+          ],
+          "includes": [
+            "../Other/**/*.ts",
+            "../other/**/*.ts"
+          ],
+          "op": "read_directory",
+          "path": "/root",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": false
+        },
+        {
+          "currentDirectory": "/root",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/a/x.ts",
+            "/a/deep/y.ts"
+          ],
+          "includes": [
+            "../a/*.ts",
+            "../a/deep/*.ts"
+          ],
+          "op": "read_directory",
+          "path": "/root",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/root",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/a/x.ts",
+            "/a/deep/y.ts"
+          ],
+          "includes": [
+            "../a/deep/*.ts",
+            "../a/*.ts"
+          ],
+          "op": "read_directory",
+          "path": "/root",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/root",
+          "depth": 1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/a/x.ts",
+            "/a/b/y.ts"
+          ],
+          "includes": [
+            "/a/*.ts",
+            "/a/b/*.ts"
+          ],
+          "op": "read_directory",
+          "path": "/root",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        }
+      ],
+      "case": "filesystem/vfsmatch/read-directory-base-path-comparer",
+      "dialect": "vfsmatch",
+      "discriminates": "the substituted comparer, with a reproducing input. vfsmatch.go:63-64 builds the sort comparer from ComparePathsOptions.GetComparer, and path.go:993-994 shows that is stringutil.GetStringComparer -- a plain STRING comparison, not ComparePaths. The port at glob.rs:404 sorts the same candidates with tsr_tspath::compare_paths, the port of ComparePaths, which reduces . segments and answers Equal for /out/z against /out/./z. Both includes in rows 1 and 2 are rooted, so getIncludeBasePath keeps them verbatim and the candidates are /out/z and /out/./z; under the pin's byte comparison '.' (0x2E) sorts before 'z' (0x7A) so /out/./z is appended first and /out/z is then dropped by ContainsPath, while under a path comparer the two compare Equal, the stable sort keeps the request order, and /out/z survives instead. The surviving base decides whether the compiled pattern -- which normalizes to [\"\",out,z,*.ts] for BOTH specs -- can match at all, so the two sides answer with different files. Rows 1 and 2 differ only in the order of the include list, which the pin must answer identically because its sort is total; a port whose sort is not total answers them differently. Rows 3 and 4 are the pinned TestGetBasePathsCaseSensitivity pair (vfsmatch_test.go:1910-1930) driven through ReadDirectory. Rows 5 and 6 do NOT pin the ContainsPath subsumption, although they were built to: /a/deep is dropped as a candidate, but visiting the surviving /a descends into deep and records its realpath on the way, so in a port that omitted the subsumption check the extra base returns immediately at vfsmatch.go:604-605 and the emitted strings and bucket assignment are byte-identical to the pin's. Row 7 is what pins the drop, by putting the subsumed base out of reach of descent: with depth 1 the walk collects /a's own files and returns at :622-627 before the directory loop, so the pin answers [\"/a/x.ts\"] while a port that kept /a/b as a base answers [\"/a/x.ts\",\"/a/b/y.ts\"].",
+      "operation": "tsc/internal/vfs/vfsmatch/vfsmatch.go:getBasePaths",
+      "order_sensitive": true,
+      "subject": "vfsmatch.ReadDirectory"
+    },
+    {
+      "actions": [
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/out/plain/a.ts"
+          ],
+          "includes": [
+            "/out/plain"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/out/a.ts",
+            "/out/sub/a.ts"
+          ],
+          "includes": [
+            "/out/a.ts"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/out/dir.with.dot/a.ts"
+          ],
+          "includes": [
+            "/out/dir.with.dot"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/out/x/deep/a.ts",
+            "/out/y/deep/b.ts",
+            "/out/z.ts"
+          ],
+          "includes": [
+            "/out/*/deep/*.ts"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/out/w/a.ts"
+          ],
+          "includes": [
+            "/out/?/*.ts"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/a.ts",
+            "/dev/b.ts"
+          ],
+          "includes": [
+            "/*.ts"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/dev/a.ts",
+            "/dev/sub/b.ts"
+          ],
+          "includes": [
+            "sub"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        }
+      ],
+      "case": "filesystem/vfsmatch/read-directory-include-base-path-branches",
+      "dialect": "vfsmatch",
+      "discriminates": "four plausible wrong implementations, one per branch of vfsmatch.go:44-55. (a) Using the LAST wildcard rather than the first: for /out/*/deep/*.ts the pin bases at /out (IndexAny finds the first, LastIndex then backs up to the separator before it), a port using the last wildcard bases at /out/*/deep, never visits /out and returns nothing. (b) Including the separator in the slice: max(LastIndex(...), 0) slices BEFORE the '/', so the base is /out and not /out/ -- a trailing separator would then reach ensureTrailingSlash unchanged and the emitted result strings would be right, but ContainsPath and the visited set would see a different string. (c) Treating a dotted name as a directory: /out/dir.with.dot has no wildcard and HasExtension is just Contains(base, \".\") (path.go:1139-1141), so the pin bases at /out AND IsImplicitGlob refuses the implicit /**/* expansion for the same dot, which together mean the include matches a file literally named dir.with.dot and returns NOTHING from the directory of that name -- the row most likely to be 'fixed' by a port. (d) Failing to return the empty base: /*.ts has its wildcard at index 1, LastIndex over \"/\" is 0, so the base is the empty string, which ContainsPath then treats as the current directory and drops -- so a rooted include at the filesystem root does NOT escape the requested path, and /a.ts is not returned.",
+      "operation": "tsc/internal/vfs/vfsmatch/vfsmatch.go:getIncludeBasePath",
+      "order_sensitive": true,
+      "subject": "vfsmatch.ReadDirectory"
+    },
+    {
+      "actions": [
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/dev/a.ts",
+            "/dev/x/b.ts"
+          ],
+          "includes": [
+            "*.ts"
+          ],
+          "op": "read_directory",
+          "path": "",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/dev/a.ts",
+            "/dev/x/b.ts"
+          ],
+          "includes": [
+            "*.ts"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/dev/a.ts",
+            "/dev/x/b.ts"
+          ],
+          "includes": [
+            "*.ts"
+          ],
+          "op": "read_directory",
+          "path": "/dev/",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/dev/a.ts",
+            "/dev/x/b.ts"
+          ],
+          "includes": [
+            "**/*.ts"
+          ],
+          "op": "read_directory",
+          "path": "",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/a.ts",
+            "/sub/b.ts"
+          ],
+          "includes": [
+            "**/*.ts"
+          ],
+          "op": "read_directory",
+          "path": "/",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        }
+      ],
+      "case": "filesystem/vfsmatch/read-directory-empty-and-root-prefix",
+      "dialect": "vfsmatch",
+      "discriminates": "a port that appends the separator unconditionally. vfsmatch.go:505-510 leaves an EMPTY string empty, and that clause is reachable: with path=\"\" the base path list is [\"\", \"\"] -- getIncludeBasePath answers \"\" for the relative include and ContainsPath(\"\",\"\") is false because CombinePaths leaves it empty, so it is appended rather than subsumed -- and the result strings are therefore BARE names, a.ts and x/b.ts, not /a.ts and /x/b.ts. A port that returned \"/\" for the empty path would give every emitted name a leading slash it must not have. The pair of rows 2 and 3 pins the other clause: a path that already ends in a separator is left alone, so /dev and /dev/ must answer identically, where a port that appended anyway would produce /dev//a.ts. Row 5 exercises the one-byte prefix, where the already-ends-in-slash arm fires on the root itself.",
+      "operation": "tsc/internal/vfs/vfsmatch/vfsmatch.go:ensureTrailingSlash",
+      "order_sensitive": true,
+      "subject": "vfsmatch.ReadDirectory"
+    },
+    {
+      "actions": [
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/dev/a.ts",
+            "/dev/b.ts"
+          ],
+          "includes": [
+            "**/b.ts",
+            "**/a.ts"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/dev/a.ts",
+            "/dev/b.ts"
+          ],
+          "includes": [
+            "**/a.ts",
+            "**/b.ts"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/dev/a.ts",
+            "/dev/b.ts",
+            "/dev/x/c.ts"
+          ],
+          "includes": [
+            "x/*.ts",
+            "*.ts"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/dev/a.ts",
+            "/dev/b.ts"
+          ],
+          "includes": [
+            "**/*.ts",
+            "*.ts"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/dev/a.ts",
+            "/dev/b.ts"
+          ],
+          "includes": [
+            "**/*.ts",
+            "a*.ts"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/dev/a.ts"
+          ],
+          "includes": [
+            "*.js"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/dev/a.ts",
+            "/dev/b.ts",
+            "/dev/c.js"
+          ],
+          "includes": [],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [],
+          "files": [
+            "/dev/a.ts",
+            "/dev/b.ts",
+            "/dev/c.js"
+          ],
+          "includes": [],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        }
+      ],
+      "case": "filesystem/vfsmatch/read-directory-bucket-order",
+      "dialect": "vfsmatch",
+      "discriminates": "result ORDER, which no set comparison can see. Results are collected into one bucket per COMPILED include (vfsmatch.go:662 sizes the slice, :617-619 appends by the index matchesFileParts returned) and flattened in include order at :670-673, not in walk order: with includes [**/b.ts, **/a.ts] over a.ts and b.ts the pin returns b.ts first, and a port that appends to one flat list in walk order returns them the other way round. Row 2 is the same two includes reversed and must answer the other way, so a port that happens to sort the result passes neither. Row 3 puts the deeper directory in the FIRST bucket, so x/c.ts precedes the two top-level files even though the walk finds them first. Row 4 has both includes matching both files with every result in bucket 0, and neither it nor row 3 separates first-match-wins from last-match-wins: in row 4 a last-match port puts both files in bucket 1 instead and the flattening emits the same two names in the same order, and in row 3 no file matches two includes at all, because *.ts compiles to [\"\",dev,*.ts] and its wildcard component fails against the path part x. Row 5 is the row that separates them: with includes [**/*.ts, a*.ts] over a.ts and b.ts, a.ts matches both includes and b.ts only the first, so the pin's first-match return (vfsmatch.go:553-557) puts both in bucket 0 and answers [\"/dev/a.ts\",\"/dev/b.ts\"], while a last-match port puts a.ts in bucket 1 and answers [\"/dev/b.ts\",\"/dev/a.ts\"].",
+      "operation": "tsc/internal/vfs/vfsmatch/vfsmatch.go:matchFiles",
+      "order_sensitive": true,
+      "subject": "vfsmatch.ReadDirectory"
+    },
+    {
+      "actions": [
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/dev/a.ts",
+            "/dev/x/b.ts"
+          ],
+          "includes": [],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/dev/a.ts",
+            "/dev/x/b.ts"
+          ],
+          "includes": [
+            "**"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/dev/a.ts",
+            "/dev/x/b.ts"
+          ],
+          "includes": [
+            "**",
+            "**"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [
+            "x/**"
+          ],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/dev/a.ts",
+            "/dev/x/b.ts"
+          ],
+          "includes": [],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/dev/a.ts",
+            "/dev/x/b.ts"
+          ],
+          "includes": [
+            "x/**"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/dev/a.ts",
+            "/dev/x/b.ts"
+          ],
+          "includes": [
+            "x/**/*"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [
+            "**"
+          ],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/dev/a.ts",
+            "/dev/x/b.ts"
+          ],
+          "includes": [
+            "**"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        }
+      ],
+      "case": "filesystem/vfsmatch/read-directory-had-includes",
+      "dialect": "vfsmatch",
+      "discriminates": "the hadIncludes field, which exists for exactly one input and is therefore the kind of field a port drops. vfsmatch.go:521 records whether include SPECS were given, not whether any compiled, and :547-552 reads the two apart: with includes=[\"**\"] under UsageFiles every spec compiles away, so the compiled list is empty but hadIncludes is true and the pin returns NOTHING -- while with includes=[] the compiled list is equally empty, hadIncludes is false, and every file is returned. A port that tested only len(includes) returns the whole tree for a config whose include list was [\"**\"]. The directory matcher reads the same field at :568-569, so the same input also stops the walk from descending at all. Rows 4 and 5 are the converse pair for excludes: x/** as an EXCLUDE compiles (the `**`-tail drop at :145 is gated on usage != UsageExclude) and prunes the subtree, while the identical spec as an INCLUDE compiles to nothing.",
+      "operation": "tsc/internal/vfs/vfsmatch/vfsmatch.go:newGlobMatcher",
+      "order_sensitive": true,
+      "subject": "vfsmatch.ReadDirectory"
+    },
+    {
+      "actions": [
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/dev/deep/nested/a.ts",
+            "/dev/other/a.ts"
+          ],
+          "includes": [
+            "deep/nested/*.ts"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/dev/a/b/c/x.ts",
+            "/dev/a/x.ts"
+          ],
+          "includes": [
+            "a/b/c/*.ts"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [
+            "x/y/*.ts"
+          ],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/dev/x/y/a.ts",
+            "/dev/x/z/a.ts",
+            "/dev/w/a.ts"
+          ],
+          "includes": [
+            "**/*.ts"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [
+            "x"
+          ],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/dev/x/a.ts",
+            "/dev/w/a.ts"
+          ],
+          "includes": [
+            "**/*.ts"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [
+            "/dev/empty"
+          ],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/dev/w/a.ts"
+          ],
+          "includes": [
+            "**/*.ts"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/dev/a/b/c/x.ts"
+          ],
+          "includes": [
+            "a/**/*"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/dev/a/b/c/x.ts"
+          ],
+          "includes": [
+            "a/**"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        }
+      ],
+      "case": "filesystem/vfsmatch/read-directory-directory-prefix-descent",
+      "dialect": "vfsmatch",
+      "discriminates": "the prefix/full asymmetry, which is what makes recursion work at all, and its direction. A directory is tested with matchesPrefixParts (vfsmatch.go:571-575, prefixOnly=true) while a file is tested with matchesParts (:553-557, prefixOnly=false), and prefixOnly short-circuits to true the moment the path runs out (:240-242). With include deep/nested/*.ts the directory /dev/deep does NOT match the full pattern but MUST match as a prefix, so a port that used the full matcher for directories prunes the subtree and returns nothing at all; with the flag inverted the other way a FILE matches as soon as its own prefix does, and /dev/other/a.ts joins the result. Rows 3 and 4 pin the half that is NOT symmetric: matchesDirectoryParts tests its EXCLUDES with matchesParts and not with the prefix form (:563-567), so exclude x -- expanded to x/**/* -- does not match the directory /dev/x itself and the walk still descends into it, and only the file is dropped. A port that used the prefix form for excludes prunes /dev/x and would answer row 4 the same way by accident while answering row 3 differently, because there the excluded subtree /dev/x/y sits beside a sibling that must survive.",
+      "operation": "tsc/internal/vfs/vfsmatch/vfsmatch.go:globMatcher.matchesDirectoryParts",
+      "order_sensitive": true,
+      "subject": "vfsmatch.ReadDirectory"
+    },
+    {
+      "actions": [
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/dev/a.ts",
+            "/dev/.hidden/a.ts"
+          ],
+          "includes": [
+            "**/*.ts"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [
+            "**/*.ts"
+          ],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/dev/a.ts",
+            "/dev/.hidden/a.ts"
+          ],
+          "includes": [],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/dev/.a.ts",
+            "/dev/a.ts"
+          ],
+          "includes": [
+            "**/*.ts"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/dev/.a.ts"
+          ],
+          "includes": [
+            ".*.ts"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/dev/src/a.ts",
+            "/dev/node_modules/b.ts"
+          ],
+          "includes": [
+            "*/*.ts"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/dev/node_modules/b.ts"
+          ],
+          "includes": [
+            "node_modules/b.ts"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/dev/NODE_MODULES/x.ts",
+            "/dev/node_module/x.ts",
+            "/dev/node_modules2/x.ts"
+          ],
+          "includes": [
+            "*/*.ts"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/dev/jspm_packages/x.ts",
+            "/dev/bower_components/x.ts",
+            "/dev/src/x.ts"
+          ],
+          "includes": [
+            "**/*.ts"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [
+            "**/*.ts"
+          ],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/dev/node_modules/x.ts"
+          ],
+          "includes": [],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        }
+      ],
+      "case": "filesystem/vfsmatch/read-directory-hidden-and-package-folders",
+      "dialect": "vfsmatch",
+      "discriminates": "the include/exclude asymmetry and the case rule, both in the walk where they decide what a tsconfig actually sees. Hidden entries and package folders are skipped under ** for INCLUDE patterns only (vfsmatch.go:256-258 is gated on !p.isExclude), so exclude **/*.ts must reach /dev/.hidden/a.ts and /dev/node_modules/x.ts while include **/*.ts must not -- a port that applies the skip to both leaves those files in the output, because the exclude quietly stops matching them. Row 4 is the counter to an over-eager hidden rule: the spec .*.ts parses with a LITERAL first segment, so matchWildcard's refusal at :363 does not fire and the hidden file is included. Rows 5 to 7 are the pinned TestGlobPatternLiteralWithPackageFolders pair (vfsmatch_test.go:1879-1908) plus the case and length boundary: isPackageFolder (:493-503) compares with EqualFold whatever the matcher's own case mode, so NODE_MODULES is skipped on this case-SENSITIVE host, while node_module and node_modules2 miss every length arm and are kept.",
+      "operation": "tsc/internal/vfs/vfsmatch/vfsmatch.go:isHiddenPath",
+      "order_sensitive": true,
+      "subject": "vfsmatch.ReadDirectory"
+    },
+    {
+      "actions": [
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [],
+          "files": [
+            "/dev/a.js",
+            "/dev/a.min.js",
+            "/dev/A.MIN.JS",
+            "/dev/b.Min.Js",
+            "/dev/a.minx.js",
+            "/dev/a.min.jsx"
+          ],
+          "includes": [
+            "**/*.js"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [],
+          "files": [
+            "/dev/A.MIN.JS",
+            "/dev/b.Min.Js",
+            "/dev/a.js",
+            "/dev/a.minx.js"
+          ],
+          "includes": [
+            "**/*.js"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": false
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [
+            "**/*.min.js"
+          ],
+          "extensions": [],
+          "files": [
+            "/dev/a.js",
+            "/dev/a.min.js"
+          ],
+          "includes": [
+            "**/*.js"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [
+            "**/*.js"
+          ],
+          "extensions": [],
+          "files": [
+            "/dev/a.js",
+            "/dev/a.min.js"
+          ],
+          "includes": [
+            "**/*.js"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [],
+          "files": [
+            "/dev/a.min.js"
+          ],
+          "includes": [
+            "**/*.min.js"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [],
+          "files": [
+            "/dev/a.min.js"
+          ],
+          "includes": [
+            "**/*.min.*"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [],
+          "files": [
+            "/dev/a.min.js"
+          ],
+          "includes": [
+            "**/a.min.js"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [],
+          "files": [
+            "/dev/A.MIN.JS"
+          ],
+          "includes": [
+            "**/*.MIN.js"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": false
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [],
+          "files": [
+            "/dev/A.MIN.JS",
+            "/dev/A.JS"
+          ],
+          "includes": [
+            "**/*.JS"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [],
+          "files": [
+            "/dev/A.MIN.JS",
+            "/dev/A.JS"
+          ],
+          "includes": [
+            "**/*.JS"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": false
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [],
+          "files": [
+            "/dev/x.min.js/a.js"
+          ],
+          "includes": [
+            "**/*.js"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        }
+      ],
+      "case": "filesystem/vfsmatch/read-directory-min-js-default",
+      "dialect": "vfsmatch",
+      "discriminates": "the usage gate and the case-mode asymmetry, in the place where they change what a project compiles. excludeMinJs is set only for the FILES matcher (vfsmatch.go:160), so exclude **/*.js must still exclude a.min.js -- a port that applied the rule to excludes leaves the file in the output because the exclude silently stops matching it, which row 4 catches. The same gate makes row 9 work: the DIRECTORY x.min.js is tested by the directories matcher, whose excludeMinJs is false, so the walk descends into it and finds a.js. The last two rows are the legacy quirk no reasonable implementer would invent: A.MIN.JS is INCLUDED by **/*.JS when useCaseSensitiveFileNames is true and EXCLUDED when it is false, because hasMinJsSuffix (:451-461) switches between HasSuffix and EqualFold -- a port that always folds, or never folds, gets exactly one of the two rows wrong. The spec is *.JS rather than *.js because a lower-case spec never matches the upper-case name on a case-sensitive matcher, so rows 1 and 2 would agree for a reason that has nothing to do with the .min.js rule.",
+      "operation": "tsc/internal/vfs/vfsmatch/vfsmatch.go:globPattern.shouldIncludeMinJs",
+      "order_sensitive": true,
+      "subject": "vfsmatch.ReadDirectory"
+    },
+    {
+      "actions": [
+        {
+          "currentDirectory": "/",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/root/file.ts",
+            "/root/a/file.ts"
+          ],
+          "includes": [
+            "**/*"
+          ],
+          "op": "read_directory",
+          "path": "/root",
+          "symlinks": [
+            {
+              "path": "/root/a/b",
+              "target": "/root/a"
+            }
+          ],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/root/t/x.ts"
+          ],
+          "includes": [
+            "**/*"
+          ],
+          "op": "read_directory",
+          "path": "/root",
+          "symlinks": [
+            {
+              "path": "/root/p",
+              "target": "/root/t"
+            },
+            {
+              "path": "/root/q",
+              "target": "/root/t"
+            }
+          ],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/dev/x/a.ts"
+          ],
+          "includes": [
+            "**/*.ts"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [
+            {
+              "path": "/dev/L",
+              "target": "/dev/x"
+            }
+          ],
+          "useCaseSensitiveFileNames": false
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": 1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/dev/a.ts",
+            "/dev/x/b.ts",
+            "/dev/x/y/c.ts"
+          ],
+          "includes": [
+            "**/*.ts"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": 2,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/dev/a.ts",
+            "/dev/x/b.ts",
+            "/dev/x/y/c.ts"
+          ],
+          "includes": [
+            "**/*.ts"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": 3,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/dev/a.ts",
+            "/dev/x/b.ts",
+            "/dev/x/y/c.ts"
+          ],
+          "includes": [
+            "**/*.ts"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": 0,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/dev/a.ts",
+            "/dev/x/b.ts",
+            "/dev/x/y/c.ts"
+          ],
+          "includes": [
+            "**/*.ts"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/dev/a.ts",
+            "/dev/x/b.ts",
+            "/dev/x/y/c.ts"
+          ],
+          "includes": [
+            "**/*.ts"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/p/x.ts"
+          ],
+          "includes": [
+            "/p/*.ts",
+            "/q/*.ts"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [
+            {
+              "path": "/q",
+              "target": "/p"
+            }
+          ],
+          "useCaseSensitiveFileNames": true
+        }
+      ],
+      "case": "filesystem/vfsmatch/read-directory-visit-cycles-and-depth",
+      "dialect": "vfsmatch",
+      "discriminates": "four separate wrong implementations, one per group of rows. (a) Keying the visited set on the absolute path rather than on the realpath: the pinned cycle tree (vfsmatch_test.go:897-906, /root/a/b -> /root/a) then recurses until it runs out of depth or duplicates /root/a/file.ts, where the pin returns exactly two files. vfsmatch.go:600-606 resolves and canonicalizes BEFORE the check, and :635-640 computes a child realpath incrementally for non-symlink directories, so only symlinked children pay for a Realpath call -- rows 2 and 3 pin the consequence a port could not guess: two distinct aliases of one directory are visited ONCE, under the name that came first in the entry order, and the real directory is then skipped because its realpath was already recorded. (b) A depth that counts the wrong way: :622-627 decrements AFTER the files of the current directory are collected and stops only on exactly 0, so depth 1 is this directory's files, depth 2 adds one level, and depth 0 decrements to -1 and therefore never stops -- it is a full walk, not an empty one, which is the arm a port most plausibly 'fixes'. (c) is withdrawn: no row here separates a port that folds the visited key from one that does not. The pin stores GetCanonicalFileName(realPath) (:602) and MapFS.Realpath returns the realpath in the spelling the tree stored (vfstest.go:470-477), so in row 3 the symlink /dev/L and the directory /dev/x both yield the key /dev/x and the folded and the unfolded key are the same string; the input that would separate them, two directories differing only in case, cannot exist on the case-insensitive host that is the only host where the fold runs. (d) Visiting base paths in a different order, which row 9 exposes: /p and /q both survive getBasePaths because neither contains the other, and /q is a symlink to /p, so the pin visits /p first -- the order the sorted candidates were appended in -- emits /p/x.ts, and then skips /q at :603-605; a port that visited the two bases the other way round emits /q/x.ts from the same file.",
+      "operation": "tsc/internal/vfs/vfsmatch/vfsmatch.go:globVisitor.visit",
+      "order_sensitive": true,
+      "subject": "vfsmatch.ReadDirectory"
+    },
+    {
+      "actions": [
+        {
+          "currentDirectory": "/",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/dev/a.ts",
+            "/dev/x/b.ts"
+          ],
+          "includes": [
+            "**/*.ts"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": false
+        },
+        {
+          "currentDirectory": "/",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/a.ts"
+          ],
+          "includes": [
+            "*.ts"
+          ],
+          "op": "read_directory",
+          "path": "/",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/a/b/c/x.ts"
+          ],
+          "includes": [
+            "*.ts"
+          ],
+          "op": "read_directory",
+          "path": "/a/b/c",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/a.ts",
+            "/b/c.ts"
+          ],
+          "includes": [
+            "**/*.ts"
+          ],
+          "op": "read_directory",
+          "path": "/",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        },
+        {
+          "currentDirectory": "/dev",
+          "depth": -1,
+          "directories": [],
+          "excludes": [],
+          "extensions": [
+            ".ts"
+          ],
+          "files": [
+            "/dev/a.b.c.ts"
+          ],
+          "includes": [
+            "*.ts"
+          ],
+          "op": "read_directory",
+          "path": "/dev",
+          "symlinks": [],
+          "useCaseSensitiveFileNames": true
+        }
+      ],
+      "case": "filesystem/vfsmatch/read-directory-path-part-boundary",
+      "dialect": "vfsmatch",
+      "discriminates": "the two-part scan as the walk uses it, and NOT the no-concatenation invariant, which ReadDirectory cannot observe. vfsmatch.go:315-357 walks a virtual prefix+suffix without ever materialising the joined string: the scan inside the prefix returns at :347 with an offset still measured in the COMBINED string, and only when the prefix is exhausted does :353-357 hand back the whole suffix as one component. That boundary is where a port could differ, and it is unreachable from here, because :610-611 builds both prefixes with ensureTrailingSlash and every call site the walk has therefore passes a prefix ending in a separator: the wrong implementation this case names -- materialise prefix+suffix and call nextPathPartSingle on the joined string -- answers all five rows exactly as the pin does. These rows pin that agreement and the case claims nothing beyond it. Row 2 is the one-byte prefix, where the root special case at :334-336 consumes the whole prefix in a single step and the suffix is reached immediately; row 3 is a deep prefix with three interior separators; row 5 pins that dots are not separators, so a.b.c.ts is one component and not four. Neither row is peculiar to nextPathPartParts: row 2's root arm is duplicated at nextPathPartSingle:299-301, which spec-matcher-path-part-separators already pins, and row 5 refutes only a port that split on '.'.",
+      "operation": "tsc/internal/vfs/vfsmatch/vfsmatch.go:nextPathPartParts",
+      "order_sensitive": true,
+      "subject": "vfsmatch.ReadDirectory"
+    }
+  ],
+  "version": 1
+}

@@ -1,0 +1,2853 @@
+{
+  "version": 1,
+  "family": "filesystem",
+  "requests": [
+    {
+      "case": "filesystem/cachedvfs/from-starts-enabled-and-enable-does-not-clear",
+      "operation": "tsc/internal/vfs/cachedvfs/cachedvfs.go:From",
+      "subject": "CachedFS",
+      "order_sensitive": true,
+      "host_applicability": "any",
+      "discriminates": "a port whose cache starts disabled, which is what an AtomicBool/Cell<bool> translation produces by dropping the constructor's enabled.Store(true) and relying on the zero value: it returns true at every step and asks the underlying 1, 2, 3 times where the pin asks 1, 1, 1. The trailing Enable catches the opposite error, an Enable written symmetrically to DisableAndClearCache so that it also clears: that port reads 1, 1, 2.",
+      "actions": [
+        {
+          "op": "from",
+          "now": "2020-01-01T00:00:00Z",
+          "case_sensitive": true,
+          "files": [
+            {
+              "path": "/some/path/file.txt",
+              "kind": "file",
+              "content": "hello world"
+            }
+          ]
+        },
+        {
+          "op": "directory_exists",
+          "path": "/some/path"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/some/path"
+        },
+        {
+          "op": "enable"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/some/path"
+        }
+      ]
+    },
+    {
+      "case": "filesystem/cachedvfs/direxists-caches-per-path",
+      "operation": "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.DirectoryExists",
+      "subject": "CachedFS",
+      "order_sensitive": true,
+      "host_applicability": "any",
+      "discriminates": "a single-slot or last-value cache: the interleaved fourth query evicts the first path, so the fifth action asks the underlying again and the count reads 3 where the pin reads 2. The pin keys a SyncMap by path and both entries survive.",
+      "actions": [
+        {
+          "op": "from",
+          "now": "2020-01-01T00:00:00Z",
+          "case_sensitive": true,
+          "files": [
+            {
+              "path": "/some/path/file.txt",
+              "kind": "file",
+              "content": "hello world"
+            }
+          ]
+        },
+        {
+          "op": "directory_exists",
+          "path": "/some/path"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/some/path"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/other/path"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/some/path"
+        }
+      ]
+    },
+    {
+      "case": "filesystem/cachedvfs/direxists-caches-the-negative-answer",
+      "operation": "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.DirectoryExists",
+      "subject": "CachedFS",
+      "order_sensitive": true,
+      "host_applicability": "any",
+      "discriminates": "a port that stores only positive answers -- a HashSet<path> of known directories, or a HashMap<path, bool> consulted as `if let Some(true)`. It returns false correctly and re-queries the underlying every time, reading 1, 2, 3, 4 where the pin reads 1, 1, 2, 2: SyncMap.Load distinguishes a stored false from an absent key.",
+      "actions": [
+        {
+          "op": "from",
+          "now": "2020-01-01T00:00:00Z",
+          "case_sensitive": true,
+          "files": [
+            {
+              "path": "/some/path/file.txt",
+              "kind": "file",
+              "content": "hello world"
+            }
+          ]
+        },
+        {
+          "op": "directory_exists",
+          "path": "/no/such/dir"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/no/such/dir"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/some/path"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/no/such/dir"
+        }
+      ]
+    },
+    {
+      "case": "filesystem/cachedvfs/direxists-keys-the-raw-argument",
+      "operation": "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.DirectoryExists",
+      "subject": "CachedFS",
+      "order_sensitive": true,
+      "host_applicability": "any",
+      "discriminates": "a port that normalizes or case-folds the path before consulting the cache. The wrapper at cachedvfs.go:47-61 hands the caller's exact string to SyncMap.Load and Store and normalizes nothing, so five spellings of one directory are five cache entries and the underlying is asked 1, 2, 3, 4, 5 times before the repeat re-hits at 5. A normalizing port collapses them and reads 1, 1, 2, 1, 1, 1 -- and on the case-insensitive spelling it would also return the wrong value, because the underlying is case-sensitive here and answers false for /SOME/PATH.",
+      "actions": [
+        {
+          "op": "from",
+          "now": "2020-01-01T00:00:00Z",
+          "case_sensitive": true,
+          "files": [
+            {
+              "path": "/some/path/file.txt",
+              "kind": "file",
+              "content": "hello world"
+            }
+          ]
+        },
+        {
+          "op": "directory_exists",
+          "path": "/some/path"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/some/path/"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/SOME/PATH"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/some//path"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/some/path/."
+        },
+        {
+          "op": "directory_exists",
+          "path": "/some/path"
+        }
+      ]
+    },
+    {
+      "case": "filesystem/cachedvfs/fileexists-caches-across-clear-disable-enable",
+      "operation": "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.FileExists",
+      "subject": "CachedFS",
+      "order_sensitive": true,
+      "host_applicability": "any",
+      "discriminates": "a wrapper with no enabled flag at all -- one that consults and populates the cache unconditionally. It reads 4, 4 across the two disabled queries where the pin reads 4, 5, because cachedvfs.go:64-78 guards the Load at :65 and the Store at :73 with the same `if fsys.enabled.Load()`. Which half is caught is worth stating exactly, because DisableAndClearCache empties all five maps before those queries run (cachedvfs.go:30-34 calling ClearCache at :40-46): a wrapper that drops only the Load guard therefore finds an empty cache, misses on both disabled queries and reproduces the pin's 4, 5, so this trace does NOT catch it; a wrapper that drops only the Store guard is caught one row later, at the first post-enable query, where what it stored while disabled makes it read 5 against the pin's 6. The same trace catches a per-instance rather than per-path cache at the /other/path query.",
+      "actions": [
+        {
+          "op": "from",
+          "now": "2020-01-01T00:00:00Z",
+          "case_sensitive": true,
+          "files": [
+            {
+              "path": "/some/path/file.txt",
+              "kind": "file",
+              "content": "hello world"
+            }
+          ]
+        },
+        {
+          "op": "file_exists",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "file_exists",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "clear_cache"
+        },
+        {
+          "op": "file_exists",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "file_exists",
+          "path": "/other/path/file.txt"
+        },
+        {
+          "op": "disable_and_clear"
+        },
+        {
+          "op": "file_exists",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "file_exists",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "enable"
+        },
+        {
+          "op": "file_exists",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "file_exists",
+          "path": "/some/path/file.txt"
+        }
+      ]
+    },
+    {
+      "case": "filesystem/cachedvfs/fileexists-caches-the-negative-answer",
+      "operation": "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.FileExists",
+      "subject": "CachedFS",
+      "order_sensitive": true,
+      "host_applicability": "any",
+      "discriminates": "a port whose file-existence cache is a HashSet of known-existing files rather than a map to bool. It returns false both times -- the right answer -- and asks the underlying twice where the pin asks once.",
+      "actions": [
+        {
+          "op": "from",
+          "now": "2020-01-01T00:00:00Z",
+          "case_sensitive": true,
+          "files": [
+            {
+              "path": "/some/path/file.txt",
+              "kind": "file",
+              "content": "hello world"
+            }
+          ]
+        },
+        {
+          "op": "file_exists",
+          "path": "/some/path/absent.txt"
+        },
+        {
+          "op": "file_exists",
+          "path": "/some/path/absent.txt"
+        }
+      ]
+    },
+    {
+      "case": "filesystem/cachedvfs/entries-caches-across-clear-disable-enable",
+      "operation": "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.GetAccessibleEntries",
+      "subject": "CachedFS",
+      "order_sensitive": true,
+      "host_applicability": "any",
+      "discriminates": "a port that caches the listing per wrapper instead of per path, and a wrapper with no enabled flag at all, which consults and populates the cache unconditionally and so reads 4, 4 rather than 4, 5 across the two disabled queries. DisableAndClearCache empties the five maps first (cachedvfs.go:30-34 calling ClearCache at :40-46), so a wrapper that drops only the Load guard misses on both disabled queries exactly as the pin does and is not caught here, while one that drops only the Store guard is caught at the first post-enable query, reading 5 against the pin's 6. Each row also renders the files, the directories and the sorted symlink names, so a port that caches only part of the Entries value -- the file list, say, re-deriving the directories or the symlink set on each hit -- diverges on the listing rows even where its counts are right. The symlinked file is in the fixture for exactly that: it appears in `files` AND in `symlinks`, and a cache that keeps one of the two loses the other.",
+      "actions": [
+        {
+          "op": "from",
+          "now": "2020-01-01T00:00:00Z",
+          "case_sensitive": true,
+          "files": [
+            {
+              "path": "/some/path/file.txt",
+              "kind": "file",
+              "content": "hello world"
+            },
+            {
+              "path": "/some/path/sub/inner.txt",
+              "kind": "file",
+              "content": "inner"
+            },
+            {
+              "path": "/some/path/lnk",
+              "kind": "symlink",
+              "target": "/some/path/file.txt"
+            }
+          ]
+        },
+        {
+          "op": "entries",
+          "path": "/some/path"
+        },
+        {
+          "op": "entries",
+          "path": "/some/path"
+        },
+        {
+          "op": "clear_cache"
+        },
+        {
+          "op": "entries",
+          "path": "/some/path"
+        },
+        {
+          "op": "entries",
+          "path": "/other/path"
+        },
+        {
+          "op": "disable_and_clear"
+        },
+        {
+          "op": "entries",
+          "path": "/some/path"
+        },
+        {
+          "op": "entries",
+          "path": "/some/path"
+        },
+        {
+          "op": "enable"
+        },
+        {
+          "op": "entries",
+          "path": "/some/path"
+        },
+        {
+          "op": "entries",
+          "path": "/some/path"
+        }
+      ]
+    },
+    {
+      "case": "filesystem/cachedvfs/entries-caches-the-empty-listing",
+      "operation": "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.GetAccessibleEntries",
+      "subject": "CachedFS",
+      "order_sensitive": true,
+      "host_applicability": "any",
+      "discriminates": "a port that treats an empty result as a cache miss -- `if entries.is_empty() { requery }`, or an Option<Entries> that conflates `no entries` with `not cached`. It returns the right empty listing and asks the underlying 1, 2, 3, 4 times where the pin asks 1, 1, 2, 2. The missing-directory pair adds the second half: the pin caches the zero-valued Entries a missing directory produces, symlinks map included, rather than the absence of an answer.",
+      "actions": [
+        {
+          "op": "from",
+          "now": "2020-01-01T00:00:00Z",
+          "case_sensitive": true,
+          "files": [
+            {
+              "path": "/some/path/file.txt",
+              "kind": "file",
+              "content": "hello world"
+            },
+            {
+              "path": "/some/path/empty",
+              "kind": "dir"
+            }
+          ]
+        },
+        {
+          "op": "entries",
+          "path": "/some/path/empty"
+        },
+        {
+          "op": "entries",
+          "path": "/some/path/empty"
+        },
+        {
+          "op": "entries",
+          "path": "/some/path/absent"
+        },
+        {
+          "op": "entries",
+          "path": "/some/path/absent"
+        }
+      ]
+    },
+    {
+      "case": "filesystem/cachedvfs/readfile-is-never-cached",
+      "operation": "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.ReadFile",
+      "subject": "CachedFS",
+      "order_sensitive": true,
+      "host_applicability": "any",
+      "discriminates": "the single most likely wrong implementation in this package: memoizing file contents. cachedvfs.go:93-95 is a bare forward with no cache and no enabled check, so the count rises on every call -- 1, 2, 3, 4, 5, 6, 7. A port that adds a contents cache returns the identical bytes at every step and the sequence 1, 1, 2, 3, 4, 5, 6: right answers, wrong contract, and invisible to any case that checks only the returned string.",
+      "actions": [
+        {
+          "op": "from",
+          "now": "2020-01-01T00:00:00Z",
+          "case_sensitive": true,
+          "files": [
+            {
+              "path": "/some/path/file.txt",
+              "kind": "file",
+              "content": "hello world"
+            }
+          ]
+        },
+        {
+          "op": "read_file",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "read_file",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "clear_cache"
+        },
+        {
+          "op": "read_file",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "disable_and_clear"
+        },
+        {
+          "op": "read_file",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "read_file",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "enable"
+        },
+        {
+          "op": "read_file",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "read_file",
+          "path": "/some/path/file.txt"
+        }
+      ]
+    },
+    {
+      "case": "filesystem/cachedvfs/realpath-caches-across-clear-disable-enable",
+      "operation": "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.Realpath",
+      "subject": "CachedFS",
+      "order_sensitive": true,
+      "host_applicability": "any",
+      "discriminates": "a per-instance rather than per-path realpath cache, and a wrapper with no enabled flag at all, which consults and populates the cache unconditionally and so reads 4, 4 instead of 4, 5 across the two disabled queries. DisableAndClearCache empties the five maps first (cachedvfs.go:30-34 calling ClearCache at :40-46), so a wrapper that drops only the Load guard is indistinguishable from the pin throughout this trace, while one that drops only the Store guard is caught at the first post-enable query, reading 5 against the pin's 6. Each row records the resolved string as well as the count. What this trace does NOT discriminate is a cache keyed on the resolved path from one keyed on the queried path: the fixture is a single regular file and holds no symlink, so every row resolves to itself and the two keys are the same string everywhere. filesystem/cachedvfs/realpath-caches-the-failure-fallback is where that distinction is made, over a /link -> /some/path symlink whose resolved value differs from its query.",
+      "actions": [
+        {
+          "op": "from",
+          "now": "2020-01-01T00:00:00Z",
+          "case_sensitive": true,
+          "files": [
+            {
+              "path": "/some/path/file.txt",
+              "kind": "file",
+              "content": "hello world"
+            }
+          ]
+        },
+        {
+          "op": "realpath",
+          "path": "/some/path"
+        },
+        {
+          "op": "realpath",
+          "path": "/some/path"
+        },
+        {
+          "op": "clear_cache"
+        },
+        {
+          "op": "realpath",
+          "path": "/some/path"
+        },
+        {
+          "op": "realpath",
+          "path": "/other/path"
+        },
+        {
+          "op": "disable_and_clear"
+        },
+        {
+          "op": "realpath",
+          "path": "/some/path"
+        },
+        {
+          "op": "realpath",
+          "path": "/some/path"
+        },
+        {
+          "op": "enable"
+        },
+        {
+          "op": "realpath",
+          "path": "/some/path"
+        },
+        {
+          "op": "realpath",
+          "path": "/some/path"
+        }
+      ]
+    },
+    {
+      "case": "filesystem/cachedvfs/realpath-caches-the-failure-fallback",
+      "operation": "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.Realpath",
+      "subject": "CachedFS",
+      "order_sensitive": true,
+      "host_applicability": "any",
+      "discriminates": "a port that caches only successful resolutions -- an Option<JsString> cache where None means `not cached` rather than `resolution failed, echo the input`. Realpath is total at the pin: iovfs/iofs.go:186-193 returns the caller's own path when the underlying resolution errors, and cachedvfs stores that echo like any other answer. The Option port returns the identical strings and asks the underlying 1, 1, 2, 3, 4, 5 times where the pin asks 1, 1, 2, 2, 3, 3.",
+      "actions": [
+        {
+          "op": "from",
+          "now": "2020-01-01T00:00:00Z",
+          "case_sensitive": true,
+          "files": [
+            {
+              "path": "/some/path/file.txt",
+              "kind": "file",
+              "content": "hello world"
+            },
+            {
+              "path": "/link",
+              "kind": "symlink",
+              "target": "/some/path"
+            },
+            {
+              "path": "/dangling",
+              "kind": "symlink",
+              "target": "/nowhere"
+            }
+          ]
+        },
+        {
+          "op": "realpath",
+          "path": "/link"
+        },
+        {
+          "op": "realpath",
+          "path": "/link"
+        },
+        {
+          "op": "realpath",
+          "path": "/missing"
+        },
+        {
+          "op": "realpath",
+          "path": "/missing"
+        },
+        {
+          "op": "realpath",
+          "path": "/dangling"
+        },
+        {
+          "op": "realpath",
+          "path": "/dangling"
+        }
+      ]
+    },
+    {
+      "case": "filesystem/cachedvfs/stat-caches-across-clear-disable-enable",
+      "operation": "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.Stat",
+      "subject": "CachedFS",
+      "order_sensitive": true,
+      "host_applicability": "any",
+      "discriminates": "a per-instance stat cache, and a wrapper with no enabled flag at all, which consults and populates the cache unconditionally and so reads 4, 4 instead of 4, 5 across the two disabled queries. DisableAndClearCache empties the five maps first (cachedvfs.go:30-34 calling ClearCache at :40-46), so a wrapper that drops only the Load guard matches the pin throughout this trace and is not caught here, while one that drops only the Store guard is caught at the first post-enable query, reading 5 against the pin's 6. Each row renders name, size, is-dir and mod time as an array, so a port whose cached FileInfo keeps only {directory, size} -- which is exactly what crates/tsr_vfs/src/lib.rs:63-67 declares -- cannot answer the row at all rather than answering it wrongly.",
+      "actions": [
+        {
+          "op": "from",
+          "now": "2020-01-01T00:00:00Z",
+          "case_sensitive": true,
+          "files": [
+            {
+              "path": "/some/path/file.txt",
+              "kind": "file",
+              "content": "hello world"
+            }
+          ]
+        },
+        {
+          "op": "stat",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "stat",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "clear_cache"
+        },
+        {
+          "op": "stat",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "stat",
+          "path": "/other/path/file.txt"
+        },
+        {
+          "op": "disable_and_clear"
+        },
+        {
+          "op": "stat",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "stat",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "enable"
+        },
+        {
+          "op": "stat",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "stat",
+          "path": "/some/path/file.txt"
+        }
+      ]
+    },
+    {
+      "case": "filesystem/cachedvfs/stat-caches-the-nil-result",
+      "operation": "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.Stat",
+      "subject": "CachedFS",
+      "order_sensitive": true,
+      "host_applicability": "any",
+      "discriminates": "the sharpest discriminator in this bucket. Stat is total and returns a nil vfs.FileInfo for a missing path; cachedvfs stores that nil, and collections/syncmap.go:14-20 returns (zero, true) for a stored nil -- `if !ok || val == nil { return value, ok }` -- so the cached negative is served without touching the underlying. The natural Rust cache, HashMap<Vec<u8>, FileInfo> read through `if let Some(info) = map.get(path)`, cannot represent a present-but-nil entry: it returns None, re-queries, and reads 1, 2, 3, 4 where the pin reads 1, 1, 2, 2.",
+      "actions": [
+        {
+          "op": "from",
+          "now": "2020-01-01T00:00:00Z",
+          "case_sensitive": true,
+          "files": [
+            {
+              "path": "/some/path/file.txt",
+              "kind": "file",
+              "content": "hello world"
+            }
+          ]
+        },
+        {
+          "op": "stat",
+          "path": "/some/path/absent.txt"
+        },
+        {
+          "op": "stat",
+          "path": "/some/path/absent.txt"
+        },
+        {
+          "op": "stat",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "stat",
+          "path": "/some/path/absent.txt"
+        }
+      ]
+    },
+    {
+      "case": "filesystem/cachedvfs/case-sensitivity-is-never-cached",
+      "operation": "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.UseCaseSensitiveFileNames",
+      "subject": "CachedFS",
+      "order_sensitive": true,
+      "host_applicability": "any",
+      "discriminates": "memoizing a value that looks constant. The method takes no argument and cannot change for a given underlying, so a OnceCell<bool>, a field read once in the constructor, or an eagerly captured flag all return the right boolean forever -- and the count sequence 1, 1, 1, 1, 1, 1, 1 instead of the pin's 1, 2, 3, 4, 5, 6, 7. The fixture is built case-insensitive so a port that hard-codes true fails on the value as well.",
+      "actions": [
+        {
+          "op": "from",
+          "now": "2020-01-01T00:00:00Z",
+          "case_sensitive": false,
+          "files": [
+            {
+              "path": "/some/path/file.txt",
+              "kind": "file",
+              "content": "hello world"
+            }
+          ]
+        },
+        {
+          "op": "use_case_sensitive_file_names"
+        },
+        {
+          "op": "use_case_sensitive_file_names"
+        },
+        {
+          "op": "clear_cache"
+        },
+        {
+          "op": "use_case_sensitive_file_names"
+        },
+        {
+          "op": "disable_and_clear"
+        },
+        {
+          "op": "use_case_sensitive_file_names"
+        },
+        {
+          "op": "use_case_sensitive_file_names"
+        },
+        {
+          "op": "enable"
+        },
+        {
+          "op": "use_case_sensitive_file_names"
+        },
+        {
+          "op": "use_case_sensitive_file_names"
+        }
+      ]
+    },
+    {
+      "case": "filesystem/cachedvfs/clear-cache-clears-all-five-and-keeps-enabled",
+      "operation": "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.ClearCache",
+      "subject": "CachedFS",
+      "order_sensitive": true,
+      "host_applicability": "any",
+      "discriminates": "a partial clear. ClearCache at cachedvfs.go:38-44 empties five separate SyncMaps, and a port that forgets one -- realpath and the entries listing are the two a hand-written clear drops -- shows 1 where 2 is required for that method alone, while the other four read 2. A port that keys one shared map by (kind, path) and clears it wholesale passes here but is caught by the per-path cases. The trailing repeat of all five is the second half: a ClearCache that also disables would read 3 there instead of 2.",
+      "actions": [
+        {
+          "op": "from",
+          "now": "2020-01-01T00:00:00Z",
+          "case_sensitive": true,
+          "files": [
+            {
+              "path": "/some/path/file.txt",
+              "kind": "file",
+              "content": "hello world"
+            }
+          ]
+        },
+        {
+          "op": "directory_exists",
+          "path": "/some/path"
+        },
+        {
+          "op": "file_exists",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "entries",
+          "path": "/some/path"
+        },
+        {
+          "op": "realpath",
+          "path": "/some/path"
+        },
+        {
+          "op": "stat",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/some/path"
+        },
+        {
+          "op": "file_exists",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "entries",
+          "path": "/some/path"
+        },
+        {
+          "op": "realpath",
+          "path": "/some/path"
+        },
+        {
+          "op": "stat",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "clear_cache"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/some/path"
+        },
+        {
+          "op": "file_exists",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "entries",
+          "path": "/some/path"
+        },
+        {
+          "op": "realpath",
+          "path": "/some/path"
+        },
+        {
+          "op": "stat",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/some/path"
+        },
+        {
+          "op": "file_exists",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "entries",
+          "path": "/some/path"
+        },
+        {
+          "op": "realpath",
+          "path": "/some/path"
+        },
+        {
+          "op": "stat",
+          "path": "/some/path/file.txt"
+        }
+      ]
+    },
+    {
+      "case": "filesystem/cachedvfs/disable-and-clear-bypasses-then-enable-restores",
+      "operation": "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.DisableAndClearCache",
+      "subject": "CachedFS",
+      "order_sensitive": true,
+      "host_applicability": "any",
+      "discriminates": "two wrong disables at once. A wrapper with no enabled flag at all -- one that consults and populates the cache unconditionally -- reads 2, 2 across the two disabled rounds where the pin reads 2, 3. It is NOT a wrapper that merely suppresses stores while still serving hits: DisableAndClearCache clears all five caches on the transition (cachedvfs.go:30-34 calling ClearCache at :40-46), so a Load-guard-only omission finds an empty cache, misses on both disabled rounds and reproduces the pin's 2, 3 exactly. The Store guard alone is caught, one round later: a wrapper that stores while disabled serves the first post-enable round from what it kept and reads 3 where the pin reads 4. A disable that flips the flag and never clears is invisible until the Enable for the opposite reason: its pre-disable entries are still there, so the first post-enable round is served from cache and reads 3, 3 where the pin reads 4, 4. Note that the CompareAndSwap guard at cachedvfs.go:31 is deliberately not tested: a second DisableAndClearCache while already disabled cannot be distinguished from an unconditional one, because nothing was stored in between for the skipped clear to have removed.",
+      "actions": [
+        {
+          "op": "from",
+          "now": "2020-01-01T00:00:00Z",
+          "case_sensitive": true,
+          "files": [
+            {
+              "path": "/some/path/file.txt",
+              "kind": "file",
+              "content": "hello world"
+            }
+          ]
+        },
+        {
+          "op": "directory_exists",
+          "path": "/some/path"
+        },
+        {
+          "op": "file_exists",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "entries",
+          "path": "/some/path"
+        },
+        {
+          "op": "realpath",
+          "path": "/some/path"
+        },
+        {
+          "op": "stat",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/some/path"
+        },
+        {
+          "op": "file_exists",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "entries",
+          "path": "/some/path"
+        },
+        {
+          "op": "realpath",
+          "path": "/some/path"
+        },
+        {
+          "op": "stat",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "disable_and_clear"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/some/path"
+        },
+        {
+          "op": "file_exists",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "entries",
+          "path": "/some/path"
+        },
+        {
+          "op": "realpath",
+          "path": "/some/path"
+        },
+        {
+          "op": "stat",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/some/path"
+        },
+        {
+          "op": "file_exists",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "entries",
+          "path": "/some/path"
+        },
+        {
+          "op": "realpath",
+          "path": "/some/path"
+        },
+        {
+          "op": "stat",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "enable"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/some/path"
+        },
+        {
+          "op": "file_exists",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "entries",
+          "path": "/some/path"
+        },
+        {
+          "op": "realpath",
+          "path": "/some/path"
+        },
+        {
+          "op": "stat",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/some/path"
+        },
+        {
+          "op": "file_exists",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "entries",
+          "path": "/some/path"
+        },
+        {
+          "op": "realpath",
+          "path": "/some/path"
+        },
+        {
+          "op": "stat",
+          "path": "/some/path/file.txt"
+        }
+      ]
+    },
+    {
+      "case": "filesystem/cachedvfs/walkdir-is-never-cached",
+      "operation": "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.WalkDir",
+      "subject": "CachedFS",
+      "order_sensitive": true,
+      "host_applicability": "any",
+      "discriminates": "a wrapper that memoizes the walk, or serves it from getAccessibleEntriesCache -- the tempting optimization, since that cache already holds the same listings. cachedvfs.go:137-139 forwards unconditionally, so the count rises 1..7 and never repeats. Each row also carries the full ordered callback trace, so a port that caches the walk returns the identical visit list and the sequence 1, 1, 2, 3, 4, 5, 6.",
+      "actions": [
+        {
+          "op": "from",
+          "now": "2020-01-01T00:00:00Z",
+          "case_sensitive": true,
+          "files": [
+            {
+              "path": "/some/path/file.txt",
+              "kind": "file",
+              "content": "hello world"
+            }
+          ]
+        },
+        {
+          "op": "walk",
+          "root": "/some/path",
+          "skip_dir_at": "",
+          "skip_all_at": "",
+          "fail_at": ""
+        },
+        {
+          "op": "walk",
+          "root": "/some/path",
+          "skip_dir_at": "",
+          "skip_all_at": "",
+          "fail_at": ""
+        },
+        {
+          "op": "clear_cache"
+        },
+        {
+          "op": "walk",
+          "root": "/some/path",
+          "skip_dir_at": "",
+          "skip_all_at": "",
+          "fail_at": ""
+        },
+        {
+          "op": "disable_and_clear"
+        },
+        {
+          "op": "walk",
+          "root": "/some/path",
+          "skip_dir_at": "",
+          "skip_all_at": "",
+          "fail_at": ""
+        },
+        {
+          "op": "walk",
+          "root": "/some/path",
+          "skip_dir_at": "",
+          "skip_all_at": "",
+          "fail_at": ""
+        },
+        {
+          "op": "enable"
+        },
+        {
+          "op": "walk",
+          "root": "/some/path",
+          "skip_dir_at": "",
+          "skip_all_at": "",
+          "fail_at": ""
+        },
+        {
+          "op": "walk",
+          "root": "/some/path",
+          "skip_dir_at": "",
+          "skip_all_at": "",
+          "fail_at": ""
+        }
+      ]
+    },
+    {
+      "case": "filesystem/cachedvfs/walkdir-forwards-skip-and-error-decisions",
+      "operation": "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.WalkDir",
+      "subject": "CachedFS",
+      "order_sensitive": true,
+      "host_applicability": "any",
+      "discriminates": "a wrapper that interposes its own closure between the caller and the underlying and then swallows, rewrites or reorders the callback's decision. The four traces pin four different answers: SkipDir at a directory prunes that subtree and the walk still returns no error; SkipAll stops the walk and is swallowed into a nil return; a sentinel error propagates out of WalkDir unchanged; and SkipDir at the walk root prunes everything. A port that maps SkipDir onto SkipAll passes the second trace's return value and fails its visit list, and a port that lets SkipAll escape fails the third trace's returned error class.",
+      "actions": [
+        {
+          "op": "from",
+          "now": "2020-01-01T00:00:00Z",
+          "case_sensitive": true,
+          "files": [
+            {
+              "path": "/some/path/a.txt",
+              "kind": "file",
+              "content": "a"
+            },
+            {
+              "path": "/some/path/sub/b.txt",
+              "kind": "file",
+              "content": "b"
+            },
+            {
+              "path": "/some/path/sub/deep/c.txt",
+              "kind": "file",
+              "content": "c"
+            },
+            {
+              "path": "/some/path/z.txt",
+              "kind": "file",
+              "content": "z"
+            }
+          ]
+        },
+        {
+          "op": "walk",
+          "root": "/some/path",
+          "skip_dir_at": "",
+          "skip_all_at": "",
+          "fail_at": ""
+        },
+        {
+          "op": "walk",
+          "root": "/some/path",
+          "skip_dir_at": "/some/path/sub",
+          "skip_all_at": "",
+          "fail_at": ""
+        },
+        {
+          "op": "walk",
+          "root": "/some/path",
+          "skip_dir_at": "",
+          "skip_all_at": "/some/path/sub/b.txt",
+          "fail_at": ""
+        },
+        {
+          "op": "walk",
+          "root": "/some/path",
+          "skip_dir_at": "",
+          "skip_all_at": "",
+          "fail_at": "/some/path/sub/b.txt"
+        },
+        {
+          "op": "walk",
+          "root": "/some/path",
+          "skip_dir_at": "/some/path",
+          "skip_all_at": "",
+          "fail_at": ""
+        }
+      ]
+    },
+    {
+      "case": "filesystem/cachedvfs/walkdir-is-not-served-from-the-entries-cache",
+      "operation": "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.WalkDir",
+      "subject": "CachedFS",
+      "order_sensitive": true,
+      "host_applicability": "any",
+      "discriminates": "a wrapper that answers WalkDir out of getAccessibleEntriesCache. The two halves diverge the moment anything is written: the cached listing must still show only file.txt, because WriteFile invalidates nothing, while the walk must show new.txt, because WalkDir is a bare forward. A port that shares one source for both gives the same answer twice -- stale in both halves if it reads the cache, fresh in both if it does not -- and cannot reproduce the split.",
+      "actions": [
+        {
+          "op": "from",
+          "now": "2020-01-01T00:00:00Z",
+          "case_sensitive": true,
+          "files": [
+            {
+              "path": "/some/path/file.txt",
+              "kind": "file",
+              "content": "hello world"
+            }
+          ]
+        },
+        {
+          "op": "entries",
+          "path": "/some/path"
+        },
+        {
+          "op": "walk",
+          "root": "/some/path",
+          "skip_dir_at": "",
+          "skip_all_at": "",
+          "fail_at": ""
+        },
+        {
+          "op": "write_file",
+          "path": "/some/path/new.txt",
+          "data_hex": "78"
+        },
+        {
+          "op": "entries",
+          "path": "/some/path"
+        },
+        {
+          "op": "walk",
+          "root": "/some/path",
+          "skip_dir_at": "",
+          "skip_all_at": "",
+          "fail_at": ""
+        }
+      ]
+    },
+    {
+      "case": "filesystem/cachedvfs/cached-miss-then-creation",
+      "operation": "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.WriteFile",
+      "subject": "CachedFS",
+      "order_sensitive": true,
+      "host_applicability": "any",
+      "discriminates": "the one wrong implementation every reviewer would call a bug fix: invalidating the cache on write. cachedvfs.go:141-143 forwards WriteFile and clears nothing, so all five cached misses must survive the creation unchanged -- with every count still 1. Two writes make four of the five stale in their VALUE as well as their count: the first creates new.txt, so the cached file-exists must still say false and the cached stat must still say nil and the cached listing must still show only file.txt; the second writes under newdir, which iovfs creates on the retry path (iofs.go:200-209), so the cached directory-exists must still say false. The realpath row is a count-only witness, because an existing file's realpath is the same string the fallback echoes; a port that evicts on write reads 2 there. A port that evicts, or that clears the caches, returns true, true, a ten-byte stat and a two-entry listing, and reads 2 everywhere: fresher, more correct-looking, and wrong against the pin. The trailing ClearCache round is what makes the stale rows evidence rather than a broken fixture: it shows the underlying really did change.",
+      "actions": [
+        {
+          "op": "from",
+          "now": "2020-01-01T00:00:00Z",
+          "case_sensitive": true,
+          "files": [
+            {
+              "path": "/some/path/file.txt",
+              "kind": "file",
+              "content": "hello world"
+            }
+          ]
+        },
+        {
+          "op": "file_exists",
+          "path": "/some/path/new.txt"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/some/path/newdir"
+        },
+        {
+          "op": "realpath",
+          "path": "/some/path/new.txt"
+        },
+        {
+          "op": "stat",
+          "path": "/some/path/new.txt"
+        },
+        {
+          "op": "entries",
+          "path": "/some/path"
+        },
+        {
+          "op": "write_file",
+          "path": "/some/path/new.txt",
+          "data_hex": "30313233343536373839"
+        },
+        {
+          "op": "write_file",
+          "path": "/some/path/newdir/deep.txt",
+          "data_hex": "64"
+        },
+        {
+          "op": "file_exists",
+          "path": "/some/path/new.txt"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/some/path/newdir"
+        },
+        {
+          "op": "realpath",
+          "path": "/some/path/new.txt"
+        },
+        {
+          "op": "stat",
+          "path": "/some/path/new.txt"
+        },
+        {
+          "op": "entries",
+          "path": "/some/path"
+        },
+        {
+          "op": "clear_cache"
+        },
+        {
+          "op": "file_exists",
+          "path": "/some/path/new.txt"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/some/path/newdir"
+        },
+        {
+          "op": "stat",
+          "path": "/some/path/new.txt"
+        },
+        {
+          "op": "entries",
+          "path": "/some/path"
+        }
+      ]
+    },
+    {
+      "case": "filesystem/cachedvfs/cached-hit-then-deletion",
+      "operation": "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.Remove",
+      "subject": "CachedFS",
+      "order_sensitive": true,
+      "host_applicability": "any",
+      "discriminates": "a port that evicts on delete -- the most defensible-looking invalidation of all, since serving a deleted file as existing looks like a bug. cachedvfs.go:109-111 forwards Remove and invalidates nothing, so the three cached answers must still read true, an 11-byte stat and a listing containing file.txt, each at count 1. The ReadFile in the middle is what makes the case airtight in the other direction: it is uncached, so it must see the deletion at once and return ok=false with its own count at 2. A port that passes by never caching anything fails the first three rows; a port that evicts fails them too. The recorded forwarded path proves the wrapper passed the caller's spelling through.",
+      "actions": [
+        {
+          "op": "from",
+          "now": "2020-01-01T00:00:00Z",
+          "case_sensitive": true,
+          "files": [
+            {
+              "path": "/some/path/file.txt",
+              "kind": "file",
+              "content": "hello world"
+            }
+          ]
+        },
+        {
+          "op": "file_exists",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "stat",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "entries",
+          "path": "/some/path"
+        },
+        {
+          "op": "read_file",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "remove",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "file_exists",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "stat",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "entries",
+          "path": "/some/path"
+        },
+        {
+          "op": "read_file",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "clear_cache"
+        },
+        {
+          "op": "file_exists",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "entries",
+          "path": "/some/path"
+        }
+      ]
+    },
+    {
+      "case": "filesystem/cachedvfs/append-splits-the-cached-and-uncached-paths",
+      "operation": "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.AppendFile",
+      "subject": "CachedFS",
+      "order_sensitive": true,
+      "host_applicability": "any",
+      "discriminates": "two opposite wrong ports in one trace, which is why this is one case and not two. A port that caches ReadFile fails at the fourth read-back by returning the stale `hello world`: the read side is uncached and must see the append immediately, at count 2. A port that invalidates the stat cache on append fails at the fifth action by returning size 12: the stat side is cached and AppendFile invalidates nothing, so it must still say 11 at count 1. The trailing ClearCache proves the underlying really is 12 bytes. The recorded forwarded (path, data) pair pins that the appended bytes crossed the boundary unchanged.",
+      "actions": [
+        {
+          "op": "from",
+          "now": "2020-01-01T00:00:00Z",
+          "case_sensitive": true,
+          "files": [
+            {
+              "path": "/some/path/file.txt",
+              "kind": "file",
+              "content": "hello world"
+            }
+          ]
+        },
+        {
+          "op": "read_file",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "stat",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "append_file",
+          "path": "/some/path/file.txt",
+          "data_hex": "21"
+        },
+        {
+          "op": "read_file",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "stat",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "clear_cache"
+        },
+        {
+          "op": "stat",
+          "path": "/some/path/file.txt"
+        }
+      ]
+    },
+    {
+      "case": "filesystem/cachedvfs/chtimes-forwards-both-times-and-does-not-invalidate",
+      "operation": "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.Chtimes",
+      "subject": "CachedFS",
+      "order_sensitive": true,
+      "host_applicability": "any",
+      "discriminates": "three wrong implementations. First, a lost timestamp argument, which is not hypothetical: crates/tsr_vfs/src/lib.rs:92 declares `fn change_times(&self, _path: &[u8])` and carries no instants at all. Second, the two instants swapped. Neither is visible in the return value, so both are caught only by the recorded (path, a_time, m_time) the mock saw -- and the swap is caught twice, because the underlying vfstest applies mTime alone (vfstest.go:605-617 sets ModTime and ignores aTime), so a swapped call also leaves the post-clear stat reading 2020-01-02 instead of 2021-06-07. Third, a port that invalidates the stat cache on Chtimes: the middle stat must be served from the cache with the Stat count still at 1, because cachedvfs.go:120-122 forwards and clears nothing. That row pins the count, the name, the size and the is-dir flag, and its mod time is recorded as the class `aliased` rather than as an instant. That is deliberate, and it is the one thing this case does not pin. Go answers 2021-06-07T08:09:10Z there even though nothing was re-queried, because vfstest.MapFS.Chtimes assigns `fileInfo.ModTime = mTime` on the stored *fstest.MapFile in place (vfstest.go:615) and the cached vfs.FileInfo interface value still points at that struct. The instant is therefore a property of the Go fixture's aliasing, not of the pinned wrapper: a port whose stat cache holds an owned FileInfo -- the only shape crates/tsr_vfs/src/lib.rs:63-67 can express, `#[derive(Clone, Copy)] pub struct FileInfo { directory, size }`, which cannot carry a mod time at all -- would answer the pre-Chtimes 2020-01-01T00:00:00Z and would be right to. Freezing the instant would fail it for implementing the wrapper correctly, so the class is frozen instead and the trailing ClearCache row carries the real evidence that Chtimes reached the underlying: at Stat count 2 it reads 2021-06-07T08:09:10Z. The append case is the contrast -- vfstest replaces the entry there, and the cached stat keeps the old size.",
+      "actions": [
+        {
+          "op": "from",
+          "now": "2020-01-01T00:00:00Z",
+          "case_sensitive": true,
+          "files": [
+            {
+              "path": "/some/path/file.txt",
+              "kind": "file",
+              "content": "hello world"
+            }
+          ]
+        },
+        {
+          "op": "stat",
+          "path": "/some/path/file.txt"
+        },
+        {
+          "op": "chtimes",
+          "path": "/some/path/file.txt",
+          "a_time": "2020-01-02T03:04:05Z",
+          "m_time": "2021-06-07T08:09:10Z"
+        },
+        {
+          "op": "stat",
+          "path": "/some/path/file.txt",
+          "mod_time": "class"
+        },
+        {
+          "op": "clear_cache"
+        },
+        {
+          "op": "stat",
+          "path": "/some/path/file.txt"
+        }
+      ]
+    },
+    {
+      "case": "filesystem/cachedvfs/common-stat-over-links-junctions-and-gaps",
+      "operation": "tsc/internal/vfs/internal/internal.go:Common.Stat",
+      "subject": "vfs.Common",
+      "order_sensitive": true,
+      "host_applicability": "any",
+      "discriminates": "three wrong ports. (a) one that reports a dangling symlink as present: internal.go:46-55 calls fs.Stat, which follows the link, and the fixture makes that stat fail, so the pin must answer nil. (b) one that returns an error where the pin collapses failure to nil. The trace pins three failure modes, not four: the dangling link, the missing name, and the unserved root -- the row for http://x/y also records that the injected root factory was asked for `http://x/` and that its nil answer short-circuited before any filesystem call. The `/sub/unreadable` row is NOT a fourth; the fixture's `read_dir_errors` set is read only by its ReadDir, never by its Stat, so that directory stats successfully, and the row pins the opposite point -- Common.Stat never touches the listing path, so a directory whose ReadDir would fail still stats. An unreadable-stat row would need a second error set in the fixture and this trace does not have one. (c) one that lstats rather than stats, which would report the symlink-to-directory as not-a-directory and the junction, an irregular entry that stats as a directory, as neither. The `foo/bar` row is the fourth thing this pins: Stat reaches RootAndPath, which reaches RootLength, which panics with the literal `vfs: path \"foo/bar\" is not absolute` -- that sentence is the contract, not an unspecified failure.",
+      "actions": [
+        {
+          "op": "from_common",
+          "now": "2020-01-01T00:00:00Z",
+          "is_reparse_point": "nil",
+          "nodes": [
+            {
+              "name": "rootlink",
+              "entry": "symlink",
+              "stat": "dir"
+            },
+            {
+              "name": "sub",
+              "entry": "dir",
+              "stat": "dir"
+            },
+            {
+              "name": "sub/alink",
+              "entry": "symlink",
+              "stat": "file",
+              "content_hex": "6578706f727420636f6e73742062203d20313b0a"
+            },
+            {
+              "name": "sub/b.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "6578706f727420636f6e73742062203d20313b0a"
+            },
+            {
+              "name": "sub/dangling",
+              "entry": "symlink",
+              "stat": "missing"
+            },
+            {
+              "name": "sub/dirlink",
+              "entry": "symlink",
+              "stat": "dir"
+            },
+            {
+              "name": "sub/empty.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": ""
+            },
+            {
+              "name": "sub/fifo",
+              "entry": "fifo",
+              "stat": "fifo"
+            },
+            {
+              "name": "sub/inner",
+              "entry": "dir",
+              "stat": "dir"
+            },
+            {
+              "name": "sub/inner/c.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "6578706f727420636f6e73742063203d20323b0a"
+            },
+            {
+              "name": "sub/junction",
+              "entry": "irregular",
+              "stat": "dir"
+            },
+            {
+              "name": "sub/odd16.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "fffe680069"
+            },
+            {
+              "name": "sub/raw.bin",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "ff01"
+            },
+            {
+              "name": "sub/unreadable",
+              "entry": "dir",
+              "stat": "dir"
+            },
+            {
+              "name": "sub/utf16be.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "feff00680069"
+            },
+            {
+              "name": "sub/utf16le.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "fffe68006900"
+            },
+            {
+              "name": "sub/utf8bom.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "efbbbf6869"
+            }
+          ],
+          "read_dir_errors": [
+            "sub/unreadable"
+          ]
+        },
+        {
+          "op": "stat",
+          "path": "/sub/b.ts"
+        },
+        {
+          "op": "stat",
+          "path": "/sub/inner"
+        },
+        {
+          "op": "stat",
+          "path": "/sub/alink"
+        },
+        {
+          "op": "stat",
+          "path": "/sub/dirlink"
+        },
+        {
+          "op": "stat",
+          "path": "/sub/junction"
+        },
+        {
+          "op": "stat",
+          "path": "/sub/fifo"
+        },
+        {
+          "op": "stat",
+          "path": "/sub/dangling"
+        },
+        {
+          "op": "stat",
+          "path": "/sub/missing"
+        },
+        {
+          "op": "stat",
+          "path": "/sub/unreadable"
+        },
+        {
+          "op": "stat",
+          "path": "/"
+        },
+        {
+          "op": "stat",
+          "path": "/sub/"
+        },
+        {
+          "op": "stat",
+          "path": "http://x/y"
+        },
+        {
+          "op": "stat",
+          "path": "foo/bar"
+        }
+      ]
+    },
+    {
+      "case": "filesystem/cachedvfs/common-existence-predicates-derive-from-stat",
+      "operation": "tsc/internal/vfs/internal/internal.go:Common.FileExists",
+      "subject": "vfs.Common",
+      "order_sensitive": true,
+      "host_applicability": "any",
+      "discriminates": "a port that answers existence from a directory listing rather than from a followed stat, and -- the sharper one -- a port that reads FileExists as is-regular. internal.go:58-61 is `stat := vfs.Stat(path); return stat != nil && !stat.IsDir()` and internal.go:63-66 is the same with `stat.IsDir()`, so FileExists is NOT-a-directory, not is-regular. On this fixture that decides two rows outright: `/sub/fifo` stats as fs.ModeNamedPipe, which is non-nil and not a directory, so the FIFO IS a file and is not a directory; `/sub/junction` is an irregular entry that stats as fs.ModeDir, so the junction IS a directory and is not a file. Only a name whose stat fails is neither -- the dangling symlink, which is listed but does not stat, and the missing path. This is the split the case exists for: internal.go:74-75, inside GetAccessibleEntries, does test `mode.IsRegular()`, and that is where the same FIFO is dropped, so the two Common entry points disagree about it and a port that implements FileExists as is-regular passes the entries case and fails this one. A symlink takes its target's kind, so the symlink-to-directory is a directory and not a file. Each row also carries what the injected filesystem was asked, so a port that stats twice, or that consults a listing of the parent, diverges on the recorded calls even where it agrees on the boolean. The `/` row pins the empty-remainder rule: RootAndPath turns the root's remainder into \".\", and a port that passes the empty string straight through looks up nothing and answers false.",
+      "actions": [
+        {
+          "op": "from_common",
+          "now": "2020-01-01T00:00:00Z",
+          "is_reparse_point": "nil",
+          "nodes": [
+            {
+              "name": "rootlink",
+              "entry": "symlink",
+              "stat": "dir"
+            },
+            {
+              "name": "sub",
+              "entry": "dir",
+              "stat": "dir"
+            },
+            {
+              "name": "sub/alink",
+              "entry": "symlink",
+              "stat": "file",
+              "content_hex": "6578706f727420636f6e73742062203d20313b0a"
+            },
+            {
+              "name": "sub/b.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "6578706f727420636f6e73742062203d20313b0a"
+            },
+            {
+              "name": "sub/dangling",
+              "entry": "symlink",
+              "stat": "missing"
+            },
+            {
+              "name": "sub/dirlink",
+              "entry": "symlink",
+              "stat": "dir"
+            },
+            {
+              "name": "sub/empty.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": ""
+            },
+            {
+              "name": "sub/fifo",
+              "entry": "fifo",
+              "stat": "fifo"
+            },
+            {
+              "name": "sub/inner",
+              "entry": "dir",
+              "stat": "dir"
+            },
+            {
+              "name": "sub/inner/c.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "6578706f727420636f6e73742063203d20323b0a"
+            },
+            {
+              "name": "sub/junction",
+              "entry": "irregular",
+              "stat": "dir"
+            },
+            {
+              "name": "sub/odd16.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "fffe680069"
+            },
+            {
+              "name": "sub/raw.bin",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "ff01"
+            },
+            {
+              "name": "sub/unreadable",
+              "entry": "dir",
+              "stat": "dir"
+            },
+            {
+              "name": "sub/utf16be.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "feff00680069"
+            },
+            {
+              "name": "sub/utf16le.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "fffe68006900"
+            },
+            {
+              "name": "sub/utf8bom.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "efbbbf6869"
+            }
+          ],
+          "read_dir_errors": [
+            "sub/unreadable"
+          ]
+        },
+        {
+          "op": "file_exists",
+          "path": "/sub/b.ts"
+        },
+        {
+          "op": "file_exists",
+          "path": "/sub/inner"
+        },
+        {
+          "op": "file_exists",
+          "path": "/sub/alink"
+        },
+        {
+          "op": "file_exists",
+          "path": "/sub/dirlink"
+        },
+        {
+          "op": "file_exists",
+          "path": "/sub/junction"
+        },
+        {
+          "op": "file_exists",
+          "path": "/sub/fifo"
+        },
+        {
+          "op": "file_exists",
+          "path": "/sub/dangling"
+        },
+        {
+          "op": "file_exists",
+          "path": "/sub/missing"
+        },
+        {
+          "op": "file_exists",
+          "path": "http://x/y"
+        },
+        {
+          "op": "file_exists",
+          "path": "/"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/sub/inner"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/sub/b.ts"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/sub/dirlink"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/sub/alink"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/sub/junction"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/sub/fifo"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/sub/dangling"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/sub/missing"
+        },
+        {
+          "op": "directory_exists",
+          "path": "http://x/y"
+        },
+        {
+          "op": "directory_exists",
+          "path": "/"
+        },
+        {
+          "op": "directory_exists",
+          "path": "foo/bar"
+        }
+      ]
+    },
+    {
+      "case": "filesystem/cachedvfs/common-entries-classifies-drops-and-reparses",
+      "operation": "tsc/internal/vfs/internal/internal.go:Common.GetAccessibleEntries",
+      "subject": "vfs.Common",
+      "order_sensitive": true,
+      "host_applicability": "any",
+      "discriminates": "(a) a port that appends reparse-point and symlink entries after the main loop instead of resolving them in ReadDir order: the pinned files list begins with `alink`, a symlink that sorts before every regular file, and a deferred port moves it to the end. (b) a port that includes a dangling symlink or a FIFO, where internal.go:81-87 drops both because addToResult accepts only IsDir and IsRegular. (c) the IsReparsePoint contract in all three of its live forms: nil, which skips the branch entirely; false, which calls the helper with the full path and still drops the entry; and true, which calls it and then admits the junction as a directory. nil and false produce the identical listing and differ only in the recorded helper calls, so a port that treats a None predicate as `return false` is caught. (d) the failure rows: a missing directory, an unreadable one and a file all yield the zero-valued Entries with a non-nil Symlinks map rather than an error, and the recorded ReadDir tells them apart from the nil-root row, which never reaches the filesystem at all. (e) the root row, where GetAccessibleEntries builds `path + \"/\" + name` and so stats `//rootlink`, which normalizes to the UNC root `//rootlink/` with an empty remainder. The injected factory does not serve that root, so the root-level symlink is silently dropped from the listing, and the recorded root argument is what shows why rather than leaving it to be guessed.",
+      "actions": [
+        {
+          "op": "from_common",
+          "now": "2020-01-01T00:00:00Z",
+          "is_reparse_point": "nil",
+          "nodes": [
+            {
+              "name": "rootlink",
+              "entry": "symlink",
+              "stat": "dir"
+            },
+            {
+              "name": "sub",
+              "entry": "dir",
+              "stat": "dir"
+            },
+            {
+              "name": "sub/alink",
+              "entry": "symlink",
+              "stat": "file",
+              "content_hex": "6578706f727420636f6e73742062203d20313b0a"
+            },
+            {
+              "name": "sub/b.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "6578706f727420636f6e73742062203d20313b0a"
+            },
+            {
+              "name": "sub/dangling",
+              "entry": "symlink",
+              "stat": "missing"
+            },
+            {
+              "name": "sub/dirlink",
+              "entry": "symlink",
+              "stat": "dir"
+            },
+            {
+              "name": "sub/empty.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": ""
+            },
+            {
+              "name": "sub/fifo",
+              "entry": "fifo",
+              "stat": "fifo"
+            },
+            {
+              "name": "sub/inner",
+              "entry": "dir",
+              "stat": "dir"
+            },
+            {
+              "name": "sub/inner/c.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "6578706f727420636f6e73742063203d20323b0a"
+            },
+            {
+              "name": "sub/junction",
+              "entry": "irregular",
+              "stat": "dir"
+            },
+            {
+              "name": "sub/odd16.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "fffe680069"
+            },
+            {
+              "name": "sub/raw.bin",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "ff01"
+            },
+            {
+              "name": "sub/unreadable",
+              "entry": "dir",
+              "stat": "dir"
+            },
+            {
+              "name": "sub/utf16be.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "feff00680069"
+            },
+            {
+              "name": "sub/utf16le.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "fffe68006900"
+            },
+            {
+              "name": "sub/utf8bom.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "efbbbf6869"
+            }
+          ],
+          "read_dir_errors": [
+            "sub/unreadable"
+          ]
+        },
+        {
+          "op": "entries",
+          "path": "/sub"
+        },
+        {
+          "op": "from_common",
+          "now": "2020-01-01T00:00:00Z",
+          "is_reparse_point": "false",
+          "nodes": [
+            {
+              "name": "rootlink",
+              "entry": "symlink",
+              "stat": "dir"
+            },
+            {
+              "name": "sub",
+              "entry": "dir",
+              "stat": "dir"
+            },
+            {
+              "name": "sub/alink",
+              "entry": "symlink",
+              "stat": "file",
+              "content_hex": "6578706f727420636f6e73742062203d20313b0a"
+            },
+            {
+              "name": "sub/b.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "6578706f727420636f6e73742062203d20313b0a"
+            },
+            {
+              "name": "sub/dangling",
+              "entry": "symlink",
+              "stat": "missing"
+            },
+            {
+              "name": "sub/dirlink",
+              "entry": "symlink",
+              "stat": "dir"
+            },
+            {
+              "name": "sub/empty.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": ""
+            },
+            {
+              "name": "sub/fifo",
+              "entry": "fifo",
+              "stat": "fifo"
+            },
+            {
+              "name": "sub/inner",
+              "entry": "dir",
+              "stat": "dir"
+            },
+            {
+              "name": "sub/inner/c.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "6578706f727420636f6e73742063203d20323b0a"
+            },
+            {
+              "name": "sub/junction",
+              "entry": "irregular",
+              "stat": "dir"
+            },
+            {
+              "name": "sub/odd16.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "fffe680069"
+            },
+            {
+              "name": "sub/raw.bin",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "ff01"
+            },
+            {
+              "name": "sub/unreadable",
+              "entry": "dir",
+              "stat": "dir"
+            },
+            {
+              "name": "sub/utf16be.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "feff00680069"
+            },
+            {
+              "name": "sub/utf16le.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "fffe68006900"
+            },
+            {
+              "name": "sub/utf8bom.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "efbbbf6869"
+            }
+          ],
+          "read_dir_errors": [
+            "sub/unreadable"
+          ]
+        },
+        {
+          "op": "entries",
+          "path": "/sub"
+        },
+        {
+          "op": "from_common",
+          "now": "2020-01-01T00:00:00Z",
+          "is_reparse_point": "true",
+          "nodes": [
+            {
+              "name": "rootlink",
+              "entry": "symlink",
+              "stat": "dir"
+            },
+            {
+              "name": "sub",
+              "entry": "dir",
+              "stat": "dir"
+            },
+            {
+              "name": "sub/alink",
+              "entry": "symlink",
+              "stat": "file",
+              "content_hex": "6578706f727420636f6e73742062203d20313b0a"
+            },
+            {
+              "name": "sub/b.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "6578706f727420636f6e73742062203d20313b0a"
+            },
+            {
+              "name": "sub/dangling",
+              "entry": "symlink",
+              "stat": "missing"
+            },
+            {
+              "name": "sub/dirlink",
+              "entry": "symlink",
+              "stat": "dir"
+            },
+            {
+              "name": "sub/empty.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": ""
+            },
+            {
+              "name": "sub/fifo",
+              "entry": "fifo",
+              "stat": "fifo"
+            },
+            {
+              "name": "sub/inner",
+              "entry": "dir",
+              "stat": "dir"
+            },
+            {
+              "name": "sub/inner/c.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "6578706f727420636f6e73742063203d20323b0a"
+            },
+            {
+              "name": "sub/junction",
+              "entry": "irregular",
+              "stat": "dir"
+            },
+            {
+              "name": "sub/odd16.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "fffe680069"
+            },
+            {
+              "name": "sub/raw.bin",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "ff01"
+            },
+            {
+              "name": "sub/unreadable",
+              "entry": "dir",
+              "stat": "dir"
+            },
+            {
+              "name": "sub/utf16be.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "feff00680069"
+            },
+            {
+              "name": "sub/utf16le.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "fffe68006900"
+            },
+            {
+              "name": "sub/utf8bom.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "efbbbf6869"
+            }
+          ],
+          "read_dir_errors": [
+            "sub/unreadable"
+          ]
+        },
+        {
+          "op": "entries",
+          "path": "/sub"
+        },
+        {
+          "op": "entries",
+          "path": "/sub/inner"
+        },
+        {
+          "op": "entries",
+          "path": "/sub/unreadable"
+        },
+        {
+          "op": "entries",
+          "path": "/sub/missing"
+        },
+        {
+          "op": "entries",
+          "path": "/sub/b.ts"
+        },
+        {
+          "op": "entries",
+          "path": "http://x/y"
+        },
+        {
+          "op": "entries",
+          "path": "/"
+        }
+      ]
+    },
+    {
+      "case": "filesystem/cachedvfs/common-read-file-flags-and-decodes",
+      "operation": "tsc/internal/vfs/internal/internal.go:Common.ReadFile",
+      "subject": "vfs.Common",
+      "order_sensitive": true,
+      "host_applicability": "any",
+      "discriminates": "(a) a port that collapses the empty-file answer into the missing-file answer. internal.go:161-163 returns (\"\", true) for a zero-byte file and internal.go:147 and :152 return (\"\", false) for every failure, and that flag is the pin's only way to tell an empty file from an absent one. Every non-empty read then goes through decodeBytes (internal.go:167), and the two BOM rows and the odd-length row go on through decodeUtf16 (internal.go:176 and :178). (b) a port that surfaces a read error instead of the false flag, for the missing path, the directory, the dangling link, the ReadDir-blocked directory -- which fails here as a directory rather than for permission, because the fixture's read_dir_errors set is read only by its ReadDir -- and the nil root alike. (c) a port that decodes only at insertion time and therefore cannot answer ReadFile's own contract for bytes it never inserted: the three BOM rows must come back decoded, the odd-length UTF-16 body must lose its trailing byte rather than fail, and the two-byte file that is neither a BOM nor valid UTF-8 must come back untouched. Contents travel as hex in both directions, because a JSON string cannot carry the bytes these rows exist to pin.",
+      "actions": [
+        {
+          "op": "from_common",
+          "now": "2020-01-01T00:00:00Z",
+          "is_reparse_point": "nil",
+          "nodes": [
+            {
+              "name": "rootlink",
+              "entry": "symlink",
+              "stat": "dir"
+            },
+            {
+              "name": "sub",
+              "entry": "dir",
+              "stat": "dir"
+            },
+            {
+              "name": "sub/alink",
+              "entry": "symlink",
+              "stat": "file",
+              "content_hex": "6578706f727420636f6e73742062203d20313b0a"
+            },
+            {
+              "name": "sub/b.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "6578706f727420636f6e73742062203d20313b0a"
+            },
+            {
+              "name": "sub/dangling",
+              "entry": "symlink",
+              "stat": "missing"
+            },
+            {
+              "name": "sub/dirlink",
+              "entry": "symlink",
+              "stat": "dir"
+            },
+            {
+              "name": "sub/empty.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": ""
+            },
+            {
+              "name": "sub/fifo",
+              "entry": "fifo",
+              "stat": "fifo"
+            },
+            {
+              "name": "sub/inner",
+              "entry": "dir",
+              "stat": "dir"
+            },
+            {
+              "name": "sub/inner/c.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "6578706f727420636f6e73742063203d20323b0a"
+            },
+            {
+              "name": "sub/junction",
+              "entry": "irregular",
+              "stat": "dir"
+            },
+            {
+              "name": "sub/odd16.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "fffe680069"
+            },
+            {
+              "name": "sub/raw.bin",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "ff01"
+            },
+            {
+              "name": "sub/unreadable",
+              "entry": "dir",
+              "stat": "dir"
+            },
+            {
+              "name": "sub/utf16be.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "feff00680069"
+            },
+            {
+              "name": "sub/utf16le.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "fffe68006900"
+            },
+            {
+              "name": "sub/utf8bom.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "efbbbf6869"
+            }
+          ],
+          "read_dir_errors": [
+            "sub/unreadable"
+          ]
+        },
+        {
+          "op": "read_file",
+          "path": "/sub/b.ts"
+        },
+        {
+          "op": "read_file",
+          "path": "/sub/empty.ts"
+        },
+        {
+          "op": "read_file",
+          "path": "/sub/missing"
+        },
+        {
+          "op": "read_file",
+          "path": "/sub/inner"
+        },
+        {
+          "op": "read_file",
+          "path": "/sub/alink"
+        },
+        {
+          "op": "read_file",
+          "path": "/sub/dangling"
+        },
+        {
+          "op": "read_file",
+          "path": "/sub/unreadable"
+        },
+        {
+          "op": "read_file",
+          "path": "/sub/utf16le.ts"
+        },
+        {
+          "op": "read_file",
+          "path": "/sub/utf16be.ts"
+        },
+        {
+          "op": "read_file",
+          "path": "/sub/utf8bom.ts"
+        },
+        {
+          "op": "read_file",
+          "path": "/sub/odd16.ts"
+        },
+        {
+          "op": "read_file",
+          "path": "/sub/raw.bin"
+        },
+        {
+          "op": "read_file",
+          "path": "http://x/y"
+        },
+        {
+          "op": "read_file",
+          "path": "foo/bar"
+        }
+      ]
+    },
+    {
+      "case": "filesystem/cachedvfs/common-root-and-path-dispatches-per-root",
+      "operation": "tsc/internal/vfs/internal/internal.go:Common.RootAndPath",
+      "subject": "vfs.Common",
+      "order_sensitive": true,
+      "host_applicability": "any",
+      "discriminates": "(a) a port that passes an empty remainder straight through, so the root directory's own lookup misses instead of resolving \".\" -- internal.go:38-44 rewrites it and every other operation in this package inherits the rewrite. (b) a port that normalizes, lowercases or trims the root before handing it to the injected factory: the recorded argument shows the exact spelling the pin passes for each form, including the trailing separator on `c:/` and `//server/`. (c) a port that splits before normalizing, which the backslash and `/a/./b` rows catch. (d) a port that treats an unserved root as an error rather than as a nil filesystem the callers guard on.",
+      "actions": [
+        {
+          "op": "from_common",
+          "now": "2020-01-01T00:00:00Z",
+          "is_reparse_point": "nil",
+          "nodes": [
+            {
+              "name": "rootlink",
+              "entry": "symlink",
+              "stat": "dir"
+            },
+            {
+              "name": "sub",
+              "entry": "dir",
+              "stat": "dir"
+            },
+            {
+              "name": "sub/alink",
+              "entry": "symlink",
+              "stat": "file",
+              "content_hex": "6578706f727420636f6e73742062203d20313b0a"
+            },
+            {
+              "name": "sub/b.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "6578706f727420636f6e73742062203d20313b0a"
+            },
+            {
+              "name": "sub/dangling",
+              "entry": "symlink",
+              "stat": "missing"
+            },
+            {
+              "name": "sub/dirlink",
+              "entry": "symlink",
+              "stat": "dir"
+            },
+            {
+              "name": "sub/empty.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": ""
+            },
+            {
+              "name": "sub/fifo",
+              "entry": "fifo",
+              "stat": "fifo"
+            },
+            {
+              "name": "sub/inner",
+              "entry": "dir",
+              "stat": "dir"
+            },
+            {
+              "name": "sub/inner/c.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "6578706f727420636f6e73742063203d20323b0a"
+            },
+            {
+              "name": "sub/junction",
+              "entry": "irregular",
+              "stat": "dir"
+            },
+            {
+              "name": "sub/odd16.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "fffe680069"
+            },
+            {
+              "name": "sub/raw.bin",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "ff01"
+            },
+            {
+              "name": "sub/unreadable",
+              "entry": "dir",
+              "stat": "dir"
+            },
+            {
+              "name": "sub/utf16be.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "feff00680069"
+            },
+            {
+              "name": "sub/utf16le.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "fffe68006900"
+            },
+            {
+              "name": "sub/utf8bom.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "efbbbf6869"
+            }
+          ],
+          "read_dir_errors": [
+            "sub/unreadable"
+          ]
+        },
+        {
+          "op": "root_and_path",
+          "path": "/"
+        },
+        {
+          "op": "root_and_path",
+          "path": "/a/b"
+        },
+        {
+          "op": "root_and_path",
+          "path": "/a/b/"
+        },
+        {
+          "op": "root_and_path",
+          "path": "c:/"
+        },
+        {
+          "op": "root_and_path",
+          "path": "c:/x/y"
+        },
+        {
+          "op": "root_and_path",
+          "path": "//server/share"
+        },
+        {
+          "op": "root_and_path",
+          "path": "http://x/y"
+        },
+        {
+          "op": "root_and_path",
+          "path": "^/untitled/a"
+        },
+        {
+          "op": "root_and_path",
+          "path": "/a/./b"
+        },
+        {
+          "op": "root_and_path",
+          "path": "c:\\x\\y"
+        },
+        {
+          "op": "root_and_path",
+          "path": "foo/bar"
+        }
+      ]
+    },
+    {
+      "case": "filesystem/cachedvfs/common-walk-dir-order-skips-and-errors",
+      "operation": "tsc/internal/vfs/internal/internal.go:Common.WalkDir",
+      "subject": "vfs.Common",
+      "order_sensitive": true,
+      "host_applicability": "any",
+      "discriminates": "(a) a port that flattens the walk into a directory listing: it cannot produce the callback order, cannot produce the two callbacks the unreadable directory receives -- one with no error and one with a permission error, both carrying the same entry -- and cannot carry a skip decision at all. (b) a port that emits \".\" or \"\" for the walk root instead of the root name: internal.go:132-138 rewrites the path \".\" to \"\" and prepends the root, so walking \"/\" reports \"/\" and walking \"/sub\" reports \"/sub\" with no rewrite. (c) a port that confuses SkipDir with SkipAll: the two traces differ in what they visit after the decision and agree that WalkDir itself returns no error, while the sentinel trace returns the error unchanged. (d) a port that reports an error for a nil root, where the pin walks nothing and returns nil, versus for a missing root, where fs.WalkDir calls back once with a nil entry and the not-exist error. The three-way divergence between this walk, the classified listing and the raw ReadDir the fixture records is the thing a port that builds all three from one filtered listing cannot reproduce: the walk reaches the FIFO, the junction and the dangling link, and the listing does not.",
+      "actions": [
+        {
+          "op": "from_common",
+          "now": "2020-01-01T00:00:00Z",
+          "is_reparse_point": "nil",
+          "nodes": [
+            {
+              "name": "rootlink",
+              "entry": "symlink",
+              "stat": "dir"
+            },
+            {
+              "name": "sub",
+              "entry": "dir",
+              "stat": "dir"
+            },
+            {
+              "name": "sub/alink",
+              "entry": "symlink",
+              "stat": "file",
+              "content_hex": "6578706f727420636f6e73742062203d20313b0a"
+            },
+            {
+              "name": "sub/b.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "6578706f727420636f6e73742062203d20313b0a"
+            },
+            {
+              "name": "sub/dangling",
+              "entry": "symlink",
+              "stat": "missing"
+            },
+            {
+              "name": "sub/dirlink",
+              "entry": "symlink",
+              "stat": "dir"
+            },
+            {
+              "name": "sub/empty.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": ""
+            },
+            {
+              "name": "sub/fifo",
+              "entry": "fifo",
+              "stat": "fifo"
+            },
+            {
+              "name": "sub/inner",
+              "entry": "dir",
+              "stat": "dir"
+            },
+            {
+              "name": "sub/inner/c.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "6578706f727420636f6e73742063203d20323b0a"
+            },
+            {
+              "name": "sub/junction",
+              "entry": "irregular",
+              "stat": "dir"
+            },
+            {
+              "name": "sub/odd16.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "fffe680069"
+            },
+            {
+              "name": "sub/raw.bin",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "ff01"
+            },
+            {
+              "name": "sub/unreadable",
+              "entry": "dir",
+              "stat": "dir"
+            },
+            {
+              "name": "sub/utf16be.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "feff00680069"
+            },
+            {
+              "name": "sub/utf16le.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "fffe68006900"
+            },
+            {
+              "name": "sub/utf8bom.ts",
+              "entry": "file",
+              "stat": "file",
+              "content_hex": "efbbbf6869"
+            }
+          ],
+          "read_dir_errors": [
+            "sub/unreadable"
+          ]
+        },
+        {
+          "op": "walk",
+          "root": "/",
+          "skip_dir_at": "",
+          "skip_all_at": "",
+          "fail_at": ""
+        },
+        {
+          "op": "walk",
+          "root": "/sub",
+          "skip_dir_at": "",
+          "skip_all_at": "",
+          "fail_at": ""
+        },
+        {
+          "op": "walk",
+          "root": "/sub",
+          "skip_dir_at": "/sub/inner",
+          "skip_all_at": "",
+          "fail_at": ""
+        },
+        {
+          "op": "walk",
+          "root": "/sub",
+          "skip_dir_at": "",
+          "skip_all_at": "/sub/b.ts",
+          "fail_at": ""
+        },
+        {
+          "op": "walk",
+          "root": "/sub",
+          "skip_dir_at": "",
+          "skip_all_at": "",
+          "fail_at": "/sub/b.ts"
+        },
+        {
+          "op": "walk",
+          "root": "/sub/b.ts",
+          "skip_dir_at": "",
+          "skip_all_at": "",
+          "fail_at": ""
+        },
+        {
+          "op": "walk",
+          "root": "/sub/missing",
+          "skip_dir_at": "",
+          "skip_all_at": "",
+          "fail_at": ""
+        },
+        {
+          "op": "walk",
+          "root": "http://x/y",
+          "skip_dir_at": "",
+          "skip_all_at": "",
+          "fail_at": ""
+        },
+        {
+          "op": "walk",
+          "root": "foo/bar",
+          "skip_dir_at": "",
+          "skip_all_at": "",
+          "fail_at": ""
+        }
+      ]
+    },
+    {
+      "case": "filesystem/cachedvfs/root-length-absolute-forms",
+      "operation": "tsc/internal/vfs/internal/internal.go:RootLength",
+      "subject": "vfs.RootLength",
+      "order_sensitive": true,
+      "host_applicability": "any",
+      "discriminates": "a port that forwards GetEncodedRootLength's negative URL encoding instead of complementing it: internal.go:20-28 returns ^l for l < 0, so `file:///c:/x` must answer 11 and `http://server/path` 14, where a forwarding port answers -12 and -15. It also catches a port that normalizes before measuring -- RootLength does not, which is why the backslash forms and `/a/./b` keep the length of the caller's own spelling -- and a port that treats `//` or `c:` as incomplete roots.",
+      "actions": [
+        {
+          "op": "root_length",
+          "path": "/"
+        },
+        {
+          "op": "root_length",
+          "path": "/a/b"
+        },
+        {
+          "op": "root_length",
+          "path": "//"
+        },
+        {
+          "op": "root_length",
+          "path": "//server"
+        },
+        {
+          "op": "root_length",
+          "path": "//server/share/x"
+        },
+        {
+          "op": "root_length",
+          "path": "c:"
+        },
+        {
+          "op": "root_length",
+          "path": "c:/"
+        },
+        {
+          "op": "root_length",
+          "path": "c:/x"
+        },
+        {
+          "op": "root_length",
+          "path": "c:\\x\\y"
+        },
+        {
+          "op": "root_length",
+          "path": "\\\\server\\share\\x"
+        },
+        {
+          "op": "root_length",
+          "path": "^/untitled/a"
+        },
+        {
+          "op": "root_length",
+          "path": "file:///c:/x"
+        },
+        {
+          "op": "root_length",
+          "path": "file://localhost/c%3a/x"
+        },
+        {
+          "op": "root_length",
+          "path": "file://server"
+        },
+        {
+          "op": "root_length",
+          "path": "http://server/path"
+        },
+        {
+          "op": "root_length",
+          "path": "/a/./b"
+        },
+        {
+          "op": "root_length",
+          "path": "/a/../b"
+        }
+      ]
+    },
+    {
+      "case": "filesystem/cachedvfs/root-length-rejects-non-absolute",
+      "operation": "tsc/internal/vfs/internal/internal.go:RootLength",
+      "subject": "vfs.RootLength",
+      "order_sensitive": true,
+      "host_applicability": "any",
+      "discriminates": "a port that returns 0 for a non-absolute path instead of panicking -- which is exactly what a port that simply calls tsr_tspath::root_length does, and what the repository's recorded `implemented_untested` disposition for this operation assumes. internal.go:20-28 is GetRootLength plus a precondition: zero is not an answer, it is `vfs: path %q is not absolute`, and that sentence is the contract. `c:d` and `a:b` are in this case and not in the absolute one because GetEncodedRootLength accepts a volume letter only when it is followed by a separator or ends the string. This case is split from the value table so that the table can report parity on its own rather than being dragged to `different` by the precondition.",
+      "actions": [
+        {
+          "op": "root_length",
+          "path": "foo/bar"
+        },
+        {
+          "op": "root_length",
+          "path": ""
+        },
+        {
+          "op": "root_length",
+          "path": "."
+        },
+        {
+          "op": "root_length",
+          "path": "./x"
+        },
+        {
+          "op": "root_length",
+          "path": ".."
+        },
+        {
+          "op": "root_length",
+          "path": "c:d"
+        },
+        {
+          "op": "root_length",
+          "path": "a:b"
+        },
+        {
+          "op": "root_length",
+          "path": "^untitled/a"
+        },
+        {
+          "op": "root_length",
+          "path": "file:server"
+        }
+      ]
+    },
+    {
+      "case": "filesystem/cachedvfs/split-path-normalizes-then-splits",
+      "operation": "tsc/internal/vfs/internal/internal.go:SplitPath",
+      "subject": "vfs.SplitPath",
+      "order_sensitive": true,
+      "host_applicability": "any",
+      "discriminates": "(a) a port that splits before normalizing: the backslash row and the `/a/./b`, `/a//b` and `/a/../b` rows all change, and so does the panic text, which internal.go:30-36 raises from the NORMALIZED spelling -- `./x` panics quoting \"x\" and \".\" panics quoting \"\", not the caller's string. (b) a port that strips the trailing separator from the whole path rather than from the remainder only, which turns the root `/` into `` and `c:/` into `c:`. (c) a port that returns the root without its trailing separator for the UNC and URL forms, where the pin keeps `//server/` and `file:///c:/` whole and leaves the remainder empty.",
+      "actions": [
+        {
+          "op": "split_path",
+          "path": "/a/b/"
+        },
+        {
+          "op": "split_path",
+          "path": "/"
+        },
+        {
+          "op": "split_path",
+          "path": "/a/b"
+        },
+        {
+          "op": "split_path",
+          "path": "c:/x"
+        },
+        {
+          "op": "split_path",
+          "path": "c:"
+        },
+        {
+          "op": "split_path",
+          "path": "c:/"
+        },
+        {
+          "op": "split_path",
+          "path": "//server/share/x"
+        },
+        {
+          "op": "split_path",
+          "path": "//server"
+        },
+        {
+          "op": "split_path",
+          "path": "file:///c:/x"
+        },
+        {
+          "op": "split_path",
+          "path": "file://localhost/c%3a/x"
+        },
+        {
+          "op": "split_path",
+          "path": "http://server/path"
+        },
+        {
+          "op": "split_path",
+          "path": "^/untitled/ts-nul-authority/Untitled-1"
+        },
+        {
+          "op": "split_path",
+          "path": "c:\\x\\y"
+        },
+        {
+          "op": "split_path",
+          "path": "/a/./b"
+        },
+        {
+          "op": "split_path",
+          "path": "/a/../b"
+        },
+        {
+          "op": "split_path",
+          "path": "/a//b"
+        },
+        {
+          "op": "split_path",
+          "path": "."
+        },
+        {
+          "op": "split_path",
+          "path": "./x"
+        },
+        {
+          "op": "split_path",
+          "path": ""
+        },
+        {
+          "op": "split_path",
+          "path": "a/../b"
+        }
+      ]
+    }
+  ]
+}

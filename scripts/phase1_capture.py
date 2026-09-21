@@ -192,6 +192,78 @@ FAMILIES = {
         "rust_example": "phase1_leaves",
         "rust_target": "tools/phase1/leaves/src/main.rs",
     },
+    "filesystem": {
+        # One request fragment per adapter surface, so each group owns its file.
+        "requests": [
+            "data/phase1/requests/filesystem-tspath.json",
+            "data/phase1/requests/filesystem-glob.json",
+            "data/phase1/requests/filesystem-vfsmatch.json",
+            "data/phase1/requests/filesystem-vfstest.json",
+            "data/phase1/requests/filesystem-cachedvfs.json",
+            "data/phase1/requests/filesystem-wrapvfs.json",
+            "data/phase1/requests/filesystem-iovfs.json",
+            "data/phase1/requests/filesystem-vfsmock.json",
+            "data/phase1/requests/filesystem-symlinks.json",
+            "data/phase1/requests/filesystem-osvfs.json",
+            "data/phase1/requests/filesystem-matchfiles.json",
+        ],
+        "native_probes": [
+            {"name": "tspath", "package": "tspath",
+             "probe": "tools/phase1/filesystem/tspath_probe_test.go",
+             "test": "TestPhase1FilesystemTspath"},
+            {"name": "glob", "package": "glob",
+             "probe": "tools/phase1/filesystem/glob_probe_test.go",
+             "test": "TestPhase1FilesystemGlob"},
+            {"name": "vfsmatch", "package": "vfs/vfsmatch",
+             "probe": "tools/phase1/filesystem/vfsmatch_probe_test.go",
+             "test": "TestPhase1FilesystemVfsmatch"},
+            {"name": "vfstest", "package": "vfs/vfstest",
+             "probe": "tools/phase1/filesystem/vfstest_probe_test.go",
+             "test": "TestPhase1FilesystemVfstest"},
+            {"name": "cachedvfs", "package": "vfs/cachedvfs",
+             "probe": "tools/phase1/filesystem/cachedvfs_probe_test.go",
+             "test": "TestPhase1FilesystemCachedvfs"},
+            {"name": "wrapvfs", "package": "vfs/wrapvfs",
+             "probe": "tools/phase1/filesystem/wrapvfs_probe_test.go",
+             "test": "TestPhase1FilesystemWrapvfs"},
+            {"name": "iovfs", "package": "vfs/iovfs",
+             "probe": "tools/phase1/filesystem/iovfs_probe_test.go",
+             "test": "TestPhase1FilesystemIovfs"},
+            {"name": "vfsmock", "package": "vfs/vfsmock",
+             "probe": "tools/phase1/filesystem/vfsmock_probe_test.go",
+             "test": "TestPhase1FilesystemVfsmock"},
+            # The live OS group mutates a real filesystem, so it stays inside a
+            # per-case temporary root and its cases declare host applicability:
+            # one host's results never certify the other.
+            # internal/symlinks is its own Go package, so it needs its own
+            # overlay file: a probe compiled into `tspath` cannot reach it.
+            {"name": "symlinks", "package": "symlinks",
+             "probe": "tools/phase1/filesystem/symlinks_probe_test.go",
+             "test": "TestPhase1FilesystemSymlinks"},
+            {"name": "osvfs", "package": "vfs/osvfs",
+             "probe": "tools/phase1/filesystem/osvfs_probe_test.go",
+             "test": "TestPhase1FilesystemOsvfs"},
+            # The carried config/matchFiles renderer. It compiles into the
+            # pinned tsoptions_test package to reach that package's own
+            # helpers, which links internal/testutil/baseline, whose init calls
+            # repo.TestDataPath() -- and repo panics under -trimpath. So the
+            # flag is dropped for this probe, as it is for the F0 pilot's
+            # command-line probe, and the choice is recorded in provenance.
+            # `helper` is a second overlay source compiled into `tsoptions`
+            # itself, so the renderer can reach the pinned unexported
+            # `getWildcardDirectories` for the raw-JSON entry point, whose
+            # result carries no ConfigFile. Overlay-only; the pin is untouched.
+            {"name": "matchfiles", "package": "tsoptions",
+             "probe": "tools/phase1/filesystem/matchfiles_probe_test.go",
+             "helper": "tools/phase1/filesystem/matchfiles_inpackage_test.go",
+             "test": "TestPhase1FilesystemMatchFiles",
+             "trimpath": False},
+        ],
+        "rust_package": "phase1_filesystem",
+        "rust_target_kind": "bin",
+        "rust_example": "phase1_filesystem",
+        "rust_target": "tools/phase1/filesystem/src/main.rs",
+    },
 }
 # The six command families the plan names. Only `pilot` is wired at F0; the
 # rest are registered so `inventory --check` can report them as unprepared
@@ -393,7 +465,7 @@ def build_rust(family: str) -> Path:
 
 
 def run_probe(directory: Path, package: str, source: str, request: dict, test: str,
-              trimpath: bool = True) -> dict:
+              trimpath: bool = True, helper: str | None = None) -> dict:
     """Run one access-only Go probe under an overlay and authenticate its output.
 
     This mirrors `s08_oracle.run_overlay`, which is reused wherever it fits. It
@@ -403,6 +475,13 @@ def run_probe(directory: Path, package: str, source: str, request: dict, test: s
     `repo` panics with "repo root cannot be found when built with -trimpath".
     Sharing that package is the whole point of the renderer seam, so the flag is
     dropped for those probes and the choice is recorded in provenance.
+
+    `helper` is an optional second overlay source, compiled *into* the pinned
+    package rather than its external test package. A probe that lives in
+    `<package>_test` can only reach exported identifiers; a probe that needs a
+    pinned unexported entry point declares an in-package companion here instead
+    of editing the pin. Both files are overlay-only: neither is written into
+    `upstream/`, and `verified_upstream()` re-checks the tree afterwards.
     """
     directory = Path(directory).resolve()
     directory.mkdir(parents=True, exist_ok=False)
@@ -417,8 +496,18 @@ def run_probe(directory: Path, package: str, source: str, request: dict, test: s
     virtual = upstream / "tsc/internal" / package / "phase1_probe_export_test.go"
     if virtual.exists():
         raise ValueError(f"overlay would replace a source file: {virtual}")
+    replace = {str(virtual): str(source_path)}
+    helper_path = None
+    if helper is not None:
+        helper_path = directory / "export_inpackage_test.go"
+        helper_path.write_text(helper)
+        helper_virtual = (upstream / "tsc/internal" / package
+                          / "phase1_probe_inpackage_export_test.go")
+        if helper_virtual.exists():
+            raise ValueError(f"overlay would replace a source file: {helper_virtual}")
+        replace[str(helper_virtual)] = str(helper_path)
     overlay = directory / "overlay.json"
-    overlay.write_bytes(canonical({"Replace": {str(virtual): str(source_path)}}))
+    overlay.write_bytes(canonical({"Replace": replace}))
     env.update(S08_REQUESTS=str(request_path), S08_OUTPUT=str(output))
     arguments = ["go", "test", "-mod=readonly"]
     if trimpath:
@@ -434,6 +523,7 @@ def run_probe(directory: Path, package: str, source: str, request: dict, test: s
     (directory / "provenance.json").write_bytes(canonical({
         "pin": pin(), "package": package, "test": test, "trimpath": trimpath,
         "source_sha256": digest(source.encode()),
+        "helper_sha256": digest(helper.encode()) if helper is not None else None,
         "request_sha256": digest(request_bytes),
         "output_sha256": digest(output.read_bytes()),
         "go": report["go"], "goos": report["goos"], "goarch": report["goarch"],
@@ -552,7 +642,7 @@ def validate_response(document: object, requests: list[dict], side: str) -> list
         if result == "not_implemented":
             missing = row.get("missing_operation")
             required = ("operation", "go_authority", "intended_signature", "production_home")
-            if not isinstance(missing, dict) or any(not missing.get(k) for k in required):
+            if not isinstance(missing, dict) or any(not isinstance(missing.get(k), str) or not missing[k] for k in required):
                 raise ValueError(
                     f"{where} is not_implemented without a complete missing_operation record"
                 )
@@ -615,10 +705,12 @@ def capture(family: str, output: Path, cases: list[str] | None = None) -> dict:
             request_document,
             probe["test"],
             probe.get("trimpath", True),
+            (ROOT / probe["helper"]).read_text() if probe.get("helper") else None,
         )
         validate_response(report, selected, "native")
         native_reports[name] = {
             "package": probe["package"],
+            "helper": probe.get("helper"),
             "directory": f"native/{name}",
             "observations_sha256": sha_file(output / "native" / name / "observations.json"),
             "go": report.get("go"),
@@ -753,7 +845,14 @@ def _merge_native(directory: Path, provenance: dict, requests: list[dict]) -> di
         for row in rows:
             case = row["case"]
             if row["result"] != "observed":
-                merged.setdefault(case, row)
+                existing = merged.setdefault(case, dict(row, native_reasons={}))
+                if existing["result"] != "observed":
+                    existing["native_reasons"][probe_name] = row["reason"]
+                    # Keep the owning probe's host limitation even when other
+                    # probes declined the case earlier in the merge.
+                    existing["reason"] = "; ".join(
+                        f"{name}: {cause}" for name, cause in existing["native_reasons"].items()
+                    )
                 continue
             existing = merged.get(case)
             if existing is not None and existing.get("result") == "observed":
@@ -837,14 +936,17 @@ def compare(directory: Path, require_parity: bool = False) -> dict:
             rows.append({"case": case, "result": "harness_failed",
                          "reason": native.get("error") or native.get("reason", "")})
             continue
+        if native["result"] == "native_unavailable":
+            rows.append({"case": case, "result": "native_unavailable",
+                         "reason": native.get("reason", ""), "rust_result": rust["result"],
+                         **({"missing_operation": rust["missing_operation"]}
+                            if rust["result"] == "not_implemented" else {})})
+            continue
         if rust["result"] == "not_implemented":
             rows.append({"case": case, "result": "not_implemented",
                          "missing_operation": rust.get("missing_operation"),
                          "native_result": native.get("result"),
                          "native_observation": native.get("observation")})
-            continue
-        if native["result"] == "native_unavailable":
-            rows.append({"case": case, "result": "native_unavailable", "reason": native.get("reason", "")})
             continue
         # Canonicalisation preserves array order, and order-sensitive cases are
         # required to put their ordered payload in an array, so this comparison

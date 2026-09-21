@@ -328,12 +328,20 @@ def package_dependencies() -> dict[str, list[str]]:
     return {k: sorted(v) for k, v in dependencies.items()}
 
 
-# A committed artifact only witnesses Rust coverage when a producer actually
-# runs Rust against it. `data/s07/path-observations.json` and
-# `semver-observations.json` look like witnesses and are not: their producers
+# A committed artifact only witnesses Rust coverage when something actually runs
+# Rust against it. That is usually the producer, and for
+# `data/s07/path-observations.json` and `semver-observations.json` the producers
 # (`s07_path_helpers.py`, `s07_semver.py`) invoke `go test` only and never
-# execute Rust, so they are native authorities. Counting them would mark ~24
-# operations covered on the strength of a Go-only run.
+# execute Rust, so on the producer's account they are native authorities and
+# counting them would mark ~24 operations covered on the strength of a Go-only
+# run.
+#
+# A CONSUMER can gate just as well, which the first pass over this missed:
+# crates/tsr_tspath/tests/go_observations.rs reads the frozen path requests and
+# observations through include_str! and asserts the Rust answers equal them, so
+# `cargo test` gates eight tspath operations against that same artifact. Both
+# records exist, and they are about different things: the kind describes what
+# runs, not what the file is.
 WITNESS_KINDS = ("rust_gated", "rust_ungated", "native_authority")
 COVERING_WITNESS_KINDS = ("rust_gated",)
 
@@ -370,7 +378,17 @@ def cases_by_operation() -> dict[str, list[str]]:
 
 
 def witnessed_gaps() -> dict[str, list[str]]:
-    """Operations whose prepared case runs but reports a missing Rust entry point."""
+    """Operations whose prepared case runs and reports a missing Rust entry point.
+
+    A case PREPARES every operation it reaches and WITNESSES ABSENT only the
+    ones the Rust driver actually reported missing, which is not the same list:
+    a trace may drive five operations and find one of them unported. Falling
+    back to `operations` folded the two together and marked an operation
+    `missing` on the strength of a neighbour's gap -- an over-claim in the
+    direction of saying the port has less than it does. So the narrower list is
+    required rather than defaulted, and `record` derives it from the capture's
+    own rust rows.
+    """
     path = ROOT / "data/phase1/cases.json"
     if not path.is_file():
         return {}
@@ -379,9 +397,47 @@ def witnessed_gaps() -> dict[str, list[str]]:
     for case in document.get("cases", []):
         if case.get("last_result") != "not_implemented":
             continue
-        for operation in case.get("missing_operations", case.get("operations", [])):
+        for operation in case.get("missing_operations", []):
             gaps.setdefault(operation, []).append(case["id"])
     return {k: sorted(v) for k, v in gaps.items()}
+
+
+def gap_record_problems(cases: dict) -> list[str]:
+    """A case reporting `not_implemented` must name what the driver found absent."""
+    problems: list[str] = []
+    for case in cases.get("cases", []):
+        if case.get("last_result") != "not_implemented":
+            if case.get("missing_operations"):
+                problems.append(
+                    f"{case['id']}: records missing_operations but its last result is "
+                    f"{case.get('last_result')!r}"
+                )
+            continue
+        claimed = case.get("operations", [])
+        missing = case.get("missing_operations")
+        if not claimed:
+            # A case may prepare an OUTPUT rather than an operation -- the
+            # carried baseline renderer is 142 of them -- and then there is no
+            # operation for a gap to name. Claiming one would attribute the
+            # whole parse chain to every baseline, which is the over-attribution
+            # this check exists to prevent, pointed the other way.
+            if missing:
+                problems.append(
+                    f"{case['id']}: claims no operations but names a missing one; a case that "
+                    "prepares an output witnesses no operation gap"
+                )
+            continue
+        if not missing:
+            problems.append(
+                f"{case['id']}: reports not_implemented without naming which operation the "
+                "driver found absent; run `phase1.py record --write` against a capture"
+            )
+            continue
+        if not set(missing) <= set(claimed):
+            problems.append(
+                f"{case['id']}: names a missing operation the case does not claim to reach"
+            )
+    return problems
 
 
 def witness_problems() -> list[str]:
@@ -433,13 +489,47 @@ def witness_problems() -> list[str]:
 # is `equivalent_rust`, which the plan already defines, so that one updates the
 # scope row and is held to the same `basis_kind: "review"` bar.
 # ---------------------------------------------------------------------------
-LEAF_PACKAGES = frozenset(
-    "internal/" + name
-    for name in (
-        "core", "collections", "stringutil", "jsnum", "semver", "json",
-        "locale", "diagnostics", "bundled",
-    )
-)
+# Each preparation step owns a package set and a ledger. The roster machinery
+# below is written once over this map rather than per step, so a second step
+# cannot quietly acquire a weaker gate than the first.
+STEP_PACKAGES: dict[str, frozenset[str]] = {
+    "leaves": frozenset(
+        "internal/" + name
+        for name in (
+            "core", "collections", "stringutil", "jsnum", "semver", "json",
+            "locale", "diagnostics", "bundled",
+        )
+    ),
+    "filesystem": frozenset(
+        "internal/" + name
+        for name in (
+            "tspath", "nativepath", "glob", "osutil", "symlinks",
+            "vfs/vfsmatch", "vfs/internal", "vfs/osvfs", "vfs/iovfs",
+            "vfs/cachedvfs", "vfs/trackingvfs", "vfs/wrapvfs",
+            "vfs/vfstest", "vfs/vfsmock",
+        )
+    ),
+}
+
+# The step a package belongs to, for the per-operation roster field. A package
+# in two steps would make the gate ambiguous, so that is refused here.
+_OWNED: dict[str, str] = {}
+for _step, _packages in STEP_PACKAGES.items():
+    for _package in _packages:
+        if _package in _OWNED:
+            raise ValueError(f"{_package} is claimed by both {_OWNED[_package]} and {_step}")
+        _OWNED[_package] = _step
+
+LEAF_PACKAGES = STEP_PACKAGES["leaves"]
+FILESYSTEM_PACKAGES = STEP_PACKAGES["filesystem"]
+
+
+def step_of(package: str) -> str | None:
+    return _OWNED.get(package)
+
+
+def roster_path(step: str) -> Path:
+    return ROOT / f"data/phase1/{step}-roster.json"
 
 ROSTER_CATEGORIES = {
     "build_tooling": "runs at build time and never in a compile; the port generates the same artifact elsewhere",
@@ -451,17 +541,21 @@ ROSTER_CATEGORIES = {
     "build_variant": "belongs to a build configuration this port does not produce, so no build reaches it",
 }
 
-ROSTER = ROOT / "data/phase1/leaf-roster.json"
-
-
-def leaf_roster() -> dict:
-    if not ROSTER.is_file():
+def leaf_roster(step: str = "leaves") -> dict:
+    path = roster_path(step)
+    if not path.is_file():
         return {"version": 1, "exemptions": []}
-    return json.loads(ROSTER.read_text())
+    return json.loads(path.read_text())
 
 
-def roster_exemptions() -> dict[str, dict]:
-    return {entry["operation"]: entry for entry in leaf_roster().get("exemptions", [])}
+def roster_exemptions(step: str | None = None) -> dict[str, dict]:
+    """Exemptions for one step, or for every step when none is named."""
+    steps = [step] if step else list(STEP_PACKAGES)
+    return {
+        entry["operation"]: dict(entry, step=name)
+        for name in steps
+        for entry in leaf_roster(name).get("exemptions", [])
+    }
 
 
 PREPARING_RESULTS = ("match", "different", "not_implemented")
@@ -489,16 +583,28 @@ def prepared_links(cases: dict) -> dict[str, list[str]]:
     return {k: sorted(v) for k, v in links.items()}
 
 
-def roster_problems(scope: dict, cases: dict | None = None) -> list[str]:
-    """Validate the exemption ledger against the scope it claims to subtract from."""
-    document = leaf_roster()
+def roster_problems(
+    scope: dict, cases: dict | None = None, step: str | None = None
+) -> list[str]:
+    """Validate a step's exemption ledger against the scope it subtracts from.
+
+    With no step named, every declared step is validated, so a new step cannot
+    be added without its ledger being held to the same bar as the first.
+    """
+    if step is None:
+        return [p for name in STEP_PACKAGES for p in roster_problems(scope, cases, name)]
+    packages = STEP_PACKAGES[step]
+    path = roster_path(step)
     problems: list[str] = []
-    if not ROSTER.is_file():
-        return ["data/phase1/leaf-roster.json is absent; the F1a roster has no reviewed ledger"]
+    if not path.is_file():
+        return [
+            f"{path.relative_to(ROOT)} is absent; the {step} roster has no reviewed ledger"
+        ]
+    document = leaf_roster(step)
     pin = json.loads((ROOT / "data/upstream.json").read_text())["pin"]
     if document.get("pin") != pin:
         problems.append(
-            f"leaf-roster.json records pin {document.get('pin')!r}, not {pin!r}"
+            f"{path.name} records pin {document.get('pin')!r}, not {pin!r}"
         )
     known = {row["id"]: row for row in scope.get("operations", [])}
     if cases is None:
@@ -506,51 +612,61 @@ def roster_problems(scope: dict, cases: dict | None = None) -> list[str]:
         cases = json.loads(path.read_text()) if path.is_file() else {}
     prepared = prepared_links(cases)
     seen: set[str] = set()
+    label = path.stem
     for entry in document.get("exemptions", []):
         identity = entry.get("operation", "<unnamed>")
         if identity in seen:
-            problems.append(f"leaf-roster: duplicate exemption for {identity}")
+            problems.append(f"{label}: duplicate exemption for {identity}")
         seen.add(identity)
         row = known.get(identity)
         if row is None:
-            problems.append(f"leaf-roster: {identity} is not an operation in the frozen scope")
+            problems.append(f"{label}: {identity} is not an operation in the frozen scope")
             continue
-        if row["go_package"] not in LEAF_PACKAGES:
+        if row["go_package"] not in packages:
             problems.append(
-                f"leaf-roster: {identity} is not in a leaf package, so it was never on F1a's roster"
+                f"{label}: {identity} is not in a {step} package, so it was never on that roster"
             )
         category = entry.get("category")
         if category not in ROSTER_CATEGORIES:
-            problems.append(f"leaf-roster: {identity} has unknown category {category!r}")
+            problems.append(f"{label}: {identity} has unknown category {category!r}")
         for field in ("owner", "evidence"):
             if not entry.get(field):
-                problems.append(f"leaf-roster: {identity} records no {field}")
+                problems.append(f"{label}: {identity} records no {field}")
         # An exemption and a prepared case are contradictory claims about the
         # same operation. Prefer the case and say so rather than silently
         # letting the ledger suppress work that was actually done.
         if identity in prepared:
             problems.append(
-                f"leaf-roster: {identity} is exempted but also prepared by "
+                f"{label}: {identity} is exempted but also prepared by "
                 + ", ".join(prepared[identity][:3])
             )
         if category == "equivalent_rust" and row.get("disposition") != "equivalent_rust":
             problems.append(
-                f"leaf-roster: {identity} claims equivalent_rust but the scope row says "
+                f"{label}: {identity} claims equivalent_rust but the scope row says "
                 f"{row.get('disposition')!r}; rebuild the scope"
             )
     return problems
 
 
-def leaf_preparation(scope: dict, cases: dict) -> dict:
+# The comparison family whose cases prepare each step's operations.
+STEP_FAMILIES = {"leaves": ("leaves",), "filesystem": ("filesystem", "pilot")}
+
+
+def leaf_preparation(scope: dict, cases: dict, step: str = "leaves") -> dict:
     """Preparation is not parity: a classified gap is runnable, an absent link isn't.
 
     Keep the conservative package roster until an operation has an explicit
-    reviewed home elsewhere. In particular, do not hide unlinked core helpers
-    or generated/runtime mechanisms merely because new traces did not use them.
+    reviewed home elsewhere. In particular, do not hide unlinked helpers or
+    generated/runtime mechanisms merely because new traces did not use them.
+
+    Written once over STEP_PACKAGES so a later step cannot acquire a weaker
+    gate than the first: the arithmetic, the exemption rules and the ledger
+    validation are the same whichever step is asked for.
     """
+    families = STEP_FAMILIES[step]
     prepared: dict[str, list[str]] = {}
     for case in cases.get("cases", []):
-        if case.get("family") != "leaves" or case.get("last_result") not in PREPARING_RESULTS:
+        if case.get("family") not in families or case.get("last_result") not in PREPARING_RESULTS:
             continue
         for operation in case.get("operations", []):
             prepared.setdefault(operation, []).append(case["id"])
@@ -559,8 +675,8 @@ def leaf_preparation(scope: dict, cases: dict) -> dict:
         if witness.get("kind") in COVERING_WITNESS_KINDS:
             for operation in witness.get("operations", []):
                 witnessed.setdefault(operation, []).append(witness["id"])
-    exempt = roster_exemptions()
-    required = [r for r in scope["operations"] if r["go_package"] in LEAF_PACKAGES]
+    exempt = roster_exemptions(step)
+    required = [r for r in scope["operations"] if r["go_package"] in STEP_PACKAGES[step]]
     pending = [
         {"operation": r["id"], "rust_home": r["rust_home"], "disposition": r["disposition"]}
         for r in required
@@ -572,15 +688,26 @@ def leaf_preparation(scope: dict, cases: dict) -> dict:
         entry = exempt.get(row["id"])
         if entry and row["id"] not in prepared and row["id"] not in witnessed:
             by_category[entry["category"]] = by_category.get(entry["category"], 0) + 1
-    problems = roster_problems(scope, cases)
+    problems = roster_problems(scope, cases, step)
+    gap_problems = gap_record_problems({"cases": [
+        case for case in cases.get("cases", []) if case.get("family") in families
+    ]})
+    outputs = None
+    if step == "filesystem":
+        from phase1_baselines import matchfiles_preparation
+
+        outputs = matchfiles_preparation(cases)
     return {
         "version": 2,
+        "step": step,
         "pin": scope["pin"],
-        # `complete` is the published `leaves_prepared` result. It is false
-        # while any leaf operation is neither prepared, witnessed nor exempted
-        # by a reviewed ledger entry, and false while that ledger itself does
-        # not validate -- an exemption nobody can defend is not an answer.
-        "complete": bool(required) and not pending and not problems,
+        # `complete` is the published `<step>_prepared` result. It is false
+        # while any operation on the roster is neither prepared, witnessed nor
+        # exempted by a reviewed ledger entry, and false while that ledger
+        # itself does not validate -- an exemption nobody can defend is not an
+        # answer.
+        "complete": bool(required) and not pending and not problems and not gap_problems
+                    and (outputs is None or outputs["complete"]),
         "total_operations": len(required),
         "accounted_operations": len(accounted),
         "prepared_operations": sum(1 for r in required if r["id"] in prepared),
@@ -591,6 +718,8 @@ def leaf_preparation(scope: dict, cases: dict) -> dict:
         "exempt_by_category": dict(sorted(by_category.items())),
         "pending": pending,
         "roster_problems": problems,
+        "gap_problems": gap_problems,
+        **({"outputs": outputs} if outputs is not None else {}),
     }
 
 
@@ -603,7 +732,7 @@ def build() -> dict:
     dependencies = package_dependencies()
     case_links = cases_by_operation()
     exemptions = roster_exemptions()
-    for function in inventory():
+    for function in inventory():  # noqa: PLR1702
         package = function["package"]
         membership, reason = MEMBERSHIP[package]
         if membership not in ("full", "partial"):
@@ -661,17 +790,20 @@ def build() -> dict:
                 "basis": basis,
                 "basis_kind": basis_kind,
                 "cases": linked,
-                # F1a roster membership, orthogonal to the disposition: whether
-                # this step owes a prepared case for the operation, and if not,
-                # which reviewed ledger entry says so.
-                "f1a_roster": (
-                    None
-                    if package not in LEAF_PACKAGES
-                    else "prepared" if linked
-                    else f"exempt:{exemption['category']}" if exemption
-                    else "pending"
-                ),
-                "f1a_roster_owner": exemption["owner"] if exemption else None,
+                # Roster membership, orthogonal to the disposition: which step
+                # owes a prepared case for this operation, whether it has one,
+                # and if it is exempt, which reviewed ledger entry says so.
+                "roster": {
+                    "step": step_of(package),
+                    "state": (
+                        None
+                        if step_of(package) is None
+                        else "prepared" if linked
+                        else f"exempt:{exemption['category']}" if exemption
+                        else "pending"
+                    ),
+                    "owner": exemption["owner"] if exemption else None,
+                },
                 "depends_on": dependencies.get(package, []),
                 "destination_phase": PHASE if disposition != "later_phase" else None,
             }
