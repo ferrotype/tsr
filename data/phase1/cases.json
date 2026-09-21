@@ -25809,7 +25809,7 @@
       "id": "leaves/bundled/wrapper-dispatch-surface",
       "last_result": "not_implemented",
       "missing_operations": [
-        "tsc/internal/bundled/embed.go:wrapFS"
+        "tsc/internal/bundled/embed.go:wrappedFS.WalkDir"
       ],
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operations": [
@@ -25856,10 +25856,7 @@
       "family": "leaves",
       "host_applicability": "any",
       "id": "leaves/core-collections/cow-map-empty-scope-write-discarded",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/collections/cow.go:CopyOnWriteMap.EnterScope"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operation_actions": {
         "enter_scope": [
@@ -25891,10 +25888,7 @@
       "family": "leaves",
       "host_applicability": "any",
       "id": "leaves/core-collections/cow-map-nested-scopes-restore-level-by-level",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/collections/cow.go:CopyOnWriteMap.ensureOwned"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operation_actions": {
         "enter_scope": [
@@ -25923,10 +25917,7 @@
       "family": "leaves",
       "host_applicability": "any",
       "id": "leaves/core-collections/cow-map-scope-write-not-visible-to-parent",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/collections/cow.go:CopyOnWriteMap.Set"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operation_actions": {
         "enter_scope": [
@@ -25954,10 +25945,7 @@
       "family": "leaves",
       "host_applicability": "any",
       "id": "leaves/core-collections/cow-set-scope-fork",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/collections/cow.go:CopyOnWriteSet.EnterScope"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operation_actions": {
         "add": [
@@ -26118,10 +26106,7 @@
       "family": "leaves",
       "host_applicability": "any",
       "id": "leaves/core-collections/ordered-map-clear-reuse",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/collections/ordered_map.go:OrderedMap.Clear"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operation_actions": {
         "clear": [
@@ -26150,10 +26135,7 @@
       "family": "leaves",
       "host_applicability": "any",
       "id": "leaves/core-collections/ordered-map-clone-isolation",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/collections/ordered_map.go:OrderedMap.Clone"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operation_actions": {
         "clone": [
@@ -26185,10 +26167,7 @@
       "family": "leaves",
       "host_applicability": "any",
       "id": "leaves/core-collections/ordered-map-clone-tolerates-nil",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/collections/ordered_map.go:OrderedMap.clone"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operations": [
         "tsc/internal/collections/ordered_map.go:OrderedMap.Clone",
@@ -26200,10 +26179,7 @@
       "family": "leaves",
       "host_applicability": "any",
       "id": "leaves/core-collections/ordered-map-clone-write-back",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/collections/ordered_map.go:OrderedMap.Clone"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operation_actions": {
         "clone": [
@@ -26234,10 +26210,7 @@
       "family": "leaves",
       "host_applicability": "any",
       "id": "leaves/core-collections/ordered-map-delete-reinsert",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/collections/ordered_map.go:OrderedMap.Delete"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operation_actions": {
         "delete": [
@@ -26262,10 +26235,7 @@
       "family": "leaves",
       "host_applicability": "any",
       "id": "leaves/core-collections/ordered-map-diff-callback-sequence",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/collections/ordered_map.go:DiffOrderedMaps"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operations": [
         "tsc/internal/collections/ordered_map.go:DiffOrderedMaps",
@@ -26279,10 +26249,7 @@
       "family": "leaves",
       "host_applicability": "any",
       "id": "leaves/core-collections/ordered-map-diff-func-uses-the-callback",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/collections/ordered_map.go:DiffOrderedMapsFunc"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operations": [
         "tsc/internal/collections/ordered_map.go:DiffOrderedMapsFunc",
@@ -26295,10 +26262,7 @@
       "family": "leaves",
       "host_applicability": "any",
       "id": "leaves/core-collections/ordered-map-double-delete",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/collections/ordered_map.go:OrderedMap.Delete"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operation_actions": {
         "delete": [
@@ -26327,10 +26291,7 @@
       "family": "leaves",
       "host_applicability": "any",
       "id": "leaves/core-collections/ordered-map-early-stop",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/collections/ordered_map.go:OrderedMap.Keys"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operation_actions": {
         "early_stop_keys": [
@@ -26355,10 +26316,7 @@
       "family": "leaves",
       "host_applicability": "any",
       "id": "leaves/core-collections/ordered-map-empty-nil",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/collections/ordered_map.go:OrderedMap.Size"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operation_actions": {
         "clear": [
@@ -26399,10 +26357,7 @@
       "family": "leaves",
       "host_applicability": "any",
       "id": "leaves/core-collections/ordered-map-entry-at-bounds",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/collections/ordered_map.go:OrderedMap.EntryAt"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operations": [
         "tsc/internal/collections/ordered_map.go:OrderedMap.EntryAt"
@@ -26413,10 +26368,7 @@
       "family": "leaves",
       "host_applicability": "any",
       "id": "leaves/core-collections/ordered-map-from-list-repeated-keys",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/collections/ordered_map.go:NewOrderedMapFromList"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operations": [
         "tsc/internal/collections/ordered_map.go:NewOrderedMapFromList",
@@ -26429,10 +26381,7 @@
       "family": "leaves",
       "host_applicability": "any",
       "id": "leaves/core-collections/ordered-map-get-or-zero-hides-absence",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/collections/ordered_map.go:OrderedMap.GetOrZero"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operations": [
         "tsc/internal/collections/ordered_map.go:OrderedMap.Get",
@@ -26444,10 +26393,7 @@
       "family": "leaves",
       "host_applicability": "any",
       "id": "leaves/core-collections/ordered-map-insert-overwrite",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/collections/ordered_map.go:OrderedMap.Set"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operation_actions": {
         "entries": [
@@ -26470,7 +26416,7 @@
       "id": "leaves/core-collections/ordered-map-marshal-integer-keys",
       "last_result": "not_implemented",
       "missing_operations": [
-        "tsc/internal/collections/ordered_map.go:resolveKeyName"
+        "tsc/internal/collections/ordered_map.go:OrderedMap.MarshalJSONTo"
       ],
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operations": [
@@ -26498,10 +26444,7 @@
       "family": "leaves",
       "host_applicability": "any",
       "id": "leaves/core-collections/ordered-map-size-hint",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/collections/ordered_map.go:NewOrderedMapWithSizeHint"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operation_actions": {
         "new_size_hint": [
@@ -26565,10 +26508,7 @@
       "family": "leaves",
       "host_applicability": "any",
       "id": "leaves/core-collections/ordered-map-values-follow-insertion",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/collections/ordered_map.go:OrderedMap.Values"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operations": [
         "tsc/internal/collections/ordered_map.go:OrderedMap.Values"
@@ -26579,10 +26519,7 @@
       "family": "leaves",
       "host_applicability": "any",
       "id": "leaves/core-collections/ordered-map-values-see-appended-key",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/collections/ordered_map.go:OrderedMap.Values"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operations": [
         "tsc/internal/collections/ordered_map.go:OrderedMap.Values"
@@ -26593,10 +26530,7 @@
       "family": "leaves",
       "host_applicability": "any",
       "id": "leaves/core-collections/ordered-set-clone-clear-isolation",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/collections/ordered_set.go:OrderedSet.Clone"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operation_actions": {
         "add": [
@@ -26642,10 +26576,7 @@
       "family": "leaves",
       "host_applicability": "any",
       "id": "leaves/core-collections/ordered-set-delete-reinsert",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/collections/ordered_set.go:OrderedSet.Delete"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operation_actions": {
         "add": [
@@ -26674,10 +26605,7 @@
       "family": "leaves",
       "host_applicability": "any",
       "id": "leaves/core-collections/ordered-set-empty-nil",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/collections/ordered_set.go:OrderedSet.Size"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operation_actions": {
         "add": [
@@ -26719,10 +26647,7 @@
       "family": "leaves",
       "host_applicability": "any",
       "id": "leaves/core-collections/ordered-set-insertion-order",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/collections/ordered_set.go:OrderedSet.Add"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operation_actions": {
         "add": [
@@ -26751,10 +26676,7 @@
       "family": "leaves",
       "host_applicability": "any",
       "id": "leaves/core-collections/ordered-set-size-hint-early-stop",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/collections/ordered_set.go:OrderedSet.Values"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operation_actions": {
         "add": [

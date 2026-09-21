@@ -2,7 +2,7 @@ use crate::{
     glob::{SpecMatcher, Usage},
     ConfigFileSpecs,
 };
-use tsr_core::CompilerOptions;
+use tsr_core::{collections::OrderedMap, CompilerOptions};
 use tsr_jsstring::JsString;
 use tsr_vfs::{Error, FileSystem};
 fn key(value: &[u8], case_sensitive: bool) -> JsString {
@@ -12,17 +12,7 @@ fn key(value: &[u8], case_sensitive: bool) -> JsString {
         JsString::from_bytes(tsr_tspath::file_name_lower_case(value).into_owned())
     }
 }
-type FileMap = Vec<(JsString, JsString)>;
-fn has(map: &FileMap, key: &JsString) -> bool {
-    map.iter().any(|(k, _)| k == key)
-}
-fn set(map: &mut FileMap, key: JsString, value: JsString) {
-    if let Some((_, v)) = map.iter_mut().find(|(k, _)| *k == key) {
-        *v = value;
-    } else {
-        map.push((key, value));
-    }
-}
+type FileMap = OrderedMap<JsString, JsString>;
 fn extension_is(file: &[u8], extension: &[u8]) -> bool {
     file.len() > extension.len() && file.ends_with(extension)
 }
@@ -73,7 +63,7 @@ fn remove_lower(
                 return;
             }
             let key = key(&changed_extension(file, ext.as_bytes()), case_sensitive);
-            map.retain(|(k, _)| *k != key);
+            map.remove(&key);
         }
     }
 }
@@ -87,11 +77,11 @@ pub fn file_names_from_specs(
 ) -> Result<(Vec<JsString>, usize), Error> {
     let base = tsr_tspath::normalize(base);
     let case_sensitive = host.use_case_sensitive_file_names();
-    let (mut literal, mut wildcard, mut json) = (FileMap::new(), FileMap::new(), FileMap::new());
+    let (mut literal, mut wildcard, mut json) =
+        (FileMap::default(), FileMap::default(), FileMap::default());
     let supported = crate::supported_extensions(options, extra);
     for file in &specs.validated_files {
-        set(
-            &mut literal,
+        literal.insert(
             key(file.as_bytes(), case_sensitive),
             JsString::from_bytes(tsr_tspath::absolute(file.as_bytes(), &base)),
         );
@@ -128,33 +118,75 @@ pub fn file_names_from_specs(
                     .is_some_and(|matcher| matcher.matches(bytes))
                 {
                     let key = key(bytes, case_sensitive);
-                    if !has(&literal, &key) && !has(&json, &key) {
-                        set(&mut json, key, file);
+                    if !literal.contains_key(&key) && !json.contains_key(&key) {
+                        json.insert(key, file);
                     }
                 }
                 continue;
             }
             if has_higher(bytes, &supported, |name| {
                 let key = key(name, case_sensitive);
-                has(&literal, &key) || has(&wildcard, &key)
+                literal.contains_key(&key) || wildcard.contains_key(&key)
             }) {
                 continue;
             }
             remove_lower(bytes, &mut wildcard, &supported, case_sensitive);
             let key = key(bytes, case_sensitive);
-            if !has(&literal, &key) && !has(&wildcard, &key) {
-                set(&mut wildcard, key, file);
+            if !literal.contains_key(&key) && !wildcard.contains_key(&key) {
+                wildcard.insert(key, file);
             }
         }
     }
     let count = literal.len();
     Ok((
         literal
-            .into_iter()
-            .chain(wildcard)
-            .chain(json)
-            .map(|(_, v)| v)
+            .into_values()
+            .chain(wildcard.into_values())
+            .chain(json.into_values())
             .collect(),
         count,
     ))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use tsr_core::Tristate;
+    use tsr_vfs::MemoryBuilder;
+
+    #[test]
+    fn file_groups_keep_literal_position_casing_and_extension_priority() {
+        let mut host = MemoryBuilder::new(b"/project", false);
+        for name in ["a.ts", "z.ts", "main.js", "main.ts", "data.json"] {
+            host.insert_loaded(name.as_bytes(), b"".as_slice());
+        }
+        let specs = ConfigFileSpecs {
+            // Overwrite a case-insensitive key without moving its position.
+            validated_files: ["/project/A.ts", "/project/z.ts", "/project/a.ts"]
+                .map(|s| JsString::from_bytes(s.as_bytes()))
+                .to_vec(),
+            // Encounter JS first, then remove it when the TS wildcard arrives.
+            validated_includes: ["*.js", "*.ts", "*.json"]
+                .map(|s| JsString::from_bytes(s.as_bytes()))
+                .to_vec(),
+            ..ConfigFileSpecs::default()
+        };
+        let options = CompilerOptions {
+            allow_js: Tristate::TRUE,
+            resolve_json_module: Tristate::TRUE,
+            ..CompilerOptions::default()
+        };
+        let (files, literal_count) =
+            file_names_from_specs(&specs, b"/project", &options, &host.finish(), &[]).unwrap();
+        assert_eq!(literal_count, 2);
+        assert_eq!(
+            files.iter().map(JsString::as_bytes).collect::<Vec<_>>(),
+            [
+                b"/project/a.ts".as_slice(),
+                b"/project/z.ts",
+                b"/project/main.ts",
+                b"/project/data.json",
+            ]
+        );
+    }
 }

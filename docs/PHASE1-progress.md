@@ -1119,9 +1119,9 @@ changed exactly one row: `leaves/bundled/wrapper-dispatch-surface` now identifie
 `wrappedFS.WalkDir` as the missing operation. `wrapFS` merely constructs the
 wrapper (`embed.go:41`), which `BundledFs::new` already implements; the handler
 itself identified walking as the blocker. Every other response is unchanged.
-The old recorded `missing_operations: [wrapFS]` is left untouched as historical
-evidence, not rewritten to look like a new capture. Its attribution needs a
-scoped leaves re-record before it can describe the corrected driver. No native
+At the PR #43 merge, the old recorded `missing_operations: [wrapFS]` was left
+untouched as historical evidence, not rewritten to look like a new capture.
+The required leaves re-record is documented below. No native
 observations, frozen reports or acceptance evidence were refreshed for this
 refactor. Cargo dependency changes invalidate affected capture fingerprints
 under the existing rules.
@@ -1150,3 +1150,171 @@ and filesystem subcases failed before the fix and pass afterward. The existing
 rosters contain no such conflicts, so preparation counts and recorded evidence
 are unchanged. The focused Phase 1 suite passed (161 tests, 17 subtests); broad
 compiler tests, native captures and benchmarks were not repeated.
+
+### F1b starting capture and ordering amendment — 2026-09-21
+
+The owner authorized starting F1b after F3a, pausing the remaining preparation.
+The implementation plan now lists F1b before F4a and F5a. Their coverage review
+and integration obligations remain required; no incomplete preparation metric
+is treated as passing.
+
+Before production changes, a complete leaf capture on merged main `e4aebf8`
+ran all 225 cases against pinned Go 1.27.1 and the current Rust driver. The
+recorder requires a complete family, so the single attribution correction was
+recorded through that existing contract, without adding a partial-record bypass.
+Results remain **74 match, 150 not_implemented, 1 different**, with no native
+unavailability or harness failure. Every native observation equals the previous
+frozen observation. The sole case-manifest change is
+`leaves/bundled/wrapper-dispatch-surface` naming `wrappedFS.WalkDir` as absent
+instead of `wrapFS`. Regenerated scope links now attach the gap to that method.
+The options-clone sharing difference remains visible and unapproved.
+
+The replay inputs and both runtimes' observations are retained in
+`data/phase1/captures/leaves-f1b-start.tar.gz`; it contains only the 27 JSON
+request, observation and provenance files, no binaries or exported upstream
+tree. Its capture provenance SHA-256 is
+`0de6a34efa0365022e4d4fc14a211a525a5f8d5c3ab0c13cba8c23094419ef45`.
+The capture authenticates 498 source inputs and is a starting-point record,
+not evidence for subsequent production edits.
+
+Commands used:
+
+```sh
+python3 scripts/phase1.py capture --family leaves --output target/phase1/f1b/leaves-start
+python3 scripts/phase1.py compare --capture target/phase1/f1b/leaves-start
+python3 scripts/phase1.py record --capture target/phase1/f1b/leaves-start --write
+python3 scripts/phase1.py inventory --write
+```
+
+Go 1.27.1 was placed on `PATH`. Only this leaf family was captured; no full
+compiler corpus or performance measurement was needed for the attribution fix.
+
+### F1b first implementation batch: ordered and scoped collections — 2026-09-21
+
+F1b is **in progress**, not complete. The first batch implements the non-JSON
+`OrderedMap`/`OrderedSet` operations and the copy-on-write map/set in
+`tsr_core::collections`. It uses the existing core dependency rather than adding
+a crate. `PORTS.toml` records the actual Rust files as in progress, and the Phase
+1 inventory records those homes. Its generated `tsr_collections` planned-crate
+classification is retained; changing the package-wide crate map and regenerating
+upstream provenance remains part of the final F1b inventory update.
+
+Representation choices:
+
+- Ordered maps hold a key deque and a hash table. Overwrite preserves position;
+  delete/reinsert appends; first/last deletion avoids shifting all keys. Borrowed
+  iterators serve ordinary reads. An explicit mutable visitor rereads the current
+  index and length after each callback, preserving Go's append and deletion-shift
+  behavior without cloning the whole collection. Diff notifications retain the
+  native order. Diff callbacks borrow both operands, matching the non-mutating
+  watcher/project consumers at the pin.
+- Nil Go receivers are represented by `Option`; the leaf adapter translates
+  nil-tolerant operations and required-receiver failures. This is not a nullable
+  production object or a new promise that every Rust method accepts nil.
+- Copy-on-write maps retain an optional `Arc<HashMap>`: empty scopes allocate
+  nothing, reads borrow, and the first shared write clones entries. Rust values
+  representing shared Go objects must themselves preserve identity, such as an
+  `Arc` or an ID; cloning the container does not turn owned mutable values into
+  shared objects. Exclusive scope guards restore on normal exit and unwind.
+  Owned snapshots let the checker's existing serialization callback borrow the
+  whole builder. Its three naming tables now share storage on entry instead of
+  cloning every table eagerly, and retain the existing fast hasher. Normal and
+  `Result`-error exits restore the saved names. Checker panic retirement is
+  unchanged. No performance ratio is claimed.
+
+The complete 225-case capture is **100 match, 124 not_implemented, 1 different**,
+with zero unavailability, harness failures or unrun cases. All 26 new matches
+were previously missing: 17 ordered-map traces, five ordered-set traces and four
+scope traces. Every native observation is byte-identical to the starting
+capture, and no previously observed Rust row changed. The five ordered-map JSON
+cases still name the missing marshal/unmarshal operation; their adapter metadata
+now points to the pending integration in the production collection. The options
+clone's shallow-sharing difference remains visible and unapproved.
+
+Replay inputs and observations are archived in
+`data/phase1/captures/leaves-f1b-collections.tar.gz` (27 JSON files, 247,047 bytes;
+no binaries or upstream export). Capture provenance SHA-256:
+`2bdef100b467260ab222e10a1ad8f04c73b10658491615b8915e0b13036a09b6`.
+The capture binds 506 input files. Results were installed only through
+`phase1.py record`, followed by `inventory --write`.
+
+Validation: all 17 core tests pass in debug and release, including copy counts,
+unwind restoration, shared value identity, live mutation and deque wraparound.
+A checker regression covers nested name scopes and an error followed by a
+sibling scope; all **208** frozen P5 display queries still match pinned Go.
+Targeted clippy passes with warnings denied. The Phase 1 Python suite passes
+**161 tests and 17 subtests**. No generator/dependency inputs changed, and no
+full compiler corpus or performance capture was run.
+
+The S07 operation inventory gains 13 ordered-map source mappings and moves three
+TextRange marker anchors by one line. All other operation data is unchanged.
+Replaying authenticated existing syntax/loader observations leaves subset and
+checker-obligation bytes unchanged; only the operation digest and its review
+chain change. Historical producer freshness and outcomes are not rewritten.
+
+Next work remains the other collection/core/text helpers, ordered-map JSON plus
+the shared JSON layer, locale matching and generated translations, diagnostic
+formatting, bundled access, and the explicit options-clone disposition. The
+case manifest retains the exact outstanding IDs; this batch does not claim
+F1b's full-family or consumer-integration exit.
+
+### F1b consumer review — 2026-09-21
+
+The review's file-collection finding is addressed: `file_names_from_specs` now
+uses the shared `OrderedMap` for literal, wildcard and JSON files. Lookup,
+overwrite, insertion and unsuccessful removal use hashing instead of scanning
+the complete vector. Successful middle removal is still linear, as in Go; this
+is not a claim that every workload is linear or a measured compiler speedup.
+Final collection consumes map values in insertion order without cloning them.
+
+The API also supplies borrowed `get_mut` and live `visit_keys_mut`, so callers
+can update values without requiring `V: Clone`. `visit_entries_mut` delegates
+to the same traversal and explicitly retains its per-value clone cost. A test
+with a non-Clone payload exercises mutation, append, delete, early stopping and
+ordered consumption. An ordered `values_mut` iterator is not needed by these
+callers; key visitation plus `get_mut` provides safe mutation without collecting
+references or introducing unsafe code.
+
+Scoped maps/sets expose an explicitly named O(1) `snapshot`. The checker now
+uses `TypeParameterNames::snapshot`, with an explicit field initializer instead
+of `derive(Clone)`. Adding a field requires changing that initializer, and each
+current table calls its copy-on-write snapshot method. The struct documents the
+cost invariant; the plan records the fourth Go table on the Phase 2 queue.
+
+The [ordered-storage decision](PHASE1-implementation-plan.md#ordered-storage-and-json-integration-decision--2026-09-21)
+requires migrating config objects and `PathMappings` with the JSON batch and
+places encoding traits in the JSON layer above core storage. One review claim
+needed narrowing: package.json's raw `Object` is a duplicate-preserving decode
+sequence, not a private ordered-map implementation. It remains a sequence so
+duplicate/partial-failure behavior survives; native witnesses and the separate
+semantic-object audit are recorded in the plan. No equivalence exemption is
+granted by this decision.
+
+Both prepared families were recaptured on the final Rust sources:
+
+| Family | Match | Missing | Different | Harness/unavailability/unrun |
+| --- | ---: | ---: | ---: | ---: |
+| Leaves | 100 | 124 | 1 | 0 |
+| Config | 176 | 299 | 9 | 0 |
+
+Every case retains its previous result classification. Leaf Rust observations
+are byte-identical after decoding to the first batch. All 56 implemented config
+cases attributed to file aggregation match native Go, including the three
+direct file-name cases; six other attributed cases still stop at named missing
+operations. The 142 matchFiles outputs alone would not test this aggregation.
+
+The new combined archive is `data/phase1/captures/f1b-consumer-review.tar.gz`:
+46 JSON files, 490,968 compressed bytes, with no binaries or upstream tree.
+Its `leaves/` provenance SHA-256 is
+`a818ef69cee442086ef08195812d914e299b49ecffbe2880cfa7725843a5754f`;
+`config/` is
+`e852d16316e7f14b6dbf45ccfa48a9e64294528f3543d3f4d7b58bb1264891b9`.
+The starting and first-batch archives remain historical observations; no hashes
+were relabeled as current.
+
+Validation also passes for the 18 core tests and two tsoptions tests in debug
+and release, the checker scope-restoration regression, all 208 frozen display
+queries, targeted clippy with warnings denied, and 161 Phase 1 Python tests plus
+17 subtests. No benchmark or full compiler corpus was run. The regenerated S07
+inventory changes only 11 marker anchors; replay preserves the selected cases
+and checker-obligation bytes, without refreshing historical producer evidence.
