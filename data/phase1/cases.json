@@ -25809,7 +25809,7 @@
       "id": "leaves/bundled/wrapper-dispatch-surface",
       "last_result": "not_implemented",
       "missing_operations": [
-        "tsc/internal/bundled/embed.go:wrapFS"
+        "tsc/internal/bundled/embed.go:wrappedFS.WalkDir"
       ],
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operations": [

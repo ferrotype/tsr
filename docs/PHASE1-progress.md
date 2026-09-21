@@ -1119,9 +1119,9 @@ changed exactly one row: `leaves/bundled/wrapper-dispatch-surface` now identifie
 `wrappedFS.WalkDir` as the missing operation. `wrapFS` merely constructs the
 wrapper (`embed.go:41`), which `BundledFs::new` already implements; the handler
 itself identified walking as the blocker. Every other response is unchanged.
-The old recorded `missing_operations: [wrapFS]` is left untouched as historical
-evidence, not rewritten to look like a new capture. Its attribution needs a
-scoped leaves re-record before it can describe the corrected driver. No native
+At the PR #43 merge, the old recorded `missing_operations: [wrapFS]` was left
+untouched as historical evidence, not rewritten to look like a new capture.
+The required leaves re-record is documented below. No native
 observations, frozen reports or acceptance evidence were refreshed for this
 refactor. Cargo dependency changes invalidate affected capture fingerprints
 under the existing rules.
@@ -1150,3 +1150,41 @@ and filesystem subcases failed before the fix and pass afterward. The existing
 rosters contain no such conflicts, so preparation counts and recorded evidence
 are unchanged. The focused Phase 1 suite passed (161 tests, 17 subtests); broad
 compiler tests, native captures and benchmarks were not repeated.
+
+### F1b starting capture and ordering amendment — 2026-09-21
+
+The owner authorized starting F1b after F3a, pausing the remaining preparation.
+The implementation plan now lists F1b before F4a and F5a. Their coverage review
+and integration obligations remain required; no incomplete preparation metric
+is treated as passing.
+
+Before production changes, a complete leaf capture on merged main `e4aebf8`
+ran all 225 cases against pinned Go 1.27.1 and the current Rust driver. The
+recorder requires a complete family, so the single attribution correction was
+recorded through that existing contract, without adding a partial-record bypass.
+Results remain **74 match, 150 not_implemented, 1 different**, with no native
+unavailability or harness failure. Every native observation equals the previous
+frozen observation. The sole case-manifest change is
+`leaves/bundled/wrapper-dispatch-surface` naming `wrappedFS.WalkDir` as absent
+instead of `wrapFS`. Regenerated scope links now attach the gap to that method.
+The options-clone sharing difference remains visible and unapproved.
+
+The replay inputs and both runtimes' observations are retained in
+`data/phase1/captures/leaves-f1b-start.tar.gz`; it contains only the 27 JSON
+request, observation and provenance files, no binaries or exported upstream
+tree. Its capture provenance SHA-256 is
+`0de6a34efa0365022e4d4fc14a211a525a5f8d5c3ab0c13cba8c23094419ef45`.
+The capture authenticates 498 source inputs and is a starting-point record,
+not evidence for subsequent production edits.
+
+Commands used:
+
+```sh
+python3 scripts/phase1.py capture --family leaves --output target/phase1/f1b/leaves-start
+python3 scripts/phase1.py compare --capture target/phase1/f1b/leaves-start
+python3 scripts/phase1.py record --capture target/phase1/f1b/leaves-start --write
+python3 scripts/phase1.py inventory --write
+```
+
+Go 1.27.1 was placed on `PATH`. Only this leaf family was captured; no full
+compiler corpus or performance measurement was needed for the attribution fix.

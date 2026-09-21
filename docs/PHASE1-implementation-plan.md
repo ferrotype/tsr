@@ -1,6 +1,6 @@
 # Phase 1 implementation plan: complete the foundations
 
-Status: proposed for review; implementation has not started.
+Status: in progress; F1b authorized after the F3a review, 2026-09-21.
 Baseline: merged main `03a55ac`, after the S12 closure, 2026-09-20.
 Upstream authority: `1f70213d4922b434345f639b441681e470c7cfc1`.
 
@@ -11,7 +11,7 @@ F0 is preparation only, so it has no `b` step. The detailed F0–F5 sections bel
 contain separate `a` and `b` checklists with inputs, tasks and completion rules.
 Read the shared execution contract before starting F0.
 
-### Phase A — prepare the tests and checks
+### Reviewed preparation sequence
 
 1. **F0 — Inventory and setup:** identify missing behavior, freeze case identities,
    and connect the existing test tools.
@@ -21,18 +21,36 @@ Read the shared execution contract before starting F0.
    comparisons, including the 142 matching baselines.
 4. **F3a — Config/resolution tests:** prepare the full 309 config/options baseline
    comparisons and package/module-resolution probes.
-5. **F4a — Syntax/binder tests:** prepare the missing AST, parser/binder,
+
+Reviewed PRs do not erase pending platform-specific preparation checks; retain
+their recorded results for the F5a review.
+
+### Authorized early implementation
+
+5. **F1b — Foundation implementation:** implement the missing leaf behavior and
+   localization support against F1a's checks.
+
+**Ordering amendment, 2026-09-21:** after reviewing F1a through F3a, the owner
+approved pausing the remaining `a` steps to start F1b. F1a supplies the native
+contracts, Rust adapters and classified leaf queue; F3a supplies downstream
+config/diagnostic observations. Re-record the corrected bundled `WalkDir` gap
+identity before changing production. This changes sequencing only: it does not
+declare Phase A complete or weaken any coverage, parity or freshness rule.
+
+### Remaining preparation and coverage review
+
+6. **F4a — Syntax/binder tests:** prepare the missing AST, parser/binder,
    syntax-only diagnostics, navigation and evaluator checks.
-6. **F5a — Integration checks:** prepare generator/transport regression checks,
+7. **F5a — Integration checks:** prepare generator/transport regression checks,
    the final acceptance checklist and a report of what still fails or is missing.
 
-**Review the test coverage and gap report before starting production changes.**
-Tests for missing behavior remain visibly unmet at this point.
+**Review the complete coverage and gap report after F5a.** Tests for remaining
+missing behavior stay visibly unmet. F1b must run its affected consumer and
+generator checks as it proceeds; future F5a integration tests may expose further
+foundation work and are still required.
 
-### Phase B — implement production code
+### Remaining production implementation
 
-7. **F1b — Foundation implementation:** implement the missing leaf behavior and
-   localization support against F1a's checks.
 8. **F2b — Filesystem implementation:** implement missing filesystem adapters,
    cache behavior, paths and matching against F2a's checks.
 9. **F3b — Config/resolution implementation:** complete command-line/config parsing,
@@ -214,7 +232,8 @@ against them. Missing APIs can remain explicitly `not_implemented` in Phase A,
 so preparation does not require writing the product. Additional boundary tests
 discovered during implementation belong with the corresponding Phase B fix.
 Keep preparation bounded to these contracts rather than building a general
-replacement framework. The first delivery is Phase A only.
+replacement framework. The initial deliveries were preparation-only; the
+ordering amendment above authorizes F1b before the remaining preparation.
 
 Checkpoints describe reviewable implementation batches, not calendar estimates.
 Each can take several focused PRs. Finish and review the behavior before
@@ -234,8 +253,9 @@ missing-operation results make that separation possible.
 | F5 | Confirm transport/generation integration and close Phase 1 | F1–F4 | Complete Phase 1 gate report and scoped regression checks, preserving S11 boundaries |
 
 F1–F5 completion evidence in this table belongs to the `b` steps. Preparation
-follows F0 → F1a → F2a → F3a → F4a → F5a; each `a` step's inputs and separate
-readiness criteria are specified below.
+retains F0 → F1a → F2a → F3a → F4a → F5a dependencies, with F1b now inserted
+after F3a. Each `a` step's inputs and separate readiness criteria are specified
+below; starting F1b does not certify the remaining preparation.
 
 Phase 2 work can start once the AST/binder/resolution/options contracts it uses
 are ready; locale and unrelated utility work should not serialize that critical
@@ -248,8 +268,8 @@ and a completion checklist. Finish that checklist before reporting the step
 complete; a pilot or a proposal to add the remaining fixtures is not completion.
 A step may span several PRs. Record progress by completed case/operation IDs,
 remaining IDs and concrete blockers, rather than by a percentage guessed from
-files edited. Phase A ends at F5a with a coverage review; do not start F1b as an
-unannounced extension of a preparation PR.
+files edited. Phase A ends at F5a with a coverage review. F1b is a separately
+authorized implementation branch, not an extension of a preparation PR.
 
 **Artifacts and ownership.** F0 establishes these conventions and the shared
 manifests/dispatcher. Create each family artifact in its own `a` step; do not
@@ -1071,7 +1091,9 @@ remaining product behavior.
 9. Review all preparation exits and the report. State which future production
    PRs close each gap, which contracts already pass and which genuine decisions
    need the owner. Stop here for the agreed coverage review, with committed
-   runnable tests and reports; don't start production fixes before that review.
+   runnable tests and reports before F2b–F5b. F1b is the explicit early-start
+   exception recorded above, and its delivered behavior participates in this
+   review.
 
 **Deliver:** integration fixtures, complete producer/consumer mapping, tested
 fingerprints and failure aggregation, CI harness checks, and the finished Phase
@@ -1237,7 +1259,8 @@ mutation leaking into an old snapshot; malformed bytes repaired too early;
 duplicate diagnostics; build options accepted with the wrong mode; lazy token
 identity changing after retention; an Unsupported result counted as unresolved.
 
-Stop for the scheduled Phase A coverage review after F5a, before starting F1b.
+Stop for the scheduled Phase A coverage review after F5a, before starting F2b.
+F1b's early start is authorized by the ordering amendment above.
 Outside that planned review, stop for owner input only when a real decision is
 needed: a new baseline behavior divergence, a change to an accepted transport/
 ownership contract, a new required platform/dependency policy decision, or an
@@ -1273,7 +1296,7 @@ such conflicts with a minimal reproducer and pinned Go output.
   incomplete results. Native/reference inventories remain independent of what
   Rust currently supports.
 
-The first preparation PR delivers F0 and a small command-line baseline adapter
-that records a genuinely missing Rust operation. Continue through F1a–F5a and
-review the resulting coverage/gap report. Production PRs then follow F1b–F5b
-in the execution list above.
+F0 delivered the initial command-line baseline adapter and missing-operation
+result. F1a–F3a have been reviewed. Proceed with F1b, then resume F4a–F5a and
+review the complete coverage/gap report before F2b–F5b, in the execution order
+above.

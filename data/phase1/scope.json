@@ -136414,8 +136414,7 @@
       "basis_kind": "rule",
       "cases": [
         "leaves/bundled/case-sensitivity-forwarding",
-        "leaves/bundled/inner-filesystem-delegation",
-        "leaves/bundled/wrapper-dispatch-surface"
+        "leaves/bundled/inner-filesystem-delegation"
       ],
       "depends_on": [
         "internal/osutil",
@@ -136809,9 +136808,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/bundled/wrapper-dispatch-surface; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/bundled/wrapper-dispatch-surface"
+      ],
       "depends_on": [
         "internal/osutil",
         "internal/tspath",
@@ -136832,7 +136833,7 @@
       "membership_reason": "packaged library access",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [
