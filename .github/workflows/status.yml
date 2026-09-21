@@ -358,6 +358,8 @@ jobs:
           rustup show active-toolchain || rustup toolchain install
           rustup target add wasm32-unknown-unknown
       - uses: Swatinem/rust-cache@v2
+      - name: Check the external consumer lockfile before wasm builds
+        run: cargo metadata --locked --manifest-path tools/s10/rust-consumer/Cargo.toml --format-version 1 > /dev/null
       - name: Read JS ABI and Node pins
         id: pins
         run: |
