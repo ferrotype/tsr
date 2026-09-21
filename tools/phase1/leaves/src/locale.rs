@@ -64,10 +64,42 @@ const MISSING: &[(&str, &str, &str, &str)] = &[
     ),
 ];
 
+// Reviewed entry points of the absent APIs above; the request must match
+// both subject and identity before it can report a gap.
+const MISSING_OPERATIONS: &[(&str, &str)] = &[
+    ("locale.context", "tsc/internal/locale/locale.go:WithLocale"),
+    (
+        "locale.default",
+        "tsc/internal/locale/locale.go:Locale.String",
+    ),
+    ("locale.parse", "tsc/internal/locale/locale.go:Parse"),
+    (
+        "locale.string",
+        "tsc/internal/locale/locale.go:Locale.String",
+    ),
+    (
+        "locale.translation",
+        "tsc/internal/diagnostics/diagnostics.go:Localize",
+    ),
+    (
+        "locale.translation",
+        "tsc/internal/diagnostics/diagnostics.go:getLocalizedMessages",
+    ),
+    (
+        "locale.translation-args",
+        "tsc/internal/diagnostics/diagnostics.go:Message.Localize",
+    ),
+    (
+        "locale.translation-cache",
+        "tsc/internal/diagnostics/diagnostics.go:getLocalizedMessages",
+    ),
+];
+
 pub fn observe(request: &Value) -> Option<Outcome> {
     let subject = crate::api::subject(request);
-    MISSING
-        .iter()
-        .find(|(name, _, _, _)| *name == subject)
-        .map(|(_, authority, signature, home)| Outcome::missing(authority, signature, home))
+    MISSING.iter().find(|(name, _, _, _)| *name == subject).map(
+        |(_, authority, signature, home)| {
+            crate::api::missing_for_subject(request, MISSING_OPERATIONS, authority, signature, home)
+        },
+    )
 }

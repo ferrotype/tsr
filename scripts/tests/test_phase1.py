@@ -435,6 +435,12 @@ class SourceClosureTests(unittest.TestCase):
                          "scripts/s04_common.py"):
             self.assertIn(required, closure, required)
 
+    def test_shared_harness_is_in_each_family_capture_closure(self):
+        for family in ("leaves", "filesystem", "config"):
+            closure = capture.source_closure(family)
+            self.assertIn("tools/phase1/harness/src/lib.rs", closure, family)
+            self.assertIn("tools/phase1/harness/Cargo.toml", closure, family)
+
     def test_closure_contains_every_native_probe(self):
         closure = capture.source_closure("pilot")
         for probe in capture.FAMILIES["pilot"]["native_probes"]:

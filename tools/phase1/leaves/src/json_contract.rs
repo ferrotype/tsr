@@ -80,5 +80,5 @@ pub fn observe(request: &Value) -> Option<Outcome> {
     MISSING
         .iter()
         .find(|(id, _, _)| *id == operation)
-        .map(|(id, signature, home)| Outcome::missing(id, signature, home))
+        .map(|(id, signature, home)| Outcome::missing(*id, id, signature, home))
 }

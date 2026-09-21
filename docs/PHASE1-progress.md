@@ -1097,3 +1097,25 @@ incomplete. F1a–F5a register producers when their declared inventory is ready.
 
 `cargo xtask validate` and `cargo xtask status --check-committed` both pass with
 P1A registered, and S01–S12 are unchanged.
+
+### PR #43 shared harness review
+
+The P2 diagnostic adapter now calls the production formatter and program sorter;
+its canonical P2 schedule returned byte-identical observations before and after.
+All three Phase 1 drivers share `tools/phase1/harness`, including outcome
+serialization, so a missing-operation identity comes from the handler rather
+than the request label. The source closure includes the shared crate transitively.
+The example-marker check now requires no out-of-src markers and retains a
+synthetic regression that proves detection still works.
+
+A Rust-only replay of all 225 leaves, 359 filesystem and 484 config requests
+changed exactly one row: `leaves/bundled/wrapper-dispatch-surface` now identifies
+`wrappedFS.WalkDir` as the missing operation. `wrapFS` merely constructs the
+wrapper (`embed.go:41`), which `BundledFs::new` already implements; the handler
+itself identified walking as the blocker. Every other response is unchanged.
+The old recorded `missing_operations: [wrapFS]` is left untouched as historical
+evidence, not rewritten to look like a new capture. Its attribution needs a
+scoped leaves re-record before it can describe the corrected driver. No native
+observations, frozen reports or acceptance evidence were refreshed for this
+refactor. Cargo dependency changes invalidate affected capture fingerprints
+under the existing rules.

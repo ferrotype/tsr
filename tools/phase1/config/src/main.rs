@@ -16,11 +16,7 @@ use std::error::Error;
 
 use serde_json::{json, Map, Value};
 
-// The group modules land one per surface. The trace helpers in `api` have no
-// caller yet: the command-line baseline group answers whole outputs rather than
-// action traces, and the resolver groups that will use them are not written.
-#[allow(dead_code)]
-mod api;
+use phase1_harness as api;
 mod commandline;
 mod commandlineops;
 mod configparse;
@@ -48,14 +44,6 @@ const GROUPS: &[(&str, GroupHandler)] = &[
 ];
 
 fn observe(request: &Value) -> Map<String, Value> {
-    let mut row = Map::new();
-    let case = request.get("case").and_then(Value::as_str).unwrap_or("");
-    let operation = request
-        .get("operation")
-        .and_then(Value::as_str)
-        .unwrap_or("");
-    row.insert("case".into(), Value::String(case.to_owned()));
-    row.insert("operation".into(), Value::String(operation.to_owned()));
     let claimed = if request.get("actions").is_some_and(|actions| {
         actions.as_array().is_none_or(|actions| {
             actions.is_empty()
@@ -74,44 +62,17 @@ fn observe(request: &Value) -> Map<String, Value> {
     } else {
         GROUPS.iter().find_map(|(_, handler)| handler(request))
     };
-    match claimed {
-        Some(Outcome::Observed(value)) => {
-            row.insert("result".into(), Value::String("observed".into()));
-            row.insert("observation".into(), value);
-        }
-        Some(Outcome::NotImplemented {
-            operation: missing_operation,
-            go_authority,
-            intended_signature,
-            production_home,
-        }) => {
-            row.insert("result".into(), Value::String("not_implemented".into()));
-            row.insert(
-                "missing_operation".into(),
-                json!({
-                    "operation": missing_operation,
-                    "go_authority": go_authority,
-                    "intended_signature": intended_signature,
-                    "production_home": production_home,
-                }),
-            );
-        }
-        Some(Outcome::Failed(error)) => {
-            row.insert("result".into(), Value::String("harness_failed".into()));
-            row.insert("error".into(), Value::String(error));
-        }
-        None => {
-            let subject = api::subject(request);
-            row.insert("result".into(), Value::String("harness_failed".into()));
-            row.insert(
-                "error".into(),
-                Value::String(format!(
-                    "no config group claimed subject {subject:?} for case {case:?}"
-                )),
-            );
-        }
-    }
-    row
+    let outcome = claimed.unwrap_or_else(|| {
+        let subject = api::subject(request);
+        let case = request
+            .get("case")
+            .and_then(Value::as_str)
+            .unwrap_or_default();
+        Outcome::Failed(format!(
+            "no config group claimed subject {subject:?} for case {case:?}"
+        ))
+    });
+    api::response(request, outcome)
 }
 
 fn run(input: &str, output: &str) -> Result<(), Box<dyn Error>> {

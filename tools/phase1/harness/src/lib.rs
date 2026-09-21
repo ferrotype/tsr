@@ -1,10 +1,8 @@
-//! The contract every leaf group module answers.
-//!
-//! One module per coverage group, each owning its own file. `main` tries them
-//! in turn and takes the first that claims the request, so adding a group is a
-//! new module plus one line in `main`.
+//! Private Phase 1 group-dispatch contract shared by every Rust probe family.
+//! Handlers report the missing operation they found; the request label is only
+//! the schedule identity and never supplies a missing-operation identity.
 
-use serde_json::{json, Value};
+use serde_json::{json, Map, Value};
 
 /// What a group module observed for one request.
 pub enum Outcome {
@@ -105,5 +103,82 @@ pub fn missing_for_subject(
             "no reviewed missing operation {requested:?} for subject {:?}",
             subject(request)
         )),
+    }
+}
+
+/// Serialize a handler result while preserving the separate schedule identity.
+pub fn response(request: &Value, outcome: Outcome) -> Map<String, Value> {
+    let mut row = Map::new();
+    for field in ["case", "operation"] {
+        row.insert(
+            field.into(),
+            Value::String(
+                request
+                    .get(field)
+                    .and_then(Value::as_str)
+                    .unwrap_or_default()
+                    .to_owned(),
+            ),
+        );
+    }
+    match outcome {
+        Outcome::Observed(value) => {
+            row.insert("result".into(), Value::String("observed".into()));
+            row.insert("observation".into(), value);
+        }
+        Outcome::NotImplemented {
+            operation,
+            go_authority,
+            intended_signature,
+            production_home,
+        } => {
+            row.insert("result".into(), Value::String("not_implemented".into()));
+            row.insert(
+                "missing_operation".into(),
+                json!({
+                    "operation": operation,
+                    "go_authority": go_authority,
+                    "intended_signature": intended_signature,
+                    "production_home": production_home,
+                }),
+            );
+        }
+        Outcome::Failed(error) => {
+            row.insert("result".into(), Value::String("harness_failed".into()));
+            row.insert("error".into(), Value::String(error));
+        }
+    }
+    row
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn missing_identity_comes_from_handler_not_schedule() {
+        let row = response(
+            &json!({"case":"trace", "operation":"caller-label"}),
+            Outcome::missing("absent-callee", "Go authority", "signature", "home"),
+        );
+        assert_eq!(row["operation"], "caller-label");
+        assert_eq!(row["missing_operation"]["operation"], "absent-callee");
+    }
+
+    #[test]
+    fn unrelated_subject_or_identity_cannot_claim_a_reviewed_gap() {
+        for request in [
+            json!({"subject":"other", "operation":"missing"}),
+            json!({"subject":"known", "operation":"other"}),
+        ] {
+            let result = missing_for_subject(
+                &request,
+                &[("known", "missing")],
+                "authority",
+                "signature",
+                "home",
+            );
+            assert_eq!(response(&request, result)["result"], "harness_failed");
+        }
     }
 }

@@ -11,6 +11,7 @@ description = "Phase 1 F1a: answers the foundation-leaf request schedule with th
 # dependencies on every leaf crate it drives, and no published crate has that
 # set, so it lives here rather than as an example on a shipped crate.
 [dependencies]
+phase1_harness = { version = "0.1.0", path = "../harness" }
 serde_json = { version = "1", features = ["preserve_order"] }
 tsr_bundled = { version = "0.1.0", path = "../../../crates/tsr_bundled" }
 tsr_core = { version = "0.1.0", path = "../../../crates/tsr_core" }

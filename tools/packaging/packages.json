@@ -2,8 +2,20 @@
   "version": 1,
   "packages": [
     {
+      "name": "phase1_config",
+      "manifest": "tools/phase1/config/Cargo.toml",
+      "publish": false,
+      "reason": "Repository-only benchmark, experiment, test or capture tool"
+    },
+    {
       "name": "phase1_filesystem",
       "manifest": "tools/phase1/filesystem/Cargo.toml",
+      "publish": false,
+      "reason": "Repository-only benchmark, experiment, test or capture tool"
+    },
+    {
+      "name": "phase1_harness",
+      "manifest": "tools/phase1/harness/Cargo.toml",
       "publish": false,
       "reason": "Repository-only benchmark, experiment, test or capture tool"
     },

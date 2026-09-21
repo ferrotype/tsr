@@ -56,14 +56,66 @@ const MISSING: &[(&str, &str, &str, &str)] = &[
      "crates/tsr_diagnostics/src/lib.rs (Message is Copy over &'static str fields and cannot hold runtime text)"),
 ];
 
+// Reviewed entry points of the absent APIs above; the request must match
+// both subject and identity before it can report a gap.
+const MISSING_OPERATIONS: &[(&str, &str)] = &[
+    (
+        "diagnostics.adhoc",
+        "tsc/internal/diagnostics/diagnostics.go:NewAdHocMessage",
+    ),
+    (
+        "diagnostics.category",
+        "tsc/internal/diagnostics/diagnostics.go:Category.Name",
+    ),
+    (
+        "diagnostics.category",
+        "tsc/internal/diagnostics/stringer_generated.go:Category.String",
+    ),
+    (
+        "diagnostics.format",
+        "tsc/internal/diagnostics/diagnostics.go:Format",
+    ),
+    (
+        "diagnostics.identity-bytes",
+        "tsc/internal/diagnostics/diagnostics_generated.go:keyToMessage",
+    ),
+    (
+        "diagnostics.localize",
+        "tsc/internal/diagnostics/diagnostics.go:Localize",
+    ),
+    (
+        "diagnostics.message-localize",
+        "tsc/internal/diagnostics/diagnostics.go:Message.Localize",
+    ),
+    (
+        "diagnostics.stringify",
+        "tsc/internal/diagnostics/diagnostics.go:StringifyArgs",
+    ),
+    (
+        "diagnostics.table",
+        "tsc/internal/diagnostics/diagnostics.go:getLocalizedMessages",
+    ),
+    (
+        "diagnostics.table",
+        "tsc/internal/diagnostics/loc_generated.go:loadLocaleData",
+    ),
+];
+
 pub fn observe(request: &Value) -> Option<Outcome> {
     match api::subject(request) {
         "diagnostics.roster" => Some(roster(request)),
         "diagnostics.identity" => Some(identity(request)),
-        subject => MISSING
-            .iter()
-            .find(|(name, _, _, _)| *name == subject)
-            .map(|(_, authority, signature, home)| Outcome::missing(authority, signature, home)),
+        subject => MISSING.iter().find(|(name, _, _, _)| *name == subject).map(
+            |(_, authority, signature, home)| {
+                crate::api::missing_for_subject(
+                    request,
+                    MISSING_OPERATIONS,
+                    authority,
+                    signature,
+                    home,
+                )
+            },
+        ),
     }
 }
 

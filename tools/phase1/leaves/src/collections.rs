@@ -43,10 +43,149 @@ const MISSING: &[(&str, &str, &str, &str)] = &[
      "crates/tsr_core/src/collections/syncset.rs (absent)"),
 ];
 
+// Reviewed entry points of the absent APIs above; the request must match
+// both subject and identity before it can report a gap.
+const MISSING_OPERATIONS: &[(&str, &str)] = &[
+    (
+        "CopyOnWriteMap",
+        "tsc/internal/collections/cow.go:CopyOnWriteMap.EnterScope",
+    ),
+    (
+        "CopyOnWriteMap",
+        "tsc/internal/collections/cow.go:CopyOnWriteMap.Set",
+    ),
+    (
+        "CopyOnWriteMap",
+        "tsc/internal/collections/cow.go:CopyOnWriteMap.ensureOwned",
+    ),
+    (
+        "CopyOnWriteSet",
+        "tsc/internal/collections/cow.go:CopyOnWriteSet.EnterScope",
+    ),
+    ("MultiMap", "tsc/internal/collections/multimap.go:GroupBy"),
+    (
+        "MultiMap",
+        "tsc/internal/collections/multimap.go:MultiMap.Add",
+    ),
+    (
+        "MultiMap",
+        "tsc/internal/collections/multimap.go:MultiMap.Remove",
+    ),
+    (
+        "OrderedMap",
+        "tsc/internal/collections/ordered_map.go:DiffOrderedMaps",
+    ),
+    (
+        "OrderedMap",
+        "tsc/internal/collections/ordered_map.go:DiffOrderedMapsFunc",
+    ),
+    (
+        "OrderedMap",
+        "tsc/internal/collections/ordered_map.go:NewOrderedMapFromList",
+    ),
+    (
+        "OrderedMap",
+        "tsc/internal/collections/ordered_map.go:NewOrderedMapWithSizeHint",
+    ),
+    (
+        "OrderedMap",
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Clear",
+    ),
+    (
+        "OrderedMap",
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Clone",
+    ),
+    (
+        "OrderedMap",
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Delete",
+    ),
+    (
+        "OrderedMap",
+        "tsc/internal/collections/ordered_map.go:OrderedMap.EntryAt",
+    ),
+    (
+        "OrderedMap",
+        "tsc/internal/collections/ordered_map.go:OrderedMap.GetOrZero",
+    ),
+    (
+        "OrderedMap",
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Keys",
+    ),
+    (
+        "OrderedMap",
+        "tsc/internal/collections/ordered_map.go:OrderedMap.MarshalJSONTo",
+    ),
+    (
+        "OrderedMap",
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Set",
+    ),
+    (
+        "OrderedMap",
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Size",
+    ),
+    (
+        "OrderedMap",
+        "tsc/internal/collections/ordered_map.go:OrderedMap.UnmarshalJSONFrom",
+    ),
+    (
+        "OrderedMap",
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Values",
+    ),
+    (
+        "OrderedMap",
+        "tsc/internal/collections/ordered_map.go:OrderedMap.clone",
+    ),
+    (
+        "OrderedMap",
+        "tsc/internal/collections/ordered_map.go:resolveKeyName",
+    ),
+    (
+        "OrderedSet",
+        "tsc/internal/collections/ordered_set.go:OrderedSet.Add",
+    ),
+    (
+        "OrderedSet",
+        "tsc/internal/collections/ordered_set.go:OrderedSet.Clone",
+    ),
+    (
+        "OrderedSet",
+        "tsc/internal/collections/ordered_set.go:OrderedSet.Delete",
+    ),
+    (
+        "OrderedSet",
+        "tsc/internal/collections/ordered_set.go:OrderedSet.Size",
+    ),
+    (
+        "OrderedSet",
+        "tsc/internal/collections/ordered_set.go:OrderedSet.Values",
+    ),
+    ("Set", "tsc/internal/collections/set.go:NewSetFromItems"),
+    ("Set", "tsc/internal/collections/set.go:Set.Clone"),
+    ("Set", "tsc/internal/collections/set.go:Set.Keys"),
+    ("Set", "tsc/internal/collections/set.go:Set.Union"),
+    (
+        "SyncMap",
+        "tsc/internal/collections/syncmap.go:SyncMap.Clone",
+    ),
+    (
+        "SyncMap",
+        "tsc/internal/collections/syncmap.go:SyncMap.Load",
+    ),
+    (
+        "SyncMap",
+        "tsc/internal/collections/syncmap.go:SyncMap.Range",
+    ),
+    (
+        "SyncSet",
+        "tsc/internal/collections/syncset.go:SyncSet.AddIfAbsent",
+    ),
+];
+
 pub fn observe(request: &Value) -> Option<Outcome> {
     let subject = crate::api::subject(request);
-    MISSING
-        .iter()
-        .find(|(name, _, _, _)| *name == subject)
-        .map(|(_, authority, signature, home)| Outcome::missing(authority, signature, home))
+    MISSING.iter().find(|(name, _, _, _)| *name == subject).map(
+        |(_, authority, signature, home)| {
+            crate::api::missing_for_subject(request, MISSING_OPERATIONS, authority, signature, home)
+        },
+    )
 }
