@@ -241,14 +241,49 @@ def workspace_symbol_index() -> dict[str, list[str]]:
     return index
 
 
-# `/// port: tsc/internal/<pkg>/<file>.go:<Symbol>` immediately above a `fn`.
-# The annotation is the author's own statement of which Go operation the
-# function ports, and it is stronger evidence than the name it happens to have.
+# `/// port: tsc/internal/<pkg>/<file>.go:<Symbol>` above a `fn`. The annotation
+# is the author's own statement of which Go operation the function ports, and it
+# is stronger evidence than the name it happens to have.
+#
+# The tail is a LOOKAHEAD on purpose. `re.finditer` does not overlap, so a
+# pattern that consumed the `fn` header would swallow every annotation stacked
+# above it and read only the first -- and stacking is how this tree records one
+# Rust function serving two pinned operations, which it does 113 times,
+# including `format` serving both WriteFormatDiagnostics and
+# FormatDiagnosticsWithColorAndContext. A zero-width tail lets each stacked
+# annotation start its own match.
+#
+# The skip group accepts attribute lines as well as comments, because an
+# attribute between the doc comment and the item is ordinary Rust and stopped
+# the earlier pattern dead, and it accepts a macro metavariable in place of a
+# visibility keyword, because this tree declares items that way inside macro
+# bodies.
 _PORT_ANNOTATION = re.compile(
-    r"port:\s*(tsc/[^\s`]+\.go:[A-Za-z0-9_.]+)[^\n]*\n(?:\s*//[^\n]*\n)*?\s*"
-    r"(?:pub(?:\([^)]*\))?\s+)?(?:const\s+|async\s+|unsafe\s+|extern\s+\"[^\"]*\"\s+)*"
-    r"fn\s+([a-z0-9_]+)"
+    r"port:\s*(tsc/[^\s`]+\.go:[A-Za-z0-9_.]+)"
+    # Everything after the operation id is a LOOKAHEAD, so a match consumes only
+    # the annotation itself. re.finditer does not overlap, and this tree stacks
+    # two annotations above one `fn` 113 times to record one Rust function
+    # serving two pinned operations -- `format` serves both
+    # WriteFormatDiagnostics and FormatDiagnosticsWithColorAndContext. A pattern
+    # that consumed the header, or that refused to skip a sibling annotation,
+    # reads exactly one of each pair and silently drops the other.
+    r"(?=[^\n]*\n"
+    # Skip further comment and attribute lines, including sibling annotations.
+    r"(?:[^\S\n]*(?://[^\n]*|#!?\[[^\n]*)\n)*?"
+    # The item header. A macro metavariable stands in for a visibility keyword
+    # inside macro bodies, which this tree also does.
+    r"[^\S\n]*(?:\$[a-z_]+\s+|pub(?:\([^)]*\))?\s+)?"
+    r"(?:const\s+|async\s+|unsafe\s+|extern\s+\"[^\"]*\"\s+)*"
+    r"fn\s+([a-z0-9_]+))"
 )
+# 220 of the 4,306 `port:` lines in crates/ are deliberately not matched. 66 sit
+# above a `let`, and most of the rest above an `if`, a `match` or a match arm:
+# they annotate a STATEMENT inside a body, not the item that ports the
+# operation, so reading them as a function-level declaration would attribute the
+# whole function to whatever a line inside it happens to mirror. 17 more sit
+# above a multi-line `#[allow(...)]`, which the single-line attribute skip does
+# not span; that is a real gap and a small one, left rather than answered with a
+# brace-balanced skip.
 
 
 def declared_ports() -> dict[str, set[str]]:

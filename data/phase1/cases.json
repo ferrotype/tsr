@@ -2966,7 +2966,7 @@
       ]
     },
     {
-      "expected_contract": "Row 11 is (0,0). Rows 12-17 are (-1,1). Row 18 is (-1,1) on arguments. Row 19 is (1,-1): the longer chain sorts first.",
+      "expected_contract": "Row 11 is (0,0). Row 12 is (1,-1): CompareDiagnostics compares paths first (ast/diagnostic.go:486), and /src/other.ts sorts before /src/plain.ts. Rows 13-17 are (-1,1) on pos, code, category, source and arguments. Row 18 is (1,-1): the longer chain sorts first. There is no row 19: the trace has 18 rows.",
       "family": "config",
       "host_applicability": "any",
       "id": "config/diagwriter/compare-ast-diagnostics-unwraps-and-delegates",
@@ -4069,31 +4069,14 @@
       ]
     },
     {
-      "expected_contract": "a package.json lookup that MISSED is remembered as an entry with a nil Contents, and the next lookup short-circuits on it and returns nil without asking the host again (resolver.go:1766-1779, :1804-1808). The fixture gains a /p/package.json between the two requests and the second still reports no containing scope, announced by the `according to earlier cached lookups` line. A port that treats a missing entry and a negative entry alike re-probes and resolves the import the pin refuses.",
+      "expected_contract": "the pin caches a NEGATIVE package.json lookup and keeps it after the host gains the file (resolver.go:1804-1808 writes the entry, :1766-1779 short-circuits on it). THIS CASE CREDITS NO OPERATION, deliberately. getPackageJsonInfo is present at crates/tsr_module/src/resolver.rs:139-199 and caches the negative answer the same way -- it is covered by 27 other links -- so recording it as absent, which an earlier revision did, would have published a false basis, and would have flipped a correct operation to `missing` the moment those 27 stopped matching. The port cannot run this case because Resolver::new refuses a live host (resolver.rs:111-113), not because the operation is missing.",
       "family": "config",
       "host_applicability": "any",
       "id": "config/module/cache/negative-package-json-lookup-survives-host-change",
       "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/module/resolver.go:resolutionState.getPackageJsonInfo"
-      ],
       "native_authority": "tools/phase1/config/module_probe_test.go against the pinned internal/module package",
-      "operation_actions": {
-        "resolve": [
-          "tsc/internal/module/resolver.go:resolutionState.getPackageJsonInfo",
-          "tsc/internal/module/resolver.go:resolutionState.loadModuleFromImports",
-          "tsc/internal/module/resolver.go:resolutionState.loadModuleFromNearestNodeModulesDirectory",
-          "tsc/internal/module/resolver.go:resolutionState.resolveNodeLike",
-          "tsc/internal/module/resolver.go:resolutionState.resolveNodeLikeWorker"
-        ]
-      },
-      "operations": [
-        "tsc/internal/module/resolver.go:resolutionState.getPackageJsonInfo",
-        "tsc/internal/module/resolver.go:resolutionState.loadModuleFromImports",
-        "tsc/internal/module/resolver.go:resolutionState.loadModuleFromNearestNodeModulesDirectory",
-        "tsc/internal/module/resolver.go:resolutionState.resolveNodeLike",
-        "tsc/internal/module/resolver.go:resolutionState.resolveNodeLikeWorker"
-      ]
+      "operation_actions": {},
+      "operations": []
     },
     {
       "expected_contract": "with tracing off a repeated request for the same (containing directory, name, mode, redirect) key is answered from the cache and touches the filesystem ZERO times (resolver.go:278-283). The cache key is built with getRedirectConfigName even when there is no redirect (:275, cache.go:84-89), and newCaches builds the entry the Get reads (:74-82). A port with no resolution cache, or one that caches the RESULT but still probes, reports a filesystem touch on the repeat.",
@@ -4170,7 +4153,7 @@
       ]
     },
     {
-      "expected_contract": "the refusal control. GetModuleResolutionKind maps Unknown, Classic and Node10 onto a supported kind (core/compileroptions.go:223-237), so the only way to reach the resolver's own default arm is a kind outside the enum -- and there the pin PANICS (resolver.go:305-307) rather than returning an unresolved result. Any port that reports a refusal as an ordinary unresolved module must be rejected by this row, whichever side it is on; the two sides agreeing on `unresolved` here would be the failure.",
+      "expected_contract": "a module resolution kind outside the enum. GetModuleResolutionKind maps Unknown, Classic and Node10 onto a supported kind (core/compileroptions.go:223-237), so the only way to reach the resolver's own default arm is a kind outside it -- and there the pin PANICS (resolver.go:305-307) while the port returns Unsupported. THIS IS NOT A CONTROL, and an earlier contract wrongly described it as one. The pinned row carries a `panic` key that the Rust driver cannot produce for any behaviour, so the row is `different` whichever way the port answers: changing crates/tsr_module/src/resolver.rs:314 from Unsupported to an empty resolved module -- the exact regression a control would exist to reject -- leaves the verdict unchanged. What the row does record, honestly, is that the two sides refuse in shapes that are not comparable. Making it discriminating needs a refusal CLASS both sides can emit, which is F3b's to add along with the port's own refusal contract.",
       "family": "config",
       "host_applicability": "any",
       "id": "config/module/control/unsupported-module-resolution-kind",
@@ -5443,7 +5426,7 @@
       ]
     },
     {
-      "expected_contract": "the type-reference cache key carries a FIFTH component the module cache does not: whether the containing file is the inferred-types sentinel (cache.go:30-36, resolver.go:231-239). The two requests here share directory, name and mode and differ only in that flag, and they resolve differently because the sentinel suppresses the node_modules lookup. A port that reuses the module cache key answers the second from the first entry.",
+      "expected_contract": "the type-reference cache key carries a FIFTH component the module cache does not: whether the containing file is the inferred-types sentinel (cache.go:30-36, resolver.go:231-239). The two requests here share directory, name and mode and differ only in that flag, and they resolve differently because the sentinel suppresses the node_modules lookup. A port that reuses the module cache key answers the second from the first entry. It also claims the cache WRITE, which resolver.go:262 performs unconditionally on every type-reference resolution and which both sides run on all three requests here. What that claim does NOT certify, and no case in this step does: the write's ORDERING semantics. The pin uses Store (last writer wins) while the module cache uses LoadOrStore (first writer wins), and distinguishing them needs two writes for one key, which the port cannot reach -- its host and options are both fixed for a resolver's lifetime. That limitation is recorded rather than papered over.",
       "family": "config",
       "host_applicability": "any",
       "id": "config/module/typeref-cache/separated-by-inferred-types-file",
@@ -5451,45 +5434,24 @@
       "native_authority": "tools/phase1/config/module_probe_test.go against the pinned internal/module package",
       "operation_actions": {
         "resolve_type_reference": [
-          "tsc/internal/module/cache.go:typeRefDirectiveResolutionCache.Get"
-        ]
-      },
-      "operations": [
-        "tsc/internal/module/cache.go:typeRefDirectiveResolutionCache.Get"
-      ]
-    },
-    {
-      "expected_contract": "the companion of cache/module-cache-set-is-first-writer-wins, and the reason the pair exists: the type-reference cache writes with Store (cache.go:46-48) where the module cache writes with LoadOrStore. The identical action sequence must therefore end on the SECOND answer here and on the first answer there. A port that gives both caches the same write semantics gets exactly one of the pair wrong, whichever semantics it chose.",
-      "family": "config",
-      "host_applicability": "any",
-      "id": "config/module/typeref-cache/set-is-last-writer-wins",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/module/cache.go:typeRefDirectiveResolutionCache.Set"
-      ],
-      "native_authority": "tools/phase1/config/module_probe_test.go against the pinned internal/module package",
-      "operation_actions": {
-        "resolve_type_reference": [
           "tsc/internal/module/cache.go:typeRefDirectiveResolutionCache.Get",
-          "tsc/internal/module/cache.go:typeRefDirectiveResolutionCache.Set",
-          "tsc/internal/module/resolver.go:resolutionState.getPackageJsonInfo",
-          "tsc/internal/module/resolver.go:resolutionState.nodeLoadModuleByRelativeName",
-          "tsc/internal/module/resolver.go:resolutionState.realPath",
-          "tsc/internal/module/resolver.go:resolutionState.resolveTypeReferenceDirective",
-          "tsc/internal/module/resolver.go:resolutionState.tryFileLookup",
-          "tsc/internal/module/resolver.go:tracer.traceTypeReferenceDirectiveResult"
+          "tsc/internal/module/cache.go:typeRefDirectiveResolutionCache.Set"
         ]
       },
       "operations": [
         "tsc/internal/module/cache.go:typeRefDirectiveResolutionCache.Get",
-        "tsc/internal/module/cache.go:typeRefDirectiveResolutionCache.Set",
-        "tsc/internal/module/resolver.go:resolutionState.getPackageJsonInfo",
-        "tsc/internal/module/resolver.go:resolutionState.nodeLoadModuleByRelativeName",
-        "tsc/internal/module/resolver.go:resolutionState.realPath",
-        "tsc/internal/module/resolver.go:resolutionState.resolveTypeReferenceDirective",
-        "tsc/internal/module/resolver.go:resolutionState.tryFileLookup",
-        "tsc/internal/module/resolver.go:tracer.traceTypeReferenceDirectiveResult"
+        "tsc/internal/module/cache.go:typeRefDirectiveResolutionCache.Set"
       ]
+    },
+    {
+      "expected_contract": "the pinned type-reference cache writes with Store, which is LAST-writer-wins (cache.go:46-48), against the module cache's LoadOrStore. The pin reaches that write twice for one key because tracing skips the cache READ (resolver.go:241-245) but not the WRITE (:262), and newTraceBuilder re-reads TraceResolution per request (:201-206). THIS CASE CREDITS NO OPERATION, deliberately. The port's own insert (crates/tsr_module/src/type_references.rs:155) is a BTreeMap insert whose semantics MATCH, so recording it as absent -- which an earlier revision did -- published a false statement about a present, correct operation. What the port actually lacks is the ability to REACH the second write: Resolver::new refuses a host without a snapshot identity (resolver.rs:111-113) and its options are an Arc fixed at construction (:106-125), so neither the filesystem nor the trace mode can change between two requests on one resolver. The row therefore observes the pin and compares against nothing, which is what `operations: []` says.",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/module/typeref-cache/set-is-last-writer-wins",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/config/module_probe_test.go against the pinned internal/module package",
+      "operation_actions": {},
+      "operations": []
     },
     {
       "expected_contract": "the secondary node_modules lookup is SKIPPED, with its own trace line, exactly when the type roots came from configuration AND the containing file is the inferred-types sentinel `__inferred type names__.ts` (resolver.go:430-443, util.go:15). The paired request differs only in the containing file name, so a port that ignores the sentinel resolves the package in both and a port that always skips resolves in neither.",
@@ -5660,7 +5622,7 @@
       ]
     },
     {
-      "expected_contract": "getCandidateFromTypeRoot (resolver.go:448-454) mangles a scoped name ONLY when the type root's last two components are `node_modules/@types`, with or without a trailing separator, and the mangle is announced by its own trace line only when it changed the name (:456-465). The custom-root request then takes the fromConfig FILE branch (:412-420), which derives a package directory with ParseNodeModuleFromPath and attaches a package id; the plain root does not. A port that mangles for every root looks for `s__pkg` under /p/types.",
+      "expected_contract": "one resolve_type_reference for a scoped name against two typeRoots. The mangling to `s__pkg` is gated on the `node_modules/@types` suffix, and the lookup RETURNS AT THE FIRST ROOT (resolver.go:419/423), so the second root is never visited. Within that root the file branch fails and the directory branch resolves through package.json, which is why the frozen result carries an EMPTY package id. This case does not claim getPackageId: none of its ten call sites is on this path -- :417 needs the file lookup to succeed, :1091-1114 need the secondary node_modules walk that the first-root return prevents, :1391 is gated on considerPackageJson which loadNodeModuleFromDirectoryWorker passes false for, and :483/:822/:826 are on the module and exports paths. The empty package id in the frozen row is the direct evidence.",
       "family": "config",
       "host_applicability": "any",
       "id": "config/module/typeref/type-root-file-and-package-id",
@@ -5670,7 +5632,6 @@
         "resolve_type_reference": [
           "tsc/internal/module/resolver.go:resolutionState.createResolvedTypeReferenceDirective",
           "tsc/internal/module/resolver.go:resolutionState.getCandidateFromTypeRoot",
-          "tsc/internal/module/resolver.go:resolutionState.getPackageId",
           "tsc/internal/module/resolver.go:resolutionState.getPackageJSONPathField",
           "tsc/internal/module/resolver.go:resolutionState.getPackageJsonInfo",
           "tsc/internal/module/resolver.go:resolutionState.loadModuleFromFile",
@@ -5686,7 +5647,6 @@
       "operations": [
         "tsc/internal/module/resolver.go:resolutionState.createResolvedTypeReferenceDirective",
         "tsc/internal/module/resolver.go:resolutionState.getCandidateFromTypeRoot",
-        "tsc/internal/module/resolver.go:resolutionState.getPackageId",
         "tsc/internal/module/resolver.go:resolutionState.getPackageJSONPathField",
         "tsc/internal/module/resolver.go:resolutionState.getPackageJsonInfo",
         "tsc/internal/module/resolver.go:resolutionState.loadModuleFromFile",

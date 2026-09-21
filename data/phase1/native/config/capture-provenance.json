@@ -11,7 +11,7 @@
       "goarch": "arm64",
       "goos": "darwin",
       "helper": null,
-      "observations_sha256": "28bf8c0d11bfbaa0bdfef7cff364222671bc56ee98f089c064fd5a3ebee34ef6",
+      "observations_sha256": "749d71571b2e0e098b7328c46aa0e7574214c7bd9a3d0dbad23b060ce9990022",
       "package": "tsoptions",
       "trimpath": false
     },
@@ -1445,7 +1445,7 @@
     "scripts/tracking-bootstrap.py": "3eeb28198dd1d9d1e2946cd0435a5b8f2e59c7d6b5b9987e7eafb555bb64c8c7",
     "tools/phase1/config/Cargo.toml": "40848b5b6011cf79d00b54ebcd1fa7b930b6d40ee83627477755b207f69dbd10",
     "tools/phase1/config/baseline_recorder.go.fragment": "67058002c1735c70f495db3686d81218974d60070fbe93a0c90c5373ecfc1d58",
-    "tools/phase1/config/commandline_probe_test.go": "e6b4d41910701fab5ddaf59e22dc3066c841e858301dbd20f655ac9efdcb8059",
+    "tools/phase1/config/commandline_probe_test.go": "db466dd25107b9a1b645b0b455396b0924c8ff3dfe4b5c1d7af95c37687a835e",
     "tools/phase1/config/commandlineops_inpackage_test.go": "5ea35cc23f689429e05660143bb0b2c1397dffd94902e137cf52053184d2d544",
     "tools/phase1/config/commandlineops_probe_test.go": "f7753ad7b3930eb0632b9ceda13b7952a68f3b29b9fb8c5a77236150f385be74",
     "tools/phase1/config/configparse_inpackage_test.go": "ac2885f6c5631d1f615778759d5e8885ba756c87dc4a9487c4d4731c4cf47450",

@@ -89,7 +89,12 @@ func commandLineArgs(t *testing.T, content string) []string {
 		t.Fatalf("Args:: section is not a bracketed vector: %q", line)
 	}
 	body := line[1 : len(line)-1]
-	var args []string
+	// Empty, not nil. The pinned literal for the one output with no arguments
+	// is `[]string{}` (commandlineparser_test.go:392), and a nil slice would
+	// travel as JSON null, which a Rust observation supplying `[]` would then
+	// read as a section-level difference that is not one. The rendered bytes
+	// are unaffected either way.
+	args := []string{}
 	if body != "" {
 		if !strings.HasPrefix(body, `"`) || !strings.HasSuffix(body, `"`) {
 			t.Fatalf("Args:: entries are not quoted: %q", line)

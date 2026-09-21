@@ -1751,7 +1751,7 @@
         "rendered": "Args::\n[]\n\nbuildOptions::\n{}\n\ncompilerOptions::\n{}\n\nProjects::\n.\n\nErrors::\n",
         "rendered_sha256": "90ee4a357bb394f118a8f4dff264f18f339d7d93f1f102cac0ea514853847060",
         "sections": {
-          "args": null,
+          "args": [],
           "buildOptions": {},
           "compilerOptions": {},
           "errors": "",
