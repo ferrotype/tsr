@@ -2433,6 +2433,1284 @@
       "result": "native_unavailable"
     },
     {
+      "case": "config/commandlineops/declaration-enum-maps-keep-their-order",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/declaration-elements-only-for-list-options",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/declaration-extends-is-the-only-option-disallowing-null",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/value-type-string-per-option-kind",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/enum-type-keys-drop-deprecated-spellings",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/name-map-short-names-case-folding-and-misses",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/name-map-over-the-build-table",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/name-map-over-the-watch-table",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/list-option-empty-value-for-a-listorelement",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/list-option-empty-value-for-a-plain-list",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/list-option-splits-on-commas-in-order",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/list-option-drops-empty-entries",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/list-option-leading-dash-answers-an-empty-list",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/list-option-enum-elements-report-the-allowed-keys",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/list-option-object-elements-are-refused",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/lib-file-name-accepts-a-lib-name-or-a-lib-file-name",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/default-lib-file-name-per-script-target",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/parse-command-line-separates-options-from-file-names",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/parse-command-line-boolean-option-consumes-only-true-or-false",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/parse-command-line-number-option-honours-its-minimum",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/parse-command-line-missing-argument-names-the-expected-type",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/parse-command-line-list-option-takes-one-comma-separated-argument",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/parse-command-line-tsconfig-only-option-is-refused",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/parse-command-line-unknown-option-without-a-suggestion",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/parse-command-line-unknown-option-with-a-suggestion",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/parse-command-line-build-option-is-diverted-by-alternate-mode",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/parse-command-line-converts-file-path-options-to-absolute",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/parse-command-line-reads-a-response-file",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/parse-command-line-response-file-that-cannot-be-read",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/parse-command-line-response-file-cycles-are-broken",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/parse-command-line-repeated-option-keeps-the-last-value",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/parse-command-line-falls-back-to-the-watch-option-table",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/parse-command-line-explicit-null-clears-an-option",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/parse-command-line-enum-option-converts-through-its-map",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/parse-build-command-line-defaults-the-project-list",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/parse-build-command-line-rejects-nonsensical-combinations",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/parse-build-command-line-short-names",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/parse-build-command-line-diverts-a-compiler-only-option",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/parse-build-command-line-unknown-build-option",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/parse-build-command-line-keeps-the-compiler-options-it-shares",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/parse-build-command-line-number-option-minimum",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/input-option-name-strips-at-most-two-dashes",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/invalid-enum-type-diagnostic-lists-the-allowed-keys",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/extra-key-diagnostics-per-parent-option",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/worker-diagnostics-for-a-supplied-declaration-list",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/canonical-key-preserves-case-when-sensitive",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/canonical-key-folds-case-when-insensitive",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/wildcard-directory-from-spec-chooses-the-watched-directory",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/wildcard-directories-drop-paths-under-a-recursive-watch",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/wildcard-directories-skip-excluded-specs",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/wildcard-directories-fold-keys-on-a-case-insensitive-host",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/parsed-config-name-is-the-config-file-name",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/parsed-config-parsing-diagnostics-carry-node-ranges",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/parsed-config-matched-file-spec",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/parsed-config-matched-include-spec",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/parsed-config-default-include-spec-is-reported-as-default",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/parsed-config-file-names-by-path",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/parsed-config-reports-the-directory-it-was-parsed-against",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/parsed-config-wildcard-directories",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/parsed-config-wildcard-directory-globs",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/parsed-config-extended-source-files",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/parsed-config-project-references",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/parsed-config-common-source-directory-under-a-rootdir",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/parsed-config-common-source-directory-without-a-rootdir",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/parsed-config-build-info-file-name",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/parsed-config-input-output-names",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/parsed-config-content-mappers",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/parsed-config-type-acquisition-round-trip",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/parsed-config-set-compiler-options-then-locale",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/commandlineops/parsed-config-set-parsed-options-replaces-the-whole-block",
+      "operation": "tsoptions.commandLineOps",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/abspath/one-option",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/abspath/whole-map",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/configdir/array-no-match",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/configdir/array-substitution",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/configdir/guard-and-replacement",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/defaults/jsconfig",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/defaults/tsconfig",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/defaults/type-acquisition-jsconfig",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/extensions/allow-js",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/extensions/extra-and-builtin",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/extensions/extra-with-json",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/extensions/ts-only",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/json/convert-to-object-non-object-root",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/json/excludes-typo-compiler-diagnostic",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/json/normalize-json-value",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/json/null-array-element-rejected",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/json/parse-extended-config-entry",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/json/parse-json-config-file-content",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/namemap/build-map",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/namemap/get",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/namemap/spelling",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/option/build-builders",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/option/build-force",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/option/compiler-enum-from-float",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/option/compiler-key-resolved-by-name-map",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/option/compiler-null-short-circuits",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/option/compiler-number-pointer",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/option/compiler-tristate",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/option/type-acquisition-include",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/option/type-acquisition-unknown-key",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/option/watch-exclude-directories",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/option/watch-interval",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/configdir-case-guard-asymmetry",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/configdir-in-include",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/configdir-in-paths",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/configdir-out-dir",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/content-mapper-shape-validation",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/content-mapper-unresolved-package",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/content-mappers-extension-validation",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/content-mappers-require-flag",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/content-mappers-resolved",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/default-include-extension-priority",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/exclude-dotdot-after-wildcard",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/excludes-typo",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/extends-array-last-wins",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/extends-content-mappers-inherited",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/extends-empty-base-file",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/extends-empty-string",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/extends-errors-on-cache-hit",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/extends-include-rebased",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/extends-missing-file",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/extends-module-resolution",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/extends-null-override",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/extends-shared-base-cache-hit",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/extends-single",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/extends-twice-no-cache",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/extends-unparsable-base",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/files-empty-list",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/files-literal",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/include-trailing-recursion",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/jsconfig-defaults",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/no-inputs-found",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/null-array-element-files",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/null-enum-options",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/null-in-raw-include",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/option-case-mismatch",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/option-command-line-only",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/option-file-path-normalized",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/option-list-falsy-filtered",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/option-wrong-type",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/project-reference-bad-path",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/project-references",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/property-assignment-expected",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/question-token",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/raw-key-order",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/raw-preserves-unknown-object",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/read-config-file",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/read-config-file-missing",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/read-configdir-paths-not-cached",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/resolve-json-module-include",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/root-compiler-option",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/root-value-array-recovery",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/root-value-not-object",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/type-acquisition",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/type-acquisition-unknown-key",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/unknown-option-no-suggestion",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/unknown-option-spelling-suggestion",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/unquoted-keys",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parse/wildcard-skips-unsupported-extension",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parser/build-parse-option",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parser/build-unknown-option-messages",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parser/compiler-unknown-option-messages",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parser/content-mapper-option-diagnostic-location",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parser/convert-map-to-options-walks-in-order",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parser/typeacquisition-parse-option",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parser/typeacquisition-unknown-option-messages",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parser/watch-parse-option",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/parser/watch-unknown-option-messages",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/spec/dotdot-after-wildcard-leading",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/spec/dotdot-at-end-after-wildcard",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/spec/dotdot-before-wildcard",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/spec/not-a-trailing-recursion",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/spec/trailing-recursion-allowed",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/spec/trailing-recursion-bare",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/spec/trailing-recursion-slash",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/specs/extension-priority",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/specs/file-names-extra-extension",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/specs/file-names-json-group",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/specs/file-names-literal-and-wildcard",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/specs/match-extensionless-exclude",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/specs/match-queries",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/syntax/double-quoted-string",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/syntax/options-syntax-by-element",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/syntax/prop-array-element",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/syntax/prop-array-element-miss",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/syntax/reference-diagnostic",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/text/empty-and-missing-arrays",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/text/empty-text",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/text/jsconfig-root-value-name",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/text/property-value-not-allowed",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/text/root-value-not-object",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/text/scalars-and-nesting",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/text/unquoted-key-diagnostic",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/value/content-mapper-invalid",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/value/content-mapper-valid",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/value/is-compiler-options-value-list",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/value/is-compiler-options-value-null",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/value/is-compiler-options-value-number",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/value/is-string-value",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/value/number-float",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/value/number-refuses-string",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/value/project-reference-flags",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/value/string-array-not-an-array",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/value/string-array-of-any",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/value/string-array-strict-accepts",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/value/string-array-strict-refuses",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/value/string-map",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/value/tristate",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/value/tristate-null",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/wildcard/case-insensitive-key",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/wildcard/excluded-and-contained",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/wildcard/implicit-glob-directory",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/wildcard/recursive-and-direct",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
       "case": "config/module/helpers/versioned-types-key",
       "operation": "tsc/internal/module/util.go:IsApplicableVersionedTypesKey",
       "reason": "operation is not served by the command-line baseline probe",
@@ -2991,6 +4269,6 @@
       "result": "native_unavailable"
     }
   ],
-  "request_sha256": "aca8607b1387a8ab8f9b3711642023f6a3a351b1afa71c06a01b64531a93e8a8",
+  "request_sha256": "32c3bfd8461fa06c0ec2dd838256eb681bb6aa3daf4dd923d07992c4acab0eb2",
   "version": 1
 }

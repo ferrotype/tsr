@@ -1,0 +1,2570 @@
+{
+  "family": "config",
+  "requests": [
+    {
+      "action": "option_absolute_path",
+      "case": "config/abspath/one-option",
+      "currentDirectory": "/project",
+      "helper": "one",
+      "name": "outDir",
+      "operation": "tsoptions.configParse",
+      "subject": "configParse",
+      "value": [
+        "string",
+        "bin"
+      ]
+    },
+    {
+      "action": "option_absolute_path",
+      "case": "config/abspath/whole-map",
+      "currentDirectory": "/project",
+      "entries": [
+        [
+          "outDir",
+          [
+            "string",
+            "bin"
+          ]
+        ],
+        [
+          "strict",
+          [
+            "bool",
+            true
+          ]
+        ],
+        [
+          "rootDirs",
+          [
+            "array",
+            [
+              [
+                "string",
+                "a"
+              ],
+              [
+                "string",
+                "/b"
+              ]
+            ]
+          ]
+        ],
+        [
+          "notAnOption",
+          [
+            "string",
+            "x"
+          ]
+        ]
+      ],
+      "helper": "all",
+      "operation": "tsoptions.configParse",
+      "subject": "configParse"
+    },
+    {
+      "action": "config_dir",
+      "basePath": "/project",
+      "case": "config/configdir/array-no-match",
+      "helper": "array",
+      "operation": "tsoptions.configParse",
+      "specs": [
+        "src/**/*",
+        "lib/**/*"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "config_dir",
+      "basePath": "/project",
+      "case": "config/configdir/array-substitution",
+      "helper": "array",
+      "operation": "tsoptions.configParse",
+      "specs": [
+        "src/**/*",
+        "${configDir}/lib/**/*"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "config_dir",
+      "basePath": "/project",
+      "case": "config/configdir/guard-and-replacement",
+      "helper": "value",
+      "operation": "tsoptions.configParse",
+      "specs": [
+        "${configDir}/bin",
+        "${CONFIGDIR}/bin",
+        "${ConfigDir}/x/${configDir}/y",
+        "bin",
+        "",
+        "${configDir}"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "default_options",
+      "case": "config/defaults/jsconfig",
+      "configFileName": "/project/jsconfig.json",
+      "operation": "tsoptions.configParse",
+      "optionNames": [
+        "allowJs",
+        "maxNodeModuleJsDepth",
+        "skipLibCheck",
+        "noEmit"
+      ],
+      "report": [
+        "options"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "default_options",
+      "case": "config/defaults/tsconfig",
+      "configFileName": "/project/tsconfig.json",
+      "operation": "tsoptions.configParse",
+      "optionNames": [
+        "allowJs",
+        "maxNodeModuleJsDepth",
+        "skipLibCheck",
+        "noEmit"
+      ],
+      "report": [
+        "options"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "default_options",
+      "case": "config/defaults/type-acquisition-jsconfig",
+      "configFileName": "/project/jsconfig.json",
+      "operation": "tsoptions.configParse",
+      "report": [
+        "type_acquisition"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "supported_extensions",
+      "case": "config/extensions/allow-js",
+      "entries": [
+        [
+          "allowJs",
+          [
+            "bool",
+            true
+          ]
+        ]
+      ],
+      "extra": [],
+      "operation": "tsoptions.configParse",
+      "subject": "configParse"
+    },
+    {
+      "action": "supported_extensions",
+      "case": "config/extensions/extra-and-builtin",
+      "entries": [],
+      "extra": [
+        ".vue",
+        ".ts",
+        ".d.ts"
+      ],
+      "operation": "tsoptions.configParse",
+      "subject": "configParse"
+    },
+    {
+      "action": "supported_extensions",
+      "case": "config/extensions/extra-with-json",
+      "entries": [
+        [
+          "resolveJsonModule",
+          [
+            "bool",
+            true
+          ]
+        ]
+      ],
+      "extra": [
+        ".vue"
+      ],
+      "operation": "tsoptions.configParse",
+      "subject": "configParse"
+    },
+    {
+      "action": "supported_extensions",
+      "case": "config/extensions/ts-only",
+      "entries": [
+        [
+          "resolveJsonModule",
+          [
+            "bool",
+            true
+          ]
+        ]
+      ],
+      "extra": [],
+      "operation": "tsoptions.configParse",
+      "subject": "configParse"
+    },
+    {
+      "action": "convert_to_object",
+      "case": "config/json/convert-to-object-non-object-root",
+      "caseSensitive": true,
+      "configFileName": "/apath/tsconfig.json",
+      "currentDirectory": "/apath",
+      "jsonText": "[{\"files\":[\"a.ts\"]},2]",
+      "operation": "tsoptions.configParse",
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_json_api",
+      "case": "config/json/excludes-typo-compiler-diagnostic",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/index.ts": "export {};\n"
+      },
+      "jsonText": "{\"excludes\":[\"out\"],\"files\":[\"index.ts\"]}",
+      "operation": "tsoptions.configParse",
+      "report": [
+        "errors",
+        "raw_keys"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_value",
+      "case": "config/json/normalize-json-value",
+      "helper": "normalize_json_value",
+      "operation": "tsoptions.configParse",
+      "subject": "configParse",
+      "value": [
+        "map",
+        [
+          [
+            "z",
+            [
+              "string",
+              "last"
+            ]
+          ],
+          [
+            "a",
+            [
+              "object",
+              [
+                [
+                  "b",
+                  [
+                    "number",
+                    1
+                  ]
+                ],
+                [
+                  "a",
+                  [
+                    "number",
+                    2
+                  ]
+                ]
+              ]
+            ]
+          ],
+          [
+            "m",
+            [
+              "strings",
+              [
+                "x",
+                "y"
+              ]
+            ]
+          ],
+          [
+            "n",
+            [
+              "nilarray"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "action": "parse_json_api",
+      "case": "config/json/null-array-element-rejected",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/index.ts": "export {};\n"
+      },
+      "jsonText": "{\"include\":[1]}",
+      "operation": "tsoptions.configParse",
+      "report": [
+        "errors"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "extended_config",
+      "case": "config/json/parse-extended-config-entry",
+      "caseSensitive": true,
+      "configFileName": "/project/base.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/base.json": "{\"extends\":\"./deeper.json\"}",
+        "/project/deeper.json": "{\"compilerOptions\":{\"strict\":true}}",
+        "/project/src/a.ts": "export {}\n"
+      },
+      "operation": "tsoptions.configParse",
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_json_api",
+      "case": "config/json/parse-json-config-file-content",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/index.ts": "export {};\n"
+      },
+      "jsonText": "{\"compilerOptions\":{\"strict\":true},\"files\":[\"index.ts\"]}",
+      "operation": "tsoptions.configParse",
+      "optionNames": [
+        "strict",
+        "configFilePath"
+      ],
+      "report": [
+        "file_names",
+        "errors",
+        "options"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "option_name_map",
+      "case": "config/namemap/build-map",
+      "helper": "build_map",
+      "operation": "tsoptions.configParse",
+      "query": [
+        "outDir",
+        "strict",
+        "ALLCAPS"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "option_name_map",
+      "case": "config/namemap/get",
+      "helper": "get",
+      "operation": "tsoptions.configParse",
+      "query": [
+        "strict",
+        "STRICT",
+        "Strict",
+        "outDir",
+        "outdir",
+        "notAnOption",
+        ""
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "option_name_map",
+      "case": "config/namemap/spelling",
+      "helper": "spelling",
+      "operation": "tsoptions.configParse",
+      "query": [
+        "strct",
+        "outdirr",
+        "zzzzzzzzzzzz"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_option",
+      "case": "config/option/build-builders",
+      "key": "builders",
+      "operation": "tsoptions.configParse",
+      "subject": "configParse",
+      "target": "build",
+      "value": [
+        "number",
+        4
+      ]
+    },
+    {
+      "action": "parse_option",
+      "case": "config/option/build-force",
+      "key": "force",
+      "operation": "tsoptions.configParse",
+      "subject": "configParse",
+      "target": "build",
+      "value": [
+        "bool",
+        true
+      ]
+    },
+    {
+      "action": "parse_option",
+      "case": "config/option/compiler-enum-from-float",
+      "key": "target",
+      "operation": "tsoptions.configParse",
+      "optionNames": [
+        "target"
+      ],
+      "subject": "configParse",
+      "target": "compiler",
+      "value": [
+        "number",
+        9
+      ]
+    },
+    {
+      "action": "parse_option",
+      "case": "config/option/compiler-key-resolved-by-name-map",
+      "key": "OUTDIR",
+      "operation": "tsoptions.configParse",
+      "optionNames": [
+        "outDir"
+      ],
+      "subject": "configParse",
+      "target": "compiler",
+      "value": [
+        "string",
+        "/bin"
+      ]
+    },
+    {
+      "action": "parse_option",
+      "case": "config/option/compiler-null-short-circuits",
+      "key": "strict",
+      "operation": "tsoptions.configParse",
+      "optionNames": [
+        "strict"
+      ],
+      "subject": "configParse",
+      "target": "compiler",
+      "value": [
+        "null"
+      ]
+    },
+    {
+      "action": "parse_option",
+      "case": "config/option/compiler-number-pointer",
+      "key": "maxNodeModuleJsDepth",
+      "operation": "tsoptions.configParse",
+      "optionNames": [
+        "maxNodeModuleJsDepth"
+      ],
+      "subject": "configParse",
+      "target": "compiler",
+      "value": [
+        "number",
+        3
+      ]
+    },
+    {
+      "action": "parse_option",
+      "case": "config/option/compiler-tristate",
+      "key": "strict",
+      "operation": "tsoptions.configParse",
+      "optionNames": [
+        "strict"
+      ],
+      "subject": "configParse",
+      "target": "compiler",
+      "value": [
+        "bool",
+        true
+      ]
+    },
+    {
+      "action": "parse_option",
+      "case": "config/option/type-acquisition-include",
+      "key": "include",
+      "operation": "tsoptions.configParse",
+      "subject": "configParse",
+      "target": "type_acquisition",
+      "value": [
+        "array",
+        [
+          [
+            "string",
+            "jquery"
+          ]
+        ]
+      ]
+    },
+    {
+      "action": "parse_option",
+      "case": "config/option/type-acquisition-unknown-key",
+      "key": "notAKey",
+      "operation": "tsoptions.configParse",
+      "subject": "configParse",
+      "target": "type_acquisition",
+      "value": [
+        "bool",
+        true
+      ]
+    },
+    {
+      "action": "parse_option",
+      "case": "config/option/watch-exclude-directories",
+      "key": "excludeDirectories",
+      "operation": "tsoptions.configParse",
+      "subject": "configParse",
+      "target": "watch",
+      "value": [
+        "array",
+        [
+          [
+            "string",
+            "node_modules"
+          ]
+        ]
+      ]
+    },
+    {
+      "action": "parse_option",
+      "case": "config/option/watch-interval",
+      "key": "watchInterval",
+      "operation": "tsoptions.configParse",
+      "subject": "configParse",
+      "target": "watch",
+      "value": [
+        "number",
+        250
+      ]
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/configdir-case-guard-asymmetry",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export const a = 1;\n"
+      },
+      "jsonText": "{\"compilerOptions\":{\"outDir\":\"${CONFIGDIR}/bin\"}}",
+      "operation": "tsoptions.configParse",
+      "optionNames": [
+        "outDir"
+      ],
+      "report": [
+        "options",
+        "error_codes"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/configdir-in-include",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export const a = 1;\n"
+      },
+      "jsonText": "{\"include\":[\"${configDir}/src/**/*\"]}",
+      "operation": "tsoptions.configParse",
+      "report": [
+        "file_names",
+        "error_codes"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/configdir-in-paths",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export const a = 1;\n"
+      },
+      "jsonText": "{\"compilerOptions\":{\"paths\":{\"@pkg/*\":[\"${configDir}/src/*\"]}}}",
+      "operation": "tsoptions.configParse",
+      "optionNames": [
+        "paths",
+        "pathsBasePath"
+      ],
+      "report": [
+        "options",
+        "error_codes"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/configdir-out-dir",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export const a = 1;\n"
+      },
+      "jsonText": "{\"compilerOptions\":{\"outDir\":\"${configDir}/bin\",\"declarationDir\":\"${configDir}/dts\"}}",
+      "operation": "tsoptions.configParse",
+      "optionNames": [
+        "outDir",
+        "declarationDir"
+      ],
+      "report": [
+        "options",
+        "error_codes"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/content-mapper-shape-validation",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/node_modules/mapper-pkg/package.json": "{\"name\":\"mapper-pkg\",\"version\":\"1.2.3\",\"tsContentMapper\":{\"exec\":[\"node\",\"run.js\"]}}",
+        "/project/src/a.ts": "export {}\n"
+      },
+      "jsonText": "{\"compilerOptions\":{\"runExternalCode\":true},\"contentMappers\":[{\"extensions\":\".vue\"},{\"package\":\"\",\"extensions\":[1]},{\"package\":\"p\",\"extensions\":[\".x\"],\"options\":3}]}",
+      "operation": "tsoptions.configParse",
+      "report": [
+        "errors",
+        "content_mappers"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/content-mapper-unresolved-package",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/node_modules/mapper-pkg/package.json": "{\"name\":\"mapper-pkg\",\"version\":\"1.2.3\",\"tsContentMapper\":{\"exec\":[\"node\",\"run.js\"]}}",
+        "/project/src/a.ts": "export {}\n",
+        "/project/src/c.vue": "<template/>\n"
+      },
+      "jsonText": "{\"compilerOptions\":{\"runExternalCode\":true},\"contentMappers\":[{\"package\":\"absent-pkg\",\"extensions\":[\".vue\"]}]}",
+      "operation": "tsoptions.configParse",
+      "report": [
+        "errors",
+        "content_mappers",
+        "file_names"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/content-mappers-extension-validation",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/node_modules/mapper-pkg/package.json": "{\"name\":\"mapper-pkg\",\"version\":\"1.2.3\",\"tsContentMapper\":{\"exec\":[\"node\",\"run.js\"]}}",
+        "/project/src/a.ts": "export {}\n"
+      },
+      "jsonText": "{\"compilerOptions\":{\"runExternalCode\":true},\"contentMappers\":[{\"package\":\"mapper-pkg\",\"extensions\":[\"vue\",\".ts\",\".vue\",\".vue\"]}]}",
+      "operation": "tsoptions.configParse",
+      "report": [
+        "errors",
+        "content_mappers"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/content-mappers-require-flag",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/node_modules/mapper-pkg/package.json": "{\"name\":\"mapper-pkg\",\"version\":\"1.2.3\",\"tsContentMapper\":{\"exec\":[\"node\",\"run.js\"]}}",
+        "/project/src/a.ts": "export {}\n"
+      },
+      "jsonText": "{\"contentMappers\":[{\"package\":\"mapper-pkg\",\"extensions\":[\".vue\"]}]}",
+      "operation": "tsoptions.configParse",
+      "report": [
+        "errors",
+        "content_mappers",
+        "file_names"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/content-mappers-resolved",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/node_modules/mapper-pkg/package.json": "{\"name\":\"mapper-pkg\",\"version\":\"1.2.3\",\"tsContentMapper\":{\"exec\":[\"node\",\"run.js\"]}}",
+        "/project/src/a.ts": "export {}\n",
+        "/project/src/c.vue": "<template/>\n"
+      },
+      "jsonText": "{\"compilerOptions\":{\"runExternalCode\":true},\"contentMappers\":[{\"package\":\"mapper-pkg\",\"extensions\":[\".vue\"],\"options\":{\"tag\":\"x\"}}]}",
+      "operation": "tsoptions.configParse",
+      "report": [
+        "content_mappers",
+        "file_names",
+        "error_codes"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/default-include-extension-priority",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.d.ts": "export {}\n",
+        "/project/src/a.ts": "export {}\n",
+        "/project/src/b.d.ts": "export {}\n",
+        "/project/src/b.js": "export {}\n"
+      },
+      "jsonText": "{}",
+      "operation": "tsoptions.configParse",
+      "report": [
+        "file_names",
+        "error_codes"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/exclude-dotdot-after-wildcard",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export const a = 1;\n"
+      },
+      "jsonText": "{\"include\":[\"src/**/*\"],\"exclude\":[\"**/../out\"]}",
+      "operation": "tsoptions.configParse",
+      "report": [
+        "file_names",
+        "errors"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/excludes-typo",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export const a = 1;\n"
+      },
+      "jsonText": "{\"excludes\":[\"out\"],\"files\":[\"src/a.ts\"]}",
+      "operation": "tsoptions.configParse",
+      "report": [
+        "errors",
+        "raw_keys"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/extends-array-last-wins",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/base.json": "{\"compilerOptions\":{\"strict\":true,\"outDir\":\"bin\"}}",
+        "/project/other.json": "{\"compilerOptions\":{\"outDir\":\"out\",\"declaration\":true}}",
+        "/project/src/a.ts": "export {}\n"
+      },
+      "jsonText": "{\"extends\":[\"./base.json\",\"./other.json\"]}",
+      "operation": "tsoptions.configParse",
+      "optionNames": [
+        "strict",
+        "declaration",
+        "outDir"
+      ],
+      "report": [
+        "options",
+        "extended_source_files",
+        "error_codes"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/extends-content-mappers-inherited",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/base-mappers.json": "{\"contentMappers\":[{\"package\":\"mapper-pkg\",\"extensions\":[\".vue\"]}]}",
+        "/project/node_modules/mapper-pkg/package.json": "{\"name\":\"mapper-pkg\",\"version\":\"1.2.3\",\"tsContentMapper\":{\"exec\":[\"node\",\"run.js\"]}}",
+        "/project/src/a.ts": "export {}\n"
+      },
+      "jsonText": "{\"extends\":\"./base-mappers.json\",\"compilerOptions\":{\"runExternalCode\":true}}",
+      "operation": "tsoptions.configParse",
+      "report": [
+        "content_mappers",
+        "errors",
+        "raw_keys"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/extends-empty-base-file",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/empty.json": "",
+        "/project/src/a.ts": "export {}\n"
+      },
+      "jsonText": "{\"extends\":\"./empty.json\"}",
+      "operation": "tsoptions.configParse",
+      "report": [
+        "file_names",
+        "error_codes",
+        "extended_source_files"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/extends-empty-string",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/base.json": "{\"compilerOptions\":{\"strict\":true,\"outDir\":\"bin\"}}",
+        "/project/other.json": "{\"compilerOptions\":{\"outDir\":\"out\",\"declaration\":true}}",
+        "/project/src/a.ts": "export {}\n"
+      },
+      "jsonText": "{\"extends\":\"\"}",
+      "operation": "tsoptions.configParse",
+      "report": [
+        "errors"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/extends-errors-on-cache-hit",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export {}\n",
+        "/project/typo.json": "{\"excludes\":[\"out\"]}"
+      },
+      "jsonText": "{\"extends\":\"./typo.json\"}",
+      "operation": "tsoptions.configParse",
+      "parseTwice": true,
+      "report": [
+        "errors",
+        "extended_source_files"
+      ],
+      "subject": "configParse",
+      "useCache": true
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/extends-include-rebased",
+      "caseSensitive": true,
+      "configFileName": "/project/app/tsconfig.json",
+      "currentDirectory": "/project/app",
+      "files": {
+        "/project/app/src/a.ts": "export {}\n",
+        "/project/base/tsconfig.json": "{\"include\":[\"../app/src/**/*\"],\"exclude\":[\"../app/src/skip\"]}"
+      },
+      "jsonText": "{\"extends\":\"../base/tsconfig.json\"}",
+      "operation": "tsoptions.configParse",
+      "report": [
+        "file_names",
+        "raw",
+        "extended_source_files",
+        "error_codes"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/extends-missing-file",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/base.json": "{\"compilerOptions\":{\"strict\":true,\"outDir\":\"bin\"}}",
+        "/project/other.json": "{\"compilerOptions\":{\"outDir\":\"out\",\"declaration\":true}}",
+        "/project/src/a.ts": "export {}\n"
+      },
+      "jsonText": "{\"extends\":\"./nope.json\",\"compilerOptions\":{\"strict\":true}}",
+      "operation": "tsoptions.configParse",
+      "optionNames": [
+        "strict"
+      ],
+      "report": [
+        "errors",
+        "options",
+        "extended_source_files"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/extends-module-resolution",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/node_modules/@scope/base/package.json": "{\"name\":\"@scope/base\",\"version\":\"1.0.0\"}",
+        "/project/node_modules/@scope/base/tsconfig.json": "{\"compilerOptions\":{\"strict\":true}}",
+        "/project/src/a.ts": "export {}\n"
+      },
+      "jsonText": "{\"extends\":\"@scope/base/tsconfig.json\"}",
+      "operation": "tsoptions.configParse",
+      "optionNames": [
+        "strict"
+      ],
+      "report": [
+        "options",
+        "extended_source_files",
+        "error_codes"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/extends-null-override",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/base.json": "{\"compilerOptions\":{\"strict\":true,\"outDir\":\"bin\"}}",
+        "/project/other.json": "{\"compilerOptions\":{\"outDir\":\"out\",\"declaration\":true}}",
+        "/project/src/a.ts": "export {}\n"
+      },
+      "jsonText": "{\"extends\":\"./base.json\",\"compilerOptions\":{\"strict\":null,\"outDir\":null}}",
+      "operation": "tsoptions.configParse",
+      "optionNames": [
+        "strict",
+        "outDir"
+      ],
+      "report": [
+        "options",
+        "error_codes"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "basePath": "/project/b",
+      "case": "config/parse/extends-shared-base-cache-hit",
+      "caseSensitive": true,
+      "configFileName": "/project/b/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/a/src/x.ts": "export {}\n",
+        "/project/a/tsconfig.json": "{\"extends\":\"../typo.json\"}",
+        "/project/b/src/y.ts": "export {}\n",
+        "/project/typo.json": "{\"excludes\":[\"out\"]}"
+      },
+      "jsonText": "{\"extends\":\"../typo.json\"}",
+      "operation": "tsoptions.configParse",
+      "parseAlso": "/project/a/tsconfig.json",
+      "report": [
+        "errors"
+      ],
+      "subject": "configParse",
+      "useCache": true
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/extends-single",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/base.json": "{\"compilerOptions\":{\"strict\":true,\"outDir\":\"bin\"}}",
+        "/project/other.json": "{\"compilerOptions\":{\"outDir\":\"out\",\"declaration\":true}}",
+        "/project/src/a.ts": "export {}\n"
+      },
+      "jsonText": "{\"extends\":\"./base.json\",\"compilerOptions\":{\"declaration\":true}}",
+      "operation": "tsoptions.configParse",
+      "optionNames": [
+        "strict",
+        "declaration",
+        "outDir"
+      ],
+      "report": [
+        "options",
+        "extended_source_files",
+        "error_codes"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/extends-twice-no-cache",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export {}\n",
+        "/project/typo.json": "{\"excludes\":[\"out\"]}"
+      },
+      "jsonText": "{\"extends\":\"./typo.json\"}",
+      "operation": "tsoptions.configParse",
+      "parseTwice": true,
+      "report": [
+        "errors",
+        "extended_source_files"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/extends-unparsable-base",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/bad.json": "{ this is not json",
+        "/project/src/a.ts": "export {}\n"
+      },
+      "jsonText": "{\"extends\":\"./bad.json\"}",
+      "operation": "tsoptions.configParse",
+      "report": [
+        "errors",
+        "file_names"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/files-empty-list",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export const a = 1;\n"
+      },
+      "jsonText": "{\"files\":[]}",
+      "operation": "tsoptions.configParse",
+      "report": [
+        "file_names",
+        "errors"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/files-literal",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export const a = 1;\n"
+      },
+      "jsonText": "{\"compilerOptions\":{\"strict\":true},\"files\":[\"src/a.ts\"]}",
+      "operation": "tsoptions.configParse",
+      "optionNames": [
+        "strict",
+        "configFilePath"
+      ],
+      "report": [
+        "file_names",
+        "error_codes",
+        "options",
+        "compile_on_save"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/include-trailing-recursion",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export const a = 1;\n"
+      },
+      "jsonText": "{\"include\":[\"src/**\"]}",
+      "operation": "tsoptions.configParse",
+      "report": [
+        "file_names",
+        "errors"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/jsconfig-defaults",
+      "caseSensitive": true,
+      "configFileName": "/project/jsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.js": "export {}\n"
+      },
+      "jsonText": "{}",
+      "operation": "tsoptions.configParse",
+      "optionNames": [
+        "allowJs",
+        "maxNodeModuleJsDepth",
+        "skipLibCheck",
+        "noEmit"
+      ],
+      "report": [
+        "options",
+        "type_acquisition",
+        "file_names"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/no-inputs-found",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export const a = 1;\n"
+      },
+      "jsonText": "{\"include\":[\"nothing/**/*\"],\"exclude\":[\"also-nothing\"]}",
+      "operation": "tsoptions.configParse",
+      "report": [
+        "file_names",
+        "errors"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/null-array-element-files",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export const a = 1;\n"
+      },
+      "jsonText": "{\"files\":[null]}",
+      "operation": "tsoptions.configParse",
+      "report": [
+        "raw",
+        "file_names",
+        "errors"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/null-enum-options",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export const a = 1;\n"
+      },
+      "jsonText": "{\"compilerOptions\":{\"target\":null,\"module\":null}}",
+      "operation": "tsoptions.configParse",
+      "optionNames": [
+        "target",
+        "module"
+      ],
+      "report": [
+        "errors",
+        "options"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/null-in-raw-include",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export const a = 1;\n"
+      },
+      "jsonText": "{\"include\":null}",
+      "operation": "tsoptions.configParse",
+      "report": [
+        "raw",
+        "file_names",
+        "error_codes"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/option-case-mismatch",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export const a = 1;\n"
+      },
+      "jsonText": "{\"compilerOptions\":{\"Strict\":true}}",
+      "operation": "tsoptions.configParse",
+      "optionNames": [
+        "strict"
+      ],
+      "report": [
+        "errors",
+        "options"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/option-command-line-only",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export const a = 1;\n"
+      },
+      "jsonText": "{\"compilerOptions\":{\"locale\":\"en\"}}",
+      "operation": "tsoptions.configParse",
+      "report": [
+        "errors"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/option-file-path-normalized",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export const a = 1;\n"
+      },
+      "jsonText": "{\"compilerOptions\":{\"outDir\":\"bin\",\"rootDir\":\"\"}}",
+      "operation": "tsoptions.configParse",
+      "optionNames": [
+        "outDir",
+        "rootDir"
+      ],
+      "report": [
+        "options",
+        "error_codes"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/option-list-falsy-filtered",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export const a = 1;\n"
+      },
+      "jsonText": "{\"compilerOptions\":{\"types\":[\"node\",\"\",\"other\"]}}",
+      "operation": "tsoptions.configParse",
+      "optionNames": [
+        "types"
+      ],
+      "report": [
+        "options",
+        "error_codes"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/option-wrong-type",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export const a = 1;\n"
+      },
+      "jsonText": "{\"compilerOptions\":{\"strict\":\"yes\"}}",
+      "operation": "tsoptions.configParse",
+      "optionNames": [
+        "strict"
+      ],
+      "report": [
+        "errors",
+        "options"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/project-reference-bad-path",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export const a = 1;\n"
+      },
+      "jsonText": "{\"files\":[\"src/a.ts\"],\"references\":[{\"path\":1},{\"path\":\"\"},{\"path\":\"ok\",\"circular\":\"yes\"}]}",
+      "operation": "tsoptions.configParse",
+      "report": [
+        "errors",
+        "project_references"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/project-references",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export const a = 1;\n"
+      },
+      "jsonText": "{\"files\":[\"src/a.ts\"],\"references\":[{\"path\":\"../other\"},{\"path\":\"/abs/other\",\"circular\":true}]}",
+      "operation": "tsoptions.configParse",
+      "report": [
+        "project_references",
+        "error_codes"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/property-assignment-expected",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export const a = 1;\n"
+      },
+      "jsonText": "{\"files\":[\"src/a.ts\"],shorthand}",
+      "operation": "tsoptions.configParse",
+      "report": [
+        "errors",
+        "syntax_diagnostics",
+        "raw_keys"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/question-token",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export const a = 1;\n"
+      },
+      "jsonText": "{\n  compilerOptions?: {\n    strict?: true\n  }\n}",
+      "operation": "tsoptions.configParse",
+      "report": [
+        "errors",
+        "syntax_diagnostics"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/raw-key-order",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export const a = 1;\n"
+      },
+      "jsonText": "{\"compileOnSave\":true,\"ts-node\":{\"transpileOnly\":true},\"files\":[\"src/a.ts\"],\"customSetting\":{\"enabled\":true}}",
+      "operation": "tsoptions.configParse",
+      "order_sensitive": true,
+      "report": [
+        "ordered"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/raw-preserves-unknown-object",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export const a = 1;\n"
+      },
+      "jsonText": "{\"files\":[\"src/a.ts\"],\"compileOnSave\":true,\"ts-node\":{\"compilerOptions\":{\"module\":\"commonjs\"},\"transpileOnly\":true}}",
+      "operation": "tsoptions.configParse",
+      "report": [
+        "raw",
+        "compile_on_save",
+        "error_codes"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "read_config_file",
+      "case": "config/parse/read-config-file",
+      "caseSensitive": true,
+      "configFileName": "tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export {}\n",
+        "/project/tsconfig.json": "{\"compilerOptions\":{\"strict\":true},\"files\":[\"src/a.ts\"]}"
+      },
+      "operation": "tsoptions.configParse",
+      "optionNames": [
+        "strict",
+        "configFilePath"
+      ],
+      "report": [
+        "file_names",
+        "options",
+        "error_codes"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "read_config_file",
+      "case": "config/parse/read-config-file-missing",
+      "caseSensitive": true,
+      "configFileName": "/project/absent.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export {}\n"
+      },
+      "operation": "tsoptions.configParse",
+      "report": [
+        "errors"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "read_config_file",
+      "case": "config/parse/read-configdir-paths-not-cached",
+      "caseSensitive": true,
+      "configFileName": "/project/packages/b/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/packages/a/index.ts": "export {}\n",
+        "/project/packages/a/tsconfig.json": "{\"extends\":\"../../tsconfig.base.json\"}",
+        "/project/packages/b/index.ts": "export {}\n",
+        "/project/packages/b/tsconfig.json": "{\"extends\":\"../../tsconfig.base.json\"}",
+        "/project/tsconfig.base.json": "{\"compilerOptions\":{\"paths\":{\"@pkg/*\":[\"${configDir}/src/*\"]}}}"
+      },
+      "operation": "tsoptions.configParse",
+      "optionNames": [
+        "paths",
+        "pathsBasePath"
+      ],
+      "parseAlso": "/project/packages/a/tsconfig.json",
+      "report": [
+        "options",
+        "error_codes"
+      ],
+      "subject": "configParse",
+      "useCache": true
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/resolve-json-module-include",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export {}\n",
+        "/project/src/data.json": "{}\n"
+      },
+      "jsonText": "{\"compilerOptions\":{\"resolveJsonModule\":true},\"include\":[\"src/**/*.ts\",\"src/**/*.json\"]}",
+      "operation": "tsoptions.configParse",
+      "report": [
+        "file_names",
+        "error_codes"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/root-compiler-option",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export const a = 1;\n"
+      },
+      "jsonText": "{\"strict\":true,\"files\":[\"src/a.ts\"]}",
+      "operation": "tsoptions.configParse",
+      "report": [
+        "errors"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/root-value-array-recovery",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export const a = 1;\n"
+      },
+      "jsonText": "[{\"files\":[\"src/a.ts\"]}]",
+      "operation": "tsoptions.configParse",
+      "report": [
+        "errors",
+        "file_names",
+        "raw_keys"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/root-value-not-object",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export const a = 1;\n"
+      },
+      "jsonText": "\"not a config\"",
+      "operation": "tsoptions.configParse",
+      "report": [
+        "errors",
+        "raw",
+        "file_names"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/type-acquisition",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export const a = 1;\n"
+      },
+      "jsonText": "{\"typeAcquisition\":{\"enable\":true,\"include\":[\"jquery\"],\"exclude\":[\"lodash\"],\"disableFilenameBasedTypeAcquisition\":true}}",
+      "operation": "tsoptions.configParse",
+      "report": [
+        "type_acquisition",
+        "error_codes"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/type-acquisition-unknown-key",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export const a = 1;\n"
+      },
+      "jsonText": "{\"typeAcquisition\":{\"enabel\":true}}",
+      "operation": "tsoptions.configParse",
+      "report": [
+        "errors"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/unknown-option-no-suggestion",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export const a = 1;\n"
+      },
+      "jsonText": "{\"compilerOptions\":{\"zzzzzzzzzzzz\":true}}",
+      "operation": "tsoptions.configParse",
+      "report": [
+        "errors"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/unknown-option-spelling-suggestion",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export const a = 1;\n"
+      },
+      "jsonText": "{\"compilerOptions\":{\"strct\":true}}",
+      "operation": "tsoptions.configParse",
+      "report": [
+        "errors"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/unquoted-keys",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export const a = 1;\n"
+      },
+      "jsonText": "{\n  compilerOptions: {\n    strict: true\n  }\n}",
+      "operation": "tsoptions.configParse",
+      "optionNames": [
+        "strict"
+      ],
+      "report": [
+        "errors",
+        "syntax_diagnostics",
+        "options"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_source_file",
+      "case": "config/parse/wildcard-skips-unsupported-extension",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export {}\n",
+        "/project/src/data.json": "{}\n",
+        "/project/src/notes.txt": "hello\n"
+      },
+      "jsonText": "{}",
+      "operation": "tsoptions.configParse",
+      "report": [
+        "file_names",
+        "error_codes"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "option_parser_parse_option",
+      "case": "config/parser/build-parse-option",
+      "operation": "tsoptions.configParse",
+      "parserEntries": [
+        {
+          "key": "verbose",
+          "value": [
+            "bool",
+            true
+          ]
+        },
+        {
+          "key": "notAnOption",
+          "value": [
+            "string",
+            "x"
+          ]
+        },
+        {
+          "key": "dry",
+          "value": [
+            "bool",
+            true
+          ]
+        }
+      ],
+      "parserKind": "build",
+      "subject": "configParse"
+    },
+    {
+      "action": "parser_diagnostics",
+      "case": "config/parser/build-unknown-option-messages",
+      "operation": "tsoptions.configParse",
+      "parserKind": "build",
+      "subject": "configParse"
+    },
+    {
+      "action": "parser_diagnostics",
+      "case": "config/parser/compiler-unknown-option-messages",
+      "operation": "tsoptions.configParse",
+      "parserKind": "compiler",
+      "subject": "configParse"
+    },
+    {
+      "action": "content_mapper_diagnostic_location",
+      "basePath": "/p",
+      "case": "config/parser/content-mapper-option-diagnostic-location",
+      "caseSensitive": true,
+      "configFileName": "tsconfig.json",
+      "currentDirectory": "/p",
+      "files": {
+        "/p/src/a.ts": ""
+      },
+      "jsonText": "{\"contentMappers\":[{\"package\":\"mapper\",\"extensions\":[\".vue\"],\"options\":{\"exec\":[\"node\"]}}],\"runExternalCode\":true}",
+      "operation": "tsoptions.configParse",
+      "optionPath": [
+        {
+          "index": 0,
+          "isIndex": false,
+          "name": "exec"
+        }
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "convert_map_to_options",
+      "case": "config/parser/convert-map-to-options-walks-in-order",
+      "operation": "tsoptions.configParse",
+      "optionNames": [
+        "outDir",
+        "rootDir"
+      ],
+      "parserEntries": [
+        {
+          "key": "outDir",
+          "value": [
+            "string",
+            "/first"
+          ]
+        },
+        {
+          "key": "rootDir",
+          "value": [
+            "string",
+            "/root"
+          ]
+        },
+        {
+          "key": "outDir",
+          "value": [
+            "string",
+            "/second"
+          ]
+        }
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "option_parser_parse_option",
+      "case": "config/parser/typeacquisition-parse-option",
+      "operation": "tsoptions.configParse",
+      "parserEntries": [
+        {
+          "key": "enable",
+          "value": [
+            "bool",
+            true
+          ]
+        },
+        {
+          "key": "notAnOption",
+          "value": [
+            "string",
+            "x"
+          ]
+        },
+        {
+          "key": "include",
+          "value": [
+            "strings",
+            [
+              "a.d.ts",
+              "b.d.ts"
+            ]
+          ]
+        },
+        {
+          "key": "enable",
+          "value": [
+            "bool",
+            false
+          ]
+        }
+      ],
+      "parserKind": "typeAcquisition",
+      "subject": "configParse"
+    },
+    {
+      "action": "parser_diagnostics",
+      "case": "config/parser/typeacquisition-unknown-option-messages",
+      "operation": "tsoptions.configParse",
+      "parserKind": "typeAcquisition",
+      "subject": "configParse"
+    },
+    {
+      "action": "option_parser_parse_option",
+      "case": "config/parser/watch-parse-option",
+      "operation": "tsoptions.configParse",
+      "parserEntries": [
+        {
+          "key": "watchInterval",
+          "value": [
+            "number",
+            250
+          ]
+        },
+        {
+          "key": "notAnOption",
+          "value": [
+            "string",
+            "x"
+          ]
+        },
+        {
+          "key": "excludeFiles",
+          "value": [
+            "strings",
+            [
+              "**/temp"
+            ]
+          ]
+        }
+      ],
+      "parserKind": "watch",
+      "subject": "configParse"
+    },
+    {
+      "action": "parser_diagnostics",
+      "case": "config/parser/watch-unknown-option-messages",
+      "operation": "tsoptions.configParse",
+      "parserKind": "watch",
+      "subject": "configParse"
+    },
+    {
+      "action": "spec_diagnostic",
+      "case": "config/spec/dotdot-after-wildcard-leading",
+      "disallow": true,
+      "operation": "tsoptions.configParse",
+      "spec": "**/a/../b",
+      "subject": "configParse"
+    },
+    {
+      "action": "spec_diagnostic",
+      "case": "config/spec/dotdot-at-end-after-wildcard",
+      "disallow": true,
+      "operation": "tsoptions.configParse",
+      "spec": "a/**/b/..",
+      "subject": "configParse"
+    },
+    {
+      "action": "spec_diagnostic",
+      "case": "config/spec/dotdot-before-wildcard",
+      "disallow": true,
+      "operation": "tsoptions.configParse",
+      "spec": "../a/**/b",
+      "subject": "configParse"
+    },
+    {
+      "action": "spec_diagnostic",
+      "case": "config/spec/not-a-trailing-recursion",
+      "disallow": true,
+      "operation": "tsoptions.configParse",
+      "spec": "a**b",
+      "subject": "configParse"
+    },
+    {
+      "action": "spec_diagnostic",
+      "case": "config/spec/trailing-recursion-allowed",
+      "disallow": false,
+      "operation": "tsoptions.configParse",
+      "spec": "src/**",
+      "subject": "configParse"
+    },
+    {
+      "action": "spec_diagnostic",
+      "case": "config/spec/trailing-recursion-bare",
+      "disallow": true,
+      "operation": "tsoptions.configParse",
+      "spec": "**",
+      "subject": "configParse"
+    },
+    {
+      "action": "spec_diagnostic",
+      "case": "config/spec/trailing-recursion-slash",
+      "disallow": true,
+      "operation": "tsoptions.configParse",
+      "spec": "src/**/",
+      "subject": "configParse"
+    },
+    {
+      "action": "config_specs",
+      "case": "config/specs/extension-priority",
+      "extensions": [
+        [
+          ".ts",
+          ".tsx",
+          ".d.ts",
+          ".js",
+          ".jsx"
+        ],
+        [
+          ".cts",
+          ".d.cts",
+          ".cjs"
+        ]
+      ],
+      "helper": "extension_priority",
+      "operation": "tsoptions.configParse",
+      "present": [
+        "/project/src/a.ts",
+        "/project/src/a.js",
+        "/project/src/a.d.ts"
+      ],
+      "spec": "/project/src/a.d.ts",
+      "subject": "configParse"
+    },
+    {
+      "action": "config_specs",
+      "case": "config/specs/file-names-extra-extension",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "entries": [],
+      "extra": [
+        ".vue"
+      ],
+      "files": {
+        "/project/lib/d.ts": "export {}\n",
+        "/project/src/a.d.ts": "export {}\n",
+        "/project/src/a.ts": "export {}\n",
+        "/project/src/b.tsx": "export {}\n",
+        "/project/src/data.json": "{}\n",
+        "/project/src/e.vue": "<template/>\n",
+        "/project/src/skip/c.ts": "export {}\n"
+      },
+      "filesBefore": [],
+      "helper": "file_names",
+      "includesBefore": [
+        "src/**/*"
+      ],
+      "operation": "tsoptions.configParse",
+      "subject": "configParse",
+      "validatedExcludes": [],
+      "validatedFiles": [],
+      "validatedIncludes": [
+        "src/**/*"
+      ]
+    },
+    {
+      "action": "config_specs",
+      "case": "config/specs/file-names-json-group",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "entries": [
+        [
+          "resolveJsonModule",
+          [
+            "bool",
+            true
+          ]
+        ]
+      ],
+      "extra": [],
+      "files": {
+        "/project/lib/d.ts": "export {}\n",
+        "/project/src/a.d.ts": "export {}\n",
+        "/project/src/a.ts": "export {}\n",
+        "/project/src/b.tsx": "export {}\n",
+        "/project/src/data.json": "{}\n",
+        "/project/src/skip/c.ts": "export {}\n"
+      },
+      "filesBefore": [],
+      "helper": "file_names",
+      "includesBefore": [
+        "src/**/*.ts",
+        "src/**/*.json"
+      ],
+      "operation": "tsoptions.configParse",
+      "subject": "configParse",
+      "validatedExcludes": [],
+      "validatedFiles": [],
+      "validatedIncludes": [
+        "src/**/*.ts",
+        "src/**/*.json"
+      ]
+    },
+    {
+      "action": "config_specs",
+      "case": "config/specs/file-names-literal-and-wildcard",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "entries": [],
+      "extra": [],
+      "files": {
+        "/project/lib/d.ts": "export {}\n",
+        "/project/src/a.d.ts": "export {}\n",
+        "/project/src/a.ts": "export {}\n",
+        "/project/src/b.tsx": "export {}\n",
+        "/project/src/data.json": "{}\n",
+        "/project/src/skip/c.ts": "export {}\n"
+      },
+      "filesBefore": [
+        "/project/lib/d.ts"
+      ],
+      "helper": "file_names",
+      "includesBefore": [
+        "src/**/*"
+      ],
+      "operation": "tsoptions.configParse",
+      "subject": "configParse",
+      "validatedExcludes": [
+        "src/skip"
+      ],
+      "validatedFiles": [
+        "/project/lib/d.ts"
+      ],
+      "validatedIncludes": [
+        "src/**/*"
+      ]
+    },
+    {
+      "action": "config_specs",
+      "case": "config/specs/match-extensionless-exclude",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "filesBefore": [],
+      "helper": "match",
+      "includesBefore": [],
+      "operation": "tsoptions.configParse",
+      "query": [
+        "/project/node_modules",
+        "/project/node_modules/x.ts",
+        "/project/src"
+      ],
+      "subject": "configParse",
+      "validatedExcludes": [
+        "**/node_modules/"
+      ],
+      "validatedFiles": [],
+      "validatedIncludes": []
+    },
+    {
+      "action": "config_specs",
+      "case": "config/specs/match-queries",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "filesBefore": [
+        "${configDir}/lib/d.ts"
+      ],
+      "helper": "match",
+      "includesBefore": [
+        "${configDir}/src/**/*",
+        "other/**/*"
+      ],
+      "operation": "tsoptions.configParse",
+      "query": [
+        "/project/src/a.ts",
+        "/project/src/skip/c.ts",
+        "/project/lib/d.ts",
+        "/project/src/skip",
+        "/project/nowhere/z.ts"
+      ],
+      "subject": "configParse",
+      "validatedExcludes": [
+        "/project/src/skip"
+      ],
+      "validatedFiles": [
+        "/project/lib/d.ts"
+      ],
+      "validatedIncludes": [
+        "/project/src/**/*",
+        "/project/other/**/*"
+      ]
+    },
+    {
+      "action": "syntax_element",
+      "case": "config/syntax/double-quoted-string",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "helper": "double_quoted",
+      "jsonText": "{\n  \"include\": [\"src/**/*\", \"lib/**/*\"],\n  \"compilerOptions\": {\n    \"lib\": [\"es5\", \"dom\"],\n    \"types\": [\"node\"]\n  },\n  \"references\": [{\"path\": \"../other\"}]\n}",
+      "key": "include",
+      "operation": "tsoptions.configParse",
+      "spec": "src/**/*",
+      "subject": "configParse"
+    },
+    {
+      "action": "syntax_element",
+      "case": "config/syntax/options-syntax-by-element",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "helper": "options_syntax",
+      "jsonText": "{\n  \"include\": [\"src/**/*\", \"lib/**/*\"],\n  \"compilerOptions\": {\n    \"lib\": [\"es5\", \"dom\"],\n    \"types\": [\"node\"]\n  },\n  \"references\": [{\"path\": \"../other\"}]\n}",
+      "key": "include",
+      "operation": "tsoptions.configParse",
+      "spec": "src/**/*",
+      "subject": "configParse"
+    },
+    {
+      "action": "syntax_element",
+      "case": "config/syntax/prop-array-element",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "helper": "prop_array_element",
+      "jsonText": "{\n  \"include\": [\"src/**/*\", \"lib/**/*\"],\n  \"compilerOptions\": {\n    \"lib\": [\"es5\", \"dom\"],\n    \"types\": [\"node\"]\n  },\n  \"references\": [{\"path\": \"../other\"}]\n}",
+      "key": "include",
+      "operation": "tsoptions.configParse",
+      "spec": "lib/**/*",
+      "subject": "configParse"
+    },
+    {
+      "action": "syntax_element",
+      "case": "config/syntax/prop-array-element-miss",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "helper": "prop_array_element",
+      "jsonText": "{\n  \"include\": [\"src/**/*\", \"lib/**/*\"],\n  \"compilerOptions\": {\n    \"lib\": [\"es5\", \"dom\"],\n    \"types\": [\"node\"]\n  },\n  \"references\": [{\"path\": \"../other\"}]\n}",
+      "key": "include",
+      "operation": "tsoptions.configParse",
+      "spec": "absent/**/*",
+      "subject": "configParse"
+    },
+    {
+      "action": "reference_syntax",
+      "case": "config/syntax/reference-diagnostic",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/src/a.ts": "export {}\n"
+      },
+      "index": 0,
+      "jsonText": "{\n  \"include\": [\"src/**/*\", \"lib/**/*\"],\n  \"compilerOptions\": {\n    \"lib\": [\"es5\", \"dom\"],\n    \"types\": [\"node\"]\n  },\n  \"references\": [{\"path\": \"../other\"}]\n}",
+      "operation": "tsoptions.configParse",
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_config_text",
+      "case": "config/text/empty-and-missing-arrays",
+      "caseSensitive": true,
+      "configFileName": "/apath/tsconfig.json",
+      "currentDirectory": "/apath",
+      "jsonText": "{\"empty\":[],\"allNull\":[null,null]}",
+      "operation": "tsoptions.configParse",
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_config_text",
+      "case": "config/text/empty-text",
+      "caseSensitive": true,
+      "configFileName": "/apath/tsconfig.json",
+      "currentDirectory": "/apath",
+      "jsonText": "",
+      "operation": "tsoptions.configParse",
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_config_text",
+      "case": "config/text/jsconfig-root-value-name",
+      "caseSensitive": true,
+      "configFileName": "/apath/jsconfig.json",
+      "currentDirectory": "/apath",
+      "jsonText": "42",
+      "operation": "tsoptions.configParse",
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_config_text",
+      "case": "config/text/property-value-not-allowed",
+      "caseSensitive": true,
+      "configFileName": "/apath/tsconfig.json",
+      "currentDirectory": "/apath",
+      "jsonText": "{\"a\": foo()}",
+      "operation": "tsoptions.configParse",
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_config_text",
+      "case": "config/text/root-value-not-object",
+      "caseSensitive": true,
+      "configFileName": "/apath/tsconfig.json",
+      "currentDirectory": "/apath",
+      "jsonText": "[1, 2]",
+      "operation": "tsoptions.configParse",
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_config_text",
+      "case": "config/text/scalars-and-nesting",
+      "caseSensitive": true,
+      "configFileName": "/apath/tsconfig.json",
+      "currentDirectory": "/apath",
+      "jsonText": "{\"s\":\"x\",\"t\":true,\"f\":false,\"n\":null,\"i\":12,\"neg\":-3,\"e\":1e3,\"frac\":1.5,\"arr\":[1,\"two\",null],\"obj\":{\"k\":[]}}",
+      "operation": "tsoptions.configParse",
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_config_text",
+      "case": "config/text/unquoted-key-diagnostic",
+      "caseSensitive": true,
+      "configFileName": "/apath/tsconfig.json",
+      "currentDirectory": "/apath",
+      "jsonText": "{\n  compilerOptions: {\n    strict: true\n  }\n}",
+      "operation": "tsoptions.configParse",
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_value",
+      "case": "config/value/content-mapper-invalid",
+      "helper": "content_mapper",
+      "operation": "tsoptions.configParse",
+      "subject": "configParse",
+      "value": [
+        "object",
+        [
+          [
+            "extensions",
+            [
+              "string",
+              ".vue"
+            ]
+          ],
+          [
+            "options",
+            [
+              "number",
+              3
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "action": "parse_value",
+      "case": "config/value/content-mapper-valid",
+      "helper": "content_mapper",
+      "operation": "tsoptions.configParse",
+      "subject": "configParse",
+      "value": [
+        "object",
+        [
+          [
+            "package",
+            [
+              "string",
+              "mapper-pkg"
+            ]
+          ],
+          [
+            "extensions",
+            [
+              "array",
+              [
+                [
+                  "string",
+                  ".vue"
+                ]
+              ]
+            ]
+          ],
+          [
+            "options",
+            [
+              "object",
+              [
+                [
+                  "tag",
+                  [
+                    "string",
+                    "x"
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "action": "parse_value",
+      "case": "config/value/is-compiler-options-value-list",
+      "helper": "is_option_value",
+      "name": "lib",
+      "operation": "tsoptions.configParse",
+      "subject": "configParse",
+      "value": [
+        "array",
+        [
+          [
+            "string",
+            "es5"
+          ]
+        ]
+      ]
+    },
+    {
+      "action": "parse_value",
+      "case": "config/value/is-compiler-options-value-null",
+      "helper": "is_option_value",
+      "name": "strict",
+      "operation": "tsoptions.configParse",
+      "subject": "configParse",
+      "value": [
+        "null"
+      ]
+    },
+    {
+      "action": "parse_value",
+      "case": "config/value/is-compiler-options-value-number",
+      "helper": "is_option_value",
+      "name": "maxNodeModuleJsDepth",
+      "operation": "tsoptions.configParse",
+      "subject": "configParse",
+      "value": [
+        "number",
+        2
+      ]
+    },
+    {
+      "action": "parse_value",
+      "case": "config/value/is-string-value",
+      "helper": "is_string_value",
+      "operation": "tsoptions.configParse",
+      "subject": "configParse",
+      "value": [
+        "number",
+        1
+      ]
+    },
+    {
+      "action": "parse_value",
+      "case": "config/value/number-float",
+      "helper": "number",
+      "operation": "tsoptions.configParse",
+      "subject": "configParse",
+      "value": [
+        "number",
+        2.9
+      ]
+    },
+    {
+      "action": "parse_value",
+      "case": "config/value/number-refuses-string",
+      "helper": "number",
+      "operation": "tsoptions.configParse",
+      "subject": "configParse",
+      "value": [
+        "string",
+        "2"
+      ]
+    },
+    {
+      "action": "parse_value",
+      "case": "config/value/project-reference-flags",
+      "helper": "project_reference",
+      "operation": "tsoptions.configParse",
+      "subject": "configParse",
+      "value": [
+        "object",
+        [
+          [
+            "path",
+            [
+              "number",
+              1
+            ]
+          ],
+          [
+            "circular",
+            [
+              "bool",
+              true
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "action": "parse_value",
+      "case": "config/value/string-array-not-an-array",
+      "helper": "string_array",
+      "operation": "tsoptions.configParse",
+      "subject": "configParse",
+      "value": [
+        "string",
+        "a"
+      ]
+    },
+    {
+      "action": "parse_value",
+      "case": "config/value/string-array-of-any",
+      "helper": "string_array",
+      "operation": "tsoptions.configParse",
+      "subject": "configParse",
+      "value": [
+        "array",
+        [
+          [
+            "string",
+            "a"
+          ],
+          [
+            "number",
+            1
+          ],
+          [
+            "string",
+            "b"
+          ],
+          [
+            "null"
+          ]
+        ]
+      ]
+    },
+    {
+      "action": "parse_value",
+      "case": "config/value/string-array-strict-accepts",
+      "helper": "string_array_strict",
+      "operation": "tsoptions.configParse",
+      "subject": "configParse",
+      "value": [
+        "array",
+        [
+          [
+            "string",
+            ".a"
+          ],
+          [
+            "string",
+            ".b"
+          ]
+        ]
+      ]
+    },
+    {
+      "action": "parse_value",
+      "case": "config/value/string-array-strict-refuses",
+      "helper": "string_array_strict",
+      "operation": "tsoptions.configParse",
+      "subject": "configParse",
+      "value": [
+        "array",
+        [
+          [
+            "string",
+            ".a"
+          ],
+          [
+            "number",
+            1
+          ]
+        ]
+      ]
+    },
+    {
+      "action": "parse_value",
+      "case": "config/value/string-map",
+      "helper": "string_map",
+      "operation": "tsoptions.configParse",
+      "subject": "configParse",
+      "value": [
+        "object",
+        [
+          [
+            "@a/*",
+            [
+              "array",
+              [
+                [
+                  "string",
+                  "src/a/*"
+                ]
+              ]
+            ]
+          ],
+          [
+            "@b/*",
+            [
+              "array",
+              [
+                [
+                  "string",
+                  "src/b/*"
+                ],
+                [
+                  "number",
+                  2
+                ]
+              ]
+            ]
+          ],
+          [
+            "@c/*",
+            [
+              "string",
+              "not an array"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "action": "parse_value",
+      "case": "config/value/tristate",
+      "helper": "tristate",
+      "operation": "tsoptions.configParse",
+      "subject": "configParse",
+      "value": [
+        "string",
+        "true"
+      ]
+    },
+    {
+      "action": "parse_value",
+      "case": "config/value/tristate-null",
+      "helper": "tristate",
+      "operation": "tsoptions.configParse",
+      "subject": "configParse",
+      "value": [
+        "null"
+      ]
+    },
+    {
+      "action": "wildcard_directories",
+      "case": "config/wildcard/case-insensitive-key",
+      "caseSensitive": false,
+      "currentDirectory": "/project",
+      "exclude": [],
+      "include": [
+        "Src/*.ts",
+        "src/**/*.ts"
+      ],
+      "operation": "tsoptions.configParse",
+      "subject": "configParse"
+    },
+    {
+      "action": "wildcard_directories",
+      "case": "config/wildcard/excluded-and-contained",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "exclude": [
+        "skip"
+      ],
+      "include": [
+        "src/**/*.ts",
+        "src/nested/*.ts",
+        "skip/**/*.ts"
+      ],
+      "operation": "tsoptions.configParse",
+      "subject": "configParse"
+    },
+    {
+      "action": "wildcard_directories",
+      "case": "config/wildcard/implicit-glob-directory",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "exclude": [],
+      "include": [
+        "src"
+      ],
+      "operation": "tsoptions.configParse",
+      "subject": "configParse"
+    },
+    {
+      "action": "wildcard_directories",
+      "case": "config/wildcard/recursive-and-direct",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "exclude": [],
+      "include": [
+        "src/**/*.ts",
+        "lib/*.ts",
+        "assets/a?z"
+      ],
+      "operation": "tsoptions.configParse",
+      "subject": "configParse"
+    }
+  ]
+}

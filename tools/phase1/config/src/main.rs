@@ -22,6 +22,8 @@ use serde_json::{json, Map, Value};
 #[allow(dead_code)]
 mod api;
 mod commandline;
+mod commandlineops;
+mod configparse;
 mod diagwriter;
 mod module;
 mod packagejson;
@@ -36,6 +38,8 @@ type GroupHandler = fn(&Value) -> Option<Outcome>;
 /// Group modules, tried in order. The first to claim a request answers it.
 const GROUPS: &[(&str, GroupHandler)] = &[
     ("commandline", commandline::observe),
+    ("commandlineops", commandlineops::observe),
+    ("configparse", configparse::observe),
     ("module", module::observe),
     ("packagejson", packagejson::observe),
     ("diagwriter", diagwriter::observe),

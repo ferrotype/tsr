@@ -1,0 +1,3230 @@
+{
+  "family": "config",
+  "requests": [
+    {
+      "actions": [
+        {
+          "name": "target",
+          "op": "option_declaration",
+          "table": "compiler"
+        },
+        {
+          "name": "module",
+          "op": "option_declaration",
+          "table": "compiler"
+        },
+        {
+          "name": "moduleResolution",
+          "op": "option_declaration",
+          "table": "compiler"
+        },
+        {
+          "name": "jsx",
+          "op": "option_declaration",
+          "table": "compiler"
+        },
+        {
+          "name": "newLine",
+          "op": "option_declaration",
+          "table": "compiler"
+        },
+        {
+          "name": "moduleDetection",
+          "op": "option_declaration",
+          "table": "compiler"
+        },
+        {
+          "name": "watchFile",
+          "op": "option_declaration",
+          "table": "watch"
+        },
+        {
+          "name": "watchDirectory",
+          "op": "option_declaration",
+          "table": "watch"
+        },
+        {
+          "name": "fallbackPolling",
+          "op": "option_declaration",
+          "table": "watch"
+        }
+      ],
+      "case": "config/commandlineops/declaration-enum-maps-keep-their-order",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "operation": "tsoptions.commandLineOps",
+      "order_sensitive": true,
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "name": "lib",
+          "op": "option_declaration",
+          "table": "compiler"
+        },
+        {
+          "name": "types",
+          "op": "option_declaration",
+          "table": "compiler"
+        },
+        {
+          "name": "typeRoots",
+          "op": "option_declaration",
+          "table": "compiler"
+        },
+        {
+          "name": "rootDirs",
+          "op": "option_declaration",
+          "table": "compiler"
+        },
+        {
+          "name": "moduleSuffixes",
+          "op": "option_declaration",
+          "table": "compiler"
+        },
+        {
+          "name": "customConditions",
+          "op": "option_declaration",
+          "table": "compiler"
+        },
+        {
+          "name": "plugins",
+          "op": "option_declaration",
+          "table": "compiler"
+        },
+        {
+          "name": "excludeDirectories",
+          "op": "option_declaration",
+          "table": "watch"
+        },
+        {
+          "name": "excludeFiles",
+          "op": "option_declaration",
+          "table": "watch"
+        },
+        {
+          "name": "files",
+          "op": "option_declaration",
+          "table": "root"
+        },
+        {
+          "name": "include",
+          "op": "option_declaration",
+          "table": "root"
+        },
+        {
+          "name": "exclude",
+          "op": "option_declaration",
+          "table": "root"
+        },
+        {
+          "name": "references",
+          "op": "option_declaration",
+          "table": "root"
+        },
+        {
+          "name": "extends",
+          "op": "option_declaration",
+          "table": "root"
+        },
+        {
+          "name": "strict",
+          "op": "option_declaration",
+          "table": "compiler"
+        },
+        {
+          "name": "paths",
+          "op": "option_declaration",
+          "table": "compiler"
+        },
+        {
+          "name": "outDir",
+          "op": "option_declaration",
+          "table": "compiler"
+        },
+        {
+          "name": "target",
+          "op": "option_declaration",
+          "table": "compiler"
+        },
+        {
+          "name": "maxNodeModuleJsDepth",
+          "op": "option_declaration",
+          "table": "compiler"
+        },
+        {
+          "name": "compileOnSave",
+          "op": "option_declaration",
+          "table": "root"
+        },
+        {
+          "name": "verbose",
+          "op": "option_declaration",
+          "table": "build"
+        },
+        {
+          "name": "builders",
+          "op": "option_declaration",
+          "table": "build"
+        }
+      ],
+      "case": "config/commandlineops/declaration-elements-only-for-list-options",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "operation": "tsoptions.commandLineOps",
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "name": "extends",
+          "op": "option_declaration",
+          "table": "root"
+        },
+        {
+          "name": "files",
+          "op": "option_declaration",
+          "table": "root"
+        },
+        {
+          "name": "strict",
+          "op": "option_declaration",
+          "table": "compiler"
+        },
+        {
+          "name": "paths",
+          "op": "option_declaration",
+          "table": "compiler"
+        },
+        {
+          "name": "build",
+          "op": "option_declaration",
+          "table": "build"
+        }
+      ],
+      "case": "config/commandlineops/declaration-extends-is-the-only-option-disallowing-null",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "operation": "tsoptions.commandLineOps",
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "name": "strict",
+          "op": "option_value_type_string",
+          "table": "compiler"
+        },
+        {
+          "name": "outDir",
+          "op": "option_value_type_string",
+          "table": "compiler"
+        },
+        {
+          "name": "maxNodeModuleJsDepth",
+          "op": "option_value_type_string",
+          "table": "compiler"
+        },
+        {
+          "name": "target",
+          "op": "option_value_type_string",
+          "table": "compiler"
+        },
+        {
+          "name": "lib",
+          "op": "option_value_type_string",
+          "table": "compiler"
+        },
+        {
+          "name": "paths",
+          "op": "option_value_type_string",
+          "table": "compiler"
+        },
+        {
+          "name": "excludeDirectories",
+          "op": "option_value_type_string",
+          "table": "watch"
+        },
+        {
+          "name": "extends",
+          "op": "option_value_type_string",
+          "table": "root"
+        },
+        {
+          "name": "references",
+          "op": "option_value_type_string",
+          "table": "root"
+        }
+      ],
+      "case": "config/commandlineops/value-type-string-per-option-kind",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "operation": "tsoptions.commandLineOps",
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "name": "target",
+          "op": "format_enum_type_keys",
+          "table": "compiler"
+        },
+        {
+          "name": "module",
+          "op": "format_enum_type_keys",
+          "table": "compiler"
+        },
+        {
+          "name": "moduleResolution",
+          "op": "format_enum_type_keys",
+          "table": "compiler"
+        },
+        {
+          "name": "jsx",
+          "op": "format_enum_type_keys",
+          "table": "compiler"
+        },
+        {
+          "name": "newLine",
+          "op": "format_enum_type_keys",
+          "table": "compiler"
+        },
+        {
+          "name": "watchFile",
+          "op": "format_enum_type_keys",
+          "table": "watch"
+        }
+      ],
+      "case": "config/commandlineops/enum-type-keys-drop-deprecated-spellings",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "operation": "tsoptions.commandLineOps",
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "allowShort": true,
+          "name": "t",
+          "op": "name_map",
+          "table": "compiler"
+        },
+        {
+          "allowShort": false,
+          "name": "t",
+          "op": "name_map",
+          "table": "compiler"
+        },
+        {
+          "allowShort": true,
+          "name": "T",
+          "op": "name_map",
+          "table": "compiler"
+        },
+        {
+          "allowShort": false,
+          "name": "T",
+          "op": "name_map",
+          "table": "compiler"
+        },
+        {
+          "allowShort": true,
+          "name": "w",
+          "op": "name_map",
+          "table": "compiler"
+        },
+        {
+          "allowShort": false,
+          "name": "w",
+          "op": "name_map",
+          "table": "compiler"
+        },
+        {
+          "allowShort": true,
+          "name": "p",
+          "op": "name_map",
+          "table": "compiler"
+        },
+        {
+          "allowShort": false,
+          "name": "p",
+          "op": "name_map",
+          "table": "compiler"
+        },
+        {
+          "allowShort": true,
+          "name": "h",
+          "op": "name_map",
+          "table": "compiler"
+        },
+        {
+          "allowShort": false,
+          "name": "h",
+          "op": "name_map",
+          "table": "compiler"
+        },
+        {
+          "allowShort": true,
+          "name": "?",
+          "op": "name_map",
+          "table": "compiler"
+        },
+        {
+          "allowShort": false,
+          "name": "?",
+          "op": "name_map",
+          "table": "compiler"
+        },
+        {
+          "allowShort": true,
+          "name": "i",
+          "op": "name_map",
+          "table": "compiler"
+        },
+        {
+          "allowShort": false,
+          "name": "i",
+          "op": "name_map",
+          "table": "compiler"
+        },
+        {
+          "allowShort": true,
+          "name": "d",
+          "op": "name_map",
+          "table": "compiler"
+        },
+        {
+          "allowShort": false,
+          "name": "d",
+          "op": "name_map",
+          "table": "compiler"
+        },
+        {
+          "allowShort": true,
+          "name": "m",
+          "op": "name_map",
+          "table": "compiler"
+        },
+        {
+          "allowShort": false,
+          "name": "m",
+          "op": "name_map",
+          "table": "compiler"
+        },
+        {
+          "allowShort": true,
+          "name": "q",
+          "op": "name_map",
+          "table": "compiler"
+        },
+        {
+          "allowShort": false,
+          "name": "q",
+          "op": "name_map",
+          "table": "compiler"
+        },
+        {
+          "allowShort": true,
+          "name": "v",
+          "op": "name_map",
+          "table": "compiler"
+        },
+        {
+          "allowShort": false,
+          "name": "v",
+          "op": "name_map",
+          "table": "compiler"
+        },
+        {
+          "allowShort": false,
+          "name": "target",
+          "op": "name_map",
+          "table": "compiler"
+        },
+        {
+          "allowShort": false,
+          "name": "TARGET",
+          "op": "name_map",
+          "table": "compiler"
+        },
+        {
+          "allowShort": false,
+          "name": "TaRgEt",
+          "op": "name_map",
+          "table": "compiler"
+        },
+        {
+          "allowShort": false,
+          "name": "moduleResolution",
+          "op": "name_map",
+          "table": "compiler"
+        },
+        {
+          "allowShort": false,
+          "name": "MODULERESOLUTION",
+          "op": "name_map",
+          "table": "compiler"
+        },
+        {
+          "allowShort": true,
+          "name": "zzz",
+          "op": "name_map",
+          "table": "compiler"
+        },
+        {
+          "allowShort": true,
+          "name": "",
+          "op": "name_map",
+          "table": "compiler"
+        },
+        {
+          "allowShort": true,
+          "name": "-",
+          "op": "name_map",
+          "table": "compiler"
+        },
+        {
+          "allowShort": true,
+          "name": "--",
+          "op": "name_map",
+          "table": "compiler"
+        },
+        {
+          "allowShort": true,
+          "name": "targt",
+          "op": "name_map",
+          "table": "compiler"
+        }
+      ],
+      "case": "config/commandlineops/name-map-short-names-case-folding-and-misses",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "operation": "tsoptions.commandLineOps",
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "allowShort": true,
+          "name": "b",
+          "op": "name_map",
+          "table": "build"
+        },
+        {
+          "allowShort": true,
+          "name": "build",
+          "op": "name_map",
+          "table": "build"
+        },
+        {
+          "allowShort": true,
+          "name": "verbose",
+          "op": "name_map",
+          "table": "build"
+        },
+        {
+          "allowShort": true,
+          "name": "v",
+          "op": "name_map",
+          "table": "build"
+        },
+        {
+          "allowShort": true,
+          "name": "d",
+          "op": "name_map",
+          "table": "build"
+        },
+        {
+          "allowShort": true,
+          "name": "f",
+          "op": "name_map",
+          "table": "build"
+        },
+        {
+          "allowShort": true,
+          "name": "clean",
+          "op": "name_map",
+          "table": "build"
+        },
+        {
+          "allowShort": true,
+          "name": "builders",
+          "op": "name_map",
+          "table": "build"
+        },
+        {
+          "allowShort": true,
+          "name": "stopBuildOnErrors",
+          "op": "name_map",
+          "table": "build"
+        },
+        {
+          "allowShort": true,
+          "name": "locale",
+          "op": "name_map",
+          "table": "build"
+        },
+        {
+          "allowShort": true,
+          "name": "incremental",
+          "op": "name_map",
+          "table": "build"
+        }
+      ],
+      "case": "config/commandlineops/name-map-over-the-build-table",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "operation": "tsoptions.commandLineOps",
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "allowShort": true,
+          "name": "watchFile",
+          "op": "name_map",
+          "table": "watch"
+        },
+        {
+          "allowShort": true,
+          "name": "watchDirectory",
+          "op": "name_map",
+          "table": "watch"
+        },
+        {
+          "allowShort": true,
+          "name": "fallbackPolling",
+          "op": "name_map",
+          "table": "watch"
+        },
+        {
+          "allowShort": true,
+          "name": "watchInterval",
+          "op": "name_map",
+          "table": "watch"
+        },
+        {
+          "allowShort": true,
+          "name": "excludeDirectories",
+          "op": "name_map",
+          "table": "watch"
+        },
+        {
+          "allowShort": true,
+          "name": "excludeFiles",
+          "op": "name_map",
+          "table": "watch"
+        },
+        {
+          "allowShort": true,
+          "name": "synchronousWatchDirectory",
+          "op": "name_map",
+          "table": "watch"
+        },
+        {
+          "allowShort": true,
+          "name": "strict",
+          "op": "name_map",
+          "table": "watch"
+        },
+        {
+          "allowShort": true,
+          "name": "target",
+          "op": "name_map",
+          "table": "watch"
+        }
+      ],
+      "case": "config/commandlineops/name-map-over-the-watch-table",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "operation": "tsoptions.commandLineOps",
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "name": "extends",
+          "op": "parse_list_type_option",
+          "table": "root",
+          "value": ""
+        },
+        {
+          "name": "extends",
+          "op": "parse_list_type_option",
+          "table": "root",
+          "value": "  "
+        },
+        {
+          "name": "extends",
+          "op": "parse_list_type_option",
+          "table": "root",
+          "value": "\t"
+        }
+      ],
+      "case": "config/commandlineops/list-option-empty-value-for-a-listorelement",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "operation": "tsoptions.commandLineOps",
+      "order_sensitive": true,
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "name": "types",
+          "op": "parse_list_type_option",
+          "table": "compiler",
+          "value": ""
+        },
+        {
+          "name": "types",
+          "op": "parse_list_type_option",
+          "table": "compiler",
+          "value": "  "
+        },
+        {
+          "name": "lib",
+          "op": "parse_list_type_option",
+          "table": "compiler",
+          "value": ""
+        }
+      ],
+      "case": "config/commandlineops/list-option-empty-value-for-a-plain-list",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "operation": "tsoptions.commandLineOps",
+      "order_sensitive": true,
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "name": "extends",
+          "op": "parse_list_type_option",
+          "table": "root",
+          "value": "a,b,c"
+        },
+        {
+          "name": "types",
+          "op": "parse_list_type_option",
+          "table": "compiler",
+          "value": "node,jest"
+        },
+        {
+          "name": "typeRoots",
+          "op": "parse_list_type_option",
+          "table": "compiler",
+          "value": "one,two,three"
+        },
+        {
+          "name": "extends",
+          "op": "parse_list_type_option",
+          "table": "root",
+          "value": "./base"
+        },
+        {
+          "name": "extends",
+          "op": "parse_list_type_option",
+          "table": "root",
+          "value": "base.json"
+        },
+        {
+          "name": "extends",
+          "op": "parse_list_type_option",
+          "table": "root",
+          "value": " ./base "
+        }
+      ],
+      "case": "config/commandlineops/list-option-splits-on-commas-in-order",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "operation": "tsoptions.commandLineOps",
+      "order_sensitive": true,
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "name": "types",
+          "op": "parse_list_type_option",
+          "table": "compiler",
+          "value": "a,,b"
+        },
+        {
+          "name": "types",
+          "op": "parse_list_type_option",
+          "table": "compiler",
+          "value": ","
+        },
+        {
+          "name": "types",
+          "op": "parse_list_type_option",
+          "table": "compiler",
+          "value": ",,"
+        },
+        {
+          "name": "types",
+          "op": "parse_list_type_option",
+          "table": "compiler",
+          "value": "a,"
+        },
+        {
+          "name": "types",
+          "op": "parse_list_type_option",
+          "table": "compiler",
+          "value": ",a"
+        }
+      ],
+      "case": "config/commandlineops/list-option-drops-empty-entries",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "operation": "tsoptions.commandLineOps",
+      "order_sensitive": true,
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "name": "types",
+          "op": "parse_list_type_option",
+          "table": "compiler",
+          "value": "-x"
+        },
+        {
+          "name": "extends",
+          "op": "parse_list_type_option",
+          "table": "root",
+          "value": "--strict"
+        },
+        {
+          "name": "lib",
+          "op": "parse_list_type_option",
+          "table": "compiler",
+          "value": "-"
+        }
+      ],
+      "case": "config/commandlineops/list-option-leading-dash-answers-an-empty-list",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "operation": "tsoptions.commandLineOps",
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "name": "lib",
+          "op": "parse_list_type_option",
+          "table": "compiler",
+          "value": "es5,bogus,es2015"
+        },
+        {
+          "name": "lib",
+          "op": "parse_list_type_option",
+          "table": "compiler",
+          "value": "ES5"
+        },
+        {
+          "name": "lib",
+          "op": "parse_list_type_option",
+          "table": "compiler",
+          "value": "bogus,alsobogus"
+        }
+      ],
+      "case": "config/commandlineops/list-option-enum-elements-report-the-allowed-keys",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "operation": "tsoptions.commandLineOps",
+      "order_sensitive": true,
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "name": "references",
+          "op": "parse_list_type_option",
+          "table": "root",
+          "value": "a,b"
+        },
+        {
+          "name": "plugins",
+          "op": "parse_list_type_option",
+          "table": "compiler",
+          "value": "a,b"
+        }
+      ],
+      "case": "config/commandlineops/list-option-object-elements-are-refused",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "operation": "tsoptions.commandLineOps",
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "op": "lib_file_name",
+          "value": "es5"
+        },
+        {
+          "op": "lib_file_name",
+          "value": "ES2015"
+        },
+        {
+          "op": "lib_file_name",
+          "value": "es6"
+        },
+        {
+          "op": "lib_file_name",
+          "value": "esnext"
+        },
+        {
+          "op": "lib_file_name",
+          "value": "lib.es2015.d.ts"
+        },
+        {
+          "op": "lib_file_name",
+          "value": "LIB.ES2015.D.TS"
+        },
+        {
+          "op": "lib_file_name",
+          "value": "dom.iterable"
+        },
+        {
+          "op": "lib_file_name",
+          "value": "lib.dom.d.ts"
+        },
+        {
+          "op": "lib_file_name",
+          "value": "nope"
+        },
+        {
+          "op": "lib_file_name",
+          "value": ""
+        },
+        {
+          "op": "lib_file_name",
+          "value": "lib.nope.d.ts"
+        }
+      ],
+      "case": "config/commandlineops/lib-file-name-accepts-a-lib-name-or-a-lib-file-name",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "operation": "tsoptions.commandLineOps",
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "op": "default_lib_file_name",
+          "target": 0
+        },
+        {
+          "op": "default_lib_file_name",
+          "target": 1
+        },
+        {
+          "op": "default_lib_file_name",
+          "target": 2
+        },
+        {
+          "op": "default_lib_file_name",
+          "target": 3
+        },
+        {
+          "op": "default_lib_file_name",
+          "target": 9
+        },
+        {
+          "op": "default_lib_file_name",
+          "target": 12
+        },
+        {
+          "op": "default_lib_file_name",
+          "target": 99
+        },
+        {
+          "op": "default_lib_file_name",
+          "target": 100
+        },
+        {
+          "op": "default_lib_file_name",
+          "target": 7
+        }
+      ],
+      "case": "config/commandlineops/default-lib-file-name-per-script-target",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "operation": "tsoptions.commandLineOps",
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "args": [
+            "a.ts",
+            "--strict",
+            "b.ts",
+            "--target",
+            "es5",
+            "c.ts"
+          ],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [
+            "--strict",
+            "--target",
+            "es5"
+          ],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [
+            "a.ts",
+            "b.ts"
+          ],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [
+            "",
+            "a.ts",
+            ""
+          ],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [
+            "--strict",
+            "",
+            "b.ts"
+          ],
+          "op": "parse_command_line"
+        }
+      ],
+      "case": "config/commandlineops/parse-command-line-separates-options-from-file-names",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/a.ts": "",
+        "/project/b.ts": "",
+        "/project/cycle.txt": "@cycle.txt --strict",
+        "/project/empty.txt": "",
+        "/project/inner.txt": "--strict b.ts",
+        "/project/outer.txt": "@inner.txt a.ts",
+        "/project/quote.txt": "\"--target\" \"es2015\"\n  b.ts  ",
+        "/project/rsp.txt": "--target es5 \"a b.ts\"",
+        "/project/sub/nested.txt": "--noEmit",
+        "/project/unterminated.txt": "\"abc"
+      },
+      "operation": "tsoptions.commandLineOps",
+      "order_sensitive": true,
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "args": [
+            "--strict",
+            "true"
+          ],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [
+            "--strict",
+            "false"
+          ],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [
+            "--strict",
+            "maybe"
+          ],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [
+            "--strict"
+          ],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [
+            "--strict",
+            "--noEmit"
+          ],
+          "op": "parse_command_line"
+        }
+      ],
+      "case": "config/commandlineops/parse-command-line-boolean-option-consumes-only-true-or-false",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/a.ts": "",
+        "/project/b.ts": "",
+        "/project/cycle.txt": "@cycle.txt --strict",
+        "/project/empty.txt": "",
+        "/project/inner.txt": "--strict b.ts",
+        "/project/outer.txt": "@inner.txt a.ts",
+        "/project/quote.txt": "\"--target\" \"es2015\"\n  b.ts  ",
+        "/project/rsp.txt": "--target es5 \"a b.ts\"",
+        "/project/sub/nested.txt": "--noEmit",
+        "/project/unterminated.txt": "\"abc"
+      },
+      "operation": "tsoptions.commandLineOps",
+      "order_sensitive": true,
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "args": [
+            "--maxNodeModuleJsDepth",
+            "2"
+          ],
+          "op": "parse_command_line",
+          "options": [
+            "maxNodeModuleJsDepth"
+          ]
+        },
+        {
+          "args": [
+            "--maxNodeModuleJsDepth",
+            "-1"
+          ],
+          "op": "parse_command_line",
+          "options": [
+            "maxNodeModuleJsDepth"
+          ]
+        },
+        {
+          "args": [
+            "--maxNodeModuleJsDepth",
+            "0"
+          ],
+          "op": "parse_command_line",
+          "options": [
+            "maxNodeModuleJsDepth"
+          ]
+        },
+        {
+          "args": [
+            "--maxNodeModuleJsDepth",
+            "nope"
+          ],
+          "op": "parse_command_line",
+          "options": [
+            "maxNodeModuleJsDepth"
+          ]
+        },
+        {
+          "args": [
+            "--maxNodeModuleJsDepth",
+            "2.5"
+          ],
+          "op": "parse_command_line",
+          "options": [
+            "maxNodeModuleJsDepth"
+          ]
+        }
+      ],
+      "case": "config/commandlineops/parse-command-line-number-option-honours-its-minimum",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/a.ts": "",
+        "/project/b.ts": "",
+        "/project/cycle.txt": "@cycle.txt --strict",
+        "/project/empty.txt": "",
+        "/project/inner.txt": "--strict b.ts",
+        "/project/outer.txt": "@inner.txt a.ts",
+        "/project/quote.txt": "\"--target\" \"es2015\"\n  b.ts  ",
+        "/project/rsp.txt": "--target es5 \"a b.ts\"",
+        "/project/sub/nested.txt": "--noEmit",
+        "/project/unterminated.txt": "\"abc"
+      },
+      "operation": "tsoptions.commandLineOps",
+      "order_sensitive": true,
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "args": [
+            "--outDir"
+          ],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [
+            "--types"
+          ],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [
+            "--target"
+          ],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [
+            "--maxNodeModuleJsDepth"
+          ],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [
+            "--strict"
+          ],
+          "op": "parse_command_line"
+        }
+      ],
+      "case": "config/commandlineops/parse-command-line-missing-argument-names-the-expected-type",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/a.ts": "",
+        "/project/b.ts": "",
+        "/project/cycle.txt": "@cycle.txt --strict",
+        "/project/empty.txt": "",
+        "/project/inner.txt": "--strict b.ts",
+        "/project/outer.txt": "@inner.txt a.ts",
+        "/project/quote.txt": "\"--target\" \"es2015\"\n  b.ts  ",
+        "/project/rsp.txt": "--target es5 \"a b.ts\"",
+        "/project/sub/nested.txt": "--noEmit",
+        "/project/unterminated.txt": "\"abc"
+      },
+      "operation": "tsoptions.commandLineOps",
+      "order_sensitive": true,
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "args": [
+            "--types",
+            "node,jest",
+            "a.ts"
+          ],
+          "op": "parse_command_line",
+          "options": [
+            "types",
+            "lib"
+          ]
+        },
+        {
+          "args": [
+            "--types",
+            "-x",
+            "a.ts"
+          ],
+          "op": "parse_command_line",
+          "options": [
+            "types",
+            "lib"
+          ]
+        },
+        {
+          "args": [
+            "--types",
+            "",
+            "a.ts"
+          ],
+          "op": "parse_command_line",
+          "options": [
+            "types",
+            "lib"
+          ]
+        },
+        {
+          "args": [
+            "--lib",
+            "es5,es2015"
+          ],
+          "op": "parse_command_line",
+          "options": [
+            "types",
+            "lib"
+          ]
+        }
+      ],
+      "case": "config/commandlineops/parse-command-line-list-option-takes-one-comma-separated-argument",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/a.ts": "",
+        "/project/b.ts": "",
+        "/project/cycle.txt": "@cycle.txt --strict",
+        "/project/empty.txt": "",
+        "/project/inner.txt": "--strict b.ts",
+        "/project/outer.txt": "@inner.txt a.ts",
+        "/project/quote.txt": "\"--target\" \"es2015\"\n  b.ts  ",
+        "/project/rsp.txt": "--target es5 \"a b.ts\"",
+        "/project/sub/nested.txt": "--noEmit",
+        "/project/unterminated.txt": "\"abc"
+      },
+      "operation": "tsoptions.commandLineOps",
+      "order_sensitive": true,
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "args": [
+            "--paths",
+            "x"
+          ],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [
+            "--paths"
+          ],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [
+            "--paths",
+            "null"
+          ],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [
+            "--paths",
+            "--strict"
+          ],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [
+            "--composite",
+            "false"
+          ],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [
+            "--composite",
+            "true"
+          ],
+          "op": "parse_command_line"
+        }
+      ],
+      "case": "config/commandlineops/parse-command-line-tsconfig-only-option-is-refused",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/a.ts": "",
+        "/project/b.ts": "",
+        "/project/cycle.txt": "@cycle.txt --strict",
+        "/project/empty.txt": "",
+        "/project/inner.txt": "--strict b.ts",
+        "/project/outer.txt": "@inner.txt a.ts",
+        "/project/quote.txt": "\"--target\" \"es2015\"\n  b.ts  ",
+        "/project/rsp.txt": "--target es5 \"a b.ts\"",
+        "/project/sub/nested.txt": "--noEmit",
+        "/project/unterminated.txt": "\"abc"
+      },
+      "operation": "tsoptions.commandLineOps",
+      "order_sensitive": true,
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "args": [
+            "--zzzzzz"
+          ],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [
+            "--Zzzzzz"
+          ],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [
+            "-x"
+          ],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [
+            "--"
+          ],
+          "op": "parse_command_line"
+        }
+      ],
+      "case": "config/commandlineops/parse-command-line-unknown-option-without-a-suggestion",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/a.ts": "",
+        "/project/b.ts": "",
+        "/project/cycle.txt": "@cycle.txt --strict",
+        "/project/empty.txt": "",
+        "/project/inner.txt": "--strict b.ts",
+        "/project/outer.txt": "@inner.txt a.ts",
+        "/project/quote.txt": "\"--target\" \"es2015\"\n  b.ts  ",
+        "/project/rsp.txt": "--target es5 \"a b.ts\"",
+        "/project/sub/nested.txt": "--noEmit",
+        "/project/unterminated.txt": "\"abc"
+      },
+      "operation": "tsoptions.commandLineOps",
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "args": [
+            "--targt"
+          ],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [
+            "--stricts"
+          ],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [
+            "--outdirr"
+          ],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [
+            "--modul"
+          ],
+          "op": "parse_command_line"
+        }
+      ],
+      "case": "config/commandlineops/parse-command-line-unknown-option-with-a-suggestion",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/a.ts": "",
+        "/project/b.ts": "",
+        "/project/cycle.txt": "@cycle.txt --strict",
+        "/project/empty.txt": "",
+        "/project/inner.txt": "--strict b.ts",
+        "/project/outer.txt": "@inner.txt a.ts",
+        "/project/quote.txt": "\"--target\" \"es2015\"\n  b.ts  ",
+        "/project/rsp.txt": "--target es5 \"a b.ts\"",
+        "/project/sub/nested.txt": "--noEmit",
+        "/project/unterminated.txt": "\"abc"
+      },
+      "operation": "tsoptions.commandLineOps",
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "args": [
+            "--verbose"
+          ],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [
+            "--build"
+          ],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [
+            "-b"
+          ],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [
+            "--clean"
+          ],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [
+            "--builders",
+            "2"
+          ],
+          "op": "parse_command_line"
+        }
+      ],
+      "case": "config/commandlineops/parse-command-line-build-option-is-diverted-by-alternate-mode",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/a.ts": "",
+        "/project/b.ts": "",
+        "/project/cycle.txt": "@cycle.txt --strict",
+        "/project/empty.txt": "",
+        "/project/inner.txt": "--strict b.ts",
+        "/project/outer.txt": "@inner.txt a.ts",
+        "/project/quote.txt": "\"--target\" \"es2015\"\n  b.ts  ",
+        "/project/rsp.txt": "--target es5 \"a b.ts\"",
+        "/project/sub/nested.txt": "--noEmit",
+        "/project/unterminated.txt": "\"abc"
+      },
+      "operation": "tsoptions.commandLineOps",
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "args": [
+            "--outDir",
+            "dist"
+          ],
+          "op": "parse_command_line",
+          "options": [
+            "outDir",
+            "rootDir",
+            "project"
+          ]
+        },
+        {
+          "args": [
+            "--outDir",
+            "/abs/dist"
+          ],
+          "op": "parse_command_line",
+          "options": [
+            "outDir",
+            "rootDir",
+            "project"
+          ]
+        },
+        {
+          "args": [
+            "--rootDir",
+            "."
+          ],
+          "op": "parse_command_line",
+          "options": [
+            "outDir",
+            "rootDir",
+            "project"
+          ]
+        },
+        {
+          "args": [
+            "--project",
+            "sub/tsconfig.json"
+          ],
+          "op": "parse_command_line",
+          "options": [
+            "outDir",
+            "rootDir",
+            "project"
+          ]
+        },
+        {
+          "args": [
+            "--outDir",
+            ""
+          ],
+          "op": "parse_command_line",
+          "options": [
+            "outDir",
+            "rootDir",
+            "project"
+          ]
+        }
+      ],
+      "case": "config/commandlineops/parse-command-line-converts-file-path-options-to-absolute",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/a.ts": "",
+        "/project/b.ts": "",
+        "/project/cycle.txt": "@cycle.txt --strict",
+        "/project/empty.txt": "",
+        "/project/inner.txt": "--strict b.ts",
+        "/project/outer.txt": "@inner.txt a.ts",
+        "/project/quote.txt": "\"--target\" \"es2015\"\n  b.ts  ",
+        "/project/rsp.txt": "--target es5 \"a b.ts\"",
+        "/project/sub/nested.txt": "--noEmit",
+        "/project/unterminated.txt": "\"abc"
+      },
+      "operation": "tsoptions.commandLineOps",
+      "order_sensitive": true,
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "args": [
+            "@rsp.txt"
+          ],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [
+            "@quote.txt"
+          ],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [
+            "@sub/nested.txt"
+          ],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [
+            "@empty.txt"
+          ],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [
+            "@rsp.txt",
+            "extra.ts"
+          ],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [
+            "@unterminated.txt"
+          ],
+          "op": "parse_command_line"
+        }
+      ],
+      "case": "config/commandlineops/parse-command-line-reads-a-response-file",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/a.ts": "",
+        "/project/b.ts": "",
+        "/project/cycle.txt": "@cycle.txt --strict",
+        "/project/empty.txt": "",
+        "/project/inner.txt": "--strict b.ts",
+        "/project/outer.txt": "@inner.txt a.ts",
+        "/project/quote.txt": "\"--target\" \"es2015\"\n  b.ts  ",
+        "/project/rsp.txt": "--target es5 \"a b.ts\"",
+        "/project/sub/nested.txt": "--noEmit",
+        "/project/unterminated.txt": "\"abc"
+      },
+      "operation": "tsoptions.commandLineOps",
+      "order_sensitive": true,
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "args": [
+            "@missing.txt"
+          ],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [
+            "@"
+          ],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [
+            "@sub"
+          ],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [
+            "@missing.txt",
+            "a.ts"
+          ],
+          "op": "parse_command_line"
+        }
+      ],
+      "case": "config/commandlineops/parse-command-line-response-file-that-cannot-be-read",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/a.ts": "",
+        "/project/b.ts": "",
+        "/project/cycle.txt": "@cycle.txt --strict",
+        "/project/empty.txt": "",
+        "/project/inner.txt": "--strict b.ts",
+        "/project/outer.txt": "@inner.txt a.ts",
+        "/project/quote.txt": "\"--target\" \"es2015\"\n  b.ts  ",
+        "/project/rsp.txt": "--target es5 \"a b.ts\"",
+        "/project/sub/nested.txt": "--noEmit",
+        "/project/unterminated.txt": "\"abc"
+      },
+      "operation": "tsoptions.commandLineOps",
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "args": [
+            "@cycle.txt"
+          ],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [
+            "@outer.txt"
+          ],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [
+            "@cycle.txt",
+            "@cycle.txt"
+          ],
+          "op": "parse_command_line"
+        }
+      ],
+      "case": "config/commandlineops/parse-command-line-response-file-cycles-are-broken",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/a.ts": "",
+        "/project/b.ts": "",
+        "/project/cycle.txt": "@cycle.txt --strict",
+        "/project/empty.txt": "",
+        "/project/inner.txt": "--strict b.ts",
+        "/project/outer.txt": "@inner.txt a.ts",
+        "/project/quote.txt": "\"--target\" \"es2015\"\n  b.ts  ",
+        "/project/rsp.txt": "--target es5 \"a b.ts\"",
+        "/project/sub/nested.txt": "--noEmit",
+        "/project/unterminated.txt": "\"abc"
+      },
+      "operation": "tsoptions.commandLineOps",
+      "order_sensitive": true,
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "args": [
+            "--target",
+            "es5",
+            "--strict",
+            "--target",
+            "es2015"
+          ],
+          "op": "parse_command_line",
+          "options": [
+            "target",
+            "strict",
+            "types"
+          ]
+        },
+        {
+          "args": [
+            "--strict",
+            "false",
+            "--strict",
+            "true"
+          ],
+          "op": "parse_command_line",
+          "options": [
+            "target",
+            "strict",
+            "types"
+          ]
+        },
+        {
+          "args": [
+            "--types",
+            "a",
+            "--types",
+            "b"
+          ],
+          "op": "parse_command_line",
+          "options": [
+            "target",
+            "strict",
+            "types"
+          ]
+        }
+      ],
+      "case": "config/commandlineops/parse-command-line-repeated-option-keeps-the-last-value",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/a.ts": "",
+        "/project/b.ts": "",
+        "/project/cycle.txt": "@cycle.txt --strict",
+        "/project/empty.txt": "",
+        "/project/inner.txt": "--strict b.ts",
+        "/project/outer.txt": "@inner.txt a.ts",
+        "/project/quote.txt": "\"--target\" \"es2015\"\n  b.ts  ",
+        "/project/rsp.txt": "--target es5 \"a b.ts\"",
+        "/project/sub/nested.txt": "--noEmit",
+        "/project/unterminated.txt": "\"abc"
+      },
+      "operation": "tsoptions.commandLineOps",
+      "order_sensitive": true,
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "args": [
+            "--watchFile",
+            "usefsevents"
+          ],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [
+            "--watchFile",
+            "bogus"
+          ],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [
+            "--watchFile"
+          ],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [
+            "--excludeDirectories",
+            "a,b"
+          ],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [
+            "--watchInterval",
+            "500"
+          ],
+          "op": "parse_command_line"
+        }
+      ],
+      "case": "config/commandlineops/parse-command-line-falls-back-to-the-watch-option-table",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/a.ts": "",
+        "/project/b.ts": "",
+        "/project/cycle.txt": "@cycle.txt --strict",
+        "/project/empty.txt": "",
+        "/project/inner.txt": "--strict b.ts",
+        "/project/outer.txt": "@inner.txt a.ts",
+        "/project/quote.txt": "\"--target\" \"es2015\"\n  b.ts  ",
+        "/project/rsp.txt": "--target es5 \"a b.ts\"",
+        "/project/sub/nested.txt": "--noEmit",
+        "/project/unterminated.txt": "\"abc"
+      },
+      "operation": "tsoptions.commandLineOps",
+      "order_sensitive": true,
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "args": [
+            "--strict",
+            "null"
+          ],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [
+            "--target",
+            "null"
+          ],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [
+            "--types",
+            "null"
+          ],
+          "op": "parse_command_line"
+        },
+        {
+          "args": [
+            "--outDir",
+            "null"
+          ],
+          "op": "parse_command_line"
+        }
+      ],
+      "case": "config/commandlineops/parse-command-line-explicit-null-clears-an-option",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/a.ts": "",
+        "/project/b.ts": "",
+        "/project/cycle.txt": "@cycle.txt --strict",
+        "/project/empty.txt": "",
+        "/project/inner.txt": "--strict b.ts",
+        "/project/outer.txt": "@inner.txt a.ts",
+        "/project/quote.txt": "\"--target\" \"es2015\"\n  b.ts  ",
+        "/project/rsp.txt": "--target es5 \"a b.ts\"",
+        "/project/sub/nested.txt": "--noEmit",
+        "/project/unterminated.txt": "\"abc"
+      },
+      "operation": "tsoptions.commandLineOps",
+      "order_sensitive": true,
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "args": [
+            "--target",
+            "ES2015"
+          ],
+          "op": "parse_command_line",
+          "options": [
+            "target",
+            "module",
+            "jsx"
+          ]
+        },
+        {
+          "args": [
+            "--target",
+            " es5 "
+          ],
+          "op": "parse_command_line",
+          "options": [
+            "target",
+            "module",
+            "jsx"
+          ]
+        },
+        {
+          "args": [
+            "--target",
+            "bogus"
+          ],
+          "op": "parse_command_line",
+          "options": [
+            "target",
+            "module",
+            "jsx"
+          ]
+        },
+        {
+          "args": [
+            "--module",
+            "node16"
+          ],
+          "op": "parse_command_line",
+          "options": [
+            "target",
+            "module",
+            "jsx"
+          ]
+        },
+        {
+          "args": [
+            "--jsx",
+            "react-jsx"
+          ],
+          "op": "parse_command_line",
+          "options": [
+            "target",
+            "module",
+            "jsx"
+          ]
+        }
+      ],
+      "case": "config/commandlineops/parse-command-line-enum-option-converts-through-its-map",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/a.ts": "",
+        "/project/b.ts": "",
+        "/project/cycle.txt": "@cycle.txt --strict",
+        "/project/empty.txt": "",
+        "/project/inner.txt": "--strict b.ts",
+        "/project/outer.txt": "@inner.txt a.ts",
+        "/project/quote.txt": "\"--target\" \"es2015\"\n  b.ts  ",
+        "/project/rsp.txt": "--target es5 \"a b.ts\"",
+        "/project/sub/nested.txt": "--noEmit",
+        "/project/unterminated.txt": "\"abc"
+      },
+      "operation": "tsoptions.commandLineOps",
+      "order_sensitive": true,
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "args": [],
+          "op": "parse_build_command_line"
+        },
+        {
+          "args": [
+            "p1"
+          ],
+          "op": "parse_build_command_line"
+        },
+        {
+          "args": [
+            "p1",
+            "p2"
+          ],
+          "op": "parse_build_command_line"
+        },
+        {
+          "args": [
+            "--verbose"
+          ],
+          "op": "parse_build_command_line"
+        },
+        {
+          "args": [
+            "--verbose",
+            "p1"
+          ],
+          "op": "parse_build_command_line"
+        }
+      ],
+      "case": "config/commandlineops/parse-build-command-line-defaults-the-project-list",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/a.ts": "",
+        "/project/b.ts": "",
+        "/project/cycle.txt": "@cycle.txt --strict",
+        "/project/empty.txt": "",
+        "/project/inner.txt": "--strict b.ts",
+        "/project/outer.txt": "@inner.txt a.ts",
+        "/project/quote.txt": "\"--target\" \"es2015\"\n  b.ts  ",
+        "/project/rsp.txt": "--target es5 \"a b.ts\"",
+        "/project/sub/nested.txt": "--noEmit",
+        "/project/unterminated.txt": "\"abc"
+      },
+      "operation": "tsoptions.commandLineOps",
+      "order_sensitive": true,
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "args": [
+            "--clean",
+            "--force"
+          ],
+          "op": "parse_build_command_line"
+        },
+        {
+          "args": [
+            "--clean",
+            "--verbose"
+          ],
+          "op": "parse_build_command_line"
+        },
+        {
+          "args": [
+            "--clean",
+            "--watch"
+          ],
+          "op": "parse_build_command_line"
+        },
+        {
+          "args": [
+            "--watch",
+            "--dry"
+          ],
+          "op": "parse_build_command_line"
+        },
+        {
+          "args": [
+            "--clean",
+            "--force",
+            "--verbose"
+          ],
+          "op": "parse_build_command_line"
+        },
+        {
+          "args": [
+            "--force",
+            "--verbose"
+          ],
+          "op": "parse_build_command_line"
+        }
+      ],
+      "case": "config/commandlineops/parse-build-command-line-rejects-nonsensical-combinations",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/a.ts": "",
+        "/project/b.ts": "",
+        "/project/cycle.txt": "@cycle.txt --strict",
+        "/project/empty.txt": "",
+        "/project/inner.txt": "--strict b.ts",
+        "/project/outer.txt": "@inner.txt a.ts",
+        "/project/quote.txt": "\"--target\" \"es2015\"\n  b.ts  ",
+        "/project/rsp.txt": "--target es5 \"a b.ts\"",
+        "/project/sub/nested.txt": "--noEmit",
+        "/project/unterminated.txt": "\"abc"
+      },
+      "operation": "tsoptions.commandLineOps",
+      "order_sensitive": true,
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "args": [
+            "-b"
+          ],
+          "op": "parse_build_command_line"
+        },
+        {
+          "args": [
+            "-v",
+            "-d",
+            "-f"
+          ],
+          "op": "parse_build_command_line"
+        },
+        {
+          "args": [
+            "-b",
+            "-v",
+            "p1"
+          ],
+          "op": "parse_build_command_line"
+        },
+        {
+          "args": [
+            "-q"
+          ],
+          "op": "parse_build_command_line"
+        }
+      ],
+      "case": "config/commandlineops/parse-build-command-line-short-names",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/a.ts": "",
+        "/project/b.ts": "",
+        "/project/cycle.txt": "@cycle.txt --strict",
+        "/project/empty.txt": "",
+        "/project/inner.txt": "--strict b.ts",
+        "/project/outer.txt": "@inner.txt a.ts",
+        "/project/quote.txt": "\"--target\" \"es2015\"\n  b.ts  ",
+        "/project/rsp.txt": "--target es5 \"a b.ts\"",
+        "/project/sub/nested.txt": "--noEmit",
+        "/project/unterminated.txt": "\"abc"
+      },
+      "operation": "tsoptions.commandLineOps",
+      "order_sensitive": true,
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "args": [
+            "--strict",
+            "p1"
+          ],
+          "op": "parse_build_command_line"
+        },
+        {
+          "args": [
+            "--outDir",
+            "dist"
+          ],
+          "op": "parse_build_command_line"
+        },
+        {
+          "args": [
+            "--jsx",
+            "react"
+          ],
+          "op": "parse_build_command_line"
+        }
+      ],
+      "case": "config/commandlineops/parse-build-command-line-diverts-a-compiler-only-option",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/a.ts": "",
+        "/project/b.ts": "",
+        "/project/cycle.txt": "@cycle.txt --strict",
+        "/project/empty.txt": "",
+        "/project/inner.txt": "--strict b.ts",
+        "/project/outer.txt": "@inner.txt a.ts",
+        "/project/quote.txt": "\"--target\" \"es2015\"\n  b.ts  ",
+        "/project/rsp.txt": "--target es5 \"a b.ts\"",
+        "/project/sub/nested.txt": "--noEmit",
+        "/project/unterminated.txt": "\"abc"
+      },
+      "operation": "tsoptions.commandLineOps",
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "args": [
+            "--zzzzzz"
+          ],
+          "op": "parse_build_command_line"
+        },
+        {
+          "args": [
+            "--verbos"
+          ],
+          "op": "parse_build_command_line"
+        },
+        {
+          "args": [
+            "--clen"
+          ],
+          "op": "parse_build_command_line"
+        },
+        {
+          "args": [
+            "--builder"
+          ],
+          "op": "parse_build_command_line"
+        }
+      ],
+      "case": "config/commandlineops/parse-build-command-line-unknown-build-option",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/a.ts": "",
+        "/project/b.ts": "",
+        "/project/cycle.txt": "@cycle.txt --strict",
+        "/project/empty.txt": "",
+        "/project/inner.txt": "--strict b.ts",
+        "/project/outer.txt": "@inner.txt a.ts",
+        "/project/quote.txt": "\"--target\" \"es2015\"\n  b.ts  ",
+        "/project/rsp.txt": "--target es5 \"a b.ts\"",
+        "/project/sub/nested.txt": "--noEmit",
+        "/project/unterminated.txt": "\"abc"
+      },
+      "operation": "tsoptions.commandLineOps",
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "args": [
+            "--incremental"
+          ],
+          "op": "parse_build_command_line",
+          "options": [
+            "incremental",
+            "tsBuildInfoFile",
+            "locale",
+            "watch"
+          ]
+        },
+        {
+          "args": [
+            "--tsBuildInfoFile",
+            "x.tsbuildinfo"
+          ],
+          "op": "parse_build_command_line",
+          "options": [
+            "incremental",
+            "tsBuildInfoFile",
+            "locale",
+            "watch"
+          ]
+        },
+        {
+          "args": [
+            "--locale",
+            "ja-jp"
+          ],
+          "op": "parse_build_command_line",
+          "options": [
+            "incremental",
+            "tsBuildInfoFile",
+            "locale",
+            "watch"
+          ]
+        },
+        {
+          "args": [
+            "--verbose"
+          ],
+          "op": "parse_build_command_line",
+          "options": [
+            "incremental",
+            "tsBuildInfoFile",
+            "locale",
+            "watch"
+          ]
+        },
+        {
+          "args": [
+            "--watch"
+          ],
+          "op": "parse_build_command_line",
+          "options": [
+            "incremental",
+            "tsBuildInfoFile",
+            "locale",
+            "watch"
+          ]
+        },
+        {
+          "args": [],
+          "op": "parse_build_command_line",
+          "options": [
+            "incremental",
+            "tsBuildInfoFile",
+            "locale",
+            "watch"
+          ]
+        },
+        {
+          "args": [
+            "--locale",
+            "en"
+          ],
+          "op": "parse_build_command_line",
+          "options": [
+            "incremental",
+            "tsBuildInfoFile",
+            "locale",
+            "watch"
+          ]
+        },
+        {
+          "args": [
+            "--locale",
+            "nope"
+          ],
+          "op": "parse_build_command_line",
+          "options": [
+            "incremental",
+            "tsBuildInfoFile",
+            "locale",
+            "watch"
+          ]
+        }
+      ],
+      "case": "config/commandlineops/parse-build-command-line-keeps-the-compiler-options-it-shares",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/a.ts": "",
+        "/project/b.ts": "",
+        "/project/cycle.txt": "@cycle.txt --strict",
+        "/project/empty.txt": "",
+        "/project/inner.txt": "--strict b.ts",
+        "/project/outer.txt": "@inner.txt a.ts",
+        "/project/quote.txt": "\"--target\" \"es2015\"\n  b.ts  ",
+        "/project/rsp.txt": "--target es5 \"a b.ts\"",
+        "/project/sub/nested.txt": "--noEmit",
+        "/project/unterminated.txt": "\"abc"
+      },
+      "operation": "tsoptions.commandLineOps",
+      "order_sensitive": true,
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "args": [
+            "--builders",
+            "4"
+          ],
+          "op": "parse_build_command_line"
+        },
+        {
+          "args": [
+            "--builders",
+            "0"
+          ],
+          "op": "parse_build_command_line"
+        },
+        {
+          "args": [
+            "--builders",
+            "1"
+          ],
+          "op": "parse_build_command_line"
+        },
+        {
+          "args": [
+            "--builders",
+            "nope"
+          ],
+          "op": "parse_build_command_line"
+        }
+      ],
+      "case": "config/commandlineops/parse-build-command-line-number-option-minimum",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/a.ts": "",
+        "/project/b.ts": "",
+        "/project/cycle.txt": "@cycle.txt --strict",
+        "/project/empty.txt": "",
+        "/project/inner.txt": "--strict b.ts",
+        "/project/outer.txt": "@inner.txt a.ts",
+        "/project/quote.txt": "\"--target\" \"es2015\"\n  b.ts  ",
+        "/project/rsp.txt": "--target es5 \"a b.ts\"",
+        "/project/sub/nested.txt": "--noEmit",
+        "/project/unterminated.txt": "\"abc"
+      },
+      "operation": "tsoptions.commandLineOps",
+      "order_sensitive": true,
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "op": "input_option_name",
+          "value": "target"
+        },
+        {
+          "op": "input_option_name",
+          "value": "-target"
+        },
+        {
+          "op": "input_option_name",
+          "value": "--target"
+        },
+        {
+          "op": "input_option_name",
+          "value": "---target"
+        },
+        {
+          "op": "input_option_name",
+          "value": "----target"
+        },
+        {
+          "op": "input_option_name",
+          "value": "-"
+        },
+        {
+          "op": "input_option_name",
+          "value": "--"
+        },
+        {
+          "op": "input_option_name",
+          "value": ""
+        },
+        {
+          "op": "input_option_name",
+          "value": "-a-b"
+        },
+        {
+          "op": "input_option_name",
+          "value": "--a--b"
+        }
+      ],
+      "case": "config/commandlineops/input-option-name-strips-at-most-two-dashes",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "operation": "tsoptions.commandLineOps",
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "name": "target",
+          "op": "invalid_enum_type_diagnostic",
+          "table": "compiler"
+        },
+        {
+          "name": "module",
+          "op": "invalid_enum_type_diagnostic",
+          "table": "compiler"
+        },
+        {
+          "name": "moduleResolution",
+          "op": "invalid_enum_type_diagnostic",
+          "table": "compiler"
+        },
+        {
+          "name": "jsx",
+          "op": "invalid_enum_type_diagnostic",
+          "table": "compiler"
+        },
+        {
+          "name": "watchFile",
+          "op": "invalid_enum_type_diagnostic",
+          "table": "watch"
+        }
+      ],
+      "case": "config/commandlineops/invalid-enum-type-diagnostic-lists-the-allowed-keys",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "operation": "tsoptions.commandLineOps",
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "op": "extra_key_diagnostics",
+          "value": "compilerOptions"
+        },
+        {
+          "op": "extra_key_diagnostics",
+          "value": "watchOptions"
+        },
+        {
+          "op": "extra_key_diagnostics",
+          "value": "typeAcquisition"
+        },
+        {
+          "op": "extra_key_diagnostics",
+          "value": "buildOptions"
+        },
+        {
+          "op": "extra_key_diagnostics",
+          "value": "compileroptions"
+        },
+        {
+          "op": "extra_key_diagnostics",
+          "value": "references"
+        },
+        {
+          "op": "extra_key_diagnostics",
+          "value": ""
+        },
+        {
+          "op": "extra_key_diagnostics",
+          "value": "undefined"
+        }
+      ],
+      "case": "config/commandlineops/extra-key-diagnostics-per-parent-option",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "operation": "tsoptions.commandLineOps",
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "declarations": [],
+          "op": "worker_diagnostics"
+        },
+        {
+          "declarations": [
+            {
+              "kind": "boolean",
+              "name": "alpha"
+            }
+          ],
+          "op": "worker_diagnostics"
+        },
+        {
+          "declarations": [
+            {
+              "kind": "boolean",
+              "name": "alpha"
+            },
+            {
+              "kind": "string",
+              "name": "beta",
+              "shortName": "b"
+            }
+          ],
+          "op": "worker_diagnostics"
+        },
+        {
+          "declarations": [
+            {
+              "isTSConfigOnly": true,
+              "kind": "enum",
+              "name": "gamma"
+            }
+          ],
+          "op": "worker_diagnostics"
+        }
+      ],
+      "case": "config/commandlineops/worker-diagnostics-for-a-supplied-declaration-list",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "operation": "tsoptions.commandLineOps",
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "op": "canonical_key",
+          "value": "/Project/Src"
+        },
+        {
+          "op": "canonical_key",
+          "value": "/project/src"
+        },
+        {
+          "op": "canonical_key",
+          "value": "/PROJECT/SRC"
+        },
+        {
+          "op": "canonical_key",
+          "value": ""
+        },
+        {
+          "op": "canonical_key",
+          "value": "/"
+        }
+      ],
+      "case": "config/commandlineops/canonical-key-preserves-case-when-sensitive",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "operation": "tsoptions.commandLineOps",
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "op": "canonical_key",
+          "value": "/Project/Src"
+        },
+        {
+          "op": "canonical_key",
+          "value": "/project/src"
+        },
+        {
+          "op": "canonical_key",
+          "value": "/PROJECT/SRC"
+        },
+        {
+          "op": "canonical_key",
+          "value": ""
+        },
+        {
+          "op": "canonical_key",
+          "value": "/"
+        }
+      ],
+      "case": "config/commandlineops/canonical-key-folds-case-when-insensitive",
+      "caseSensitive": false,
+      "currentDirectory": "/project",
+      "operation": "tsoptions.commandLineOps",
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "op": "wildcard_directory_from_spec",
+          "value": "/project/src/**/x"
+        },
+        {
+          "op": "wildcard_directory_from_spec",
+          "value": "/project/src/*/d"
+        },
+        {
+          "op": "wildcard_directory_from_spec",
+          "value": "/project/src/*"
+        },
+        {
+          "op": "wildcard_directory_from_spec",
+          "value": "/project/src/a?z"
+        },
+        {
+          "op": "wildcard_directory_from_spec",
+          "value": "/project/src"
+        },
+        {
+          "op": "wildcard_directory_from_spec",
+          "value": "/project/src/"
+        },
+        {
+          "op": "wildcard_directory_from_spec",
+          "value": "/project/a.ts"
+        },
+        {
+          "op": "wildcard_directory_from_spec",
+          "value": "*"
+        },
+        {
+          "op": "wildcard_directory_from_spec",
+          "value": "/project/**"
+        },
+        {
+          "op": "wildcard_directory_from_spec",
+          "value": "/project/src/node_modules"
+        }
+      ],
+      "case": "config/commandlineops/wildcard-directory-from-spec-chooses-the-watched-directory",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "operation": "tsoptions.commandLineOps",
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "exclude": [],
+          "include": [
+            "/project/src/**/*",
+            "/project/src/deep/*"
+          ],
+          "op": "wildcard_directories"
+        },
+        {
+          "exclude": [],
+          "include": [
+            "/project/src/*",
+            "/project/src/**/*"
+          ],
+          "op": "wildcard_directories"
+        },
+        {
+          "exclude": [],
+          "include": [
+            "/project/src/**/*",
+            "/project/lib/*"
+          ],
+          "op": "wildcard_directories"
+        },
+        {
+          "exclude": [],
+          "include": [
+            "/project/a.ts"
+          ],
+          "op": "wildcard_directories"
+        },
+        {
+          "exclude": [],
+          "include": [],
+          "op": "wildcard_directories"
+        }
+      ],
+      "case": "config/commandlineops/wildcard-directories-drop-paths-under-a-recursive-watch",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "operation": "tsoptions.commandLineOps",
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "exclude": [],
+          "include": [
+            "/project/src/**/*",
+            "/project/lib/*"
+          ],
+          "op": "wildcard_directories"
+        },
+        {
+          "exclude": [
+            "/project/lib"
+          ],
+          "include": [
+            "/project/src/**/*",
+            "/project/lib/*"
+          ],
+          "op": "wildcard_directories"
+        },
+        {
+          "exclude": [
+            "/project/lib/**/*"
+          ],
+          "include": [
+            "/project/src/**/*",
+            "/project/lib/*"
+          ],
+          "op": "wildcard_directories"
+        },
+        {
+          "exclude": [
+            "/project/**/*"
+          ],
+          "include": [
+            "/project/src/**/*",
+            "/project/lib/*"
+          ],
+          "op": "wildcard_directories"
+        },
+        {
+          "exclude": [
+            "/project/src/deep"
+          ],
+          "include": [
+            "/project/src/**/*",
+            "/project/lib/*"
+          ],
+          "op": "wildcard_directories"
+        }
+      ],
+      "case": "config/commandlineops/wildcard-directories-skip-excluded-specs",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "operation": "tsoptions.commandLineOps",
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "exclude": [],
+          "include": [
+            "/project/Src/*",
+            "/project/src/*"
+          ],
+          "op": "wildcard_directories"
+        },
+        {
+          "exclude": [],
+          "include": [
+            "/project/src/*",
+            "/project/Src/**/*"
+          ],
+          "op": "wildcard_directories"
+        },
+        {
+          "exclude": [],
+          "include": [
+            "/project/SRC/*"
+          ],
+          "op": "wildcard_directories"
+        }
+      ],
+      "case": "config/commandlineops/wildcard-directories-fold-keys-on-a-case-insensitive-host",
+      "caseSensitive": false,
+      "currentDirectory": "/project",
+      "operation": "tsoptions.commandLineOps",
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "op": "parsed_config",
+          "probe": "config_name"
+        },
+        {
+          "op": "parsed_config",
+          "probe": "file_names"
+        }
+      ],
+      "case": "config/commandlineops/parsed-config-name-is-the-config-file-name",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/extra.ts": "",
+        "/project/out/old.ts": "",
+        "/project/src/a.ts": "",
+        "/project/src/b.ts": "",
+        "/project/src/deep/c.ts": ""
+      },
+      "jsonText": "{\"compilerOptions\": {\"strict\": true, \"notAnOption\": 1, \"targt\": \"es5\"}, \"include\": [\"src/**/*\"], \"files\": [\"extra.ts\"]}",
+      "operation": "tsoptions.commandLineOps",
+      "order_sensitive": true,
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "op": "parsed_config",
+          "probe": "config_file_parsing_diagnostics"
+        }
+      ],
+      "case": "config/commandlineops/parsed-config-parsing-diagnostics-carry-node-ranges",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/extra.ts": "",
+        "/project/out/old.ts": "",
+        "/project/src/a.ts": "",
+        "/project/src/b.ts": "",
+        "/project/src/deep/c.ts": ""
+      },
+      "jsonText": "{\"compilerOptions\": {\"strict\": true, \"notAnOption\": 1, \"targt\": \"es5\"}, \"include\": [\"src/**/*\"], \"files\": [\"extra.ts\"]}",
+      "operation": "tsoptions.commandLineOps",
+      "order_sensitive": true,
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "op": "parsed_config",
+          "probe": "matched_file_spec:/project/extra.ts"
+        },
+        {
+          "op": "parsed_config",
+          "probe": "matched_file_spec:/project/src/a.ts"
+        },
+        {
+          "op": "parsed_config",
+          "probe": "matched_file_spec:/project/missing.ts"
+        },
+        {
+          "op": "parsed_config",
+          "probe": "matched_file_spec:extra.ts"
+        }
+      ],
+      "case": "config/commandlineops/parsed-config-matched-file-spec",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/extra.ts": "",
+        "/project/out/old.ts": "",
+        "/project/src/a.ts": "",
+        "/project/src/b.ts": "",
+        "/project/src/deep/c.ts": ""
+      },
+      "jsonText": "{\"compilerOptions\": {\"strict\": true, \"notAnOption\": 1, \"targt\": \"es5\"}, \"include\": [\"src/**/*\"], \"files\": [\"extra.ts\"]}",
+      "operation": "tsoptions.commandLineOps",
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "op": "parsed_config",
+          "probe": "matched_include_spec:/project/src/a.ts"
+        },
+        {
+          "op": "parsed_config",
+          "probe": "matched_include_spec:/project/src/deep/c.ts"
+        },
+        {
+          "op": "parsed_config",
+          "probe": "matched_include_spec:/project/extra.ts"
+        }
+      ],
+      "case": "config/commandlineops/parsed-config-matched-include-spec",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/extra.ts": "",
+        "/project/out/old.ts": "",
+        "/project/src/a.ts": "",
+        "/project/src/b.ts": "",
+        "/project/src/deep/c.ts": ""
+      },
+      "jsonText": "{\"compilerOptions\": {\"strict\": true, \"notAnOption\": 1, \"targt\": \"es5\"}, \"include\": [\"src/**/*\"], \"files\": [\"extra.ts\"]}",
+      "operation": "tsoptions.commandLineOps",
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "op": "parsed_config",
+          "probe": "matched_include_spec:/project/src/a.ts"
+        },
+        {
+          "op": "parsed_config",
+          "probe": "matched_include_spec:/project/nothing.ts"
+        }
+      ],
+      "case": "config/commandlineops/parsed-config-default-include-spec-is-reported-as-default",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/extra.ts": "",
+        "/project/out/old.ts": "",
+        "/project/src/a.ts": "",
+        "/project/src/b.ts": "",
+        "/project/src/deep/c.ts": ""
+      },
+      "jsonText": "{\"compilerOptions\":{\"strict\":true}}",
+      "operation": "tsoptions.commandLineOps",
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "op": "parsed_config",
+          "probe": "file_names_by_path"
+        }
+      ],
+      "case": "config/commandlineops/parsed-config-file-names-by-path",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/extra.ts": "",
+        "/project/out/old.ts": "",
+        "/project/src/a.ts": "",
+        "/project/src/b.ts": "",
+        "/project/src/deep/c.ts": ""
+      },
+      "jsonText": "{\"compilerOptions\": {\"strict\": true, \"notAnOption\": 1, \"targt\": \"es5\"}, \"include\": [\"src/**/*\"], \"files\": [\"extra.ts\"]}",
+      "operation": "tsoptions.commandLineOps",
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "op": "parsed_config",
+          "probe": "current_directory"
+        }
+      ],
+      "case": "config/commandlineops/parsed-config-reports-the-directory-it-was-parsed-against",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/extra.ts": "",
+        "/project/out/old.ts": "",
+        "/project/src/a.ts": "",
+        "/project/src/b.ts": "",
+        "/project/src/deep/c.ts": ""
+      },
+      "jsonText": "{\"compilerOptions\": {\"strict\": true, \"notAnOption\": 1, \"targt\": \"es5\"}, \"include\": [\"src/**/*\"], \"files\": [\"extra.ts\"]}",
+      "operation": "tsoptions.commandLineOps",
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "op": "parsed_config",
+          "probe": "wildcard_directories"
+        }
+      ],
+      "case": "config/commandlineops/parsed-config-wildcard-directories",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/extra.ts": "",
+        "/project/out/old.ts": "",
+        "/project/src/a.ts": "",
+        "/project/src/b.ts": "",
+        "/project/src/deep/c.ts": ""
+      },
+      "jsonText": "{\"compilerOptions\": {\"strict\": true, \"notAnOption\": 1, \"targt\": \"es5\"}, \"include\": [\"src/**/*\"], \"files\": [\"extra.ts\"]}",
+      "operation": "tsoptions.commandLineOps",
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "op": "parsed_config",
+          "probe": "wildcard_directory_globs"
+        }
+      ],
+      "case": "config/commandlineops/parsed-config-wildcard-directory-globs",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/extra.ts": "",
+        "/project/out/old.ts": "",
+        "/project/src/a.ts": "",
+        "/project/src/b.ts": "",
+        "/project/src/deep/c.ts": ""
+      },
+      "jsonText": "{\"compilerOptions\": {\"strict\": true, \"notAnOption\": 1, \"targt\": \"es5\"}, \"include\": [\"src/**/*\"], \"files\": [\"extra.ts\"]}",
+      "operation": "tsoptions.commandLineOps",
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "op": "parsed_config",
+          "probe": "extended_source_files"
+        }
+      ],
+      "case": "config/commandlineops/parsed-config-extended-source-files",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/extra.ts": "",
+        "/project/out/old.ts": "",
+        "/project/src/a.ts": "",
+        "/project/src/b.ts": "",
+        "/project/src/deep/c.ts": ""
+      },
+      "jsonText": "{\"compilerOptions\": {\"strict\": true, \"notAnOption\": 1, \"targt\": \"es5\"}, \"include\": [\"src/**/*\"], \"files\": [\"extra.ts\"]}",
+      "operation": "tsoptions.commandLineOps",
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "op": "parsed_config",
+          "probe": "project_references"
+        }
+      ],
+      "case": "config/commandlineops/parsed-config-project-references",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/extra.ts": "",
+        "/project/other/tsconfig.json": "{}",
+        "/project/out/old.ts": "",
+        "/project/src/a.ts": "",
+        "/project/src/b.ts": "",
+        "/project/src/deep/c.ts": "",
+        "/project/sub/tsconfig.json": "{}"
+      },
+      "jsonText": "{\"compilerOptions\": {\"composite\": true}, \"files\": [\"extra.ts\"], \"references\": [{\"path\": \"./sub\"}, {\"path\": \"/project/other/tsconfig.json\"}]}",
+      "operation": "tsoptions.commandLineOps",
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "op": "parsed_config",
+          "probe": "common_source_directory"
+        }
+      ],
+      "case": "config/commandlineops/parsed-config-common-source-directory-under-a-rootdir",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/extra.ts": "",
+        "/project/out/old.ts": "",
+        "/project/src/a.ts": "",
+        "/project/src/b.ts": "",
+        "/project/src/deep/c.ts": ""
+      },
+      "jsonText": "{\"compilerOptions\": {\"rootDir\": \"src\"}, \"files\": [\"src/a.ts\", \"extra.ts\"]}",
+      "operation": "tsoptions.commandLineOps",
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "op": "parsed_config",
+          "probe": "common_source_directory"
+        }
+      ],
+      "case": "config/commandlineops/parsed-config-common-source-directory-without-a-rootdir",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/extra.ts": "",
+        "/project/out/old.ts": "",
+        "/project/src/a.ts": "",
+        "/project/src/b.ts": "",
+        "/project/src/deep/c.ts": ""
+      },
+      "jsonText": "{\"files\": [\"src/a.ts\", \"extra.ts\"]}",
+      "operation": "tsoptions.commandLineOps",
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "op": "parsed_config",
+          "probe": "build_info_file_name"
+        }
+      ],
+      "case": "config/commandlineops/parsed-config-build-info-file-name",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/extra.ts": "",
+        "/project/out/old.ts": "",
+        "/project/src/a.ts": "",
+        "/project/src/b.ts": "",
+        "/project/src/deep/c.ts": ""
+      },
+      "jsonText": "{\"compilerOptions\": {\"incremental\": true}, \"files\": [\"extra.ts\"]}",
+      "operation": "tsoptions.commandLineOps",
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "op": "parsed_config",
+          "probe": "input_output_names"
+        }
+      ],
+      "case": "config/commandlineops/parsed-config-input-output-names",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/extra.ts": "",
+        "/project/out/old.ts": "",
+        "/project/src/a.ts": "",
+        "/project/src/b.ts": "",
+        "/project/src/deep/c.ts": ""
+      },
+      "jsonText": "{\"compilerOptions\": {\"declaration\": true, \"outDir\": \"out\"}, \"files\": [\"src/a.ts\", \"extra.ts\"]}",
+      "operation": "tsoptions.commandLineOps",
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "op": "parsed_config",
+          "probe": "content_mappers:/project/src/a.ts"
+        }
+      ],
+      "case": "config/commandlineops/parsed-config-content-mappers",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/extra.ts": "",
+        "/project/out/old.ts": "",
+        "/project/src/a.ts": "",
+        "/project/src/b.ts": "",
+        "/project/src/deep/c.ts": ""
+      },
+      "jsonText": "{\"compilerOptions\": {\"strict\": true, \"notAnOption\": 1, \"targt\": \"es5\"}, \"include\": [\"src/**/*\"], \"files\": [\"extra.ts\"]}",
+      "operation": "tsoptions.commandLineOps",
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "op": "parsed_config",
+          "probe": "type_acquisition"
+        }
+      ],
+      "case": "config/commandlineops/parsed-config-type-acquisition-round-trip",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/extra.ts": "",
+        "/project/out/old.ts": "",
+        "/project/src/a.ts": "",
+        "/project/src/b.ts": "",
+        "/project/src/deep/c.ts": ""
+      },
+      "jsonText": "{\"compilerOptions\": {\"strict\": true, \"notAnOption\": 1, \"targt\": \"es5\"}, \"include\": [\"src/**/*\"], \"files\": [\"extra.ts\"]}",
+      "operation": "tsoptions.commandLineOps",
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "op": "parsed_config",
+          "probe": "set_compiler_options:ja-jp"
+        }
+      ],
+      "case": "config/commandlineops/parsed-config-set-compiler-options-then-locale",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/extra.ts": "",
+        "/project/out/old.ts": "",
+        "/project/src/a.ts": "",
+        "/project/src/b.ts": "",
+        "/project/src/deep/c.ts": ""
+      },
+      "jsonText": "{\"compilerOptions\": {\"strict\": true, \"notAnOption\": 1, \"targt\": \"es5\"}, \"include\": [\"src/**/*\"], \"files\": [\"extra.ts\"]}",
+      "operation": "tsoptions.commandLineOps",
+      "subject": "commandLine"
+    },
+    {
+      "actions": [
+        {
+          "op": "parsed_config",
+          "probe": "set_parsed_options:/project/src/b.ts"
+        }
+      ],
+      "case": "config/commandlineops/parsed-config-set-parsed-options-replaces-the-whole-block",
+      "caseSensitive": true,
+      "currentDirectory": "/project",
+      "files": {
+        "/project/extra.ts": "",
+        "/project/out/old.ts": "",
+        "/project/src/a.ts": "",
+        "/project/src/b.ts": "",
+        "/project/src/deep/c.ts": ""
+      },
+      "jsonText": "{\"compilerOptions\": {\"strict\": true, \"notAnOption\": 1, \"targt\": \"es5\"}, \"include\": [\"src/**/*\"], \"files\": [\"extra.ts\"]}",
+      "operation": "tsoptions.commandLineOps",
+      "subject": "commandLine"
+    }
+  ]
+}
