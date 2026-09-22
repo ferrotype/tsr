@@ -30604,6 +30604,245 @@
       ]
     },
     {
+      "expected_contract": "TestAssertFalseNoMessage: 'False expression.'.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/debug/assert-false",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/debug/debug.go:Assert"
+      ],
+      "native_authority": "tools/phase1/syntax/debug_probe_test.go in the pinned debug package",
+      "operations": [
+        "tsc/internal/debug/debug.go:Assert",
+        "tsc/internal/debug/debug.go:Fail",
+        "tsc/internal/debug/debug.go:assertSlow"
+      ]
+    },
+    {
+      "expected_contract": "assertSlow joins several operands with fmt.Sprint's spacing rule.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/debug/assert-false-sprint-spacing",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/debug/debug.go:Assert"
+      ],
+      "native_authority": "tools/phase1/syntax/debug_probe_test.go in the pinned debug package",
+      "operations": [
+        "tsc/internal/debug/debug.go:Assert",
+        "tsc/internal/debug/debug.go:Fail",
+        "tsc/internal/debug/debug.go:assertSlow"
+      ]
+    },
+    {
+      "expected_contract": "TestAssertFalseWithMessage: 'False expression: ' and the message.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/debug/assert-false-with-message",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/debug/debug.go:Assert"
+      ],
+      "native_authority": "tools/phase1/syntax/debug_probe_test.go in the pinned debug package",
+      "operations": [
+        "tsc/internal/debug/debug.go:Assert",
+        "tsc/internal/debug/debug.go:Fail",
+        "tsc/internal/debug/debug.go:assertSlow"
+      ]
+    },
+    {
+      "expected_contract": "TestAssertNeverCustomMessageKindString: a custom message.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/debug/assert-never-custom-message",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/debug/debug.go:AssertNever"
+      ],
+      "native_authority": "tools/phase1/syntax/debug_probe_test.go in the pinned debug package",
+      "operations": [
+        "tsc/internal/debug/debug.go:AssertNever",
+        "tsc/internal/debug/debug.go:Fail"
+      ]
+    },
+    {
+      "expected_contract": "TestAssertNeverFallback: %v for any other value.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/debug/assert-never-fallback",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/debug/debug.go:AssertNever"
+      ],
+      "native_authority": "tools/phase1/syntax/debug_probe_test.go in the pinned debug package",
+      "operations": [
+        "tsc/internal/debug/debug.go:AssertNever",
+        "tsc/internal/debug/debug.go:Fail"
+      ]
+    },
+    {
+      "expected_contract": "TestAssertNeverDefaultMessageKindString: the default 'Illegal value:' and the member's KindString.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/debug/assert-never-kind-string",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/debug/debug.go:AssertNever"
+      ],
+      "native_authority": "tools/phase1/syntax/debug_probe_test.go in the pinned debug package",
+      "operations": [
+        "tsc/internal/debug/debug.go:AssertNever",
+        "tsc/internal/debug/debug.go:Fail"
+      ]
+    },
+    {
+      "expected_contract": "A member with both KindString and String: KindString is tried first.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/debug/assert-never-kind-string-wins",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/debug/debug.go:AssertNever"
+      ],
+      "native_authority": "tools/phase1/syntax/debug_probe_test.go in the pinned debug package",
+      "operations": [
+        "tsc/internal/debug/debug.go:AssertNever",
+        "tsc/internal/debug/debug.go:Fail"
+      ]
+    },
+    {
+      "expected_contract": "AssertNever(nil): the %v fallback prints <nil>.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/debug/assert-never-nil",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/debug/debug.go:AssertNever"
+      ],
+      "native_authority": "tools/phase1/syntax/debug_probe_test.go in the pinned debug package",
+      "operations": [
+        "tsc/internal/debug/debug.go:AssertNever",
+        "tsc/internal/debug/debug.go:Fail"
+      ]
+    },
+    {
+      "expected_contract": "TestAssertNeverStringer: String() when there is no KindString.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/debug/assert-never-stringer",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/debug/debug.go:AssertNever"
+      ],
+      "native_authority": "tools/phase1/syntax/debug_probe_test.go in the pinned debug package",
+      "operations": [
+        "tsc/internal/debug/debug.go:AssertNever",
+        "tsc/internal/debug/debug.go:Fail"
+      ]
+    },
+    {
+      "expected_contract": "TestAssertTrue: a true condition returns.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/debug/assert-true",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/debug/debug.go:Assert"
+      ],
+      "native_authority": "tools/phase1/syntax/debug_probe_test.go in the pinned debug package",
+      "operations": [
+        "tsc/internal/debug/debug.go:Assert"
+      ]
+    },
+    {
+      "expected_contract": "TestAssertTrueWithMessage: a message does not change a true condition.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/debug/assert-true-with-message",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/debug/debug.go:Assert"
+      ],
+      "native_authority": "tools/phase1/syntax/debug_probe_test.go in the pinned debug package",
+      "operations": [
+        "tsc/internal/debug/debug.go:Assert"
+      ]
+    },
+    {
+      "expected_contract": "TestFailBadSyntaxKindNoMessage: the default message and the node's KindString on a second line.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/debug/fail-bad-syntax-kind-default",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/debug/debug.go:FailBadSyntaxKind"
+      ],
+      "native_authority": "tools/phase1/syntax/debug_probe_test.go in the pinned debug package",
+      "operations": [
+        "tsc/internal/debug/debug.go:Fail",
+        "tsc/internal/debug/debug.go:FailBadSyntaxKind"
+      ]
+    },
+    {
+      "expected_contract": "TestFailBadSyntaxKindWithMessage: a custom message replaces the default.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/debug/fail-bad-syntax-kind-message",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/debug/debug.go:FailBadSyntaxKind"
+      ],
+      "native_authority": "tools/phase1/syntax/debug_probe_test.go in the pinned debug package",
+      "operations": [
+        "tsc/internal/debug/debug.go:Fail",
+        "tsc/internal/debug/debug.go:FailBadSyntaxKind"
+      ]
+    },
+    {
+      "expected_contract": "Several message operands go through fmt.Sprint, which puts a space only between two operands when neither is a string: 'a' then 1 then 2 then 'b' renders as 'a1 2b'.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/debug/fail-bad-syntax-kind-sprint-spacing",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/debug/debug.go:FailBadSyntaxKind"
+      ],
+      "native_authority": "tools/phase1/syntax/debug_probe_test.go in the pinned debug package",
+      "operations": [
+        "tsc/internal/debug/debug.go:Fail",
+        "tsc/internal/debug/debug.go:FailBadSyntaxKind"
+      ]
+    },
+    {
+      "expected_contract": "debug_test.go TestFailEmptyReason: an empty reason is 'Debug failure.'.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/debug/fail-empty-reason",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/debug/debug.go:Fail"
+      ],
+      "native_authority": "tools/phase1/syntax/debug_probe_test.go in the pinned debug package",
+      "operations": [
+        "tsc/internal/debug/debug.go:Fail"
+      ]
+    },
+    {
+      "expected_contract": "debug_test.go TestFailWithReason: a reason follows 'Debug failure.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/debug/fail-with-reason",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/debug/debug.go:Fail"
+      ],
+      "native_authority": "tools/phase1/syntax/debug_probe_test.go in the pinned debug package",
+      "operations": [
+        "tsc/internal/debug/debug.go:Fail"
+      ]
+    },
+    {
       "expected_contract": "An empty file, a whitespace-only file and a BOM-only file: no syntactic diagnostic, and none of the three is dropped from the program.",
       "family": "syntax",
       "host_applicability": "any",
@@ -31951,6 +32190,32 @@
       "witnesses": "A frozen inventory of tsr_core pattern unit tests, enforced by a producer. It gates the Rust implementation directly. It is not a Go-versus-Rust comparison: the group's `checker` is null, so its expectations were derived from the pinned source rather than regenerated."
     },
     {
+      "artifact": "data/s07/include-reason-observations.json",
+      "freshness": "gated on every `cargo test`",
+      "id": "witness/s07-include-reasons-rust",
+      "kind": "rust_gated",
+      "operations": [
+        "tsc/internal/compiler/fileInclude.go:FileIncludeReason.computeDiagnostic",
+        "tsc/internal/compiler/fileInclude.go:FileIncludeReason.computeReferenceFileDiagnostic",
+        "tsc/internal/compiler/fileInclude.go:FileIncludeReason.toDiagnostic",
+        "tsc/internal/compiler/fileInclude.go:FileIncludeReason.toRelatedInfo",
+        "tsc/internal/compiler/fileInclude.go:referenceFileLocation.diagnosticAt",
+        "tsc/internal/compiler/includeprocessor.go:includeProcessor.explainRedirectAndImpliedFormat",
+        "tsc/internal/compiler/includeprocessor.go:includeProcessor.getCompilerOptionsObjectLiteralSyntax",
+        "tsc/internal/compiler/includeprocessor.go:includeProcessor.getDiagnostics",
+        "tsc/internal/compiler/includeprocessor.go:includeProcessor.getReferenceLocation",
+        "tsc/internal/compiler/includeprocessor.go:includeProcessor.getRelatedInfo",
+        "tsc/internal/compiler/processingDiagnostic.go:processingDiagnostic.createDiagnosticExplainingFile",
+        "tsc/internal/compiler/program.go:Program.CommonSourceDirectory",
+        "tsc/internal/compiler/program.go:Program.GetProgramDiagnostics",
+        "tsc/internal/compiler/program.go:SortAndDeduplicateDiagnostics",
+        "tsc/internal/compiler/program.go:compactAndMergeRelatedInfos"
+      ],
+      "producer": "tools/s07/include-reason/export_test.go",
+      "rust_gate": "crates/tsr_compiler/src/include_reason_tests.rs:99 independently_observed_go_include_explanations and crates/tsr_compiler/src/program_diagnostics.rs:316 independently_observed_go_related_merge_and_sort_ties (`cargo test -p tsr_compiler --lib include_reason::tests program_diagnostics::tests`)",
+      "witnesses": "30 include-reason rows with 37 queries and 4 related-information merge rows. The adapter builds some processing diagnostics itself, so this witnesses how they render and merge, not whether the loader creates them."
+    },
+    {
       "artifact": "data/s07/module-trace-observations.json",
       "freshness": "gated on every `cargo test`; also enumerated in data/s07/program-helper-tests.json and run individually by `cargo xtask run program`.",
       "id": "witness/s07-module-trace-rust",
@@ -32124,6 +32389,37 @@
       "witnesses": "The same frozen artifact has two relationships to the port, and only one of them was recorded before. Its PRODUCER, scripts/s07_path_helpers.py, runs `go test` only and never executes Rust, which is what witness/s07-path-observations records as a native authority. But a Rust test CONSUMES it: crates/tsr_tspath/tests/go_observations.rs:36-57 reads data/s07/path-requests.json and data/s07/path-observations.json through include_str!, calls tsr_tspath for each of the 4096 requests, and asserts the whole row equal -- so `cargo test` gates the port against the frozen Go answers. The eight operations listed are the ones the Go adapter tools/s07/paths/export_test.go actually drives and the Rust test actually calls, paired one to one: PathIsRelative/is_relative, TrimFilePathPrefix/trim_file_path_prefix, GetNormalizedPathComponents/normalized_components, ComparePaths/compare_paths, ContainsPath/contains_path, GetPathFromPathComponents/path_from_components, GetRelativePathFromDirectory/relative_from_directory and GetRelativePathFromFile/relative_from_file. The row's `fold` column is Go's strings.EqualFold, a standard library call rather than a tspath operation, so it confers nothing here. The panic arm is compared too: both sides catch the unwind and assert the literal text \"paths must either both be absolute or both be relative\"."
     },
     {
+      "artifact": "data/s07/program-observations.json",
+      "freshness": "gated on every `cargo test`",
+      "id": "witness/s07-program-loader-rust",
+      "kind": "rust_gated",
+      "not_claimed": {
+        "compilerHost.Trace": "every trace in the 48 rows is empty",
+        "fileLoader.isSupportedExtension": "only ever returns true, one direction of change",
+        "filesParser.addIncludeReason": "fileIncludeReasons is never read because diag.file is empty",
+        "filesParser/parseTask internals": "no Rust counterpart: the Rust loader is structured differently, so only the outcome is witnessed"
+      },
+      "operations": [
+        "tsc/internal/compiler/fileInclude.go:FileIncludeReason.computeDiagnostic",
+        "tsc/internal/compiler/fileInclude.go:FileIncludeReason.getReferencedLocation",
+        "tsc/internal/compiler/fileInclude.go:FileIncludeReason.toDiagnostic",
+        "tsc/internal/compiler/fileInclude.go:referenceFileLocation.diagnosticAt",
+        "tsc/internal/compiler/fileloader.go:fileLoader.createSyntheticImport",
+        "tsc/internal/compiler/fileloader.go:fileLoader.getSourceFileFromReference",
+        "tsc/internal/compiler/fileloader.go:fileLoader.pathForLibFile",
+        "tsc/internal/compiler/fileloader.go:fileLoader.resolveAutomaticTypeDirectives",
+        "tsc/internal/compiler/fileloader.go:getDefaultResolutionModeForFile",
+        "tsc/internal/compiler/fileloader.go:getEmitSyntaxForUsageLocationWorker",
+        "tsc/internal/compiler/fileloader.go:getModeForTypeReferenceDirectiveInFile",
+        "tsc/internal/compiler/fileloader.go:getModeForUsageLocation",
+        "tsc/internal/compiler/fileloader.go:processAllProgramFiles",
+        "tsc/internal/compiler/program.go:Program.GetSourceFileMetaData"
+      ],
+      "producer": "tools/s07/program/export_test.go through scripts/s07_program.py (processAllProgramFiles and the include processor's diagnostics, without NewProgram)",
+      "rust_gate": "crates/tsr_compiler/src/tests.rs:15 actual_go_loader_observations (`cargo test -p tsr_compiler --lib tests::actual_go_loader_observations`) asserts each whole row; also enumerated in data/s07/program-helper-tests.json",
+      "witnesses": "48 loader rows: files, metadata, imports, resolutions, type resolutions, missing files and include diagnostics (6053, 2688, 2209). The Rust loader is a reimplementation compared as a whole, so beyond the entry point only operations with a Rust port that runs on this path are claimed."
+    },
+    {
       "artifact": "data/s07/resolver-observations.json",
       "freshness": "gated on every `cargo test`",
       "id": "witness/s07-resolver-rust",
@@ -32209,6 +32505,26 @@
       ],
       "producer": "program",
       "witnesses": "Frozen native semver observations. NOT Rust coverage: scripts/s07_semver.py runs `go test ./internal/semver` against a copied adapter and never executes Rust."
+    },
+    {
+      "artifact": "data/s07/verify-options-observations.json",
+      "freshness": "gated on every `cargo test`",
+      "id": "witness/s07-verify-options-rust",
+      "kind": "rust_gated",
+      "not_claimed": {
+        "blockEmittingOfFile, getSourceFilesToEmit": "no Rust port annotation",
+        "moduleResolutionSupportsPackageJsonExportsAndImports": "runs in 2 rows, true both times",
+        "verifyProjectReferences": "only the no-reference form runs"
+      },
+      "operations": [
+        "tsc/internal/compiler/emitter.go:sourceFileMayBeEmitted",
+        "tsc/internal/compiler/program.go:Program.verifyCompilerOptions",
+        "tsc/internal/compiler/program.go:emitModuleKindIsNonNodeESM",
+        "tsc/internal/compiler/program.go:hasZeroOrOneAsteriskCharacter"
+      ],
+      "producer": "tools/s07/verify-options/export_test.go (processAllProgramFiles, then verifyCompilerOptions)",
+      "rust_gate": "crates/tsr_compiler/tests/verify_options.rs:7 option_diagnostics_locations_paths_and_output_conflicts_match_go (`cargo test -p tsr_compiler --test verify_options`)",
+      "witnesses": "103 rows observing 28 option-verification codes, their locations, output-path conflicts and blocked outputs."
     },
     {
       "artifact": "data/s08/p5/errors/observations.json",

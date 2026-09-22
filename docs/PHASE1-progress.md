@@ -14,7 +14,7 @@ moved pin invalidates it.
 | F1a — foundation leaf tests | **complete**: `leaves_prepared: true`; 225 leaf cases frozen, all 460 inventoried leaf operations prepared, witnessed or exempted by the reviewed ledger, and both divergences triaged |
 | F2a — filesystem, path and matching tests | **pending Linux observation**: `filesystem_prepared: false`; 359 cases, 314 of 316 roster operations accounted for; all 142 baselines prepared (68 exact, 74 owner-approved exceptions). The Linux realpath case must observe `Realpath` and `ignoringEINTR`. |
 | F3a — config, command-line and resolution tests | **complete**: `config_prepared: true`; 486 cases, all 402 roster operations prepared, witnessed or exempted, and all 309 reference outputs prepared (F2a's 142 plus F3a's 167, all 167 exact) |
-| F4a — syntax, binder and utility coverage | not started |
+| F4a — syntax, binder and utility coverage | **prepared, roster open**: every primary and expanded request accounted for; all 15,206 variants scheduled (15,152 observed, 54 on named boundaries); 75 cases (44 match, 31 name their missing Rust entry point); a 908-row bounded smoke matches; `syntax_prepared: false` with 2,796 of 3,617 roster operations pending for F4b |
 | F5a — integration checks and the stage A review | not started |
 
 `python3 scripts/phase1.py inventory --check` computes this: it reports
@@ -831,6 +831,250 @@ builds, not the factory, so the symlink-normalization case that first surfaced i
 was split and the refusal has its own case saying where the behavior actually
 lives. The refusal is recorded as a flag, not as the pin's panic wording: what
 the host does is the contract, how it phrases its own panic is not.
+
+## F4a — syntax, binder and utility preparation
+
+F4a is organized around **requests**, as the plan's completion rule is: every
+primary and expanded request accounted for, a syntax phase that cannot be
+confused with a whole `.errors.txt`, executable witnesses for the required
+utility operations, passing bounded controls, and named pending Rust behavior.
+It has two layers: a corpus layer over all 15,206 compiler variants
+(`scripts/phase1_syntax.py`, `scripts/phase1_syntax_schedule.py`) and a case
+layer, the `syntax` capture family (75 requests).
+
+| Plan criterion | Where it is met |
+| --- | --- |
+| every primary/expanded request accounted for | `data/phase1/syntax-inventory.json`: 12,721 sources, 108 libraries, 17,264 units, 15,206 variants, 22,343 primary and 135 supplemental requests, checked against the pin by `phase1.py inventory --check` |
+| the syntax phase cannot be confused with `.errors.txt` | the schedule names its phase, renders only through the production `diagnosticwriter`, and a validator refuses any other phase label |
+| required utility operations have executable witnesses | the utility audit below: every group the plan lists has a rust-gated witness or a new case |
+| bounded controls pass | 42 schedule, smoke and comparator tests in `scripts/tests/test_phase1_syntax.py`; the 908-row smoke; five production mutations caught |
+| pending Rust behavior is named | 31 `not_implemented` cases each name the missing entry point; 2,796 roster operations are listed as pending; the F4b queue below |
+
+### Request accounting (task 1)
+
+The inventory joins the manifests that already own the corpus and records their
+digests; it does not copy them. No E2 eligibility filter removes a parser
+request: the E1 and binder request sets are identical, and all 4,478
+E2-excluded variants keep their parser requests. Each of the 29 units that is
+not a parser input has a named boundary: 21 content-mapper assets (Phase 5) and
+8 ancillary files whose script kind is Unknown. Both covering producers, E1 and
+the binder, last recorded at 098941fd, before the crate rename; the inventory
+links them as stale, not as current runs. The plan's "start from" list names
+`scripts/s07_inventory.py`, but that script inventories binder source functions.
+The corpus is owned by `s06.py freeze` and re-derived by `s07_binder_corpus`.
+
+### The syntax schedule and its native capture (tasks 2 and 3)
+
+One row per declared variant, all 15,206, rebuilt from a fresh run of the native
+preprocessing S07 owns (`TestS07SubsetExport`). Every rebuilt loading request
+must hash to the `loading_request_sha256` in `data/s07/subset.json`. A Go probe
+(`tools/phase1/syntax/program_probe_test.go`, overlaid into `testrunner`) loads
+each loadable row with `compiler.NewProgram` and calls only
+`GetSyntacticDiagnostics`.
+
+| Schedule | Variants |
+| --- | ---: |
+| observed | 15,152 |
+| `options_rejected`: the harness fails in option setup; the native CLI diagnostics are kept | 39 |
+| `content_mapper`: the Phase 5 boundary; mapped text cannot travel in a loading request | 15 |
+| native selection `runs` / `option_guard_skip` / `filename_skip` | 13,434 / 1,720 / 52 |
+| with syntactic diagnostics | 775 (3,451 diagnostics) |
+
+The native harness's selection is executed and recorded, but it selects
+nothing: a skipped variant is still a real program. On the 10,728 variants the
+E2 policy covers, the guard outcome agrees with that authenticated observation,
+except for the 34 rejected-option variants. The harness fails before reaching
+the guard on those, while the E2 bridge ran the guard on the accepted subset of
+settings. Every rejected variant is also a filename skip.
+
+Two independent native captures produced identical rows. As a cross-check, 707
+of the 709 diagnosed variants that have a committed `.errors.txt` contain every
+syntactic diagnostic in that baseline. The other two use the pretty format,
+which the line check cannot read.
+
+### Discriminating syntax requests (task 4)
+
+18 `syntacticDiagnostics` cases, all matching. They cover: JS-only grammar;
+parameter decorators under each checkJs, experimentalDecorators,
+`@ts-check` and `@ts-nocheck` combination, including the later-directive-wins
+rule (parser.go:6684) in both orders; first decorator per parameter, in
+preorder; malformed, unterminated and zero-width sources; empty, whitespace and
+BOM files; sorting across files; per-file scope; JSX/TSX; JSON; and malformed
+JSDoc, which is not part of the syntactic list at all.
+
+Cross-file owner rejection is a Rust-only contract. Go has no owner check, and
+`GetSyntacticDiagnostics` computes a foreign file's diagnostics with the
+receiver's options. It is recorded as
+`rust-contract/syntax-foreign-owner-rejection`, gated by
+`syntactic_diagnostics::tests::foreign_file_handles_are_rejected`.
+Content-mapped filtering stays the named Phase 5 boundary: the 15 schedule rows,
+plus `filter_and_sort_diagnostics`'s `Unsupported` branch.
+
+### The utility audit (task 5)
+
+| Utility group | Executable witness |
+| --- | --- |
+| list order, trailing commas and ranges | E1 over every request; the binder corpus's parsed-graph lists; the trailing-comma comparator control; the factory deep-clone ranges |
+| clone, update and original identity | `witness/s06-factory-fixtures-rust` (update-returns-self, clone and deep-clone, reparse flags); `witness/s07-bound-clone-rust`. Go has no original-node link at this layer; that belongs to emit's `EmitNode` |
+| foreign owners | `rust-contract/syntax-foreign-owner-rejection`; the lazy JSDoc provider's `WrongOwner` |
+| lazy JSDoc and token repeated access | new `parseOutputs` cases: EagerJSDoc empty before first use, JSDoc parses and caches, a repeat returns identical nodes. Plus the astnav `token_at_repeat` sweeps and upstream's pointer-equality source |
+| source text | `witness/s07-scanner-helpers-rust` |
+| bundle and member retention | `rust-contract/s06-storage-ownership` (E3, 30 storage tests, four modes) |
+| independent binding, publication and helper caches | the binder corpus (repeat-bind must not change the graph), `witness/s07-ast-helpers-rust` (the module-instance-state cache), the factory subtree-facts cache, E3 |
+
+The new `parseOutputs` cases (11, all matching) witness what E1's encoder never
+observes: comment directives, pragmas, the check-js directive,
+`UsesUriStyleNodeCoreModules` in each branch, and reparsed clones.
+
+18 witnesses are registered in `data/phase1/cases.json`: seven from S06, nine
+from S07 (the loader, include-reason and option-verification observations
+among them), and two Rust-only contracts. Each claims only the operations a
+change could alter. The survey's weak discriminators are listed under
+`not_claimed` with the reason. For example, `IsDottedName` has one negative row,
+`NodeList.HasTrailingComma` one true observation, and dispatch-only accessors
+never return a value. An Opus sub-agent ran every named Rust gate on this
+branch, and all pass.
+
+### Navigation (task 6)
+
+16 `astnav` cases, 15 matching. They cover the pinned `mapCode.ts` and the
+upstream inline-test sources, swept at every byte offset including end of file.
+The native `GetTokenAtPosition` sweep over `mapCode.ts` reproduces upstream's
+baseline structure, 1,404 runs. Every operation is compared with token identity
+(first-seen ordinals), plus `FindChildOfKind` over every node and kind, and the
+visitor. New sources reach what the fixture cannot: JSX `<<`, JSDoc and
+dotted-namespace reparsed nodes (where the pinned "Cannot create token from
+reparsed node" panic is reached and matched), trivia, unterminated JSDoc,
+zero-width nodes and private names.
+
+The one `not_implemented` case is `VisitEachChildAndJSDoc`. Rust's public
+visitor resolves each list to its members, so a caller cannot read the list's
+range (ls `findContainingList` does). It also reports no call for an absent
+child slot, where the pin calls both hooks with nil.
+
+### Evaluator (task 7) and debug
+
+14 evaluator cases drive `NewEvaluator` with a recording callback. They cover
+values, string-ness, cross-file flags, unknown results, template short-circuit
+order and dropped flags, entity forms, and left-then-right evaluation. They
+also call `AnyToString`, `IsTruthy` and `NewResult` on every value type. All 14
+are `not_implemented`: the Rust logic exists but is fused into
+`tsr_checker/src/enum_eval.rs`, with the entity callback hard-wired to enum
+resolution. Each case names the reusable API instead of duplicating checker
+name resolution. The prepared cases move `NewEvaluator`, `AnyToString` and
+`evaluateTemplateExpression` from `implemented_untested` (a name match) to
+`missing`.
+
+16 debug cases record the pinned panic texts, including `fmt.Sprint`'s spacing
+(`a1 2b`). All are `not_implemented`: no shared Rust helper exists, and each
+call site formats its own message.
+
+### Comparator controls (task 8) and the bounded smoke (task 9)
+
+- **Schedule validator.** It names a dropped variant, a boundary row posing as a
+  success, a rejected variant without its diagnostics, a rejected variant
+  claiming to pass the guard, a guard outcome contradicting the E2 policy, a
+  missing native row and a wrong phase label.
+- **Row comparator.** It fails on reordered diagnostics, an appended semantic
+  diagnostic, a wrong owner file, a changed range or argument, a rendering-only
+  change and a different program.
+- **Binder comparator.** It uses a real stream the Go oracle and the Rust binder
+  emitted identically (`data/phase1/syntax-comparator-fixture.json`), replayed
+  through the real stream validator. It fails on a changed parent edge, a
+  changed flow edge, a lost trailing comma (the list end moved onto the last
+  parameter, which is exactly `HasTrailingComma`), a wrong symbol identity,
+  reordered diagnostics and an appended diagnostic. A relabelled reorder is
+  refused earlier, by the stream itself.
+- **Bounded smoke.** It covers every row with a native syntactic diagnostic,
+  plus one row per (extensions, checkJs, allowJs, experimentalDecorators, native
+  selection) stratum, 908 rows. All match on structured diagnostics, plain and
+  pretty bytes and the program's file list. The other 14,244 loaded rows are
+  prepared but not run; F5b owns the full capture. `phase1_syntax.py replay`
+  recomputes the report from the stored outputs without running anything.
+
+### Mutation checks
+
+Each fault was planted in production code, observed, then reverted.
+
+| Fault | Caught by |
+| --- | --- |
+| unchecked-JS parameter-decorator walk disabled | the smoke: `parameterDecoratorInJsFile` |
+| sort and deduplication skipped | the smoke: 59 rows |
+| first check-js directive kept instead of the last | exactly the two precedence cases |
+| private-identifier test dropped from `GetTouchingPropertyName` | **not caught at first**: `mapCode.ts` has no private name. `private-names-and-keyword-properties` was added and catches it |
+| token-cache key made unique per call | every astnav case becomes a Rust harness failure and the capture is refused |
+
+### The syntax roster and the compiler surface
+
+`STEP_PACKAGES` gains `syntax`, the 15 packages no earlier step owned, so every
+Phase 1 operation is now on some roster. `data/phase1/syntax-roster.json` holds
+388 reviewed exemptions:
+
+- 155 `go_test_harness` for upstream's own harness packages, following F3a's
+  ruling for `testutil/baseline`. No compiler code imports them; the outside
+  importers are `fourslash` and `execute/tsctests`.
+- 230 `later_step` for the compiler operations outside the syntactic surface.
+  The membership note gives F4a the job of enumerating that surface. The owners
+  are:
+
+  | Class | Operations | Owner |
+  | --- | ---: | --- |
+  | checker | 63 | phase 2 |
+  | emit | 51 | phase 3 |
+  | project references | 54 | phase 4 |
+  | content mapper | 18 | phase 5 |
+  | CLI, language-service and reuse consumers | 44 | phases 4 to 6 |
+
+  This follows F3a's precedent of `later_step` owners in later phases. The 108
+  syntactic operations stay on the roster.
+- 3 `unused_at_pin`: `findRightmostNode`, the compiler's unexported
+  `newCheckerPool` and `GetResolvedProjectReferenceFor`.
+
+`syntax_prepared: false`. Of 3,617 roster operations, 821 are accounted for (43
+prepared, 390 witnessed, 388 exempt) and 2,796 are pending: ast 1,889, parser
+509, binder 181, scanner 144 and compiler 73. Scope coverage rose from 1,015
+to 1,439.
+
+### F4b queue, ranked by behavior
+
+1. **Parser, scanner, AST and binder internals (2,723 pending).** E1 and the
+   binder corpus run them, but only their entry points can be claimed. Linking
+   the internals needs a Go coverage capture of the persistent oracle over the
+   22,343 requests and a Rust coverage capture of the examples. Coverage alone
+   is not enough: an operation should be credited only when both sides ran it
+   and a per-category argument or a mutation shows the output depends on it.
+   Rust coverage needs `llvm-tools` installed, which is an owner decision.
+2. **A reusable evaluator** (`NewEvaluator`, `evaluateTemplateExpression`,
+   `AnyToString`, `IsTruthy`, `NewResult`): factor the callback contract out of
+   `enum_eval.rs` for the checker and printer to share.
+3. **`VisitEachChildAndJSDoc`**: expose the list range and absent-slot visits.
+4. **A shared debug helper** for the five panic-text contracts.
+5. **The 73 pending syntactic compiler operations**: loader internals the S07
+   witnesses reach only as a whole, plus accessors such as `NewProgram`,
+   `GetSourceFiles` and `Program.GetBindDiagnostics`.
+6. **The full syntax capture**: the 14,244 unrun schedule rows (F5b).
+
+### Open decisions for the owner
+
+- **The 230 compiler `later_step` exemptions** move operations the plan's
+  membership note leaves to F4a out of this step's accounting. They are
+  reviewable in `data/phase1/syntax-roster.json`. A disposition-level move to
+  `later_phase` would need a per-operation ledger mechanism, which the scope
+  does not have yet.
+- **Rust coverage tooling** for F4b item 1.
+- **`status/`**: nothing under it was rewritten. The committed view still marks
+  E1 and the binder stale.
+
+### Commands
+
+```sh
+python3 scripts/phase1_syntax.py capture --write --output "$SCRATCH/syntax"   # native schedule, ~30 s
+python3 scripts/phase1_syntax.py smoke --write --output "$SCRATCH/syntax"     # bounded Rust smoke, ~2 min
+python3 scripts/phase1_syntax.py replay "$SCRATCH/syntax/smoke"               # recompute, runs nothing
+python3 scripts/phase1.py capture --family syntax --output "$SCRATCH/family"  # the 75 cases
+python3 scripts/phase1.py compare --capture "$SCRATCH/family"
+python3 scripts/phase1.py inventory --check
+```
 
 ## F0 checklist
 

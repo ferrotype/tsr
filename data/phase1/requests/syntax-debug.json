@@ -1,0 +1,234 @@
+{
+  "family": "syntax",
+  "requests": [
+    {
+      "call": "fail",
+      "case": "syntax/debug/fail-empty-reason",
+      "discriminates": "debug_test.go TestFailEmptyReason: an empty reason is 'Debug failure.'.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/debug/debug.go:Fail",
+      "order_sensitive": true,
+      "reason": "",
+      "subject": "debug"
+    },
+    {
+      "call": "fail",
+      "case": "syntax/debug/fail-with-reason",
+      "discriminates": "debug_test.go TestFailWithReason: a reason follows 'Debug failure. '.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/debug/debug.go:Fail",
+      "order_sensitive": true,
+      "reason": "something went wrong",
+      "subject": "debug"
+    },
+    {
+      "call": "fail_bad_syntax_kind",
+      "case": "syntax/debug/fail-bad-syntax-kind-default",
+      "discriminates": "TestFailBadSyntaxKindNoMessage: the default message and the node's KindString on a second line.",
+      "host_applicability": "any",
+      "member": {
+        "kind_string": "FooNode"
+      },
+      "operation": "tsc/internal/debug/debug.go:FailBadSyntaxKind",
+      "order_sensitive": true,
+      "subject": "debug"
+    },
+    {
+      "call": "fail_bad_syntax_kind",
+      "case": "syntax/debug/fail-bad-syntax-kind-message",
+      "discriminates": "TestFailBadSyntaxKindWithMessage: a custom message replaces the default.",
+      "host_applicability": "any",
+      "member": {
+        "kind_string": "BarNode"
+      },
+      "message": [
+        {
+          "string": "custom message"
+        }
+      ],
+      "operation": "tsc/internal/debug/debug.go:FailBadSyntaxKind",
+      "order_sensitive": true,
+      "subject": "debug"
+    },
+    {
+      "call": "fail_bad_syntax_kind",
+      "case": "syntax/debug/fail-bad-syntax-kind-sprint-spacing",
+      "discriminates": "Several message operands go through fmt.Sprint, which puts a space only between two operands when neither is a string: 'a' then 1 then 2 then 'b' renders as 'a1 2b'.",
+      "host_applicability": "any",
+      "member": {
+        "kind_string": "K"
+      },
+      "message": [
+        {
+          "string": "a"
+        },
+        {
+          "int": 1
+        },
+        {
+          "int": 2
+        },
+        {
+          "string": "b"
+        }
+      ],
+      "operation": "tsc/internal/debug/debug.go:FailBadSyntaxKind",
+      "order_sensitive": true,
+      "subject": "debug"
+    },
+    {
+      "call": "assert_never",
+      "case": "syntax/debug/assert-never-kind-string",
+      "discriminates": "TestAssertNeverDefaultMessageKindString: the default 'Illegal value:' and the member's KindString.",
+      "host_applicability": "any",
+      "member": {
+        "kind_string": "TestNode"
+      },
+      "operation": "tsc/internal/debug/debug.go:AssertNever",
+      "order_sensitive": true,
+      "subject": "debug"
+    },
+    {
+      "call": "assert_never",
+      "case": "syntax/debug/assert-never-custom-message",
+      "discriminates": "TestAssertNeverCustomMessageKindString: a custom message.",
+      "host_applicability": "any",
+      "member": {
+        "kind_string": "TestNode"
+      },
+      "message": [
+        {
+          "string": "bad value:"
+        }
+      ],
+      "operation": "tsc/internal/debug/debug.go:AssertNever",
+      "order_sensitive": true,
+      "subject": "debug"
+    },
+    {
+      "call": "assert_never",
+      "case": "syntax/debug/assert-never-stringer",
+      "discriminates": "TestAssertNeverStringer: String() when there is no KindString.",
+      "host_applicability": "any",
+      "member": {
+        "stringer": "hello"
+      },
+      "operation": "tsc/internal/debug/debug.go:AssertNever",
+      "order_sensitive": true,
+      "subject": "debug"
+    },
+    {
+      "call": "assert_never",
+      "case": "syntax/debug/assert-never-fallback",
+      "discriminates": "TestAssertNeverFallback: %v for any other value.",
+      "host_applicability": "any",
+      "member": {
+        "int": 42
+      },
+      "operation": "tsc/internal/debug/debug.go:AssertNever",
+      "order_sensitive": true,
+      "subject": "debug"
+    },
+    {
+      "call": "assert_never",
+      "case": "syntax/debug/assert-never-nil",
+      "discriminates": "AssertNever(nil): the %v fallback prints <nil>.",
+      "host_applicability": "any",
+      "member": {
+        "nil": true
+      },
+      "operation": "tsc/internal/debug/debug.go:AssertNever",
+      "order_sensitive": true,
+      "subject": "debug"
+    },
+    {
+      "call": "assert_never",
+      "case": "syntax/debug/assert-never-kind-string-wins",
+      "discriminates": "A member with both KindString and String: KindString is tried first.",
+      "host_applicability": "any",
+      "member": {
+        "both": [
+          "Kind",
+          "text"
+        ]
+      },
+      "operation": "tsc/internal/debug/debug.go:AssertNever",
+      "order_sensitive": true,
+      "subject": "debug"
+    },
+    {
+      "call": "assert",
+      "case": "syntax/debug/assert-true",
+      "discriminates": "TestAssertTrue: a true condition returns.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/debug/debug.go:Assert",
+      "order_sensitive": true,
+      "subject": "debug",
+      "value": true
+    },
+    {
+      "call": "assert",
+      "case": "syntax/debug/assert-true-with-message",
+      "discriminates": "TestAssertTrueWithMessage: a message does not change a true condition.",
+      "host_applicability": "any",
+      "message": [
+        {
+          "string": "this should not trigger"
+        }
+      ],
+      "operation": "tsc/internal/debug/debug.go:Assert",
+      "order_sensitive": true,
+      "subject": "debug",
+      "value": true
+    },
+    {
+      "call": "assert",
+      "case": "syntax/debug/assert-false",
+      "discriminates": "TestAssertFalseNoMessage: 'False expression.'.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/debug/debug.go:Assert",
+      "order_sensitive": true,
+      "subject": "debug",
+      "value": false
+    },
+    {
+      "call": "assert",
+      "case": "syntax/debug/assert-false-with-message",
+      "discriminates": "TestAssertFalseWithMessage: 'False expression: ' and the message.",
+      "host_applicability": "any",
+      "message": [
+        {
+          "string": "expected x > 0"
+        }
+      ],
+      "operation": "tsc/internal/debug/debug.go:Assert",
+      "order_sensitive": true,
+      "subject": "debug",
+      "value": false
+    },
+    {
+      "call": "assert",
+      "case": "syntax/debug/assert-false-sprint-spacing",
+      "discriminates": "assertSlow joins several operands with fmt.Sprint's spacing rule.",
+      "host_applicability": "any",
+      "message": [
+        {
+          "int": 1
+        },
+        {
+          "int": 2
+        },
+        {
+          "string": "x"
+        },
+        {
+          "int": 3
+        }
+      ],
+      "operation": "tsc/internal/debug/debug.go:Assert",
+      "order_sensitive": true,
+      "subject": "debug",
+      "value": false
+    }
+  ]
+}

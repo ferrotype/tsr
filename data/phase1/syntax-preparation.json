@@ -1,11 +1,12 @@
 {
-  "accounted_operations": 555,
+  "accounted_operations": 821,
   "complete": false,
   "exempt_by_category": {
     "go_test_harness": 155,
-    "unused_at_pin": 1
+    "later_step": 230,
+    "unused_at_pin": 3
   },
-  "exempt_operations": 156,
+  "exempt_operations": 388,
   "gap_problems": [],
   "pending": [
     {
@@ -29986,384 +29987,7 @@
     },
     {
       "disposition": "missing",
-      "operation": "tsc/internal/compiler/checkerpool.go:checkerPool.GetChecker",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/checkerpool.go:checkerPool.GetGlobalDiagnostics",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/checkerpool.go:checkerPool.createCheckers",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/checkerpool.go:checkerPool.forEachCheckerGroupDo",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/checkerpool.go:checkerPool.forEachCheckerParallel",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/checkerpool.go:checkerPool.getCheckerForFileExclusive",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/checkerpool.go:checkerPool.getCheckerForFileNonExclusive",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/checkerpool.go:checkerPool.getCheckerNonExclusive",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/checkerpool.go:checkerPool.getImportAdjacency",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/checkerpool.go:getCheckerAssociationBaseWeight",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/checkerpool.go:getCheckerAssociationOrder",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/checkerpool.go:getCheckerAssociationPolicy",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/checkerpool.go:getCheckerAssociationWeights",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/checkerpool.go:getCheckerAssociationsInOrder",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/checkerpool.go:newCheckerPool",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/checkerpool.go:newCheckerPoolWithTracing",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/checkerpool.go:noop",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/checkerpool.go:shouldPrioritizeSourceFiles",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitHost.go:emitHost.CommonSourceDirectory",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitHost.go:emitHost.ContentMapperExtensions",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitHost.go:emitHost.FileExists",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetCurrentDirectory",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetDefaultResolutionModeForFile",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetEffectiveDeclarationFlags",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetEmitModuleFormatOfFile",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetEmitResolver",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetGlobalTypingsCacheLocation",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetModeForUsageLocation",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetNearestAncestorDirectoryWithPackageJson",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetOutputPathsFor",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetPackageJsonInfo",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetProjectReferenceFromSource",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetRedirectTargets",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetResolvedModuleFromModuleSpecifier",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetSourceFileFromReference",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetSourceOfProjectReferenceIfOutputIncluded",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetSymlinkCache",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitHost.go:emitHost.IsEmitBlocked",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitHost.go:emitHost.IsSourceFileFromExternalLibrary",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitHost.go:emitHost.Options",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitHost.go:emitHost.ResolveModuleName",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitHost.go:emitHost.SourceFileMayBeEmitted",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitHost.go:emitHost.SourceFiles",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitHost.go:emitHost.UseCaseSensitiveFileNames",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitHost.go:emitHost.WriteFile",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitHost.go:newEmitHost",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitter.go:declarationMapSource.ECMALineMap",
-      "rust_home": [
-        "crates/tsr_compiler/src/output_paths.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitter.go:declarationMapSource.FileName",
-      "rust_home": [
-        "crates/tsr_compiler/src/output_paths.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitter.go:declarationMapSource.Text",
-      "rust_home": [
-        "crates/tsr_compiler/src/output_paths.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitter.go:emitter.emit",
-      "rust_home": [
-        "crates/tsr_compiler/src/output_paths.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitter.go:emitter.emitDeclarationFile",
-      "rust_home": [
-        "crates/tsr_compiler/src/output_paths.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitter.go:emitter.emitJSFile",
-      "rust_home": [
-        "crates/tsr_compiler/src/output_paths.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitter.go:emitter.getDeclarationTransformers",
-      "rust_home": [
-        "crates/tsr_compiler/src/output_paths.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitter.go:emitter.getSourceMapDirectory",
-      "rust_home": [
-        "crates/tsr_compiler/src/output_paths.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitter.go:emitter.getSourceMappingURL",
-      "rust_home": [
-        "crates/tsr_compiler/src/output_paths.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitter.go:emitter.printSourceFile",
-      "rust_home": [
-        "crates/tsr_compiler/src/output_paths.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitter.go:emitter.runDeclarationTransformers",
-      "rust_home": [
-        "crates/tsr_compiler/src/output_paths.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitter.go:emitter.runScriptTransformers",
-      "rust_home": [
-        "crates/tsr_compiler/src/output_paths.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitter.go:emitter.writeText",
-      "rust_home": [
-        "crates/tsr_compiler/src/output_paths.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/emitter.go:getDeclarationDiagnostics",
-      "rust_home": [
-        "crates/tsr_compiler/src/output_paths.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitter.go:getModuleTransformer",
-      "rust_home": [
-        "crates/tsr_compiler/src/output_paths.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitter.go:getScriptTransformers",
-      "rust_home": [
-        "crates/tsr_compiler/src/output_paths.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
       "operation": "tsc/internal/compiler/emitter.go:getSourceFilesToEmit",
-      "rust_home": [
-        "crates/tsr_compiler/src/output_paths.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitter.go:getSourceRoot",
-      "rust_home": [
-        "crates/tsr_compiler/src/output_paths.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitter.go:isSourceFileNotJson",
-      "rust_home": [
-        "crates/tsr_compiler/src/output_paths.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitter.go:newDeclarationMapSource",
-      "rust_home": [
-        "crates/tsr_compiler/src/output_paths.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/emitter.go:shouldEmitSourceMaps",
-      "rust_home": [
-        "crates/tsr_compiler/src/output_paths.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/emitter.go:sourceFileMayBeEmitted",
       "rust_home": [
         "crates/tsr_compiler/src/output_paths.rs"
       ]
@@ -30397,20 +30021,6 @@
       ]
     },
     {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/fileInclude.go:FileIncludeReason.computeDiagnostic",
-      "rust_home": [
-        "crates/tsr_compiler/src/include_reason.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/fileInclude.go:FileIncludeReason.computeReferenceFileDiagnostic",
-      "rust_home": [
-        "crates/tsr_compiler/src/include_reason.rs"
-      ]
-    },
-    {
       "disposition": "missing",
       "operation": "tsc/internal/compiler/fileInclude.go:FileIncludeReason.computeReferenceFileRelatedInfo",
       "rust_home": [
@@ -30418,36 +30028,8 @@
       ]
     },
     {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/fileInclude.go:FileIncludeReason.getReferencedLocation",
-      "rust_home": [
-        "crates/tsr_compiler/src/include_reason.rs"
-      ]
-    },
-    {
       "disposition": "missing",
       "operation": "tsc/internal/compiler/fileInclude.go:FileIncludeReason.isReferencedFile",
-      "rust_home": [
-        "crates/tsr_compiler/src/include_reason.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/fileInclude.go:FileIncludeReason.toDiagnostic",
-      "rust_home": [
-        "crates/tsr_compiler/src/include_reason.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/fileInclude.go:FileIncludeReason.toRelatedInfo",
-      "rust_home": [
-        "crates/tsr_compiler/src/include_reason.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/fileInclude.go:referenceFileLocation.diagnosticAt",
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs"
       ]
@@ -30461,71 +30043,7 @@
     },
     {
       "disposition": "missing",
-      "operation": "tsc/internal/compiler/fileloader.go:ContentMapperInitializationDiagnostic",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/metadata.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/fileloader.go:ContentMapperProjectDiagnostic",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/metadata.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/fileloader.go:ContentMapperProjectErrorDiagnostic",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/metadata.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/fileloader.go:contentMapperMappingDiagnostic",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/metadata.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/fileloader.go:contentMapperTransformDiagnostic",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/metadata.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/fileloader.go:contentMapperTransformDiagnosticChain",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/metadata.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/fileloader.go:contentMapperTransformDiagnosticWithDetail",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/metadata.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
       "operation": "tsc/internal/compiler/fileloader.go:fileLoader.addAutomaticTypeDirectiveTasks",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/metadata.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/fileloader.go:fileLoader.addProjectReferenceTasks",
       "rust_home": [
         "crates/tsr_compiler/src/loader.rs",
         "crates/tsr_compiler/src/metadata.rs"
@@ -30549,47 +30067,7 @@
     },
     {
       "disposition": "missing",
-      "operation": "tsc/internal/compiler/fileloader.go:fileLoader.contentMapperUnavailable",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/metadata.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/fileloader.go:fileLoader.createSyntheticImport",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/metadata.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/fileloader.go:fileLoader.emptyContentMappedFile",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/metadata.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/fileloader.go:fileLoader.getContentMapperTransformIdentity",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/metadata.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
       "operation": "tsc/internal/compiler/fileloader.go:fileLoader.getDefaultLibFilePriority",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/metadata.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/fileloader.go:fileLoader.getSourceFileFromReference",
       "rust_home": [
         "crates/tsr_compiler/src/loader.rs",
         "crates/tsr_compiler/src/metadata.rs"
@@ -30613,47 +30091,7 @@
     },
     {
       "disposition": "missing",
-      "operation": "tsc/internal/compiler/fileloader.go:fileLoader.parseContentMappedFile",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/metadata.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
       "operation": "tsc/internal/compiler/fileloader.go:fileLoader.parseSourceFile",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/metadata.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/fileloader.go:fileLoader.pathForLibFile",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/metadata.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/fileloader.go:fileLoader.recordContentMapperFailure",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/metadata.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/fileloader.go:fileLoader.recordContentMapperInitializationFailure",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/metadata.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/fileloader.go:fileLoader.resolveAutomaticTypeDirectives",
       "rust_home": [
         "crates/tsr_compiler/src/loader.rs",
         "crates/tsr_compiler/src/metadata.rs"
@@ -30708,22 +30146,6 @@
       ]
     },
     {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/fileloader.go:getDefaultResolutionModeForFile",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/metadata.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/fileloader.go:getEmitSyntaxForUsageLocationWorker",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/metadata.rs"
-      ]
-    },
-    {
       "disposition": "missing",
       "operation": "tsc/internal/compiler/fileloader.go:getInferredLibraryNameResolveFrom",
       "rust_home": [
@@ -30740,32 +30162,8 @@
       ]
     },
     {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/fileloader.go:getModeForTypeReferenceDirectiveInFile",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/metadata.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/fileloader.go:getModeForUsageLocation",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/metadata.rs"
-      ]
-    },
-    {
       "disposition": "missing",
       "operation": "tsc/internal/compiler/fileloader.go:importSyntaxAffectsModuleResolution",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/metadata.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/fileloader.go:processAllProgramFiles",
       "rust_home": [
         "crates/tsr_compiler/src/loader.rs",
         "crates/tsr_compiler/src/metadata.rs"
@@ -30869,14 +30267,6 @@
     },
     {
       "disposition": "missing",
-      "operation": "tsc/internal/compiler/filesparser.go:parseTask.redirect",
-      "rust_home": [
-        "crates/tsr_compiler/src/cache.rs",
-        "crates/tsr_compiler/src/loader.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
       "operation": "tsc/internal/compiler/filesparser.go:putParseTaskData",
       "rust_home": [
         "crates/tsr_compiler/src/cache.rs",
@@ -30885,21 +30275,7 @@
     },
     {
       "disposition": "missing",
-      "operation": "tsc/internal/compiler/host.go:NewCachedFSCompilerHost",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
       "operation": "tsc/internal/compiler/host.go:NewCompilerHost",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/host.go:compilerHost.ContentMapperProject",
       "rust_home": [
         "crates/tsr_compiler/src/loader.rs"
       ]
@@ -30920,21 +30296,7 @@
     },
     {
       "disposition": "missing",
-      "operation": "tsc/internal/compiler/host.go:compilerHost.GetContentMappedSourceFiles",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
       "operation": "tsc/internal/compiler/host.go:compilerHost.GetCurrentDirectory",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/host.go:compilerHost.GetResolvedProjectReference",
       "rust_home": [
         "crates/tsr_compiler/src/loader.rs"
       ]
@@ -30970,54 +30332,6 @@
       ]
     },
     {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/includeprocessor.go:includeProcessor.explainRedirectAndImpliedFormat",
-      "rust_home": [
-        "crates/tsr_compiler/src/include_reason.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/includeprocessor.go:includeProcessor.getCompilerOptionsObjectLiteralSyntax",
-      "rust_home": [
-        "crates/tsr_compiler/src/include_reason.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/includeprocessor.go:includeProcessor.getDiagnostics",
-      "rust_home": [
-        "crates/tsr_compiler/src/include_reason.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/includeprocessor.go:includeProcessor.getReferenceLocation",
-      "rust_home": [
-        "crates/tsr_compiler/src/include_reason.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/includeprocessor.go:includeProcessor.getRelatedInfo",
-      "rust_home": [
-        "crates/tsr_compiler/src/include_reason.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/includeprocessor.go:updateFileIncludeProcessor",
-      "rust_home": [
-        "crates/tsr_compiler/src/include_reason.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs"
-      ]
-    },
-    {
       "disposition": "missing",
       "operation": "tsc/internal/compiler/processingDiagnostic.go:processingDiagnostic.asFileIncludeReason",
       "rust_home": [
@@ -31032,57 +30346,10 @@
       ]
     },
     {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/processingDiagnostic.go:processingDiagnostic.createDiagnosticExplainingFile",
-      "rust_home": [
-        "crates/tsr_compiler/src/include_reason.rs"
-      ]
-    },
-    {
       "disposition": "missing",
       "operation": "tsc/internal/compiler/processingDiagnostic.go:processingDiagnostic.toDiagnostic",
       "rust_home": [
         "crates/tsr_compiler/src/include_reason.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:CombineEmitResults",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:FilterNoEmitSemanticDiagnostics",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:GetDiagnosticsOfAnyProgram",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:HandleNoEmitOptions",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
       ]
     },
     {
@@ -31107,147 +30374,7 @@
     },
     {
       "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.CommandLine",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/program.go:Program.CommonSourceDirectory",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.ContentMapperExtensions",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.ContentMapperProject",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.DeepImportPackageNames",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.DuplicateSourceFiles",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.Emit",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.ExplainFiles",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/program.go:Program.FileExists",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.FilesByPath",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.ForEachCheckerParallel",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.ForEachResolvedModule",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.ForEachResolvedTypeReferenceDirective",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
       "operation": "tsc/internal/compiler/program.go:Program.GetBindDiagnostics",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.GetCheckerPool",
       "rust_home": [
         "crates/tsr_compiler/src/loader.rs",
         "crates/tsr_compiler/src/output_paths.rs",
@@ -31266,88 +30393,8 @@
       ]
     },
     {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.GetContentMapper",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
       "disposition": "implemented_untested",
       "operation": "tsc/internal/compiler/program.go:Program.GetCurrentDirectory",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.GetDeclarationDiagnostics",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.GetDefaultLibFile",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.GetDefaultResolutionModeForFile",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/program.go:Program.GetEmitModuleFormatOfFile",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/program.go:Program.GetEmitSyntaxForUsageLocation",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.GetGlobalDiagnostics",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.GetGlobalTypingsCacheLocation",
       "rust_home": [
         "crates/tsr_compiler/src/loader.rs",
         "crates/tsr_compiler/src/output_paths.rs",
@@ -31366,148 +30413,8 @@
       ]
     },
     {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.GetImportHelpersImportSpecifier",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.GetIncludeProcessorDiagnostics",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.GetIncludeReasons",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.GetJSXRuntimeImportSpecifier",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.GetLibFileFromReference",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
       "disposition": "implemented_untested",
       "operation": "tsc/internal/compiler/program.go:Program.GetModeForUsageLocation",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/program.go:Program.GetNearestAncestorDirectoryWithPackageJson",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/program.go:Program.GetPackageJsonInfo",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/program.go:Program.GetPackagesMap",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.GetParseFileRedirect",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/program.go:Program.GetProgramDiagnostics",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/program.go:Program.GetProjectReferenceFromOutputDts",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/program.go:Program.GetProjectReferenceFromSource",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.GetRedirectForResolution",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.GetRedirectTargets",
       "rust_home": [
         "crates/tsr_compiler/src/loader.rs",
         "crates/tsr_compiler/src/output_paths.rs",
@@ -31536,76 +30443,6 @@
       ]
     },
     {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.GetResolvedModules",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.GetResolvedProjectReferenceFor",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.GetResolvedProjectReferences",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.GetResolvedTypeReferenceDirectiveFromTypeReferenceDirective",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.GetResolvedTypeReferenceDirectives",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.GetSemanticDiagnostics",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.GetSemanticDiagnosticsWithoutNoEmitFiltering",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
       "disposition": "implemented_untested",
       "operation": "tsc/internal/compiler/program.go:Program.GetSourceFile",
       "rust_home": [
@@ -31626,36 +30463,6 @@
       ]
     },
     {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/program.go:Program.GetSourceFileForResolvedModule",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.GetSourceFileFromReference",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/program.go:Program.GetSourceFileMetaData",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
       "disposition": "missing",
       "operation": "tsc/internal/compiler/program.go:Program.GetSourceFiles",
       "rust_home": [
@@ -31667,157 +30474,7 @@
     },
     {
       "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.GetSourceOfProjectReferenceIfOutputIncluded",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.GetSuggestionDiagnostics",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/program.go:Program.GetSymlinkCache",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.GetTypeChecker",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.GetTypeCheckerForFile",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.GetTypeCheckerForFileExclusive",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.GetUnresolvedImports",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.HasSameFileNames",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.HasTSFile",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
       "operation": "tsc/internal/compiler/program.go:Program.Host",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.IdentifierCount",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.InstantiationCount",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.IsEmitBlocked",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.IsGlobalTypingsFile",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.IsLibFile",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.IsMissingPath",
       "rust_home": [
         "crates/tsr_compiler/src/loader.rs",
         "crates/tsr_compiler/src/output_paths.rs",
@@ -31846,38 +30503,8 @@
       ]
     },
     {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.IsSourceFromProjectReference",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.LineCount",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
       "disposition": "implemented_untested",
       "operation": "tsc/internal/compiler/program.go:Program.Options",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.PackageJsonCacheEntries",
       "rust_home": [
         "crates/tsr_compiler/src/loader.rs",
         "crates/tsr_compiler/src/output_paths.rs",
@@ -31897,56 +30524,6 @@
     },
     {
       "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReferenceInChildConfig",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.ResolveModuleName",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.ResolvedPackageNames",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.ReuseProgram",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
       "operation": "tsc/internal/compiler/program.go:Program.SingleThreaded",
       "rust_home": [
         "crates/tsr_compiler/src/loader.rs",
@@ -31957,77 +30534,7 @@
     },
     {
       "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/program.go:Program.SkipTypeChecking",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/program.go:Program.SourceFileMayBeEmitted",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
       "operation": "tsc/internal/compiler/program.go:Program.SourceFiles",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.SymbolCount",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.Tracing",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.TypeCount",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.UnresolvedPackageNames",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.UpdateProgram",
       "rust_home": [
         "crates/tsr_compiler/src/loader.rs",
         "crates/tsr_compiler/src/output_paths.rs",
@@ -32047,37 +30554,7 @@
     },
     {
       "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.UsesUriStyleNodeCoreModules",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
       "operation": "tsc/internal/compiler/program.go:Program.blockEmittingOfFile",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/program.go:Program.canIncludeBindAndCheckDiagnostics",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.canReplaceFileInProgram",
       "rust_home": [
         "crates/tsr_compiler/src/loader.rs",
         "crates/tsr_compiler/src/output_paths.rs",
@@ -32097,157 +30574,7 @@
     },
     {
       "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.collectCheckerDiagnostics",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.collectCheckerDiagnosticsFromFiles",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.collectContentMapperOptionDiagnostics",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.collectPackageNames",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.extractUnresolvedImports",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.extractUnresolvedImportsFromSourceFile",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/program.go:Program.getBindAndCheckDiagnosticsWithChecker",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/program.go:Program.getDeclarationDiagnosticsForFile",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/program.go:Program.getDiagnosticsWithPrecedingDirectives",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.getModeForTypeReferenceDirectiveInFile",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/program.go:Program.getSemanticDiagnosticsWithChecker",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
       "operation": "tsc/internal/compiler/program.go:Program.getSourceFilesToEmit",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/program.go:Program.getSuggestionDiagnosticsWithChecker",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.initCheckerPool",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.jsxRuntimeImportSpecifier",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.needsImportHelpersImportSpecifier",
       "rust_home": [
         "crates/tsr_compiler/src/loader.rs",
         "crates/tsr_compiler/src/output_paths.rs",
@@ -32267,156 +30594,6 @@
     },
     {
       "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/program.go:Program.verifyCompilerOptions",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:ProgramOptions.canUseProjectReferenceSource",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/program.go:applyContentMapperDiagnosticDirectives",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/program.go:compactAndMergeRelatedInfos",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/program.go:emitModuleKindIsNonNodeESM",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:equalCheckJSDirectives",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:equalFileReferences",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:equalModuleAugmentationNames",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:equalModuleSpecifiers",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:forEachResolution",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/program.go:hasZeroOrOneAsteriskCharacter",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/program.go:isCommentOrBlankLine",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:lazyValue.getValue",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:lazyValue.tryReuse",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
       "operation": "tsc/internal/compiler/program.go:moduleResolutionSupportsPackageJsonExportsAndImports",
       "rust_home": [
         "crates/tsr_compiler/src/loader.rs",
@@ -32424,231 +30601,6 @@
         "crates/tsr_compiler/src/program_diagnostics.rs",
         "crates/tsr_compiler/src/verify_options.rs"
       ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:newProjectReferenceDtsFakingHost",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingHost.FS",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingHost.GetCurrentDirectory",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.AppendFile",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.Chtimes",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.DirectoryExists",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.FileExists",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.GetAccessibleEntries",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.ReadFile",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.Realpath",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.Remove",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.Stat",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.UseCaseSensitiveFileNames",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.WalkDir",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.WriteFile",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.directoryExistsIfProjectReferenceDeclDir",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.fileExistsIfProjectReferenceDts",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.fileOrDirectoryExistsUsingSource",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.handleDirectoryCouldBeSymlink",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.toPath",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getCompilerOptionsForFile",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromOutputDts",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getRedirectForResolution",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getRedirectParsedCommandLineForResolution",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getResolvedProjectReferences",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getResolvedReferenceFor",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getSourceToDtsIfSymlink",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.isSourceFromProjectReference",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReferenceInChildConfig",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rootConfigPath",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/projectreferenceparser.go:createProjectReferenceParseTasks",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParseTask.parse",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.initMapper",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.initMapperWorker",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.parse",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.start",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/debug/debug.go:Assert",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/debug/debug.go:AssertNever",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/debug/debug.go:Fail",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/debug/debug.go:FailBadSyntaxKind",
-      "rust_home": []
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/debug/debug.go:assertSlow",
-      "rust_home": []
     },
     {
       "disposition": "implemented_untested",
@@ -47657,10 +45609,10 @@
     }
   ],
   "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
-  "prepared_operations": 38,
+  "prepared_operations": 43,
   "roster_problems": [],
   "step": "syntax",
   "total_operations": 3617,
   "version": 2,
-  "witnessed_operations": 361
+  "witnessed_operations": 390
 }

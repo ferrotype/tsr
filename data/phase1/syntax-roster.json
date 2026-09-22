@@ -7,6 +7,1398 @@
       "owner": "nothing at the pin calls it"
     },
     {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/checkerpool.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/checkerpool.go:checkerPool.GetChecker",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/checkerpool.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/checkerpool.go:checkerPool.GetGlobalDiagnostics",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/checkerpool.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/checkerpool.go:checkerPool.createCheckers",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/checkerpool.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/checkerpool.go:checkerPool.forEachCheckerGroupDo",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/checkerpool.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/checkerpool.go:checkerPool.forEachCheckerParallel",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/checkerpool.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/checkerpool.go:checkerPool.getCheckerForFileExclusive",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/checkerpool.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/checkerpool.go:checkerPool.getCheckerForFileNonExclusive",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/checkerpool.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/checkerpool.go:checkerPool.getCheckerNonExclusive",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/checkerpool.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/checkerpool.go:checkerPool.getImportAdjacency",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/checkerpool.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/checkerpool.go:getCheckerAssociationBaseWeight",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/checkerpool.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/checkerpool.go:getCheckerAssociationOrder",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/checkerpool.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/checkerpool.go:getCheckerAssociationPolicy",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/checkerpool.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/checkerpool.go:getCheckerAssociationWeights",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/checkerpool.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/checkerpool.go:getCheckerAssociationsInOrder",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "unused_at_pin",
+      "evidence": "upstream/tsc/internal/compiler/checkerpool.go:301. Unexported, and its definition is its only occurrence in package compiler (verified in this session); the newCheckerPool in internal/project/checkerpool.go:84 is a different function. || RUST: none needed.",
+      "operation": "tsc/internal/compiler/checkerpool.go:newCheckerPool",
+      "owner": "nothing at the pin calls it"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/checkerpool.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/checkerpool.go:newCheckerPoolWithTracing",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/checkerpool.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/checkerpool.go:noop",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/checkerpool.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/checkerpool.go:shouldPrioritizeSourceFiles",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.CommonSourceDirectory",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.ContentMapperExtensions",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.FileExists",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetCurrentDirectory",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetDefaultResolutionModeForFile",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetEffectiveDeclarationFlags",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetEmitModuleFormatOfFile",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetEmitResolver",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetGlobalTypingsCacheLocation",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetModeForUsageLocation",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetNearestAncestorDirectoryWithPackageJson",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetOutputPathsFor",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetPackageJsonInfo",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetProjectReferenceFromSource",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetRedirectTargets",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetResolvedModuleFromModuleSpecifier",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetSourceFileFromReference",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetSourceOfProjectReferenceIfOutputIncluded",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetSymlinkCache",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.IsEmitBlocked",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.IsSourceFileFromExternalLibrary",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.Options",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.ResolveModuleName",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.SourceFileMayBeEmitted",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.SourceFiles",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.UseCaseSensitiveFileNames",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.WriteFile",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitHost.go:newEmitHost",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitter.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitter.go:declarationMapSource.ECMALineMap",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitter.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitter.go:declarationMapSource.FileName",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitter.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitter.go:declarationMapSource.Text",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitter.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitter.go:emitter.emit",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitter.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitter.go:emitter.emitDeclarationFile",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitter.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitter.go:emitter.emitJSFile",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitter.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitter.go:emitter.getDeclarationTransformers",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitter.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitter.go:emitter.getSourceMapDirectory",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitter.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitter.go:emitter.getSourceMappingURL",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitter.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitter.go:emitter.printSourceFile",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitter.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitter.go:emitter.runDeclarationTransformers",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitter.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitter.go:emitter.runScriptTransformers",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitter.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitter.go:emitter.writeText",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitter.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitter.go:getDeclarationDiagnostics",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitter.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitter.go:getModuleTransformer",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitter.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitter.go:getScriptTransformers",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitter.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitter.go:getSourceRoot",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitter.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitter.go:isSourceFileNotJson",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitter.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitter.go:newDeclarationMapSource",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/emitter.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/emitter.go:shouldEmitSourceMaps",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/fileloader.go. Gated by a content-mapper extension (fileloader.go:410) or a content-mapper project; the F4a syntax schedule carries the 15 content-mapped variants as this named boundary. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/fileloader.go:ContentMapperInitializationDiagnostic",
+      "owner": "phase 5, the content-mapper integration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/fileloader.go. Gated by a content-mapper extension (fileloader.go:410) or a content-mapper project; the F4a syntax schedule carries the 15 content-mapped variants as this named boundary. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/fileloader.go:ContentMapperProjectDiagnostic",
+      "owner": "phase 5, the content-mapper integration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/fileloader.go. Gated by a content-mapper extension (fileloader.go:410) or a content-mapper project; the F4a syntax schedule carries the 15 content-mapped variants as this named boundary. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/fileloader.go:ContentMapperProjectErrorDiagnostic",
+      "owner": "phase 5, the content-mapper integration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/fileloader.go. Gated by a content-mapper extension (fileloader.go:410) or a content-mapper project; the F4a syntax schedule carries the 15 content-mapped variants as this named boundary. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/fileloader.go:contentMapperMappingDiagnostic",
+      "owner": "phase 5, the content-mapper integration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/fileloader.go. Gated by a content-mapper extension (fileloader.go:410) or a content-mapper project; the F4a syntax schedule carries the 15 content-mapped variants as this named boundary. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/fileloader.go:contentMapperTransformDiagnostic",
+      "owner": "phase 5, the content-mapper integration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/fileloader.go. Gated by a content-mapper extension (fileloader.go:410) or a content-mapper project; the F4a syntax schedule carries the 15 content-mapped variants as this named boundary. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/fileloader.go:contentMapperTransformDiagnosticChain",
+      "owner": "phase 5, the content-mapper integration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/fileloader.go. Gated by a content-mapper extension (fileloader.go:410) or a content-mapper project; the F4a syntax schedule carries the 15 content-mapped variants as this named boundary. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/fileloader.go:contentMapperTransformDiagnosticWithDetail",
+      "owner": "phase 5, the content-mapper integration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/fileloader.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/fileloader.go:fileLoader.addProjectReferenceTasks",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/fileloader.go. Gated by a content-mapper extension (fileloader.go:410) or a content-mapper project; the F4a syntax schedule carries the 15 content-mapped variants as this named boundary. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/fileloader.go:fileLoader.contentMapperUnavailable",
+      "owner": "phase 5, the content-mapper integration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/fileloader.go. Gated by a content-mapper extension (fileloader.go:410) or a content-mapper project; the F4a syntax schedule carries the 15 content-mapped variants as this named boundary. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/fileloader.go:fileLoader.emptyContentMappedFile",
+      "owner": "phase 5, the content-mapper integration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/fileloader.go. Gated by a content-mapper extension (fileloader.go:410) or a content-mapper project; the F4a syntax schedule carries the 15 content-mapped variants as this named boundary. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/fileloader.go:fileLoader.getContentMapperTransformIdentity",
+      "owner": "phase 5, the content-mapper integration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/fileloader.go. Gated by a content-mapper extension (fileloader.go:410) or a content-mapper project; the F4a syntax schedule carries the 15 content-mapped variants as this named boundary. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/fileloader.go:fileLoader.parseContentMappedFile",
+      "owner": "phase 5, the content-mapper integration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/fileloader.go. Gated by a content-mapper extension (fileloader.go:410) or a content-mapper project; the F4a syntax schedule carries the 15 content-mapped variants as this named boundary. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/fileloader.go:fileLoader.recordContentMapperFailure",
+      "owner": "phase 5, the content-mapper integration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/fileloader.go. Gated by a content-mapper extension (fileloader.go:410) or a content-mapper project; the F4a syntax schedule carries the 15 content-mapped variants as this named boundary. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/fileloader.go:fileLoader.recordContentMapperInitializationFailure",
+      "owner": "phase 5, the content-mapper integration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/filesparser.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/host.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/host.go:NewCachedFSCompilerHost",
+      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/host.go. Gated by a content-mapper extension (fileloader.go:410) or a content-mapper project; the F4a syntax schedule carries the 15 content-mapped variants as this named boundary. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/host.go:compilerHost.ContentMapperProject",
+      "owner": "phase 5, the content-mapper integration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/host.go. Gated by a content-mapper extension (fileloader.go:410) or a content-mapper project; the F4a syntax schedule carries the 15 content-mapped variants as this named boundary. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/host.go:compilerHost.GetContentMappedSourceFiles",
+      "owner": "phase 5, the content-mapper integration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/host.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/host.go:compilerHost.GetResolvedProjectReference",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/includeprocessor.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/includeprocessor.go:updateFileIncludeProcessor",
+      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:CombineEmitResults",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:FilterNoEmitSemanticDiagnostics",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:GetDiagnosticsOfAnyProgram",
+      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:HandleNoEmitOptions",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.CommandLine",
+      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.ContentMapperExtensions",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Gated by a content-mapper extension (fileloader.go:410) or a content-mapper project; the F4a syntax schedule carries the 15 content-mapped variants as this named boundary. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.ContentMapperProject",
+      "owner": "phase 5, the content-mapper integration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.DeepImportPackageNames",
+      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.DuplicateSourceFiles",
+      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.Emit",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.ExplainFiles",
+      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.FileExists",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.FilesByPath",
+      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.ForEachCheckerParallel",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.ForEachResolvedModule",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.ForEachResolvedTypeReferenceDirective",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.GetCheckerPool",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Gated by a content-mapper extension (fileloader.go:410) or a content-mapper project; the F4a syntax schedule carries the 15 content-mapped variants as this named boundary. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.GetContentMapper",
+      "owner": "phase 5, the content-mapper integration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.GetDeclarationDiagnostics",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.GetDefaultLibFile",
+      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.GetDefaultResolutionModeForFile",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.GetEmitModuleFormatOfFile",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.GetEmitSyntaxForUsageLocation",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.GetGlobalDiagnostics",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.GetGlobalTypingsCacheLocation",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.GetImportHelpersImportSpecifier",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.GetIncludeProcessorDiagnostics",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.GetIncludeReasons",
+      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.GetJSXRuntimeImportSpecifier",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.GetLibFileFromReference",
+      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.GetNearestAncestorDirectoryWithPackageJson",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.GetPackageJsonInfo",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.GetPackagesMap",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.GetParseFileRedirect",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.GetProjectReferenceFromOutputDts",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.GetProjectReferenceFromSource",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.GetRedirectForResolution",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.GetRedirectTargets",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.GetResolvedModules",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "unused_at_pin",
+      "evidence": "upstream/tsc/internal/compiler/program.go:201. A bare-name search over the pinned tree returns exactly one occurrence, the definition itself (verified in this session). || RUST: none needed.",
+      "operation": "tsc/internal/compiler/program.go:Program.GetResolvedProjectReferenceFor",
+      "owner": "nothing at the pin calls it"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.GetResolvedProjectReferences",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.GetResolvedTypeReferenceDirectiveFromTypeReferenceDirective",
+      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.GetResolvedTypeReferenceDirectives",
+      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.GetSemanticDiagnostics",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.GetSemanticDiagnosticsWithoutNoEmitFiltering",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.GetSourceFileForResolvedModule",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.GetSourceFileFromReference",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.GetSourceOfProjectReferenceIfOutputIncluded",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.GetSuggestionDiagnostics",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.GetSymlinkCache",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.GetTypeChecker",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.GetTypeCheckerForFile",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.GetTypeCheckerForFileExclusive",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.GetUnresolvedImports",
+      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.HasSameFileNames",
+      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.HasTSFile",
+      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.IdentifierCount",
+      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.InstantiationCount",
+      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.IsEmitBlocked",
+      "owner": "phase 3, emit orchestration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.IsGlobalTypingsFile",
+      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.IsLibFile",
+      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.IsMissingPath",
+      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.IsSourceFromProjectReference",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.LineCount",
+      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.PackageJsonCacheEntries",
+      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReferenceInChildConfig",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.ResolveModuleName",
+      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.ResolvedPackageNames",
+      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.ReuseProgram",
+      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.SkipTypeChecking",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.SourceFileMayBeEmitted",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.SymbolCount",
+      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.Tracing",
+      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.TypeCount",
+      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.UnresolvedPackageNames",
+      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.UpdateProgram",
+      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.UsesUriStyleNodeCoreModules",
+      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.canIncludeBindAndCheckDiagnostics",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.canReplaceFileInProgram",
+      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.collectCheckerDiagnostics",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.collectCheckerDiagnosticsFromFiles",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Gated by a content-mapper extension (fileloader.go:410) or a content-mapper project; the F4a syntax schedule carries the 15 content-mapped variants as this named boundary. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.collectContentMapperOptionDiagnostics",
+      "owner": "phase 5, the content-mapper integration"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.collectPackageNames",
+      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.extractUnresolvedImports",
+      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.extractUnresolvedImportsFromSourceFile",
+      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.getBindAndCheckDiagnosticsWithChecker",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.getDeclarationDiagnosticsForFile",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.getDiagnosticsWithPrecedingDirectives",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.getModeForTypeReferenceDirectiveInFile",
+      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.getSemanticDiagnosticsWithChecker",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.getSuggestionDiagnosticsWithChecker",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.initCheckerPool",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.jsxRuntimeImportSpecifier",
+      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.needsImportHelpersImportSpecifier",
+      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:ProgramOptions.canUseProjectReferenceSource",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:applyContentMapperDiagnosticDirectives",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:equalCheckJSDirectives",
+      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:equalFileReferences",
+      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:equalModuleAugmentationNames",
+      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:equalModuleSpecifiers",
+      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:forEachResolution",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:isCommentOrBlankLine",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:lazyValue.getValue",
+      "owner": "phase 2, the checker and its checker pool"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/program.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/program.go:lazyValue.tryReuse",
+      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/projectreferencedtsfakinghost.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:newProjectReferenceDtsFakingHost",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/projectreferencedtsfakinghost.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingHost.FS",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/projectreferencedtsfakinghost.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingHost.GetCurrentDirectory",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/projectreferencedtsfakinghost.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.AppendFile",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/projectreferencedtsfakinghost.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.Chtimes",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/projectreferencedtsfakinghost.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.DirectoryExists",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/projectreferencedtsfakinghost.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.FileExists",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/projectreferencedtsfakinghost.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.GetAccessibleEntries",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/projectreferencedtsfakinghost.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.ReadFile",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/projectreferencedtsfakinghost.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.Realpath",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/projectreferencedtsfakinghost.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.Remove",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/projectreferencedtsfakinghost.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.Stat",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/projectreferencedtsfakinghost.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.UseCaseSensitiveFileNames",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/projectreferencedtsfakinghost.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.WalkDir",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/projectreferencedtsfakinghost.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.WriteFile",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/projectreferencedtsfakinghost.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.directoryExistsIfProjectReferenceDeclDir",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/projectreferencedtsfakinghost.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.fileExistsIfProjectReferenceDts",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/projectreferencedtsfakinghost.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.fileOrDirectoryExistsUsingSource",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/projectreferencedtsfakinghost.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.handleDirectoryCouldBeSymlink",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/projectreferencedtsfakinghost.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.toPath",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getCompilerOptionsForFile",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromOutputDts",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getRedirectForResolution",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getRedirectParsedCommandLineForResolution",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getResolvedProjectReferences",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getResolvedReferenceFor",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getSourceToDtsIfSymlink",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.isSourceFromProjectReference",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReferenceInChildConfig",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rootConfigPath",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/projectreferenceparser.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/projectreferenceparser.go:createProjectReferenceParseTasks",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/projectreferenceparser.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParseTask.parse",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/projectreferenceparser.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.initMapper",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/projectreferenceparser.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.initMapperWorker",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/projectreferenceparser.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.parse",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/compiler/projectreferenceparser.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "operation": "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.start",
+      "owner": "phase 4, project-reference scheduling"
+    },
+    {
       "category": "go_test_harness",
       "evidence": "upstream/tsc/internal/repo/paths.go. The package is every non-test caller is test harness: testrunner/compiler_runner.go, testutil/baseline/baseline.go, testutil/fixtures/benchfixtures.go, testutil/harnessutil/harnessutil.go, testutil/jstest/node.go. || RUST: Absent, intentionally. The port finds its roots with ROOT = Path(__file__).resolve().parents[1] in scripts and with include_str! in Rust tests.",
       "operation": "tsc/internal/repo/paths.go:RootPath",

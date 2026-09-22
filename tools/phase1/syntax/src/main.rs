@@ -20,6 +20,7 @@ use tsr_compiler as ts_compiler_error;
 use tsr_compiler::{FileCache, Program, ProgramOptions};
 
 mod astnav;
+mod debug;
 mod diagnostics;
 mod evaluator;
 mod parse_outputs;
@@ -51,6 +52,7 @@ const GROUPS: &[(&str, GroupHandler)] = &[
     ("astnav", astnav::observe),
     ("evaluator", evaluator::observe),
     ("parseOutputs", parse_outputs::observe),
+    ("debug", debug::observe),
 ];
 
 fn observe(request: &Value) -> Map<String, Value> {

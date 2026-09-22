@@ -347,6 +347,7 @@ FAMILIES = {
             "data/phase1/requests/syntax-astnav.json",
             "data/phase1/requests/syntax-evaluator.json",
             "data/phase1/requests/syntax-parse-outputs.json",
+            "data/phase1/requests/syntax-debug.json",
         ],
         "native_probes": [
             # In-package so a probe may reach unexported program state. The
@@ -373,6 +374,9 @@ FAMILIES = {
              "probe": "tools/phase1/syntax/utilities_probe_test.go",
              "test": "TestPhase1SyntaxParseOutputs",
              "trimpath": False},
+            {"name": "debug", "package": "debug",
+             "probe": "tools/phase1/syntax/debug_probe_test.go",
+             "test": "TestPhase1SyntaxDebug"},
         ],
         "rust_package": "phase1_syntax",
         "rust_target_kind": "bin",

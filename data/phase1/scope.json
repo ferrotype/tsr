@@ -1,10 +1,10 @@
 {
   "counts": {
-    "covered": 1410,
+    "covered": 1439,
     "equivalent_rust": 8,
-    "implemented_untested": 2725,
+    "implemented_untested": 2697,
     "later_phase": 18,
-    "missing": 634
+    "missing": 633
   },
   "dispositions": [
     "covered",
@@ -141233,8 +141233,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -141297,8 +141297,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -141361,8 +141361,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -141425,8 +141425,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -141489,8 +141489,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -141553,8 +141553,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -141617,8 +141617,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -141681,8 +141681,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -141745,8 +141745,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -141809,8 +141809,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -141873,8 +141873,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -141937,8 +141937,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -142001,8 +142001,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -142065,8 +142065,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -142129,8 +142129,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "nothing at the pin calls it",
+        "state": "exempt:unused_at_pin",
         "step": "syntax"
       },
       "rust_home": [],
@@ -142193,8 +142193,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -142257,8 +142257,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -142321,8 +142321,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -142385,8 +142385,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -142449,8 +142449,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -142513,8 +142513,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -142577,8 +142577,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -142641,8 +142641,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -142705,8 +142705,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -142769,8 +142769,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -142833,8 +142833,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -142897,8 +142897,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -142961,8 +142961,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -143025,8 +143025,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -143089,8 +143089,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -143153,8 +143153,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -143217,8 +143217,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -143281,8 +143281,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -143345,8 +143345,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -143409,8 +143409,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -143473,8 +143473,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -143537,8 +143537,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -143601,8 +143601,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -143665,8 +143665,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -143729,8 +143729,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -143793,8 +143793,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -143857,8 +143857,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -143921,8 +143921,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -143985,8 +143985,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -144049,8 +144049,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -144113,8 +144113,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -144177,8 +144177,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -144243,8 +144243,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -144309,8 +144309,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -144375,8 +144375,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -144441,8 +144441,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -144507,8 +144507,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -144573,8 +144573,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -144639,8 +144639,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -144705,8 +144705,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -144771,8 +144771,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -144837,8 +144837,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -144903,8 +144903,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -144969,8 +144969,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -145037,8 +145037,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -145103,8 +145103,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -145169,8 +145169,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -145301,8 +145301,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -145367,8 +145367,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -145433,8 +145433,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -145499,8 +145499,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -145513,9 +145513,11 @@
       "annotated_home": [
         "crates/tsr_compiler/src/output_paths.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-verify-options-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-verify-options-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/binder",
@@ -145555,7 +145557,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/emitter.go",
       "id": "tsc/internal/compiler/emitter.go:sourceFileMayBeEmitted",
@@ -145568,7 +145570,7 @@
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -145845,9 +145847,12 @@
       "annotated_home": [
         "crates/tsr_compiler/src/include_reason.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 2 exact link(s): witness/s07-include-reasons-rust, witness/s07-program-loader-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-include-reasons-rust",
+        "witness/s07-program-loader-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/binder",
@@ -145887,7 +145892,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/fileInclude.go",
       "id": "tsc/internal/compiler/fileInclude.go:FileIncludeReason.computeDiagnostic",
@@ -145900,7 +145905,7 @@
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -145913,9 +145918,11 @@
       "annotated_home": [
         "crates/tsr_compiler/src/include_reason.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-include-reasons-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-include-reasons-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/binder",
@@ -145955,7 +145962,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/fileInclude.go",
       "id": "tsc/internal/compiler/fileInclude.go:FileIncludeReason.computeReferenceFileDiagnostic",
@@ -145968,7 +145975,7 @@
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -146047,9 +146054,11 @@
       "annotated_home": [
         "crates/tsr_compiler/src/include_reason.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-program-loader-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-program-loader-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/binder",
@@ -146089,7 +146098,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/fileInclude.go",
       "id": "tsc/internal/compiler/fileInclude.go:FileIncludeReason.getReferencedLocation",
@@ -146102,7 +146111,7 @@
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -146181,9 +146190,12 @@
       "annotated_home": [
         "crates/tsr_compiler/src/include_reason.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 2 exact link(s): witness/s07-include-reasons-rust, witness/s07-program-loader-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-include-reasons-rust",
+        "witness/s07-program-loader-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/binder",
@@ -146223,7 +146235,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/fileInclude.go",
       "id": "tsc/internal/compiler/fileInclude.go:FileIncludeReason.toDiagnostic",
@@ -146236,7 +146248,7 @@
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -146249,9 +146261,11 @@
       "annotated_home": [
         "crates/tsr_compiler/src/include_reason.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-include-reasons-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-include-reasons-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/binder",
@@ -146291,7 +146305,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/fileInclude.go",
       "id": "tsc/internal/compiler/fileInclude.go:FileIncludeReason.toRelatedInfo",
@@ -146304,7 +146318,7 @@
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -146317,9 +146331,12 @@
       "annotated_home": [
         "crates/tsr_compiler/src/include_reason.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 2 exact link(s): witness/s07-include-reasons-rust, witness/s07-program-loader-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-include-reasons-rust",
+        "witness/s07-program-loader-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/binder",
@@ -146359,7 +146376,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/fileInclude.go",
       "id": "tsc/internal/compiler/fileInclude.go:referenceFileLocation.diagnosticAt",
@@ -146372,7 +146389,7 @@
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -146503,8 +146520,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 5, the content-mapper integration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -146570,8 +146587,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 5, the content-mapper integration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -146637,8 +146654,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 5, the content-mapper integration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -146704,8 +146721,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 5, the content-mapper integration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -146771,8 +146788,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 5, the content-mapper integration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -146838,8 +146855,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 5, the content-mapper integration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -146905,8 +146922,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 5, the content-mapper integration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -147039,8 +147056,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -147240,8 +147257,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 5, the content-mapper integration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -147255,9 +147272,11 @@
       "annotated_home": [
         "crates/tsr_compiler/src/checker_host.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-program-loader-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-program-loader-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/binder",
@@ -147297,7 +147316,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/fileloader.go",
       "id": "tsc/internal/compiler/fileloader.go:fileLoader.createSyntheticImport",
@@ -147310,7 +147329,7 @@
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -147376,8 +147395,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 5, the content-mapper integration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -147443,8 +147462,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 5, the content-mapper integration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -147525,9 +147544,11 @@
       "annotated_home": [
         "crates/tsr_compiler/src/loader.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-program-loader-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-program-loader-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/binder",
@@ -147567,7 +147588,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/fileloader.go",
       "id": "tsc/internal/compiler/fileloader.go:fileLoader.getSourceFileFromReference",
@@ -147580,7 +147601,7 @@
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -147780,8 +147801,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 5, the content-mapper integration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -147862,9 +147883,11 @@
       "annotated_home": [
         "crates/tsr_compiler/src/loader.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-program-loader-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-program-loader-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/binder",
@@ -147904,7 +147927,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/fileloader.go",
       "id": "tsc/internal/compiler/fileloader.go:fileLoader.pathForLibFile",
@@ -147917,7 +147940,7 @@
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -147983,8 +148006,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 5, the content-mapper integration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -148050,8 +148073,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 5, the content-mapper integration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -148065,9 +148088,11 @@
       "annotated_home": [
         "crates/tsr_compiler/src/loader.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-program-loader-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-program-loader-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/binder",
@@ -148107,7 +148132,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/fileloader.go",
       "id": "tsc/internal/compiler/fileloader.go:fileLoader.resolveAutomaticTypeDirectives",
@@ -148120,7 +148145,7 @@
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -148536,9 +148561,11 @@
       "annotated_home": [
         "crates/tsr_compiler/src/checker_host.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-program-loader-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-program-loader-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/binder",
@@ -148578,7 +148605,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/fileloader.go",
       "id": "tsc/internal/compiler/fileloader.go:getDefaultResolutionModeForFile",
@@ -148591,7 +148618,7 @@
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -148605,9 +148632,11 @@
       "annotated_home": [
         "crates/tsr_compiler/src/metadata.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-program-loader-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-program-loader-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/binder",
@@ -148647,7 +148676,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/fileloader.go",
       "id": "tsc/internal/compiler/fileloader.go:getEmitSyntaxForUsageLocationWorker",
@@ -148660,7 +148689,7 @@
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -148808,9 +148837,11 @@
       "annotated_home": [
         "crates/tsr_compiler/src/metadata.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-program-loader-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-program-loader-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/binder",
@@ -148850,7 +148881,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/fileloader.go",
       "id": "tsc/internal/compiler/fileloader.go:getModeForTypeReferenceDirectiveInFile",
@@ -148863,7 +148894,7 @@
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -148877,9 +148908,11 @@
       "annotated_home": [
         "crates/tsr_compiler/src/checker_host.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-program-loader-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-program-loader-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/binder",
@@ -148919,7 +148952,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/fileloader.go",
       "id": "tsc/internal/compiler/fileloader.go:getModeForUsageLocation",
@@ -148932,7 +148965,7 @@
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -149011,9 +149044,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): witness/s07-program-loader-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-program-loader-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/binder",
@@ -149053,7 +149088,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/fileloader.go",
       "id": "tsc/internal/compiler/fileloader.go:processAllProgramFiles",
@@ -149066,7 +149101,7 @@
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -149936,8 +149971,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -150070,8 +150105,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phases 4 to 6: the CLI, the language service and program reuse",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -150202,8 +150237,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 5, the content-mapper integration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -150400,8 +150435,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 5, the content-mapper integration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -150532,8 +150567,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -150812,9 +150847,11 @@
       "annotated_home": [
         "crates/tsr_compiler/src/include_reason.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-include-reasons-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-include-reasons-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/binder",
@@ -150854,7 +150891,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/includeprocessor.go",
       "id": "tsc/internal/compiler/includeprocessor.go:includeProcessor.explainRedirectAndImpliedFormat",
@@ -150867,7 +150904,7 @@
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -150881,9 +150918,11 @@
       "annotated_home": [
         "crates/tsr_compiler/src/include_reason.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-include-reasons-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-include-reasons-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/binder",
@@ -150923,7 +150962,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/includeprocessor.go",
       "id": "tsc/internal/compiler/includeprocessor.go:includeProcessor.getCompilerOptionsObjectLiteralSyntax",
@@ -150936,7 +150975,7 @@
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -150950,9 +150989,11 @@
       "annotated_home": [
         "crates/tsr_compiler/src/program_diagnostics.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-include-reasons-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-include-reasons-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/binder",
@@ -150992,7 +151033,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/includeprocessor.go",
       "id": "tsc/internal/compiler/includeprocessor.go:includeProcessor.getDiagnostics",
@@ -151005,7 +151046,7 @@
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -151019,9 +151060,11 @@
       "annotated_home": [
         "crates/tsr_compiler/src/include_reason.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-include-reasons-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-include-reasons-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/binder",
@@ -151061,7 +151104,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/includeprocessor.go",
       "id": "tsc/internal/compiler/includeprocessor.go:includeProcessor.getReferenceLocation",
@@ -151074,7 +151117,7 @@
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -151088,9 +151131,11 @@
       "annotated_home": [
         "crates/tsr_compiler/src/include_reason.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-include-reasons-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-include-reasons-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/binder",
@@ -151130,7 +151175,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/includeprocessor.go",
       "id": "tsc/internal/compiler/includeprocessor.go:includeProcessor.getRelatedInfo",
@@ -151143,7 +151188,7 @@
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -151209,8 +151254,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phases 4 to 6: the CLI, the language service and program reuse",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -151356,9 +151401,11 @@
       "annotated_home": [
         "crates/tsr_compiler/src/include_reason.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-include-reasons-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-include-reasons-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/binder",
@@ -151398,7 +151445,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/processingDiagnostic.go",
       "id": "tsc/internal/compiler/processingDiagnostic.go:processingDiagnostic.createDiagnosticExplainingFile",
@@ -151411,7 +151458,7 @@
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -151542,8 +151589,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -151611,8 +151658,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -151680,8 +151727,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phases 4 to 6: the CLI, the language service and program reuse",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -151749,8 +151796,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -151956,8 +152003,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phases 4 to 6: the CLI, the language service and program reuse",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -151973,9 +152020,11 @@
       "annotated_home": [
         "crates/tsr_compiler/src/checker_host.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-include-reasons-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-include-reasons-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/binder",
@@ -152015,7 +152064,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/program.go",
       "id": "tsc/internal/compiler/program.go:Program.CommonSourceDirectory",
@@ -152028,7 +152077,7 @@
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -152096,8 +152145,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -152165,8 +152214,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 5, the content-mapper integration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -152234,8 +152283,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phases 4 to 6: the CLI, the language service and program reuse",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -152303,8 +152352,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phases 4 to 6: the CLI, the language service and program reuse",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -152372,8 +152421,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -152441,8 +152490,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phases 4 to 6: the CLI, the language service and program reuse",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -152512,8 +152561,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -152581,8 +152630,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phases 4 to 6: the CLI, the language service and program reuse",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -152650,8 +152699,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -152719,8 +152768,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -152788,8 +152837,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -152926,8 +152975,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -153064,8 +153113,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 5, the content-mapper integration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -153204,8 +153253,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -153273,8 +153322,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phases 4 to 6: the CLI, the language service and program reuse",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -153342,8 +153391,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -153413,8 +153462,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -153484,8 +153533,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -153553,8 +153602,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -153622,8 +153671,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -153762,8 +153811,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -153831,8 +153880,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -153900,8 +153949,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phases 4 to 6: the CLI, the language service and program reuse",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -153969,8 +154018,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -154038,8 +154087,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phases 4 to 6: the CLI, the language service and program reuse",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -154180,8 +154229,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -154251,8 +154300,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -154322,8 +154371,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -154391,8 +154440,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -154408,9 +154457,11 @@
       "annotated_home": [
         "crates/tsr_compiler/src/program_diagnostics.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-include-reasons-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-include-reasons-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/binder",
@@ -154450,7 +154501,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/program.go",
       "id": "tsc/internal/compiler/program.go:Program.GetProgramDiagnostics",
@@ -154463,7 +154514,7 @@
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -154533,8 +154584,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -154604,8 +154655,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -154673,8 +154724,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -154742,8 +154793,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -154951,8 +155002,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -155020,8 +155071,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "nothing at the pin calls it",
+        "state": "exempt:unused_at_pin",
         "step": "syntax"
       },
       "rust_home": [
@@ -155089,8 +155140,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -155158,8 +155209,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phases 4 to 6: the CLI, the language service and program reuse",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -155227,8 +155278,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phases 4 to 6: the CLI, the language service and program reuse",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -155296,8 +155347,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -155365,8 +155416,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -155576,8 +155627,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -155645,8 +155696,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -155662,9 +155713,11 @@
       "annotated_home": [
         "crates/tsr_compiler/src/checker_host.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-program-loader-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-program-loader-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/binder",
@@ -155704,7 +155757,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/program.go",
       "id": "tsc/internal/compiler/program.go:Program.GetSourceFileMetaData",
@@ -155717,7 +155770,7 @@
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -155854,8 +155907,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -155923,8 +155976,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -155994,8 +156047,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -156153,8 +156206,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -156222,8 +156275,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -156291,8 +156344,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -156360,8 +156413,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phases 4 to 6: the CLI, the language service and program reuse",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -156429,8 +156482,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phases 4 to 6: the CLI, the language service and program reuse",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -156498,8 +156551,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phases 4 to 6: the CLI, the language service and program reuse",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -156636,8 +156689,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phases 4 to 6: the CLI, the language service and program reuse",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -156705,8 +156758,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phases 4 to 6: the CLI, the language service and program reuse",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -156774,8 +156827,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 3, emit orchestration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -156843,8 +156896,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phases 4 to 6: the CLI, the language service and program reuse",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -156912,8 +156965,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phases 4 to 6: the CLI, the language service and program reuse",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -156981,8 +157034,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phases 4 to 6: the CLI, the language service and program reuse",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -157190,8 +157243,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -157259,8 +157312,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phases 4 to 6: the CLI, the language service and program reuse",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -157399,8 +157452,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phases 4 to 6: the CLI, the language service and program reuse",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -157537,8 +157590,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -157606,8 +157659,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -157675,8 +157728,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phases 4 to 6: the CLI, the language service and program reuse",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -157744,8 +157797,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phases 4 to 6: the CLI, the language service and program reuse",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -157813,8 +157866,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phases 4 to 6: the CLI, the language service and program reuse",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -157953,8 +158006,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -158024,8 +158077,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -158164,8 +158217,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phases 4 to 6: the CLI, the language service and program reuse",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -158233,8 +158286,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phases 4 to 6: the CLI, the language service and program reuse",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -158302,8 +158355,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phases 4 to 6: the CLI, the language service and program reuse",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -158371,8 +158424,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phases 4 to 6: the CLI, the language service and program reuse",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -158440,8 +158493,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phases 4 to 6: the CLI, the language service and program reuse",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -158580,8 +158633,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phases 4 to 6: the CLI, the language service and program reuse",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -158720,8 +158773,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -158789,8 +158842,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phases 4 to 6: the CLI, the language service and program reuse",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -158927,8 +158980,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -158996,8 +159049,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -159065,8 +159118,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 5, the content-mapper integration",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -159298,8 +159351,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phases 4 to 6: the CLI, the language service and program reuse",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -159367,8 +159420,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phases 4 to 6: the CLI, the language service and program reuse",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -159436,8 +159489,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phases 4 to 6: the CLI, the language service and program reuse",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -159507,8 +159560,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -159578,8 +159631,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -159649,8 +159702,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -159718,8 +159771,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phases 4 to 6: the CLI, the language service and program reuse",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -159789,8 +159842,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -159929,8 +159982,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -159998,8 +160051,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -160067,8 +160120,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phases 4 to 6: the CLI, the language service and program reuse",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -160136,8 +160189,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phases 4 to 6: the CLI, the language service and program reuse",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -160222,9 +160275,11 @@
       "annotated_home": [
         "crates/tsr_compiler/src/verify_options.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-verify-options-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-verify-options-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/binder",
@@ -160264,7 +160319,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/program.go",
       "id": "tsc/internal/compiler/program.go:Program.verifyCompilerOptions",
@@ -160277,7 +160332,7 @@
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -160345,8 +160400,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -160414,8 +160469,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -160431,7 +160486,7 @@
       "annotated_home": [
         "crates/tsr_compiler/src/program_diagnostics.rs"
       ],
-      "basis": "witnessed by 8 exact link(s): syntax/diagnostics/js-only-typescript-syntax, syntax/diagnostics/json-file-syntax, syntax/diagnostics/jsx-and-tsx-grammar",
+      "basis": "witnessed by 9 exact link(s): syntax/diagnostics/js-only-typescript-syntax, syntax/diagnostics/json-file-syntax, syntax/diagnostics/jsx-and-tsx-grammar",
       "basis_kind": "rule",
       "cases": [
         "syntax/diagnostics/js-only-typescript-syntax",
@@ -160441,7 +160496,8 @@
         "syntax/diagnostics/missing-nodes-zero-width",
         "syntax/diagnostics/multi-file-sort-by-file-name",
         "syntax/diagnostics/parameter-decorators-first-per-parameter-in-preorder",
-        "syntax/diagnostics/unterminated-literals"
+        "syntax/diagnostics/unterminated-literals",
+        "witness/s07-include-reasons-rust"
       ],
       "depends_on": [
         "internal/ast",
@@ -160565,8 +160621,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -160582,9 +160638,11 @@
       "annotated_home": [
         "crates/tsr_compiler/src/program_diagnostics.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-include-reasons-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-include-reasons-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/binder",
@@ -160624,7 +160682,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/program.go",
       "id": "tsc/internal/compiler/program.go:compactAndMergeRelatedInfos",
@@ -160637,7 +160695,7 @@
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -160653,9 +160711,11 @@
       "annotated_home": [
         "crates/tsr_compiler/src/verify_options.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-verify-options-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-verify-options-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/binder",
@@ -160695,7 +160755,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/program.go",
       "id": "tsc/internal/compiler/program.go:emitModuleKindIsNonNodeESM",
@@ -160708,7 +160768,7 @@
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -160776,8 +160836,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phases 4 to 6: the CLI, the language service and program reuse",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -160845,8 +160905,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phases 4 to 6: the CLI, the language service and program reuse",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -160914,8 +160974,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phases 4 to 6: the CLI, the language service and program reuse",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -160983,8 +161043,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phases 4 to 6: the CLI, the language service and program reuse",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -161132,8 +161192,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -161229,9 +161289,11 @@
       "annotated_home": [
         "crates/tsr_compiler/src/verify_options.rs"
       ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-verify-options-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-verify-options-rust"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/binder",
@@ -161271,7 +161333,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/program.go",
       "id": "tsc/internal/compiler/program.go:hasZeroOrOneAsteriskCharacter",
@@ -161284,7 +161346,7 @@
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -161354,8 +161416,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -161423,8 +161485,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 2, the checker and its checker pool",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -161492,8 +161554,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phases 4 to 6: the CLI, the language service and program reuse",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -161632,8 +161694,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -161696,8 +161758,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -161760,8 +161822,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -161824,8 +161886,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -161888,8 +161950,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -161952,8 +162014,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -162016,8 +162078,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -162080,8 +162142,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -162144,8 +162206,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -162208,8 +162270,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -162272,8 +162334,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -162336,8 +162398,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -162400,8 +162462,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -162464,8 +162526,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -162528,8 +162590,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -162592,8 +162654,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -162656,8 +162718,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -162720,8 +162782,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -162784,8 +162846,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -162848,8 +162910,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -162912,8 +162974,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -162976,8 +163038,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -163040,8 +163102,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -163104,8 +163166,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -163168,8 +163230,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -163232,8 +163294,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -163296,8 +163358,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -163360,8 +163422,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -163424,8 +163486,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -163488,8 +163550,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -163552,8 +163614,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -163616,8 +163678,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -163680,8 +163742,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -163744,8 +163806,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -163808,8 +163870,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -163872,8 +163934,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -163936,8 +163998,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -164000,8 +164062,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -164064,8 +164126,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -164128,8 +164190,8 @@
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "phase 4, project-reference scheduling",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [],
@@ -171459,9 +171521,15 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "a prepared case runs and reports the Rust entry point absent: syntax/debug/assert-false, syntax/debug/assert-false-sprint-spacing, syntax/debug/assert-false-with-message; witnessed by 5 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "syntax/debug/assert-false",
+        "syntax/debug/assert-false-sprint-spacing",
+        "syntax/debug/assert-false-with-message",
+        "syntax/debug/assert-true",
+        "syntax/debug/assert-true-with-message"
+      ],
       "depends_on": [
         "internal/testutil"
       ],
@@ -171479,7 +171547,7 @@
       "membership_reason": "shared debug helpers used by in-scope packages",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [],
@@ -171488,9 +171556,16 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "a prepared case runs and reports the Rust entry point absent: syntax/debug/assert-never-custom-message, syntax/debug/assert-never-fallback, syntax/debug/assert-never-kind-string; witnessed by 6 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "syntax/debug/assert-never-custom-message",
+        "syntax/debug/assert-never-fallback",
+        "syntax/debug/assert-never-kind-string",
+        "syntax/debug/assert-never-kind-string-wins",
+        "syntax/debug/assert-never-nil",
+        "syntax/debug/assert-never-stringer"
+      ],
       "depends_on": [
         "internal/testutil"
       ],
@@ -171508,7 +171583,7 @@
       "membership_reason": "shared debug helpers used by in-scope packages",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [],
@@ -171517,9 +171592,12 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "a prepared case runs and reports the Rust entry point absent: syntax/debug/fail-empty-reason, syntax/debug/fail-with-reason; witnessed by 2 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "syntax/debug/fail-empty-reason",
+        "syntax/debug/fail-with-reason"
+      ],
       "depends_on": [
         "internal/testutil"
       ],
@@ -171537,7 +171615,7 @@
       "membership_reason": "shared debug helpers used by in-scope packages",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [],
@@ -171546,9 +171624,13 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "a prepared case runs and reports the Rust entry point absent: syntax/debug/fail-bad-syntax-kind-default, syntax/debug/fail-bad-syntax-kind-message, syntax/debug/fail-bad-syntax-kind-sprint-spacing; witnessed by 3 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "syntax/debug/fail-bad-syntax-kind-default",
+        "syntax/debug/fail-bad-syntax-kind-message",
+        "syntax/debug/fail-bad-syntax-kind-sprint-spacing"
+      ],
       "depends_on": [
         "internal/testutil"
       ],
@@ -171566,7 +171648,7 @@
       "membership_reason": "shared debug helpers used by in-scope packages",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [],
