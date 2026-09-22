@@ -372,6 +372,7 @@ dependencies = [
  "tsr_arena",
  "tsr_core",
  "tsr_diagnostics",
+ "tsr_jsnum",
  "tsr_jsstring",
 ]
 
@@ -433,6 +434,7 @@ dependencies = [
  "tsr_core",
  "tsr_diagnostics",
  "tsr_jsstring",
+ "tsr_locale",
  "tsr_module",
  "tsr_parser",
  "tsr_printer",
