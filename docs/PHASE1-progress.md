@@ -2377,6 +2377,11 @@ its raw observation remain visible in the capture and
 [ownership audit](PHASE1-aliasing-audit.md).
 This approval does not suppress unrelated future differences.
 
+Resolution remains exclusive per `Resolver`: redirect scopes temporarily swap
+option handles and restore them on return or unwinding. The implementation plan
+records the [per-call state and cache work required before concurrent resolution](PHASE1-implementation-plan.md#follow-up-before-concurrent-resolution-on-one-resolver).
+F3b's serial comparisons do not certify overlapping calls on one resolver.
+
 The final family captures are retained in
 `data/phase1/captures/f3b-complete.tar.gz` (3,723,174 bytes, SHA-256
 `d60a5741831573dfc88ccda94a46e5ed3de79d0cdbe7c675195687c6c3d432d2`).
