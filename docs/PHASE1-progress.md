@@ -2813,3 +2813,89 @@ and tracker validation pass. The actual generator wrapper reproduces all managed
 outputs, untouched-client output and locale tables. The focused utility capture
 has 83/83 matches. Full correctness/benchmark histories were preserved and not
 rerun solely to refresh their timestamps.
+
+
+## F5b — integration fixes and exact-operation witnesses
+
+This increment is on `codex/phase1-f5b`, based on #52. It implements the
+integration fixes exposed by F5a and expands exact operation evidence. It does
+not close Phase 1: the regenerated coverage report still has 1,250 pending
+operation entries (1,249 syntax/helper entries and the Linux-only Realpath
+observation). Those are evidence or implementation-review obligations, not a
+claim that 1,250 production functions are absent. No threshold changed.
+
+Production changes:
+
+- `DiagnosticWriter` now carries the selected locale through messages, related
+  information, plain/pretty output, status messages and error summaries. Six
+  native config-plus-renderer comparisons cover German, Japanese and fallback;
+  packaged consumption also checks the German TS2322 generated asset.
+- `GetTextOfJSDocComment` now concatenates stored text and the source spelling of
+  links, preserves malformed bytes, and trims Go Unicode White_Space. Thirteen
+  direct native/Rust requests cover all 25 whitespace characters, ignored node
+  kinds, source/line helpers and the actual nil-element panic payload.
+- Program loading honors `skip_module_resolution` for package metadata and
+  normalizes custom default-library paths before priority ordering. Four new
+  native observations supplement the original unchanged 48 loader rows.
+- Linux realpath retries EINTR from `readlinkat` as well as `openat`. Other errors
+  are returned without being retried.
+
+The generated AST harness executes 1,026 exact native/Rust traces over all 192
+shapes, including the explicit SourceFile and limited SyntheticExpression
+cases. Every constructor, field update, clone hook, visitor, predicate and fact
+operation receives only the action links its own probe executes. The complete
+syntax utility family now has **1,122/1,122 exact matches**. Exact supporting
+scanner, parser, binder, navigation and loader links are documented in the
+`PHASE1-F5b-*-coverage.md` records. The four SyntheticExpression operations that
+carry Go's opaque checker-type payload remain pending the separate ownership
+and phase decision; the cast/child probes do not certify them.
+
+The owner approved exactly the two foreign-interface-input exceptions described
+in `PHASE1-F5b-filesystem-audit.md`. All 50 representable actions in those traces
+still compare; native observations and raw `different` outcomes remain intact.
+The three earlier ownership exceptions retain their separate scope.
+
+Final direct family captures:
+
+| Family | Actual results | Capture |
+| --- | --- | --- |
+| Leaves | 229 match; one approved difference | `target/phase1-f5b-leaves-03` |
+| Config | 485 match; one approved difference | `target/phase1-f5b-config-04` |
+| Filesystem | 355 match; three approved differences; one Linux-only native-unavailable row | `target/phase1-f5b-filesystem-04` |
+| Syntax utilities | 1,122 match; no differences or failed rows | `target/phase1-f5b-syntax-05` |
+
+Every one of the 309 config reference output identities matches. Native
+observations and provenance are frozen under `data/phase1/native`; the ordinary
+validators authenticate the complete request and dependency closures. Finder
+metadata and Python bytecode caches are excluded as non-inputs. A separately
+authenticated Linux capture can supply only the declared unavailable Realpath
+case; it cannot replace an executed difference, and its raw evidence stays
+separate. CI captures that exact Linux case.
+
+The installed-package witness now selects Cargo's actual emitted executable,
+including target overrides, and its source closure includes every public
+package's manifest, assets and documentation. It cannot run a stale binary from
+an assumed output path or retain a passing receipt after an omitted package
+input changes. Localized-envelope comparisons authenticate both the native
+request and the renderer's actual Rust input. Targeted regressions cover these
+failure modes and platform supplementation.
+
+The S07 operation inventory refresh changes only six added Rust mappings and
+18 moved mapping locations. Independently reviewed replay of authenticated
+native observations preserves `subset.json`, checker obligations and the pin
+byte-for-byte. Existing classification and historical measurements are not
+regraded.
+
+Validation completed so far: workspace clippy with warnings denied, formatting,
+dependency policy and tracker validation; 60 affected Rust tests in each of
+debug and release; Rust 1.96 for compiler/scanner/VFS; all 44 targeted integration,
+receipt and packaging script tests. The full script run passed 869 tests and
+found one obsolete test demanding more than 1,000 untested rows; replacing that
+count with a negative classification control makes all five coverage-link tests
+pass. Full program-syntax and current parser/binder captures are being completed
+separately; the preceding full captures are not relabeled as current.
+
+The remaining work is explicit in `coverage-report.json.gz`: exact private
+parser/binder/helper witnesses, handwritten AST contracts, the four semantic
+SyntheticExpression operations, and the Linux observation. Finishing this
+integration increment does not satisfy those requirements automatically.

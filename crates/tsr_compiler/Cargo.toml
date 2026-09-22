@@ -54,6 +54,7 @@ tsr_printer = { version = "0.1.0", path = "../tsr_printer" }
 tsr_checker = { version = "0.1.0", path = "../tsr_checker" }
 tsr_jsstring = { version = "0.1.0", path = "../tsr_jsstring" }
 tsr_diagnostics = { version = "0.1.0", path = "../tsr_diagnostics" }
+tsr_locale = { version = "0.1.0", path = "../tsr_locale" }
 
 [lints]
 workspace = true

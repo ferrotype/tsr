@@ -1389,7 +1389,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_ast/src/symbols.rs",
-          "line": 168
+          "line": 255
         }
       ],
       "rust_generated_provenance": [],
@@ -1436,7 +1436,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_ast/src/symbols.rs",
-          "line": 172
+          "line": 262
         }
       ],
       "rust_generated_provenance": [],
@@ -1507,7 +1507,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_ast/src/symbols.rs",
-          "line": 176
+          "line": 269
         }
       ],
       "rust_generated_provenance": [],
@@ -1719,7 +1719,12 @@
       "end_line": 63,
       "kind": "source",
       "planned_crate": "tsr_ast",
-      "rust_mappings": [],
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_binder/src/state.rs",
+          "line": 178
+        }
+      ],
       "rust_generated_provenance": [],
       "source_sha256": "92efcd7eadfb9d348c30dd60a671f9481fa14ab3510a201e63ee72bf363b8a80",
       "intended_overlay_family": "node_symbol_and_container_side_tables",
@@ -1896,7 +1901,11 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_ast/src/runtime_id.rs",
-          "line": 8
+          "line": 13
+        },
+        {
+          "file": "crates/tsr_ast/src/runtime_id.rs",
+          "line": 36
         }
       ],
       "rust_generated_provenance": [],
@@ -1931,7 +1940,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_ast/src/symbols.rs",
-          "line": 50
+          "line": 122
         }
       ],
       "rust_generated_provenance": [],
@@ -1966,7 +1975,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_ast/src/flow.rs",
-          "line": 63
+          "line": 73
         }
       ],
       "rust_generated_provenance": [],
@@ -2001,7 +2010,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_ast/src/flow.rs",
-          "line": 78
+          "line": 98
         }
       ],
       "rust_generated_provenance": [],

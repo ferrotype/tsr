@@ -75,6 +75,16 @@ fn factory_masks_counts_and_hooks_follow_the_pinned_observation_order() {
     assert_eq!(unchanged, property);
     assert_ne!(changed, property);
     assert_ne!(cloned, property);
+    assert_eq!(
+        factory.node(cloned).data().to_owned(),
+        factory.node(property).data().to_owned()
+    );
+    let changed_node = factory.node(changed);
+    let changed_data = changed_node.data();
+    let changed_data = changed_data.as_property_access_expression().unwrap();
+    assert_eq!(changed_data.expression(), Some(name));
+    assert_eq!(changed_data.name(), None);
+    assert_eq!(changed_data.question_dot_token(), None);
     // Values recorded by clean Go at pin 1f70213, including pre-mask OnCreate.
     assert_eq!(
         *hooks.0.lock().unwrap(),
@@ -93,16 +103,21 @@ fn factory_masks_counts_and_hooks_follow_the_pinned_observation_order() {
 #[test]
 fn raw_slice_updates_use_backing_identity_and_all_empty_slices_compare_same() {
     let mut factory = builder();
+    let name = factory.new_identifier(JsString::from_bytes(&b"target"[..]));
     let first = factory
         .text_slice(vec![JsString::from_bytes(&b"same"[..])])
         .unwrap();
     let second = factory
         .text_slice(vec![JsString::from_bytes(&b"same"[..])])
         .unwrap();
-    let link = factory.new_js_doc_link(None, first);
-    assert_eq!(factory.update_js_doc_link(link, None, first), link);
-    let updated = factory.update_js_doc_link(link, None, second);
+    let link = factory.new_js_doc_link(Some(name), first);
+    assert_eq!(factory.update_js_doc_link(link, Some(name), first), link);
+    let updated = factory.update_js_doc_link(link, Some(name), second);
     assert_ne!(updated, link);
+    assert_eq!(
+        factory.node(updated).as_js_doc_link().unwrap().name(),
+        Some(name)
+    );
     let empty = factory.text_slice(vec![]).unwrap();
     let empty_link = factory.new_js_doc_link(None, TextSlice::empty());
     assert_eq!(
@@ -110,6 +125,10 @@ fn raw_slice_updates_use_backing_identity_and_all_empty_slices_compare_same() {
         empty_link
     );
     let cloned = factory.clone_js_doc_link(link);
+    assert_eq!(
+        factory.node(cloned).as_js_doc_link().unwrap().name(),
+        Some(name)
+    );
     assert!(factory
         .node(cloned)
         .data()

@@ -330,3 +330,34 @@ fn source_text_and_diagnostic_spans_match_pinned_go() {
         "unconsumed source observations: {expected:?}"
     );
 }
+
+#[test]
+fn jsdoc_comment_text_keeps_nonspace_bytes_and_rejects_foreign_lists() {
+    let counters = Counters::new();
+    let mut f = AstBuilder::new(SourceText::default(), &counters);
+    let text = f
+        .text_slice(vec![JsString::from_bytes(
+            b" body\xff\xe2\x80\x8b\xef\xbb\xbf \xc2\x85".as_slice(),
+        )])
+        .unwrap();
+    let node = f.new_js_doc_text(text);
+    let nodes = f.node_slice(vec![Some(node)]).unwrap();
+    let comment = f.new_list(TextRange::new(-1, -1), nodes).unwrap();
+    // Go unicode.IsSpace trims the final space/NEL, but neither the raw byte
+    // nor U+200B/U+FEFF. The paired scannerAst fixtures independently measure
+    // these distinctions and source-spelled links against the pinned helper.
+    assert_eq!(
+        get_text_of_jsdoc_comment(f.view(), Some(comment))
+            .unwrap()
+            .as_bytes(),
+        b" body\xff\xe2\x80\x8b\xef\xbb\xbf"
+    );
+    assert!(get_text_of_jsdoc_comment(f.view(), None)
+        .unwrap()
+        .is_empty());
+    let foreign = AstBuilder::new(SourceText::default(), &counters);
+    assert_eq!(
+        get_text_of_jsdoc_comment(foreign.view(), Some(comment)),
+        Err(Error::WrongOwner)
+    );
+}

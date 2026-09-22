@@ -95,6 +95,18 @@ class BaselineIndexTests(unittest.TestCase):
         problems = baselines.verify(forged)
         self.assertTrue(any(dropped["name"] in p for p in problems))
 
+    def test_finder_metadata_is_not_a_reference_output(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            group = Path(temporary) / baselines.REFERENCE / baselines.GROUPS["matchFiles"][0]
+            (group / "nested").mkdir(parents=True)
+            (group / "a.js").write_text("baseline\n")
+            (group / "nested/b.js").write_text("baseline\n")
+            for parent in (group, group / "nested"):
+                (parent / ".DS_Store").write_bytes(b"Finder view settings")
+            with patch.object(baselines, "upstream", return_value=Path(temporary)):
+                self.assertEqual([p.relative_to(group) for p in baselines.outputs("matchFiles")],
+                                 [Path("a.js"), Path("nested/b.js")])
+
     def test_matching_group_authority_is_recorded_as_blocked(self):
         authority = self.index["groups"]["matchFiles"]["authority"]
         self.assertEqual(authority["status"], "blocked")
@@ -446,6 +458,23 @@ class SourceClosureTests(unittest.TestCase):
         for probe in capture.FAMILIES["pilot"]["native_probes"]:
             self.assertIn(probe["probe"], closure, probe["probe"])
 
+    def test_finder_metadata_is_not_a_cross_platform_source_input(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / "crates/sample/src/lib.rs"
+            source.parent.mkdir(parents=True)
+            source.write_text("pub fn observed() {}\n")
+            with patch.object(capture, "ROOT", root):
+                before = capture.source_closure("filesystem", ["crates/sample"])
+                for parent in (source.parent, root / "tools/phase1/filesystem"):
+                    parent.mkdir(parents=True, exist_ok=True)
+                    (parent / ".DS_Store").write_bytes(b"Finder view settings")
+                    (parent / "__pycache__").mkdir()
+                    (parent / "__pycache__" / "generate.cpython-311.pyc").write_bytes(b"interpreter cache")
+                self.assertEqual(before, capture.source_closure("filesystem", ["crates/sample"]))
+                source.write_text("pub fn observed() { panic!() }\n")
+                self.assertNotEqual(before, capture.source_closure("filesystem", ["crates/sample"]))
+
     def test_closure_is_derived_from_the_dependency_graph(self):
         # tsr_tsoptions links these transitively; a hand-listed closure would
         # drift from the manifest the moment a dependency is added.
@@ -740,10 +769,15 @@ class CoverageLinkTests(unittest.TestCase):
             r for r in self.scope["operations"]
             if r.get("ledger_verification") and not r["cases"] and r["mapped_in_ledger"]
         ]
-        self.assertTrue(rows, "expected mapped operations carrying only file-level metrics")
         for row in rows:
             self.assertEqual(row["disposition"], "implemented_untested", row["id"])
-        self.assertGreater(len(rows), 1000, "the overclaim affected thousands of rows")
+        # Keep the negative control when exact witnesses eventually cover all
+        # live rows; the number of remaining gaps is not a correctness rule.
+        entry = {"status": "ported", "verify": ["run.e1.parity >= 0.999"]}
+        self.assertEqual(scope.classify(entry, "Parse", True, {}, [])[0],
+                         "implemented_untested")
+        self.assertEqual(scope.classify(entry, "Parse", True, {}, ["exact-case"])[0],
+                         "covered")
 
     def test_file_level_metrics_are_retained_for_context(self):
         rows = [r for r in self.scope["operations"] if r.get("ledger_verification")]

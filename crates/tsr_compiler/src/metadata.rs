@@ -7,11 +7,14 @@ use tsr_core::{CompilerOptions, JsxEmit, ModuleDetectionKind, ModuleKind, Module
 use tsr_jsstring::JsString;
 use tsr_module::Resolver;
 use tsr_tspath as path;
+/// The caller also uses this helper for the library metadata shortcut.
+/// port: tsc/internal/compiler/fileloader.go:fileLoader.loadSourceFileMetaData
 pub(crate) fn load(
     resolver: &mut Resolver,
     name: &[u8],
     options: &CompilerOptions,
     is_lib: bool,
+    skip_resolution: bool,
 ) -> Result<SourceFileMetaData, Error> {
     if is_lib {
         return Ok(SourceFileMetaData {
@@ -20,7 +23,12 @@ pub(crate) fn load(
         });
     }
     let mut result = SourceFileMetaData::default();
-    if let Some(info) = resolver.package_scope(&path::directory(name))? {
+    let scope = if skip_resolution {
+        None
+    } else {
+        resolver.package_scope(&path::directory(name))?
+    };
+    if let Some(info) = scope {
         result.package_json_directory = info.directory.clone();
         let resolution = options.module_resolution_kind();
         if !has_suffix(name, &[b".mts", b".cts", b".mjs", b".cjs"])

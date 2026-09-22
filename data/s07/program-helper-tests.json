@@ -39,6 +39,10 @@
     [
       "scripts/s07_path_helpers.py",
       "--check"
+    ],
+    [
+      "scripts/s07_program_boundaries.py",
+      "--check"
     ]
   ],
   "groups": [
@@ -102,6 +106,7 @@
       "prefix": "tests::",
       "target": "lib",
       "tests": [
+        "tests::actual_go_loader_boundary_observations",
         "tests::actual_go_loader_observations",
         "tests::resolver_scope_routes_retained_files_and_rejects_foreign_generations",
         "tests::retained_snapshot_edit_reuses_only_equal_parse_inputs",

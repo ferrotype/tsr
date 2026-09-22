@@ -98,6 +98,29 @@ class IntegrationTests(unittest.TestCase):
         self.assertIn("crates/tsr_compiler/examples/phase1_integration.rs", paths)
         self.assertIn("tools/s11/mapper_test.go", paths)
         self.assertIn("tools/phase1/locale/internal_export_test.go", paths)
+        self.assertIn("tools/s10/toolchains.json", paths)
+        self.assertIn("LICENSE", paths)
+        for package in integration.load(ROOT, "tools/packaging/packages.json")["packages"]:
+            if package["publish"]:
+                directory = Path(package["manifest"]).parent
+                for name in ("Cargo.toml", "README.md", "LICENSE", "NOTICE"):
+                    self.assertIn(str(directory / name), paths)
+
+    def test_public_package_manifest_change_stales_receipt_inputs(self):
+        import phase1_producers as producers
+        manifest = ROOT / "crates/tsr_wasm/Cargo.toml"
+        before = producers.source_closure("foundations")
+        original = Path.read_bytes
+
+        def changed(path):
+            data = original(path)
+            return data + b"\n# changed archive manifest\n" if path == manifest else data
+
+        with patch.object(Path, "read_bytes", changed):
+            after = producers.source_closure("foundations")
+        self.assertNotEqual(before[str(manifest.relative_to(ROOT))], after[str(manifest.relative_to(ROOT))])
+        self.assertEqual({name for name in before if before[name] != after[name]},
+                         {str(manifest.relative_to(ROOT))})
 
     def test_localized_config_mismatch_stays_visible(self):
         observed = {"id": "localized-config-diagnostics", "locale": "de-DE", "code": 5023,
@@ -110,6 +133,20 @@ class IntegrationTests(unittest.TestCase):
         observed["leaf_localized"] = "wrong leaf translation"
         with self.assertRaisesRegex(ValueError, "pinned Go catalog"):
             integration.localized_result(ROOT, observed)
+
+    def test_installed_consumer_cannot_pass_without_locale_assets(self):
+        observed = {"encoded_bytes": 64, "libraries": 108, "locale": "de-DE",
+                    "diagnostic_code": 2322,
+                    "localized_message": 'Der Typ "number" kann dem Typ "string" nicht zugewiesen werden.',
+                    "owners_returned_to_baseline": True}
+        integration.validate_installed_observation(ROOT, observed)
+        for key, wrong in (("encoded_bytes", 0), ("libraries", 107), ("locale", "en"),
+                           ("localized_message", "Type 'number' is not assignable to type 'string'."),
+                           ("diagnostic_code", True), ("owners_returned_to_baseline", 1)):
+            with self.subTest(key=key), self.assertRaisesRegex(ValueError, "observations differ"):
+                integration.validate_installed_observation(ROOT, {**observed, key: wrong})
+        with self.assertRaisesRegex(ValueError, "omits"):
+            integration.validate_installed_observation(ROOT, None)
 
 
 class IntegrationEvaluationTests(unittest.TestCase):
@@ -183,7 +220,8 @@ class IntegrationEvaluationTests(unittest.TestCase):
         observed = {"id": "localized-config-diagnostics", "locale": "de-DE", "code": 5023,
                     "leaf_localized": 'Unbekannte Compileroption "notAnOption".',
                     "writer_localized": 'Unbekannte Compileroption "notAnOption".'}
-        localized = integration.localized_result(ROOT, observed)
+        from test_phase1_localized import fixture
+        localized = integration.localized_integration_result(ROOT, observed, fixture())
         receipts = [self.receipt("localized-config-diagnostics", json.dumps(localized)),
                     self.receipt("retained-program-snapshot", "test tests::retained_snapshot_edit_reuses_only_equal_parse_inputs ... ok\n"),
                     self.receipt("transport", json.dumps({"metrics": {"controls": True}, "tests": {case: "pass" for case in integration.load(ROOT, "data/s11/cases.json")}})),
@@ -195,7 +233,11 @@ class IntegrationEvaluationTests(unittest.TestCase):
         installed = next(row for row in self.prepared["witnesses"] if row["id"] == "installed-generated-assets")
         packages = integration.load(ROOT, "tools/packaging/packages.json")["packages"]
         artifact = {"state": "pass", "archives": {row["name"]: {} for row in packages if row["publish"]},
-                    "commands": [{"log": "consumer.log", "command": ["/isolated/package_consumer"]}]}
+                    "commands": [{"log": "consumer.log", "command": ["/isolated/package_consumer"]}],
+                    "consumer_observation": {"encoded_bytes": 64, "libraries": 108, "locale": "de-DE",
+                        "diagnostic_code": 2322,
+                        "localized_message": 'Der Typ "number" kann dem Typ "string" nicht zugewiesen werden.',
+                        "owners_returned_to_baseline": True}}
         receipts.append(integration.receipt(installed["id"], installed["command"], self.inputs, "", artifact=artifact))
         result = self.evaluate(reports, receipts)
         self.assertEqual(result["problems"], [])

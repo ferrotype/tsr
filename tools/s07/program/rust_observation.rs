@@ -85,7 +85,12 @@ pub(super) fn program_options(
         config,
         host,
         current_directory: JsString::from_bytes(request["cwd"].as_str().unwrap().as_bytes()),
-        default_library_path: JsString::from_bytes(tsr_bundled::LIB_PATH),
+        default_library_path: JsString::from_bytes(
+            request["default_library_path"]
+                .as_str()
+                .filter(|value| !value.is_empty())
+                .map_or(tsr_bundled::LIB_PATH, str::as_bytes),
+        ),
         skip_module_resolution: request["skip_module_resolution"].as_bool().unwrap_or(false),
     }
 }

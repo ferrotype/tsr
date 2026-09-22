@@ -539,11 +539,15 @@ def rust_closure() -> dict[str, str]:
     root = ROOT.resolve()
     cargo_config = root / ".cargo"
     if cargo_config.is_dir():
-        paths.update(str(path.relative_to(root)) for path in cargo_config.rglob("*") if path.is_file())
+        paths.update(str(path.relative_to(root)) for path in cargo_config.rglob("*")
+                     if path.is_file() and path.name != ".DS_Store")
     for directory in rust_dependency_directories():
         for path in directory.rglob("*"):
             relative = path.relative_to(root)
-            if path.is_file() and not any(part in (".git", "target", "__pycache__") for part in relative.parts):
+            # Finder metadata is not a build input; recording it makes the
+            # closure host-local and lets opening a folder stale a capture.
+            if (path.is_file() and path.name != ".DS_Store"
+                    and not any(part in (".git", "target", "__pycache__") for part in relative.parts)):
                 paths.add(str(relative))
     return {name: _digest(name) for name in sorted(paths) if (ROOT / name).is_file()}
 

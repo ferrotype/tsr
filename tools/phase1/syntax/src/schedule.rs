@@ -67,6 +67,7 @@ fn syntactic(request: &Value, program: &Program) -> Result<Value, ts_compiler_er
                 .as_bytes()
                 .to_vec(),
             case_sensitive: request["case_sensitive"].as_bool().unwrap_or_default(),
+            ..FormattingOptions::default()
         },
     );
     let refs: Vec<_> = diagnostics.iter().collect();

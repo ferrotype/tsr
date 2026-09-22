@@ -158,6 +158,77 @@ mod tests {
     }
 
     #[test]
+    fn foreign_go_values_remain_explicit_without_hiding_representable_actions() {
+        // Owner qualifications live separately in approved-differences.json.
+        // Keep every representable action equal to the frozen native result,
+        // and require the two Go-only operands to remain visibly different.
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../..");
+        for (group, case, foreign_index, native_foreign, rust_foreign) in [
+            (
+                "glob",
+                "filesystem/glob/match-group-branch-buffer",
+                28,
+                json!({"op": "match_elems", "result": null,
+                       "panic": "unimplemented_segment_type"}),
+                json!({"op": "match_elems", "result": null,
+                       "panic": "unrepresentable_element"}),
+            ),
+            (
+                "vfstest",
+                "filesystem/vfstest/from-map-rejects-malformed-maps",
+                4,
+                json!({"op": "from_map_guarded",
+                       "result": ["guarded", "pinned:invalid file type"]}),
+                json!({"op": "from_map_guarded",
+                       "result": ["guarded", "unrepresentable_input"]}),
+            ),
+        ] {
+            let requests: Value = serde_json::from_slice(
+                &std::fs::read(root.join(format!("data/phase1/requests/filesystem-{group}.json")))
+                    .unwrap(),
+            )
+            .unwrap();
+            let request = requests["requests"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|request| request["case"] == case)
+                .unwrap();
+            let native: Value = serde_json::from_slice(
+                &std::fs::read(root.join(format!(
+                    "data/phase1/native/filesystem/{group}/observations.json"
+                )))
+                .unwrap(),
+            )
+            .unwrap();
+            let native = native["observations"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|row| row["case"] == case && row["result"] == "observed")
+                .unwrap();
+            let rust = observe(request);
+            assert_eq!(rust["result"], "observed", "{case}: {rust:?}");
+            let native_rows = native["observation"]["ordered"].as_array().unwrap();
+            let rust_rows = rust["observation"]["ordered"].as_array().unwrap();
+            assert_eq!(
+                native_rows.len(),
+                request["actions"].as_array().unwrap().len()
+            );
+            assert_eq!(rust_rows.len(), native_rows.len(), "{case}");
+            for (index, (native, rust)) in native_rows.iter().zip(rust_rows).enumerate() {
+                if index == foreign_index {
+                    assert_eq!(native, &native_foreign, "{case}: native action {index}");
+                    assert_eq!(rust, &rust_foreign, "{case}: Rust action {index}");
+                    assert_ne!(native, rust, "the raw difference must stay visible");
+                } else {
+                    assert_eq!(native, rust, "{case}: representable action {index}");
+                }
+            }
+        }
+    }
+
+    #[test]
     fn every_frozen_filesystem_gap_has_a_handler_owned_identity() {
         // Exercise each dispatch branch over the real schedule, including the
         // case-specific and multi-operation groups. No native children or

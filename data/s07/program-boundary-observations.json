@@ -1,0 +1,210 @@
+[
+  {
+    "ID": "skip-resolution-metadata",
+    "Files": [
+      {
+        "Name": "/src/main.ts",
+        "Path": "/src/main.ts",
+        "SHA256": "5dd25e250435ab2d434e779fa4ece76e13b4f56fd8b3578b6ccac531712bd642",
+        "Bytes": 17,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": false,
+        "Imports": [],
+        "External": true
+      },
+      {
+        "Name": "/src/explicit.mts",
+        "Path": "/src/explicit.mts",
+        "SHA256": "0306297665bdceee0471bf51bf0c36233eb7e6d0f985cbc2a960be8cfa0f72d4",
+        "Bytes": 17,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 99
+        },
+        "Lib": false,
+        "Imports": [],
+        "External": true
+      },
+      {
+        "Name": "/src/node_modules/pkg/index.ts",
+        "Path": "/src/node_modules/pkg/index.ts",
+        "SHA256": "50ce64e9a2ff528b35c02f2af065ccc25750436680b5577d087cb7bc500201ea",
+        "Bytes": 17,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": false,
+        "Imports": [],
+        "External": true
+      }
+    ],
+    "Missing": null,
+    "Resolutions": [],
+    "TypeResolutions": [],
+    "Diagnostics": null,
+    "Trace": null
+  },
+  {
+    "ID": "library-path-trailing-separator",
+    "Files": [
+      {
+        "Name": "/custom/lib.es5.d.ts",
+        "Path": "/custom/lib.es5.d.ts",
+        "SHA256": "c85cb8a2ca2e73c221c6422f9f4578d61e5fe585f059dcc6ace8fdbf833dea7a",
+        "Bytes": 19,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": true,
+        "Imports": [],
+        "External": false
+      },
+      {
+        "Name": "/custom/lib.es2015.promise.d.ts",
+        "Path": "/custom/lib.es2015.promise.d.ts",
+        "SHA256": "274676bbd3f65b85c85941cb93d9f64a96d402c2830723f875e69f05ab631d6c",
+        "Bytes": 23,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": true,
+        "Imports": [],
+        "External": false
+      },
+      {
+        "Name": "/src/main.ts",
+        "Path": "/src/main.ts",
+        "SHA256": "3eb87fd76c16c3336fa803a044595da1cab1be40c3a6f69e18126f48d5b36ddb",
+        "Bytes": 8,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": false,
+        "Imports": [],
+        "External": false
+      }
+    ],
+    "Missing": null,
+    "Resolutions": [],
+    "TypeResolutions": [],
+    "Diagnostics": null,
+    "Trace": null
+  },
+  {
+    "ID": "library-path-normalized-control",
+    "Files": [
+      {
+        "Name": "/custom/lib.es5.d.ts",
+        "Path": "/custom/lib.es5.d.ts",
+        "SHA256": "c85cb8a2ca2e73c221c6422f9f4578d61e5fe585f059dcc6ace8fdbf833dea7a",
+        "Bytes": 19,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": true,
+        "Imports": [],
+        "External": false
+      },
+      {
+        "Name": "/custom/lib.es2015.promise.d.ts",
+        "Path": "/custom/lib.es2015.promise.d.ts",
+        "SHA256": "274676bbd3f65b85c85941cb93d9f64a96d402c2830723f875e69f05ab631d6c",
+        "Bytes": 23,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": true,
+        "Imports": [],
+        "External": false
+      },
+      {
+        "Name": "/src/main.ts",
+        "Path": "/src/main.ts",
+        "SHA256": "3eb87fd76c16c3336fa803a044595da1cab1be40c3a6f69e18126f48d5b36ddb",
+        "Bytes": 8,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": false,
+        "Imports": [],
+        "External": false
+      }
+    ],
+    "Missing": null,
+    "Resolutions": [],
+    "TypeResolutions": [],
+    "Diagnostics": null,
+    "Trace": null
+  },
+  {
+    "ID": "library-path-relative",
+    "Files": [
+      {
+        "Name": "/custom/lib.es5.d.ts",
+        "Path": "/custom/lib.es5.d.ts",
+        "SHA256": "c85cb8a2ca2e73c221c6422f9f4578d61e5fe585f059dcc6ace8fdbf833dea7a",
+        "Bytes": 19,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": true,
+        "Imports": [],
+        "External": false
+      },
+      {
+        "Name": "/custom/lib.es2015.promise.d.ts",
+        "Path": "/custom/lib.es2015.promise.d.ts",
+        "SHA256": "274676bbd3f65b85c85941cb93d9f64a96d402c2830723f875e69f05ab631d6c",
+        "Bytes": 23,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": true,
+        "Imports": [],
+        "External": false
+      },
+      {
+        "Name": "/src/main.ts",
+        "Path": "/src/main.ts",
+        "SHA256": "3eb87fd76c16c3336fa803a044595da1cab1be40c3a6f69e18126f48d5b36ddb",
+        "Bytes": 8,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": false,
+        "Imports": [],
+        "External": false
+      }
+    ],
+    "Missing": null,
+    "Resolutions": [],
+    "TypeResolutions": [],
+    "Diagnostics": null,
+    "Trace": null
+  }
+]

@@ -925,10 +925,10 @@
       "owner": "phase 4, project-reference scheduling"
     },
     {
-      "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/program.go. Every caller is in internal/execute, internal/ls, internal/project or the reuse path (UpdateProgram, ReuseProgram); no Phase 1 package calls it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "category": "unused_at_pin",
+      "evidence": "upstream/tsc/internal/compiler/program.go:2274-2277. A full Go-tree symbol search finds only this Program definition. Every real ResolveModuleName invocation is on module.Resolver or a separate emitHost/fakeProgram method; the wrapper is absent from checker.Program and the module-specifier host interface. Its body delegates to resolver.ResolveModuleName with a nil redirect and discards the trace; that underlying Phase 1 operation remains independently probed by config/module cases.",
       "operation": "tsc/internal/compiler/program.go:Program.ResolveModuleName",
-      "owner": "phases 4 to 6: the CLI, the language service and program reuse"
+      "owner": "nothing at the pin calls this Program wrapper"
     },
     {
       "category": "later_step",

@@ -83,11 +83,12 @@ class CoverageTests(unittest.TestCase):
         self.assertGreater(len(inferred), 0)
         self.assertTrue(all(row["owner"] in ("F2b", "F4b") for row in inferred))
 
-    def test_ambiguous_compiler_destinations_stay_in_scope(self):
+    def test_compiler_destinations_are_reviewed_without_claiming_coverage(self):
         unresolved = [row for row in self.report["gaps"] if row["root_cause"] == "compiler_destination_unreviewed"]
-        self.assertEqual(len(unresolved), 44)
-        self.assertTrue(all(row["destination_phase"] == 1 for row in unresolved))
-        self.assertTrue(all(row["owner"] == "F5a" for row in unresolved))
+        self.assertEqual(unresolved, [])
+        row = next(row for row in self.report["operations"] if row["id"] == "tsc/internal/compiler/program.go:Program.ResolveModuleName")
+        self.assertEqual(row["roster_state"], "exempt:unused_at_pin")
+        self.assertEqual(row["links"], [])
 
     def test_pilot_missing_is_visible_but_not_a_production_gap_claim(self):
         pilot = [row for row in self.report["case_gaps"] if row["family"] == "pilot"]
@@ -98,7 +99,7 @@ class CoverageTests(unittest.TestCase):
 
     def test_approvals_classify_without_rewriting_raw_difference(self):
         approved = [row for row in self.report["case_gaps"] if row["approved_difference"]]
-        self.assertEqual(len(approved), 3)
+        self.assertEqual(len(approved), 5)
         for row in approved:
             self.assertEqual(row["recorded_result"], "different")
             self.assertNotEqual(row["approved_native"], row["approved_rust"])
@@ -108,14 +109,25 @@ class CoverageTests(unittest.TestCase):
         report = self.mutated("data/phase1/approved-differences.json", lambda d: d["differences"][0].update(request_sha256="0" * 64))
         self.assertTrue(any("approved difference request changed" in p for p in report["problems"]))
 
-    def test_compiler_review_cannot_drop_an_unresolved_identity(self):
-        report = self.mutated("data/phase1/coverage-review.json", lambda d: d["unresolved_compiler_destinations"].pop())
+    def test_compiler_review_cannot_drop_a_reviewed_identity(self):
+        report = self.mutated("data/phase1/coverage-review.json", lambda d: d["reviewed_operation_destinations"].pop())
         self.assertTrue(any("every later-step exemption" in p for p in report["problems"]))
+
+    def test_unknown_and_duplicate_unused_reviews_fail(self):
+        for mutate in (
+            lambda d: d["reviewed_unused_compiler_operations"].append(d["reviewed_unused_compiler_operations"][0]),
+            lambda d: d["reviewed_unused_compiler_operations"][0].update(operation="tsc/internal/compiler/program.go:Invented"),
+            lambda d: d["reviewed_unused_compiler_operations"][0].update(go_source_sha256="0" * 64),
+        ):
+            with self.subTest(mutate=mutate):
+                report = self.mutated("data/phase1/coverage-review.json", mutate)
+                self.assertFalse(report["healthy"])
 
 
 class ReviewedDestinationTests(unittest.TestCase):
     def test_unmapped_is_derived_without_the_status_view(self):
-        expected = {operation for rows in scope.unmapped().values() for operation in rows}
+        expected = scope.unmapped_ids()
+        self.assertNotIn("tsc/internal/nativepath/eintr_unix.go:ignoringEINTR", expected)
         original = Path.read_text
         target = ROOT / "status/unmapped-functions.json"
         def read(path, *args, **kwargs):

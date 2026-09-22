@@ -1,5 +1,5 @@
 {
-  "accounted_operations": 314,
+  "accounted_operations": 315,
   "complete": false,
   "exempt_by_category": {
     "build_variant": 5,
@@ -17,11 +17,6 @@
   },
   "pending": [
     {
-      "disposition": "missing",
-      "operation": "tsc/internal/nativepath/eintr_unix.go:ignoringEINTR",
-      "rust_home": []
-    },
-    {
       "disposition": "implemented_untested",
       "operation": "tsc/internal/nativepath/realpath_linux.go:Realpath",
       "rust_home": [
@@ -35,5 +30,5 @@
   "step": "filesystem",
   "total_operations": 316,
   "version": 2,
-  "witnessed_operations": 8
+  "witnessed_operations": 9
 }

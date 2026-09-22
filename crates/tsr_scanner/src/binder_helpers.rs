@@ -1,7 +1,9 @@
 //! Source text and diagnostic ranges for the binder's AST-facing scanner calls.
 use crate::{normalize_jsdoc_type_source_text, skip_trivia, Scanner};
 use tsr_arena::Error;
-use tsr_ast::{node_flags, token_flags, AstView, NodeId, SourceFileState, SyntaxKind as K};
+use tsr_ast::{
+    node_flags, token_flags, AstView, NodeId, NodeListId, SourceFileState, SyntaxKind as K,
+};
 use tsr_core::TextRange;
 use tsr_jsstring::{scanner_positions, JsString};
 
@@ -96,6 +98,39 @@ pub fn get_text_of_node(view: AstView<'_>, node: NodeId) -> Result<JsString, Err
     let source = tsr_ast::utilities::get_source_file_of_node(view, Some(node))?
         .expect("nil source file in GetTextOfNode");
     get_source_text_of_node_from_source_file(view, source, Some(node), false)
+}
+
+/// Concatenate JSDoc text and link source spellings, trimming only Unicode
+/// White_Space at the end. JavaScript trivia also includes U+200B and U+FEFF;
+/// Go's unicode.IsSpace used here does not.
+/// port: tsc/internal/scanner/utilities.go:GetTextOfJSDocComment
+pub fn get_text_of_jsdoc_comment(
+    view: AstView<'_>,
+    comment: Option<NodeListId>,
+) -> Result<JsString, Error> {
+    let Some(comment) = comment else {
+        return Ok(JsString::default());
+    };
+    let nodes = view.node_slice(view.list(comment)?.nodes())?;
+    let mut text = Vec::new();
+    for node in nodes.iter() {
+        let node = node.expect("runtime error: invalid memory address or nil pointer dereference");
+        match view.node(node)?.kind().known() {
+            Some(K::JSDocText) => text.extend_from_slice(view.node_text(node)?.as_bytes()),
+            Some(K::JSDocLink | K::JSDocLinkCode | K::JSDocLinkPlain) => {
+                text.extend_from_slice(get_text_of_node(view, node)?.as_bytes());
+            }
+            _ => {}
+        }
+    }
+    loop {
+        let (rune, width) = crate::utilities::decode_last_utf8(&text);
+        if width == 0 || !char::from_u32(rune as u32).is_some_and(char::is_whitespace) {
+            break;
+        }
+        text.truncate(text.len() - width);
+    }
+    Ok(JsString::from_bytes(text))
 }
 
 /// port: tsc/internal/scanner/utilities.go:DeclarationNameToString

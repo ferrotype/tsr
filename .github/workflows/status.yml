@@ -179,6 +179,25 @@ jobs:
         run: |
           cargo test -p tsr_binder -p tsr_compiler -p tsr_tsoptions -p tsr_module -p tsr_semver -p tsr_tspath -p tsr_vfs -p tsr_bundled --all-targets --all-features --locked
           cargo test -p tsr_binder -p tsr_compiler -p tsr_tsoptions -p tsr_module -p tsr_semver -p tsr_tspath -p tsr_vfs -p tsr_bundled --all-targets --all-features --locked --release
+      - name: Linux procfs realpath against the pinned native operation
+        if: ${{ !cancelled() && steps.validate.outcome == 'success' && runner.os == 'Linux' }}
+        # Darwin cannot execute this operation. Preserve an authenticated,
+        # bounded Linux capture instead of qualifying native_unavailable.
+        run: |
+          python3 - <<'PY'
+          import json, sys
+          from pathlib import Path
+          sys.path.insert(0, "scripts")
+          import phase1_capture as capture
+          case = "filesystem/osvfs/nativepath-realpath-linux-procfs"
+          output = Path("target/phase1-platform/linux-realpath")
+          capture.capture("filesystem", output, [case])
+          report = capture.compare(output)
+          (output / "comparison.json").write_text(json.dumps(report, indent=2) + "\n")
+          rows = [row for row in report["rows"] if row["case"] == case]
+          if len(rows) != 1 or rows[0]["result"] != "match":
+              raise SystemExit("Linux Realpath did not match: " + repr(rows))
+          PY
       - name: Checker ownership, constructor and type-display contracts
         if: ${{ !cancelled() && steps.validate.outcome == 'success' }}
         run: |
@@ -348,6 +367,7 @@ jobs:
             target/s06-reports/
             target/s07-binder-reports/
             target/s07-program-reports/
+            target/phase1-platform/
             target/s07-subset/review/review-payload.json
             target/s11-reports/
           if-no-files-found: error

@@ -66,10 +66,22 @@ def input_paths(root=ROOT):
              "scripts/generate_locale_tables.py", "scripts/s03.py", "data/upstream.json",
              "data/s04/toolchains.toml", "data/s03/generated.json",
              "data/phase1/locale-tables-manifest.json", "tools/packaging/packages.json", "tools/packaging/verification.json",
-             "crates/tsr_bundled/bundled/manifest.json", "upstream/package.json", "scripts/package_assets.py"}
+             "crates/tsr_bundled/bundled/manifest.json", "upstream/package.json", "scripts/package_assets.py",
+             "tools/s10/toolchains.json", "LICENSE", "NOTICE", "licenses/GO-BSD-3-Clause.txt"}
     for folder in ("data/s11", "tools/s11", "tools/phase1/locale", "tools/s03"):
         paths.update(str(p.relative_to(root)) for p in (root / folder).rglob("*")
                      if p.is_file() and p.name != ".DS_Store" and "__pycache__" not in p.parts)
+    # Archive verification builds every public package, including packages no
+    # Phase 1 adapter depends on. Bind their manifests, build scripts and assets
+    # as well as Rust sources; a dependency-only closure misses archive changes.
+    for package in load(root, "tools/packaging/packages.json")["packages"]:
+        if package["publish"]:
+            paths.add(package["manifest"])
+            directory = (root / package["manifest"]).parent
+            paths.update(str(p.relative_to(root)) for p in directory.rglob("*")
+                         if p.is_file() and p.name != ".DS_Store"
+                         and not any(part in {".git", "target", "__pycache__"}
+                                     for part in p.relative_to(directory).parts))
     requests = request_index(root)
     for witness in document["witnesses"]:
         for reference in witness["references"]:
@@ -195,6 +207,30 @@ def localized_result(root, observed):
             "scope": "config parser to production writer text; not a 309-baseline count"}
 
 
+def validate_installed_observation(root, observed):
+    """Require the archive consumer's actual locale/message/ownership outputs."""
+    if not isinstance(observed, dict) or set(observed) != {
+            "encoded_bytes", "libraries", "locale", "diagnostic_code",
+            "localized_message", "owners_returned_to_baseline"}:
+        raise ValueError("installed consumer omits generated-asset observations")
+    table = strict_json_loads(gzip.decompress((root / "upstream/tsc/internal/diagnostics/loc/de-DE.json.gz").read_bytes()))
+    expected = table["Type_0_is_not_assignable_to_type_1_2322"].replace("{0}", "number").replace("{1}", "string")
+    if (type(observed["encoded_bytes"]) is not int or observed["encoded_bytes"] <= 0
+            or type(observed["libraries"]) is not int or observed["libraries"] != 108
+            or type(observed["diagnostic_code"]) is not int or observed["diagnostic_code"] != 2322
+            or observed["locale"] != "de-DE" or observed["localized_message"] != expected
+            or observed["owners_returned_to_baseline"] is not True):
+        raise ValueError("installed consumer generated-asset observations differ")
+
+
+def localized_integration_result(root, leaf, envelopes):
+    import phase1_localized
+    leaf_result = localized_result(root, leaf)
+    envelope_result = phase1_localized.compare(envelopes, root)
+    return {"leaf": leaf_result, "envelopes": {**envelope_result, "observation": envelopes},
+            "status": "match" if leaf_result["status"] == envelope_result["status"] == "match" else "different"}
+
+
 def receipt(identity, command, source_inputs, stdout, *, stderr="", exit_code=0, artifact=None):
     """Serialize outputs of an actually executed command; never executes a child.
 
@@ -270,7 +306,7 @@ def evaluate(preparation, family_reports, receipts=(), *, source_inputs=None, ro
         try:
             if identity == "localized-config-diagnostics":
                 output = strict_json_loads(item["stdout"])
-                actual = localized_result(root, output["observation"])
+                actual = localized_integration_result(root, output["leaf"]["observation"], output["envelopes"]["observation"])
                 if output != actual:
                     raise ValueError("localized comparison differs from independent replay")
                 measured[identity] = actual["status"]
@@ -306,6 +342,7 @@ def evaluate(preparation, family_reports, receipts=(), *, source_inputs=None, ro
                 commands = artifact.get("commands", [])
                 if not any(row.get("log") == "consumer.log" and Path(row["command"][0]).name == "package_consumer" for row in commands):
                     raise ValueError("installed consumer did not execute")
+                validate_installed_observation(root, artifact.get("consumer_observation"))
                 measured[identity] = "match"
         except (ValueError, KeyError, TypeError, IndexError) as error:
             problems.append(f"{identity}: {error}")
@@ -333,9 +370,11 @@ def main():
     if args.operation == "check":
         result = check()
     else:
+        import phase1_localized
         output = subprocess.run(["cargo", "run", "--locked", "-p", "tsr_compiler", "--example", "phase1_integration"],
                                 cwd=ROOT, stdout=subprocess.PIPE, stderr=sys.stderr, check=True)
-        result = localized_result(ROOT, strict_json_loads(output.stdout))
+        envelopes = phase1_localized.observe()
+        result = localized_integration_result(ROOT, strict_json_loads(output.stdout), envelopes["observation"])
     print(json.dumps(result, indent=2, sort_keys=True))
     return int(bool(result.get("problems")))
 

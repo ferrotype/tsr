@@ -1105,7 +1105,8 @@ def reviewed_destinations() -> dict[str, dict]:
         raise ValueError("coverage-review.json has no current pinned review authority")
     known = {row["id"]: row for row in inventory()}
     decisions: dict[str, dict] = {}
-    for row in review.get("reviewed_operation_destinations", []):
+    unused = review.get("reviewed_unused_compiler_operations", [])
+    for row in [*review.get("reviewed_operation_destinations", []), *unused]:
         identity = row.get("operation")
         original = known.get(identity)
         if identity in decisions or original is None:
@@ -1113,7 +1114,9 @@ def reviewed_destinations() -> dict[str, dict]:
         if original["package"] != "internal/compiler":
             raise ValueError(f"{identity}: only the reviewed partial compiler scope can move")
         phase = row.get("destination_phase")
-        if type(phase) is not int or phase not in range(2, 8):
+        if row in unused and phase is not None:
+            raise ValueError(f"{identity}: unused operation cannot also name a destination")
+        if row not in unused and (type(phase) is not int or phase not in range(2, 8)):
             raise ValueError(f"{identity}: invalid reviewed destination phase {phase!r}")
         if not row.get("reason") or not row.get("evidence"):
             raise ValueError(f"{identity}: reviewed destination lacks a reason or source evidence")
@@ -1126,4 +1129,4 @@ def reviewed_destinations() -> dict[str, dict]:
         raise ValueError("coverage-review.json: duplicate or simultaneously resolved destination")
     if any(identity not in known for identity in unresolved):
         raise ValueError("coverage-review.json: unknown unresolved operation")
-    return decisions
+    return {identity: row for identity, row in decisions.items() if "destination_phase" in row}

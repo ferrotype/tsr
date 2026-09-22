@@ -452,6 +452,1254 @@
           }
         ]
       }
+    },
+    {
+      "approved_by": "owner in task conversation, 2026-09-22: retain closed typed APIs for these two foreign dynamic operands",
+      "case": "filesystem/glob/match-group-branch-buffer",
+      "decision": "docs/PHASE1-F5b-filesystem-audit.md#decision",
+      "family": "filesystem",
+      "historical_artifact": "data/phase1/captures/f3b-complete.tar.gz",
+      "native": {
+        "ordered": [
+          {
+            "count": 2,
+            "elems": [
+              [
+                "group",
+                [
+                  [
+                    [
+                      "literal",
+                      "61"
+                    ]
+                  ],
+                  [
+                    [
+                      "literal",
+                      "62"
+                    ]
+                  ],
+                  [
+                    [
+                      "literal",
+                      "63"
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "literal",
+                "78"
+              ]
+            ],
+            "op": "build_elems"
+          },
+          {
+            "op": "match_elems",
+            "panic": "",
+            "result": true
+          },
+          {
+            "op": "match_elems",
+            "panic": "",
+            "result": true
+          },
+          {
+            "op": "match_elems",
+            "panic": "",
+            "result": true
+          },
+          {
+            "op": "match_elems",
+            "panic": "",
+            "result": false
+          },
+          {
+            "count": 2,
+            "elems": [
+              [
+                "group",
+                [
+                  [
+                    [
+                      "literal",
+                      "61"
+                    ]
+                  ],
+                  [
+                    [
+                      "literal",
+                      "6162"
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "literal",
+                "63"
+              ]
+            ],
+            "op": "build_elems"
+          },
+          {
+            "op": "match_elems",
+            "panic": "",
+            "result": true
+          },
+          {
+            "count": 2,
+            "elems": [
+              [
+                "group",
+                [
+                  [
+                    [
+                      "literal",
+                      "6162"
+                    ]
+                  ],
+                  [
+                    [
+                      "literal",
+                      "61"
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "literal",
+                "63"
+              ]
+            ],
+            "op": "build_elems"
+          },
+          {
+            "op": "match_elems",
+            "panic": "",
+            "result": true
+          },
+          {
+            "count": 2,
+            "elems": [
+              [
+                "group",
+                [
+                  [
+                    [
+                      "literal",
+                      "61"
+                    ]
+                  ],
+                  [
+                    [
+                      "literal",
+                      "62"
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "group",
+                [
+                  [
+                    [
+                      "literal",
+                      "63"
+                    ]
+                  ],
+                  [
+                    [
+                      "literal",
+                      "64"
+                    ]
+                  ]
+                ]
+              ]
+            ],
+            "op": "build_elems"
+          },
+          {
+            "op": "match_elems",
+            "panic": "",
+            "result": true
+          },
+          {
+            "count": 3,
+            "elems": [
+              [
+                "literal",
+                "61"
+              ],
+              [
+                "group",
+                [
+                  [
+                    [
+                      "literal",
+                      "62"
+                    ]
+                  ],
+                  [
+                    [
+                      "literal",
+                      "63"
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "literal",
+                "64"
+              ]
+            ],
+            "op": "build_elems"
+          },
+          {
+            "op": "match_elems",
+            "panic": "",
+            "result": true
+          },
+          {
+            "count": 1,
+            "elems": [
+              [
+                "group",
+                [
+                  [
+                    "star_star",
+                    "slash",
+                    [
+                      "literal",
+                      "61"
+                    ]
+                  ],
+                  [
+                    [
+                      "literal",
+                      "62"
+                    ]
+                  ]
+                ]
+              ]
+            ],
+            "op": "build_elems"
+          },
+          {
+            "op": "match_elems",
+            "panic": "",
+            "result": true
+          },
+          {
+            "op": "match_elems",
+            "panic": "",
+            "result": true
+          },
+          {
+            "count": 1,
+            "elems": [
+              [
+                "group",
+                [
+                  [
+                    [
+                      "literal",
+                      "61"
+                    ]
+                  ],
+                  [
+                    "star"
+                  ]
+                ]
+              ]
+            ],
+            "op": "build_elems"
+          },
+          {
+            "op": "match_elems",
+            "panic": "",
+            "result": true
+          },
+          {
+            "count": 1,
+            "elems": [
+              [
+                "group",
+                [
+                  [
+                    [
+                      "literal",
+                      "61"
+                    ]
+                  ],
+                  []
+                ]
+              ]
+            ],
+            "op": "build_elems"
+          },
+          {
+            "op": "match_elems",
+            "panic": "",
+            "result": true
+          },
+          {
+            "op": "match_elems",
+            "panic": "",
+            "result": true
+          },
+          {
+            "count": 1,
+            "elems": [
+              [
+                "group",
+                []
+              ]
+            ],
+            "op": "build_elems"
+          },
+          {
+            "op": "match_elems",
+            "panic": "",
+            "result": false
+          },
+          {
+            "op": "match_elems",
+            "panic": "",
+            "result": false
+          },
+          {
+            "count": 1,
+            "elems": [
+              [
+                "group",
+                []
+              ]
+            ],
+            "op": "build_elems"
+          },
+          {
+            "op": "match_elems",
+            "panic": "",
+            "result": false
+          },
+          {
+            "op": "match_elems",
+            "panic": "",
+            "result": false
+          },
+          {
+            "count": 1,
+            "elems": [
+              "foreign"
+            ],
+            "op": "build_elems"
+          },
+          {
+            "op": "match_elems",
+            "panic": "unimplemented_segment_type",
+            "result": null
+          },
+          {
+            "count": 1,
+            "elems": [
+              "slash"
+            ],
+            "op": "build_elems"
+          },
+          {
+            "op": "match_elems",
+            "panic": "index_out_of_range",
+            "result": null
+          },
+          {
+            "op": "match_elems",
+            "panic": "index_out_of_range",
+            "result": null
+          },
+          {
+            "count": 2,
+            "elems": [
+              "slash",
+              [
+                "literal",
+                "61"
+              ]
+            ],
+            "op": "build_elems"
+          },
+          {
+            "op": "match_elems",
+            "panic": "",
+            "result": true
+          },
+          {
+            "count": 1,
+            "elems": [
+              "star"
+            ],
+            "op": "build_elems"
+          },
+          {
+            "op": "match_elems",
+            "panic": "",
+            "result": true
+          },
+          {
+            "count": 1,
+            "elems": [
+              "star_star"
+            ],
+            "op": "build_elems"
+          },
+          {
+            "op": "match_elems",
+            "panic": "",
+            "result": true
+          },
+          {
+            "count": 1,
+            "elems": [
+              "any_char"
+            ],
+            "op": "build_elems"
+          },
+          {
+            "op": "match_elems",
+            "panic": "",
+            "result": false
+          },
+          {
+            "count": 3,
+            "elems": [
+              "star",
+              "slash",
+              [
+                "literal",
+                "61"
+              ]
+            ],
+            "op": "build_elems"
+          },
+          {
+            "op": "match_elems",
+            "panic": "",
+            "result": false
+          }
+        ]
+      },
+      "request_sha256": "c89e667c73a1ef9337602ca31c19ec842d58152a481186ef44fff8c6a4c90d99",
+      "rust": {
+        "ordered": [
+          {
+            "count": 2,
+            "elems": [
+              [
+                "group",
+                [
+                  [
+                    [
+                      "literal",
+                      "61"
+                    ]
+                  ],
+                  [
+                    [
+                      "literal",
+                      "62"
+                    ]
+                  ],
+                  [
+                    [
+                      "literal",
+                      "63"
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "literal",
+                "78"
+              ]
+            ],
+            "op": "build_elems"
+          },
+          {
+            "op": "match_elems",
+            "panic": "",
+            "result": true
+          },
+          {
+            "op": "match_elems",
+            "panic": "",
+            "result": true
+          },
+          {
+            "op": "match_elems",
+            "panic": "",
+            "result": true
+          },
+          {
+            "op": "match_elems",
+            "panic": "",
+            "result": false
+          },
+          {
+            "count": 2,
+            "elems": [
+              [
+                "group",
+                [
+                  [
+                    [
+                      "literal",
+                      "61"
+                    ]
+                  ],
+                  [
+                    [
+                      "literal",
+                      "6162"
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "literal",
+                "63"
+              ]
+            ],
+            "op": "build_elems"
+          },
+          {
+            "op": "match_elems",
+            "panic": "",
+            "result": true
+          },
+          {
+            "count": 2,
+            "elems": [
+              [
+                "group",
+                [
+                  [
+                    [
+                      "literal",
+                      "6162"
+                    ]
+                  ],
+                  [
+                    [
+                      "literal",
+                      "61"
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "literal",
+                "63"
+              ]
+            ],
+            "op": "build_elems"
+          },
+          {
+            "op": "match_elems",
+            "panic": "",
+            "result": true
+          },
+          {
+            "count": 2,
+            "elems": [
+              [
+                "group",
+                [
+                  [
+                    [
+                      "literal",
+                      "61"
+                    ]
+                  ],
+                  [
+                    [
+                      "literal",
+                      "62"
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "group",
+                [
+                  [
+                    [
+                      "literal",
+                      "63"
+                    ]
+                  ],
+                  [
+                    [
+                      "literal",
+                      "64"
+                    ]
+                  ]
+                ]
+              ]
+            ],
+            "op": "build_elems"
+          },
+          {
+            "op": "match_elems",
+            "panic": "",
+            "result": true
+          },
+          {
+            "count": 3,
+            "elems": [
+              [
+                "literal",
+                "61"
+              ],
+              [
+                "group",
+                [
+                  [
+                    [
+                      "literal",
+                      "62"
+                    ]
+                  ],
+                  [
+                    [
+                      "literal",
+                      "63"
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "literal",
+                "64"
+              ]
+            ],
+            "op": "build_elems"
+          },
+          {
+            "op": "match_elems",
+            "panic": "",
+            "result": true
+          },
+          {
+            "count": 1,
+            "elems": [
+              [
+                "group",
+                [
+                  [
+                    "star_star",
+                    "slash",
+                    [
+                      "literal",
+                      "61"
+                    ]
+                  ],
+                  [
+                    [
+                      "literal",
+                      "62"
+                    ]
+                  ]
+                ]
+              ]
+            ],
+            "op": "build_elems"
+          },
+          {
+            "op": "match_elems",
+            "panic": "",
+            "result": true
+          },
+          {
+            "op": "match_elems",
+            "panic": "",
+            "result": true
+          },
+          {
+            "count": 1,
+            "elems": [
+              [
+                "group",
+                [
+                  [
+                    [
+                      "literal",
+                      "61"
+                    ]
+                  ],
+                  [
+                    "star"
+                  ]
+                ]
+              ]
+            ],
+            "op": "build_elems"
+          },
+          {
+            "op": "match_elems",
+            "panic": "",
+            "result": true
+          },
+          {
+            "count": 1,
+            "elems": [
+              [
+                "group",
+                [
+                  [
+                    [
+                      "literal",
+                      "61"
+                    ]
+                  ],
+                  []
+                ]
+              ]
+            ],
+            "op": "build_elems"
+          },
+          {
+            "op": "match_elems",
+            "panic": "",
+            "result": true
+          },
+          {
+            "op": "match_elems",
+            "panic": "",
+            "result": true
+          },
+          {
+            "count": 1,
+            "elems": [
+              [
+                "group",
+                []
+              ]
+            ],
+            "op": "build_elems"
+          },
+          {
+            "op": "match_elems",
+            "panic": "",
+            "result": false
+          },
+          {
+            "op": "match_elems",
+            "panic": "",
+            "result": false
+          },
+          {
+            "count": 1,
+            "elems": [
+              [
+                "group",
+                []
+              ]
+            ],
+            "op": "build_elems"
+          },
+          {
+            "op": "match_elems",
+            "panic": "",
+            "result": false
+          },
+          {
+            "op": "match_elems",
+            "panic": "",
+            "result": false
+          },
+          {
+            "count": 1,
+            "elems": [
+              "foreign"
+            ],
+            "op": "build_elems"
+          },
+          {
+            "op": "match_elems",
+            "panic": "unrepresentable_element",
+            "result": null
+          },
+          {
+            "count": 1,
+            "elems": [
+              "slash"
+            ],
+            "op": "build_elems"
+          },
+          {
+            "op": "match_elems",
+            "panic": "index_out_of_range",
+            "result": null
+          },
+          {
+            "op": "match_elems",
+            "panic": "index_out_of_range",
+            "result": null
+          },
+          {
+            "count": 2,
+            "elems": [
+              "slash",
+              [
+                "literal",
+                "61"
+              ]
+            ],
+            "op": "build_elems"
+          },
+          {
+            "op": "match_elems",
+            "panic": "",
+            "result": true
+          },
+          {
+            "count": 1,
+            "elems": [
+              "star"
+            ],
+            "op": "build_elems"
+          },
+          {
+            "op": "match_elems",
+            "panic": "",
+            "result": true
+          },
+          {
+            "count": 1,
+            "elems": [
+              "star_star"
+            ],
+            "op": "build_elems"
+          },
+          {
+            "op": "match_elems",
+            "panic": "",
+            "result": true
+          },
+          {
+            "count": 1,
+            "elems": [
+              "any_char"
+            ],
+            "op": "build_elems"
+          },
+          {
+            "op": "match_elems",
+            "panic": "",
+            "result": false
+          },
+          {
+            "count": 3,
+            "elems": [
+              "star",
+              "slash",
+              [
+                "literal",
+                "61"
+              ]
+            ],
+            "op": "build_elems"
+          },
+          {
+            "op": "match_elems",
+            "panic": "",
+            "result": false
+          }
+        ]
+      }
+    },
+    {
+      "approved_by": "owner in task conversation, 2026-09-22: retain closed typed APIs for these two foreign dynamic operands",
+      "case": "filesystem/vfstest/from-map-rejects-malformed-maps",
+      "decision": "docs/PHASE1-F5b-filesystem-audit.md#decision",
+      "family": "filesystem",
+      "historical_artifact": "data/phase1/captures/f3b-complete.tar.gz",
+      "native": {
+        "ordered": [
+          {
+            "op": "from_map_guarded",
+            "result": [
+              "guarded",
+              "pinned:non-rooted path \"string\""
+            ]
+          },
+          {
+            "op": "from_map_guarded",
+            "result": [
+              "guarded",
+              "pinned:non-normalized path \"/string/\""
+            ]
+          },
+          {
+            "op": "from_map_guarded",
+            "result": [
+              "guarded",
+              "pinned:non-normalized path \"/string/../foo\""
+            ]
+          },
+          {
+            "op": "from_map_guarded",
+            "result": [
+              "guarded",
+              "pinned:mixed posix and windows paths"
+            ]
+          },
+          {
+            "op": "from_map_guarded",
+            "result": [
+              "guarded",
+              "pinned:invalid file type"
+            ]
+          },
+          {
+            "op": "from_map_guarded",
+            "result": [
+              "guarded",
+              "pinned:non-rooted path \"root/a\""
+            ]
+          },
+          {
+            "op": "from_map",
+            "result": [
+              "built",
+              3
+            ]
+          },
+          {
+            "op": "entries",
+            "panic": "",
+            "result": [
+              "entries",
+              [
+                [
+                  "/a",
+                  [
+                    true,
+                    false,
+                    false,
+                    "0755"
+                  ],
+                  0,
+                  ""
+                ],
+                [
+                  "/a-x",
+                  [
+                    true,
+                    false,
+                    false,
+                    "0755"
+                  ],
+                  0,
+                  ""
+                ],
+                [
+                  "/a/b.ts",
+                  [
+                    false,
+                    false,
+                    true,
+                    "0000"
+                  ],
+                  2,
+                  "ab"
+                ],
+                [
+                  "/a-x/c.ts",
+                  [
+                    false,
+                    false,
+                    true,
+                    "0000"
+                  ],
+                  2,
+                  "ax"
+                ],
+                [
+                  "/ab",
+                  [
+                    true,
+                    false,
+                    false,
+                    "0755"
+                  ],
+                  0,
+                  ""
+                ],
+                [
+                  "/ab/c.ts",
+                  [
+                    false,
+                    false,
+                    true,
+                    "0000"
+                  ],
+                  3,
+                  "abc"
+                ]
+              ]
+            ]
+          },
+          {
+            "op": "from_map",
+            "result": [
+              "built",
+              2
+            ]
+          },
+          {
+            "op": "entries",
+            "panic": "",
+            "result": [
+              "entries",
+              [
+                [
+                  "c:",
+                  [
+                    true,
+                    false,
+                    false,
+                    "0755"
+                  ],
+                  0,
+                  ""
+                ],
+                [
+                  "c:/dir",
+                  [
+                    true,
+                    false,
+                    false,
+                    "0755"
+                  ],
+                  0,
+                  ""
+                ],
+                [
+                  "c:/dir/y.ts",
+                  [
+                    false,
+                    false,
+                    true,
+                    "0000"
+                  ],
+                  1,
+                  "y"
+                ],
+                [
+                  "c:/x.ts",
+                  [
+                    false,
+                    false,
+                    true,
+                    "0000"
+                  ],
+                  1,
+                  "x"
+                ]
+              ]
+            ]
+          }
+        ]
+      },
+      "request_sha256": "9684794de8b5198ec15ce5981c924a67da807927d569d356f53bf8f8b01bb885",
+      "rust": {
+        "ordered": [
+          {
+            "op": "from_map_guarded",
+            "result": [
+              "guarded",
+              "pinned:non-rooted path \"string\""
+            ]
+          },
+          {
+            "op": "from_map_guarded",
+            "result": [
+              "guarded",
+              "pinned:non-normalized path \"/string/\""
+            ]
+          },
+          {
+            "op": "from_map_guarded",
+            "result": [
+              "guarded",
+              "pinned:non-normalized path \"/string/../foo\""
+            ]
+          },
+          {
+            "op": "from_map_guarded",
+            "result": [
+              "guarded",
+              "pinned:mixed posix and windows paths"
+            ]
+          },
+          {
+            "op": "from_map_guarded",
+            "result": [
+              "guarded",
+              "unrepresentable_input"
+            ]
+          },
+          {
+            "op": "from_map_guarded",
+            "result": [
+              "guarded",
+              "pinned:non-rooted path \"root/a\""
+            ]
+          },
+          {
+            "op": "from_map",
+            "result": [
+              "built",
+              3
+            ]
+          },
+          {
+            "op": "entries",
+            "panic": "",
+            "result": [
+              "entries",
+              [
+                [
+                  "/a",
+                  [
+                    true,
+                    false,
+                    false,
+                    "0755"
+                  ],
+                  0,
+                  ""
+                ],
+                [
+                  "/a-x",
+                  [
+                    true,
+                    false,
+                    false,
+                    "0755"
+                  ],
+                  0,
+                  ""
+                ],
+                [
+                  "/a/b.ts",
+                  [
+                    false,
+                    false,
+                    true,
+                    "0000"
+                  ],
+                  2,
+                  "ab"
+                ],
+                [
+                  "/a-x/c.ts",
+                  [
+                    false,
+                    false,
+                    true,
+                    "0000"
+                  ],
+                  2,
+                  "ax"
+                ],
+                [
+                  "/ab",
+                  [
+                    true,
+                    false,
+                    false,
+                    "0755"
+                  ],
+                  0,
+                  ""
+                ],
+                [
+                  "/ab/c.ts",
+                  [
+                    false,
+                    false,
+                    true,
+                    "0000"
+                  ],
+                  3,
+                  "abc"
+                ]
+              ]
+            ]
+          },
+          {
+            "op": "from_map",
+            "result": [
+              "built",
+              2
+            ]
+          },
+          {
+            "op": "entries",
+            "panic": "",
+            "result": [
+              "entries",
+              [
+                [
+                  "c:",
+                  [
+                    true,
+                    false,
+                    false,
+                    "0755"
+                  ],
+                  0,
+                  ""
+                ],
+                [
+                  "c:/dir",
+                  [
+                    true,
+                    false,
+                    false,
+                    "0755"
+                  ],
+                  0,
+                  ""
+                ],
+                [
+                  "c:/dir/y.ts",
+                  [
+                    false,
+                    false,
+                    true,
+                    "0000"
+                  ],
+                  1,
+                  "y"
+                ],
+                [
+                  "c:/x.ts",
+                  [
+                    false,
+                    false,
+                    true,
+                    "0000"
+                  ],
+                  1,
+                  "x"
+                ]
+              ]
+            ]
+          }
+        ]
+      }
     }
   ],
   "pin": "1f70213d4922b434345f639b441681e470c7cfc1",

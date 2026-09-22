@@ -35,7 +35,7 @@ def _sha(value: bytes) -> str:
     return hashlib.sha256(value).hexdigest()
 
 
-def build(root: Path = ROOT) -> dict:
+def build(root: Path = ROOT, *, supplemental_prepared_cases=()) -> dict:
     """Rebuild all links without subprocesses or reading untracked captures."""
     inputs: dict[str, str] = {}
     problems: list[str] = []
@@ -83,10 +83,25 @@ def build(root: Path = ROOT) -> dict:
         if row.get("disposition") != "later_phase" or row.get("destination_phase") != decision["destination_phase"]:
             problems.append(f"{identity}: scope and reviewed destination disagree")
     unresolved = set(review["unresolved_compiler_destinations"])
+    unused_rows = review.get("reviewed_unused_compiler_operations", [])
+    unused = {row["operation"]: row for row in unused_rows}
+    if len(unused) != len(unused_rows):
+        problems.append("duplicate reviewed unused compiler operation")
+    for identity, decision in unused.items():
+        row = operations.get(identity, {})
+        source = root / "upstream" / identity.rsplit(":", 1)[0]
+        if not row or not identity.startswith("tsc/internal/compiler/"):
+            problems.append(f"{identity}: unknown reviewed unused compiler operation")
+        if not source.is_file() or _sha(source.read_bytes()) != decision.get("go_source_sha256"):
+            problems.append(f"{identity}: reviewed pinned source changed")
+        if not decision.get("reason") or not decision.get("evidence") or row.get("roster", {}).get("state") != "exempt:unused_at_pin":
+            problems.append(f"{identity}: unused review lacks an exact roster exemption and evidence")
     roster = load("data/phase1/syntax-roster.json")
     compiler_exemptions = {row["operation"] for row in roster["exemptions"]
-                          if row["category"] == "later_step" and row["operation"].startswith("tsc/internal/compiler/")}
-    if reviewed.keys() & unresolved or reviewed.keys() | unresolved != compiler_exemptions:
+                          if (row["category"] == "later_step" or row["operation"] in unused)
+                          and row["operation"].startswith("tsc/internal/compiler/")}
+    if (reviewed.keys() & unresolved or reviewed.keys() & unused.keys() or unused.keys() & unresolved
+            or reviewed.keys() | unused.keys() | unresolved != compiler_exemptions):
         problems.append("compiler destination review does not account for every later-step exemption exactly once")
 
     requests: dict[str, tuple[str, str, dict]] = {}
@@ -202,6 +217,14 @@ def build(root: Path = ROOT) -> dict:
     operation_rows, gaps = [], []
     preparing_cases = {row["id"] for row in joined_cases
                        if row["acceptance"] and row["recorded_result"] in scope.PREPARING_RESULTS}
+    supplemental = set(supplemental_prepared_cases)
+    eligible_supplements = {row["id"] for row in joined_cases
+                            if row["acceptance"] and row["recorded_result"] == "native_unavailable"}
+    if not supplemental <= eligible_supplements:
+        raise ValueError("supplemental preparation must name native-unavailable acceptance cases")
+    # Only the producer passes these IDs, after authenticating a platform
+    # capture. Recorded outcomes and committed coverage remain unchanged.
+    preparing_cases.update(supplemental)
     gated_witnesses = {row["id"] for row in manifest.get("witnesses", []) if row.get("kind") == "rust_gated"}
     for row in document["operations"]:
         identity, disposition = row["id"], row["disposition"]
@@ -249,7 +272,8 @@ def build(root: Path = ROOT) -> dict:
             "families": families, "operations": operation_rows, "cases": joined_cases,
             "gaps": gaps, "case_gaps": case_gaps,
             "root_causes": [{"cause": cause, "count": len(rows), "example": rows[0]} for cause, rows in sorted(causes.items())],
-            "input_sha256": dict(sorted(inputs.items())), "problems": problems}
+            "input_sha256": dict(sorted(inputs.items())), "problems": problems,
+            **({"supplemental_prepared_cases": sorted(supplemental)} if supplemental else {})}
 
 
 def verify(document: dict, root: Path = ROOT) -> list[str]:

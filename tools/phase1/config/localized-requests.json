@@ -1,0 +1,131 @@
+{
+  "version": 1,
+  "requests": [
+    {
+      "case": "integration/localized-config/de-DE/json",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "subject": "tsconfigParsingBaseline",
+      "source": "integration",
+      "api": "json",
+      "baseline": "integration/localized-config/de-DE-json.js",
+      "title": "localized config de-DE json",
+      "include_compiler_options": true,
+      "inputs": [
+        {
+          "locale": "de-DE",
+          "config_file_name": "tsconfig.json",
+          "base_path": "/",
+          "json_text": "{\"compilerOptions\":{\"notAnOption\":true},\"files\":[\"main.ts\"]}",
+          "all_file_list": {
+            "/main.ts": ""
+          }
+        }
+      ]
+    },
+    {
+      "case": "integration/localized-config/de-DE/jsonSourceFile",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "subject": "tsconfigParsingBaseline",
+      "source": "integration",
+      "api": "jsonSourceFile",
+      "baseline": "integration/localized-config/de-DE-jsonSourceFile.js",
+      "title": "localized config de-DE jsonSourceFile",
+      "include_compiler_options": true,
+      "inputs": [
+        {
+          "locale": "de-DE",
+          "config_file_name": "tsconfig.json",
+          "base_path": "/",
+          "json_text": "{\"compilerOptions\":{\"notAnOption\":true},\"files\":[\"main.ts\"]}",
+          "all_file_list": {
+            "/main.ts": ""
+          }
+        }
+      ]
+    },
+    {
+      "case": "integration/localized-config/ja-JP/json",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "subject": "tsconfigParsingBaseline",
+      "source": "integration",
+      "api": "json",
+      "baseline": "integration/localized-config/ja-JP-json.js",
+      "title": "localized config ja-JP json",
+      "include_compiler_options": true,
+      "inputs": [
+        {
+          "locale": "ja-JP",
+          "config_file_name": "tsconfig.json",
+          "base_path": "/",
+          "json_text": "{\"compilerOptions\":{\"notAnOption\":true},\"files\":[\"main.ts\"]}",
+          "all_file_list": {
+            "/main.ts": ""
+          }
+        }
+      ]
+    },
+    {
+      "case": "integration/localized-config/ja-JP/jsonSourceFile",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "subject": "tsconfigParsingBaseline",
+      "source": "integration",
+      "api": "jsonSourceFile",
+      "baseline": "integration/localized-config/ja-JP-jsonSourceFile.js",
+      "title": "localized config ja-JP jsonSourceFile",
+      "include_compiler_options": true,
+      "inputs": [
+        {
+          "locale": "ja-JP",
+          "config_file_name": "tsconfig.json",
+          "base_path": "/",
+          "json_text": "{\"compilerOptions\":{\"notAnOption\":true},\"files\":[\"main.ts\"]}",
+          "all_file_list": {
+            "/main.ts": ""
+          }
+        }
+      ]
+    },
+    {
+      "case": "integration/localized-config/zz-ZZ/json",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "subject": "tsconfigParsingBaseline",
+      "source": "integration",
+      "api": "json",
+      "baseline": "integration/localized-config/zz-ZZ-json.js",
+      "title": "localized config zz-ZZ json",
+      "include_compiler_options": true,
+      "inputs": [
+        {
+          "locale": "zz-ZZ",
+          "config_file_name": "tsconfig.json",
+          "base_path": "/",
+          "json_text": "{\"compilerOptions\":{\"notAnOption\":true},\"files\":[\"main.ts\"]}",
+          "all_file_list": {
+            "/main.ts": ""
+          }
+        }
+      ]
+    },
+    {
+      "case": "integration/localized-config/zz-ZZ/jsonSourceFile",
+      "operation": "tsoptions.tsconfigParsingBaseline",
+      "subject": "tsconfigParsingBaseline",
+      "source": "integration",
+      "api": "jsonSourceFile",
+      "baseline": "integration/localized-config/zz-ZZ-jsonSourceFile.js",
+      "title": "localized config zz-ZZ jsonSourceFile",
+      "include_compiler_options": true,
+      "inputs": [
+        {
+          "locale": "zz-ZZ",
+          "config_file_name": "tsconfig.json",
+          "base_path": "/",
+          "json_text": "{\"compilerOptions\":{\"notAnOption\":true},\"files\":[\"main.ts\"]}",
+          "all_file_list": {
+            "/main.ts": ""
+          }
+        }
+      ]
+    }
+  ]
+}

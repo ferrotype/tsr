@@ -28,6 +28,11 @@ GROUPS = {"foundations": ("leaves", "filesystem", "config", "syntax"),
           "config": ("config", "filesystem"), "syntax": ("syntax", "program")}
 CASE_FILES = {"config": "data/phase1/config-cases.json", "syntax": "data/phase1/syntax-cases.json"}
 DEFAULT = ROOT / "target/phase1-acceptance"
+# Platform-only requests keep their raw native_unavailable row on other hosts.
+# A separately authenticated capture can supply that exact missing witness.
+PLATFORM_CASES = {
+    "filesystem/osvfs/nativepath-realpath-linux-procfs": ("filesystem", "Linux-"),
+}
 
 
 def read(path: Path):
@@ -195,6 +200,73 @@ def replay_family(family: str, directory: Path) -> dict:
     return report
 
 
+def attach_platform_captures(family: str, report: dict, directories: list[Path]) -> None:
+    """Keep raw rows intact; attest only explicitly platform-scoped missing rows."""
+    witnesses = {}
+    rows = {row["case"]: row for row in report["rows"]}
+    for directory in directories:
+        provenance = read(directory / "provenance.json")
+        current = capture.source_closure(family, rust_packages(family))
+        if provenance.get("family") != family or provenance.get("source_closure") != current:
+            raise ValueError("platform capture family or current source closure differs")
+        # compare authenticates pin, gitlink, request bytes, child observations,
+        # renderer outputs and the independently reconstructed input key set.
+        supplemental = capture.compare(directory)
+        selected = provenance.get("selected_cases")
+        if not isinstance(selected, list) or not selected or len(set(selected)) != len(selected):
+            raise ValueError("platform capture has no unique selected inventory")
+        actual = {row["case"]: row for row in supplemental["rows"] if row["result"] != "not_run"}
+        if set(actual) != set(selected):
+            raise ValueError("platform capture selection differs from its observed rows")
+        for identity in selected:
+            policy = PLATFORM_CASES.get(identity)
+            if policy is None or policy[0] != family:
+                raise ValueError(f"case has no platform supplementation policy: {identity}")
+            if not provenance.get("host", {}).get("platform", "").startswith(policy[1]):
+                raise ValueError(f"platform capture ran on the wrong host: {identity}")
+            if identity in witnesses:
+                raise ValueError(f"duplicate platform witness: {identity}")
+            if identity not in rows or rows[identity]["result"] != "native_unavailable":
+                raise ValueError(f"platform witness cannot replace an executed result: {identity}")
+            if actual[identity]["result"] != "match":
+                raise ValueError(f"platform witness does not match: {identity}")
+            witnesses[identity] = {"row": actual[identity],
+                "capture_identity": sha((directory / "provenance.json").read_bytes()),
+                "platform": provenance["host"]["platform"], "report": supplemental}
+    report["platform_witnesses"] = witnesses
+
+
+def platform_matched(family: str, row: dict, report: dict) -> bool:
+    witness = report.get("platform_witnesses", {}).get(row["case"])
+    policy = PLATFORM_CASES.get(row["case"])
+    return bool(row["result"] == "native_unavailable" and policy and policy[0] == family
+                and witness and witness["row"] == {"case": row["case"], "result": "match"}
+                and witness["platform"].startswith(policy[1]) and witness["capture_identity"])
+
+
+def apply_platform_preparation(reports: dict, health: dict) -> None:
+    """Use authenticated platform observations for precisely their own links.
+
+    The checked-in report is validated by harness_check before this call.
+    Neither that historical report nor any raw comparison row is rewritten.
+    """
+    import phase1_coverage
+    observed = {row["case"] for family, report in reports.items()
+                for row in report["rows"] if platform_matched(family, row, report)}
+    if not observed:
+        return
+    document = read(ROOT / "data/phase1/scope.json")
+    cases = read(ROOT / "data/phase1/cases.json")
+    for case in cases["cases"]:
+        if case["id"] in observed:
+            if case.get("last_result") != "native_unavailable":
+                raise ValueError("platform preparation would replace an executed case")
+            case["last_result"] = "match"
+    for family in scope.STEP_PACKAGES:
+        health["preparations"][family] = scope.leaf_preparation(document, cases, family)
+    health["coverage"] = phase1_coverage.build(supplemental_prepared_cases=observed)
+
+
 def replay_program(directory: Path) -> dict:
     problems = syntax.schedule_problems()
     if problems:
@@ -279,7 +351,8 @@ def aggregate(producer: str, reports: dict[str, dict], health: dict) -> dict:
             identities = [r["case"] for r in capture.load_requests(capture.FAMILIES[family])["requests"]]
             rows[family] = require_rows(report["rows"], identities)
     def complete(family):
-        return prepared(family) and bool(rows.get(family)) and all(accepted(r, approved) for r in rows[family].values())
+        return prepared(family) and bool(rows.get(family)) and all(accepted(r, approved) or platform_matched(family, r, reports[family])
+                                                                     for r in rows[family].values())
     def prepared(family):
         return health["healthy"] and health["preparations"][family]["complete"] and family in rows
     metrics = {"inventory_complete": health["healthy"]}
@@ -309,7 +382,8 @@ def aggregate(producer: str, reports: dict[str, dict], health: dict) -> dict:
     return {"metrics": metrics, **({"tests": tests} if tests else {})}
 
 
-def produce(producer: str, captures: dict[str, Path], output: Path, receipts: list[dict] | None = None) -> dict:
+def produce(producer: str, captures: dict[str, Path], output: Path, receipts: list[dict] | None = None,
+            platform_captures: list[Path] | None = None) -> dict:
     before = source_closure(producer)
     health = harness_check()
     if not health["healthy"]:
@@ -323,6 +397,16 @@ def produce(producer: str, captures: dict[str, Path], output: Path, receipts: li
             unavailable[family] = f"no capture at {directory.relative_to(ROOT)}"
             continue
         reports[family] = replay_program(directory) if family == "program" else replay_family(family, directory)
+    if platform_captures is None and producer in ("foundations", "config"):
+        default_platform = ROOT / "target/phase1-platform/linux-realpath"
+        needs_platform = any(row["case"] in PLATFORM_CASES and row["result"] == "native_unavailable"
+                             for row in reports.get("filesystem", {}).get("rows", []))
+        platform_captures = [default_platform] if needs_platform and default_platform.is_dir() else []
+    if platform_captures:
+        if "filesystem" not in reports:
+            raise ValueError("platform witnesses require a complete filesystem capture")
+        attach_platform_captures("filesystem", reports["filesystem"], platform_captures)
+        apply_platform_preparation(reports, health)
     if producer == "foundations":
         import phase1_integration
         health["integration"] = phase1_integration.evaluate(
@@ -399,6 +483,8 @@ def main(argv=None) -> int:
     parser.add_argument("command", choices=(*GROUPS, "check", "manifests", "observe"))
     parser.add_argument("--capture", action="append", default=[], metavar="FAMILY=DIR")
     parser.add_argument("--receipt", type=Path, action="append", default=[])
+    parser.add_argument("--platform-capture", type=Path, action="append", default=[],
+                        help="authenticated platform-only filesystem capture (e.g. Linux CI)")
     parser.add_argument("--witness", help="integration test/driver, transport or generation identity")
     parser.add_argument("--output", type=Path, default=ROOT / "target/phase1-producers")
     args = parser.parse_args(argv)
@@ -439,7 +525,10 @@ def main(argv=None) -> int:
                     if item.get("id") != identity:
                         raise ValueError("integration receipt registry identity differs")
                     receipts.append(item)
-            result = produce(args.command, captures, args.output.resolve(), receipts)
+            platforms = args.platform_capture
+            if platforms and args.command not in ("foundations", "config"):
+                raise ValueError("platform captures are consumed only by filesystem producers")
+            result = produce(args.command, captures, args.output.resolve(), receipts, platforms or None)
         print(json.dumps(result, sort_keys=True))
         return 0
     except (OSError, ValueError, KeyError) as error:

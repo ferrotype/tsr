@@ -563,6 +563,13 @@
       "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
     },
     {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/host.go:44. internal/execute/tsc.go and internal/execute/build/orchestrator.go call this constructor; host.go delegates directly to NewCompilerHost with cachedvfs.From. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation.",
+      "go_source_sha256": "7f1cea0567a2817c8f6a1dc840fa6d24450e121832e4a516b1e85dfaf50ef6fb",
+      "operation": "tsc/internal/compiler/host.go:NewCachedFSCompilerHost",
+      "reason": "The cached host constructor is used by CLI execution and project-reference build orchestration; the underlying cachedvfs contract remains required in Phase 1."
+    },
+    {
       "destination_phase": 5,
       "evidence": "upstream/tsc/internal/compiler/host.go. Gated by a content-mapper extension (fileloader.go:410) or a content-mapper project; the F4a syntax schedule carries the 15 content-mapped variants as this named boundary. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
       "go_source_sha256": "7f1cea0567a2817c8f6a1dc840fa6d24450e121832e4a516b1e85dfaf50ef6fb",
@@ -584,6 +591,13 @@
       "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
     },
     {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/includeprocessor.go:28. Its sole call is Program.ReuseProgram in internal/compiler/program.go; the normal NewProgram path constructs a fresh processor. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation.",
+      "go_source_sha256": "fbe67fc26d79dc7ea3ff0f332d93587c2952877fd0b386055ed5cf92428527be",
+      "operation": "tsc/internal/compiler/includeprocessor.go:updateFileIncludeProcessor",
+      "reason": "This clones include-diagnostic state only while reusing a program during a watch edit."
+    },
+    {
       "destination_phase": 3,
       "evidence": "upstream/tsc/internal/compiler/program.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
       "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
@@ -599,10 +613,24 @@
     },
     {
       "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/program.go:1942. internal/compiler/program.go:HandleNoEmitOptions invokes it to decide NoEmitOnError; internal/execute/tsc/emit.go also invokes it. Its implementation requests global, semantic and declaration diagnostics after syntax. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:GetDiagnosticsOfAnyProgram",
+      "reason": "This combined semantic/declaration/emit-gating workflow first becomes required by emission; the separate parse/bind/syntactic APIs remain Phase 1."
+    },
+    {
+      "destination_phase": 3,
       "evidence": "upstream/tsc/internal/compiler/program.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
       "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
       "operation": "tsc/internal/compiler/program.go:HandleNoEmitOptions",
       "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/program.go:512. internal/compiler/program.go:GetSourceFileFromReference calls p.CommandLine().ContentMapperExtensions(); that operation already has reviewed Phase 3 placement. Additional consumers are incremental build info, project sessions and API sessions. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.CommandLine",
+      "reason": "This config accessor serves the emit reference lookup before the later CLI/project/API callers; config parsing itself remains Phase 1."
     },
     {
       "destination_phase": 5,
@@ -619,6 +647,20 @@
       "reason": "This operation executes or adapts production content-mapper services, explicitly retained for Phase 5 by section 2 and ADR 0019."
     },
     {
+      "destination_phase": 5,
+      "evidence": "upstream/tsc/internal/compiler/program.go:2147. internal/ls/autoimport/registry.go consumes this method; it reads collectPackageNames().deepImportPackages. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.DeepImportPackageNames",
+      "reason": "Deep-import package enumeration belongs to editor auto-import discovery."
+    },
+    {
+      "destination_phase": 5,
+      "evidence": "upstream/tsc/internal/compiler/program.go:495. internal/project/project.go and snapshot.go consume duplicate-source entries; refcountcache_test.go verifies that project lifecycle. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.DuplicateSourceFiles",
+      "reason": "Duplicate-source ownership reporting feeds project snapshots and their reference-counted caches."
+    },
+    {
       "destination_phase": 3,
       "evidence": "upstream/tsc/internal/compiler/program.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
       "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
@@ -626,11 +668,25 @@
       "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
     },
     {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/program.go:2049. internal/execute/tsc/emit.go calls this writer; it formats include reasons and redirect/implied-format information. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.ExplainFiles",
+      "reason": "The --explainFiles report is CLI execution, not option parsing or syntax diagnostics."
+    },
+    {
       "destination_phase": 2,
       "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
       "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
       "operation": "tsc/internal/compiler/program.go:Program.FileExists",
       "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/program.go:2016. internal/execute/watcher.go reads this map while updating watches; additional consumers are API/session and project content-mapper tests. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.FilesByPath",
+      "reason": "Exposing the entire program path map is first consumed by native watch execution."
     },
     {
       "destination_phase": 2,
@@ -673,6 +729,13 @@
       "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
       "operation": "tsc/internal/compiler/program.go:Program.GetDeclarationDiagnostics",
       "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/program.go:1724. internal/execute/incremental/snapshottobuildinfo.go calls it; normal library loading uses the loader directly. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.GetDefaultLibFile",
+      "reason": "This LibFile metadata accessor is consumed by incremental build-info serialization."
     },
     {
       "destination_phase": 2,
@@ -724,11 +787,25 @@
       "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
     },
     {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/program.go:2038. The sole caller is internal/execute/tsctests/sys.go; Phase 1 include-reason diagnostics have independent required probes. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.GetIncludeReasons",
+      "reason": "This report accessor exists for CLI/watch test instrumentation."
+    },
+    {
       "destination_phase": 2,
       "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
       "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
       "operation": "tsc/internal/compiler/program.go:Program.GetJSXRuntimeImportSpecifier",
       "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 5,
+      "evidence": "upstream/tsc/internal/compiler/program.go:2089. internal/ls/utilities.go consumes the accessor; initial lib loading is performed by fileloader.go and remains Phase 1. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.GetLibFileFromReference",
+      "reason": "Resolving an existing lib-reference directive for navigation belongs to language services."
     },
     {
       "destination_phase": 2,
@@ -801,6 +878,20 @@
       "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
     },
     {
+      "destination_phase": 5,
+      "evidence": "upstream/tsc/internal/compiler/program.go:2100. internal/ls/importTracker.go and utilities.go call it; it reads the completed typeResolutionsInFile cache. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.GetResolvedTypeReferenceDirectiveFromTypeReferenceDirective",
+      "reason": "This source-level directive lookup is an editor navigation/import-tracking service."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/program.go:2109. internal/execute/incremental/programtosnapshot.go is the consumer; direct module/type-reference resolution remains Phase 1. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.GetResolvedTypeReferenceDirectives",
+      "reason": "Exporting the complete per-file type-resolution cache serves incremental snapshots."
+    },
+    {
       "destination_phase": 2,
       "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
       "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
@@ -871,6 +962,41 @@
       "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
     },
     {
+      "destination_phase": 5,
+      "evidence": "upstream/tsc/internal/compiler/program.go:521. internal/project/project.go consumes it; the Program field is explicitly documented as cached unresolved imports for ATA. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.GetUnresolvedImports",
+      "reason": "The lazy unresolved-import set drives automatic type acquisition in the project system."
+    },
+    {
+      "destination_phase": 5,
+      "evidence": "upstream/tsc/internal/compiler/program.go:2024. internal/project/project.go is the consumer; the method compares both canonical-file and redirect maps. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.HasSameFileNames",
+      "reason": "Cross-program filename equality is a project update decision."
+    },
+    {
+      "destination_phase": 5,
+      "evidence": "upstream/tsc/internal/compiler/program.go:2213. internal/ls/symbols.go is the sole consumer; its once cell is not involved in initial parsing/loading. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.HasTSFile",
+      "reason": "The memoized implementation-TS-file presence query serves workspace symbol behavior."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/program.go:1647. internal/execute/tsc/statistics.go is the sole consumer; per-file parser identifier counts remain part of Phase 1 parser observations. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.IdentifierCount",
+      "reason": "Program-wide identifier totals feed CLI diagnostic statistics."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/program.go:1676. internal/execute/tsc/statistics.go is the sole consumer; the method iterates checker pools and sums TotalInstantiationCount. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.InstantiationCount",
+      "reason": "Aggregating checker instantiation totals serves CLI statistics; checker instantiation semantics remain Phase 2."
+    },
+    {
       "destination_phase": 3,
       "evidence": "upstream/tsc/internal/compiler/program.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
       "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
@@ -878,11 +1004,46 @@
       "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
     },
     {
+      "destination_phase": 5,
+      "evidence": "upstream/tsc/internal/compiler/program.go:1717. internal/ls/autoimport/registry.go consumes this method; it first requires a declaration filename then checks the global cache path. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.IsGlobalTypingsFile",
+      "reason": "Classifying files inside the automatic-typings cache is an auto-import discovery query."
+    },
+    {
+      "destination_phase": 5,
+      "evidence": "upstream/tsc/internal/compiler/program.go:2208. internal/ls/symbols.go is the only consumer; initial library loading and source-file flags remain in Phase 1. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.IsLibFile",
+      "reason": "The lib-map membership accessor is used for workspace symbol selection."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/program.go:2043. internal/execute/tsctests/sys.go is the sole consumer; it scans the program missingFiles list using canonical paths. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.IsMissingPath",
+      "reason": "This missing-path report query is used by the CLI/watch test system."
+    },
+    {
       "destination_phase": 4,
       "evidence": "upstream/tsc/internal/compiler/program.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
       "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
       "operation": "tsc/internal/compiler/program.go:Program.IsSourceFromProjectReference",
       "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/program.go:1639. internal/execute/tsc/statistics.go calls Program.LineCount. The same-named call in internal/sourcemap/util.go is on lineInfo, not Program. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.LineCount",
+      "reason": "The complete-program line total is a CLI statistic."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/program.go:166. internal/execute/incremental/program.go calls this wrapper; internal/compiler/program.go:167 calls the underlying resolver method, not the Program wrapper. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.PackageJsonCacheEntries",
+      "reason": "Iterating all program package cache entries serves incremental dependency snapshots."
     },
     {
       "destination_phase": 4,
@@ -899,6 +1060,20 @@
       "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
     },
     {
+      "destination_phase": 5,
+      "evidence": "upstream/tsc/internal/compiler/program.go:2139. internal/ls/autoimport/util.go calls it; the wrapper reads collectPackageNames().resolved. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.ResolvedPackageNames",
+      "reason": "Resolved package-name enumeration belongs to auto-import discovery."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/program.go:323. internal/execute/watcher.go calls it directly; Program.UpdateProgram also calls it for the later project system. Immutable snapshot construction/cache reuse already exercised in Phase 1 is a distinct path. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.ReuseProgram",
+      "reason": "Reusing the loaded program after a single-file change belongs to watch execution."
+    },
+    {
       "destination_phase": 2,
       "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
       "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
@@ -913,11 +1088,60 @@
       "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
     },
     {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/program.go:1655. internal/execute/tsc/statistics.go is the sole consumer; it sums file.SymbolCount and checker counters. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.SymbolCount",
+      "reason": "The total of source and checker symbol counts is a CLI statistic."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/program.go:514. internal/execute/incremental/program.go reads it; tracing execution is explicitly deferred by the Phase 1 plan. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.Tracing",
+      "reason": "The tracing-state accessor serves the incremental CLI."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/program.go:1668. internal/execute/tsc/statistics.go is the sole consumer; the method sums checker.TypeCount through ForEachCheckerParallel. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.TypeCount",
+      "reason": "Checker type-count aggregation is a CLI statistic."
+    },
+    {
+      "destination_phase": 5,
+      "evidence": "upstream/tsc/internal/compiler/program.go:2143. internal/ls/autoimport/util.go calls it; it reads collectPackageNames().unresolved. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.UnresolvedPackageNames",
+      "reason": "Unresolved package-name enumeration belongs to auto-import discovery."
+    },
+    {
+      "destination_phase": 5,
+      "evidence": "upstream/tsc/internal/compiler/program.go:304. internal/project/project.go is the sole consumer; native watch calls ReuseProgram directly and owns its fallback. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.UpdateProgram",
+      "reason": "This reuse-or-rebuild orchestration entry point is a project-system update operation."
+    },
+    {
+      "destination_phase": 5,
+      "evidence": "upstream/tsc/internal/compiler/program.go:234. internal/ls/lsutil/utilities.go is the only consumer; parser metadata for individual imports remains in Phase 1. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.UsesUriStyleNodeCoreModules",
+      "reason": "The program-wide node: style preference is consumed by language-service import helpers."
+    },
+    {
       "destination_phase": 2,
       "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
       "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
       "operation": "tsc/internal/compiler/program.go:Program.canIncludeBindAndCheckDiagnostics",
       "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/program.go:437. Program.ReuseProgram calls it for canonical and supplemental files; it compares parse options, imports, augmentations and reference directives before retaining other program state. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.canReplaceFileInProgram",
+      "reason": "The replacement admissibility predicate exists only for watch/program reuse."
     },
     {
       "destination_phase": 2,
@@ -941,6 +1165,27 @@
       "reason": "This operation executes or adapts production content-mapper services, explicitly retained for Phase 5 by section 2 and ADR 0019."
     },
     {
+      "destination_phase": 5,
+      "evidence": "upstream/tsc/internal/compiler/program.go:2151. Only Program.ResolvedPackageNames, UnresolvedPackageNames and DeepImportPackageNames call this lazy collector; their consumers are internal/ls/autoimport. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.collectPackageNames",
+      "reason": "Collecting resolved/unresolved/deep-import package sets serves the three editor auto-import accessors."
+    },
+    {
+      "destination_phase": 5,
+      "evidence": "upstream/tsc/internal/compiler/program.go:525. Program.GetUnresolvedImports passes it as the lazyValue callback; internal/project/project.go is the public accessor consumer. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.extractUnresolvedImports",
+      "reason": "This lazy ATA set builder is a project-system helper."
+    },
+    {
+      "destination_phase": 5,
+      "evidence": "upstream/tsc/internal/compiler/program.go:538. Program.extractUnresolvedImports is its sole caller; it does not perform or change initial module resolution. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.extractUnresolvedImportsFromSourceFile",
+      "reason": "Filtering per-file unresolved/non-TS external resolutions feeds ATA."
+    },
+    {
       "destination_phase": 2,
       "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
       "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
@@ -960,6 +1205,13 @@
       "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
       "operation": "tsc/internal/compiler/program.go:Program.getDiagnosticsWithPrecedingDirectives",
       "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 5,
+      "evidence": "upstream/tsc/internal/compiler/program.go:2113. Only Program.GetResolvedTypeReferenceDirectiveFromTypeReferenceDirective calls this method. fileloader.go has a different free function with the same name, which remains required in Phase 1. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.getModeForTypeReferenceDirectiveInFile",
+      "reason": "This completed-program directive-mode accessor supports editor lookup."
     },
     {
       "destination_phase": 2,
@@ -984,6 +1236,20 @@
     },
     {
       "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/program.go:469. Its only calls are in Program.ReuseProgram. The initial loader separately computes JSX-runtime imports and remains required in Phase 1. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.jsxRuntimeImportSpecifier",
+      "reason": "This helper rejects the single-file reuse shortcut when JSX synthetic imports would need recomputation."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/program.go:455. Its only calls are in Program.ReuseProgram. Initial tslib/importHelpers dependency processing is a separate Phase 1 loader operation. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.needsImportHelpersImportSpecifier",
+      "reason": "This helper rejects the single-file reuse shortcut when helper-import bookkeeping would change."
+    },
+    {
+      "destination_phase": 4,
       "evidence": "upstream/tsc/internal/compiler/program.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
       "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
       "operation": "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
@@ -1002,6 +1268,34 @@
       "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
       "operation": "tsc/internal/compiler/program.go:applyContentMapperDiagnosticDirectives",
       "reason": "This operation executes or adapts production content-mapper services, explicitly retained for Phase 5 by section 2 and ADR 0019."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/program.go:490. Program.canReplaceFileInProgram is its sole caller; parsing and acting on @ts-check itself remains Phase 1. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:equalCheckJSDirectives",
+      "reason": "Comparing old/new @ts-check state belongs to the watch reuse admissibility predicate."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/program.go:486. Program.canReplaceFileInProgram passes it to slices.EqualFunc for reference, type-reference and lib-reference lists. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:equalFileReferences",
+      "reason": "Reference-directive equality serves the watch reuse admissibility predicate."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/program.go:482. Program.canReplaceFileInProgram passes it to slices.EqualFunc over ModuleAugmentations. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:equalModuleAugmentationNames",
+      "reason": "Old/new augmentation-name equality serves the watch reuse admissibility predicate."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/program.go:478. Program.canReplaceFileInProgram calls it while comparing imports and resolution modes. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:equalModuleSpecifiers",
+      "reason": "Old/new import-node equality serves the watch reuse admissibility predicate."
     },
     {
       "destination_phase": 2,
@@ -1023,6 +1317,13 @@
       "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
       "operation": "tsc/internal/compiler/program.go:lazyValue.getValue",
       "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/program.go:71. Program.ReuseProgram is the only caller, for unresolvedImports, knownSymlinks and packageNames; ordinary lazyValue initialization is separate. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:lazyValue.tryReuse",
+      "reason": "Copying an initialized lazy cache from a previous Program is a watch reuse operation."
     },
     {
       "destination_phase": 4,
@@ -1305,52 +1606,15 @@
       "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
     }
   ],
-  "unresolved_compiler_destinations": [
-    "tsc/internal/compiler/host.go:NewCachedFSCompilerHost",
-    "tsc/internal/compiler/includeprocessor.go:updateFileIncludeProcessor",
-    "tsc/internal/compiler/program.go:GetDiagnosticsOfAnyProgram",
-    "tsc/internal/compiler/program.go:Program.CommandLine",
-    "tsc/internal/compiler/program.go:Program.DeepImportPackageNames",
-    "tsc/internal/compiler/program.go:Program.DuplicateSourceFiles",
-    "tsc/internal/compiler/program.go:Program.ExplainFiles",
-    "tsc/internal/compiler/program.go:Program.FilesByPath",
-    "tsc/internal/compiler/program.go:Program.GetDefaultLibFile",
-    "tsc/internal/compiler/program.go:Program.GetIncludeReasons",
-    "tsc/internal/compiler/program.go:Program.GetLibFileFromReference",
-    "tsc/internal/compiler/program.go:Program.GetResolvedTypeReferenceDirectiveFromTypeReferenceDirective",
-    "tsc/internal/compiler/program.go:Program.GetResolvedTypeReferenceDirectives",
-    "tsc/internal/compiler/program.go:Program.GetUnresolvedImports",
-    "tsc/internal/compiler/program.go:Program.HasSameFileNames",
-    "tsc/internal/compiler/program.go:Program.HasTSFile",
-    "tsc/internal/compiler/program.go:Program.IdentifierCount",
-    "tsc/internal/compiler/program.go:Program.InstantiationCount",
-    "tsc/internal/compiler/program.go:Program.IsGlobalTypingsFile",
-    "tsc/internal/compiler/program.go:Program.IsLibFile",
-    "tsc/internal/compiler/program.go:Program.IsMissingPath",
-    "tsc/internal/compiler/program.go:Program.LineCount",
-    "tsc/internal/compiler/program.go:Program.PackageJsonCacheEntries",
-    "tsc/internal/compiler/program.go:Program.ResolveModuleName",
-    "tsc/internal/compiler/program.go:Program.ResolvedPackageNames",
-    "tsc/internal/compiler/program.go:Program.ReuseProgram",
-    "tsc/internal/compiler/program.go:Program.SymbolCount",
-    "tsc/internal/compiler/program.go:Program.Tracing",
-    "tsc/internal/compiler/program.go:Program.TypeCount",
-    "tsc/internal/compiler/program.go:Program.UnresolvedPackageNames",
-    "tsc/internal/compiler/program.go:Program.UpdateProgram",
-    "tsc/internal/compiler/program.go:Program.UsesUriStyleNodeCoreModules",
-    "tsc/internal/compiler/program.go:Program.canReplaceFileInProgram",
-    "tsc/internal/compiler/program.go:Program.collectPackageNames",
-    "tsc/internal/compiler/program.go:Program.extractUnresolvedImports",
-    "tsc/internal/compiler/program.go:Program.extractUnresolvedImportsFromSourceFile",
-    "tsc/internal/compiler/program.go:Program.getModeForTypeReferenceDirectiveInFile",
-    "tsc/internal/compiler/program.go:Program.jsxRuntimeImportSpecifier",
-    "tsc/internal/compiler/program.go:Program.needsImportHelpersImportSpecifier",
-    "tsc/internal/compiler/program.go:equalCheckJSDirectives",
-    "tsc/internal/compiler/program.go:equalFileReferences",
-    "tsc/internal/compiler/program.go:equalModuleAugmentationNames",
-    "tsc/internal/compiler/program.go:equalModuleSpecifiers",
-    "tsc/internal/compiler/program.go:lazyValue.tryReuse"
+  "reviewed_unused_compiler_operations": [
+    {
+      "evidence": "upstream/tsc/internal/compiler/program.go:2274-2277. A full Go-tree symbol search finds only this Program definition. Every real ResolveModuleName invocation is on module.Resolver or a separate emitHost/fakeProgram method; the wrapper is absent from checker.Program and the module-specifier host interface. Its body delegates to resolver.ResolveModuleName with a nil redirect and discards the trace; that underlying Phase 1 operation remains independently probed by config/module cases.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.ResolveModuleName",
+      "reason": "The Program wrapper has no caller or interface requirement at the pin; retain the exact operation identity as unused, not as a passing implementation or later-phase promise."
+    }
   ],
-  "unresolved_reason": "F4a grouped these under phases 4 to 6 without proving one destination. Keep the Phase 1 scope and report a review gap; no automatic promotion from a roster exemption.",
+  "unresolved_compiler_destinations": [],
+  "unresolved_reason": "The F5b per-operation audit resolved all 44 former phase-4-to-6 ambiguities: 43 explicit existing-plan destinations and one exact unused-at-pin Program wrapper. Later-phase placement does not grant coverage or remove any original operation ID.",
   "version": 1
 }

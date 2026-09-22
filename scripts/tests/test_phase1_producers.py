@@ -119,7 +119,7 @@ class AggregationTests(unittest.TestCase):
 class QualificationTests(unittest.TestCase):
     def test_approved_differences_keep_raw_result_and_reject_additional_drift(self):
         approved = p.qualifications()
-        self.assertEqual(len(approved), 3)
+        self.assertEqual(len(approved), 5)
         for identity, item in approved.items():
             row = {"case": identity, "result": "different", "native": item["native"], "rust": item["rust"]}
             with self.subTest(case=identity):

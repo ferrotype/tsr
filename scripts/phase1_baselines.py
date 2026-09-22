@@ -56,7 +56,8 @@ def outputs(group: str) -> list[Path]:
     """
     subdirectory, _ = GROUPS[group]
     root = upstream() / REFERENCE / subdirectory
-    return sorted(p for p in root.rglob("*") if p.is_file())
+    # Finder metadata written into the checkout is not a reference output.
+    return sorted(p for p in root.rglob("*") if p.is_file() and p.name != ".DS_Store")
 
 
 def subfolder_writers(text: str) -> set[str]:

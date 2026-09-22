@@ -23,6 +23,20 @@ fn main() {
         .iter()
         .all(|(_, bytes)| !bytes.is_empty()));
     assert!(tsr_bundled::COPYRIGHT.contains("Microsoft Corporation"));
+    let (locale, valid_locale) = tsr_locale::Locale::parse("de-DE");
+    assert!(valid_locale);
+    assert_eq!(locale.tag_string(), "de-DE");
+    let message = tsr_diagnostics::by_code(2322).unwrap();
+    let translated = tsr_diagnostics::localize(
+        &locale,
+        Some(message),
+        message.key.as_bytes(),
+        &[b"number", b"string"],
+    );
+    // Pinned de-DE catalog text: verifies the archive carries both locale
+    // negotiation tables and generated translated diagnostic messages.
+    let expected = "Der Typ \"number\" kann dem Typ \"string\" nicht zugewiesen werden.";
+    assert_eq!(translated, expected.as_bytes());
 
     let mut host = tsr_vfs::MemoryBuilder::new(b"/", true);
     host.insert_loaded(b"/main.ts", b"const value: string = 1;".as_slice());
@@ -57,6 +71,10 @@ fn main() {
             diagnostics.iter().map(|d| d.code).collect::<Vec<_>>(),
             [2322]
         );
+        let formatted =
+            tsr_compiler::diagnostic_writer::localized_with_locale(&diagnostics[0], &locale)
+                .unwrap();
+        assert_eq!(formatted, translated);
         operation
             .retain_type(operation.builtin_type("stringType").unwrap())
             .unwrap()
@@ -72,5 +90,15 @@ fn main() {
     }
     drop(retained);
     assert_eq!(counters.snapshot(), Counts::default());
-    println!("packaged parser, bundled assets, checker and retained ownership: pass");
+    println!(
+        "{}",
+        serde_json::json!({
+            "encoded_bytes": encoded.len(),
+            "libraries": tsr_bundled::LIBRARIES.len(),
+            "locale": locale.tag_string(),
+            "diagnostic_code": message.code,
+            "localized_message": String::from_utf8(translated).unwrap(),
+            "owners_returned_to_baseline": counters.snapshot() == Counts::default(),
+        })
+    );
 }

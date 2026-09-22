@@ -55,13 +55,25 @@ fn acquisition(value: &o::TypeAcquisition) -> Value {
 }
 fn row(input: &Value, api: &str) -> Result<Value, String> {
     let content = text(input, "json_text")?;
+    let locale = match input.get("locale") {
+        None => "",
+        Some(Value::String(locale)) => locale,
+        Some(_) => return Err("locale must be a string".into()),
+    };
+    if api == "jsonParse" && !locale.is_empty() {
+        return Err("jsonParse baseline uses the default locale".into());
+    }
+    let existing = CompilerOptions {
+        locale: js(locale.as_bytes()),
+        ..Default::default()
+    };
     let (parsed, errors, format) = if api == "jsonParse" {
         let result = o::parse_config_file_text_to_json(
             js(b"/apath/tsconfig.json"),
             js(b"/apath"),
             SourceText::from_bytes(content.as_bytes()),
         );
-        let mut parsed = ParsedCommandLine::new(CompilerOptions::default(), vec![]);
+        let mut parsed = ParsedCommandLine::new(existing.clone(), vec![]);
         parsed.config_file = Some(result.source);
         parsed.raw = result.value;
         (
@@ -71,6 +83,7 @@ fn row(input: &Value, api: &str) -> Result<Value, String> {
                 new_line: b"\n".to_vec(),
                 current_directory: b"/".to_vec(),
                 case_sensitive: true,
+                ..Default::default()
             },
         )
     } else {
@@ -115,7 +128,7 @@ fn row(input: &Value, api: &str) -> Result<Value, String> {
                     raw.value,
                     &host,
                     &base,
-                    &CompilerOptions::default(),
+                    &existing,
                     &absolute,
                     &[],
                 )
@@ -128,7 +141,7 @@ fn row(input: &Value, api: &str) -> Result<Value, String> {
                 ),
                 &host,
                 host.current_directory(),
-                &CompilerOptions::default(),
+                &existing,
                 &ConfigValue::Null,
                 &absolute,
             ),
@@ -143,10 +156,23 @@ fn row(input: &Value, api: &str) -> Result<Value, String> {
                 new_line: b"\r\n".to_vec(),
                 current_directory: base,
                 case_sensitive: true,
+                ..Default::default()
             },
         )
     };
-    let mut writer = DiagnosticWriter::from_sources(&parsed, format);
+    let mut writer = DiagnosticWriter::from_sources(
+        &parsed,
+        FormattingOptions {
+            // The original 87 native envelopes use the default locale. The
+            // integration requests explicitly pass a locale to the writer.
+            locale: if locale.is_empty() {
+                format.locale
+            } else {
+                parsed.locale().clone()
+            },
+            ..format
+        },
+    );
     let diagnostic_rows = diagnostics(&writer, &errors)?;
     let error_text = writer
         .format(&errors.iter().collect::<Vec<_>>(), true)

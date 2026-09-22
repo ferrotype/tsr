@@ -62,7 +62,15 @@ fn main() {
         diagnostic.message_key.as_bytes(),
         &args,
     );
-    let writer = tsr_compiler::diagnostic_writer::localized(diagnostic).unwrap();
+    let writer = tsr_compiler::diagnostic_writer::DiagnosticWriter::from_sources(
+        &config,
+        tsr_compiler::diagnostic_writer::FormattingOptions {
+            locale: config.locale().clone(),
+            ..Default::default()
+        },
+    )
+    .flatten(diagnostic, b"\n")
+    .unwrap();
     println!(
         "{}",
         serde_json::json!({

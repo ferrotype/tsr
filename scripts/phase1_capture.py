@@ -348,8 +348,21 @@ FAMILIES = {
             "data/phase1/requests/syntax-evaluator.json",
             "data/phase1/requests/syntax-parse-outputs.json",
             "data/phase1/requests/syntax-debug.json",
+            "data/phase1/requests/syntax-scanner-ast.json",
+            "tools/phase1/syntax/ast-generated/requests.json",
         ],
         "native_probes": [
+            {"name": "scanner_ast", "package": "scanner",
+             "probe": "tools/phase1/syntax/scanner_ast_probe_test.go",
+             "test": "TestPhase1SyntaxScannerAst", "trimpath": False},
+            # Existing ast tests use repo paths during package initialization.
+            {"name": "generated_ast", "package": "ast",
+             "probe": "tools/phase1/syntax/ast-generated/probe_test.go",
+             "test": "TestPhase1GeneratedAST", "trimpath": False,
+             "extra_sources": {
+                 "phase1_generated_predicates_test.go": "tools/phase1/syntax/ast-generated/predicates_test.go",
+                 "phase1_generated_shapes_test.go": "tools/phase1/syntax/ast-generated/shapes_test.go",
+                 "phase1_generated_shapes_runtime_test.go": "tools/phase1/syntax/ast-generated/shapes_runtime_test.go"}},
             # In-package so a probe may reach unexported program state. The
             # compiler package's tests link internal/repo, which panics under
             # -trimpath, so the flag is dropped as for the config probes.
@@ -600,7 +613,10 @@ def source_closure(family: str, packages: list[str] | None = None) -> dict[str, 
     closure: dict[str, str] = {}
     for relative in sorted({str(p) for p in paths}):
         path = ROOT / relative
-        if path.is_file():
+        # Finder metadata and interpreter caches are not build inputs.
+        # Including it makes an otherwise identical Linux capture unreplayable
+        # on macOS and lets opening a source folder stale its observations.
+        if path.is_file() and path.name != ".DS_Store" and "__pycache__" not in path.parts:
             closure[relative] = sha_file(path)
     return closure
 
@@ -843,13 +859,19 @@ def validate_renderer(directory: Path, requests: dict, rendered: dict) -> None:
     """Child-free check that rendering retained every Rust result unchanged."""
     raw = strict_json_loads((directory / "rust-raw-observations.json").read_bytes())
     before = validate_response(raw, requests["requests"], "rust")
-    after = validate_response(rendered, requests["requests"], "rust")
     bridge_input = strict_json_loads((directory / "renderer/requests.json").read_bytes())
     if bridge_input != {**requests, "observations": before}:
         raise ValueError("renderer input does not carry the captured Rust results")
     bridge_output = strict_json_loads((directory / "renderer/observations.json").read_bytes())
     if bridge_output != rendered:
         raise ValueError("Rust observations differ from the renderer output")
+    validate_rendered_rows(requests, raw, rendered)
+
+
+def validate_rendered_rows(requests: dict, raw: dict, rendered: dict) -> None:
+    """Validate the shared envelope seam, also for integration receipts."""
+    before = validate_response(raw, requests["requests"], "rust")
+    after = validate_response(rendered, requests["requests"], "rust")
     for request, original, final in zip(requests["requests"], before, after):
         if request.get("subject") in ("commandLineBaseline", "tsconfigParsingBaseline") and original["result"] == "observed":
             observation = final.get("observation", {})

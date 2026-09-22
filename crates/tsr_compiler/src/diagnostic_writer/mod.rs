@@ -22,6 +22,7 @@ pub struct FormattingOptions {
     pub new_line: Vec<u8>,
     pub current_directory: Vec<u8>,
     pub case_sensitive: bool,
+    pub locale: tsr_locale::Locale,
 }
 impl Default for FormattingOptions {
     fn default() -> Self {
@@ -29,6 +30,7 @@ impl Default for FormattingOptions {
             new_line: b"\n".to_vec(),
             current_directory: Vec::new(),
             case_sensitive: false,
+            locale: tsr_locale::Locale::default(),
         }
     }
 }
@@ -269,6 +271,12 @@ pub fn styled(out: &mut Vec<u8>, bytes: &[u8], style: &[u8], pretty: bool) {
 /// Stored arguments and unformatted external messages remain byte-exact.
 /// Uses the shared diagnostics::Format port for the default locale.
 pub fn localized(d: &Diagnostic) -> Result<Vec<u8>> {
+    localized_with_locale(d, &tsr_locale::DEFAULT)
+}
+
+/// Localize an existing message using the same request locale as its writer.
+/// External message text remains byte-exact and is never translated.
+pub fn localized_with_locale(d: &Diagnostic, locale: &tsr_locale::Locale) -> Result<Vec<u8>> {
     if d.message.is_none() && !d.message_text.is_empty() {
         return Ok(d.message_text.as_bytes().to_vec());
     }
@@ -285,7 +293,10 @@ pub fn localized(d: &Diagnostic) -> Result<Vec<u8>> {
         .iter()
         .map(tsr_jsstring::JsString::as_bytes)
         .collect();
-    tsr_diagnostics::try_format(message.text.as_bytes(), &args).map_err(Error::Unsupported)
+    let template = tsr_diagnostics::localized_messages(locale)
+        .and_then(|table| table.get(message.key))
+        .map_or(message.text.as_bytes(), |text| text.as_bytes());
+    tsr_diagnostics::try_format(template, &args).map_err(Error::Unsupported)
 }
 /// Flatten already-resolved default-locale messages. This leaf operation does
 /// not resolve files; use DiagnosticWriter::flatten for mapped diagnostics.

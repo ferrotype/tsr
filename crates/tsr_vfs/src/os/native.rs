@@ -40,6 +40,18 @@ pub fn is_symlink_or_reparse_point(name: &[u8]) -> bool {
     use std::os::windows::fs::MetadataExt;
     std::fs::symlink_metadata(path(name)).is_ok_and(|m| m.file_attributes() & 0x400 != 0)
 }
+/// Retry only a raw syscall EINTR, not a caller-created or wrapped error that
+/// merely has `ErrorKind::Interrupted`.
+/// port: tsc/internal/nativepath/eintr_unix.go:ignoringEINTR
+#[cfg(any(target_os = "linux", all(test, unix)))]
+fn ignoring_eintr<T>(mut operation: impl FnMut() -> std::io::Result<T>) -> std::io::Result<T> {
+    loop {
+        match operation() {
+            Err(error) if error.raw_os_error() == Some(rustix::io::Errno::INTR.raw_os_error()) => {}
+            result => return result,
+        }
+    }
+}
 /// port: tsc/internal/nativepath/realpath_linux.go:Realpath
 #[cfg(target_os = "linux")]
 pub fn realpath(name: &[u8]) -> Result<Vec<u8>, IoError> {
@@ -49,19 +61,18 @@ pub fn realpath(name: &[u8]) -> Result<Vec<u8>, IoError> {
     if !*PROC.get_or_init(|| std::fs::metadata("/proc/self/fd").is_ok()) {
         return eval_symlinks(name);
     }
-    let fd = loop {
-        match openat(
+    let fd = ignoring_eintr(|| {
+        openat(
             CWD,
             path(name),
             OFlags::PATH | OFlags::CLOEXEC,
             Mode::empty(),
-        ) {
-            Err(rustix::io::Errno::INTR) => continue,
-            Err(e) => return Err(failure("open", name, e.into())),
-            Ok(fd) => break fd,
-        }
-    };
-    let resolved = std::fs::read_link(format!("/proc/self/fd/{}", fd.as_raw_fd()))
+        )
+        .map_err(std::io::Error::from)
+    })
+    .map_err(|error| failure("open", name, error))?;
+    let proc_path = format!("/proc/self/fd/{}", fd.as_raw_fd());
+    let resolved = ignoring_eintr(|| std::fs::read_link(&proc_path))
         .map_err(|e| failure("readlink", name, e))?;
     Ok(bytes(&resolved))
 }
@@ -170,4 +181,54 @@ pub fn executable() -> Result<Vec<u8>, IoError> {
 /// port: tsc/internal/osutil/osutil.go:Args
 pub fn args() -> Vec<Vec<u8>> {
     std::env::args_os().map(|s| bytes(Path::new(&s))).collect()
+}
+
+#[cfg(all(test, unix))]
+mod tests {
+    use super::ignoring_eintr;
+
+    #[test]
+    fn interrupted_syscalls_retry_but_other_and_wrapped_errors_return_once() {
+        let interrupted =
+            || std::io::Error::from_raw_os_error(rustix::io::Errno::INTR.raw_os_error());
+        let mut attempts = 0;
+        let result = ignoring_eintr(|| {
+            attempts += 1;
+            if attempts < 3 {
+                Err(interrupted())
+            } else {
+                Ok(19)
+            }
+        });
+        assert_eq!(result.unwrap(), 19);
+        assert_eq!(attempts, 3);
+
+        let mut attempts = 0;
+        let error = ignoring_eintr::<()>(|| {
+            attempts += 1;
+            Err(std::io::Error::from_raw_os_error(
+                rustix::io::Errno::NOENT.raw_os_error(),
+            ))
+        })
+        .unwrap_err();
+        assert_eq!(attempts, 1);
+        assert_eq!(
+            error.raw_os_error(),
+            Some(rustix::io::Errno::NOENT.raw_os_error())
+        );
+
+        let mut attempts = 0;
+        let error = ignoring_eintr::<()>(|| {
+            attempts += 1;
+            assert_eq!(attempts, 1, "wrapped EINTR must not be retried");
+            Err(std::io::Error::new(
+                std::io::ErrorKind::Interrupted,
+                interrupted(),
+            ))
+        })
+        .unwrap_err();
+        assert_eq!(error.kind(), std::io::ErrorKind::Interrupted);
+        assert_eq!(error.raw_os_error(), None);
+        assert_eq!(attempts, 1);
+    }
 }

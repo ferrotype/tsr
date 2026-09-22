@@ -16,6 +16,7 @@
       "package": "tsr_scanner",
       "prefix": "binder_helpers::tests::",
       "tests": [
+        "binder_helpers::tests::jsdoc_comment_text_keeps_nonspace_bytes_and_rejects_foreign_lists",
         "binder_helpers::tests::source_text_and_diagnostic_spans_match_pinned_go"
       ]
     },

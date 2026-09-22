@@ -918,6 +918,7 @@ dependencies = [
  "tsr_core",
  "tsr_diagnostics",
  "tsr_jsstring",
+ "tsr_locale",
  "tsr_module",
  "tsr_nodebuilder",
  "tsr_parser",

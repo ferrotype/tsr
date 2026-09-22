@@ -15,6 +15,10 @@ import s06_utilities as utilities
 
 
 class ProgramPreflightTests(unittest.TestCase):
+    def test_committed_source_check_inventory_matches_the_runner(self):
+        manifest = json.loads((helpers.ROOT / 'data/s07/program-helper-tests.json').read_bytes())
+        self.assertEqual(manifest['checks'], helpers.CHECKS)
+
     def setUp(self):
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)

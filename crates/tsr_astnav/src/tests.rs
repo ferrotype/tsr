@@ -215,3 +215,42 @@ fn deep_preceding_and_rightmost_searches_fit_a_small_caller_stack() {
         .join()
         .unwrap();
 }
+
+#[test]
+fn jsx_shift_rescan_matches_the_pinned_private_operation() {
+    // Direct Go observations and access-only overlay are retained under
+    // tools/phase1/syntax/astnav-rescan. Parsed JSX alone does not establish
+    // the containing-node kind; this tests both values of that predicate.
+    for line in include_str!("testdata/navigation-rescan.tsv")
+        .lines()
+        .filter(|line| !line.starts_with('#'))
+    {
+        let fields: Vec<_> = line.split('\t').collect();
+        assert_eq!(fields.len(), 7);
+        let text: Vec<u8> = fields[0]
+            .as_bytes()
+            .chunks_exact(2)
+            .map(|pair| u8::from_str_radix(std::str::from_utf8(pair).unwrap(), 16).unwrap())
+            .collect();
+        let expected: Vec<i64> = fields[2..]
+            .iter()
+            .map(|value| value.parse().unwrap())
+            .collect();
+        let mut scanner = tsr_scanner::Scanner::new();
+        scanner.set_text(&text);
+        scanner.scan();
+        let before = i64::from(scanner.token() as u16);
+        let after = super::scan_navigation_token(&mut scanner, fields[1] == "true");
+        assert_eq!(
+            [
+                before,
+                i64::from(after as u16),
+                scanner.token_start(),
+                scanner.token_end(),
+                i64::from(scanner.token_flags())
+            ],
+            expected.as_slice(),
+            "native navigation rescan row {line}"
+        );
+    }
+}

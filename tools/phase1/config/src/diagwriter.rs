@@ -264,6 +264,7 @@ fn options(action: &Value) -> FormattingOptions {
             .as_bytes()
             .to_vec(),
         case_sensitive: action["case_sensitive"].as_bool().unwrap_or_default(),
+        ..FormattingOptions::default()
     }
 }
 fn file_kind(file: &File) -> &'static str {

@@ -18,6 +18,7 @@ CHECKS = [
     ['scripts/s07_module_trace.py', '--check'], ['scripts/s07_config_resolver.py', '--check'],
     ['scripts/s07_config_mappers.py', '--check'], ['scripts/s07_include_reason.py', '--check'],
     ['scripts/s07_verify_options.py', '--check'], ['scripts/s07_path_helpers.py', '--check'],
+    ['scripts/s07_program_boundaries.py', '--check'],
 ]
 
 

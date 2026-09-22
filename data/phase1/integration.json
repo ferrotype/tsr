@@ -4,19 +4,23 @@
   "witnesses": [
     {
       "id": "localized-config-diagnostics",
-      "claim": "A German config diagnostic reaches the compiler writer without reverting to English.",
+      "claim": "Localized config diagnostics retain their locale through the production writer and byte-equal shared Go envelopes (German, Japanese and unknown-locale fallback).",
       "kind": "driver",
       "references": [
         "crates/tsr_compiler/examples/phase1_integration.rs",
-        "upstream/tsc/internal/diagnostics/loc/de-DE.json.gz"
+        "upstream/tsc/internal/diagnostics/loc/de-DE.json.gz",
+        "tools/phase1/config/localized-requests.json",
+        "tools/phase1/config/tsconfigparsing_probe_test.go",
+        "tools/phase1/config/commandline_probe_test.go",
+        "tools/phase1/config/renderer_test.go",
+        "scripts/phase1_localized.py"
       ],
       "command": [
         "python3",
         "scripts/phase1_integration.py",
         "observe-localized-config"
       ],
-      "owner": "F5b",
-      "dependency": "Compiler diagnostic writer locale parameter and config-envelope propagation; the leaf translation is already present."
+      "owner": "F5b"
     },
     {
       "id": "ordered-package-resolution",
@@ -131,7 +135,7 @@
     },
     {
       "id": "installed-generated-assets",
-      "claim": "An isolated Cargo archive consumer loads all108 library assets and receives generated diagnostic code2322 through a checker.",
+      "claim": "An isolated Cargo archive consumer loads all 108 libraries, generated locale tables and German diagnostic messages, and retains checker ownership correctly.",
       "kind": "installed",
       "references": [
         "tools/packaging/consumer.rs",
@@ -145,7 +149,7 @@
         "target/phase1-f5-packages"
       ],
       "owner": "F5b",
-      "boundary": "Locale message rendering by an installed consumer remains pending until localized-config-diagnostics is implemented."
+      "boundary": "Archive-only execution; locale and diagnostic observations are compared with the pinned German catalog, independent of the generated Rust tables."
     },
     {
       "id": "compiler-syntax-diagnostics",

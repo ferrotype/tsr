@@ -26,6 +26,25 @@ fn actual_go_loader_observations() {
         assert_eq!(observe(id, &program), expected, "{id}");
     }
 }
+
+#[test]
+fn actual_go_loader_boundary_observations() {
+    let requests: Vec<Value> = serde_json::from_str(include_str!(
+        "../../../data/s07/program-boundary-requests.json"
+    ))
+    .unwrap();
+    let expected: Vec<Value> = serde_json::from_str(include_str!(
+        "../../../data/s07/program-boundary-observations.json"
+    ))
+    .unwrap();
+    assert_eq!(requests.len(), expected.len());
+    for (request, expected) in requests.iter().zip(expected) {
+        let id = request["id"].as_str().unwrap();
+        assert_eq!(expected["ID"], id);
+        let program = load(request, &mut FileCache::new(), &Counters::new());
+        assert_eq!(observe(id, &program), expected, "{id}");
+    }
+}
 #[test]
 fn retained_snapshot_edit_reuses_only_equal_parse_inputs() {
     let requests: Vec<Value> =
