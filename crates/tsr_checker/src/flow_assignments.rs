@@ -17,7 +17,7 @@ pub(crate) struct MarkedAssignment {
     pub(crate) has_definite_assignment: bool,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 pub(crate) enum MarkingStatus {
     Visiting,
     Complete,
@@ -239,7 +239,7 @@ impl CheckerState {
         let Some(root) = self.assignment_function(self.symbol(symbol)?.value_declaration())? else {
             return Ok(());
         };
-        match self.flow.assignments.roots.get(&root).copied() {
+        match self.flow.assignments.roots.get(&root).cloned() {
             Some(MarkingStatus::Complete) => return Ok(()),
             Some(MarkingStatus::Failed(error)) => return Err(error),
             Some(MarkingStatus::Visiting) => {
@@ -251,7 +251,7 @@ impl CheckerState {
         }
         let mut parent = self.node(root)?.parent();
         while let Some(function) = self.assignment_function(parent)? {
-            match self.flow.assignments.roots.get(&function).copied() {
+            match self.flow.assignments.roots.get(&function).cloned() {
                 Some(MarkingStatus::Complete) => {
                     self.flow
                         .assignments
@@ -289,7 +289,7 @@ impl CheckerState {
                 self.flow
                     .assignments
                     .roots
-                    .insert(root, MarkingStatus::Failed(error));
+                    .insert(root, MarkingStatus::Failed(error.clone()));
                 Err(error)
             }
         }

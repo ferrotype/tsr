@@ -10,7 +10,7 @@ use tsr_arena::{NodeId, SymbolId};
 use tsr_ast::{node_flags as nf, symbol_flags as sf, SyntaxKind as K};
 use tsr_diagnostics as messages;
 
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 enum Resolution {
     Signature(SignatureId),
     Failed(Error),
@@ -150,7 +150,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.getResolvedSignature
     pub(crate) fn resolved_call_signature(&mut self, node: NodeId) -> Result<SignatureId, Error> {
-        let cached = self.calls.resolved.get(&node).copied();
+        let cached = self.calls.resolved.get(&node).cloned();
         match cached {
             Some(Resolution::Failed(error)) => return Err(error),
             Some(Resolution::Signature(signature))
@@ -179,7 +179,9 @@ impl CheckerState {
         let result = match result {
             Ok(result) => result,
             Err(error) => {
-                self.calls.resolved.insert(node, Resolution::Failed(error));
+                self.calls
+                    .resolved
+                    .insert(node, Resolution::Failed(error.clone()));
                 return Err(error);
             }
         };

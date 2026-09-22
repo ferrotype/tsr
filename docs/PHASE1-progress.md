@@ -10,10 +10,10 @@ moved pin invalidates it.
 
 | Step | State |
 | --- | --- |
-| F0 — inventory, manifests and executable setup | **incomplete**: implementing and verifying the approved matchFiles test renderer, and connecting existing evidence to operation ids |
+| F0 — inventory, manifests and executable setup | **incomplete**: connecting existing evidence to operation ids and completing the remaining preparation rosters |
 | F1a — foundation leaf tests | **complete**: `leaves_prepared: true`; 225 leaf cases frozen, all 460 inventoried leaf operations prepared, witnessed or exempted by the reviewed ledger, and both divergences triaged |
 | F2a — filesystem, path and matching tests | **pending Linux observation**: `filesystem_prepared: false`; 359 cases, 314 of 316 roster operations accounted for; all 142 baselines prepared (68 exact, 74 owner-approved exceptions). The Linux realpath case must observe `Realpath` and `ignoringEINTR`. |
-| F3a — config, command-line and resolution tests | **complete**: `config_prepared: true`; 484 cases, all 402 roster operations prepared, witnessed or exempted, and all 309 reference outputs prepared (F2a's 142 plus F3a's 167, all 167 exact) |
+| F3a — config, command-line and resolution tests | **complete**: `config_prepared: true`; 486 cases, all 402 roster operations prepared, witnessed or exempted, and all 309 reference outputs prepared (F2a's 142 plus F3a's 167, all 167 exact) |
 | F4a — syntax, binder and utility coverage | not started |
 | F5a — integration checks and the stage A review | not started |
 
@@ -1759,3 +1759,255 @@ files, 1,359,496 compressed bytes; provenance SHA-256
 Every native and Rust observation is identical to the first-batch archive;
 the counts and four unwaived differences above are unchanged. The original
 archive is preserved. Tracker views are regenerated for the reviewed sources.
+
+### F2b continuation and required F3b integration — 2026-09-21
+
+The owner authorized finishing the work after #47, including the F3b pieces
+needed by `matchFiles`. F1b's prepared leaf scope is already complete; this
+continuation does not reopen its approved options-ownership decision.
+
+Implementation order:
+
+1. Connect the live I/O adapter to the production `FileSystem` contract. Add
+   the missing independent read-result representation for wrappers without
+   changing immutable `MemorySnapshot` reads. Preserve errors and both times.
+2. Add cached, replacing, tracking and recording wrappers. Cache raw keys and
+   negative answers, release locks before calling a delegate, preserve the
+   pin's enable/clear transitions and non-invalidation on writes, and record
+   calls before dispatch. Arbitrary replacements must not claim snapshot
+   identity; observing wrappers may preserve an immutable delegate's identity.
+3. Implement the live OS host and its path helpers, with byte-preserving POSIX
+   paths, source-specific failure behavior, BOM decoding, symlink classification
+   and caller-controlled walks. Label platform-only observations honestly.
+4. Add the JSON config entry point and wildcard-directory calculation in
+   `tsr_tsoptions`, using the existing source-config parser and ordered config
+   values where their semantics agree. Implement the declared test-only
+   `matchFiles` envelope using real Rust results. Keep the approved historical
+   baseline exceptions distinct from Go-versus-Rust parity.
+5. Run each affected native action group while implementing it, then the full
+   filesystem family and affected config/loader controls. Refresh operation
+   mappings, scoped captures and tracker views only after source changes settle.
+   Do not claim F3b's unrelated command-line or resolution gaps are complete.
+
+The held-entry timestamp alias difference remains visible. If the continuation
+finds another ownership conflict or a native authority gap, record the exact
+case rather than weakening the comparator or manufacturing matching evidence.
+
+#### Implementation and scoped result — 2026-09-22
+
+The continuation implements the missing cached, wrapping, tracking, recording
+and live OS filesystems, plus the F3b configuration work required by
+`matchFiles`. It does not close unrelated F3b work. F1b's prepared leaf scope
+remains 229 exact matches and the existing owner-approved options-clone
+exception. The separate filesystem held-entry approval is recorded below.
+
+| Family/group | Current result |
+|---|---|
+| Full filesystem family | 355 match, 1 approved difference, 2 unapproved differences, 1 native unavailable; no missing operation or harness failure |
+| cachedvfs | 32/32 match, including the earlier root-length panic difference |
+| wrapvfs / tracking | 28/28 match |
+| vfsmock | 10/10 match |
+| osvfs / native path | 22 match; the Linux procfs case is unavailable on Darwin |
+| matchFiles | 142/142 rendered outputs byte-identical to the approved native renderer |
+| Leaves control | 229 match, 1 approved difference |
+| Config control | 183 match, 9 different, 292 missing; seven additional matches |
+
+No previously matching case regresses in any of these families. The seven new
+config matches cover the raw JSON entry point and wildcard directories. The
+config family still needs its unrelated command-line, extended-cache and
+resolution implementation. The 142 matchFiles comparisons use the current
+approved native renderer; they do not erase the separate historical-baseline
+exceptions recorded in F2a.
+
+**Production contracts.** `FileSystem` gains an independent content/success
+read result for transparent forwarding, nil-versus-empty entry lists, an
+explicit retaining walk callback, opaque native stat metadata, and rich I/O
+errors preserving path, operation and wrapping. Immutable snapshots remain
+immutable. Arbitrary replacing and recording wrappers return no snapshot
+identity; observing/caching wrappers preserve the delegate's identity. Cache
+keys remain raw paths, negative results are cached, writes do not invalidate,
+and no delegate or visitor runs under a cache/log lock. Recording happens
+before dispatch and therefore includes calls that unwind; an unwired method
+fails before recording. Owned walk callbacks can be retained and invoked
+later, including by the tracking wrapper.
+
+Rich VFS failures make the checker and its containing cached result enums
+`Clone` rather than `Copy`. The affected checker edits explicitly clone stored
+failures and replace `Cell` with local mutable storage or `RefCell` where a
+callback must retain a failure. They do not change checker algorithms. The
+compiler, embedding boundary and module-resolution consumers are adjusted to
+the same representation.
+
+The live OS host preserves byte paths, follows the pinned write/append/remove
+and timestamp behavior, uses process-wide 128 blocking / 128 read / 32 write
+limits, and releases walk permits during unwinding. POSIX directory removal
+uses descriptor-relative operations with `O_NOFOLLOW`; it continues after a
+child failure and returns the first error. The existing `ScopedOsFs` snapshot
+loader is moved without changing its implementation. Unicode case swapping
+uses generated simple lower/upper tables from the pinned Go toolchain, rather
+than the Rust toolchain's Unicode version.
+
+`rustix` 1.1.5 is a Unix-only dependency for safe descriptor-relative filesystem
+operations and `UTIME_OMIT`. `std::fs` does not expose these contracts, while a
+local FFI shim would introduce unsafe code. The external Rust consumer lockfile
+is updated too. Package names and publication policy are unchanged. POSIX
+behavior is measured on Darwin here; Linux-specific execution and Windows /
+Android fidelity are not certified by this capture.
+
+**Configuration integration.** `parse_json_config_file_content` shares the
+source-config completion pipeline, preserving the raw entry point's diagnostic
+locations and type acquisition. Both entry points retain the validated specs
+used by `ParsedCommandLine::wildcard_directories`. Wildcard watches preserve
+first insertion spelling, recursive promotion and removal of redundant child
+watches. `DiagnosticSources` allows the production diagnostic writer to resolve
+retained config sources without constructing a compiler program. Foreign
+source identities still fail rather than selecting a file by name.
+
+The matchFiles envelope is explicitly test-only. It reads the historical input
+prefix and computes the result using production config parsing, ordered JSON,
+wildcard directories and diagnostic formatting. Expected result bytes are
+never read as output. The comparator compares exact rendered UTF-8 bytes for
+the inventory-declared `matchFilesBaseline` subject. Native historical-renderer
+metadata remains authenticated separately; Rust does not fabricate it. Other
+subjects retain their full observation comparison. Negative tests reject
+newline changes and missing/inconsistent rendered payloads.
+
+**Probe amendment.** The native executable class formerly compared raw and
+resolved path spelling. Darwin's Go test binary launched under `/var` while
+the Rust driver launched under the workspace's `/private/var` spelling, so it
+graded temporary executable placement. Both sides now verify successful
+resolution, identical OS file identity, and unchanged forwarding of their own
+native executable path. The amendment is recorded in the case contract and
+both probes; prior archives are preserved.
+
+**Remaining strict F2b boundaries.** The two unapproved differences are
+`glob/match-group-branch-buffer` (foreign Go dynamic element) and
+`vfstest/from-map-rejects-malformed-maps` (foreign dynamic map value). The owner
+approved `vfstest/snapshot-mutation-leak-control` on 2026-09-22: previously held
+Rust entry values remain independent of live timestamp updates, consistent
+with the compiler-options ownership choice. The exact scope is recorded in
+[the ownership audit](PHASE1-aliasing-audit.md#filesystem-held-entry-snapshots-approved-follow-up).
+Its raw result remains `different`; no observation or comparator is changed.
+The Linux-only procfs case is `native_unavailable`, leaving its two operation
+preparation entries pending. Thus all prepared missing adapters now execute,
+but strict F2b parity is not declared complete.
+
+**Traceability.** The S07 inventory changes six Rust mappings: four moved
+anchors and two added config helper markers. A separate final boundary review
+confirmed every non-mapping operation field is identical; replay of the
+authenticated native syntax and loader observations preserves byte-identical
+selected variants and checker obligations. Only the operation-matrix digest
+changes in the candidate rule. This refreshes source mapping metadata, not
+historical correctness or performance evidence. Generated package assignments
+remain unchanged; the ledger's editable `rust` lists name the actual VFS source
+homes. Mock references name their pinned Go test-harness counterparts without
+claiming production-source port markers.
+
+**Capture archive.** `data/phase1/captures/f2b-continuation.tar.gz` contains
+136 JSON request, observation, overlay, comparison and provenance files
+(3,458,325 compressed bytes), with no executables or exported upstream tree.
+Archive SHA-256: `db1139d4ec79a559f8fbf20b4e11b226951f183d9426171e3a02979e551efc2f`.
+
+Family provenance SHA-256 values:
+
+- filesystem: `3997f6888867bfbda6e82fd8974f8051166f881f7145f8ee7a18c17ce05035cd`
+- leaves: `ea3f15e10adff6054e6a6a124467d518ff146fd1f63af865941ceed1998882b4`
+- config: `a5c5e570b2f1a435632bf7d8afb0d5cf709dc19f3715414af6d303b1fd75f0e2`
+
+Extracting the archive and replaying all three comparisons reproduces the
+counts above. No compiler corpus or performance benchmark was run.
+
+Validation: workspace clippy with warnings denied; Rust 1.96 checks for VFS and
+config parsing; 41 affected Rust tests and nine compiler/config/diagnostic
+consumer tests; 686 Python tests plus 1,258 subtests (one platform skip);
+`cargo fmt --check`; pinned case-table regeneration check; dependency deny;
+package assets; tracker validation; and replay of the three archived captures.
+The missing-operation identity regression now injects a missing handler instead
+of requiring the real filesystem family to remain unimplemented forever.
+
+
+## F2b integration review — 2026-09-22
+
+**Review fixes.** The raw-JSON config entry point now revalidates `references`
+when collecting project references, as the pinned worker does after validating
+config specs. A non-array value and an array containing a non-object each
+produce two TS5024 diagnostics, preserving arguments, ranges and order. Two
+native differential cases and a Rust regression exercise the public raw entry
+point. Source-file configuration retains its separate AST validation.
+
+`GetGlobalTypingsCacheLocation` now treats empty environment values as absent
+and rejects relative `XDG_CACHE_HOME` values, selecting the temporary-directory
+fallback instead of falling through to HOME. Relative HOME and LocalAppData
+remain accepted where Go accepts them. An injected environment keeps the unit
+cases deterministic without mutating the process environment.
+
+The recording mock, retained walk callback API and `wired_count` are behind a
+**default-off `tsr_vfs/harness` feature**, enabled explicitly by the filesystem
+probe. Default production builds expose borrowed walks. Borrowed callback
+reentry is exercised with the feature disabled, and retained callback behavior
+is exercised with it enabled. `Entries` keeps the explicit nil-versus-empty
+representation; this review does not approve a normalization of those results.
+
+The shared comparator has no matchFiles subject branch. Both runtimes put only
+`rendered` in the comparable observation. Native historical-renderer provenance
+lives in a separate `metadata` object in the row, authenticated with the entire
+native response. Full observation equality applies to every family; tests cover
+newline changes, omitted rendered output, extra observation fields and invalid
+metadata envelopes. Baseline preparation still checks the rendered and
+historical reference digests independently.
+
+The generated ledger now assigns `nativepath` and `osutil` to `tsr_vfs`, and
+`symlinks` to `tsr_module`, matching their existing production homes. Phase and
+platform scope are unchanged. A regression checks these package assignments
+against both the generator and recorded Rust paths. The S07 operation refresh
+moves three mapping anchors and changes no other operation fields. A fresh
+Go syntax/config export is byte-identical to the previous export; its
+`data/upstream.json` input hash changes with the corrected ledger homes. The
+existing authenticated loader observation replays unchanged, and the selected
+subset and checker obligations remain byte-identical. Historical correctness
+and performance evidence is not reclassified as fresh.
+
+**Explicit follow-ups.** Native I/O error messages still use Rust's OS error
+text while Go's text differs; a diagnostics integration change must port the
+message contract, not lowercase or strip arbitrary text. Wildcard directory
+memoization belongs with F3b/watch integration once mutation and cache
+invalidation are specified for the currently public config fields. OS
+case-sensitivity probing remains lazy; Phase 4 can provide an explicit startup
+hook if executable-move behavior matters.
+
+The error-layout concern was checked on Darwin arm64: VFS Error remains 24
+bytes and Checker Error, Result<(), Error> and SourceCheckStatus remain 32
+bytes compared with the previous Copy representation. This does not measure
+cloning cost for rich errors or certify other target layouts. No checkerbench
+or other performance benchmark is part of this review.
+
+
+**Refreshed captures.** `data/phase1/captures/f2b-integration-review.tar.gz`
+contains 136 JSON files (3,451,167 compressed bytes). SHA-256:
+`5352d7bffd1613b9b8b74285ddc2280e0823b13ca6f18d49cffdde37005e60eb`.
+Previous archives are retained.
+
+| Family | Current raw comparison |
+| --- | --- |
+| config (486) | 185 match, 9 different, 292 not implemented |
+| filesystem (359) | 355 match, 3 different, 1 Linux-only native unavailable |
+| leaves (230) | 229 match, 1 different |
+
+All 142 matchFiles rendered outputs still match byte for byte. Both new config
+cases match the pinned native pair of TS5024 diagnostics. Existing case results
+are unchanged, including the two approved ownership differences. No capture
+contains a harness failure.
+
+Family provenance SHA-256 values:
+
+- config: `e78c2f83769f5cb80ffa37ef65526e6fffbd52ce62a1f0fef1136e6b560f3c97`
+- filesystem: `03e7e40961f358e5c6dff95b3fbdf7a17c6d8fbad6238fb1e7de71efdc9237b9`
+- leaves: `202cfa20e6b76900c190096287409078f5342196e45058a04379ba37e602c36e`
+
+Review validation: VFS tests with default features and with `harness`, including
+borrowed reentry and retained callbacks; the new raw-config regression;
+workspace all-target/all-feature clippy with warnings denied (plus the added
+config regression target after it landed); the Rust 1.96 default VFS build;
+687 Python tests and 1,260 subtests (one platform skip); formatting; package
+assets; inventory consistency; tracker validation and committed-view checks;
+and extraction/replay of all three new archived captures.

@@ -7,7 +7,7 @@ use tsr_ast::{node_flags as nf, SyntaxKind as K};
 use tsr_core::Tristate;
 use tsr_diagnostics as messages;
 
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 pub(crate) enum SourceCheckStatus {
     Checking,
     Complete,
@@ -34,7 +34,7 @@ impl CheckerState {
         source: NodeId,
         check_unused: bool,
     ) -> Result<(), Error> {
-        match self.source_checks.get(&source).copied() {
+        match self.source_checks.get(&source).cloned() {
             Some(SourceCheckStatus::Complete) => {}
             Some(SourceCheckStatus::Failed(error)) => return Err(error),
             Some(SourceCheckStatus::Checking) => {
@@ -46,16 +46,16 @@ impl CheckerState {
                 let result = self.check_source_file_worker(source);
                 self.source_checks.insert(
                     source,
-                    match result {
+                    match &result {
                         Ok(()) => SourceCheckStatus::Complete,
-                        Err(error) => SourceCheckStatus::Failed(error),
+                        Err(error) => SourceCheckStatus::Failed(error.clone()),
                     },
                 );
                 result?;
             }
         }
         if check_unused {
-            if let Some(&result) = self.query.unused_checks.get(&source) {
+            if let Some(result) = self.query.unused_checks.get(&source).cloned() {
                 return result;
             }
             // This pass depends on a completed type check, but its own failure
@@ -73,7 +73,7 @@ impl CheckerState {
             })();
             // The queue has been consumed: retrying this phase must return its
             // recorded failure, not succeed on the now-empty queue.
-            self.query.unused_checks.insert(source, result);
+            self.query.unused_checks.insert(source, result.clone());
             result?;
         }
         Ok(())

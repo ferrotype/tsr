@@ -1,28 +1,11 @@
 //! The config-parsing group: `internal/tsoptions/tsconfigparsing.go`,
 //! `parsinghelpers.go` and `wildcarddirectories.go`.
 //!
-//! `crates/tsr_tsoptions` carries a real port of the jsonSourceFile config
-//! path -- `parse_json_source_file_config_file_content` (config_parse.rs:691)
-//! down through `own_config`, `parse_config`, `specs`, `references`,
-//! `convert_json_option`, `file_names_from_specs` and the content-mapper
-//! validator -- so most of this group OBSERVES rather than reports a gap. What
-//! it reports as missing is reported as missing for a reason it can name, and
-//! it never emulates a pinned algorithm to make a comparison run:
-//!
-//!   * the whole JSON (non-source-file) API. `ParseJsonConfigFileContent`,
-//!     `parseOwnConfigOfJson`, `convertToObject` and `normalizeJsonValue` have
-//!     no counterpart: the Rust parse only accepts a parsed source file.
-//!   * the extended-config CACHE. `ExtendedConfigCache`, `getExtendedConfig`
-//!     and `ParseExtendedConfig` are one seam in the pin; the Rust
-//!     `parse_config` reads and parses each extended config inline
-//!     (config_parse.rs:440-509) with nothing to hand a cache to.
-//!   * `ParseWatchOptions`, `ParseBuildOptions`, `ConvertOptionToAbsolutePath`
-//!     and `convertToOptionsWithAbsolutePaths`: `core::WatchOptions` and
-//!     `core::BuildOptions` have no Rust type at all.
-//!   * `getWildcardDirectories` and its two helpers: absent from every crate.
-//!   * a handful of operations that ARE implemented but only privately, named
-//!     one by one below with the file:line that implements them, so the gap
-//!     recorded is "no reachable entry point", not "no code".
+//! Both source-file and raw-JSON entry points, including wildcard directory
+//! calculation, execute the production `tsr_tsoptions` port. Remaining gaps
+//! (extended-config caching, watch/build options and private helper entry
+//! points) are reported at the handler that encounters them; this driver
+//! never implements a missing compiler operation.
 
 use crate::api::{subject, Outcome};
 use serde_json::{json, Map, Value};
@@ -553,20 +536,6 @@ fn parse_source(
 
 type Gap = (&'static str, &'static str, &'static str, &'static str);
 
-const JSON_API: Gap = (
-    "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent",
-    "tsc/internal/tsoptions/tsconfigparsing.go:872-880, which normalizes an arbitrary Go value \
-     with normalizeJsonValue and runs parseJsonConfigFileContentWorker over the resulting ordered \
-     map with no source file, so parseOwnConfigOfJson replaces parseOwnConfigOfJsonSourceFile and \
-     every diagnostic is location-less",
-    "pub fn parse_json_config_file_content(value: &ConfigValue, host: &dyn ParseConfigHost, \
-     base: &[u8], existing: &CompilerOptions, name: &[u8]) -> Result<ParsedCommandLine, Error>, \
-     plus the parseOwnConfigOfJson branch it needs",
-    "crates/tsr_tsoptions/src/config_parse.rs, whose only entry point is \
-     parse_json_source_file_config_file_content (:691) and whose parse_config (:409) always calls \
-     own_config (:284), the jsonSourceFile branch; there is no value-mode branch and no \
-     ConfigValue normalizer (absent)",
-);
 const CONVERT_TO_OBJECT: Gap = (
     "tsc/internal/tsoptions/tsconfigparsing.go:convertToObject",
     "tsc/internal/tsoptions/tsconfigparsing.go:918-925, the circularity branch's converter: unlike \
@@ -663,18 +632,6 @@ const GET_SPELLING_SUGGESTION: Gap = (
      convert_options.rs:304-319 both run tsr_scanner::get_spelling_suggestion_for_strings over \
      COMPILER_OPTIONS, but neither `unknown` nor `unknown_option` is exported from the crate \
      (lib.rs:273-276 re-exports neither), so no caller outside tsr_tsoptions can reach it",
-);
-const GET_WILDCARD_DIRECTORIES: Gap = (
-    "tsc/internal/tsoptions/wildcarddirectories.go:getWildcardDirectories",
-    "tsc/internal/tsoptions/wildcarddirectories.go:10-83, which maps each include spec to a \
-     watched directory and a recursive flag, keeps the first path recorded for a canonical key, \
-     upgrades a non-recursive entry to recursive, and deletes any entry contained by a recursive \
-     one",
-    "pub fn wildcard_directories(include: &[JsString], exclude: &[JsString], cwd: &[u8], \
-     case_sensitive: bool) -> Vec<(JsString, bool)>",
-    "no Rust home: a search of crates/ for `wildcard` finds only diagnostic names and \
-     options.uses_wildcard_types; neither the directory computation nor its \
-     getWildcardDirectoryFromSpec/toCanonicalKey helpers exist (absent)",
 );
 const HAS_FILE_WITH_HIGHER_PRIORITY_EXTENSION: Gap = (
     "tsc/internal/tsoptions/tsconfigparsing.go:hasFileWithHigherPriorityExtension",
@@ -866,7 +823,16 @@ fn answer(request: &Value) -> Result<Outcome, String> {
             observation.insert("read_failed".into(), Value::Bool(false));
             Ok(Outcome::Observed(Value::Object(observation)))
         }
-        "parse_json_api" | "parse_json_api_value" => Ok(missing(JSON_API)),
+        "parse_json_api" | "parse_json_api_value" => {
+            let host=build_host(request);
+            let name=text_of(request,"configFileName").as_bytes();
+            let raw=if action=="parse_json_api_value" { decode_value(&request["value"])? } else {
+                let path=tsr_tspath::to_path(name,&base_of(request),flag(request,"caseSensitive"));
+                parse_config_file_text_to_json(JsString::from_bytes(name),path,SourceText::from_loaded_bytes(text_of(request,"jsonText").as_bytes().to_vec())).value
+            };
+            let parsed=failed(tsr_tsoptions::parse_json_config_file_content(raw,&host,&base_of(request),&CompilerOptions::default(),name,&[]))?;
+            Ok(Outcome::Observed(Value::Object(describe_parsed(request,&parsed)?)))
+        },
         "parse_config_text" => {
             let name = text_of(request, "configFileName").as_bytes().to_vec();
             let path =
@@ -1129,7 +1095,12 @@ fn answer(request: &Value) -> Result<Outcome, String> {
             "build_map" => Ok(missing(COMMAND_LINE_OPTIONS_TO_MAP)),
             other => Err(format!("unknown option_name_map helper {other:?}")),
         },
-        "wildcard_directories" => Ok(missing(GET_WILDCARD_DIRECTORIES)),
+        "wildcard_directories" => {
+            let include=list_of(request,"include").into_iter().map(JsString::from_bytes).collect::<Vec<_>>();let exclude=list_of(request,"exclude").into_iter().map(JsString::from_bytes).collect::<Vec<_>>();
+            let directories=tsr_tsoptions::wildcard_directories(&include,&exclude,text_of(request,"currentDirectory").as_bytes(),flag(request,"caseSensitive"));
+            let mut rows=directories.as_ref().map_or(Vec::new(),|m|m.iter().map(|(p,r)| (text(p.as_bytes()),*r)).collect::<Vec<_>>());rows.sort_by(|a,b|a.0.cmp(&b.0));
+            Ok(Outcome::Observed(json!({"directories":rows,"nil_result":directories.is_none()})))
+        },
         "config_specs" => {
             let specs = config_specs(request);
             match helper {
@@ -1228,5 +1199,34 @@ fn config_specs(request: &Value) -> ConfigFileSpecs {
         files_before_substitution: strings_of(request, "filesBefore"),
         includes_before_substitution: strings_of(request, "includesBefore"),
         is_default_include: flag(request, "isDefaultInclude"),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{observe, Outcome};
+    use serde_json::json;
+
+    #[test]
+    fn raw_references_reports_both_pinned_validation_calls() {
+        // getConfigFileSpecs and getProjectReferences each validate the raw
+        // property at the pin. These cases are also captured from native Go.
+        for (references, required) in [(json!(42), "Array"), (json!([42]), "object")] {
+            let request = json!({
+                "operation": "tsoptions.configParse", "subject": "configParse",
+                "action": "parse_json_api", "currentDirectory": "/project",
+                "configFileName": "/project/tsconfig.json", "caseSensitive": true,
+                "files": {"/project/index.ts": "export {};\n"}, "report": ["errors"],
+                "jsonText": json!({"files": ["index.ts"], "references": references}).to_string()
+            });
+            let Some(Outcome::Observed(result)) = observe(&request) else {
+                panic!("raw config must execute");
+            };
+            let expected = json!({
+                "code": 5024, "args": ["references", required],
+                "pos": -1, "end": -1, "has_file": false
+            });
+            assert_eq!(result["errors"], json!([expected, expected]));
+        }
     }
 }

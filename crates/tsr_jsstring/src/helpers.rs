@@ -178,3 +178,14 @@ pub fn truncate_by_runes(bytes: &[u8], max_length: isize) -> &[u8] {
     }
     &bytes[..offset]
 }
+
+/// Single-rune Go casing, using the pinned runtime's Unicode version.
+/// Decoding and replacement of invalid UTF-8 belongs to the caller.
+pub fn simple_upper_go(rune: i32) -> i32 {
+    crate::case_tables::SIMPLE_UPPER
+        .binary_search_by_key(&rune, |row| row.0)
+        .map_or(rune, |index| crate::case_tables::SIMPLE_UPPER[index].1)
+}
+pub fn simple_lower_go(rune: i32) -> i32 {
+    simple_lower(rune)
+}

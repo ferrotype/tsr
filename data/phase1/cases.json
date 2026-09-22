@@ -3746,10 +3746,7 @@
       "family": "config",
       "host_applicability": "any",
       "id": "config/json/excludes-typo-compiler-diagnostic",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/config/configparse_probe_test.go with its in-package companion configparse_inpackage_test.go, against the pinned tsoptions package",
       "operation_actions": {
         "parse_json_api": [
@@ -3822,10 +3819,7 @@
       "family": "config",
       "host_applicability": "any",
       "id": "config/json/null-array-element-rejected",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/config/configparse_probe_test.go with its in-package companion configparse_inpackage_test.go, against the pinned tsoptions package",
       "operation_actions": {
         "parse_json_api": [
@@ -3938,10 +3932,7 @@
       "family": "config",
       "host_applicability": "any",
       "id": "config/json/parse-json-config-file-content",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/config/configparse_probe_test.go with its in-package companion configparse_inpackage_test.go, against the pinned tsoptions package",
       "operation_actions": {
         "parse_json_api": [
@@ -4006,6 +3997,38 @@
         "tsc/internal/tsoptions/tsconfigparsing.go:startsWithConfigDirTemplate",
         "tsc/internal/tsoptions/tsconfigparsing.go:validateJsonOptionValue",
         "tsc/internal/tsoptions/tsconfigparsing.go:validateSpecs"
+      ]
+    },
+    {
+      "expected_contract": "The raw JSON entry point reports the references type error twice, from specs validation and getProjectReferences, in pinned source order.",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/json/references-invalid-element-diagnosed-twice",
+      "last_result": "match",
+      "native_authority": "tools/phase1/config/configparse_probe_test.go with its in-package companion configparse_inpackage_test.go, against the pinned tsoptions package",
+      "operation_actions": {
+        "parse_json_api": [
+          "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
+        ]
+      },
+      "operations": [
+        "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
+      ]
+    },
+    {
+      "expected_contract": "The raw JSON entry point reports the references type error twice, from specs validation and getProjectReferences, in pinned source order.",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/json/references-non-array-diagnosed-twice",
+      "last_result": "match",
+      "native_authority": "tools/phase1/config/configparse_probe_test.go with its in-package companion configparse_inpackage_test.go, against the pinned tsoptions package",
+      "operation_actions": {
+        "parse_json_api": [
+          "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
+        ]
+      },
+      "operations": [
+        "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
       ]
     },
     {
@@ -12079,10 +12102,7 @@
       "family": "config",
       "host_applicability": "any",
       "id": "config/wildcard/case-insensitive-key",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tsoptions/wildcarddirectories.go:getWildcardDirectories"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/config/configparse_probe_test.go with its in-package companion configparse_inpackage_test.go, against the pinned tsoptions package",
       "operation_actions": {
         "wildcard_directories": [
@@ -12102,10 +12122,7 @@
       "family": "config",
       "host_applicability": "any",
       "id": "config/wildcard/excluded-and-contained",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tsoptions/wildcarddirectories.go:getWildcardDirectories"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/config/configparse_probe_test.go with its in-package companion configparse_inpackage_test.go, against the pinned tsoptions package",
       "operation_actions": {
         "wildcard_directories": [
@@ -12125,10 +12142,7 @@
       "family": "config",
       "host_applicability": "any",
       "id": "config/wildcard/implicit-glob-directory",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tsoptions/wildcarddirectories.go:getWildcardDirectories"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/config/configparse_probe_test.go with its in-package companion configparse_inpackage_test.go, against the pinned tsoptions package",
       "operation_actions": {
         "wildcard_directories": [
@@ -12148,10 +12162,7 @@
       "family": "config",
       "host_applicability": "any",
       "id": "config/wildcard/recursive-and-direct",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tsoptions/wildcarddirectories.go:getWildcardDirectories"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/config/configparse_probe_test.go with its in-package companion configparse_inpackage_test.go, against the pinned tsoptions package",
       "operation_actions": {
         "wildcard_directories": [
@@ -12171,10 +12182,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/cachedvfs/append-splits-the-cached-and-uncached-paths",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.AppendFile"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "append_file": [
@@ -12206,10 +12214,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/cachedvfs/cached-hit-then-deletion",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.Remove"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "clear_cache": [
@@ -12249,10 +12254,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/cachedvfs/cached-miss-then-creation",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.WriteFile"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "clear_cache": [
@@ -12296,10 +12298,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/cachedvfs/case-sensitivity-is-never-cached",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.UseCaseSensitiveFileNames"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "clear_cache": [
@@ -12331,10 +12330,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/cachedvfs/chtimes-forwards-both-times-and-does-not-invalidate",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.Chtimes"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "chtimes": [
@@ -12362,10 +12358,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/cachedvfs/clear-cache-clears-all-five-and-keeps-enabled",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.ClearCache"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "clear_cache": [
@@ -12405,10 +12398,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/cachedvfs/common-entries-classifies-drops-and-reparses",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/internal/internal.go:Common.GetAccessibleEntries"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "entries": [
@@ -12435,10 +12425,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/cachedvfs/common-existence-predicates-derive-from-stat",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/internal/internal.go:Common.FileExists"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "directory_exists": [
@@ -12471,10 +12458,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/cachedvfs/common-read-file-flags-and-decodes",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/internal/internal.go:Common.ReadFile"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "from_common": [],
@@ -12501,10 +12485,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/cachedvfs/common-root-and-path-dispatches-per-root",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/internal/internal.go:Common.RootAndPath"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "from_common": [],
@@ -12525,10 +12506,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/cachedvfs/common-stat-over-links-junctions-and-gaps",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/internal/internal.go:Common.Stat"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "from_common": [],
@@ -12551,10 +12529,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/cachedvfs/common-walk-dir-order-skips-and-errors",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/internal/internal.go:Common.WalkDir"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "from_common": [],
@@ -12577,10 +12552,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/cachedvfs/direxists-caches-per-path",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.DirectoryExists"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "directory_exists": [
@@ -12600,10 +12572,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/cachedvfs/direxists-caches-the-negative-answer",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.DirectoryExists"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "directory_exists": [
@@ -12623,10 +12592,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/cachedvfs/direxists-keys-the-raw-argument",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.DirectoryExists"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "directory_exists": [
@@ -12646,10 +12612,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/cachedvfs/disable-and-clear-bypasses-then-enable-restores",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.DisableAndClearCache"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "directory_exists": [
@@ -12693,10 +12656,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/cachedvfs/entries-caches-across-clear-disable-enable",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.GetAccessibleEntries"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "clear_cache": [
@@ -12728,10 +12688,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/cachedvfs/entries-caches-the-empty-listing",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.GetAccessibleEntries"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "entries": [
@@ -12751,10 +12708,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/cachedvfs/fileexists-caches-across-clear-disable-enable",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.FileExists"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "clear_cache": [
@@ -12786,10 +12740,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/cachedvfs/fileexists-caches-the-negative-answer",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.FileExists"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "file_exists": [
@@ -12809,10 +12760,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/cachedvfs/from-starts-enabled-and-enable-does-not-clear",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/cachedvfs/cachedvfs.go:From"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "directory_exists": [
@@ -12836,10 +12784,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/cachedvfs/readfile-is-never-cached",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.ReadFile"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "clear_cache": [
@@ -12871,10 +12816,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/cachedvfs/realpath-caches-across-clear-disable-enable",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.Realpath"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "clear_cache": [
@@ -12906,10 +12848,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/cachedvfs/realpath-caches-the-failure-fallback",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.Realpath"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "from": [
@@ -12945,7 +12884,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/cachedvfs/root-length-rejects-non-absolute",
-      "last_result": "different",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "root_length": [
@@ -12961,10 +12900,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/cachedvfs/split-path-normalizes-then-splits",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/internal/internal.go:SplitPath"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "split_path": [
@@ -12982,10 +12918,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/cachedvfs/stat-caches-across-clear-disable-enable",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.Stat"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "clear_cache": [
@@ -13017,10 +12950,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/cachedvfs/stat-caches-the-nil-result",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.Stat"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "from": [
@@ -13040,10 +12970,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/cachedvfs/walkdir-forwards-skip-and-error-decisions",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.WalkDir"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "from": [
@@ -13063,10 +12990,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/cachedvfs/walkdir-is-never-cached",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.WalkDir"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "clear_cache": [
@@ -13098,10 +13022,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/cachedvfs/walkdir-is-not-served-from-the-entries-cache",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/cachedvfs/cachedvfs.go:FS.WalkDir"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "entries": [
@@ -15133,7 +15054,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/always-include-literal-files-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -15147,7 +15068,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/always-include-literal-files-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -15161,7 +15082,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/and-empty-exclude-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -15175,7 +15096,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/and-empty-exclude-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -15189,7 +15110,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/and-exclusions-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -15203,7 +15124,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/and-exclusions-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -15217,7 +15138,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/and-explicit-recursive-include-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -15231,7 +15152,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/and-explicit-recursive-include-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -15245,7 +15166,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/and-explicit-wildcard-include-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -15259,7 +15180,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/and-explicit-wildcard-include-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -15273,7 +15194,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/and-no-exclusions-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -15287,7 +15208,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/and-no-exclusions-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -15301,7 +15222,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/and-wildcard-include-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -15315,7 +15236,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/and-wildcard-include-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -15329,7 +15250,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/are-not-removed-due-to-excludes-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -15343,7 +15264,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/are-not-removed-due-to-excludes-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -15357,7 +15278,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/can-exclude-dirs-whose-pattern-starts-with-starstar-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -15371,7 +15292,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/can-exclude-dirs-whose-pattern-starts-with-starstar-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -15385,7 +15306,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/can-include-dirs-whose-pattern-starts-with-starstart-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -15399,7 +15320,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/can-include-dirs-whose-pattern-starts-with-starstart-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -15413,7 +15334,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/can-include-files-in-the-same-order-on-multiple-platforms-case-insensitive-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -15427,7 +15348,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/can-include-files-in-the-same-order-on-multiple-platforms-case-insensitive-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -15441,7 +15362,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/can-include-files-in-the-same-order-on-multiple-platforms-case-sensitive-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -15455,7 +15376,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/can-include-files-in-the-same-order-on-multiple-platforms-case-sensitive-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -15469,7 +15390,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/case-sensitive-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -15483,7 +15404,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/case-sensitive-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -15497,7 +15418,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/exclude-files-with-in-their-name-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -15511,7 +15432,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/exclude-files-with-in-their-name-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -15525,7 +15446,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/exclude-folders-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -15539,7 +15460,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/exclude-folders-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -15553,7 +15474,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/exclude-js-files-when-allowjs-false-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -15567,7 +15488,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/exclude-js-files-when-allowjs-false-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -15581,7 +15502,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/exclude-min-js-files-using-wildcards-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -15595,7 +15516,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/exclude-min-js-files-using-wildcards-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -15609,7 +15530,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/exclude-paths-outside-of-the-project-using-relative-paths-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -15623,7 +15544,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/exclude-paths-outside-of-the-project-using-relative-paths-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -15637,7 +15558,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/expands-z-to-z-starstart-star-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -15651,7 +15572,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/expands-z-to-z-starstart-star-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -15665,7 +15586,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/in-excludes-after-a-subdirectory-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -15679,7 +15600,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/in-excludes-after-a-subdirectory-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -15693,7 +15614,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/in-excludes-immediately-after-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -15707,7 +15628,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/in-excludes-immediately-after-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -15721,7 +15642,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/in-excludes-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -15735,7 +15656,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/in-excludes-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -15749,7 +15670,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/in-excludes-with-trailing-recursive-directory-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -15763,7 +15684,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/in-excludes-with-trailing-recursive-directory-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -15777,7 +15698,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/in-includes-after-a-subdirectory-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -15791,7 +15712,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/in-includes-after-a-subdirectory-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -15805,7 +15726,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/in-includes-immediately-after-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -15819,7 +15740,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/in-includes-immediately-after-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -15833,7 +15754,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/in-includes-with-multiple-recursive-directory-patterns-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -15847,7 +15768,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/in-includes-with-multiple-recursive-directory-patterns-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -15861,7 +15782,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/in-includes-with-trailing-recursive-directory-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -15875,7 +15796,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/in-includes-with-trailing-recursive-directory-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -15889,7 +15810,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/include-explicitly-listed-min-js-files-when-allowjs-true-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -15903,7 +15824,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/include-explicitly-listed-min-js-files-when-allowjs-true-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -15917,7 +15838,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/include-files-with-in-their-name-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -15931,7 +15852,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/include-files-with-in-their-name-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -15945,7 +15866,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/include-js-files-when-allowjs-true-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -15959,7 +15880,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/include-js-files-when-allowjs-true-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -15973,7 +15894,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/include-paths-outside-of-the-project-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -15987,7 +15908,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/include-paths-outside-of-the-project-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -16001,7 +15922,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/include-paths-outside-of-the-project-using-relative-paths-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -16015,7 +15936,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/include-paths-outside-of-the-project-using-relative-paths-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -16029,7 +15950,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/is-sorted-in-include-order-then-in-alphabetical-order-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -16043,7 +15964,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/is-sorted-in-include-order-then-in-alphabetical-order-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -16057,7 +15978,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/missing-files-are-still-present-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -16071,7 +15992,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/missing-files-are-still-present-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -16085,7 +16006,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/question-matches-only-a-single-character-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -16099,7 +16020,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/question-matches-only-a-single-character-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -16113,7 +16034,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/same-named-declarations-are-excluded-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -16127,7 +16048,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/same-named-declarations-are-excluded-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -16141,7 +16062,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/same-named-declarations-with-include-dts-tsx-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -16155,7 +16076,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/same-named-declarations-with-include-dts-tsx-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -16169,7 +16090,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/same-named-declarations-with-include-ts-dts-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -16183,7 +16104,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/same-named-declarations-with-include-ts-dts-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -16197,7 +16118,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/same-named-declarations-with-include-ts-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -16211,7 +16132,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/same-named-declarations-with-include-ts-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -16225,7 +16146,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/same-named-declarations-with-include-ts-tsx-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -16239,7 +16160,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/same-named-declarations-with-include-ts-tsx-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -16253,7 +16174,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/same-named-declarations-with-include-tsx-dts-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -16267,7 +16188,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/same-named-declarations-with-include-tsx-dts-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -16281,7 +16202,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/same-named-declarations-with-include-tsx-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -16295,7 +16216,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/same-named-declarations-with-include-tsx-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -16309,7 +16230,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/same-named-declarations-with-include-tsx-ts-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -16323,7 +16244,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/same-named-declarations-with-include-tsx-ts-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -16337,7 +16258,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/star-matches-only-ts-files-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -16351,7 +16272,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/star-matches-only-ts-files-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -16365,7 +16286,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/that-are-not-explicitly-included-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -16379,7 +16300,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/that-are-not-explicitly-included-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -16393,7 +16314,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/when-recursive-symlinked-directories-are-present-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -16407,7 +16328,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/when-recursive-symlinked-directories-are-present-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -16421,7 +16342,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/with-case-sensitive-exclude-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -16435,7 +16356,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/with-case-sensitive-exclude-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -16449,7 +16370,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/with-common-package-folders-and-empty-exclude-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -16463,7 +16384,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/with-common-package-folders-and-empty-exclude-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -16477,7 +16398,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/with-common-package-folders-and-exclusions-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -16491,7 +16412,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/with-common-package-folders-and-exclusions-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -16505,7 +16426,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/with-common-package-folders-and-no-exclusions-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -16519,7 +16440,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/with-common-package-folders-and-no-exclusions-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -16533,7 +16454,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/with-defaults-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -16547,7 +16468,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/with-defaults-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -16561,7 +16482,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/with-jsx-none-allowjs-false-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -16575,7 +16496,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/with-jsx-none-allowjs-false-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -16589,7 +16510,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/with-jsx-none-allowjs-true-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -16603,7 +16524,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/with-jsx-none-allowjs-true-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -16617,7 +16538,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/with-jsx-preserve-allowjs-false-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -16631,7 +16552,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/with-jsx-preserve-allowjs-false-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -16645,7 +16566,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/with-jsx-preserve-allowjs-true-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -16659,7 +16580,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/with-jsx-preserve-allowjs-true-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -16673,7 +16594,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/with-jsx-react-native-allowjs-false-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -16687,7 +16608,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/with-jsx-react-native-allowjs-false-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -16701,7 +16622,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/with-jsx-react-native-allowjs-true-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -16715,7 +16636,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/with-jsx-react-native-allowjs-true-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -16729,7 +16650,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/with-literal-excludes-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -16743,7 +16664,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/with-literal-excludes-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -16757,7 +16678,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/with-missing-files-are-excluded-with-literal-include-list-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -16771,7 +16692,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/with-missing-files-are-excluded-with-literal-include-list-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -16785,7 +16706,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/with-missing-files-are-excluded-with-wildcard-include-list-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -16799,7 +16720,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/with-missing-files-are-excluded-with-wildcard-include-list-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -16813,7 +16734,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/with-multiple-recursive-directories-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -16827,7 +16748,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/with-multiple-recursive-directories-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -16841,7 +16762,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/with-non-ts-file-extensions-are-excluded-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -16855,7 +16776,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/with-non-ts-file-extensions-are-excluded-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -16869,7 +16790,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/with-recursive-directory-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -16883,7 +16804,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/with-recursive-directory-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -16897,7 +16818,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/with-recursive-excludes-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -16911,7 +16832,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/with-recursive-excludes-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -16925,7 +16846,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/with-recursive-wildcards-that-match-directories-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -16939,7 +16860,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/with-recursive-wildcards-that-match-directories-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -16953,7 +16874,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/with-recursive-wildcards-that-match-nothing-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -16967,7 +16888,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/with-recursive-wildcards-that-match-nothing-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -16981,7 +16902,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/with-wildcard-excludes-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -16995,7 +16916,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/with-wildcard-excludes-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -17009,7 +16930,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/with-wildcard-excludes-that-implicitly-exclude-dotted-files-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -17023,7 +16944,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/with-wildcard-excludes-that-implicitly-exclude-dotted-files-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -17037,7 +16958,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/without-exclusions-with-literal-file-list-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -17051,7 +16972,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/without-exclusions-with-literal-file-list-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -17065,7 +16986,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/without-exclusions-with-literal-include-list-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -17079,7 +17000,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/without-exclusions-with-literal-include-list-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -17093,7 +17014,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/without-wildcards-json-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
@@ -17107,7 +17028,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/matchfiles/without-wildcards-jsonsourcefile-api",
-      "last_result": "not_implemented",
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem/matchfiles_probe_test.go: the carried config/matchFiles envelope, filled from tsc/internal/tsoptions/tsconfigparsing_test.go::printFS and the pinned parse",
       "native_operations": [
         "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent"
@@ -17119,10 +17040,7 @@
       "family": "filesystem",
       "host_applicability": "posix, non-root: both active native targets run these paths, but the results recorded here are darwin/arm64's and do not certify linux",
       "id": "filesystem/osvfs/append-file-concatenates",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/osvfs/os.go:osFS.AppendFile"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "append path=a.txt": [
@@ -17164,10 +17082,7 @@
       "family": "filesystem",
       "host_applicability": "host-specific: timestamp resolution is a filesystem property, not a language one. This darwin/APFS host keeps the full nanosecond remainder; an ext4 host with a small inode, or a FAT volume, keeps less, and the precision row is what says so rather than the case failing.",
       "id": "filesystem/osvfs/chtimes-two-arguments",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/osvfs/os.go:osFS.Chtimes"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "chtimes": [
@@ -17189,10 +17104,7 @@
       "family": "filesystem",
       "host_applicability": "posix, non-root: both active native targets run these paths, but the results recorded here are darwin/arm64's and do not certify linux",
       "id": "filesystem/osvfs/ensure-directory-exists-direct",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/osvfs/os.go:osFS.ensureDirectoryExists"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "ensure_directory": [
@@ -17211,10 +17123,7 @@
       "family": "filesystem",
       "host_applicability": "posix, non-root: both active native targets run these paths, but the results recorded here are darwin/arm64's and do not certify linux",
       "id": "filesystem/osvfs/file-and-directory-exists",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/osvfs/os.go:osFS.FileExists"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "exists": [
@@ -17243,10 +17152,7 @@
       "family": "filesystem",
       "host_applicability": "posix, non-root: both active native targets run these paths, but the results recorded here are darwin/arm64's and do not certify linux",
       "id": "filesystem/osvfs/fs-live-shared-handle",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/osvfs/os.go:FS"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "acquire": [
@@ -17278,10 +17184,7 @@
       "family": "filesystem",
       "host_applicability": "posix, non-root: both active native targets run these paths, but the results recorded here are darwin/arm64's and do not certify linux",
       "id": "filesystem/osvfs/get-accessible-entries",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/osvfs/os.go:osFS.GetAccessibleEntries"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "entries": [
@@ -17300,10 +17203,7 @@
       "family": "filesystem",
       "host_applicability": "host-specific: the leading component is the host's user cache directory -- $HOME/Library/Caches on this darwin host, $XDG_CACHE_HOME or $HOME/.cache on linux -- so only the decomposition is recorded and never the path. The middle component also differs by platform (os.go:237-241), which is why the `host` row travels beside it, recording the is_windows predicate rather than runtime.GOOS.",
       "id": "filesystem/osvfs/global-typings-cache-location",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/osvfs/os.go:GetGlobalTypingsCacheLocation"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "location_repeat_identical": [
@@ -17325,10 +17225,7 @@
       "family": "filesystem",
       "host_applicability": "posix: symlink_other.go is //go:build !windows, so these rows certify the posix arm only. The windows arm (GetFileAttributesEx and FILE_ATTRIBUTE_REPARSE_POINT, which also answers true for a junction) is a different operation id and is not reached here.",
       "id": "filesystem/osvfs/is-symlink-or-reparse-point",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/nativepath/symlink_other.go:IsSymlinkOrReparsePoint"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "predicate": [
@@ -17350,10 +17247,7 @@
       "family": "filesystem",
       "host_applicability": "host-specific: darwin (and any !windows && !linux). On linux this row set is recorded as native_unavailable, because the pinned file is not compiled there.",
       "id": "filesystem/osvfs/nativepath-realpath-eval-symlinks",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/nativepath/realpath_other.go:Realpath"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "realpath": [
@@ -17406,14 +17300,11 @@
       ]
     },
     {
-      "expected_contract": "Pins the two osutil accessors as CLASSES, never as values: the Go probe and the Rust driver are different processes with different argv and different executables, so a literal comparison would be meaningless even after both sides exist. Args is recorded as (at least one argument, argv[0] nonempty, identical to os.Args) -- the last of which is the whole of os_other.go:args, a verbatim pass-through, and the row that catches a port that stripped a launcher argument on a non-android build. `argv[0] equals Executable` was recorded here and has been WITHDRAWN: it is a property of how the process was launched, not of Args or Executable -- true under `go test`, false for a port reached through PATH, a shell wrapper or `cargo run` -- and because os_other.go:7-9 is a verbatim `return os.Args`, no wrong implementation of the operation under test could have made it false. Dropping it also removes the Executable pair from this action, which no longer calls osutil.Executable at all. Executable is recorded as (no error, absolute, exists on disk, basename nonempty, equals its own resolved path) and again after a chdir. Both exported accessors delegate straight to the build-tagged unexported pair on this host, so every action that reaches Args reaches args and every action that reaches Executable reaches executable; os_android.go is a different pair and is not reached. args_class now reaches only the Args pair. executable_class also calls nativepath.Realpath to ask whether the answer is already symlink-resolved, which is why realpath_other.go:Realpath is listed for that action alone -- on a linux host that same row would enter realpath_linux.go instead.",
+      "expected_contract": "The Go and Rust probes are separate processes, so record classes rather than literal executable paths or argv. Args reports (has an argument, argv[0] nonempty, raw native argv forwarded unchanged). Executable reports (no error, absolute, exists, basename nonempty, resolves successfully to the same OS file, raw native executable path forwarded unchanged), before and after chdir. The final resolution observation is [resolution_succeeded, same_file_identity, raw_path_forwarded]. The earlier equality of raw versus resolved path spelling was removed on 2026-09-22: on Darwin the Go temporary launch path may use /var while the workspace Rust binary uses /private/var, even though both forward the same _NSGetExecutablePath primitive faithfully. The native probe uses os.SameFile and the Rust probe uses dev/ino, so this no longer grades test-process placement. Both exported osutil functions reach their non-Android unexported delegates. Only executable_class invokes nativepath.Realpath.",
       "family": "filesystem",
-      "host_applicability": "posix, and the executable-resolution row is host-divergent: darwin's os.Executable is NOT symlink-resolved -- verified on this host, where it answers a /var/... path whose resolved spelling is /private/var/... -- while linux reads /proc/self/exe, which IS fully resolved. The recorded equals_own_realpath is therefore false here and would be true on linux, so only the classes are recorded and neither host's row certifies the other.",
+      "host_applicability": "POSIX. The class comparison permits platform-specific executable path spelling; the same-file check must succeed on the active native build. This Darwin capture does not certify Linux procfs resolution or Android executable/argv behavior.",
       "id": "filesystem/osvfs/osutil-process-identity",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/osutil/osutil.go:Executable"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "args_class": [
@@ -17447,10 +17338,7 @@
       "family": "filesystem",
       "host_applicability": "posix, non-root: both active native targets run these paths, but the results recorded here are darwin/arm64's and do not certify linux",
       "id": "filesystem/osvfs/read-file-decoding",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/osvfs/os.go:osFS.ReadFile"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "read": [
@@ -17469,10 +17357,7 @@
       "family": "filesystem",
       "host_applicability": "host-specific: the resolved spelling is the host's. This darwin host resolves the temporary root through /var -> /private/var, which is why every row is recorded relative to <root> or <realroot> rather than as a path; the case-swap row is valid only on a case-insensitive volume and records that volume's answer",
       "id": "filesystem/osvfs/realpath-symlink-resolution",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/osvfs/os.go:osFS.Realpath"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "realpath": [
@@ -17507,10 +17392,7 @@
       "family": "filesystem",
       "host_applicability": "host-specific for the three on-disk rows; the five root-form rows are host-independent on any posix host, and windows would differ because filepath.FromSlash is not the identity there",
       "id": "filesystem/osvfs/realpath-total-on-failure",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/osvfs/os.go:osFSRealpath"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "realpath": [
@@ -17541,10 +17423,7 @@
       "family": "filesystem",
       "host_applicability": "posix, non-root: both active native targets run these paths, but the results recorded here are darwin/arm64's and do not certify linux",
       "id": "filesystem/osvfs/remove-recursive-and-symlinks",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/osvfs/os.go:osFS.Remove"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "exists": [
@@ -17569,10 +17448,7 @@
       "family": "filesystem",
       "host_applicability": "posix, non-root: both active native targets run these paths, but the results recorded here are darwin/arm64's and do not certify linux. The permission components are also umask-derived, which is why the first action records the mask.",
       "id": "filesystem/osvfs/stat-shape",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/osvfs/os.go:osFS.Stat"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "stat": [
@@ -17594,10 +17470,7 @@
       "family": "filesystem",
       "host_applicability": "any: a pure total function over a string, with no I/O",
       "id": "filesystem/osvfs/swap-case-unicode",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/osvfs/os.go:swapCase"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "swap_case": [
@@ -17616,10 +17489,7 @@
       "family": "filesystem",
       "host_applicability": "host-specific: the boolean IS the host volume's answer. darwin/arm64 on a default case-insensitive APFS volume records false; a linux capture records true. Neither certifies the other, and a case-sensitive macOS volume would record true here.",
       "id": "filesystem/osvfs/use-case-sensitive-file-names",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/osvfs/os.go:osFS.UseCaseSensitiveFileNames"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "cross_check_on_disk": [
@@ -17647,10 +17517,7 @@
       "family": "filesystem",
       "host_applicability": "posix, non-root: the binding and release contract is itself host-independent, but three of the five observing actions replay a real walk over the `tree` fixture, which contains a 0o000 directory and symlinks. Run as root that directory is readable, so io/fs never delivers the second (error) callback for it and its child is visited instead, changing the recorded row lists. The tree rows are recorded relative to <root>.",
       "id": "filesystem/osvfs/walkdir-callback-binding",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/osvfs/os.go:getLimitedWalkDirFunc"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "acquire_wrapper": [
@@ -17693,10 +17560,7 @@
       "family": "filesystem",
       "host_applicability": "posix, non-root: both active native targets run these paths, but the results recorded here are darwin/arm64's and do not certify linux",
       "id": "filesystem/osvfs/walkdir-order-and-skip",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/osvfs/os.go:osFS.WalkDir"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "walk decision=error_on:b": [
@@ -17765,10 +17629,7 @@
       "family": "filesystem",
       "host_applicability": "posix, non-root: both active native targets run these paths, but the results recorded here are darwin/arm64's and do not certify linux",
       "id": "filesystem/osvfs/write-file-ensuring-dir-layering",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/osvfs/os.go:osFS.writeFileEnsuringDir"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "write_ensuring_dir path=adir": [
@@ -17805,10 +17666,7 @@
       "family": "filesystem",
       "host_applicability": "posix, non-root: both active native targets run these paths, but the results recorded here are darwin/arm64's and do not certify linux",
       "id": "filesystem/osvfs/write-file-truncate-and-create",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/osvfs/os.go:osFS.WriteFile"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "write path=a.txt": [
@@ -17861,10 +17719,7 @@
       "family": "filesystem",
       "host_applicability": "posix, non-root: both active native targets run these paths, but the results recorded here are darwin/arm64's and do not certify linux",
       "id": "filesystem/osvfs/write-file-with-flag-direct",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/osvfs/os.go:osFS.writeFileWithFlag"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "write_with_flag": [
@@ -22893,10 +22748,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/vfsmock/append-file-records-before-delegating",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/vfsmock/mock_generated.go:FSMock.AppendFile"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "append_file": [
@@ -22930,10 +22782,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/vfsmock/case-sensitivity-query-is-counted-not-cached",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/vfsmock/mock_generated.go:FSMock.UseCaseSensitiveFileNames"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "read_use_case_sensitive_file_names_calls": [
@@ -22957,10 +22806,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/vfsmock/chtimes-keeps-the-access-time-the-write-discards",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/vfsmock/mock_generated.go:FSMock.Chtimes"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "chtimes": [
@@ -22985,10 +22831,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/vfsmock/entries-listing-is-not-memoised",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/vfsmock/mock_generated.go:FSMock.GetAccessibleEntries"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "get_accessible_entries": [
@@ -23012,10 +22855,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/vfsmock/predicate-dispatch-is-independent-of-stat",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/vfsmock/mock_generated.go:FSMock.FileExists"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "directory_exists": [
@@ -23055,10 +22895,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/vfsmock/read-and-realpath-log-every-request",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/vfsmock/mock_generated.go:FSMock.ReadFile"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "read_file": [
@@ -23090,10 +22927,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/vfsmock/remove-is-one-call-per-request",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/vfsmock/mock_generated.go:FSMock.Remove"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "inner_entry_names": [],
@@ -23118,10 +22952,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/vfsmock/walk-dir-records-the-supplied-callback",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/vfsmock/mock_generated.go:FSMock.WalkDir"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "read_walk_dir_calls": [
@@ -23146,10 +22977,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/vfsmock/wrap-wires-every-interface-method",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/vfsmock/wrapper.go:Wrap"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "interface_methods": [],
@@ -23175,10 +23003,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/vfsmock/write-file-logs-once-through-the-mkdirall-retry",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/vfsmock/mock_generated.go:FSMock.WriteFile"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "inner_entry_names": [],
@@ -24068,7 +23893,7 @@
       ]
     },
     {
-      "expected_contract": "The comparator record for mutation leaking into an old snapshot, and a plain statement of what the port can and cannot answer about it. Chtimes assigns THROUGH the stored pointer, so the pin's published view changes under its holder and reports itself changed; the port refuses the call, change_times being the deliberate capability error Unsupported(\"immutable filesystem timestamps\"), and reports itself unchanged. This case is expected to be DIFFERENT, at exactly those two rows. What it pins is that capability gap, and the separator asymmetry: Chtimes strips no leading separator, so the action carries the key spelling `a.ts` and both sides forward it verbatim. What it does NOT pin is snapshot isolation. A MemorySnapshot records no modification time -- FileInfo is { directory, size } -- so there is nothing for a timestamp mutation to change, and no change to tsr_vfs could make the view_unchanged row report a leak. An earlier wording claimed a flip to `match` here would be the alarm for a Rust mutation reaching a published snapshot; that claim is withdrawn, because this case cannot produce it. The sibling case is where snapshot isolation is measured: there the published view is the live filesystem object and a leaked write would be read back at read_view.",
+      "expected_contract": "The pinned MapFS.Chtimes mutates the stored entry through its pointer, so an earlier GetFileInfo result observes the new modification time. Rust updates the live entry but preserves the previously obtained owned value. The current capture differs only at view_unchanged: Go false, Rust true; Chtimes succeeds on both sides and the byte reads agree. The owner approved this bounded ownership divergence on 2026-09-22, consistent with owned compiler-option clones; see docs/PHASE1-aliasing-audit.md. Keep the native observation and raw different result. This is not a blanket exception for filesystem clones or other aliasing, and it does not excuse failed live timestamp updates, changed bytes, paths, errors, or other observations.",
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/vfstest/snapshot-mutation-leak-control",
@@ -24577,10 +24402,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/wrapvfs/tracking-append-file-is-not-read-then-write",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.AppendFile"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "append_file": [
@@ -24600,10 +24422,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/wrapvfs/tracking-chtimes-forwards-both-instants-untracked",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.Chtimes"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "chtimes": [
@@ -24623,10 +24442,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/wrapvfs/tracking-entries-records-only-the-directory",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.GetAccessibleEntries"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "entries": [
@@ -24642,10 +24458,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/wrapvfs/tracking-existence-predicates-are-two-inner-calls",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.FileExists"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "directory_exists": [
@@ -24665,10 +24478,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/wrapvfs/tracking-read-file-records-every-path",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.ReadFile"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "read_file": [
@@ -24684,10 +24494,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/wrapvfs/tracking-realpath-records-the-argument-not-the-resolution",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.Realpath"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "realpath": [
@@ -24703,10 +24510,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/wrapvfs/tracking-remove-is-untracked",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.Remove"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "file_exists": [
@@ -24726,10 +24530,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/wrapvfs/tracking-stat-records-including-the-nil-answer",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.Stat"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "stat": [
@@ -24745,10 +24546,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/wrapvfs/tracking-use-case-sensitive-file-names-is-untracked",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.UseCaseSensitiveFileNames"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "read_file": [
@@ -24768,10 +24566,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/wrapvfs/tracking-walkdir-records-every-arrival",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.WalkDir"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "walk_dir": [
@@ -24787,10 +24582,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/wrapvfs/tracking-walkdir-skipdir-still-records-the-skipped-directory",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.WalkDir"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "walk_dir": [
@@ -24806,10 +24598,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/wrapvfs/tracking-walkdir-stop-sentinels-still-record",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.WalkDir"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "walk_dir": [
@@ -24825,10 +24614,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/wrapvfs/tracking-write-class-capability-failure-is-forwarded",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.WriteFile"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "append_file": [
@@ -24860,10 +24646,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/wrapvfs/tracking-write-file-is-untracked",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.WriteFile"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "read_file": [
@@ -24883,10 +24666,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/wrapvfs/wrap-append-is-not-read-then-write",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.AppendFile"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "append_file": [
@@ -24910,10 +24690,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/wrapvfs/wrap-chtimes-carries-both-instants",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.Chtimes"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "chtimes": [
@@ -24937,10 +24714,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/wrapvfs/wrap-empty-table-forwards-every-method",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/wrapvfs/wrapvfs.go:Wrap"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "append_file": [
@@ -25004,10 +24778,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/wrapvfs/wrap-entries-are-forwarded-verbatim",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.GetAccessibleEntries"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "entries": [
@@ -25027,10 +24798,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/wrapvfs/wrap-existence-predicates-are-separate-entries",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.FileExists"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "directory_exists": [
@@ -25054,10 +24822,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/wrapvfs/wrap-read-file-pair-is-independent",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.ReadFile"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "read_file": [
@@ -25077,10 +24842,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/wrapvfs/wrap-remove-replacement-suppresses-the-inner",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.Remove"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "file_exists": [
@@ -25104,10 +24866,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/wrapvfs/wrap-replacement-answers-and-the-inner-is-never-consulted",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.Realpath"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "read_file": [
@@ -25135,10 +24894,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/wrapvfs/wrap-stat-forwards-the-interface-value",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.Stat"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "stat": [
@@ -25158,10 +24914,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/wrapvfs/wrap-takes-the-replacement-table-by-value",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/wrapvfs/wrapvfs.go:Wrap"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "realpath": [
@@ -25181,10 +24934,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/wrapvfs/wrap-unreplaced-write-class-forwards-the-capability-failure",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.WriteFile"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "append_file": [
@@ -25220,10 +24970,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/wrapvfs/wrap-use-case-sensitive-file-names-replacement-is-zero-argument",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.UseCaseSensitiveFileNames"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "use_case_sensitive_file_names": [
@@ -25243,10 +24990,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/wrapvfs/wrap-walkdir-passes-the-callback-through-unchanged",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.WalkDir"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "walk_dir": [
@@ -25266,10 +25010,7 @@
       "family": "filesystem",
       "host_applicability": "any",
       "id": "filesystem/wrapvfs/wrap-write-file-replacement-is-not-a-hook",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.WriteFile"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "file_exists": [

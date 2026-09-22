@@ -3,10 +3,10 @@ use serde_json::{json, Value};
 use std::sync::Arc;
 use tsr_vfs::{Error, FileSystem, WalkControl as C};
 const SENTINEL: Error = Error::Unsupported("phase1 walk sentinel");
-fn error(value: Option<Error>) -> &'static str {
+fn error(value: Option<&Error>) -> &'static str {
     match value {
         None => "nil",
-        Some(SENTINEL) => "phase1 walk sentinel",
+        Some(Error::Unsupported("phase1 walk sentinel")) => "phase1 walk sentinel",
         Some(Error::Io(std::io::ErrorKind::NotFound)) => "not-exist",
         _ => "other",
     }
@@ -27,7 +27,7 @@ pub(super) fn walk(request: &Value) -> Outcome {
         let result = fs.walk_dir(root.as_bytes(), &mut |path, entry, err| {
             if let Some(err) = err {
                 if callback == "nil" {
-                    callback = error(Some(err));
+                    callback = error(Some(&err));
                 }
                 return Err(err);
             }
@@ -49,7 +49,7 @@ pub(super) fn walk(request: &Value) -> Outcome {
             }
             Ok(C::Continue)
         });
-        rows.push(json!({"op":op,"root":root,"stop":stop,"error":error(result.err()),"callback_error":callback,"count":count,"first":first}));
+        rows.push(json!({"op":op,"root":root,"stop":stop,"error":error(result.as_ref().err()),"callback_error":callback,"count":count,"first":first}));
     }
     Outcome::Observed(api::ordered(rows))
 }
@@ -81,10 +81,11 @@ pub(super) fn wrapper() -> Outcome {
                 path,
                 fs.directory_exists(bytes)?,
                 fs.file_exists(bytes)?,
-                entries.files.len(),
+                entries.files.as_ref().map_or(0, Vec::len),
                 entries
                     .directories
                     .iter()
+                    .flatten()
                     .map(|v| utf8(v.as_bytes()))
                     .collect::<Vec<_>>(),
                 entry
@@ -130,7 +131,7 @@ pub(super) fn wrapper() -> Outcome {
                 "walk",
                 label,
                 root,
-                error(result.err()),
+                error(result.as_ref().err()),
                 count,
                 first
             ]));
@@ -156,7 +157,7 @@ pub(super) fn wrapper() -> Outcome {
                 _ => fs.write_file(b"bundled:///", b"x"),
             }));
             rows.push(match result {
-                Ok(value) => json!(["mutate", method, "returned", error(value.err())]),
+                Ok(value) => json!(["mutate", method, "returned", error(value.as_ref().err())]),
                 Err(value) => json!([
                     "mutate",
                     method,

@@ -421,7 +421,7 @@ struct Host {
 
 fn module_error(error: &tsr_module::Error) -> tsr_vfs::Error {
     match error {
-        tsr_module::Error::Host(error) => *error,
+        tsr_module::Error::Host(error) => error.clone(),
         tsr_module::Error::MutableHost => {
             tsr_vfs::Error::Unsupported("config resolver requires an immutable host")
         }

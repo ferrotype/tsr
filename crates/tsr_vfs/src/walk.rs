@@ -44,7 +44,7 @@ pub(crate) fn walk<F: FileSystem + ?Sized>(
         let info = fs
             .stat(&path)
             .and_then(|entry| entry.ok_or(Error::Io(std::io::ErrorKind::NotFound)));
-        let failure = info.as_ref().err().copied();
+        let failure = info.as_ref().err().cloned();
         let entry = info.ok().map(|info| WalkEntry {
             name: JsString::from_bytes(path.rsplit(|&byte| byte == b'/').next().unwrap_or(&path)),
             info,
@@ -74,8 +74,8 @@ pub(crate) fn walk<F: FileSystem + ?Sized>(
                 continue;
             }
         };
-        let mut names = children.files;
-        names.extend(children.directories);
+        let mut names = children.files.unwrap_or_default();
+        names.extend(children.directories.unwrap_or_default());
         names.sort();
         let rows: Vec<_> = names
             .into_iter()
@@ -95,3 +95,10 @@ pub(crate) fn walk<F: FileSystem + ?Sized>(
         stack.push(rows.into_iter());
     }
 }
+
+/// An explicitly retained callback. Unlike a borrowed visitor, this may be
+/// kept by a recorder after traversal; captures must own their dependencies.
+#[cfg(feature = "harness")]
+pub type OwnedWalkCallback = std::sync::Arc<
+    dyn Fn(&[u8], Option<&WalkEntry>, Option<Error>) -> Result<WalkControl, Error> + Send + Sync,
+>;

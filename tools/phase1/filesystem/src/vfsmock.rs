@@ -1,177 +1,346 @@
-//! The `vfs/vfsmock` recording-wrapper group.
-//!
-//! The pinned subject is `FSMock`, the moq-generated recorder that `Wrap`
-//! fills from a real `vfs.FS` (upstream/tsc/internal/vfs/vfsmock/wrapper.go).
-//! What it contributes is a call log: each method appends the caller's
-//! arguments to a private slice and then forwards, and each `XxxCalls` reader
-//! hands that slice back. Every case in this group is about that log --
-//! which calls reached the wrapper, in what order, with which arguments, and
-//! whether an entry survives a call that failed.
-//!
-//! The port has no counterpart, and the gap is wider than a missing type.
-//! `crates/tsr_vfs/src/lib.rs:70-95` declares `FileSystem` with twelve
-//! members, and two types implement it: `MemorySnapshot` (:215), which wraps
-//! nothing, and `tsr_bundled::BundledFs` (crates/tsr_bundled/src/lib.rs:447),
-//! which *is* a delegating decorator -- it holds an `Arc<dyn FileSystem>` and
-//! forwards every member it does not intercept (:457, :460, :468, :487, :493,
-//! :515, :519). So the gap is not "no wrapper"; it is no *recording* wrapper.
-//! Nothing keeps a call log, and the decorator that does exist shows two of
-//! the three structural differences that would survive even once one did:
-//!
-//! * `file_exists` and `directory_exists` are trait *defaults* built on
-//!   `stat` (:77-82), where the pin dispatches each of the three
-//!   independently. A recorder over today's trait would log stat calls where
-//!   the pin logs predicate calls. `BundledFs` is the live illustration: it
-//!   overrides `directory_exists` (crates/tsr_bundled/src/lib.rs:489) but not
-//!   `file_exists`, so a call to the latter arrives at the decorator's `stat`
-//!   and the predicate itself is never a dispatch site at all.
-//! * `change_times` takes no timestamps at all (:92) -- `fn change_times(&self,
-//!   _path: &[u8])`. The pin's log keeps both the access and the modification
-//!   time, including for a call that failed, so a port has nowhere to put the
-//!   arguments the log is supposed to carry.
-//! * there is no walk member of any kind, so `WalkDir` and the callback its
-//!   log records have no Rust surface to be recorded on -- `BundledFs`, the
-//!   one decorator in the tree, has no walk member to forward either.
-//!
-//! Preparation records the gap; it never emulates the recorder to make a
-//! comparison run, and it never reads an expected result.
-
-use crate::api::Outcome;
-use serde_json::Value;
-
-/// One record per case, because each case reaches a different part of the
-/// missing surface and the gap it needs named is different. Each row names the
-/// pinned Go authority, the signature the port is expected to carry and the
-/// file that does not have it yet.
-const MISSING: &[(&str, &str, &str, &str, &str)] = &[
-    ("filesystem/vfsmock/wrap-wires-every-interface-method",
-     "tsc/internal/vfs/vfsmock/wrapper.go:Wrap",
-     "tsc/internal/vfs/vfsmock/wrapper.go:Wrap, whose completeness the pinned \
-      vfsmock/wrapper_test.go:TestWrap asserts field by field",
-     "pub fn wrap(inner: Arc<dyn FileSystem>) -> RecordingFs, wiring one recorded delegate per \
-      member of tsr_vfs::FileSystem and holding the delegate live (a later change to the wrapped \
-      filesystem is visible through the wrapper) while the wrapper's own binding is fixed",
-     "crates/tsr_vfs/src/recording.rs (absent). MemorySnapshot at crates/tsr_vfs/src/lib.rs:215 \
-      and tsr_bundled::BundledFs at crates/tsr_bundled/src/lib.rs:455 are the only implementors \
-      of tsr_vfs::FileSystem. BundledFs is already a delegating decorator -- it holds an \
-      Arc<dyn FileSystem> (crates/tsr_bundled/src/lib.rs:447-453) and forwards every member it \
-      does not intercept -- so what is missing is not a wrapper but a recording one: nothing in \
-      the tree keeps a call log"),
-    ("filesystem/vfsmock/append-file-records-before-delegating",
-     "tsc/internal/vfs/vfsmock/mock_generated.go:FSMock.AppendFile",
-     "tsc/internal/vfs/vfsmock/mock_generated.go:FSMock.AppendFile and :FSMock.AppendFileCalls",
-     "RecordingFs::append_file(&self, path, data) -> Result<(), Error> appending (path, data) to \
-      the log before it delegates, so a delegate that fails or panics still leaves its entry, plus \
-      append_file_calls(&self) -> Vec<(JsString, Vec<u8>)> returning the ordered log",
-     "crates/tsr_vfs/src/recording.rs (absent; the trait's append_file at \
-      crates/tsr_vfs/src/lib.rs:86 is the default Err(Error::Unsupported(\"immutable filesystem \
-      append\")) and nothing overrides it)"),
-    ("filesystem/vfsmock/chtimes-keeps-the-access-time-the-write-discards",
-     "tsc/internal/vfs/vfsmock/mock_generated.go:FSMock.Chtimes",
-     "tsc/internal/vfs/vfsmock/mock_generated.go:FSMock.Chtimes and :FSMock.ChtimesCalls",
-     "RecordingFs::change_times(&self, path, a_time, m_time) -> Result<(), Error> recording both \
-      instants, plus change_times_calls(&self) -> Vec<(JsString, Time, Time)>. This first needs \
-      the two arguments to exist: tsr_vfs::FileSystem::change_times is \
-      fn change_times(&self, _path: &[u8]) (crates/tsr_vfs/src/lib.rs:92) and carries no \
-      timestamps at all, so the log has nothing to record",
-     "crates/tsr_vfs/src/recording.rs (absent) over a change_times that takes the two instants \
-      (crates/tsr_vfs/src/lib.rs:92 takes neither)"),
-    ("filesystem/vfsmock/predicate-dispatch-is-independent-of-stat",
-     "tsc/internal/vfs/vfsmock/mock_generated.go:FSMock.FileExists",
-     "tsc/internal/vfs/vfsmock/mock_generated.go:FSMock.FileExists, :FSMock.FileExistsCalls, \
-      :FSMock.DirectoryExists, :FSMock.DirectoryExistsCalls, :FSMock.Stat and :FSMock.StatCalls",
-     "RecordingFs::file_exists / directory_exists / stat, each an independent recorded dispatch \
-      site with its own log, so three predicate logs read together give three independent counts. \
-      tsr_vfs::FileSystem makes the first two defaults over stat \
-      (crates/tsr_vfs/src/lib.rs:77-82), so a recorder over today's trait logs a stat where the \
-      pin logs a predicate. Stat also needs a FileInfo carrying the members the pin's log exposes: \
-      tsr_vfs::FileInfo is { directory, size } (crates/tsr_vfs/src/lib.rs:65-68) with no name, \
-      mode or modification time",
-     "crates/tsr_vfs/src/recording.rs (absent) over overridable file_exists/directory_exists and \
-      a widened FileInfo (crates/tsr_vfs/src/lib.rs)"),
-    ("filesystem/vfsmock/read-and-realpath-log-every-request",
-     "tsc/internal/vfs/vfsmock/mock_generated.go:FSMock.ReadFile",
-     "tsc/internal/vfs/vfsmock/mock_generated.go:FSMock.ReadFile, :FSMock.ReadFileCalls, \
-      :FSMock.Realpath and :FSMock.RealpathCalls",
-     "RecordingFs::read_file and ::realpath logging every request verbatim -- including a repeat \
-      of a path already asked for, and including the caller's unnormalised argument, since the \
-      pin records what the caller passed and normalises inside the delegate",
-     "crates/tsr_vfs/src/recording.rs (absent). The delegate also differs: \
-      MemorySnapshot::realpath (crates/tsr_vfs/src/lib.rs:283-290) resolves and normalises, where \
-      the pinned iovfs.Realpath returns the caller's own path unchanged when resolution fails \
-      (upstream/tsc/internal/vfs/iovfs/iofs.go:188-196)"),
-    ("filesystem/vfsmock/entries-listing-is-not-memoised",
-     "tsc/internal/vfs/vfsmock/mock_generated.go:FSMock.GetAccessibleEntries",
-     "tsc/internal/vfs/vfsmock/mock_generated.go:FSMock.GetAccessibleEntries and \
-      :FSMock.GetAccessibleEntriesCalls",
-     "RecordingFs::entries(&self, path) -> Result<Entries, Error> forwarding once per request with \
-      no memoisation, plus entries_calls(&self) -> Vec<JsString>. The Entries the log exposes also \
-      needs the pin's absent-member distinctions: the pinned Entries has nil-able Files, \
-      Directories and Symlinks (upstream/tsc/internal/vfs/vfs.go:51-61) and tsr_vfs::Entries \
-      (crates/tsr_vfs/src/lib.rs:59-64) can express absence on symlinks only",
-     "crates/tsr_vfs/src/recording.rs (absent) over an Entries that can distinguish an absent \
-      member from an empty one on all three fields (crates/tsr_vfs/src/lib.rs:59-64)"),
-    ("filesystem/vfsmock/remove-is-one-call-per-request",
-     "tsc/internal/vfs/vfsmock/mock_generated.go:FSMock.Remove",
-     "tsc/internal/vfs/vfsmock/mock_generated.go:FSMock.Remove and :FSMock.RemoveCalls",
-     "RecordingFs::remove(&self, path) -> Result<(), Error> logging one entry per caller-level \
-      request however many entries the delegate removes underneath, plus \
-      remove_calls(&self) -> Vec<JsString>",
-     "crates/tsr_vfs/src/recording.rs (absent; the trait's remove at \
-      crates/tsr_vfs/src/lib.rs:89 is the default Err(Error::Unsupported(\"immutable filesystem \
-      remove\")) and nothing overrides it)"),
-    ("filesystem/vfsmock/write-file-logs-once-through-the-mkdirall-retry",
-     "tsc/internal/vfs/vfsmock/mock_generated.go:FSMock.WriteFile",
-     "tsc/internal/vfs/vfsmock/mock_generated.go:FSMock.WriteFile and :FSMock.WriteFileCalls",
-     "RecordingFs::write_file(&self, path, data) -> Result<(), Error> logging one entry per \
-      caller-level write even when the delegate performs several inner writes -- the pinned \
-      ioFS.writeFileEnsuringDir writes, and on failure calls mkdirAll and writes again \
-      (upstream/tsc/internal/vfs/iovfs/iofs.go:201-213) -- plus \
-      write_file_calls(&self) -> Vec<(JsString, Vec<u8>)>",
-     "crates/tsr_vfs/src/recording.rs (absent; the trait's write_file at \
-      crates/tsr_vfs/src/lib.rs:83 is the default Err(Error::Unsupported(\"immutable filesystem \
-      write\")) and nothing overrides it)"),
-    ("filesystem/vfsmock/walk-dir-records-the-supplied-callback",
-     "tsc/internal/vfs/vfsmock/mock_generated.go:FSMock.WalkDir",
-     "tsc/internal/vfs/vfsmock/mock_generated.go:FSMock.WalkDir and :FSMock.WalkDirCalls",
-     "RecordingFs::walk_dir(&self, root, &mut dyn FnMut(&[u8], Option<&DirEntry>, \
-      Option<Error>) -> WalkAction) -> Result<(), Error>, logging the root together with a handle \
-      to the callback the caller supplied -- one the reader can still invoke, so a recorded \
-      callback that never reaches the caller's, that is handed rewritten arguments, or whose \
-      answer is swallowed is detectable (a callback forwarded unchanged is not, and is not meant \
-      to be) -- plus walk_dir_calls(&self). This first needs a walk member at all: \
-      tsr_vfs::FileSystem (crates/tsr_vfs/src/lib.rs:70-95) declares none, and neither does any \
-      implementor",
-     "crates/tsr_vfs/src/recording.rs (absent) over a walk member of tsr_vfs::FileSystem \
-      (crates/tsr_vfs/src/lib.rs:70-95, absent), with SkipDir and SkipAll as callback results"),
-    ("filesystem/vfsmock/case-sensitivity-query-is-counted-not-cached",
-     "tsc/internal/vfs/vfsmock/mock_generated.go:FSMock.UseCaseSensitiveFileNames",
-     "tsc/internal/vfs/vfsmock/mock_generated.go:FSMock.UseCaseSensitiveFileNames and \
-      :FSMock.UseCaseSensitiveFileNamesCalls",
-     "RecordingFs::use_case_sensitive_file_names(&self) -> bool recording an entry per call even \
-      though the call has no arguments, plus use_case_sensitive_file_names_calls(&self) -> usize: \
-      for this member the count is the entire payload, so a wrapper that answered from a cached \
-      value is visible only as a missing entry",
-     "crates/tsr_vfs/src/recording.rs (absent; tsr_vfs::FileSystem declares \
-      use_case_sensitive_file_names at crates/tsr_vfs/src/lib.rs:71 and MemorySnapshot answers it \
-      from a field at :216-218, with no wrapper to count the asking)"),
-];
-
+//! Replay the recording-wrapper trace against production delegates and logs.
+use crate::{
+    api::{ordered, Outcome},
+    fs_trace as t, wrapvfs,
+};
+use serde_json::{json, Value};
+use std::sync::{Arc, Mutex};
+use tsr_vfs::{
+    iofs::{Sys, Time},
+    recording::{Operation, RecordingFs},
+    Error, FileSystem, WalkControl,
+};
+const SENTINEL: &[u8] = b"\0phase1-walk-sentinel";
+fn string(bytes: &[u8]) -> String {
+    String::from_utf8(bytes.to_vec()).expect("UTF-8 fixture")
+}
+fn error(e: Option<Error>) -> &'static str {
+    match t::error(e) {
+        "none" => "ok",
+        "not_exist" => "not_exist",
+        _ => "error",
+    }
+}
+fn backing(a: &Value, key: &str) -> Result<Arc<dyn FileSystem>, String> {
+    t::filesystem(
+        t::array(a, key)?,
+        t::flag(a, "case_sensitive")?,
+        Time::now(),
+    )
+}
+#[derive(Default)]
+struct Walk {
+    trace: Vec<Value>,
+    probed: bool,
+    handed: Vec<Value>,
+}
 pub fn observe(request: &Value) -> Option<Outcome> {
     if crate::api::subject(request) != "vfsmock.FSMock" {
         return None;
     }
-    let case = request.get("case").and_then(Value::as_str).unwrap_or("");
-    let Some((_, identity, authority, signature, home)) =
-        MISSING.iter().find(|(id, ..)| *id == case)
-    else {
-        // The request schedule and this module disagree. That is a harness
-        // failure, not an observation: a generic gap record here would let a
-        // case nobody described still report a tidy result.
-        return Some(Outcome::Failed(format!(
-            "case {case:?} declares subject vfsmock.FSMock but the vfsmock group has no record of \
-             the gap it needs named"
-        )));
-    };
-    Some(Outcome::missing(*identity, authority, signature, home))
+    Some(match replay(request) {
+        Ok(rows) => Outcome::Observed(ordered(rows)),
+        Err(e) => Outcome::Failed(e),
+    })
+}
+fn replay(request: &Value) -> Result<Vec<Value>, String> {
+    let mut inner: Option<Arc<dyn FileSystem>> = None;
+    let mut mock: Option<RecordingFs> = None;
+    let mut walks: Vec<Arc<Mutex<Walk>>> = Vec::new();
+    let mut rows = Vec::new();
+    let actions = t::array(request, "actions")?;
+    if actions.is_empty() {
+        return Err("empty trace".into());
+    }
+    for a in actions {
+        let op = t::text(a, "op")?;
+        let mut row = json!({"op":op});
+        match op {
+            "wrap" | "rebind_source" => {
+                let first = backing(a, "files")?;
+                mock = Some(RecordingFs::new(first.clone()));
+                inner = Some(first);
+                walks.clear();
+                if op == "wrap" {
+                    row["case_sensitive"] = json!(t::flag(a, "case_sensitive")?);
+                    fields(&mut row, mock.as_ref().unwrap());
+                } else {
+                    let _new_source = backing(a, "files_other")?;
+                    let r = mock
+                        .as_ref()
+                        .unwrap()
+                        .read_file_result(t::text(a, "path")?.as_bytes())
+                        .map_err(|e| e.to_string())?;
+                    row["result"] = json!([string(&r.content.raw), r.found]);
+                }
+            }
+            "zero_mock_fields" => fields(&mut row, &RecordingFs::default()),
+            "unconfigured_append_file" | "panicking_append_file" => {
+                let path = t::text(a, "path")?;
+                let data = t::text(a, "data")?;
+                let mut recorder = RecordingFs::default();
+                if op == "panicking_append_file" {
+                    recorder.delegates.append_file = Some(Arc::new(|_, _| {
+                        panic!("phase1: delegate panicked on purpose")
+                    }));
+                }
+                let (_, panic) = wrapvfs::guarded(|| {
+                    json!(error(
+                        recorder.append_file(path.as_bytes(), data.as_bytes()).err()
+                    ))
+                });
+                row["panic"] = json!(if panic.contains("method is nil but FS.") {
+                    String::from("unwired_method")
+                } else if panic == "other:phase1: delegate panicked on purpose" {
+                    String::from("delegate_panicked")
+                } else {
+                    panic
+                });
+                let calls = recorder.calls(Operation::AppendFile);
+                row["log_length"] = json!(calls.len());
+                if op == "panicking_append_file" {
+                    row["log"] = json!(calls
+                        .iter()
+                        .map(|c| json!([
+                            string(c.path.as_ref().unwrap().as_bytes()),
+                            string(c.data.as_ref().unwrap().as_bytes())
+                        ]))
+                        .collect::<Vec<_>>());
+                }
+            }
+            _ => {
+                let fs = mock.as_ref().ok_or("action before wrap")?;
+                let backing = inner.as_ref().ok_or("missing inner")?;
+                match op {
+                    "interface_methods" => {
+                        fields(&mut row, fs);
+                        row["count"] = json!(Operation::ALL.len());
+                    }
+                    "use_case_sensitive_file_names" => {
+                        row["result"] = json!(fs.use_case_sensitive_file_names());
+                    }
+                    "read_use_case_sensitive_file_names_calls" => {
+                        row["length"] = json!(fs.calls(Operation::UseCaseSensitiveFileNames).len());
+                    }
+                    "read_walk_dir_calls" => {
+                        let calls = fs.retained_walks();
+                        if calls.len() != walks.len() {
+                            return Err("retained callback count differs".into());
+                        }
+                        let mut log = Vec::new();
+                        for ((root, callback), record) in calls.iter().zip(&walks) {
+                            let returned = match callback(
+                                SENTINEL,
+                                None,
+                                Some(Error::Io(std::io::ErrorKind::NotFound)),
+                            ) {
+                                Ok(WalkControl::Continue) => "ok",
+                                Ok(WalkControl::SkipDir) => "skip_dir",
+                                Ok(WalkControl::SkipAll) => "skip_all",
+                                Err(_) => "error",
+                            };
+                            let record = record.lock().unwrap();
+                            log.push(json!([
+                                string(root.as_bytes()),
+                                record.probed,
+                                record.handed,
+                                returned
+                            ]));
+                        }
+                        row["length"] = json!(calls.len());
+                        row["log"] = json!(log);
+                    }
+                    "walk_dir" => {
+                        let root = t::text(a, "root")?;
+                        let stop = t::text(a, "stop_kind")?.to_owned();
+                        let at = t::text(a, "stop_at")?.to_owned();
+                        if !matches!(stop.as_str(), "none" | "skip_dir" | "skip_all") {
+                            return Err("invalid stop_kind".into());
+                        }
+                        let record = Arc::new(Mutex::new(Walk::default()));
+                        walks.push(record.clone());
+                        let retained = record.clone();
+                        let result = fs.walk_dir_owned(
+                            root.as_bytes(),
+                            Arc::new(move |path, entry, err| {
+                                let mut record = retained.lock().unwrap();
+                                if path == SENTINEL {
+                                    record.probed = true;
+                                    record.handed = vec![json!(entry.is_none()), json!(error(err))];
+                                    return Ok(WalkControl::SkipAll);
+                                }
+                                record.trace.push(json!([
+                                    string(path),
+                                    entry.is_some(),
+                                    entry.is_some_and(|e| e.info.directory),
+                                    error(err)
+                                ]));
+                                Ok(if path == at.as_bytes() {
+                                    match stop.as_str() {
+                                        "skip_dir" => WalkControl::SkipDir,
+                                        "skip_all" => WalkControl::SkipAll,
+                                        _ => WalkControl::Continue,
+                                    }
+                                } else {
+                                    WalkControl::Continue
+                                })
+                            }),
+                        );
+                        row["root"] = json!(root);
+                        row["returned"] = json!(error(result.err()));
+                        row["trace"] = json!(record.lock().unwrap().trace);
+                    }
+                    "inner_entry_names" => {
+                        let root = t::text(a, "root")?;
+                        let mut names = Vec::new();
+                        let _ = backing.walk_dir(root.as_bytes(), &mut |p, _, _| {
+                            names.push(string(p));
+                            Ok(WalkControl::Continue)
+                        });
+                        names.sort();
+                        row["root"] = json!(root);
+                        row["result"] = json!(names);
+                    }
+                    op if op.starts_with("read_") && op.ends_with("_calls") => {
+                        let method = match op {
+                            "read_append_file_calls" => Operation::AppendFile,
+                            "read_chtimes_calls" => Operation::Chtimes,
+                            "read_directory_exists_calls" => Operation::DirectoryExists,
+                            "read_file_exists_calls" => Operation::FileExists,
+                            "read_get_accessible_entries_calls" => Operation::GetAccessibleEntries,
+                            "read_read_file_calls" => Operation::ReadFile,
+                            "read_realpath_calls" => Operation::Realpath,
+                            "read_remove_calls" => Operation::Remove,
+                            "read_stat_calls" => Operation::Stat,
+                            "read_write_file_calls" => Operation::WriteFile,
+                            _ => return Err(format!("unknown log reader {op}")),
+                        };
+                        let calls = fs.calls(method);
+                        let mut log = Vec::new();
+                        for c in &calls {
+                            let path = string(c.path.as_ref().unwrap().as_bytes());
+                            log.push(if let Some(data) = &c.data {
+                                json!([path, string(data.as_bytes())])
+                            } else if let Some((a, m)) = c.times {
+                                json!([path, a.format_rfc3339_nano(), m.format_rfc3339_nano()])
+                            } else {
+                                json!(path)
+                            });
+                        }
+                        row["length"] = json!(calls.len());
+                        row["log"] = json!(log);
+                    }
+                    _ => {
+                        let path = t::text(a, "path")?;
+                        if path.is_empty() {
+                            return Err("empty path".into());
+                        }
+                        row["path"] = json!(path);
+                        let p = path.as_bytes();
+                        row["result"] = match op {
+                            "file_exists" => json!(fs.file_exists(p).map_err(|e| e.to_string())?),
+                            "directory_exists" => {
+                                json!(fs.directory_exists(p).map_err(|e| e.to_string())?)
+                            }
+                            "read_file" | "inner_read_file" => {
+                                let r = if op == "read_file" {
+                                    fs.read_file_result(p)
+                                } else {
+                                    backing.read_file_result(p)
+                                }
+                                .map_err(|e| e.to_string())?;
+                                json!([string(&r.content.raw), r.found])
+                            }
+                            "mutate_source" => {
+                                let e = backing.write_file(p, t::text(a, "data")?.as_bytes()).err();
+                                let r = fs.read_file_result(p).map_err(|e| e.to_string())?;
+                                row.as_object_mut().unwrap().remove("path");
+                                json!([error(e), string(&r.content.raw), r.found])
+                            }
+                            "stat" => {
+                                fs.stat(p)
+                                    .map_err(|e| e.to_string())?
+                                    .map_or(json!([false]), |i| {
+                                        json!([
+                                            true,
+                                            string(i.name.as_bytes()),
+                                            i.size,
+                                            i.directory,
+                                            i.mod_time.is_zero(),
+                                            i.sys != Sys::Nil,
+                                            i.mode.to_string()
+                                        ])
+                                    })
+                            }
+                            "realpath" => json!(string(
+                                fs.realpath(p).map_err(|e| e.to_string())?.as_bytes()
+                            )),
+                            "get_accessible_entries" => {
+                                let e = fs.entries(p).map_err(|e| e.to_string())?;
+                                let mut absent = Vec::new();
+                                if e.files.is_none() {
+                                    absent.push("files");
+                                }
+                                if e.directories.is_none() {
+                                    absent.push("directories");
+                                }
+                                if e.symlinks.is_none() {
+                                    absent.push("symlinks");
+                                }
+                                json!([
+                                    t::strings(e.files.as_deref().unwrap_or_default()),
+                                    t::strings(e.directories.as_deref().unwrap_or_default()),
+                                    t::strings(
+                                        &e.symlinks
+                                            .unwrap_or_default()
+                                            .into_iter()
+                                            .collect::<Vec<_>>()
+                                    ),
+                                    absent
+                                ])
+                            }
+                            "write_file" => json!(error(
+                                fs.write_file(p, t::text(a, "data")?.as_bytes()).err()
+                            )),
+                            "append_file" => json!(error(
+                                fs.append_file(p, t::text(a, "data")?.as_bytes()).err()
+                            )),
+                            "remove" => json!(error(fs.remove(p).err())),
+                            "chtimes" => json!(error(
+                                fs.change_times(
+                                    p,
+                                    t::instant(a, "atime")?,
+                                    t::instant(a, "mtime")?
+                                )
+                                .err()
+                            )),
+                            "inner_modtime_class" => {
+                                let a_time = t::instant(a, "atime")?;
+                                let m_time = t::instant(a, "mtime")?;
+                                json!(backing.stat(p).map_err(|e| e.to_string())?.map_or(
+                                    "missing",
+                                    |i| if i.mod_time == m_time {
+                                        "equals_mtime"
+                                    } else if i.mod_time == a_time {
+                                        "equals_atime"
+                                    } else {
+                                        "equals_neither"
+                                    }
+                                ))
+                            }
+                            _ => return Err(format!("unknown mock action {op}")),
+                        };
+                    }
+                }
+            }
+        }
+        rows.push(row);
+    }
+    Ok(rows)
+}
+fn fields(row: &mut Value, fs: &RecordingFs) {
+    let wired = fs.delegates.wired_count();
+    row["wired_count"] = json!(wired);
+    row["unwired_count"] = json!(Operation::ALL.len() - wired);
+    row["every_member_wired"] = json!(wired == Operation::ALL.len());
 }

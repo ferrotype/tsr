@@ -14,3 +14,7 @@ license and attribution information.
 
 For application integration, start with
 [`tsr_embed`](https://github.com/ferrotype/tsr/tree/main/crates/tsr_embed).
+
+The default-off `harness` feature exposes the Go test-mock recorder, probe
+counters and retained walk callbacks for differential tests. Production hosts
+use the default borrowed `FileSystem::walk_dir` contract.

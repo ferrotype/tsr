@@ -297,7 +297,7 @@ pub(crate) use value_links::ValueSymbolLinks;
 
 /// Checker-boundary failures. Arena identity, generation and bounds failures pass
 /// through unchanged; the checker adds the failures only it can observe.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Error {
     Host(tsr_vfs::Error),
     Arena(tsr_arena::Error),

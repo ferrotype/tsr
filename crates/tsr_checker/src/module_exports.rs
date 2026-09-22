@@ -73,7 +73,7 @@ impl CheckerState {
     }
     // port: tsc/internal/checker/checker.go:Checker.getExportsOfModule
     pub(crate) fn module_exports(&mut self, symbol: SymbolId) -> Result<SymbolTableId, Error> {
-        if let Some(&result) = self.module_aliases.resolved_exports.get(&symbol) {
+        if let Some(result) = self.module_aliases.resolved_exports.get(&symbol).cloned() {
             return result;
         }
         if !self.module_aliases.resolving_exports.insert(symbol) {
@@ -83,7 +83,9 @@ impl CheckerState {
         }
         let result = self.module_exports_worker(symbol);
         self.module_aliases.resolving_exports.remove(&symbol);
-        self.module_aliases.resolved_exports.insert(symbol, result);
+        self.module_aliases
+            .resolved_exports
+            .insert(symbol, result.clone());
         result
     }
     // port: tsc/internal/checker/checker.go:Checker.getExportsOfModuleWorker

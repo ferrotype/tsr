@@ -1490,7 +1490,13 @@ class FilesystemPreparationTests(unittest.TestCase):
 
     def test_a_gap_without_identity_cannot_prepare_a_step(self):
         case = next(c for c in self.cases["cases"]
-                    if c["family"] == "filesystem" and c.get("missing_operations"))
+                    if c["family"] == "filesystem" and c.get("operations"))
+        # Inject the missing handler: this guard must remain testable when the
+        # production family has no unimplemented operations left.
+        case["last_result"] = "not_implemented"
+        case["missing_operations"] = [case["operations"][0]]
+        report = scope.leaf_preparation(self.scope, self.cases, "filesystem")
+        self.assertEqual(report["gap_problems"], [])
         case.pop("missing_operations")
         report = scope.leaf_preparation(self.scope, self.cases, "filesystem")
         self.assertFalse(report["complete"])
@@ -1912,3 +1918,35 @@ class RosterLedgerTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+class ObservationMetadataTests(unittest.TestCase):
+    def compare(self, native, rust):
+        request = {"case": "metadata-test", "operation": "test"}
+        def row(observation):
+            return dict(request, result="observed", **observation)
+        validated = ({"family": "pilot", "pin": "test", "partial": False,
+                      "requests_sha256": "test"}, [request],
+                     {request["case"]: row(native)}, {request["case"]: row(rust)})
+        with patch.object(capture, "validate_capture", return_value=validated), \
+                patch.object(capture, "load_requests", return_value={"requests": [request]}):
+            return capture.compare(Path("unused"))["rows"][0]["result"]
+
+    def test_metadata_is_separate_from_exact_rendered_observation(self):
+        rendered = "FileNames::\r\n[\"/a.ts\"]\r\n"
+        native = {"observation": {"rendered": rendered},
+                  "metadata": {"reproduced": False, "expected_sha256": "historical-only"}}
+        self.assertEqual(self.compare(native, {"observation": {"rendered": rendered}}), "match")
+        for changed in (rendered.rstrip(), rendered.replace("\r\n", "\n"), ""):
+            self.assertEqual(self.compare(native, {"observation": {"rendered": changed}}), "different")
+        self.assertEqual(self.compare(native, {"observation": {}}), "different")
+
+    def test_all_observation_fields_remain_comparable(self):
+        self.assertEqual(self.compare({"observation": {"rendered": "x", "other": 1}},
+                                      {"observation": {"rendered": "x"}}), "different")
+
+    def test_metadata_requires_an_object(self):
+        request = {"case": "test", "operation": "test"}
+        for metadata in (None, [], "provenance"):
+            document = {"observations": [dict(request, result="observed", observation={}, metadata=metadata)]}
+            with self.subTest(metadata=metadata), self.assertRaisesRegex(ValueError, "metadata must be an object"):
+                capture.validate_response(document, [request], "native")

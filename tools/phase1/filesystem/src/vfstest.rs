@@ -665,6 +665,7 @@ fn sys(value: &Sys) -> Value {
     match value {
         Sys::Nil => json!(["nil", 0]),
         Sys::Int(value) => json!(["int", value]),
+        Sys::Native(_) => json!(["native", 0]),
         Sys::Wrapper { .. } => json!(["wrapper", 0]),
     }
 }

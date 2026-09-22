@@ -145,3 +145,30 @@ or failed leaf cases. The comparator continues to report that difference and
 `--require-parity` continues to reject it; this audit does not redefine exact
 parity. The new capture and validation results are recorded in the progress
 record. Native expectations are not rewritten.
+
+
+## Filesystem held-entry snapshots: approved follow-up
+
+Owner-approved on 2026-09-22, following PR #48. Previously obtained filesystem
+entry values retain their state after later mutation of the live filesystem,
+consistent with the independent compiler-option containers approved above.
+This records the existing Rust behavior; it requires no production code change.
+
+The exact witness is
+`filesystem/vfstest/snapshot-mutation-leak-control`. Pinned
+`MapFS.Chtimes` writes through its stored entry pointer, so a previously held
+`GetFileInfo` result changes. Rust retains an owned entry value. In the current
+capture both timestamp mutations succeed and all byte observations agree;
+only `view_unchanged` differs: Go returns `false`, Rust returns `true`.
+
+Approval is limited to that held-entry ownership difference. Keep the native
+expectation, the raw `different` result and the capture archive. A failure to
+update the live entry, or a difference in bytes, paths, errors or other
+observations, is not approved. This is not a blanket change to all filesystem
+clones or to the slice and multimap contracts reviewed above. The two foreign
+Go dynamic-type differences remain unapproved, and Linux-only observations
+still require a Linux host.
+
+The case manifest's old preparation-time explanation described timestamps as
+unsupported. It is corrected to the implemented behavior and the single
+observed difference; no recorded observation is rewritten.

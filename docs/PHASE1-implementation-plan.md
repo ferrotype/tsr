@@ -37,6 +37,14 @@ config/diagnostic observations. Re-record the corrected bundled `WalkDir` gap
 identity before changing production. This changes sequencing only: it does not
 declare Phase A complete or weaken any coverage, parity or freshness rule.
 
+**Ordering amendment, 2026-09-22:** the owner also authorized F2b and the
+F3b config entry point, wildcard-directory and renderer prerequisites for
+matchFiles. This does not close F3b or replace the F5a coverage review.
+
+**Ordering amendment, 2026-09-22 (after #48 review):** the owner authorized
+merging #48 and proceeding with the remaining F3b implementation. F4a/F5a and
+the pending Linux filesystem observations remain separate obligations.
+
 ### Remaining preparation and coverage review
 
 6. **F4a — Syntax/binder tests:** prepare the missing AST, parser/binder,
@@ -960,7 +968,16 @@ executor or mapper process is implemented to finish this preparation step.
    add command execution or build scheduling.
 2. Close config interpretation, inheritance, raw-value, JSONC diagnostic and
    cache gaps. Wire F1b's formatter or port only the missing native diagnostic
-   writer slice; exact output remains the authority.
+   writer slice; exact output remains the authority. Include **wildcard-directory
+   memoization** from #48 review item 9: Go's `ParsedCommandLine.WildcardDirectories`
+   uses `sync.Once`, while Rust currently recomputes on every call. Before caching,
+   define the immutable input boundary or explicit invalidation for config specs,
+   base path and case sensitivity; these fields are currently publicly mutable.
+   Keep the derived result lazy, avoid rescanning/cloning specs on cache hits,
+   and keep clones consistent with the accepted owned-options policy. Verify
+   unused inputs do no work, repeated and concurrent reads compute once, changed
+   inputs cannot return stale watches, and returned key order/recursive flags
+   still match the pinned wildcard action traces and matchFiles baselines.
 3. Close package JSON and module-resolution gaps in the existing `tsr_module`
    homes. Apply invalidation and mode separation at the real cache owner, not
    only in a test host. Recheck the full action trace, not just its final path.

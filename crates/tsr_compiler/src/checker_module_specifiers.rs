@@ -131,7 +131,7 @@ impl ProgramCheckerHost {
             .get_or_init(|| self.compute_known_symlinks())
         {
             Ok(value) => value,
-            Err(error) => return Err(*error),
+            Err(error) => return Err(error.clone()),
         };
         let mut result = vec![];
         for directory in path::ancestors(&path::directory(&path::absolute(target, cwd))) {

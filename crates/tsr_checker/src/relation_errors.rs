@@ -749,7 +749,7 @@ impl crate::CheckerState {
                 candidates.push((ty, value));
             }
         }
-        let failure = std::cell::Cell::new(None);
+        let failure = std::cell::RefCell::new(None);
         let suggestion = tsr_scanner::get_spelling_suggestion(
             name.as_bytes(),
             candidates.iter(),
@@ -757,15 +757,15 @@ impl crate::CheckerState {
             |a, b| match self.compare_types(a.0, b.0) {
                 Ok(order) => order,
                 Err(error) => {
-                    if failure.get().is_none() {
-                        failure.set(Some(error));
+                    if failure.borrow().is_none() {
+                        *failure.borrow_mut() = Some(error);
                     }
                     std::cmp::Ordering::Equal
                 }
             },
             1000,
         );
-        if let Some(error) = failure.get() {
+        if let Some(error) = failure.into_inner() {
             return Err(error);
         }
         Ok(suggestion.map(|entry| entry.0))

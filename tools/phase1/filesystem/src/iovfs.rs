@@ -495,8 +495,8 @@ fn entries_row(got: &Entries) -> Value {
         .map(|name| text(name.as_bytes()))
         .collect();
     json!([
-        names(&got.files),
-        names(&got.directories),
+        names(got.files.as_deref().unwrap_or_default()),
+        names(got.directories.as_deref().unwrap_or_default()),
         links,
         got.symlinks.is_none()
     ])

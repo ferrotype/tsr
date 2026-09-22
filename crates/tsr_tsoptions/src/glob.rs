@@ -467,7 +467,7 @@ impl Visitor<'_> {
         let entries = self.host.entries(absolute)?;
         let path_prefix = trailing_slash(path.to_vec());
         let abs_prefix = trailing_slash(absolute.to_vec());
-        for file in entries.files {
+        for file in entries.files.into_iter().flatten() {
             if !self.extensions.is_empty()
                 && !self
                     .extensions
@@ -488,7 +488,7 @@ impl Visitor<'_> {
                 return Ok(());
             }
         }
-        for dir in entries.directories {
+        for dir in entries.directories.into_iter().flatten() {
             if self
                 .directories
                 .matches(&abs_prefix, dir.as_bytes(), true)

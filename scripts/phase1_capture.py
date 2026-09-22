@@ -674,6 +674,8 @@ def validate_response(document: object, requests: list[dict], side: str) -> list
                 f"{where} reports operation {operation!r} for case {case!r}, "
                 f"but the request asked for {request.get('operation')!r}"
             )
+        if "metadata" in row and not isinstance(row["metadata"], dict):
+            raise ValueError(f"{where}: metadata must be an object")
         result = row.get("result")
         if result not in statuses:
             raise ValueError(
@@ -1019,6 +1021,9 @@ def compare(directory: Path, require_parity: bool = False) -> dict:
         # Canonicalisation preserves array order, and order-sensitive cases are
         # required to put their ordered payload in an array, so this comparison
         # sees order differences without being confused by named-field order.
+        # All families compare their complete observation. Optional row-level
+        # metadata (e.g. native renderer provenance) is authenticated, not a
+        # compiler result, and never changes this comparison rule.
         same = canonical(native.get("observation")) == canonical(rust.get("observation"))
         rows.append({
             "case": case,

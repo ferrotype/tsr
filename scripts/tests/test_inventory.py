@@ -20,6 +20,21 @@ ledger_init = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(ledger_init)
 
 
+class PackageHomeTests(unittest.TestCase):
+    def test_filesystem_package_homes_follow_the_production_paths(self):
+        ledger = tomllib.loads((REPO / "PORTS.toml").read_text())
+        for package, crate in (("internal/nativepath", "tsr_vfs"),
+                               ("internal/osutil", "tsr_vfs"),
+                               ("internal/symlinks", "tsr_module")):
+            with self.subTest(package=package):
+                self.assertEqual(ledger_init.crate_for(package)[0], crate)
+                for row in ledger["file"]:
+                    if row["package"] == package:
+                        self.assertEqual(row["crate"], crate)
+                        for path in row.get("rust", []):
+                            self.assertTrue(path.startswith(f"crates/{crate}/"), path)
+
+
 class InventoryTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

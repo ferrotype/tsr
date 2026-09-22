@@ -11,7 +11,7 @@ use tsr_ast::{node_flags as nf, Diagnostic, SyntaxKind as K};
 use tsr_core::{TextRange, Tristate};
 use tsr_diagnostics as messages;
 
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 enum ContextStatus {
     Checking,
     Complete,
@@ -361,7 +361,7 @@ impl CheckerState {
             self.check_grammar_generator(function)?;
         }
         self.check_full_signature_arity(function)?;
-        match self.body_checks.contexts.get(&function).copied() {
+        match self.body_checks.contexts.get(&function).cloned() {
             Some(ContextStatus::Failed(error)) => return Err(error),
             Some(ContextStatus::Checking | ContextStatus::Complete) => {}
             None => {
@@ -371,9 +371,9 @@ impl CheckerState {
                 let result = self.check_function_expression_context(function);
                 self.body_checks.contexts.insert(
                     function,
-                    match result {
+                    match &result {
                         Ok(()) => ContextStatus::Complete,
-                        Err(error) => ContextStatus::Failed(error),
+                        Err(error) => ContextStatus::Failed(error.clone()),
                     },
                 );
                 result?;

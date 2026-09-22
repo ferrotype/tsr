@@ -44,7 +44,7 @@ impl CheckerState {
             0,
         )
         .map(|entry| entry.1);
-        if let Some(error) = failure.get() {
+        if let Some(error) = failure.take() {
             return Err(error);
         }
         Ok(result)

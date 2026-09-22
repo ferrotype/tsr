@@ -709,14 +709,20 @@ func phase1ReplayProcessIdentity(t *testing.T, request phase1Request) []any {
 				if err != nil {
 					return []any{"error", phase1Err(err)}
 				}
-				_, statErr := os.Stat(exe)
+				originalInfo, statErr := os.Stat(exe)
 				resolved, resolveErr := nativepath.Realpath(exe)
+				resolvedInfo, resolvedStatErr := os.Stat(resolved)
+				raw, rawErr := os.Executable()
+				// A temporary Go binary may run through /var rather than
+				// /private/var. Path spelling reflects launch layout, not
+				// osutil behavior: witness identity and raw forwarding.
+				sameFile := statErr == nil && resolvedStatErr == nil && os.SameFile(originalInfo, resolvedInfo)
 				return []any{
 					"ok",
 					filepath.IsAbs(exe),
 					statErr == nil,
 					filepath.Base(exe) != "",
-					resolveErr == nil && resolved == exe,
+					[]any{resolveErr == nil, sameFile, rawErr == nil && raw == exe},
 				}
 			})
 			ordered = append(ordered, phase1Row(op, value, panicked))

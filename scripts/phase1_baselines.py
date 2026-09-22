@@ -473,14 +473,17 @@ def output_preparation(cases: dict, step: str) -> dict:
             continue
         row = rows.get(case["id"], {})
         observation = row.get("observation", {})
-        if row.get("result") != "observed" or observation.get("baseline") != name:
+        # Older probes keep provenance beside rendered; newer ones separate
+        # it from the compiler observation in authenticated row metadata.
+        metadata = row.get("metadata", observation)
+        if row.get("result") != "observed" or metadata.get("baseline") != name:
             problems.append(f"{name}: no corresponding native observation")
             continue
         rendered = observation.get("rendered")
-        if not isinstance(rendered, str) or digest(rendered.encode()) != observation.get("rendered_sha256"):
+        if not isinstance(rendered, str) or digest(rendered.encode()) != metadata.get("rendered_sha256"):
             problems.append(f"{name}: rendered bytes disagree with their digest")
             continue
-        if observation.get("expected_sha256") != expected_row["sha256"]:
+        if metadata.get("expected_sha256") != expected_row["sha256"]:
             problems.append(f"{name}: native observation names a different reference digest")
             continue
         if digest(rendered.encode()) == expected_row["sha256"]:

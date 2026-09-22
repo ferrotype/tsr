@@ -211,3 +211,5 @@ mod names;
 mod ranges;
 #[cfg(feature = "go-slice-compat")]
 pub mod slices;
+
+pub mod semaphore;
