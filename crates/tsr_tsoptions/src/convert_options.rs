@@ -27,6 +27,21 @@ fn diagnostic(
         Diagnostic::compiler(message, args)
     }
 }
+/// port: tsc/internal/tsoptions/errors.go:createDiagnosticForInvalidEnumType
+pub fn invalid_enum_type_diagnostic(
+    option: &OptionDeclaration,
+    syntax: OptionSyntax<'_>,
+) -> Diagnostic {
+    diagnostic(
+        syntax,
+        syntax.value,
+        d::Argument_for_0_option_must_be_Colon_1,
+        vec![
+            text(&format!("--{}", option.name)),
+            text(&option.enum_names()),
+        ],
+    )
+}
 fn text(value: &str) -> JsString {
     JsString::from_bytes(value.as_bytes())
 }
@@ -125,15 +140,7 @@ pub fn convert_json_option<'a>(
             }
             return (
                 Cow::Owned(ConfigValue::Null),
-                vec![diagnostic(
-                    syntax,
-                    syntax.value,
-                    d::Argument_for_0_option_must_be_Colon_1,
-                    vec![
-                        text(&format!("--{}", option.name)),
-                        text(&option.enum_names()),
-                    ],
-                )],
+                vec![invalid_enum_type_diagnostic(option, syntax)],
             );
         }
         _ => {}

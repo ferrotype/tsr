@@ -2264,3 +2264,12 @@ action schedule to **67/70** (three diagnostic-helper cases remain). Focused
 regressions cover cache lifetime across replacement/clone, once-only diagnostics,
 shared map records and lazy output-directory discovery. Focused clippy and the
 package asset/publication policy check pass.
+
+### F3b continuation: shared option diagnostic policies
+
+Invalid enum diagnostics, unknown-key message pairs and compiler/build/watch
+worker policies now have shared production definitions. Both config conversion
+and command-line parsing call them; direct probes no longer duplicate message
+selection or report these operations absent. All **70/70 command-line action
+cases** match Go, including custom worker declaration lists, and all nine parser
+regressions pass. Focused clippy passes.

@@ -142,19 +142,13 @@ fn array_string(config: &TsConfigSourceFile, key: &[u8], value: &[u8]) -> Option
     None
 }
 fn unknown(config: &TsConfigSourceFile, node: NodeId, key: &[u8], parent: &str) -> Diagnostic {
-    let (options, unknown, suggested) = if parent == "compilerOptions" {
-        (
-            COMPILER_OPTIONS,
-            d::Unknown_compiler_option_0,
-            d::Unknown_compiler_option_0_Did_you_mean_1,
-        )
+    let options = if parent == "compilerOptions" {
+        COMPILER_OPTIONS
     } else {
-        (
-            TYPE_ACQUISITION_OPTIONS,
-            d::Unknown_type_acquisition_option_0,
-            d::Unknown_type_acquisition_option_0_Did_you_mean_1,
-        )
+        TYPE_ACQUISITION_OPTIONS
     };
+    let (unknown, suggested) =
+        crate::extra_key_diagnostics(parent.as_bytes()).expect("known config option parent");
     let suggestion = find_declaration(options, key, false)
         .map(|option| option.name.as_bytes())
         .or_else(|| {

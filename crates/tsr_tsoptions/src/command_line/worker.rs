@@ -2,7 +2,7 @@ use crate::{
     find_declaration,
     fixture_options::{enum_error, enum_value, trim},
     parse_list_type_option, ConfigValue as V, OptionDeclaration, OptionKind, ParseConfigHost,
-    BUILD_OPTIONS, COMPILER_OPTIONS, WATCH_OPTIONS,
+    WATCH_OPTIONS,
 };
 use std::{borrow::Cow, collections::HashSet};
 use tsr_ast::Diagnostic;
@@ -16,33 +16,25 @@ pub(super) enum Mode {
     Build,
 }
 impl Mode {
-    fn declarations(self) -> &'static [OptionDeclaration] {
+    fn diagnostics(self) -> crate::ParseCommandLineWorkerDiagnostics<'static> {
         match self {
-            Self::Compiler(options) => options,
-            Self::Build => BUILD_OPTIONS,
+            Self::Compiler(options) => crate::parse_command_line_worker_diagnostics(options),
+            Self::Build => crate::build_worker_diagnostics(),
         }
+    }
+    fn declarations(self) -> &'static [OptionDeclaration] {
+        self.diagnostics().declarations
     }
     fn mismatch(self) -> &'static Message {
-        match self {
-            Self::Compiler(_) => d::Compiler_option_0_expects_an_argument,
-            Self::Build => d::Build_option_0_requires_a_value_of_type_1,
-        }
+        self.diagnostics().mismatch
     }
     fn unknown(self, name: &[u8], argument: &[u8]) -> Diagnostic {
-        let (alternate, alternate_message, unknown, suggestion_message) = match self {
-            Self::Compiler(_) => (
-                BUILD_OPTIONS,
-                d::Compiler_option_0_may_only_be_used_with_build,
-                d::Unknown_compiler_option_0,
-                d::Unknown_compiler_option_0_Did_you_mean_1,
-            ),
-            Self::Build => (
-                COMPILER_OPTIONS,
-                d::Compiler_option_0_may_not_be_used_with_build,
-                d::Unknown_build_option_0,
-                d::Unknown_build_option_0_Did_you_mean_1,
-            ),
-        };
+        let policy = self.diagnostics();
+        let alternate = policy.alternate.expect("compiler/build alternate mode");
+        let alternate_message = alternate.diagnostic;
+        let alternate = alternate.declarations;
+        let unknown = policy.unknown;
+        let suggestion_message = policy.did_you_mean;
         if let Some(option) = find_declaration(alternate, name, false) {
             return diagnostic(
                 if option.name == "build" {
@@ -144,7 +136,7 @@ pub(super) fn parse(args: &[JsString], host: &dyn ParseConfigHost, mode: Mode) -
                         &frame.args,
                         frame.next,
                         option,
-                        d::Watch_option_0_requires_a_value_of_type_1,
+                        crate::watch_worker_diagnostics().mismatch,
                     );
                 } else {
                     parsed.errors.push(mode.unknown(name, bytes));

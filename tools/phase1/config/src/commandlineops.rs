@@ -1,6 +1,6 @@
 //! Direct native action traces for command-line parsing and parsed config.
-//! Missing result accessors remain individually identified; argv operations
-//! now call the production parser, including response files and build mode.
+//! Operations call production parsers, result accessors and diagnostic policies,
+//! including response files and build mode.
 
 use crate::api::{action_op, action_str, actions, ordered, subject, Outcome};
 use serde_json::{json, Map, Value};
@@ -14,49 +14,6 @@ use tsr_tsoptions::{
     COMPILER_OPTIONS, ROOT_OPTIONS, WATCH_OPTIONS,
 };
 use tsr_vfs::{FileSystem, MemoryBuilder};
-
-// ---------------------------------------------------------------------------
-// The gaps, one reviewed record each.
-// ---------------------------------------------------------------------------
-
-/// `(operation, go_authority, intended_signature, production_home)`.
-type Gap = (&'static str, &'static str, &'static str, &'static str);
-
-const INVALID_ENUM_TYPE_DIAGNOSTIC: Gap = (
-    "tsc/internal/tsoptions/errors.go:createDiagnosticForInvalidEnumType",
-    "tsc/internal/tsoptions/errors.go:14, which collects the option's enum keys, formats them \
-     through formatEnumTypeKeys (:21) and builds Argument_for_0_option_must_be_Colon_1",
-    "pub fn invalid_enum_type_diagnostic(option: &OptionDeclaration, syntax: OptionSyntax<'_>) -> \
-     Diagnostic",
-    "crates/tsr_tsoptions/src/option_declarations.rs:62 has enum_names, the string this \
-     diagnostic carries, and crates/tsr_tsoptions/src/fixture_options.rs:57 builds the same \
-     message for the fixture bridge; neither is a shared operation the config path can call, \
-     and fixture_options::enum_error is private to that module (absent as a named operation)",
-);
-
-const EXTRA_KEY_DIAGNOSTICS: Gap = (
-    "tsc/internal/tsoptions/errors.go:extraKeyDiagnostics",
-    "tsc/internal/tsoptions/errors.go:103 and its did-you-mean sibling at :118, which map a \
-     parent option name -- compilerOptions, watchOptions, typeAcquisition, buildOptions -- to \
-     the unknown-key message pair, and answer nil for anything else",
-    "pub fn extra_key_diagnostics(parent: &[u8]) -> Option<(&'static Message, &'static Message)>",
-    "crates/tsr_tsoptions/src/config_parse.rs:144-156 inlines the same choice inside `unknown`, \
-     for compilerOptions and typeAcquisition only, with no watchOptions or buildOptions arm and \
-     no nil answer for an unrecognised parent (absent as an operation, and partial where it is \
-     inlined)",
-);
-
-const WORKER_DIAGNOSTICS: Gap = (
-    "tsc/internal/tsoptions/diagnostics.go:getParseCommandLineWorkerDiagnostics",
-    "tsc/internal/tsoptions/diagnostics.go:30, which builds the compiler-mode \
-     ParseCommandLineWorkerDiagnostics -- the alternate mode pointing at BuildNameMap, the \
-     unknown and did-you-mean messages, and the option-type mismatch message -- over a \
-     caller-supplied declaration list",
-    "pub fn parse_command_line_worker_diagnostics(declarations: &'static [OptionDeclaration]) -> \
-     ParseCommandLineWorkerDiagnostics",
-    "no Rust home: crates/tsr_tsoptions has no worker-diagnostics value at all; \
-     fixture_options.rs:276-302 hard-codes the compiler-mode choices inline instead (absent)",
-);
 
 // ---------------------------------------------------------------------------
 // Rendering.
@@ -255,6 +212,40 @@ fn config_parse(request: &Value) -> Result<ParsedCommandLine, String> {
 // ---------------------------------------------------------------------------
 // Actions.
 // ---------------------------------------------------------------------------
+
+// Production declarations have static metadata. This short-lived probe process
+// retains request-owned synthetic names for that lifetime; no production parser
+// or compiler options acquire a leaking dynamic-declaration API.
+fn worker_declaration(value: &Value) -> Result<OptionDeclaration, Outcome> {
+    use tsr_tsoptions::OptionKind;
+    let kind = match action_str(value, "kind") {
+        "string" => OptionKind::String,
+        "boolean" => OptionKind::Boolean,
+        "number" => OptionKind::Number,
+        "object" => OptionKind::Object,
+        "enum" => OptionKind::Enum,
+        other => {
+            return Err(Outcome::Failed(format!(
+                "unsupported synthetic declaration kind {other:?}"
+            )))
+        }
+    };
+    Ok(OptionDeclaration {
+        name: Box::leak(action_str(value, "name").to_owned().into_boxed_str()),
+        short_name: Box::leak(action_str(value, "shortName").to_owned().into_boxed_str()),
+        kind,
+        is_file_path: value["isFilePath"].as_bool().unwrap_or(false),
+        is_tsconfig_only: value["isTSConfigOnly"].as_bool().unwrap_or(false),
+        is_command_line_only: value["isCommandLineOnly"].as_bool().unwrap_or(false),
+        enum_values: &[],
+        deprecated_keys: &[],
+        element: None,
+        extra_validation: "",
+        min_value: 0,
+        allow_config_dir_template: false,
+        preserve_falsy: false,
+    })
+}
 
 /// Answer one action, or report which pinned operation the port is missing.
 #[allow(clippy::too_many_lines)]
@@ -487,9 +478,61 @@ fn run(
                 text(tsr_tsoptions::input_option_name(input.as_bytes())),
             );
         }
-        "invalid_enum_type_diagnostic" => return Err(gap(INVALID_ENUM_TYPE_DIAGNOSTIC)),
-        "extra_key_diagnostics" => return Err(gap(EXTRA_KEY_DIAGNOSTICS)),
-        "worker_diagnostics" => return Err(gap(WORKER_DIAGNOSTICS)),
+        "invalid_enum_type_diagnostic" => {
+            let option = declaration(action).map_err(Outcome::Failed)?;
+            let diagnostic = tsr_tsoptions::invalid_enum_type_diagnostic(
+                option,
+                tsr_tsoptions::OptionSyntax::default(),
+            );
+            row.insert("name".into(), json!(option.name));
+            row.insert(
+                "diagnostic".into(),
+                diagnostic_rows!([diagnostic])[0].clone(),
+            );
+        }
+        "extra_key_diagnostics" => {
+            let parent = action_str(action, "value");
+            let messages = tsr_tsoptions::extra_key_diagnostics(parent.as_bytes());
+            row.insert("parent".into(), json!(parent));
+            row.insert(
+                "unknown_code".into(),
+                messages.map_or(Value::Null, |messages| json!(messages.0.code)),
+            );
+            row.insert(
+                "did_you_mean_code".into(),
+                messages.map_or(Value::Null, |messages| json!(messages.1.code)),
+            );
+        }
+        "worker_diagnostics" => {
+            let declarations = action
+                .get("declarations")
+                .and_then(Value::as_array)
+                .ok_or_else(|| Outcome::Failed("missing declarations".into()))?
+                .iter()
+                .map(worker_declaration)
+                .collect::<Result<Vec<_>, _>>()?;
+            let policy = tsr_tsoptions::parse_command_line_worker_diagnostics(&declarations);
+            row.insert(
+                "option_type_mismatch_code".into(),
+                json!(policy.mismatch.code),
+            );
+            row.insert("unknown_option_code".into(), json!(policy.unknown.code));
+            row.insert(
+                "unknown_did_you_mean_code".into(),
+                json!(policy.did_you_mean.code),
+            );
+            row.insert(
+                "alternate_mode_code".into(),
+                policy
+                    .alternate
+                    .map_or(Value::Null, |alternate| json!(alternate.diagnostic.code)),
+            );
+            row.insert(
+                "alternate_mode_has_name_map".into(),
+                json!(policy.alternate.is_some()),
+            );
+            row.insert("declaration_count".into(), json!(policy.declarations.len()));
+        }
         "canonical_key" => {
             let input = action_str(action, "value");
             row.insert("input".into(), json!(input));
@@ -569,10 +612,6 @@ fn directory_rows(
         .into_iter()
         .map(|(p, r)| json!([text(p.as_bytes()), r]))
         .collect::<Vec<_>>())
-}
-
-fn gap((operation, authority, signature, home): Gap) -> Outcome {
-    Outcome::missing(operation, authority, signature, home)
 }
 
 /// Drive one `ParsedCommandLine` accessor, or report it missing.

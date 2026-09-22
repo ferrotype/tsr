@@ -339,3 +339,10 @@ pub use parsed_accessors::{
 };
 
 pub mod output_paths;
+
+mod option_diagnostics;
+pub use convert_options::invalid_enum_type_diagnostic;
+pub use option_diagnostics::{
+    build_worker_diagnostics, extra_key_diagnostics, parse_command_line_worker_diagnostics,
+    watch_worker_diagnostics, AlternateModeDiagnostics, ParseCommandLineWorkerDiagnostics,
+};
