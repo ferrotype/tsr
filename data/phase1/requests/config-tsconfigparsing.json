@@ -5,6 +5,18 @@
       "api": "json",
       "baseline": "config/tsconfigParsing/Convert correctly format tsconfig.json to typeAcquisition  with json api.js",
       "case": "config/tsconfigparsing/convert-correctly-format-tsconfig-json-to-typeacquisition-json-api",
+      "include_compiler_options": true,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/apath/a.ts": "",
+            "/apath/b.ts": ""
+          },
+          "base_path": "/apath",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n\t\"typeAcquisition\": {\n\t\t\"enable\": true,\n\t\t\"include\": [\"0.d.ts\", \"1.d.ts\"],\n\t\t\"exclude\": [\"0.js\", \"1.js\"],\n\t},\n}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "recovered",
       "subject": "tsconfigParsingBaseline",
@@ -14,6 +26,18 @@
       "api": "jsonSourceFile",
       "baseline": "config/tsconfigParsing/Convert correctly format tsconfig.json to typeAcquisition  with jsonSourceFile api.js",
       "case": "config/tsconfigparsing/convert-correctly-format-tsconfig-json-to-typeacquisition-jsonsourcefile-api",
+      "include_compiler_options": true,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/apath/a.ts": "",
+            "/apath/b.ts": ""
+          },
+          "base_path": "/apath",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n\t\"typeAcquisition\": {\n\t\t\"enable\": true,\n\t\t\"include\": [\"0.d.ts\", \"1.d.ts\"],\n\t\t\"exclude\": [\"0.js\", \"1.js\"],\n\t},\n}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "recovered",
       "subject": "tsconfigParsingBaseline",
@@ -23,6 +47,18 @@
       "api": "json",
       "baseline": "config/tsconfigParsing/Convert default jsconfig.json to typeAcquisition  with json api.js",
       "case": "config/tsconfigparsing/convert-default-jsconfig-json-to-typeacquisition-json-api",
+      "include_compiler_options": true,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/apath/a.ts": "",
+            "/apath/b.ts": ""
+          },
+          "base_path": "/apath",
+          "config_file_name": "jsconfig.json",
+          "json_text": "{}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "recovered",
       "subject": "tsconfigParsingBaseline",
@@ -32,6 +68,18 @@
       "api": "jsonSourceFile",
       "baseline": "config/tsconfigParsing/Convert default jsconfig.json to typeAcquisition  with jsonSourceFile api.js",
       "case": "config/tsconfigparsing/convert-default-jsconfig-json-to-typeacquisition-jsonsourcefile-api",
+      "include_compiler_options": true,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/apath/a.ts": "",
+            "/apath/b.ts": ""
+          },
+          "base_path": "/apath",
+          "config_file_name": "jsconfig.json",
+          "json_text": "{}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "recovered",
       "subject": "tsconfigParsingBaseline",
@@ -41,6 +89,18 @@
       "api": "json",
       "baseline": "config/tsconfigParsing/Convert default tsconfig.json to typeAcquisition  with json api.js",
       "case": "config/tsconfigparsing/convert-default-tsconfig-json-to-typeacquisition-json-api",
+      "include_compiler_options": true,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/apath/a.ts": "",
+            "/apath/b.ts": ""
+          },
+          "base_path": "/apath",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "recovered",
       "subject": "tsconfigParsingBaseline",
@@ -50,6 +110,18 @@
       "api": "jsonSourceFile",
       "baseline": "config/tsconfigParsing/Convert default tsconfig.json to typeAcquisition  with jsonSourceFile api.js",
       "case": "config/tsconfigparsing/convert-default-tsconfig-json-to-typeacquisition-jsonsourcefile-api",
+      "include_compiler_options": true,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/apath/a.ts": "",
+            "/apath/b.ts": ""
+          },
+          "base_path": "/apath",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "recovered",
       "subject": "tsconfigParsingBaseline",
@@ -59,6 +131,18 @@
       "api": "json",
       "baseline": "config/tsconfigParsing/Convert incorrect format jsconfig.json to typeAcquisition  with json api.js",
       "case": "config/tsconfigparsing/convert-incorrect-format-jsconfig-json-to-typeacquisition-json-api",
+      "include_compiler_options": true,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/apath/a.ts": "",
+            "/apath/b.ts": ""
+          },
+          "base_path": "/apath",
+          "config_file_name": "jsconfig.json",
+          "json_text": "{\n\t\"typeAcquisition\": {\n\t\t\"enableAutoDiscovy\": true,\n\t},\n}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "recovered",
       "subject": "tsconfigParsingBaseline",
@@ -68,6 +152,18 @@
       "api": "jsonSourceFile",
       "baseline": "config/tsconfigParsing/Convert incorrect format jsconfig.json to typeAcquisition  with jsonSourceFile api.js",
       "case": "config/tsconfigparsing/convert-incorrect-format-jsconfig-json-to-typeacquisition-jsonsourcefile-api",
+      "include_compiler_options": true,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/apath/a.ts": "",
+            "/apath/b.ts": ""
+          },
+          "base_path": "/apath",
+          "config_file_name": "jsconfig.json",
+          "json_text": "{\n\t\"typeAcquisition\": {\n\t\t\"enableAutoDiscovy\": true,\n\t},\n}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "recovered",
       "subject": "tsconfigParsingBaseline",
@@ -77,6 +173,18 @@
       "api": "json",
       "baseline": "config/tsconfigParsing/Convert incorrect format tsconfig.json to typeAcquisition  with json api.js",
       "case": "config/tsconfigparsing/convert-incorrect-format-tsconfig-json-to-typeacquisition-json-api",
+      "include_compiler_options": true,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/apath/a.ts": "",
+            "/apath/b.ts": ""
+          },
+          "base_path": "/apath",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n\t\"typeAcquisition\": {\n\t\t\"enableAutoDiscovy\": true,\n\t}\n}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "recovered",
       "subject": "tsconfigParsingBaseline",
@@ -86,6 +194,18 @@
       "api": "jsonSourceFile",
       "baseline": "config/tsconfigParsing/Convert incorrect format tsconfig.json to typeAcquisition  with jsonSourceFile api.js",
       "case": "config/tsconfigparsing/convert-incorrect-format-tsconfig-json-to-typeacquisition-jsonsourcefile-api",
+      "include_compiler_options": true,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/apath/a.ts": "",
+            "/apath/b.ts": ""
+          },
+          "base_path": "/apath",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n\t\"typeAcquisition\": {\n\t\t\"enableAutoDiscovy\": true,\n\t}\n}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "recovered",
       "subject": "tsconfigParsingBaseline",
@@ -95,6 +215,18 @@
       "api": "json",
       "baseline": "config/tsconfigParsing/Convert jsconfig.json to typeAcquisition  with json api.js",
       "case": "config/tsconfigparsing/convert-jsconfig-json-to-typeacquisition-json-api",
+      "include_compiler_options": true,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/apath/a.ts": "",
+            "/apath/b.ts": ""
+          },
+          "base_path": "/apath",
+          "config_file_name": "jsconfig.json",
+          "json_text": "{\n\t\"typeAcquisition\": {\n\t\t\"enable\": false,\n\t\t\"include\": [\"0.d.ts\"],\n\t\t\"exclude\": [\"0.js\"],\n\t},\n}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "recovered",
       "subject": "tsconfigParsingBaseline",
@@ -104,6 +236,18 @@
       "api": "jsonSourceFile",
       "baseline": "config/tsconfigParsing/Convert jsconfig.json to typeAcquisition  with jsonSourceFile api.js",
       "case": "config/tsconfigparsing/convert-jsconfig-json-to-typeacquisition-jsonsourcefile-api",
+      "include_compiler_options": true,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/apath/a.ts": "",
+            "/apath/b.ts": ""
+          },
+          "base_path": "/apath",
+          "config_file_name": "jsconfig.json",
+          "json_text": "{\n\t\"typeAcquisition\": {\n\t\t\"enable\": false,\n\t\t\"include\": [\"0.d.ts\"],\n\t\t\"exclude\": [\"0.js\"],\n\t},\n}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "recovered",
       "subject": "tsconfigParsingBaseline",
@@ -113,6 +257,18 @@
       "api": "json",
       "baseline": "config/tsconfigParsing/Convert jsconfig.json with only enable property to typeAcquisition  with json api.js",
       "case": "config/tsconfigparsing/convert-jsconfig-json-with-only-enable-property-to-typeacquisition-json-api",
+      "include_compiler_options": true,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/apath/a.ts": "",
+            "/apath/b.ts": ""
+          },
+          "base_path": "/apath",
+          "config_file_name": "jsconfig.json",
+          "json_text": "{\n\t\"typeAcquisition\": {\n\t\t\"enable\": false,\n\t},\n}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "recovered",
       "subject": "tsconfigParsingBaseline",
@@ -122,6 +278,18 @@
       "api": "jsonSourceFile",
       "baseline": "config/tsconfigParsing/Convert jsconfig.json with only enable property to typeAcquisition  with jsonSourceFile api.js",
       "case": "config/tsconfigparsing/convert-jsconfig-json-with-only-enable-property-to-typeacquisition-jsonsourcefile-api",
+      "include_compiler_options": true,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/apath/a.ts": "",
+            "/apath/b.ts": ""
+          },
+          "base_path": "/apath",
+          "config_file_name": "jsconfig.json",
+          "json_text": "{\n\t\"typeAcquisition\": {\n\t\t\"enable\": false,\n\t},\n}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "recovered",
       "subject": "tsconfigParsingBaseline",
@@ -131,6 +299,18 @@
       "api": "json",
       "baseline": "config/tsconfigParsing/Convert tsconfig.json with only enable property to typeAcquisition  with json api.js",
       "case": "config/tsconfigparsing/convert-tsconfig-json-with-only-enable-property-to-typeacquisition-json-api",
+      "include_compiler_options": true,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/apath/a.ts": "",
+            "/apath/b.ts": ""
+          },
+          "base_path": "/apath",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n\t\"typeAcquisition\": {\n\t\t\"enable\": true,\n\t},\n}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "recovered",
       "subject": "tsconfigParsingBaseline",
@@ -140,6 +320,18 @@
       "api": "jsonSourceFile",
       "baseline": "config/tsconfigParsing/Convert tsconfig.json with only enable property to typeAcquisition  with jsonSourceFile api.js",
       "case": "config/tsconfigparsing/convert-tsconfig-json-with-only-enable-property-to-typeacquisition-jsonsourcefile-api",
+      "include_compiler_options": true,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/apath/a.ts": "",
+            "/apath/b.ts": ""
+          },
+          "base_path": "/apath",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n\t\"typeAcquisition\": {\n\t\t\"enable\": true,\n\t},\n}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "recovered",
       "subject": "tsconfigParsingBaseline",
@@ -149,6 +341,20 @@
       "api": "json",
       "baseline": "config/tsconfigParsing/allow dotted files and folders when explicitly requested with json api.js",
       "case": "config/tsconfigparsing/allow-dotted-files-and-folders-when-explicitly-requested-json-api",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/apath/..c.ts": "",
+            "/apath/.b.ts": "",
+            "/apath/.git/a.ts": "",
+            "/apath/test.ts": ""
+          },
+          "base_path": "/apath",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n                    \"files\": [\"/apath/.git/a.ts\", \"/apath/.b.ts\", \"/apath/..c.ts\"]\n                }"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -158,6 +364,20 @@
       "api": "jsonSourceFile",
       "baseline": "config/tsconfigParsing/allow dotted files and folders when explicitly requested with jsonSourceFile api.js",
       "case": "config/tsconfigparsing/allow-dotted-files-and-folders-when-explicitly-requested-jsonsourcefile-api",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/apath/..c.ts": "",
+            "/apath/.b.ts": "",
+            "/apath/.git/a.ts": "",
+            "/apath/test.ts": ""
+          },
+          "base_path": "/apath",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n                    \"files\": [\"/apath/.git/a.ts\", \"/apath/.b.ts\", \"/apath/..c.ts\"]\n                }"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -167,6 +387,17 @@
       "api": "json",
       "baseline": "config/tsconfigParsing/does not generate errors for empty files list when one or more references are provided with json api.js",
       "case": "config/tsconfigparsing/does-not-generate-errors-for-empty-files-list-when-one-or-more-references-are-provided-json-api",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/apath/a.ts": ""
+          },
+          "base_path": "/apath",
+          "config_file_name": "/apath/tsconfig.json",
+          "json_text": "{\n                \"files\": [],\n                \"references\": [{ \"path\": \"/apath\" }]\n            }"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -176,6 +407,17 @@
       "api": "jsonSourceFile",
       "baseline": "config/tsconfigParsing/does not generate errors for empty files list when one or more references are provided with jsonSourceFile api.js",
       "case": "config/tsconfigparsing/does-not-generate-errors-for-empty-files-list-when-one-or-more-references-are-provided-jsonsourcefile-api",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/apath/a.ts": ""
+          },
+          "base_path": "/apath",
+          "config_file_name": "/apath/tsconfig.json",
+          "json_text": "{\n                \"files\": [],\n                \"references\": [{ \"path\": \"/apath\" }]\n            }"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -185,6 +427,27 @@
       "api": "json",
       "baseline": "config/tsconfigParsing/exclude declarationDir unless overridden with json api.js",
       "case": "config/tsconfigparsing/exclude-declarationdir-unless-overridden-json-api",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/a.ts": "",
+            "/declarations/a.d.ts": ""
+          },
+          "base_path": "/",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n                \"compilerOptions\": {\n                    \"declarationDir\": \"declarations\"\n                }\n            }"
+        },
+        {
+          "all_file_list": {
+            "/a.ts": "",
+            "/declarations/a.d.ts": ""
+          },
+          "base_path": "/",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n                \"compilerOptions\": {\n                    \"declarationDir\": \"declarations\"\n                },\n                \"exclude\": [ \"types\" ]\n            }"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -194,6 +457,27 @@
       "api": "jsonSourceFile",
       "baseline": "config/tsconfigParsing/exclude declarationDir unless overridden with jsonSourceFile api.js",
       "case": "config/tsconfigparsing/exclude-declarationdir-unless-overridden-jsonsourcefile-api",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/a.ts": "",
+            "/declarations/a.d.ts": ""
+          },
+          "base_path": "/",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n                \"compilerOptions\": {\n                    \"declarationDir\": \"declarations\"\n                }\n            }"
+        },
+        {
+          "all_file_list": {
+            "/a.ts": "",
+            "/declarations/a.d.ts": ""
+          },
+          "base_path": "/",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n                \"compilerOptions\": {\n                    \"declarationDir\": \"declarations\"\n                },\n                \"exclude\": [ \"types\" ]\n            }"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -203,6 +487,27 @@
       "api": "json",
       "baseline": "config/tsconfigParsing/exclude outDir unless overridden with json api.js",
       "case": "config/tsconfigparsing/exclude-outdir-unless-overridden-json-api",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/b.ts": "",
+            "/bin/a.ts": ""
+          },
+          "base_path": "/",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n                \"compilerOptions\": {\n                    \"outDir\": \"bin\"\n                }\n            }"
+        },
+        {
+          "all_file_list": {
+            "/b.ts": "",
+            "/bin/a.ts": ""
+          },
+          "base_path": "/",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n                \"compilerOptions\": {\n                    \"outDir\": \"bin\"\n                },\n                \"exclude\": [ \"obj\" ]\n            }"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -212,6 +517,27 @@
       "api": "jsonSourceFile",
       "baseline": "config/tsconfigParsing/exclude outDir unless overridden with jsonSourceFile api.js",
       "case": "config/tsconfigparsing/exclude-outdir-unless-overridden-jsonsourcefile-api",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/b.ts": "",
+            "/bin/a.ts": ""
+          },
+          "base_path": "/",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n                \"compilerOptions\": {\n                    \"outDir\": \"bin\"\n                }\n            }"
+        },
+        {
+          "all_file_list": {
+            "/b.ts": "",
+            "/bin/a.ts": ""
+          },
+          "base_path": "/",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n                \"compilerOptions\": {\n                    \"outDir\": \"bin\"\n                },\n                \"exclude\": [ \"obj\" ]\n            }"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -221,6 +547,17 @@
       "api": "json",
       "baseline": "config/tsconfigParsing/generates errors for directory with no .ts files with json api.js",
       "case": "config/tsconfigparsing/generates-errors-for-directory-with-no-ts-files-json-api",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/apath/a.js": ""
+          },
+          "base_path": "/apath",
+          "config_file_name": "/apath/tsconfig.json",
+          "json_text": "{\n            }"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -230,6 +567,17 @@
       "api": "jsonSourceFile",
       "baseline": "config/tsconfigParsing/generates errors for directory with no .ts files with jsonSourceFile api.js",
       "case": "config/tsconfigparsing/generates-errors-for-directory-with-no-ts-files-jsonsourcefile-api",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/apath/a.js": ""
+          },
+          "base_path": "/apath",
+          "config_file_name": "/apath/tsconfig.json",
+          "json_text": "{\n            }"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -239,6 +587,15 @@
       "api": "json",
       "baseline": "config/tsconfigParsing/generates errors for empty directory with json api.js",
       "case": "config/tsconfigparsing/generates-errors-for-empty-directory-json-api",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": {},
+          "base_path": "/apath",
+          "config_file_name": "/apath/tsconfig.json",
+          "json_text": "{\n                \"compilerOptions\": {\n                    \"allowJs\": true\n                }\n            }"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -248,6 +605,15 @@
       "api": "jsonSourceFile",
       "baseline": "config/tsconfigParsing/generates errors for empty directory with jsonSourceFile api.js",
       "case": "config/tsconfigparsing/generates-errors-for-empty-directory-jsonsourcefile-api",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": {},
+          "base_path": "/apath",
+          "config_file_name": "/apath/tsconfig.json",
+          "json_text": "{\n                \"compilerOptions\": {\n                    \"allowJs\": true\n                }\n            }"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -257,6 +623,17 @@
       "api": "json",
       "baseline": "config/tsconfigParsing/generates errors for empty files list when no references are provided with json api.js",
       "case": "config/tsconfigparsing/generates-errors-for-empty-files-list-when-no-references-are-provided-json-api",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/apath/a.ts": ""
+          },
+          "base_path": "/apath",
+          "config_file_name": "/apath/tsconfig.json",
+          "json_text": "{\n                \"files\": [],\n                \"references\": []\n            }"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -266,6 +643,17 @@
       "api": "jsonSourceFile",
       "baseline": "config/tsconfigParsing/generates errors for empty files list when no references are provided with jsonSourceFile api.js",
       "case": "config/tsconfigparsing/generates-errors-for-empty-files-list-when-no-references-are-provided-jsonsourcefile-api",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/apath/a.ts": ""
+          },
+          "base_path": "/apath",
+          "config_file_name": "/apath/tsconfig.json",
+          "json_text": "{\n                \"files\": [],\n                \"references\": []\n            }"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -275,6 +663,17 @@
       "api": "json",
       "baseline": "config/tsconfigParsing/generates errors for empty files list with json api.js",
       "case": "config/tsconfigparsing/generates-errors-for-empty-files-list-json-api",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/apath/a.ts": ""
+          },
+          "base_path": "/apath",
+          "config_file_name": "/apath/tsconfig.json",
+          "json_text": "{\n                \"files\": []\n            }"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -284,6 +683,17 @@
       "api": "jsonSourceFile",
       "baseline": "config/tsconfigParsing/generates errors for empty files list with jsonSourceFile api.js",
       "case": "config/tsconfigparsing/generates-errors-for-empty-files-list-jsonsourcefile-api",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/apath/a.ts": ""
+          },
+          "base_path": "/apath",
+          "config_file_name": "/apath/tsconfig.json",
+          "json_text": "{\n                \"files\": []\n            }"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -293,6 +703,17 @@
       "api": "json",
       "baseline": "config/tsconfigParsing/generates errors for empty include with json api.js",
       "case": "config/tsconfigparsing/generates-errors-for-empty-include-json-api",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/apath/a.ts": ""
+          },
+          "base_path": "tests/cases/unittests",
+          "config_file_name": "/apath/tsconfig.json",
+          "json_text": "{\n                \"include\": []\n            }"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -302,6 +723,17 @@
       "api": "jsonSourceFile",
       "baseline": "config/tsconfigParsing/generates errors for empty include with jsonSourceFile api.js",
       "case": "config/tsconfigparsing/generates-errors-for-empty-include-jsonsourcefile-api",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/apath/a.ts": ""
+          },
+          "base_path": "tests/cases/unittests",
+          "config_file_name": "/apath/tsconfig.json",
+          "json_text": "{\n                \"include\": []\n            }"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -311,6 +743,17 @@
       "api": "json",
       "baseline": "config/tsconfigParsing/generates errors for include with parent directory after recursive wildcard with json api.js",
       "case": "config/tsconfigparsing/generates-errors-for-include-with-parent-directory-after-recursive-wildcard-json-api",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/apath/main.ts": ""
+          },
+          "base_path": "/apath",
+          "config_file_name": "/apath/tsconfig.json",
+          "json_text": "{\n                \"include\": [\"**/../*.ts\"]\n            }"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -320,6 +763,17 @@
       "api": "jsonSourceFile",
       "baseline": "config/tsconfigParsing/generates errors for include with parent directory after recursive wildcard with jsonSourceFile api.js",
       "case": "config/tsconfigparsing/generates-errors-for-include-with-parent-directory-after-recursive-wildcard-jsonsourcefile-api",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/apath/main.ts": ""
+          },
+          "base_path": "/apath",
+          "config_file_name": "/apath/tsconfig.json",
+          "json_text": "{\n                \"include\": [\"**/../*.ts\"]\n            }"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -329,6 +783,17 @@
       "api": "json",
       "baseline": "config/tsconfigParsing/generates errors for includes with outDir with json api.js",
       "case": "config/tsconfigparsing/generates-errors-for-includes-with-outdir-json-api",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/apath/a.ts": ""
+          },
+          "base_path": "/apath",
+          "config_file_name": "/apath/tsconfig.json",
+          "json_text": "{\n                \"compilerOptions\": {\n                    \"outDir\": \"./\"\n                },\n                \"include\": [\"**/*\"]\n            }"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -338,6 +803,17 @@
       "api": "jsonSourceFile",
       "baseline": "config/tsconfigParsing/generates errors for includes with outDir with jsonSourceFile api.js",
       "case": "config/tsconfigparsing/generates-errors-for-includes-with-outdir-jsonsourcefile-api",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/apath/a.ts": ""
+          },
+          "base_path": "/apath",
+          "config_file_name": "/apath/tsconfig.json",
+          "json_text": "{\n                \"compilerOptions\": {\n                    \"outDir\": \"./\"\n                },\n                \"include\": [\"**/*\"]\n            }"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -347,6 +823,17 @@
       "api": "json",
       "baseline": "config/tsconfigParsing/generates errors when commandline option is in tsconfig with json api.js",
       "case": "config/tsconfigparsing/generates-errors-when-commandline-option-is-in-tsconfig-json-api",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/apath/a.ts": ""
+          },
+          "base_path": "/apath",
+          "config_file_name": "/apath/tsconfig.json",
+          "json_text": "{\n  \"compilerOptions\": {\n    \"help\": true\n  }\n}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -356,6 +843,17 @@
       "api": "jsonSourceFile",
       "baseline": "config/tsconfigParsing/generates errors when commandline option is in tsconfig with jsonSourceFile api.js",
       "case": "config/tsconfigparsing/generates-errors-when-commandline-option-is-in-tsconfig-jsonsourcefile-api",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/apath/a.ts": ""
+          },
+          "base_path": "/apath",
+          "config_file_name": "/apath/tsconfig.json",
+          "json_text": "{\n  \"compilerOptions\": {\n    \"help\": true\n  }\n}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -365,6 +863,17 @@
       "api": "json",
       "baseline": "config/tsconfigParsing/generates errors when files is not string with json api.js",
       "case": "config/tsconfigparsing/generates-errors-when-files-is-not-string-json-api",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/apath/a.ts": ""
+          },
+          "base_path": "/apath",
+          "config_file_name": "/apath/tsconfig.json",
+          "json_text": "{\n  \"files\": [\n    {\n      \"compilerOptions\": {\n        \"experimentalDecorators\": true,\n        \"allowJs\": true\n      }\n    }\n  ]\n}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -374,6 +883,17 @@
       "api": "jsonSourceFile",
       "baseline": "config/tsconfigParsing/generates errors when files is not string with jsonSourceFile api.js",
       "case": "config/tsconfigparsing/generates-errors-when-files-is-not-string-jsonsourcefile-api",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/apath/a.ts": ""
+          },
+          "base_path": "/apath",
+          "config_file_name": "/apath/tsconfig.json",
+          "json_text": "{\n  \"files\": [\n    {\n      \"compilerOptions\": {\n        \"experimentalDecorators\": true,\n        \"allowJs\": true\n      }\n    }\n  ]\n}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -383,6 +903,17 @@
       "api": "json",
       "baseline": "config/tsconfigParsing/generates errors when include is not string with json api.js",
       "case": "config/tsconfigparsing/generates-errors-when-include-is-not-string-json-api",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/apath/a.ts": ""
+          },
+          "base_path": "/apath",
+          "config_file_name": "/apath/tsconfig.json",
+          "json_text": "{\n  \"include\": [\n    [\n      \"./**/*.ts\"\n    ]\n  ]\n}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -392,6 +923,17 @@
       "api": "jsonSourceFile",
       "baseline": "config/tsconfigParsing/generates errors when include is not string with jsonSourceFile api.js",
       "case": "config/tsconfigparsing/generates-errors-when-include-is-not-string-jsonsourcefile-api",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/apath/a.ts": ""
+          },
+          "base_path": "/apath",
+          "config_file_name": "/apath/tsconfig.json",
+          "json_text": "{\n  \"include\": [\n    [\n      \"./**/*.ts\"\n    ]\n  ]\n}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -401,6 +943,17 @@
       "api": "json",
       "baseline": "config/tsconfigParsing/handles empty types array with json api.js",
       "case": "config/tsconfigparsing/handles-empty-types-array-json-api",
+      "include_compiler_options": true,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/app.ts": ""
+          },
+          "base_path": "/",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n\t\t\t    \"compilerOptions\": {\n\t\t\t\t\t\"types\": []\n\t\t\t\t}\n\t\t\t}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -410,6 +963,17 @@
       "api": "jsonSourceFile",
       "baseline": "config/tsconfigParsing/handles empty types array with jsonSourceFile api.js",
       "case": "config/tsconfigparsing/handles-empty-types-array-jsonsourcefile-api",
+      "include_compiler_options": true,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/app.ts": ""
+          },
+          "base_path": "/",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n\t\t\t    \"compilerOptions\": {\n\t\t\t\t\t\"types\": []\n\t\t\t\t}\n\t\t\t}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -419,6 +983,21 @@
       "api": "jsonParse",
       "baseline": "config/tsconfigParsing/handles escaped characters in strings correctly jsonParse.js",
       "case": "config/tsconfigparsing/handles-escaped-characters-in-strings-correctly-jsonparse",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": null,
+          "base_path": "",
+          "config_file_name": "",
+          "json_text": "{\n            \"exclude\": [\n                \"xx\\\"//files\"\n            ]\n        }"
+        },
+        {
+          "all_file_list": null,
+          "base_path": "",
+          "config_file_name": "",
+          "json_text": "{\n            \"exclude\": [\n                \"xx\\\\\" // end of line comment\n            ]\n        }"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -428,6 +1007,20 @@
       "api": "json",
       "baseline": "config/tsconfigParsing/ignore dotted files and folders with json api.js",
       "case": "config/tsconfigparsing/ignore-dotted-files-and-folders-json-api",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/apath/..c.ts": "",
+            "/apath/.b.ts": "",
+            "/apath/.git/a.ts": "",
+            "/apath/test.ts": ""
+          },
+          "base_path": "/apath",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -437,6 +1030,20 @@
       "api": "jsonSourceFile",
       "baseline": "config/tsconfigParsing/ignore dotted files and folders with jsonSourceFile api.js",
       "case": "config/tsconfigparsing/ignore-dotted-files-and-folders-jsonsourcefile-api",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/apath/..c.ts": "",
+            "/apath/.b.ts": "",
+            "/apath/.git/a.ts": "",
+            "/apath/test.ts": ""
+          },
+          "base_path": "/apath",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -446,6 +1053,21 @@
       "api": "json",
       "baseline": "config/tsconfigParsing/implicitly exclude common package folders with json api.js",
       "case": "config/tsconfigparsing/implicitly-exclude-common-package-folders-json-api",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/bower_components/b.ts": "",
+            "/d.ts": "",
+            "/folder/e.ts": "",
+            "/jspm_packages/c.ts": "",
+            "/node_modules/a.ts": ""
+          },
+          "base_path": "/",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -455,6 +1077,21 @@
       "api": "jsonSourceFile",
       "baseline": "config/tsconfigParsing/implicitly exclude common package folders with jsonSourceFile api.js",
       "case": "config/tsconfigparsing/implicitly-exclude-common-package-folders-jsonsourcefile-api",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/bower_components/b.ts": "",
+            "/d.ts": "",
+            "/folder/e.ts": "",
+            "/jspm_packages/c.ts": "",
+            "/node_modules/a.ts": ""
+          },
+          "base_path": "/",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -464,6 +1101,27 @@
       "api": "json",
       "baseline": "config/tsconfigParsing/issue 1267 scenario - extended files not picked up with json api.js",
       "case": "config/tsconfigparsing/issue-1267-scenario-extended-files-not-picked-up-json-api",
+      "include_compiler_options": true,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/src/main.ts": "export {}",
+            "/src/utils.ts": "export {}",
+            "/tsconfig-base/backend.json": "{\n  \"$schema\": \"https://json.schemastore.org/tsconfig\",\n  \"display\": \"Backend\",\n  \"compilerOptions\": {\n    \"allowJs\": true,\n    \"module\": \"nodenext\",\n    \"removeComments\": true,\n    \"emitDecoratorMetadata\": true,\n    \"experimentalDecorators\": true,\n    \"allowSyntheticDefaultImports\": true,\n    \"target\": \"esnext\",\n    \"lib\": [\"ESNext\"],\n    \"incremental\": false,\n    \"esModuleInterop\": true,\n    \"noImplicitAny\": true,\n    \"moduleResolution\": \"nodenext\",\n    \"types\": [\"node\", \"vitest/globals\"],\n    \"sourceMap\": true,\n    \"strictPropertyInitialization\": false\n  },\n  \"files\": [\n    \"types/ical2json.d.ts\",\n    \"types/express.d.ts\",\n    \"types/multer.d.ts\",\n    \"types/reset.d.ts\",\n    \"types/stripe-custom-typings.d.ts\",\n    \"types/nestjs-modules.d.ts\",\n    \"types/luxon.d.ts\",\n    \"types/nestjs-pino.d.ts\"\n  ],\n  \"ts-node\": {\n    \"files\": true\n  }\n}",
+            "/tsconfig-base/types/express.d.ts": "export {}",
+            "/tsconfig-base/types/ical2json.d.ts": "export {}",
+            "/tsconfig-base/types/luxon.d.ts": "declare module 'luxon' {\n  interface TSSettings {\n    throwOnInvalid: true\n  }\n}\nexport {}",
+            "/tsconfig-base/types/multer.d.ts": "export {}",
+            "/tsconfig-base/types/nestjs-modules.d.ts": "export {}",
+            "/tsconfig-base/types/nestjs-pino.d.ts": "export {}",
+            "/tsconfig-base/types/reset.d.ts": "export {}",
+            "/tsconfig-base/types/stripe-custom-typings.d.ts": "export {}"
+          },
+          "base_path": "/",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n  \"extends\": \"./tsconfig-base/backend.json\",\n  \"compilerOptions\": {\n    \"baseUrl\": \"./\",\n    \"outDir\": \"dist\",\n    \"rootDir\": \"src\",\n    \"resolveJsonModule\": true\n  },\n  \"exclude\": [\"node_modules\", \"dist\"],\n  \"include\": [\"src/**/*\"]\n}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -473,6 +1131,27 @@
       "api": "jsonSourceFile",
       "baseline": "config/tsconfigParsing/issue 1267 scenario - extended files not picked up with jsonSourceFile api.js",
       "case": "config/tsconfigparsing/issue-1267-scenario-extended-files-not-picked-up-jsonsourcefile-api",
+      "include_compiler_options": true,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/src/main.ts": "export {}",
+            "/src/utils.ts": "export {}",
+            "/tsconfig-base/backend.json": "{\n  \"$schema\": \"https://json.schemastore.org/tsconfig\",\n  \"display\": \"Backend\",\n  \"compilerOptions\": {\n    \"allowJs\": true,\n    \"module\": \"nodenext\",\n    \"removeComments\": true,\n    \"emitDecoratorMetadata\": true,\n    \"experimentalDecorators\": true,\n    \"allowSyntheticDefaultImports\": true,\n    \"target\": \"esnext\",\n    \"lib\": [\"ESNext\"],\n    \"incremental\": false,\n    \"esModuleInterop\": true,\n    \"noImplicitAny\": true,\n    \"moduleResolution\": \"nodenext\",\n    \"types\": [\"node\", \"vitest/globals\"],\n    \"sourceMap\": true,\n    \"strictPropertyInitialization\": false\n  },\n  \"files\": [\n    \"types/ical2json.d.ts\",\n    \"types/express.d.ts\",\n    \"types/multer.d.ts\",\n    \"types/reset.d.ts\",\n    \"types/stripe-custom-typings.d.ts\",\n    \"types/nestjs-modules.d.ts\",\n    \"types/luxon.d.ts\",\n    \"types/nestjs-pino.d.ts\"\n  ],\n  \"ts-node\": {\n    \"files\": true\n  }\n}",
+            "/tsconfig-base/types/express.d.ts": "export {}",
+            "/tsconfig-base/types/ical2json.d.ts": "export {}",
+            "/tsconfig-base/types/luxon.d.ts": "declare module 'luxon' {\n  interface TSSettings {\n    throwOnInvalid: true\n  }\n}\nexport {}",
+            "/tsconfig-base/types/multer.d.ts": "export {}",
+            "/tsconfig-base/types/nestjs-modules.d.ts": "export {}",
+            "/tsconfig-base/types/nestjs-pino.d.ts": "export {}",
+            "/tsconfig-base/types/reset.d.ts": "export {}",
+            "/tsconfig-base/types/stripe-custom-typings.d.ts": "export {}"
+          },
+          "base_path": "/",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n  \"extends\": \"./tsconfig-base/backend.json\",\n  \"compilerOptions\": {\n    \"baseUrl\": \"./\",\n    \"outDir\": \"dist\",\n    \"rootDir\": \"src\",\n    \"resolveJsonModule\": true\n  },\n  \"exclude\": [\"node_modules\", \"dist\"],\n  \"include\": [\"src/**/*\"]\n}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -482,6 +1161,21 @@
       "api": "jsonParse",
       "baseline": "config/tsconfigParsing/keeps string content untouched jsonParse.js",
       "case": "config/tsconfigparsing/keeps-string-content-untouched-jsonparse",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": null,
+          "base_path": "",
+          "config_file_name": "",
+          "json_text": "{\n            \"exclude\": [\n                \"xx//file.d.ts\"\n            ]\n        }"
+        },
+        {
+          "all_file_list": null,
+          "base_path": "",
+          "config_file_name": "",
+          "json_text": "{\n            \"exclude\": [\n                \"xx/*file.d.ts*/\"\n            ]\n        }"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -491,6 +1185,18 @@
       "api": "json",
       "baseline": "config/tsconfigParsing/null overrides in extended tsconfig - array fields with json api.js",
       "case": "config/tsconfigparsing/null-overrides-in-extended-tsconfig-array-fields-json-api",
+      "include_compiler_options": true,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/app.ts": "",
+            "/tsconfig-base.json": "{\n  \"compilerOptions\": {\n    \"types\": [\"node\", \"@types/jest\"],\n    \"lib\": [\"es2020\", \"dom\"],\n    \"typeRoots\": [\"./types\", \"./node_modules/@types\"]\n  }\n}"
+          },
+          "base_path": "/",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n  \"extends\": \"./tsconfig-base.json\",\n  \"compilerOptions\": {\n    \"types\": null,\n    \"lib\": null,\n    \"typeRoots\": null\n  }\n}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -500,6 +1206,18 @@
       "api": "jsonSourceFile",
       "baseline": "config/tsconfigParsing/null overrides in extended tsconfig - array fields with jsonSourceFile api.js",
       "case": "config/tsconfigparsing/null-overrides-in-extended-tsconfig-array-fields-jsonsourcefile-api",
+      "include_compiler_options": true,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/app.ts": "",
+            "/tsconfig-base.json": "{\n  \"compilerOptions\": {\n    \"types\": [\"node\", \"@types/jest\"],\n    \"lib\": [\"es2020\", \"dom\"],\n    \"typeRoots\": [\"./types\", \"./node_modules/@types\"]\n  }\n}"
+          },
+          "base_path": "/",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n  \"extends\": \"./tsconfig-base.json\",\n  \"compilerOptions\": {\n    \"types\": null,\n    \"lib\": null,\n    \"typeRoots\": null\n  }\n}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -509,6 +1227,18 @@
       "api": "json",
       "baseline": "config/tsconfigParsing/null overrides in extended tsconfig - mixed field types with json api.js",
       "case": "config/tsconfigparsing/null-overrides-in-extended-tsconfig-mixed-field-types-json-api",
+      "include_compiler_options": true,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/app.ts": "",
+            "/tsconfig-base.json": "{\n  \"compilerOptions\": {\n    \"types\": [\"node\"],\n    \"lib\": [\"es2020\", \"dom\"],\n    \"outDir\": \"./dist\",\n    \"strict\": true,\n    \"allowJs\": true,\n    \"target\": \"es2020\"\n  }\n}"
+          },
+          "base_path": "/",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n  \"extends\": \"./tsconfig-base.json\",\n  \"compilerOptions\": {\n    \"types\": null,\n    \"outDir\": null,\n    \"strict\": false,\n    \"lib\": [\"es2022\"],\n    \"allowJs\": null\n  }\n}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -518,6 +1248,18 @@
       "api": "jsonSourceFile",
       "baseline": "config/tsconfigParsing/null overrides in extended tsconfig - mixed field types with jsonSourceFile api.js",
       "case": "config/tsconfigparsing/null-overrides-in-extended-tsconfig-mixed-field-types-jsonsourcefile-api",
+      "include_compiler_options": true,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/app.ts": "",
+            "/tsconfig-base.json": "{\n  \"compilerOptions\": {\n    \"types\": [\"node\"],\n    \"lib\": [\"es2020\", \"dom\"],\n    \"outDir\": \"./dist\",\n    \"strict\": true,\n    \"allowJs\": true,\n    \"target\": \"es2020\"\n  }\n}"
+          },
+          "base_path": "/",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n  \"extends\": \"./tsconfig-base.json\",\n  \"compilerOptions\": {\n    \"types\": null,\n    \"outDir\": null,\n    \"strict\": false,\n    \"lib\": [\"es2022\"],\n    \"allowJs\": null\n  }\n}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -527,6 +1269,18 @@
       "api": "json",
       "baseline": "config/tsconfigParsing/null overrides in extended tsconfig - string fields with json api.js",
       "case": "config/tsconfigparsing/null-overrides-in-extended-tsconfig-string-fields-json-api",
+      "include_compiler_options": true,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/app.ts": "",
+            "/tsconfig-base.json": "{\n  \"compilerOptions\": {\n    \"outDir\": \"./dist\",\n    \"baseUrl\": \"./src\",\n    \"rootDir\": \"./src\"\n  }\n}"
+          },
+          "base_path": "/",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n  \"extends\": \"./tsconfig-base.json\",\n  \"compilerOptions\": {\n    \"outDir\": null,\n    \"baseUrl\": null,\n    \"rootDir\": null\n  }\n}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -536,6 +1290,18 @@
       "api": "jsonSourceFile",
       "baseline": "config/tsconfigParsing/null overrides in extended tsconfig - string fields with jsonSourceFile api.js",
       "case": "config/tsconfigparsing/null-overrides-in-extended-tsconfig-string-fields-jsonsourcefile-api",
+      "include_compiler_options": true,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/app.ts": "",
+            "/tsconfig-base.json": "{\n  \"compilerOptions\": {\n    \"outDir\": \"./dist\",\n    \"baseUrl\": \"./src\",\n    \"rootDir\": \"./src\"\n  }\n}"
+          },
+          "base_path": "/",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n  \"extends\": \"./tsconfig-base.json\",\n  \"compilerOptions\": {\n    \"outDir\": null,\n    \"baseUrl\": null,\n    \"rootDir\": null\n  }\n}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -545,6 +1311,19 @@
       "api": "json",
       "baseline": "config/tsconfigParsing/null overrides in middle level of extends chain with json api.js",
       "case": "config/tsconfigparsing/null-overrides-in-middle-level-of-extends-chain-json-api",
+      "include_compiler_options": true,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/app.ts": "",
+            "/tsconfig-base.json": "{\n  \"compilerOptions\": {\n    \"types\": [\"node\"],\n    \"lib\": [\"es2020\"],\n    \"outDir\": \"./base\",\n    \"strict\": true\n  }\n}",
+            "/tsconfig-middle.json": "{\n  \"extends\": \"./tsconfig-base.json\",\n  \"compilerOptions\": {\n    \"types\": null,\n    \"lib\": null,\n    \"outDir\": \"./middle\"\n  }\n}"
+          },
+          "base_path": "/",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n  \"extends\": \"./tsconfig-middle.json\",\n  \"compilerOptions\": {\n    \"outDir\": \"./final\"\n  }\n}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -554,6 +1333,19 @@
       "api": "jsonSourceFile",
       "baseline": "config/tsconfigParsing/null overrides in middle level of extends chain with jsonSourceFile api.js",
       "case": "config/tsconfigparsing/null-overrides-in-middle-level-of-extends-chain-jsonsourcefile-api",
+      "include_compiler_options": true,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/app.ts": "",
+            "/tsconfig-base.json": "{\n  \"compilerOptions\": {\n    \"types\": [\"node\"],\n    \"lib\": [\"es2020\"],\n    \"outDir\": \"./base\",\n    \"strict\": true\n  }\n}",
+            "/tsconfig-middle.json": "{\n  \"extends\": \"./tsconfig-base.json\",\n  \"compilerOptions\": {\n    \"types\": null,\n    \"lib\": null,\n    \"outDir\": \"./middle\"\n  }\n}"
+          },
+          "base_path": "/",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n  \"extends\": \"./tsconfig-middle.json\",\n  \"compilerOptions\": {\n    \"outDir\": \"./final\"\n  }\n}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -563,6 +1355,19 @@
       "api": "json",
       "baseline": "config/tsconfigParsing/null overrides with multiple extends levels with json api.js",
       "case": "config/tsconfigparsing/null-overrides-with-multiple-extends-levels-json-api",
+      "include_compiler_options": true,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/app.ts": "",
+            "/tsconfig-base.json": "{\n  \"compilerOptions\": {\n    \"types\": [\"node\"],\n    \"lib\": [\"es2020\"],\n    \"outDir\": \"./dist\",\n    \"strict\": true\n  }\n}",
+            "/tsconfig-middle.json": "{\n  \"extends\": \"./tsconfig-base.json\",\n  \"compilerOptions\": {\n    \"types\": [\"jest\"],\n    \"outDir\": \"./build\"\n  }\n}"
+          },
+          "base_path": "/",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n  \"extends\": \"./tsconfig-middle.json\",\n  \"compilerOptions\": {\n    \"types\": null,\n    \"lib\": null\n  }\n}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -572,6 +1377,19 @@
       "api": "jsonSourceFile",
       "baseline": "config/tsconfigParsing/null overrides with multiple extends levels with jsonSourceFile api.js",
       "case": "config/tsconfigparsing/null-overrides-with-multiple-extends-levels-jsonsourcefile-api",
+      "include_compiler_options": true,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/app.ts": "",
+            "/tsconfig-base.json": "{\n  \"compilerOptions\": {\n    \"types\": [\"node\"],\n    \"lib\": [\"es2020\"],\n    \"outDir\": \"./dist\",\n    \"strict\": true\n  }\n}",
+            "/tsconfig-middle.json": "{\n  \"extends\": \"./tsconfig-base.json\",\n  \"compilerOptions\": {\n    \"types\": [\"jest\"],\n    \"outDir\": \"./build\"\n  }\n}"
+          },
+          "base_path": "/",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n  \"extends\": \"./tsconfig-middle.json\",\n  \"compilerOptions\": {\n    \"types\": null,\n    \"lib\": null\n  }\n}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -581,6 +1399,20 @@
       "api": "json",
       "baseline": "config/tsconfigParsing/parses tsconfig with compilerOptions, files, include, and exclude with json api.js",
       "case": "config/tsconfigparsing/parses-tsconfig-with-compileroptions-files-include-and-exclude-json-api",
+      "include_compiler_options": true,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/apath/dist/output.js": "",
+            "/apath/node_modules/module.ts": "",
+            "/apath/src/app.ts": "",
+            "/apath/src/index.ts": ""
+          },
+          "base_path": "/apath",
+          "config_file_name": "/apath/tsconfig.json",
+          "json_text": "{\n  \"compilerOptions\": {\n    \"outDir\": \"./dist\",\n    \"strict\": true,\n    \"noImplicitAny\": true,\n    \"target\": \"ES2017\",\n    \"module\": \"ESNext\",\n    \"moduleResolution\": \"bundler\",\n    \"moduleDetection\": \"auto\",\n    \"jsx\": \"react\",\n\t\"maxNodeModuleJsDepth\": 1,\n\t\"paths\": {\n      \"jquery\": [\"./vendor/jquery/dist/jquery\"]\n    }\n  },\n  \"files\": [\"/apath/src/index.ts\", \"/apath/src/app.ts\"],\n  \"include\": [\"/apath/src/**/*\"],\n  \"exclude\": [\"/apath/node_modules\", \"/apath/dist\"]\n}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -590,6 +1422,20 @@
       "api": "jsonSourceFile",
       "baseline": "config/tsconfigParsing/parses tsconfig with compilerOptions, files, include, and exclude with jsonSourceFile api.js",
       "case": "config/tsconfigparsing/parses-tsconfig-with-compileroptions-files-include-and-exclude-jsonsourcefile-api",
+      "include_compiler_options": true,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/apath/dist/output.js": "",
+            "/apath/node_modules/module.ts": "",
+            "/apath/src/app.ts": "",
+            "/apath/src/index.ts": ""
+          },
+          "base_path": "/apath",
+          "config_file_name": "/apath/tsconfig.json",
+          "json_text": "{\n  \"compilerOptions\": {\n    \"outDir\": \"./dist\",\n    \"strict\": true,\n    \"noImplicitAny\": true,\n    \"target\": \"ES2017\",\n    \"module\": \"ESNext\",\n    \"moduleResolution\": \"bundler\",\n    \"moduleDetection\": \"auto\",\n    \"jsx\": \"react\",\n\t\"maxNodeModuleJsDepth\": 1,\n\t\"paths\": {\n      \"jquery\": [\"./vendor/jquery/dist/jquery\"]\n    }\n  },\n  \"files\": [\"/apath/src/index.ts\", \"/apath/src/app.ts\"],\n  \"include\": [\"/apath/src/**/*\"],\n  \"exclude\": [\"/apath/node_modules\", \"/apath/dist\"]\n}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -599,6 +1445,21 @@
       "api": "json",
       "baseline": "config/tsconfigParsing/parses tsconfig with extends and configDir with json api.js",
       "case": "config/tsconfigparsing/parses-tsconfig-with-extends-and-configdir-json-api",
+      "include_compiler_options": true,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/dist/output.js": "",
+            "/node_modules/module.ts": "",
+            "/src/app.ts": "",
+            "/src/index.ts": "",
+            "/tsconfig.base.json": "{\n  \"compilerOptions\": {\n    \"outFile\": \"${configDir}/outFile\",\n    \"outDir\": \"${configDir}/outDir\",\n    \"rootDir\": \"${configDir}/rootDir\",\n    \"tsBuildInfoFile\": \"${configDir}/tsBuildInfoFile\",\n    \"baseUrl\": \"${configDir}/baseUrl\",\n    \"declarationDir\": \"${configDir}/declarationDir\",\n  }\n}"
+          },
+          "base_path": "/",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n\t\t\t\t\"extends\": \"./tsconfig.base.json\"\n\t\t\t}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -608,6 +1469,21 @@
       "api": "jsonSourceFile",
       "baseline": "config/tsconfigParsing/parses tsconfig with extends and configDir with jsonSourceFile api.js",
       "case": "config/tsconfigparsing/parses-tsconfig-with-extends-and-configdir-jsonsourcefile-api",
+      "include_compiler_options": true,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/dist/output.js": "",
+            "/node_modules/module.ts": "",
+            "/src/app.ts": "",
+            "/src/index.ts": "",
+            "/tsconfig.base.json": "{\n  \"compilerOptions\": {\n    \"outFile\": \"${configDir}/outFile\",\n    \"outDir\": \"${configDir}/outDir\",\n    \"rootDir\": \"${configDir}/rootDir\",\n    \"tsBuildInfoFile\": \"${configDir}/tsBuildInfoFile\",\n    \"baseUrl\": \"${configDir}/baseUrl\",\n    \"declarationDir\": \"${configDir}/declarationDir\",\n  }\n}"
+          },
+          "base_path": "/",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n\t\t\t\t\"extends\": \"./tsconfig.base.json\"\n\t\t\t}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -617,6 +1493,21 @@
       "api": "json",
       "baseline": "config/tsconfigParsing/parses tsconfig with extends, files, include and other options with json api.js",
       "case": "config/tsconfigparsing/parses-tsconfig-with-extends-files-include-and-other-options-json-api",
+      "include_compiler_options": true,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/dist/output.js": "",
+            "/node_modules/module.ts": "",
+            "/src/app.ts": "",
+            "/src/index.ts": "",
+            "/tsconfigWithExtends.json": "{\n  \"files\": [\"/src/index.ts\", \"/src/app.ts\"],\n  \"include\": [\"/src/**/*\"],\n  \"exclude\": [],\n  \"ts-node\": {\n    \"compilerOptions\": {\n      \"module\": \"commonjs\"\n    },\n    \"transpileOnly\": true\n  }\n}"
+          },
+          "base_path": "/",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n\t\t\t\t\"extends\": \"./tsconfigWithExtends.json\",\n\t\t\t\t\"compilerOptions\": {\n\t\t\t\t    \"outDir\": \"./dist\",\n    \t\t\t\t\"strict\": true,\n    \t\t\t\t\"noImplicitAny\": true,\n\t\t\t\t\t\"baseUrl\": \"\",\n\t\t\t\t},\n\t\t\t}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -626,6 +1517,21 @@
       "api": "jsonSourceFile",
       "baseline": "config/tsconfigParsing/parses tsconfig with extends, files, include and other options with jsonSourceFile api.js",
       "case": "config/tsconfigparsing/parses-tsconfig-with-extends-files-include-and-other-options-jsonsourcefile-api",
+      "include_compiler_options": true,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/dist/output.js": "",
+            "/node_modules/module.ts": "",
+            "/src/app.ts": "",
+            "/src/index.ts": "",
+            "/tsconfigWithExtends.json": "{\n  \"files\": [\"/src/index.ts\", \"/src/app.ts\"],\n  \"include\": [\"/src/**/*\"],\n  \"exclude\": [],\n  \"ts-node\": {\n    \"compilerOptions\": {\n      \"module\": \"commonjs\"\n    },\n    \"transpileOnly\": true\n  }\n}"
+          },
+          "base_path": "/",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n\t\t\t\t\"extends\": \"./tsconfigWithExtends.json\",\n\t\t\t\t\"compilerOptions\": {\n\t\t\t\t    \"outDir\": \"./dist\",\n    \t\t\t\t\"strict\": true,\n    \t\t\t\t\"noImplicitAny\": true,\n\t\t\t\t\t\"baseUrl\": \"\",\n\t\t\t\t},\n\t\t\t}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -635,6 +1541,17 @@
       "api": "json",
       "baseline": "config/tsconfigParsing/reports error for an unknown option with json api.js",
       "case": "config/tsconfigparsing/reports-error-for-an-unknown-option-json-api",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/app.ts": ""
+          },
+          "base_path": "/",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n\t\t\t    \"compilerOptions\": {\n\t\t\t\t\"unknown\": true\n\t\t\t    }\n\t\t\t}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -644,6 +1561,17 @@
       "api": "jsonSourceFile",
       "baseline": "config/tsconfigParsing/reports error for an unknown option with jsonSourceFile api.js",
       "case": "config/tsconfigparsing/reports-error-for-an-unknown-option-jsonsourcefile-api",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/app.ts": ""
+          },
+          "base_path": "/",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n\t\t\t    \"compilerOptions\": {\n\t\t\t\t\"unknown\": true\n\t\t\t    }\n\t\t\t}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -653,6 +1581,17 @@
       "api": "json",
       "baseline": "config/tsconfigParsing/reports errors for incorrectly cased option names with json api.js",
       "case": "config/tsconfigparsing/reports-errors-for-incorrectly-cased-option-names-json-api",
+      "include_compiler_options": true,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/app.ts": ""
+          },
+          "base_path": "/",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n\t\t\t    \"compilerOptions\": {\n\t\t\t\t\"sourcemap\": true,\n\t\t\t\t\"declarationmap\": true,\n\t\t\t\t\"nouncheckedindexedaccess\": true,\n\t\t\t\t\"exactoptionalpropertytypes\": true,\n\t\t\t\t\"verbatimmodulesyntax\": true,\n\t\t\t\t\"isolatedmodules\": true,\n\t\t\t\t\"nouncheckedsideeffectimports\": true,\n\t\t\t\t\"moduledetection\": \"force\",\n\t\t\t\t\"skiplibcheck\": true,\n\t\t\t\t\"checkjs\": true\n\t\t\t    }\n\t\t\t}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -662,6 +1601,17 @@
       "api": "jsonSourceFile",
       "baseline": "config/tsconfigParsing/reports errors for incorrectly cased option names with jsonSourceFile api.js",
       "case": "config/tsconfigparsing/reports-errors-for-incorrectly-cased-option-names-jsonsourcefile-api",
+      "include_compiler_options": true,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/app.ts": ""
+          },
+          "base_path": "/",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n\t\t\t    \"compilerOptions\": {\n\t\t\t\t\"sourcemap\": true,\n\t\t\t\t\"declarationmap\": true,\n\t\t\t\t\"nouncheckedindexedaccess\": true,\n\t\t\t\t\"exactoptionalpropertytypes\": true,\n\t\t\t\t\"verbatimmodulesyntax\": true,\n\t\t\t\t\"isolatedmodules\": true,\n\t\t\t\t\"nouncheckedsideeffectimports\": true,\n\t\t\t\t\"moduledetection\": \"force\",\n\t\t\t\t\"skiplibcheck\": true,\n\t\t\t\t\"checkjs\": true\n\t\t\t    }\n\t\t\t}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -671,6 +1621,17 @@
       "api": "json",
       "baseline": "config/tsconfigParsing/reports errors for wrong type option and invalid enum value with json api.js",
       "case": "config/tsconfigparsing/reports-errors-for-wrong-type-option-and-invalid-enum-value-json-api",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/app.ts": ""
+          },
+          "base_path": "/",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n\t\t\t    \"compilerOptions\": {\n\t\t\t\t\"target\": \"invalid value\",\n\t\t\t\t\"removeComments\": \"should be a boolean\",\n\t\t\t\t\"moduleResolution\": \"invalid value\"\n\t\t\t    }\n\t\t\t}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -680,6 +1641,17 @@
       "api": "jsonSourceFile",
       "baseline": "config/tsconfigParsing/reports errors for wrong type option and invalid enum value with jsonSourceFile api.js",
       "case": "config/tsconfigparsing/reports-errors-for-wrong-type-option-and-invalid-enum-value-jsonsourcefile-api",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/app.ts": ""
+          },
+          "base_path": "/",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n\t\t\t    \"compilerOptions\": {\n\t\t\t\t\"target\": \"invalid value\",\n\t\t\t\t\"removeComments\": \"should be a boolean\",\n\t\t\t\t\"moduleResolution\": \"invalid value\"\n\t\t\t    }\n\t\t\t}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -689,6 +1661,17 @@
       "api": "json",
       "baseline": "config/tsconfigParsing/reports spelling suggestion for an unknown option with json api.js",
       "case": "config/tsconfigparsing/reports-spelling-suggestion-for-an-unknown-option-json-api",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/app.ts": ""
+          },
+          "base_path": "/",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n\t\t\t    \"compilerOptions\": {\n\t\t\t\t\"targt\": 1\n\t\t\t    }\n\t\t\t}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -698,6 +1681,17 @@
       "api": "jsonSourceFile",
       "baseline": "config/tsconfigParsing/reports spelling suggestion for an unknown option with jsonSourceFile api.js",
       "case": "config/tsconfigparsing/reports-spelling-suggestion-for-an-unknown-option-jsonsourcefile-api",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/app.ts": ""
+          },
+          "base_path": "/",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n\t\t\t    \"compilerOptions\": {\n\t\t\t\t\"targt\": 1\n\t\t\t    }\n\t\t\t}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -707,6 +1701,21 @@
       "api": "jsonParse",
       "baseline": "config/tsconfigParsing/returns config object without comments jsonParse.js",
       "case": "config/tsconfigparsing/returns-config-object-without-comments-jsonparse",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": null,
+          "base_path": "",
+          "config_file_name": "",
+          "json_text": "{ // Excluded files\n            \"exclude\": [\n                // Exclude d.ts\n                \"file.d.ts\"\n            ]\n        }"
+        },
+        {
+          "all_file_list": null,
+          "base_path": "",
+          "config_file_name": "",
+          "json_text": "{\n            /* Excluded\n                    Files\n            */\n            \"exclude\": [\n                /* multiline comments can be in the middle of a line */\"file.d.ts\"\n            ]\n        }"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -716,6 +1725,21 @@
       "api": "jsonParse",
       "baseline": "config/tsconfigParsing/returns empty config for file with comments only jsonParse.js",
       "case": "config/tsconfigparsing/returns-empty-config-for-file-with-comments-only-jsonparse",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": null,
+          "base_path": "",
+          "config_file_name": "",
+          "json_text": "// Comment"
+        },
+        {
+          "all_file_list": null,
+          "base_path": "",
+          "config_file_name": "",
+          "json_text": "/* Comment*/"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -725,6 +1749,21 @@
       "api": "jsonParse",
       "baseline": "config/tsconfigParsing/returns empty config for file with only whitespaces jsonParse.js",
       "case": "config/tsconfigparsing/returns-empty-config-for-file-with-only-whitespaces-jsonparse",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": null,
+          "base_path": "",
+          "config_file_name": "",
+          "json_text": ""
+        },
+        {
+          "all_file_list": null,
+          "base_path": "",
+          "config_file_name": "",
+          "json_text": " "
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -734,6 +1773,15 @@
       "api": "jsonParse",
       "baseline": "config/tsconfigParsing/returns empty config when config is empty object jsonParse.js",
       "case": "config/tsconfigparsing/returns-empty-config-when-config-is-empty-object-jsonparse",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": null,
+          "base_path": "",
+          "config_file_name": "",
+          "json_text": "{}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -743,6 +1791,18 @@
       "api": "json",
       "baseline": "config/tsconfigParsing/returns error when tsconfig have excludes with json api.js",
       "case": "config/tsconfigparsing/returns-error-when-tsconfig-have-excludes-json-api",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/apath/foge.ts": "",
+            "/apath/test.ts": ""
+          },
+          "base_path": "/apath",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n                    \"compilerOptions\": {\n                        \"lib\": [\"es5\"]\n                    },\n                    \"excludes\": [\n                        \"foge.ts\"\n                    ]\n                }"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -752,6 +1812,18 @@
       "api": "jsonSourceFile",
       "baseline": "config/tsconfigParsing/returns error when tsconfig have excludes with jsonSourceFile api.js",
       "case": "config/tsconfigparsing/returns-error-when-tsconfig-have-excludes-jsonsourcefile-api",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/apath/foge.ts": "",
+            "/apath/test.ts": ""
+          },
+          "base_path": "/apath",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n                    \"compilerOptions\": {\n                        \"lib\": [\"es5\"]\n                    },\n                    \"excludes\": [\n                        \"foge.ts\"\n                    ]\n                }"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -761,6 +1833,21 @@
       "api": "jsonParse",
       "baseline": "config/tsconfigParsing/returns object when users correctly specify library jsonParse.js",
       "case": "config/tsconfigparsing/returns-object-when-users-correctly-specify-library-jsonparse",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": null,
+          "base_path": "",
+          "config_file_name": "",
+          "json_text": "{\n            \"compilerOptions\": {\n                \"lib\": [\"es5\"]\n            }\n        }"
+        },
+        {
+          "all_file_list": null,
+          "base_path": "",
+          "config_file_name": "",
+          "json_text": "{\n            \"compilerOptions\": {\n                \"lib\": [\"es5\", \"es6\"]\n            }\n        }"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -770,6 +1857,29 @@
       "api": "json",
       "baseline": "config/tsconfigParsing/with outDir from base tsconfig with json api.js",
       "case": "config/tsconfigparsing/with-outdir-from-base-tsconfig-json-api",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/b.ts": "",
+            "/bin/a.ts": "",
+            "/tsconfigWithoutConfigDir.json": "{\n  \"compilerOptions\": {\n    \"outDir\": \"bin\"\n  }\n}"
+          },
+          "base_path": "/",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n  \"extends\": \"./tsconfigWithoutConfigDir.json\"\n}"
+        },
+        {
+          "all_file_list": {
+            "/b.ts": "",
+            "/bin/a.ts": "",
+            "/tsconfigWithConfigDir.json": "{\n  \"compilerOptions\": {\n    \"outDir\": \"${configDir}/bin\"\n  }\n}"
+          },
+          "base_path": "/",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n  \"extends\": \"./tsconfigWithConfigDir.json\"\n}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",
@@ -779,6 +1889,29 @@
       "api": "jsonSourceFile",
       "baseline": "config/tsconfigParsing/with outDir from base tsconfig with jsonSourceFile api.js",
       "case": "config/tsconfigparsing/with-outdir-from-base-tsconfig-jsonsourcefile-api",
+      "include_compiler_options": false,
+      "inputs": [
+        {
+          "all_file_list": {
+            "/b.ts": "",
+            "/bin/a.ts": "",
+            "/tsconfigWithoutConfigDir.json": "{\n  \"compilerOptions\": {\n    \"outDir\": \"bin\"\n  }\n}"
+          },
+          "base_path": "/",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n  \"extends\": \"./tsconfigWithoutConfigDir.json\"\n}"
+        },
+        {
+          "all_file_list": {
+            "/b.ts": "",
+            "/bin/a.ts": "",
+            "/tsconfigWithConfigDir.json": "{\n  \"compilerOptions\": {\n    \"outDir\": \"${configDir}/bin\"\n  }\n}"
+          },
+          "base_path": "/",
+          "config_file_name": "tsconfig.json",
+          "json_text": "{\n  \"extends\": \"./tsconfigWithConfigDir.json\"\n}"
+        }
+      ],
       "operation": "tsoptions.tsconfigParsingBaseline",
       "source": "table",
       "subject": "tsconfigParsingBaseline",

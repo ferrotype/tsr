@@ -27,9 +27,9 @@ use tsr_vfs::{Error, FileSystem, MemoryBuilder};
 /// `tools/s07/config/host.rs:27` is the existing one. The pinned
 /// `tsoptionstest` factory that does this in Go has no Rust counterpart, which
 /// `tools/phase1/config/src/parseconfighost.rs` already records as its own gap.
-struct Host {
-    fs: Arc<dyn FileSystem>,
-    cwd: JsString,
+pub(super) struct Host {
+    pub(super) fs: Arc<dyn FileSystem>,
+    pub(super) cwd: JsString,
 }
 #[allow(
     clippy::needless_pass_by_value,

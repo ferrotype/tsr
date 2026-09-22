@@ -2105,3 +2105,24 @@ order. Focused Rust checks and 167 Phase 1 Python tests plus 20 subtests pass;
 the committed-scope comparison is intentionally stale until the final F3b
 inventory refresh. This step does not claim the remaining config, cache and
 module-resolution gaps complete.
+
+### F3b continuation: config baseline bridge
+
+The same bridge now covers the 40 raw-JSON, 40 JSON-source and seven JSON-text
+config baselines. The inputs are frozen from the actual pinned test tables
+(and the already-reviewed input-only recovery for acquisition cases); the
+native producer refuses drift. Rust calls the production config APIs and pretty
+diagnostic writer. All option fields, raw values, acquisition values, file
+order, diagnostic positions/arguments/chains and formatted bytes are compared.
+The carried inline envelope assembly consumes supplied results only.
+
+All **87/87** config baselines reproduce the native bytes and canonical typed
+observations (`target/phase1/f3b-config-native-02` and
+`target/phase1/f3b-config-render-rust-02`). Floating-point transport uses IEEE-754
+bits: JSON's `1` versus `1.0` otherwise creates artificial canonical differences
+in four raw-value observations despite identical types and rendered bytes.
+The full intermediate family capture found the same seven existing differences
+and 96 remaining direct-operation gaps; its four additional raw-number transport
+differences were resolved by that lossless encoding. No earlier matching
+production case regressed. Focused clippy and the Phase 1 Python checks pass;
+tracker/inventory recording remains deferred to F3b completion.

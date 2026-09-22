@@ -10,9 +10,11 @@ import (
 	"encoding/hex"
 	stdjson "encoding/json"
 	"fmt"
+	"math"
 	"os"
 	"reflect"
 	"runtime"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -61,7 +63,7 @@ func bridgeWire(value any) any {
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 		return []any{"int", v.Uint()}
 	case reflect.Float64:
-		return []any{"float", v.Float()}
+		return []any{"float", fmt.Sprintf("%016x", math.Float64bits(v.Float()))}
 	case reflect.Slice:
 		if v.IsNil() {
 			return []any{"slice", nil}
@@ -132,15 +134,15 @@ func bridgeDecode(value any) any {
 		}
 		return n
 	case "float":
-		v, ok := row[1].(stdjson.Number)
-		if !ok {
-			panic("not number")
+		v, ok := row[1].(string)
+		if !ok || len(v) != 16 {
+			panic("float must be IEEE-754 hex")
 		}
-		n, err := v.Float64()
+		bits, err := strconv.ParseUint(v, 16, 64)
 		if err != nil {
 			panic(err)
 		}
-		return n
+		return math.Float64frombits(bits)
 	case "slice":
 		if row[1] == nil {
 			return []any(nil)
@@ -342,14 +344,17 @@ func bridgeCommandLine(request commandLineBaselineRequest, typed map[string]any)
 	sum := sha256.Sum256([]byte(rendered))
 	return map[string]any{"baseline": request.Baseline, "typed": typed, "rendered": rendered, "rendered_sha256": hex.EncodeToString(sum[:])}
 }
+
+var bridgeRenderers = map[string]func(stdjson.RawMessage, map[string]any) map[string]any{}
+
 func TestPhase1ConfigRender(t *testing.T) {
 	input, err := os.ReadFile(os.Getenv("S08_REQUESTS"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	var document struct {
-		Requests     []commandLineBaselineRequest `json:"requests"`
-		Observations []map[string]any             `json:"observations"`
+		Requests     []stdjson.RawMessage `json:"requests"`
+		Observations []map[string]any     `json:"observations"`
 	}
 	decoder := stdjson.NewDecoder(bytes.NewReader(input))
 	decoder.UseNumber()
@@ -359,12 +364,16 @@ func TestPhase1ConfigRender(t *testing.T) {
 	if len(document.Requests) != len(document.Observations) {
 		t.Fatal("renderer schedule size")
 	}
-	for i, request := range document.Requests {
+	for i, rawRequest := range document.Requests {
+		var request commandLineBaselineRequest
+		if err := stdjson.Unmarshal(rawRequest, &request); err != nil {
+			t.Fatal(err)
+		}
 		row := document.Observations[i]
 		if row["case"] != request.Case || row["operation"] != request.Operation {
 			t.Fatal("renderer schedule mismatch")
 		}
-		if request.Operation != commandLineOperation && request.Operation != buildOptionsOperation {
+		if request.Operation != commandLineOperation && request.Operation != buildOptionsOperation && bridgeRenderers[request.Operation] == nil {
 			continue
 		}
 		if row["result"] != "observed" {
@@ -374,7 +383,11 @@ func TestPhase1ConfigRender(t *testing.T) {
 		if !ok {
 			t.Fatal("missing typed result")
 		}
-		row["observation"] = bridgeCommandLine(request, typed)
+		if renderer := bridgeRenderers[request.Operation]; renderer != nil {
+			row["observation"] = renderer(rawRequest, typed)
+		} else {
+			row["observation"] = bridgeCommandLine(request, typed)
+		}
 	}
 	sum := sha256.Sum256(input)
 	result := map[string]any{"version": 1, "request_sha256": hex.EncodeToString(sum[:]), "go": runtime.Version(), "goos": runtime.GOOS, "goarch": runtime.GOARCH, "observations": document.Observations}

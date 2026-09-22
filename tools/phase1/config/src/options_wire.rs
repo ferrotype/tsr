@@ -54,7 +54,7 @@ impl Wire for ConfigValue {
             Self::Null => json!(["nil"]),
             Self::EmptyStruct => json!(["struct", {}]),
             Self::Boolean(b) => json!(["bool", b]),
-            Self::Number(n) => json!(["float", n]),
+            Self::Number(n) => json!(["float", format!("{:016x}", n.to_bits())]),
             Self::Integer(n) => json!(["int", n]),
             Self::Enum(n) => json!(["int", n]),
             Self::String(s) => s.wire(),
