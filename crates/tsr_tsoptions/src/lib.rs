@@ -323,3 +323,6 @@ mod command_line;
 pub use command_line::{
     input_option_name, parse_build_command_line, parse_command_line, ParsedBuildCommandLine,
 };
+
+#[cfg(feature = "harness")]
+pub use command_line::parse_command_line_test_worker;

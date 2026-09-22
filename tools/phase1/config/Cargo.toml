@@ -21,7 +21,7 @@ tsr_compiler = { version = "0.1.0", path = "../../../crates/tsr_compiler" }
 tsr_core = { version = "0.1.0", path = "../../../crates/tsr_core" }
 tsr_jsstring = { version = "0.1.0", path = "../../../crates/tsr_jsstring" }
 tsr_module = { version = "0.1.0", path = "../../../crates/tsr_module" }
-tsr_tsoptions = { version = "0.1.0", path = "../../../crates/tsr_tsoptions" }
+tsr_tsoptions = { version = "0.1.0", path = "../../../crates/tsr_tsoptions", features = ["harness"] }
 tsr_tspath = { version = "0.1.0", path = "../../../crates/tsr_tspath" }
 tsr_vfs = { version = "0.1.0", path = "../../../crates/tsr_vfs" }
 

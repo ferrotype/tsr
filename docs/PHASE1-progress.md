@@ -2072,3 +2072,36 @@ Clippy with warnings denied, Rust 1.96 checks for both changed consumers,
 formatting, publication policy and the 164 Phase 1 Python tests (20 subtests)
 pass. Inventory validation has no problems; pending Linux observations remain
 explicit.
+
+### F3b continuation: build paths and the shared CLI renderer
+
+`ParsedBuildCommandLine::resolved_project_paths` now mirrors the pinned lazy
+once cache, including JSON suffix rules, input order and repeated projects.
+Its seven direct Go build traces match; the focused tests also cover normalized
+paths and cache/clone behavior.
+
+The 53 ordinary and 27 build command-line baseline cases now execute the Rust
+production parser and diagnostic writer. The default-off `harness` feature
+exposes the same parser worker to the pinned synthetic declaration fixture.
+The argument vectors are frozen inputs and checked against the native input
+sections; neither Rust nor the renderer reads expected result sections.
+
+The Go bridge calls the original `formatNewBaseline`/`formatNewBaselineBuild`.
+It converts a complete typed option record to the native structs for their
+JSON encoding, rejecting unknown or missing fields and invalid types. Byte
+strings use hex; nil slices, empty slices, ordered maps, raw enum values and
+all three tristates stay distinct. Diagnostic arguments are an ordered
+sequence (nil and zero arguments both mean an empty sequence); this does not
+normalize any option container. Rust supplies its own formatted error bytes.
+Native witnesses passed through the same bridge reproduce all 80 frozen files.
+
+The scoped capture `target/phase1/f3b-cli-bridge` compares **80/80** byte and
+typed observations, with no missing or differing selected row. It retains the
+raw Rust output and renderer input/output with authenticated hashes; replay
+checks the renderer did not change a Rust value or outcome and starts no
+children. Renderer controls reject missing/unknown/wrong-type fields and
+repeated map keys, preserve nil/empty/order, and expose changed options or file
+order. Focused Rust checks and 167 Phase 1 Python tests plus 20 subtests pass;
+the committed-scope comparison is intentionally stale until the final F3b
+inventory refresh. This step does not claim the remaining config, cache and
+module-resolution gaps complete.

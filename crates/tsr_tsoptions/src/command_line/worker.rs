@@ -12,25 +12,25 @@ use tsr_jsstring::{wtf8::decode_utf8, JsString};
 
 #[derive(Clone, Copy)]
 pub(super) enum Mode {
-    Compiler,
+    Compiler(&'static [OptionDeclaration]),
     Build,
 }
 impl Mode {
     fn declarations(self) -> &'static [OptionDeclaration] {
         match self {
-            Self::Compiler => COMPILER_OPTIONS,
+            Self::Compiler(options) => options,
             Self::Build => BUILD_OPTIONS,
         }
     }
     fn mismatch(self) -> &'static Message {
         match self {
-            Self::Compiler => d::Compiler_option_0_expects_an_argument,
+            Self::Compiler(_) => d::Compiler_option_0_expects_an_argument,
             Self::Build => d::Build_option_0_requires_a_value_of_type_1,
         }
     }
     fn unknown(self, name: &[u8], argument: &[u8]) -> Diagnostic {
         let (alternate, alternate_message, unknown, suggestion_message) = match self {
-            Self::Compiler => (
+            Self::Compiler(_) => (
                 BUILD_OPTIONS,
                 d::Compiler_option_0_may_only_be_used_with_build,
                 d::Unknown_compiler_option_0,

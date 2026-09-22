@@ -29,7 +29,7 @@ pub struct ParsedBuildCommandLine {
 
 /// port: tsc/internal/tsoptions/commandlineparser.go:ParseCommandLine
 pub fn parse_command_line(args: &[JsString], host: &dyn ParseConfigHost) -> ParsedCommandLine {
-    let parsed = worker::parse(args, host, worker::Mode::Compiler);
+    let parsed = worker::parse(args, host, worker::Mode::Compiler(COMPILER_OPTIONS));
     let mut result = ParsedCommandLine::new(CompilerOptions::default(), parsed.files);
     let mut watch = WatchOptions::default();
     for (key, value) in &parsed.options {
@@ -175,4 +175,16 @@ impl ParsedBuildCommandLine {
             .0
         })
     }
+}
+
+/// Test-only counterpart of the pinned export_test.go worker. Uses the same
+/// parser body; declarations and expected results are supplied independently.
+#[cfg(feature = "harness")]
+pub fn parse_command_line_test_worker(
+    args: &[JsString],
+    host: &dyn ParseConfigHost,
+    declarations: &'static [crate::OptionDeclaration],
+) -> (V, Vec<JsString>, Vec<Diagnostic>) {
+    let parsed = worker::parse(args, host, worker::Mode::Compiler(declarations));
+    (V::Object(parsed.options), parsed.files, parsed.errors)
 }

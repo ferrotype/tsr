@@ -37,13 +37,13 @@ import (
 	stdjson "encoding/json"
 	"os"
 	"path/filepath"
+	"reflect"
 	"runtime"
 	"strings"
 	"testing"
 
 	"github.com/microsoft/TypeScript/tsc/internal/ast"
 	"github.com/microsoft/TypeScript/tsc/internal/diagnosticwriter"
-	"github.com/microsoft/TypeScript/tsc/internal/json"
 	"github.com/microsoft/TypeScript/tsc/internal/repo"
 	"github.com/microsoft/TypeScript/tsc/internal/tsoptions"
 	"github.com/microsoft/TypeScript/tsc/internal/tsoptions/tsoptionstest"
@@ -64,9 +64,10 @@ const (
 )
 
 type commandLineBaselineRequest struct {
-	Case      string `json:"case"`
-	Operation string `json:"operation"`
-	Baseline  string `json:"baseline"`
+	Case      string   `json:"case"`
+	Operation string   `json:"operation"`
+	Args      []string `json:"args"`
+	Baseline  string   `json:"baseline"`
 	// The synthesised option declaration the eight `option of type ...`
 	// outputs need, named by the kind the pinned test passes to
 	// `createVerifyNullForNonNullIncluded`. Empty for the other 72.
@@ -172,59 +173,39 @@ func TestPhase1ConfigCommandLine(t *testing.T) {
 		content := string(expected)
 		args := commandLineArgs(t, content)
 
-		var rendered string
-		sections := map[string]any{}
+		if !reflect.DeepEqual(args, request.Args) {
+			t.Fatalf("%s: frozen Args input differs from pinned test", request.Case)
+		}
+		typed := map[string]any{"build": nil}
+		var diagnostics []*ast.Diagnostic
 		switch request.Operation {
 		case commandLineOperation:
-			// The pinned host construction at commandlineparser_test.go:280.
-			parsed := tsoptions.ParseCommandLineTestWorker(
-				syntheticDeclarations(t, request.SyntheticOption), args, osvfs.FS(), t.TempDir())
-			optionBytes, marshalErr := json.Marshal(parsed.Options)
-			if marshalErr != nil {
-				t.Fatalf("%s: %v", request.Case, marshalErr)
-			}
-			fileNames := strings.Join(parsed.FileNames, ",")
-			errorText := formatDiagnostics(parsed.Errors)
-			sections["args"] = args
-			sections["compilerOptions"] = stdjson.RawMessage(optionBytes)
-			sections["fileNames"] = fileNames
-			sections["errors"] = errorText
-			rendered = formatNewBaseline(args, optionBytes, fileNames, errorText)
-
+			parsed := tsoptions.ParseCommandLineTestWorker(syntheticDeclarations(t, request.SyntheticOption), args, osvfs.FS(), t.TempDir())
+			typed["compiler"] = bridgeWire(parsed.Options)
+			typed["files"] = bridgeWire(parsed.FileNames)
+			diagnostics = parsed.Errors
 		case buildOptionsOperation:
-			// The pinned host construction at commandlineparser_test.go:382-385.
-			parsed := tsoptions.ParseBuildCommandLine(args, &tsoptionstest.VfsParseConfigHost{
-				Vfs:              osvfs.FS(),
-				CurrentDirectory: tspath.NormalizeSlashes(repo.TestDataPath()),
-			})
-			buildBytes, marshalErr := json.Marshal(parsed.BuildOptions)
-			if marshalErr != nil {
-				t.Fatalf("%s: %v", request.Case, marshalErr)
-			}
-			compilerBytes, marshalErr := json.Marshal(parsed.CompilerOptions)
-			if marshalErr != nil {
-				t.Fatalf("%s: %v", request.Case, marshalErr)
-			}
-			projects := strings.Join(parsed.Projects, ",")
-			errorText := formatDiagnostics(parsed.Errors)
-			sections["args"] = args
-			sections["buildOptions"] = stdjson.RawMessage(buildBytes)
-			sections["compilerOptions"] = stdjson.RawMessage(compilerBytes)
-			sections["projects"] = projects
-			sections["errors"] = errorText
-			rendered = formatNewBaselineBuild(args, buildBytes, compilerBytes, projects, errorText)
+			parsed := tsoptions.ParseBuildCommandLine(args, &tsoptionstest.VfsParseConfigHost{Vfs: osvfs.FS(), CurrentDirectory: tspath.NormalizeSlashes(repo.TestDataPath())})
+			typed["compiler"] = bridgeWire(parsed.CompilerOptions)
+			typed["build"] = bridgeWire(parsed.BuildOptions)
+			typed["files"] = bridgeWire(parsed.Projects)
+			diagnostics = parsed.Errors
 		}
-
-		renderedSum := sha256.Sum256([]byte(rendered))
+		typed["errors"] = hex.EncodeToString([]byte(formatDiagnostics(diagnostics)))
+		diagnosticRows := []any{}
+		for _, d := range diagnostics {
+			diagnosticRows = append(diagnosticRows, []any{d.Code(), bridgeWire(append([]string{}, d.MessageArgs()...))})
+		}
+		typed["diagnostics"] = diagnosticRows
+		observation := bridgeCommandLine(request, bridgeRoundtrip(typed).(map[string]any))
+		if observation["rendered"] != content {
+			t.Fatalf("%s: native renderer seam changed the frozen bytes", request.Case)
+		}
 		expectedSum := sha256.Sum256(expected)
 		row["result"] = "observed"
-		row["observation"] = map[string]any{
-			"baseline":        request.Baseline,
-			"sections":        sections,
-			"rendered":        rendered,
-			"rendered_sha256": hex.EncodeToString(renderedSum[:]),
-			"expected_sha256": hex.EncodeToString(expectedSum[:]),
-		}
+		row["observation"] = observation
+		row["metadata"] = map[string]any{"expected_sha256": hex.EncodeToString(expectedSum[:])}
+
 		observations = append(observations, row)
 	}
 

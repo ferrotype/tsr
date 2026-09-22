@@ -22,6 +22,7 @@ mod commandlineops;
 mod configparse;
 mod diagwriter;
 mod module;
+mod options_wire;
 mod packagejson;
 mod parseconfighost;
 mod tsconfigparsing;
