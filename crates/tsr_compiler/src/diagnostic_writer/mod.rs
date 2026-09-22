@@ -1,11 +1,15 @@
 //! Byte-preserving diagnostic display from `tsc/internal/diagnosticwriter`.
 //! This formats existing diagnostics; it never runs checker queries. Content-map
-//! span translation remains an explicit boundary until the spanmap port exists.
+//! spans resolve against the original text, preserving synthesized-code notes.
 use crate::{Error, Program};
 use std::{collections::HashMap, sync::Arc};
 use tsr_ast::{Diagnostic, NodeId, SourceFileRead};
 use tsr_jsstring::{JsString, SourceText};
 mod pretty;
+mod resolved;
+pub use resolved::{
+    to_diagnostics, try_clear_screen, wrap_diagnostics, AstDiagnostic, FileKind, ResolvedLocation,
+};
 
 type Result<T> = std::result::Result<T, Error>;
 const RESET: &[u8] = b"\x1b[0m";
@@ -35,6 +39,7 @@ pub struct File {
     text: SourceText,
     supplemental: bool,
     stable_identity: bool,
+    kind: FileKind,
     lines: Vec<i32>,
 }
 impl File {
@@ -92,38 +97,27 @@ impl<'a> DiagnosticWriter<'a> {
         }
     }
     /// port: tsc/internal/diagnosticwriter/diagnosticwriter.go:ASTDiagnostic.File
-    /// Original text for external diagnostics, canonical file names, and explicit
-    /// rejection of compiler diagnostics that still require span translation.
+    /// Select original or virtual text after resolving the diagnostic span.
     pub fn file(&mut self, diagnostic: &Diagnostic) -> Result<Option<Arc<File>>> {
         let Some(id) = diagnostic.file else {
             return Ok(None);
         };
-        let original = !diagnostic.source.is_empty();
+        let original = self.resolved_location(diagnostic)?.use_original;
         if let Some(file) = self.files.get(&(id, original)) {
             return Ok(Some(file.clone()));
         }
         let source = self.source(id)?;
-        if !original && source.span_map().is_some() {
-            return Err(Error::Unsupported(
-                "ASTDiagnostic.resolve content-map span translation",
-            ));
-        }
         let name = if let Some(canonical) = source.canonical_source_file() {
             self.source(canonical)?.parse_options().file_name.clone()
         } else {
             source.parse_options().file_name.clone()
         };
-        let text = if original {
-            SourceText::from_bytes(source.original_text())
+        let file = Arc::new(if original {
+            File::original(&source, name)
+        } else if name.as_bytes() != source.file_name() {
+            File::renamed(&source, name)
         } else {
-            source.text().clone()
-        };
-        let file = Arc::new(File {
-            name,
-            lines: tsr_jsstring::line_map::compute_ecma_line_starts(text.as_bytes()),
-            text,
-            supplemental: source.is_content_mapper_supplemental(),
-            stable_identity: !original && source.canonical_source_file().is_none(),
+            File::from_source(&source)
         });
         self.files.insert((id, original), file.clone());
         Ok(Some(file))
@@ -222,7 +216,7 @@ impl<'a> DiagnosticWriter<'a> {
     /// port: tsc/internal/diagnosticwriter/diagnosticwriter.go:WriteFormatDiagnostic
     fn plain(&mut self, out: &mut Vec<u8>, d: &Diagnostic) -> Result<()> {
         if let Some(file) = self.file(d)? {
-            let (line, ch) = file.line_and_character(d.loc.pos())?;
+            let (line, ch) = file.line_and_character(self.resolved_location(d)?.loc.pos())?;
             out.extend_from_slice(&self.relative_name(file.name.as_bytes()));
             out.extend_from_slice(format!("({},{}): ", line + 1, ch + 1).as_bytes());
         }
@@ -230,7 +224,7 @@ impl<'a> DiagnosticWriter<'a> {
         out.push(b' ');
         out.extend_from_slice(prefix(d));
         out.extend_from_slice(format!("{}: ", d.code).as_bytes());
-        out.extend_from_slice(&flattened(d, &self.options.new_line)?);
+        out.extend_from_slice(&self.flatten(d, &self.options.new_line)?);
         out.extend_from_slice(&self.options.new_line);
         Ok(())
     }
@@ -245,7 +239,7 @@ pub fn category(value: i32) -> Result<&'static [u8]> {
         _ => Err(Error::Unsupported("Unhandled diagnostic category")),
     }
 }
-fn color(value: i32) -> Result<&'static [u8]> {
+pub fn color(value: i32) -> Result<&'static [u8]> {
     match value {
         0 => Ok(YELLOW),
         1 => Ok(b"\x1b[91m"),
@@ -254,14 +248,14 @@ fn color(value: i32) -> Result<&'static [u8]> {
         _ => Err(Error::Unsupported("Unhandled diagnostic category")),
     }
 }
-fn prefix(d: &Diagnostic) -> &[u8] {
+pub fn prefix(d: &Diagnostic) -> &[u8] {
     if d.source.is_empty() {
         b"TS"
     } else {
         d.source.as_bytes()
     }
 }
-fn styled(out: &mut Vec<u8>, bytes: &[u8], style: &[u8], pretty: bool) {
+pub fn styled(out: &mut Vec<u8>, bytes: &[u8], style: &[u8], pretty: bool) {
     if pretty {
         out.extend_from_slice(style);
     }
@@ -274,7 +268,7 @@ fn styled(out: &mut Vec<u8>, bytes: &[u8], style: &[u8], pretty: bool) {
 /// Default-locale formatting uses Go ToValidUTF8 on substituted arguments.
 /// Stored arguments and unformatted external messages remain byte-exact.
 /// Uses the shared diagnostics::Format port for the default locale.
-fn localized(d: &Diagnostic) -> Result<Vec<u8>> {
+pub fn localized(d: &Diagnostic) -> Result<Vec<u8>> {
     if d.message.is_none() && !d.message_text.is_empty() {
         return Ok(d.message_text.as_bytes().to_vec());
     }
@@ -294,9 +288,9 @@ fn localized(d: &Diagnostic) -> Result<Vec<u8>> {
     tsr_diagnostics::try_format(message.text.as_bytes(), &args).map_err(Error::Unsupported)
 }
 /// Flatten already-resolved default-locale messages. This leaf operation does
-/// not translate content-mapper aliases; file-aware formatting rejects that
-/// unported path. Iteration keeps message nesting off the native call stack.
-/// port: tsc/internal/diagnosticwriter/diagnosticwriter.go:WriteFlattenedDiagnosticMessage
+/// not resolve files; use DiagnosticWriter::flatten for mapped diagnostics.
+/// Iteration keeps message nesting off the native call stack.
+/// Raw-message helper; the complete file-aware port is DiagnosticWriter::flatten.
 pub fn flattened(d: &Diagnostic, new_line: &[u8]) -> Result<Vec<u8>> {
     let mut out = localized(d)?;
     let mut stack: Vec<_> = d

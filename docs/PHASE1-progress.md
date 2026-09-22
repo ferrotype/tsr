@@ -2331,3 +2331,23 @@ The tsoptionstest helpers remain private harness composition. Host observation
 now uses the actual TestFs adapter, including its relative-path refusal, and the
 one-shot helper calls production config parsing. **11/11 host cases match.**
 Focused module tests and clippy pass.
+
+### F3b continuation: diagnostic display and forward source maps
+
+All **18/18 diagnostic-writer action cases match** pinned Go. The production
+writer now resolves original versus virtual ranges, retains canonical file
+names, appends the synthesized-code note without mutating diagnostics, and
+serves wrapper identity, related information, comparison, status, clear-screen
+and tabular display operations. Full plain/pretty formatting uses those same
+resolved locations. The raw chain helper remains available for callers that
+have no file context; it no longer claims the complete file-aware port.
+
+The required forward span-mapping slice lives with the AST span segments and is
+recorded as a partial Phase 5 prerequisite in PORTS.toml. Reverse lookups,
+feature filtering, mapper transport and validation are not claimed. Tests port
+native span/boundary expectations and exercise mapped plain/pretty output,
+external diagnostics, synthesized notes, foreign-source rejection and retained
+file text after its AST owner drops. The existing native diagnostic byte suite,
+config source parity and config diagnostic integration tests pass. Focused
+all-target clippy passes with warnings denied. The S07 config observer also
+handles the newly explicit foreign JSON input variants through normalization.

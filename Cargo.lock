@@ -418,6 +418,7 @@ dependencies = [
  "tsr_glob",
  "tsr_jsstring",
  "tsr_module",
+ "tsr_parser",
  "tsr_tsoptions",
  "tsr_tspath",
  "tsr_vfs",

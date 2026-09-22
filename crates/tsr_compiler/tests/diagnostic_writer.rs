@@ -69,3 +69,103 @@ fn deep_message_flattening_uses_an_explicit_stack() {
         .join()
         .unwrap();
 }
+
+#[test]
+fn mapped_diagnostics_select_text_without_mutating_the_ast() {
+    use tsr_ast::{
+        AstFile, ContentMapperSourceFileInfo, Diagnostic, NodeId, SourceFileParseOptions,
+        SourceFileRead, SpanSegment,
+    };
+    use tsr_compiler::{
+        diagnostic_writer::{DiagnosticSources, DiagnosticWriter, FormattingOptions},
+        Error,
+    };
+    use tsr_core::{ScriptKind, TextRange};
+    use tsr_jsstring::{JsString, SourceText};
+    struct Sources(AstFile, NodeId);
+    impl DiagnosticSources for Sources {
+        fn diagnostic_source(&self, id: NodeId) -> Result<SourceFileRead<'_>, Error> {
+            if id != self.1 {
+                return Err(Error::Unsupported("foreign test source"));
+            }
+            Ok(self.0.view().source_file(id)?)
+        }
+    }
+    let mut parsed = tsr_parser::parse_source_file(
+        SourceText::from_bytes(b"xxxfoo".as_slice()),
+        ScriptKind::TS,
+        SourceFileParseOptions {
+            file_name: JsString::from_bytes(b"/mapped.ts".as_slice()),
+            ..Default::default()
+        },
+    );
+    let root = parsed.root();
+    parsed
+        .builder_mut()
+        .source_file_mut(root)
+        .unwrap()
+        .set_content_mapper_info(ContentMapperSourceFileInfo {
+            content_mapper: JsString::from_bytes(b"test-mapper".as_slice()),
+            original_text: SourceText::from_bytes(b"\nfoo".as_slice()),
+            span_map: Some(tsr_ast::span_map::new(&[SpanSegment {
+                virtual_start: 3,
+                virtual_end: 6,
+                original_start: 1,
+                original_end: 4,
+                kind: 0,
+                features: 0,
+            }])),
+            ..Default::default()
+        });
+    let sources = Sources(parsed.publish_unbound(), root);
+    let mut writer = DiagnosticWriter::from_sources(
+        &sources,
+        FormattingOptions {
+            current_directory: b"/".to_vec(),
+            ..Default::default()
+        },
+    );
+    let mut diagnostic = Diagnostic::external(
+        Some(root),
+        TextRange::new(3, 6),
+        JsString::default(),
+        1,
+        9999,
+        JsString::from_bytes(b"problem".as_slice()),
+    );
+    assert_eq!(
+        writer.format(&[&diagnostic], false).unwrap(),
+        b"mapped.ts(2,1): error TS9999: problem\n"
+    );
+    let pretty = writer.format(&[&diagnostic], true).unwrap();
+    assert!(pretty.windows(3).any(|bytes| bytes == b"foo"));
+    assert!(!pretty.windows(6).any(|bytes| bytes == b"xxxfoo"));
+    assert_eq!(diagnostic.loc, TextRange::new(3, 6));
+    diagnostic.loc = TextRange::new(0, 2);
+    let rendered = writer.format(&[&diagnostic], false).unwrap();
+    assert!(rendered.starts_with(b"mapped.ts(1,1): error TS9999: problem\n  "));
+    assert!(rendered
+        .windows(b"test-mapper".len())
+        .any(|bytes| bytes == b"test-mapper"));
+    assert_eq!(diagnostic.message_chain.len(), 0);
+    diagnostic.source = JsString::from_bytes(b"external".as_slice());
+    diagnostic.loc = TextRange::new(1, 4);
+    assert_eq!(
+        writer.format(&[&diagnostic], false).unwrap(),
+        b"mapped.ts(2,1): error external9999: problem\n"
+    );
+    let retained = writer.file(&diagnostic).unwrap().unwrap();
+    let foreign = tsr_parser::parse_source_file(
+        SourceText::from_bytes(b"foo".as_slice()),
+        ScriptKind::TS,
+        SourceFileParseOptions {
+            file_name: JsString::from_bytes(b"/foreign.ts".as_slice()),
+            ..Default::default()
+        },
+    );
+    diagnostic.file = Some(foreign.root());
+    assert!(writer.file(&diagnostic).is_err());
+    drop(writer);
+    drop(sources);
+    assert_eq!(retained.text(), b"\nfoo");
+}

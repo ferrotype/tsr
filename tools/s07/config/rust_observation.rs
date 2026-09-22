@@ -53,6 +53,9 @@ fn observed(value: &C) -> Value {
         }
         C::Integer(value) => json!({"kind":"integer","value":value}),
         C::Enum(value) => json!({"kind":"integer","value":value}),
+        C::StringArray(_) | C::UnorderedObject(_) => {
+            observed(&tsr_tsoptions::normalize_json_value(value.clone()))
+        }
     }
 }
 fn diagnostic(value: &tsr_ast::Diagnostic, parsed: &ParsedCommandLine) -> Value {

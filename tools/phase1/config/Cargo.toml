@@ -27,5 +27,7 @@ tsr_tsoptions = { version = "0.1.0", path = "../../../crates/tsr_tsoptions", fea
 tsr_tspath = { version = "0.1.0", path = "../../../crates/tsr_tspath" }
 tsr_vfs = { version = "0.1.0", path = "../../../crates/tsr_vfs" }
 
+tsr_parser = { version = "0.1.0", path = "../../../crates/tsr_parser" }
+
 [lints]
 workspace = true
