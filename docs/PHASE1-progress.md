@@ -21,7 +21,7 @@ moved pin invalidates it.
 `f0_complete: false` with the outstanding items, separately from whether the
 manifests are internally consistent. This table tracks preparation; the later
 sections record production implementation separately. **F3b is complete** under
-the approved immutable-package exception; see the completion record below.
+the approved immutable-`Parseable` exception; see the completion record below.
 
 ## F1a — foundation leaf preparation
 
@@ -2291,7 +2291,7 @@ predicate follow the pin. Config helper comparisons are **127/145 exact**, with
 18 explicitly missing cases and no differing results. Three syntax unit tests
 and focused clippy pass.
 
-The owner separately approved immutable published package contents on 2026-09-22;
+The owner separately approved immutable published `Parseable` on 2026-09-22;
 the pinned caller audit and narrowly scoped alias-mutation exception are recorded
 in `PHASE1-aliasing-audit.md`. Final package evidence must preserve this difference.
 
@@ -2325,7 +2325,7 @@ absence distinct from null and reject off-type string reads. Dependency queries
 cover all four fields with native field order and early termination. The package
 probes also exercise the already-implemented first-writer info cache and shared
 contents. **15/16 package cases match**; the remaining case reports immutable
-publication explicitly (`mutation_performed: false`) under the owner's recorded
+`Parseable` explicitly (`mutation_performed: false`) under the owner's recorded
 exception, while preserving shared identity.
 
 The tsoptionstest helpers remain private harness composition. Host observation
@@ -2357,7 +2357,7 @@ handles the newly explicit foreign JSON input variants through normalization.
 ## F3b completion (2026-09-22)
 
 The remaining config, package and resolution implementation is complete under
-the owner-approved immutable-package-contents decision. The 80 command-line
+the owner-approved immutable-`Parseable` decision. The 80 command-line
 and 87 config outputs pass through the shared pinned Go test renderer; the 142
 matchFiles outputs also match the observed native renderer byte for byte.
 The existing 74 exceptions concerning historical matchFiles reference files
@@ -2365,13 +2365,15 @@ remain separate and unchanged. No renderer copies expected output sections.
 
 | Family | Final raw comparison |
 | --- | --- |
-| Config, command-line, resolution and display (486) | 485 match; 1 approved immutable-package alias difference |
+| Config, command-line, resolution and display (486) | 485 match; 1 approved `Parseable` alias-mutation difference |
 | Filesystem controls (359) | 355 match; 3 previously recorded differences; 1 Linux-only native unavailable |
 | Leaf controls (230) | 229 match; 1 previously approved options-clone difference |
 
 Every F3b case executes; none is missing or a harness failure. Package contents
-remain shared by identity and immutable after publication. The exact rejected
-mutation and its raw observation remain visible in the capture and
+remain shared by identity; `Parseable` remains immutable after publication.
+Version selection and traces retain shared memoization, while path tables are
+memoized per retrieval, as in Go. The exact rejected `Parseable` mutation and
+its raw observation remain visible in the capture and
 [ownership audit](PHASE1-aliasing-audit.md).
 This approval does not suppress unrelated future differences.
 

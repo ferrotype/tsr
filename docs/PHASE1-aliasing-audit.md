@@ -173,12 +173,14 @@ The case manifest's old preparation-time explanation described timestamps as
 unsupported. It is corrected to the implemented behavior and the single
 observed difference; no recorded observation is rewritten.
 
-## Parsed package contents: approved immutable publication
+## Package `Parseable`: approved immutable-field divergence
 
-On 2026-09-22 the owner approved keeping parsed package contents immutable while
-preserving their shared identity. `InfoCacheEntry::with_package_directory`
-retains the same contents Arc when it creates a directory-specific view. Neither
-view can mutate the published parsed fields.
+On 2026-09-22 the owner approved keeping `PackageJson.Parseable` immutable after
+publication. This exception covers mutation of that field only; it does not
+waive shared identity or production memoization. For a different directory,
+`InfoCacheEntry::with_package_directory` creates a new entry retaining the exact
+same contents Arc. For an unchanged directory, it returns the same entry Arc,
+matching `internal/packagejson/cache.go:InfoCacheEntry.WithPackageDirectory`.
 
 The pinned production audit found three `Parseable` initializations (module
 resolution and project auto-import construction) and one read in
@@ -188,3 +190,27 @@ an alias in `with_package_directory_shares_contents`. That mutation is a named
 Go/Rust divergence, not evidence of an absent directory-alias operation and not
 covered implicitly by the earlier options or filesystem approvals. Comparison
 must retain the mutation difference and the separate shared-identity witness.
+
+The recorded alias row is `[false, true, false, true]` in Go and
+`[false, true, false, false]` in Rust: different entry, shared contents, initial
+`Parseable`, final `Parseable`. Only the fourth element differs. Rust also
+reports `mutation_performed: false`; the raw comparison remains `different`,
+and the native observation is retained.
+
+The pin has two distinct cache lifetimes, neither covered by this exception:
+
+- `PackageJson.GetVersionPaths` initializes version selection and recorded
+  traces once on the shared package, then replays the traces on every traced
+  call. Rust's `PackageContents.version_paths` is a `OnceLock` behind the shared
+  Arc, so directory aliases observe the same initialization.
+- `GetVersionPaths` returns `VersionPaths` **by value**. `VersionPaths.GetPaths`
+  memoizes the mapping table on that returned value, not on the shared package.
+  Repeated reads of one retrieval share a table; separate retrievals build
+  separate tables. Rust keeps a retrieval-local `OnceLock` accordingly. Moving
+  it into the package Arc would change the pinned behavior.
+
+The native `version-paths-mappings-are-rebuilt-per-retrieval` probe observes
+`[true, false]` for same-retrieval and cross-retrieval table identity, matching
+Rust. The Rust `directory_alias_preserves_uncomputed_and_initialized_version_cache_identity`
+test separately checks shared selection state before and after initialization
+and distinct, equal mapping tables across retrievals.
