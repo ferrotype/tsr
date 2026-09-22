@@ -36,6 +36,7 @@ mod auxiliary_tests;
 mod data_generated;
 mod diagnostic;
 mod diagnostic_order;
+pub mod evaluator;
 mod factory;
 mod factory_generated;
 mod jsdoc;
@@ -116,7 +117,8 @@ pub use transform_generated::{VisitContext, VisitorMethods};
 pub use tsr_arena::{ArenaId, NodeId};
 pub use tsr_jsstring::JsString;
 pub use visitor::{
-    modifier_to_flag, ListVisit, NodeVisit, NodeVisitor, NodeVisitorHooks, RuntimeFactory,
+    modifier_to_flag, ChildSlot, ListVisit, NodeVisit, NodeVisitor, NodeVisitorHooks,
+    RuntimeFactory,
 };
 
 use std::ops::ControlFlow;

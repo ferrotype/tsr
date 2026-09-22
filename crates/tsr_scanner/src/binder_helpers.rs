@@ -66,9 +66,11 @@ pub fn get_text_of_node_from_source_text(
         } else if node.kind() == K::Identifier {
             return Ok(JsString::from_bytes(view.node_text(id)?.as_bytes()));
         }
-        panic!(
-            "Debug failure. Unexpected reparser-transformed node kind\nNode {} was unexpected.",
-            node.kind_string()
+        tsr_core::debug::fail_bad_syntax_kind(
+            &node.kind_string(),
+            &[tsr_core::debug::Argument::String(
+                "Unexpected reparser-transformed node kind",
+            )],
         );
     }
     Ok(JsString::from_bytes(text.as_ref()))

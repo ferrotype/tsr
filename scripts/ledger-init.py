@@ -38,7 +38,7 @@ CRATES = {
     "internal/debug": ("tsr_core", 1),
     "internal/diagnostics": ("tsr_diagnostics", 1),
     "internal/diagnosticwriter": ("tsr_diagnosticwriter", 4),
-    "internal/evaluator": ("tsr_evaluator", 1),
+    "internal/evaluator": ("tsr_ast", 1),
     "internal/execute/build": ("tsr_build", 4),
     "internal/execute/incremental": ("tsr_incremental", 4),
     "internal/execute/tsc": ("tsr_execute", 4),

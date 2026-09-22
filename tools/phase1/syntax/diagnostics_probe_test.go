@@ -2,10 +2,10 @@ package compiler
 
 // Phase 1 F4a, `syntacticDiagnostics` group (plan task 4): access only. Each
 // request is a small in-memory program. The probe builds it with the pinned
-// NewProgram, calls only Program.GetSyntacticDiagnostics -- for the whole
-// program, or for the one file the request names -- and renders the result
-// with the production diagnosticwriter. It never runs the binder, the checker,
-// declaration diagnostics or emit, and it carries no expected value.
+// NewProgram, calls Program.GetSyntacticDiagnostics or Program.GetBindDiagnostics
+// as selected by the subject, and renders only that phase's result with the
+// production diagnosticwriter. Bind requests invoke the native binder; neither
+// subject invokes the checker, declaration diagnostics or emit.
 //
 // It is an IN-PACKAGE test file so a later probe may reach unexported program
 // state; this one needs only exported entry points. Every name is prefixed
@@ -92,7 +92,12 @@ func phase1SyntaxObserve(t *testing.T, request phase1SyntaxRequest) map[string]a
 			t.Fatalf("%s: scope %s is not a program file", request.Case, *request.Scope)
 		}
 	}
-	diagnostics := program.GetSyntacticDiagnostics(context.Background(), target)
+	var diagnostics []*ast.Diagnostic
+	if request.Subject == "bindDiagnostics" {
+		diagnostics = program.GetBindDiagnostics(context.Background(), target)
+	} else {
+		diagnostics = program.GetSyntacticDiagnostics(context.Background(), target)
+	}
 	ordered := []any{}
 	for _, d := range diagnostics {
 		ordered = append(ordered, phase1SyntaxDiagnostic(d))
@@ -132,7 +137,7 @@ func TestPhase1SyntaxDiagnostics(t *testing.T) {
 			t.Fatal(err)
 		}
 		row := map[string]any{"case": request.Case, "operation": request.Operation}
-		if request.Subject == "syntacticDiagnostics" {
+		if request.Subject == "syntacticDiagnostics" || request.Subject == "bindDiagnostics" {
 			row["result"] = "observed"
 			row["observation"] = phase1SyntaxObserve(t, request)
 		} else {

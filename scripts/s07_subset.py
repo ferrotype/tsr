@@ -19,8 +19,11 @@ TABLES = ROOT / "tools/s07/subset"
 PIN = strict_json_loads((ROOT / "data/upstream.json").read_bytes())["pin"]
 PRODUCER_INPUTS = (
     "tools/s07/subset/export_test.go", "tools/s07/subset/options_bridge.go",
-    "scripts/s06_build.py", "scripts/s06_oracle/export_test.go", "scripts/s06_oracle/metadata_bridge.go",
-    "scripts/s04.py", "scripts/s04_common.py", "data/s04/toolchains.toml", "data/upstream.json",
+    "scripts/s07_subset.py", "scripts/s06_build.py",
+    "scripts/s06_oracle/export_test.go", "scripts/s06_oracle/metadata_bridge.go",
+    "scripts/s06_oracle/export_boundaries_test.go", "scripts/s06_oracle/fixture_export_test.go",
+    "scripts/s04.py", "scripts/s04_common.py", "scripts/s04_runtime.py", "scripts/tracking-bootstrap.py",
+    "data/s04/toolchains.toml", "data/upstream.json", ".gitmodules",
 )
 
 

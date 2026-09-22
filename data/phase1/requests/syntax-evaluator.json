@@ -1750,6 +1750,174 @@
           "bool": true
         }
       ]
+    },
+    {
+      "case": "syntax/evaluator/string-literal-bytes",
+      "discriminates": "Lone high and low surrogate escapes retain their distinct CESU-8 bytes; replacement characters remain different; paired escapes and a non-BMP escape produce the same UTF-8 value.",
+      "entities": {},
+      "host_applicability": "any",
+      "mode": "evaluate",
+      "operation": "tsc/internal/evaluator/evaluator.go:NewEvaluator",
+      "order_sensitive": true,
+      "skip": [],
+      "source": "\"\\uD800\"; \"\\uD801\"; \"\\uDC00\"; \"\\uFFFD\\uFFFD\\uFFFD\"; \"\\uD83D\\uDE00\"; \"\\u{1F600}\";",
+      "subject": "evaluator"
+    },
+    {
+      "case": "syntax/evaluator/string-concatenation-bytes",
+      "discriminates": "Concatenation preserves every operand byte, including separately evaluated high/low surrogates and malformed callback strings; it must not normalize surrogate pairs or replace invalid bytes.",
+      "entities": {
+        "hi": {
+          "has_external_references": false,
+          "is_syntactically_string": false,
+          "resolved_other_files": true,
+          "value": {
+            "string_hex": "eda080"
+          }
+        },
+        "lo": {
+          "has_external_references": true,
+          "is_syntactically_string": false,
+          "resolved_other_files": false,
+          "value": {
+            "string_hex": "edb080"
+          }
+        },
+        "raw": {
+          "has_external_references": false,
+          "is_syntactically_string": false,
+          "resolved_other_files": false,
+          "value": {
+            "string_hex": "ff0080"
+          }
+        }
+      },
+      "host_applicability": "any",
+      "mode": "evaluate",
+      "operation": "tsc/internal/evaluator/evaluator.go:NewEvaluator",
+      "order_sensitive": true,
+      "skip": [],
+      "source": "\"\\uD800\" + \"x\"; \"x\" + \"\\uDC00\"; \"\\uD800\" + \"\\uDC00\"; hi + lo; \"p\" + raw;",
+      "subject": "evaluator"
+    },
+    {
+      "case": "syntax/evaluator/template-string-bytes",
+      "discriminates": "Template heads, literal tails and callback values preserve lone surrogates, non-BMP UTF-8, replacement characters and malformed bytes through AnyToString, alongside callback order and cross-file flags.",
+      "entities": {
+        "hi": {
+          "has_external_references": false,
+          "is_syntactically_string": false,
+          "resolved_other_files": true,
+          "value": {
+            "string_hex": "eda080"
+          }
+        },
+        "lo": {
+          "has_external_references": true,
+          "is_syntactically_string": false,
+          "resolved_other_files": false,
+          "value": {
+            "string_hex": "edb080"
+          }
+        },
+        "pair": {
+          "has_external_references": false,
+          "is_syntactically_string": false,
+          "resolved_other_files": false,
+          "value": {
+            "string_hex": "f09f9880"
+          }
+        },
+        "raw": {
+          "has_external_references": false,
+          "is_syntactically_string": false,
+          "resolved_other_files": false,
+          "value": {
+            "string_hex": "ff0080"
+          }
+        },
+        "replacement": {
+          "has_external_references": false,
+          "is_syntactically_string": false,
+          "resolved_other_files": false,
+          "value": {
+            "string_hex": "efbfbdefbfbdefbfbd"
+          }
+        }
+      },
+      "host_applicability": "any",
+      "mode": "evaluate",
+      "operation": "tsc/internal/evaluator/evaluator.go:evaluateTemplateExpression",
+      "order_sensitive": true,
+      "skip": [],
+      "source": "`a\\uD800${1}\\uDC00`; `${hi}|${lo}|${raw}`; `${pair}`; `${replacement}`;",
+      "subject": "evaluator"
+    },
+    {
+      "case": "syntax/evaluator/any-to-string-bytes",
+      "discriminates": "AnyToString returns arbitrary string bytes unchanged, keeping distinct lone surrogates separate from replacement characters and preserving embedded NUL and malformed UTF-8.",
+      "flags": [],
+      "host_applicability": "any",
+      "mode": "any_to_string",
+      "operation": "tsc/internal/evaluator/evaluator.go:AnyToString",
+      "order_sensitive": true,
+      "subject": "evaluator",
+      "values": [
+        {
+          "string_hex": ""
+        },
+        {
+          "string_hex": "eda080"
+        },
+        {
+          "string_hex": "eda081"
+        },
+        {
+          "string_hex": "edb080"
+        },
+        {
+          "string_hex": "efbfbdefbfbdefbfbd"
+        },
+        {
+          "string_hex": "f09f9880"
+        },
+        {
+          "string_hex": "ff0080"
+        }
+      ]
+    },
+    {
+      "case": "syntax/evaluator/is-truthy-string-bytes",
+      "discriminates": "String truthiness observes byte length: only the empty byte string is false; lone surrogates, non-BMP text, replacement characters and malformed bytes are nonempty.",
+      "flags": [],
+      "host_applicability": "any",
+      "mode": "is_truthy",
+      "operation": "tsc/internal/evaluator/evaluator.go:IsTruthy",
+      "order_sensitive": true,
+      "subject": "evaluator",
+      "values": [
+        {
+          "string_hex": ""
+        },
+        {
+          "string_hex": "eda080"
+        },
+        {
+          "string_hex": "eda081"
+        },
+        {
+          "string_hex": "edb080"
+        },
+        {
+          "string_hex": "efbfbdefbfbdefbfbd"
+        },
+        {
+          "string_hex": "f09f9880"
+        },
+        {
+          "string_hex": "ff0080"
+        }
+      ]
     }
   ]
 }

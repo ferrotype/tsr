@@ -37,6 +37,7 @@ import (
 type phase1Value struct {
 	Number      *string `json:"number"`
 	String      *string `json:"string"`
+	StringHex   *string `json:"string_hex"`
 	Bool        *bool   `json:"bool"`
 	BigInt      *string `json:"bigint"`
 	Nil         bool    `json:"nil"`
@@ -45,12 +46,19 @@ type phase1Value struct {
 
 type phase1Unsupported struct{}
 
-func (v phase1Value) decode() any {
+func (v phase1Value) decode(t *testing.T) any {
+	t.Helper()
 	switch {
 	case v.Number != nil:
 		return jsnum.FromString(*v.Number)
 	case v.String != nil:
 		return *v.String
+	case v.StringHex != nil:
+		bytes, err := hex.DecodeString(*v.StringHex)
+		if err != nil {
+			t.Fatalf("invalid evaluator string_hex: %v", err)
+		}
+		return string(bytes)
 	case v.Bool != nil:
 		return *v.Bool
 	case v.BigInt != nil:
@@ -65,7 +73,9 @@ func (v phase1Value) decode() any {
 }
 
 // phase1Encode renders a Go value with its dynamic type, so a number that
-// became a string (or -0 that became 0) is visible.
+// became a string (or -0 that became 0) is visible. Go strings carry arbitrary
+// bytes, including the scanner's lone-surrogate encodings. JSON strings would
+// replace those bytes, so string values always travel as hexadecimal bytes.
 func phase1Encode(value any) any {
 	switch v := value.(type) {
 	case nil:
@@ -74,7 +84,7 @@ func phase1Encode(value any) any {
 		// A NaN's sign bit is not part of any contract, so it is not recorded.
 		return []any{"number", v.String(), math.Signbit(float64(v)) && !v.IsNaN(), v.IsNaN()}
 	case string:
-		return []any{"string", v}
+		return []any{"string_hex", hex.EncodeToString([]byte(v))}
 	case bool:
 		return []any{"bool", v}
 	case jsnum.PseudoBigInt:
@@ -148,7 +158,7 @@ func phase1Evaluate(t *testing.T, request phase1EvalRequest) []any {
 		if !ok {
 			return Result{}
 		}
-		return Result{entity.Value.decode(), entity.IsSyntacticallyString, entity.ResolvedOtherFiles, entity.HasExternalReferences}
+		return Result{entity.Value.decode(t), entity.IsSyntacticallyString, entity.ResolvedOtherFiles, entity.HasExternalReferences}
 	}
 	evaluate := NewEvaluator(callback, skip)
 	rows := []any{}
@@ -169,19 +179,19 @@ func phase1Direct(t *testing.T, request phase1EvalRequest) []any {
 	switch request.Mode {
 	case "any_to_string":
 		for _, value := range request.Values {
-			decoded := value.decode()
-			rows = append(rows, []any{phase1Encode(decoded), phase1Guarded(func() any { return AnyToString(decoded) })})
+			decoded := value.decode(t)
+			rows = append(rows, []any{phase1Encode(decoded), phase1Guarded(func() any { return phase1Encode(AnyToString(decoded)) })})
 		}
 	case "is_truthy":
 		for _, value := range request.Values {
-			decoded := value.decode()
+			decoded := value.decode(t)
 			rows = append(rows, []any{phase1Encode(decoded), phase1Guarded(func() any { return IsTruthy(decoded) })})
 		}
 	case "new_result":
 		for i, flags := range request.Flags {
 			var value any = nil
 			if i < len(request.Values) {
-				value = request.Values[i].decode()
+				value = request.Values[i].decode(t)
 			}
 			rows = append(rows, phase1Result(NewResult(value, flags[0], flags[1], flags[2])))
 		}

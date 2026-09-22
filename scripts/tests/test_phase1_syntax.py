@@ -8,8 +8,10 @@ real defect would and requires the validator to name it.
 import copy
 import json
 import sys
+import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
@@ -185,6 +187,36 @@ class SyntaxScheduleTests(unittest.TestCase):
         self.assertTrue(any("names its phase" in p for p in self.check(schedule)))
 
 
+class SyntaxScheduleRequestControls(unittest.TestCase):
+    def test_native_closure_includes_preprocessing_and_executed_helpers(self):
+        import s07_subset
+
+        required = {"scripts/tracking-bootstrap.py", "scripts/s04_runtime.py", "scripts/s06_build.py",
+                    "scripts/s06_oracle/export_boundaries_test.go", "scripts/s06_oracle/fixture_export_test.go",
+                    "tools/s07/subset/export_test.go", "tools/s07/subset/options_bridge.go", ".gitmodules"}
+        self.assertLessEqual(required, set(s07_subset.PRODUCER_INPUTS))
+        required.update(s07_subset.PRODUCER_INPUTS)
+        required.update({"scripts/s06_corpus.py", "scripts/s06_protocol.py", "data/s06/corpus.json"})
+        self.assertLessEqual(required, set(syntax.schedule_inputs()))
+
+    def test_wire_requests_preserve_the_frozen_paths_order(self):
+        from s07_subset import json_bytes, sha256
+
+        request = {"id": "ordered", "options": {"paths": {"foo": ["first"], "bar": ["second"]}}}
+        probes = [{"id": "ordered", "request": request, "guard": True, "load": True}]
+        decoded = json.loads(syntax.schedule_request_bytes(probes))[0]["request"]
+        self.assertEqual(list(decoded["options"]["paths"]), ["foo", "bar"])
+        self.assertEqual(sha256(json_bytes(decoded)), sha256(json_bytes(request)))
+
+    def test_unexpected_native_panic_invalidates_the_capture(self):
+        import phase1_syntax_schedule
+
+        with self.assertRaisesRegex(ValueError, "unexpected native syntax panic"):
+            phase1_syntax_schedule.join(
+                [{"id": "panic"}], [{"id": "panic", "guard": True, "load": True}],
+                {"rows": [{"id": "panic", "option_guard": "allowed", "load": "panic", "panic": "boom"}]})
+
+
 class SyntaxComparatorControls(unittest.TestCase):
     """Plan task 8: each control perturbs a real observation the way a defect
     would and requires the comparator to fail."""
@@ -234,10 +266,23 @@ class SyntaxComparatorControls(unittest.TestCase):
     def test_a_different_program_fails(self):
         self.assertEqual(self.result(self.rust(file_names_sha256="0" * 64))["differs"], ["file_names_sha256"])
 
-    def test_a_rust_load_failure_is_a_difference_not_a_skip(self):
-        for state in ("panic", "load_error", "error"):
-            outcome = self.result({"id": self.native["id"], "state": state, "panic": "boom", "error": "boom"})
-            self.assertEqual(outcome["result"], "different", state)
+    def test_a_rust_load_error_is_a_difference_not_a_skip(self):
+        outcome = self.result({"id": self.native["id"], "state": "load_error", "error": "boom"})
+        self.assertEqual(outcome["result"], "different")
+
+    def test_unexpected_failures_invalidate_the_smoke(self):
+        for state in ("panic", "error", "unknown", None):
+            with self.subTest(state=state), self.assertRaisesRegex(ValueError, "harness failed"):
+                self.result({"id": self.native["id"], "state": state, "panic": "boom", "error": "boom"})
+
+    def test_malformed_observed_rows_cannot_be_semantic_differences(self):
+        for field, value in (("files", None), ("syntactic", None), ("pretty_hex", "invalid")):
+            with self.subTest(field=field), self.assertRaisesRegex(ValueError, "malformed"):
+                self.result(self.rust(**{field: value}))
+
+    def test_a_missing_entry_point_must_be_named(self):
+        with self.assertRaisesRegex(ValueError, "lacks its operation"):
+            self.result({"id": self.native["id"], "state": "not_implemented"})
 
     def test_a_named_unsupported_branch_is_not_implemented(self):
         outcome = self.result({"id": self.native["id"], "state": "not_implemented", "operation": "x"})
@@ -305,6 +350,284 @@ class SyntaxSmokeTests(unittest.TestCase):
             path.write_text("".join(json.dumps(row) + "\n" for row in rows))
             report = syntax._smoke_report(Path(directory), selected, native, schedule)
             self.assertEqual({k: v for k, v in report["counts"].items() if k != "not_run"}, {"match": 3})
+
+
+class SyntaxReplayControls(unittest.TestCase):
+    def setUp(self):
+        from s07_subset import json_bytes, sha256
+
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        self.directory = Path(temporary.name)
+        self.request = {"id": "case", "options": {}, "files": {}, "roots": []}
+        self.schedule = {"rows": [{"id": "case", "load": "loaded", "request_shape": [],
+                                   "native_selection": "runs",
+                                   "loading_request_sha256": sha256(json_bytes(self.request))}]}
+        self.native = {"rows": [{"id": "case", "files": 0, "file_names_sha256": "0" * 64,
+                                 "syntactic": [], "plain_hex": "", "pretty_hex": ""}]}
+        schedule_path = self.directory / "schedule.json"
+        native_path = self.directory / "native.json"
+        schedule_path.write_bytes(syntax._json_canonical(self.schedule))
+        native_path.write_bytes(syntax._json_canonical(self.native))
+        for name, value in (("SCHEDULE", schedule_path), ("NATIVE", native_path)):
+            replacement = patch.object(syntax, name, value)
+            replacement.start()
+            self.addCleanup(replacement.stop)
+        replacement = patch.object(syntax, "rust_closure", return_value={".cargo/config.toml": "current"})
+        replacement.start()
+        self.addCleanup(replacement.stop)
+        self.probes = [{"id": "case", "request": self.request, "load": True, "guard": True}]
+        self.rust = [{**self.native["rows"][0], "state": "observed"}]
+        self.provenance = {"schedule_sha256": sha256(schedule_path.read_bytes()),
+                           "native_rows_sha256": syntax.native_rows_digest(self.native),
+                           "rust_binary_sha256": "unused", "selected": ["case"],
+                           "rust_closure": {".cargo/config.toml": "current"}}
+        self.write_capture()
+
+    def write_capture(self):
+        from s07_subset import sha256
+
+        requests = syntax.schedule_request_bytes(self.probes)
+        rows = b"".join(syntax._json_canonical(row) for row in self.rust)
+        (self.directory / "requests.json").write_bytes(requests)
+        (self.directory / "rust-rows.jsonl").write_bytes(rows)
+        self.provenance.update(requests_sha256=sha256(requests), rust_rows_sha256=sha256(rows))
+        (self.directory / "provenance.json").write_bytes(syntax._json_canonical(self.provenance))
+
+    def test_valid_capture_replays_without_children(self):
+        with patch("s04_common.command", side_effect=AssertionError("replay ran a child")):
+            self.assertEqual(syntax.replay(self.directory)["counts"], {"match": 1, "not_run": 0})
+
+    def test_a_changed_schedule_is_refused(self):
+        syntax.SCHEDULE.write_text(syntax.SCHEDULE.read_text() + "\n")
+        with self.assertRaisesRegex(ValueError, "schedule changed"):
+            syntax.replay(self.directory)
+
+    def test_a_self_consistent_but_partial_capture_is_refused(self):
+        self.provenance["selected"] = []
+        self.probes, self.rust = [], []
+        self.write_capture()
+        with self.assertRaisesRegex(ValueError, "rule's selection"):
+            syntax.replay(self.directory)
+
+    def test_request_payload_must_match_the_frozen_loading_request(self):
+        self.request["options"]["checkJs"] = True
+        self.write_capture()
+        with self.assertRaisesRegex(ValueError, "frozen loading request"):
+            syntax.replay(self.directory)
+
+    def test_an_omitted_source_input_is_not_current(self):
+        self.provenance["rust_closure"] = {}
+        self.write_capture()
+        self.assertFalse(syntax.replay(self.directory)["rust_sources_current"])
+
+    def test_omitting_a_whole_parser_package_is_not_current(self):
+        current = {"Cargo.toml": "workspace", "tools/phase1/syntax/Cargo.toml": "driver",
+                   "crates/tsr_parser/Cargo.toml": "parser", "crates/tsr_parser/src/lib.rs": "code"}
+        self.provenance["rust_closure"] = {
+            name: digest for name, digest in current.items() if not name.startswith("crates/tsr_parser/")}
+        self.write_capture()
+        with patch.object(syntax, "rust_closure", return_value=current):
+            self.assertFalse(syntax.replay(self.directory)["rust_sources_current"])
+
+    def test_rust_panic_cannot_produce_a_report(self):
+        self.rust = [{"id": "case", "state": "panic", "panic": "boom"}]
+        self.write_capture()
+        with self.assertRaisesRegex(ValueError, "harness failed"):
+            syntax.replay(self.directory)
+
+    def full_capture(self):
+        from s07_subset import json_bytes, sha256
+
+        second = {**self.request, "id": "case-two"}
+        self.schedule["rows"].append({**self.schedule["rows"][0], "id": second["id"],
+                                      "loading_request_sha256": sha256(json_bytes(second))})
+        self.native["rows"].append({**self.native["rows"][0], "id": second["id"]})
+        self.probes.append({"id": second["id"], "request": second, "load": True, "guard": True})
+        self.rust.append({**self.native["rows"][-1], "state": "observed"})
+        syntax.SCHEDULE.write_bytes(syntax._json_canonical(self.schedule))
+        syntax.NATIVE.write_bytes(syntax._json_canonical(self.native))
+        self.provenance.update(selection="full", rule=syntax.FULL_RULE, selected=["case", "case-two"],
+                               schedule_sha256=sha256(syntax.SCHEDULE.read_bytes()),
+                               native_rows_sha256=syntax.native_rows_digest(self.native))
+        self.write_capture()
+
+    def test_full_capture_requires_every_loaded_row(self):
+        self.full_capture()
+        report = syntax.replay(self.directory)
+        self.assertEqual(report["counts"], {"match": 2, "not_run": 0})
+        self.assertEqual(report["selection"], "full")
+        self.assertEqual(report["rule"], syntax.FULL_RULE)
+        self.provenance["selected"].pop()
+        self.probes.pop()
+        self.rust.pop()
+        self.write_capture()
+        with self.assertRaisesRegex(ValueError, "rule's selection"):
+            syntax.replay(self.directory)
+
+    def test_smoke_can_be_derived_from_full_outputs_without_children(self):
+        self.full_capture()
+        with patch("s04_common.command", side_effect=AssertionError("child")):
+            report = syntax.smoke_from_full(self.directory)
+        self.assertEqual(report["selected"], ["case"])
+        self.assertEqual(report["counts"], {"match": 1, "not_run": 1})
+        self.assertEqual((report["selection"], report["capture_selection"]), ("smoke", "full"))
+        self.assertEqual(report["rule"], syntax.SMOKE_RULE)
+
+    def test_deriving_smoke_does_not_hide_a_failure_outside_the_smoke(self):
+        self.full_capture()
+        self.rust[-1] = {"id": "case-two", "state": "panic", "panic": "outside smoke"}
+        self.write_capture()
+        with self.assertRaisesRegex(ValueError, "harness failed"):
+            syntax.smoke_from_full(self.directory)
+
+    def test_full_replay_checks_unselected_smoke_request_payloads(self):
+        self.full_capture()
+        self.probes[-1]["request"] = {**self.probes[-1]["request"], "options": {"checkJs": True}}
+        self.write_capture()
+        with self.assertRaisesRegex(ValueError, "frozen loading request"):
+            syntax.smoke_from_full(self.directory)
+
+    def test_a_smoke_capture_cannot_pose_as_the_full_capture(self):
+        with self.assertRaisesRegex(ValueError, "requires a full"):
+            syntax.smoke_from_full(self.directory)
+
+    def test_full_and_smoke_reports_have_separate_validation(self):
+        self.full_capture()
+        path = self.directory / "full-report.json"
+        path.write_bytes(syntax._json_canonical(syntax.replay(self.directory)))
+        self.assertEqual(syntax._report_problems(path, full=True), [])
+        self.assertTrue(any("selection" in problem for problem in syntax._report_problems(path)))
+
+    def test_full_cli_uses_the_same_capture_function(self):
+        with patch.object(syntax, "smoke", return_value={"match": 2}) as run, patch("builtins.print"):
+            self.assertEqual(syntax.main(["smoke", "--full", "--write", "--output", str(self.directory)]), 0)
+        run.assert_called_once_with(self.directory, write_committed=True, full=True)
+
+
+class SyntaxSourceClosureControls(unittest.TestCase):
+    def test_cargo_config_and_new_package_files_are_included_without_cargo(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "Cargo.toml").write_text("[workspace]\n")
+            (root / ".cargo").mkdir()
+            (root / ".cargo/config.toml").write_text("[build]\n")
+            (root / "tools/phase1/syntax").mkdir(parents=True)
+            (root / "tools/phase1/syntax/Cargo.toml").write_text("[package]\n")
+            with patch.object(syntax, "ROOT", root), patch("s04_common.command", side_effect=AssertionError("child")):
+                before = syntax.rust_closure()
+                self.assertIn(".cargo/config.toml", before)
+                (root / "tools/phase1/syntax/new.rs").write_text("// new build input\n")
+                self.assertEqual(set(syntax.rust_closure()) - set(before), {"tools/phase1/syntax/new.rs"})
+
+    def test_parser_dependency_is_found_without_any_recorded_package_list(self):
+        with patch("s04_common.command", side_effect=AssertionError("child")):
+            paths = syntax.rust_closure()
+        self.assertIn("crates/tsr_parser/Cargo.toml", paths)
+        self.assertIn("crates/tsr_parser/src/lib.rs", paths)
+
+    def test_manifest_graph_includes_target_build_and_inherited_paths(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "Cargo.toml").write_text('[workspace.dependencies]\ninherited = { path = "inherited" }\n')
+            manifests = {
+                "tools/phase1/syntax": ('[dependencies]\ninherited.workspace = true\n'
+                                        '[build-dependencies]\nhelper = { path = "../../../helper" }\n'
+                                        '[target.\'cfg(unix)\'.dev-dependencies]\n'
+                                        'target = { path = "../../../target-dependency" }\n'),
+                "inherited": '[package]\nname = "inherited"\n',
+                "helper": '[package]\nname = "helper"\n',
+                "target-dependency": '[package]\nname = "target"\n',
+            }
+            for name, content in manifests.items():
+                (root / name).mkdir(parents=True)
+                (root / name / "Cargo.toml").write_text(content)
+            with patch.object(syntax, "ROOT", root):
+                self.assertEqual({str(path.relative_to(root.resolve()))
+                                  for path in syntax.rust_dependency_directories()}, set(manifests))
+
+
+class SyntaxOperationCoverageControls(unittest.TestCase):
+    def setUp(self):
+        import phase1_capture
+
+        self.capture = phase1_capture
+        self.request = {"case": "syntax/control", "operation": "navigator", "file": {"source": "a"},
+                        "actions": [{"op": "token_at"}, {"op": "next_in_file"}]}
+        self.case = {"id": self.request["case"], "family": "syntax", "last_result": "match",
+                     "operations": ["GetTokenAtPosition", "FindNextToken"],
+                     "operation_actions": {"token_at": ["GetTokenAtPosition"], "next_in_file": ["FindNextToken"]}}
+        self.cases = {"cases": [self.case]}
+        self.review_signature()
+
+    def review_signature(self):
+        self.case["request_sha256"] = self.capture.digest(self.capture.canonical(self.request) + b"\n")
+
+    def problems(self):
+        return self.capture.operation_coverage_problems([self.request], self.cases)
+
+    def test_reviewed_links_match_the_request(self):
+        self.assertEqual(self.problems(), [])
+
+    def test_committed_syntax_operation_links_match_their_requests(self):
+        requests = self.capture.load_requests(self.capture.FAMILIES["syntax"])["requests"]
+        self.assertEqual(self.capture.operation_coverage_problems(requests), [])
+
+    def test_removing_an_action_cannot_retain_its_operation_credit(self):
+        self.request["actions"].pop()
+        self.review_signature()
+        self.assertTrue(any("requested actions" in problem for problem in self.problems()))
+
+    def test_removing_a_link_cannot_retain_its_operation_credit(self):
+        self.case["operation_actions"]["next_in_file"] = []
+        self.assertTrue(any("claimed operations" in problem for problem in self.problems()))
+
+    def test_changed_source_requires_review_of_the_discriminator(self):
+        self.request["file"]["source"] = ""
+        self.assertTrue(any("request changed" in problem for problem in self.problems()))
+
+    def test_missing_review_signature_is_rejected(self):
+        del self.case["request_sha256"]
+        self.assertTrue(any("request changed" in problem for problem in self.problems()))
+
+    def test_uncredited_actions_are_explicit_and_allowed(self):
+        self.case["operation_actions"]["next_in_file"] = []
+        self.case["operations"].remove("FindNextToken")
+        self.assertEqual(self.problems(), [])
+
+    def test_actionless_requests_bind_their_mode_and_payload(self):
+        del self.request["actions"]
+        self.request.update(operation="evaluator", mode="literal")
+        self.case["operation_actions"] = {"evaluator": self.case["operations"]}
+        self.review_signature()
+        self.assertEqual(self.problems(), [])
+        self.request["mode"] = "callback"
+        self.assertTrue(any("request changed" in problem for problem in self.problems()))
+
+    def test_capture_rejects_stale_coverage_before_running_children(self):
+        self.request["actions"].pop()
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "data/phase1").mkdir(parents=True)
+            (root / "data/phase1/cases.json").write_text(json.dumps(self.cases))
+            with (patch.object(self.capture, "ROOT", root),
+                  patch.object(self.capture, "load_requests", return_value={"requests": [self.request]}),
+                  patch.object(self.capture, "source_closure", side_effect=AssertionError("child preflight"))):
+                with self.assertRaisesRegex(ValueError, "invalid syntax operation coverage"):
+                    self.capture.capture("syntax", root / "capture")
+
+    def test_replay_rejects_stale_coverage_before_accepting_observations(self):
+        self.request["actions"].pop()
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "data/phase1").mkdir(parents=True)
+            (root / "data/phase1/cases.json").write_text(json.dumps(self.cases))
+            (root / "requests.json").write_text(json.dumps({"requests": [self.request]}))
+            with (patch.object(self.capture, "ROOT", root),
+                  patch.object(self.capture, "_authenticate", return_value={"family": "syntax"}),
+                  patch.object(self.capture, "_merge_native", side_effect=AssertionError("accepted rows"))):
+                with self.assertRaisesRegex(ValueError, "invalid syntax operation coverage"):
+                    self.capture.validate_capture(root)
 
 
 class _Replay:

@@ -62,10 +62,7 @@ pub fn get_spelling_suggestion<'name, T: Copy>(
         if distance < 0.0 {
             continue;
         }
-        assert!(
-            distance <= best_distance,
-            "Debug failure. False expression."
-        );
+        tsr_core::debug::assert(distance <= best_distance, &[]);
         if distance < best_distance {
             best_distance = distance;
             best_candidate = Some(candidate_value);

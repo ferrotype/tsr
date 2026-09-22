@@ -66,12 +66,15 @@ SCHEDULE_INPUTS = (
     PROBE,
     "scripts/phase1_syntax_schedule.py",
     "scripts/s07_subset.py",
+    "scripts/s06_corpus.py",
+    "scripts/s06_protocol.py",
     "scripts/s08_oracle.py",
     "scripts/s04.py",
     "scripts/s04_common.py",
     "data/s04/toolchains.toml",
     "data/upstream.json",
     "data/s07/subset.json",
+    "data/s06/corpus.json",
 )
 BOUNDARIES = {
     "options_rejected": "the native harness fails in SetOptionsFromTestConfig before compiling; the row "
@@ -94,6 +97,13 @@ def _json_canonical(value: object) -> bytes:
     return canonical(value) + b"\n"
 
 
+def schedule_request_bytes(probes: list[dict]) -> bytes:
+    """Serialize the children’s requests without reordering semantic option maps."""
+    from s07_subset import json_bytes
+
+    return json_bytes(probes)
+
+
 def _write_rows(path: Path, document: dict) -> None:
     """Canonical JSON with one `rows` element per line, so a changed row is a one-line diff."""
     def encode(value: object) -> str:
@@ -105,7 +115,11 @@ def _write_rows(path: Path, document: dict) -> None:
 
 
 def schedule_inputs() -> dict[str, str]:
-    return {name: _digest(name) for name in SCHEDULE_INPUTS}
+    import s07_subset
+
+    # The exported preprocessing requests are an input to this producer too.
+    # Reuse their closure so a new copied bridge cannot be missed here.
+    return {name: _digest(name) for name in sorted(set(SCHEDULE_INPUTS) | set(s07_subset.PRODUCER_INPUTS))}
 
 
 def schedule_requests(observations: Path) -> tuple[list[dict], list[dict]]:
@@ -167,7 +181,7 @@ def run_probe(directory: Path, probes: list[dict]) -> dict:
     virtual = upstream / "tsc/internal/testrunner/phase1_syntax_probe_test.go"
     if virtual.exists():
         raise ValueError(f"overlay would replace a source file: {virtual}")
-    request_bytes = _json_canonical(probes)
+    request_bytes = schedule_request_bytes(probes)
     (directory / "requests.json").write_bytes(request_bytes)
     output = directory / "observations.json"
     (directory / "overlay.json").write_bytes(_json_canonical({"Replace": {str(virtual): str(ROOT / PROBE)}}))
@@ -204,6 +218,9 @@ def join(rows: list[dict], probes: list[dict], report: dict) -> tuple[dict, dict
         if guard not in ("allowed", "skipped", "not_reached") or (guard == "not_reached") == probe["guard"]:
             raise ValueError(f"{row['id']}: unclassified native option guard outcome {guard!r}")
         load = result["load"]
+        if load == "panic":
+            raise ValueError(f"{row['id']}: unexpected native syntax panic invalidates the capture: "
+                             f"{result.get('panic')}")
         if load not in ("loaded", "panic", "not_loaded") or (load == "not_loaded") == probe["load"]:
             raise ValueError(f"{row['id']}: unclassified native load outcome {load!r}")
         syntactic = "observed" if load == "loaded" else "load_panicked" if load == "panic" else "boundary"

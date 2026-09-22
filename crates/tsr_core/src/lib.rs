@@ -9,6 +9,7 @@ mod watch_options;
 pub use watch_options::{PollingKind, WatchDirectoryKind, WatchFileKind, WatchOptions};
 
 pub mod collections;
+pub mod debug;
 pub mod path;
 pub mod pattern;
 

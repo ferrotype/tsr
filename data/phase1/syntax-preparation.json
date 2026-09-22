@@ -1,5 +1,5 @@
 {
-  "accounted_operations": 821,
+  "accounted_operations": 814,
   "complete": false,
   "exempt_by_category": {
     "go_test_harness": 155,
@@ -27059,6 +27059,62 @@
       ]
     },
     {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/astnav/tokens.go:findRightmostValidToken",
+      "rust_home": [
+        "crates/tsr_astnav/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/astnav/tokens.go:getNodeVisitor",
+      "rust_home": [
+        "crates/tsr_astnav/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/astnav/tokens.go:getPosition",
+      "rust_home": [
+        "crates/tsr_astnav/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/astnav/tokens.go:getTokenAtPosition",
+      "rust_home": [
+        "crates/tsr_astnav/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/astnav/tokens.go:isValidPrecedingNode",
+      "rust_home": [
+        "crates/tsr_astnav/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/astnav/tokens.go:scanNavigationToken",
+      "rust_home": [
+        "crates/tsr_astnav/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/astnav/tokens.go:shouldRescanLessThanLessThanToken",
+      "rust_home": [
+        "crates/tsr_astnav/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/astnav/tokens.go:shouldSkipChild",
+      "rust_home": [
+        "crates/tsr_astnav/src/lib.rs"
+      ]
+    },
+    {
       "disposition": "missing",
       "operation": "tsc/internal/binder/binder.go:ActiveLabel.BreakTarget",
       "rust_home": [
@@ -30365,16 +30421,6 @@
     {
       "disposition": "missing",
       "operation": "tsc/internal/compiler/program.go:Program.BindSourceFiles",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/output_paths.rs",
-        "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/compiler/program.go:Program.GetBindDiagnostics",
       "rust_home": [
         "crates/tsr_compiler/src/loader.rs",
         "crates/tsr_compiler/src/output_paths.rs",
@@ -45609,7 +45655,7 @@
     }
   ],
   "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
-  "prepared_operations": 43,
+  "prepared_operations": 36,
   "roster_problems": [],
   "step": "syntax",
   "total_operations": 3617,

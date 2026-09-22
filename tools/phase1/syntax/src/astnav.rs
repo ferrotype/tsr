@@ -12,7 +12,7 @@ use std::panic::{catch_unwind, AssertUnwindSafe};
 use serde_json::{json, Value};
 use tsr_arena::NodeId;
 use tsr_ast::{AstView, ChildVisitor, NodeListId, NodeSlice, SourceFileParseOptions, SyntaxKind};
-use tsr_astnav::{ChildVisit, Error as NavError, Navigator};
+use tsr_astnav::{ChildVisit, Error as NavError, HookVisit, Navigator};
 use tsr_jsstring::SourceText;
 
 use crate::api::{subject, Outcome};
@@ -172,25 +172,6 @@ fn kinds_by_name() -> HashMap<String, SyntaxKind> {
 }
 
 fn run(request: &Value) -> Result<Outcome, String> {
-    if actions(request)
-        .iter()
-        .any(|action| op(action) == "visit_lists")
-    {
-        // The public visitor resolves each list to its members
-        // (ChildVisit::List(Vec<NodeId>)), so a caller cannot read the list's
-        // own range, which upstream hands its visitNodes hook; and it reports
-        // no call for an absent child, where upstream calls visitNode(nil) and
-        // visitNodes(nil) for every empty slot.
-        return Ok(Outcome::missing(
-            "tsc/internal/astnav/tokens.go:VisitEachChildAndJSDoc",
-            "upstream/tsc/internal/astnav/tokens.go:311 passes the *ast.NodeList to visitNodes \
-             (ls/utilities.go findContainingList reads its position), and ast/visitor.go passes \
-             absent children through as nil hook calls",
-            "Navigator::visit_each_child_and_jsdoc(&mut self, id: NodeId) -> Result<Vec<Visit>, Error>, \
-             with Visit::List(NodeListId) keeping the list range and an absent-slot visit",
-            "crates/tsr_astnav/src/lib.rs",
-        ));
-    }
     let file_spec = request.get("file").ok_or("request has no file")?;
     let name = file_spec["name"].as_str().ok_or("file has no name")?;
     let text = file_spec["text"].as_str().ok_or("file has no text")?;
@@ -280,6 +261,36 @@ fn run(request: &Value) -> Result<Outcome, String> {
                         })?;
                         rows.push(json!([index, name, found]));
                     }
+                }
+                Value::Array(rows)
+            }
+            "visit_lists" => {
+                let mut rows = Vec::new();
+                for (index, node) in preorder(view, root)?.into_iter().enumerate() {
+                    let visits = answers
+                        .nav
+                        .visit_child_slots_and_jsdoc(node)
+                        .map_err(|e| format!("{e:?}"))?;
+                    let mut out = Vec::new();
+                    for visit in visits {
+                        out.push(match visit {
+                            HookVisit::Node(child) => {
+                                json!(["node", answers.node(child).map_err(|e| format!("{e:?}"))?])
+                            }
+                            HookVisit::List(None) => json!(["list", null]),
+                            HookVisit::List(Some(list)) => {
+                                let list = view.list(list).map_err(|e| format!("{e:?}"))?;
+                                let members = view
+                                    .node_slice(list.nodes())
+                                    .map_err(|e| format!("{e:?}"))?
+                                    .iter()
+                                    .map(|child| answers.node(child).map_err(|e| format!("{e:?}")))
+                                    .collect::<Result<Vec<_>, _>>()?;
+                                json!(["list", list.loc().pos(), list.loc().end(), members])
+                            }
+                        });
+                    }
+                    rows.push(json!([index, out]));
                 }
                 Value::Array(rows)
             }

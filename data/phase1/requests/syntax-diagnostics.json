@@ -447,6 +447,79 @@
       },
       "scope": null,
       "subject": "syntacticDiagnostics"
+    },
+    {
+      "case": "syntax/diagnostics/bind-all-files-sorted",
+      "discriminates": "Binder-only diagnostics from all files, sorted by file despite z.ts loading before a.ts; duplicate block-scoped declarations preserve both diagnostic locations, arguments, and rendered bytes.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/program.go:Program.GetBindDiagnostics",
+      "order_sensitive": true,
+      "program": {
+        "case_sensitive": true,
+        "cwd": "/",
+        "files": {
+          "/a.ts": "export {}; let a = 1; let a = 2;",
+          "/z.ts": "export {}; let z = 1; let z = 2;"
+        },
+        "options": {
+          "noEmit": true,
+          "noLib": true
+        },
+        "roots": [
+          "/z.ts",
+          "/a.ts"
+        ]
+      },
+      "scope": null,
+      "subject": "bindDiagnostics"
+    },
+    {
+      "case": "syntax/diagnostics/bind-selected-file",
+      "discriminates": "Only the requested retained file contributes binder diagnostics; duplicate declarations in a.ts must not leak into the z.ts result.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/program.go:Program.GetBindDiagnostics",
+      "order_sensitive": true,
+      "program": {
+        "case_sensitive": true,
+        "cwd": "/",
+        "files": {
+          "/a.ts": "export {}; let a = 1; let a = 2;",
+          "/z.ts": "export {}; let z = 1; let z = 2;"
+        },
+        "options": {
+          "noEmit": true,
+          "noLib": true
+        },
+        "roots": [
+          "/z.ts",
+          "/a.ts"
+        ]
+      },
+      "scope": "/z.ts",
+      "subject": "bindDiagnostics"
+    },
+    {
+      "case": "syntax/diagnostics/bind-excludes-parser-and-checker",
+      "discriminates": "A parser error and an unresolved name do not become binder diagnostics; the bind-only result and rendering are empty without invoking a checker.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/program.go:Program.GetBindDiagnostics",
+      "order_sensitive": true,
+      "program": {
+        "case_sensitive": true,
+        "cwd": "/",
+        "files": {
+          "/a.ts": "export {}; let invalid = ; let x = missing;"
+        },
+        "options": {
+          "noEmit": true,
+          "noLib": true
+        },
+        "roots": [
+          "/a.ts"
+        ]
+      },
+      "scope": null,
+      "subject": "bindDiagnostics"
     }
   ]
 }

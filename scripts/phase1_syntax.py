@@ -38,6 +38,7 @@ from __future__ import annotations
 import hashlib
 import json
 import sys
+import tomllib
 from collections import Counter
 from pathlib import Path
 
@@ -340,7 +341,7 @@ def write() -> dict:
 
 from phase1_syntax_schedule import (  # noqa: E402
     BOUNDARIES, NATIVE, SCHEDULE, SELECTIONS, _json_canonical, _write_rows, capture,
-    schedule_inputs, schedule_requests,
+    schedule_inputs, schedule_request_bytes, schedule_requests,
 )
 
 
@@ -397,6 +398,8 @@ def _schedule_problems(schedule: dict, native: dict, subset_variants: dict[str, 
         # A boundary row never loads; every other row loaded or panicked, and
         # its syntactic status says which. None becomes an empty success.
         want = {"loaded": "observed", "panic": "load_panicked", "not_loaded": "boundary"}.get(row["load"])
+        if row["load"] == "panic":
+            found.append(f"{rid}: unexpected native syntax panic invalidates the capture")
         if want is None or row["syntactic"] != want:
             found.append(f"{rid}: load {row['load']!r} and syntactic {row['syntactic']!r} disagree")
         if (row["load"] == "not_loaded") != (boundary is not None):
@@ -468,14 +471,20 @@ def schedule_problems(*, check_inputs: bool = True) -> list[str]:
 # ---------------------------------------------------------------------------
 
 SMOKE = ROOT / "data/phase1/syntax-smoke.json"
+FULL = ROOT / "data/phase1/syntax-full.json"
 SMOKE_RULE = ("every schedule row with at least one native syntactic diagnostic, plus the first row "
               "(schedule order) of each stratum of (extensions present in the request, checkJs, allowJs, "
               "experimentalDecorators, native selection)")
+FULL_RULE = "every loaded row in the syntax schedule, in schedule order"
 RUST_EXTRA = ("tools/s07/program/rust_observation.rs", "Cargo.toml", "Cargo.lock", "rust-toolchain.toml")
 COMPARED = ("files", "file_names_sha256", "syntactic", "plain_hex", "pretty_hex")
 
 
-def select(schedule: dict, native: dict) -> list[str]:
+def select(schedule: dict, native: dict, *, full: bool = False) -> list[str]:
+    if any(row["load"] == "panic" for row in schedule["rows"]):
+        raise ValueError("unexpected native syntax panic invalidates the capture")
+    if full:
+        return [row["id"] for row in schedule["rows"] if row["load"] == "loaded"]
     diagnosed = {row["id"] for row in native["rows"] if row.get("syntactic")}
     chosen, strata = set(diagnosed), set()
     for row in schedule["rows"]:
@@ -488,13 +497,52 @@ def select(schedule: dict, native: dict) -> list[str]:
     return [row["id"] for row in schedule["rows"] if row["id"] in chosen]
 
 
+def rust_dependency_directories() -> list[Path]:
+    """Rewalk local build inputs from current manifests, without running Cargo.
+
+    Include every path dependency, even optional, target-specific and dev
+    dependencies. This conservative closure cannot lose a whole crate because
+    a stored provenance omitted its manifest as well as its source files.
+    """
+    workspace = tomllib.loads((ROOT / "Cargo.toml").read_text())
+    inherited = workspace.get("workspace", {}).get("dependencies", {})
+    pending = [ROOT / "tools/phase1/syntax"]
+    overrides = [*workspace.get("patch", {}).values(), workspace.get("replace", {})]
+    for table in overrides:
+        for dependency in table.values():
+            if isinstance(dependency, dict) and "path" in dependency:
+                pending.append(ROOT / dependency["path"])
+    seen = set()
+    while pending:
+        directory = pending.pop().resolve()
+        directory.relative_to(ROOT.resolve())  # Refuse unrecordable external path dependencies.
+        if directory in seen:
+            continue
+        seen.add(directory)
+        manifest = tomllib.loads((directory / "Cargo.toml").read_text())
+        scopes = [manifest, *manifest.get("target", {}).values()]
+        for scope in scopes:
+            for category in ("dependencies", "build-dependencies", "dev-dependencies"):
+                for name, dependency in scope.get(category, {}).items():
+                    base = directory
+                    if isinstance(dependency, dict) and dependency.get("workspace"):
+                        dependency = inherited[name]
+                        base = ROOT
+                    if isinstance(dependency, dict) and "path" in dependency:
+                        pending.append(base / dependency["path"])
+    return sorted(seen)
+
+
 def rust_closure() -> dict[str, str]:
-    import phase1_capture
 
     paths = set(RUST_EXTRA)
-    for directory in phase1_capture.workspace_closure("phase1_syntax"):
+    root = ROOT.resolve()
+    cargo_config = root / ".cargo"
+    if cargo_config.is_dir():
+        paths.update(str(path.relative_to(root)) for path in cargo_config.rglob("*") if path.is_file())
+    for directory in rust_dependency_directories():
         for path in directory.rglob("*"):
-            relative = path.relative_to(ROOT)
+            relative = path.relative_to(root)
             if path.is_file() and not any(part in (".git", "target", "__pycache__") for part in relative.parts):
                 paths.add(str(relative))
     return {name: _digest(name) for name in sorted(paths) if (ROOT / name).is_file()}
@@ -516,24 +564,49 @@ def build_rust() -> Path:
 def compare_row(native_row: dict, rust_row: dict) -> dict:
     """One smoke row's result in the Phase 1 vocabulary."""
     state = rust_row.get("state")
+    if rust_row.get("id") != native_row["id"]:
+        raise ValueError("Rust smoke observation has the wrong request id")
     if state == "not_implemented":
+        if not isinstance(rust_row.get("operation"), str) or not rust_row["operation"]:
+            raise ValueError("Rust smoke not_implemented row lacks its operation")
         return {"id": native_row["id"], "result": "not_implemented", "operation": rust_row.get("operation")}
-    if state != "observed":
-        # A Rust load error or panic on a program Go loaded is a finding, not a
-        # harness failure: the harness ran and the production path failed.
+    if state == "load_error" and isinstance(rust_row.get("error"), str) and rust_row["error"]:
         return {"id": native_row["id"], "result": "different", "rust_state": state,
-                "detail": rust_row.get("error") or rust_row.get("panic")}
+                "detail": rust_row["error"]}
+    if state != "observed":
+        raise ValueError(f"{native_row['id']}: Rust smoke harness failed with state {state!r}: "
+                         f"{rust_row.get('error') or rust_row.get('panic')}")
+    if (type(rust_row.get("files")) is not int or rust_row["files"] < 0
+            or not isinstance(rust_row.get("syntactic"), list)
+            or not all(isinstance(rust_row.get(field), str)
+                       for field in ("file_names_sha256", "plain_hex", "pretty_hex"))):
+        raise ValueError(f"{native_row['id']}: malformed Rust smoke observation")
+    try:
+        if len(rust_row["file_names_sha256"]) != 64:
+            raise ValueError("invalid SHA-256 length")
+        for field in ("file_names_sha256", "plain_hex", "pretty_hex"):
+            encoded = rust_row[field]
+            if bytes.fromhex(encoded).hex() != encoded:
+                raise ValueError(f"noncanonical {field}")
+    except ValueError as error:
+        raise ValueError(f"{native_row['id']}: malformed Rust smoke observation: {error}") from error
     differs = [field for field in COMPARED if native_row.get(field) != rust_row.get(field)]
     return {"id": native_row["id"], "result": "different" if differs else "match",
             **({"differs": differs} if differs else {})}
 
 
-def _smoke_report(directory: Path, selected: list[str], native: dict, schedule: dict) -> dict:
+def _smoke_report(directory: Path, selected: list[str], native: dict, schedule: dict,
+                  *, captured: list[str] | None = None) -> dict:
     from s04_common import strict_json_loads
 
     rust_rows = [strict_json_loads(line) for line in (directory / "rust-rows.jsonl").read_bytes().splitlines() if line.strip()]
-    if [row.get("id") for row in rust_rows] != selected:
+    if [row.get("id") for row in rust_rows] != (selected if captured is None else captured):
         raise ValueError("Rust smoke rows are missing, extra, duplicated or reordered")
+    if captured is not None:
+        wanted = set(selected)
+        rust_rows = [row for row in rust_rows if row["id"] in wanted]
+        if [row["id"] for row in rust_rows] != selected:
+            raise ValueError("the capture does not contain the selected syntax rows in order")
     native_by_id = {row["id"]: row for row in native["rows"]}
     rows = [compare_row(native_by_id[rid], rust) for rid, rust in zip(selected, rust_rows, strict=True)]
     loaded = [row["id"] for row in schedule["rows"] if row["load"] == "loaded"]
@@ -544,8 +617,8 @@ def _smoke_report(directory: Path, selected: list[str], native: dict, schedule: 
                                                               if row["result"] == "not_implemented").items()))}
 
 
-def smoke(directory: Path, *, write_committed: bool = False) -> dict:
-    """Run the bounded Rust smoke once and store every input it read."""
+def smoke(directory: Path, *, write_committed: bool = False, full: bool = False) -> dict:
+    """Run the bounded smoke or full Rust syntax selection with the same producer."""
     import s07_subset
 
     directory = Path(directory).resolve()
@@ -560,11 +633,11 @@ def smoke(directory: Path, *, write_committed: bool = False) -> dict:
     rows, probes = schedule_requests(observations)
     if [row["loading_request_sha256"] for row in rows] != [row["loading_request_sha256"] for row in schedule["rows"]]:
         raise ValueError("fresh native preprocessing differs from the committed schedule")
-    selected = select(schedule, native)
+    selected = select(schedule, native, full=full)
     wanted = set(selected)
-    smoke_dir = directory / "smoke"
+    smoke_dir = directory / ("full" if full else "smoke")
     smoke_dir.mkdir(parents=True, exist_ok=False)
-    request_bytes = _json_canonical([probe for probe in probes if probe["id"] in wanted])
+    request_bytes = schedule_request_bytes([probe for probe in probes if probe["id"] in wanted])
     (smoke_dir / "requests.json").write_bytes(request_bytes)
     before = rust_closure()
     executable = build_rust()
@@ -572,7 +645,8 @@ def smoke(directory: Path, *, write_committed: bool = False) -> dict:
     command([str(executable), "--schedule", str(smoke_dir / "requests.json"), str(smoke_dir / "rust-rows.jsonl")], cwd=ROOT)
     if rust_closure() != before:
         raise ValueError("a Rust source input changed during the smoke; the capture is invalid")
-    provenance = {"schedule_sha256": _digest(str(SCHEDULE.relative_to(ROOT))),
+    provenance = {"selection": "full" if full else "smoke", "rule": FULL_RULE if full else SMOKE_RULE,
+                  "schedule_sha256": _digest(str(SCHEDULE.relative_to(ROOT))),
                   "native_rows_sha256": native_rows_digest(native),
                   "requests_sha256": hashlib.sha256(request_bytes).hexdigest(),
                   "rust_rows_sha256": hashlib.sha256((smoke_dir / "rust-rows.jsonl").read_bytes()).hexdigest(),
@@ -581,16 +655,22 @@ def smoke(directory: Path, *, write_committed: bool = False) -> dict:
     (smoke_dir / "provenance.json").write_bytes(_json_canonical(provenance))
     report = replay(smoke_dir)
     if write_committed:
-        _write_rows(SMOKE, report)
+        _write_rows(FULL if full else SMOKE, report)
     return report["counts"]
 
 
-def replay(smoke_dir: Path) -> dict:
-    """Recompute the smoke report from a stored capture. Runs no child."""
+def replay(smoke_dir: Path, *, smoke_only: bool = False) -> dict:
+    """Recompute a stored selection, or derive the bounded smoke from a full capture.
+
+    Runs no child. Even when deriving the smoke, every captured full row is
+    validated and compared before the bounded report is produced.
+    """
     from s04_common import strict_json_loads
 
     smoke_dir = Path(smoke_dir).resolve()
     provenance = strict_json_loads((smoke_dir / "provenance.json").read_bytes())
+    if hashlib.sha256(SCHEDULE.read_bytes()).hexdigest() != provenance["schedule_sha256"]:
+        raise ValueError("the committed syntax schedule changed since the smoke")
     for name, key in (("requests.json", "requests_sha256"), ("rust-rows.jsonl", "rust_rows_sha256")):
         if hashlib.sha256((smoke_dir / name).read_bytes()).hexdigest() != provenance[key]:
             raise ValueError(f"stored smoke {name} changed since capture")
@@ -598,16 +678,50 @@ def replay(smoke_dir: Path) -> dict:
         raise ValueError("the committed native syntax observation changed since the smoke")
     schedule = json.loads(SCHEDULE.read_text())
     native = json.loads(NATIVE.read_text())
+    mode = provenance.get("selection", "smoke")
+    if mode not in ("smoke", "full"):
+        raise ValueError(f"unknown syntax capture selection {mode!r}")
+    rule = FULL_RULE if mode == "full" else SMOKE_RULE
+    if provenance.get("rule", rule) != rule:
+        raise ValueError("stored syntax capture has a different selection rule")
+    if smoke_only and mode != "full":
+        raise ValueError("deriving a smoke report requires a full syntax capture")
+    if provenance["selected"] != select(schedule, native, full=mode == "full"):
+        raise ValueError("stored smoke selection is not the committed rule's selection")
     requests = strict_json_loads((smoke_dir / "requests.json").read_bytes())
     if [request["id"] for request in requests] != provenance["selected"]:
         raise ValueError("stored smoke requests are not the recorded selection")
+    from s07_subset import json_bytes
+
+    by_id = {row["id"]: row for row in schedule["rows"]}
+    for probe in requests:
+        request = probe.get("request")
+        if (not isinstance(request, dict) or request.get("id") != probe["id"]
+                or hashlib.sha256(json_bytes(request)).hexdigest() != by_id[probe["id"]]["loading_request_sha256"]
+                or probe.get("load") is not True or probe.get("guard") is not True):
+            raise ValueError(f"{probe['id']}: stored smoke request differs from the frozen loading request")
     report = _smoke_report(smoke_dir, provenance["selected"], native, schedule)
-    stale = sorted(name for name, sha in provenance["rust_closure"].items()
-                   if not (ROOT / name).is_file() or _digest(name) != sha)
-    return {"version": 1, "rule": SMOKE_RULE, "selected": provenance["selected"],
+    selected = provenance["selected"]
+    if smoke_only:
+        selected = select(schedule, native)
+        report = _smoke_report(smoke_dir, selected, native, schedule, captured=provenance["selected"])
+    # Derive expected inputs independently of the recorded closure, including
+    # entire omitted packages, without spawning Cargo during replay.
+    recorded = provenance["rust_closure"]
+    current = rust_closure()
+    stale = sorted(name for name in set(recorded) | set(current) if recorded.get(name) != current.get(name))
+    return {"version": 1, "selection": "smoke" if smoke_only else mode,
+            "capture_selection": mode, "rule": SMOKE_RULE if smoke_only else rule, "selected": selected,
             "native_rows_sha256": provenance["native_rows_sha256"], "rust_binary_sha256": provenance["rust_binary_sha256"],
             "rust_closure": provenance["rust_closure"],
             "rust_sources_current": not stale, **report}
+
+
+def smoke_from_full(directory: Path, *, write_committed: bool = False) -> dict:
+    report = replay(directory, smoke_only=True)
+    if write_committed:
+        _write_rows(SMOKE, report)
+    return report
 
 
 def native_rows_digest(native: dict) -> str:
@@ -616,17 +730,20 @@ def native_rows_digest(native: dict) -> str:
     return hashlib.sha256(_json_canonical(native["rows"])).hexdigest()
 
 
-def smoke_problems() -> list[str]:
-    """The committed smoke report checked against the committed schedule, without a child."""
-    if not SMOKE.is_file():
+def _report_problems(path: Path, *, full: bool = False) -> list[str]:
+    """A committed report checked against its exact selection, without a child."""
+    if not path.is_file():
         return ["the syntax smoke report is absent; run `phase1_syntax.py smoke --write`"]
-    smoke_report = json.loads(SMOKE.read_text())
+    smoke_report = json.loads(path.read_text())
     schedule = json.loads(SCHEDULE.read_text())
     native = json.loads(NATIVE.read_text())
     found = []
     if smoke_report.get("native_rows_sha256") != native_rows_digest(native):
         found.append("the syntax smoke compared against a different native observation")
-    if smoke_report.get("rule") != SMOKE_RULE or smoke_report.get("selected") != select(schedule, native):
+    rule = FULL_RULE if full else SMOKE_RULE
+    mode = "full" if full else "smoke"
+    if (smoke_report.get("selection", "smoke") != mode or smoke_report.get("rule") != rule
+            or smoke_report.get("selected") != select(schedule, native, full=full)):
         found.append("the syntax smoke selection is not the committed rule's selection")
     rows = smoke_report.get("rows", [])
     if [row.get("id") for row in rows] != smoke_report.get("selected"):
@@ -640,6 +757,15 @@ def smoke_problems() -> list[str]:
     if smoke_report.get("counts") != expected:
         found.append("the syntax smoke counts do not follow from its rows")
     return found
+
+
+def smoke_problems() -> list[str]:
+    return _report_problems(SMOKE)
+
+
+def full_problems() -> list[str]:
+    # The full run is a production-stage artifact; F4a does not invent one.
+    return _report_problems(FULL, full=True) if FULL.is_file() else []
 
 
 def smoke_freshness() -> dict:
@@ -666,20 +792,28 @@ def main(argv: list[str] | None = None) -> int:
         sub = commands.add_parser(name, help=text)
         sub.add_argument("--output", type=Path, required=True, help="a scratch directory, never an owner capture")
         sub.add_argument("--write", action="store_true", help="also rewrite the committed documents")
+        if name == "smoke":
+            sub.add_argument("--full", action="store_true", help="observe every loaded row and write syntax-full.json")
     sub = commands.add_parser("replay", help="recompute a stored smoke report without running anything")
     sub.add_argument("directory", type=Path)
+    sub = commands.add_parser("smoke-from-full", help="derive the bounded smoke from a validated full capture")
+    sub.add_argument("directory", type=Path)
+    sub.add_argument("--write", action="store_true", help="also rewrite syntax-smoke.json")
     commands.add_parser("check", help="check the committed inventory, schedule and native observation")
     args = parser.parse_args(argv)
     if args.command == "capture":
         print(json.dumps(capture(args.output, write_committed=args.write), indent=2))
     elif args.command == "smoke":
-        print(json.dumps(smoke(args.output, write_committed=args.write), indent=2))
+        print(json.dumps(smoke(args.output, write_committed=args.write, full=args.full), indent=2))
+    elif args.command == "smoke-from-full":
+        report = smoke_from_full(args.directory, write_committed=args.write)
+        print(json.dumps({"counts": report["counts"], "rust_sources_current": report["rust_sources_current"]}, indent=2))
     elif args.command == "replay":
         report = replay(args.directory)
         print(json.dumps({"counts": report["counts"], "rust_sources_current": report["rust_sources_current"]},
                          indent=2))
     else:
-        found = problems() + schedule_problems() + smoke_problems()
+        found = problems() + schedule_problems() + smoke_problems() + full_problems()
         print(json.dumps({"problems": found, "smoke": smoke_freshness()}, indent=2))
         return 1 if found else 0
     return 0

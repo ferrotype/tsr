@@ -2884,3 +2884,790 @@ pub trait VisitorMethods: VisitContext {
     }
 }
 impl<T: VisitContext + ?Sized> VisitorMethods for T {}
+impl NodeRead<'_> {
+    /// Snapshot immediate VisitEachChild hook arguments, including absent slots.
+    /// No node borrow escapes; callers can materialize lazy children afterwards.
+    pub fn child_slots(&self) -> Vec<(ChildRole, ChildSlot)> {
+        match self.data() {
+            NodeDataRead::QualifiedName(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.left())),
+                (ChildRole::Node, ChildSlot::Node(data.right())),
+            ],
+            NodeDataRead::ComputedPropertyName(data) => {
+                vec![(ChildRole::Node, ChildSlot::Node(data.expression()))]
+            }
+            NodeDataRead::Decorator(data) => {
+                vec![(ChildRole::Node, ChildSlot::Node(data.expression()))]
+            }
+            NodeDataRead::IfStatement(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.expression())),
+                (
+                    ChildRole::EmbeddedStatement,
+                    ChildSlot::Node(data.then_statement()),
+                ),
+                (
+                    ChildRole::EmbeddedStatement,
+                    ChildSlot::Node(data.else_statement()),
+                ),
+            ],
+            NodeDataRead::DoStatement(data) => vec![
+                (ChildRole::IterationBody, ChildSlot::Node(data.statement())),
+                (ChildRole::Node, ChildSlot::Node(data.expression())),
+            ],
+            NodeDataRead::WhileStatement(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.expression())),
+                (ChildRole::IterationBody, ChildSlot::Node(data.statement())),
+            ],
+            NodeDataRead::ForStatement(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.initializer())),
+                (ChildRole::Node, ChildSlot::Node(data.condition())),
+                (ChildRole::Node, ChildSlot::Node(data.incrementor())),
+                (ChildRole::IterationBody, ChildSlot::Node(data.statement())),
+            ],
+            NodeDataRead::ForInOrOfStatement(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.await_modifier())),
+                (ChildRole::Node, ChildSlot::Node(data.initializer())),
+                (ChildRole::Node, ChildSlot::Node(data.expression())),
+                (ChildRole::IterationBody, ChildSlot::Node(data.statement())),
+            ],
+            NodeDataRead::BreakStatement(data) => {
+                vec![(ChildRole::Node, ChildSlot::Node(data.label()))]
+            }
+            NodeDataRead::ContinueStatement(data) => {
+                vec![(ChildRole::Node, ChildSlot::Node(data.label()))]
+            }
+            NodeDataRead::ReturnStatement(data) => {
+                vec![(ChildRole::Node, ChildSlot::Node(data.expression()))]
+            }
+            NodeDataRead::WithStatement(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.expression())),
+                (
+                    ChildRole::EmbeddedStatement,
+                    ChildSlot::Node(data.statement()),
+                ),
+            ],
+            NodeDataRead::SwitchStatement(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.expression())),
+                (ChildRole::Node, ChildSlot::Node(data.case_block())),
+            ],
+            NodeDataRead::CaseBlock(data) => {
+                vec![(ChildRole::Nodes, ChildSlot::List(data.clauses()))]
+            }
+            NodeDataRead::CaseOrDefaultClause(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.expression())),
+                (ChildRole::Nodes, ChildSlot::List(data.statements())),
+            ],
+            NodeDataRead::ThrowStatement(data) => {
+                vec![(ChildRole::Node, ChildSlot::Node(data.expression()))]
+            }
+            NodeDataRead::TryStatement(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.try_block())),
+                (ChildRole::Node, ChildSlot::Node(data.catch_clause())),
+                (ChildRole::Node, ChildSlot::Node(data.finally_block())),
+            ],
+            NodeDataRead::CatchClause(data) => vec![
+                (
+                    ChildRole::Node,
+                    ChildSlot::Node(data.variable_declaration()),
+                ),
+                (ChildRole::Node, ChildSlot::Node(data.block())),
+            ],
+            NodeDataRead::LabeledStatement(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.label())),
+                (
+                    ChildRole::EmbeddedStatement,
+                    ChildSlot::Node(data.statement()),
+                ),
+            ],
+            NodeDataRead::ExpressionStatement(data) => {
+                vec![(ChildRole::Node, ChildSlot::Node(data.expression()))]
+            }
+            NodeDataRead::Block(data) => {
+                vec![(ChildRole::Nodes, ChildSlot::List(data.statements()))]
+            }
+            NodeDataRead::VariableStatement(data) => vec![
+                (ChildRole::Modifiers, ChildSlot::List(data.modifiers())),
+                (ChildRole::Node, ChildSlot::Node(data.declaration_list())),
+            ],
+            NodeDataRead::VariableDeclaration(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.name())),
+                (ChildRole::Node, ChildSlot::Node(data.exclamation_token())),
+                (ChildRole::Node, ChildSlot::Node(data.r#type())),
+                (ChildRole::Node, ChildSlot::Node(data.initializer())),
+            ],
+            NodeDataRead::VariableDeclarationList(data) => {
+                vec![(ChildRole::Nodes, ChildSlot::List(data.declarations()))]
+            }
+            NodeDataRead::BindingPattern(data) => {
+                vec![(ChildRole::Nodes, ChildSlot::List(data.elements()))]
+            }
+            NodeDataRead::ParameterDeclaration(data) => vec![
+                (ChildRole::Modifiers, ChildSlot::List(data.modifiers())),
+                (ChildRole::Node, ChildSlot::Node(data.dot_dot_dot_token())),
+                (ChildRole::Node, ChildSlot::Node(data.name())),
+                (ChildRole::Node, ChildSlot::Node(data.question_token())),
+                (ChildRole::Node, ChildSlot::Node(data.r#type())),
+                (ChildRole::Node, ChildSlot::Node(data.initializer())),
+            ],
+            NodeDataRead::BindingElement(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.dot_dot_dot_token())),
+                (ChildRole::Node, ChildSlot::Node(data.property_name())),
+                (ChildRole::Node, ChildSlot::Node(data.name())),
+                (ChildRole::Node, ChildSlot::Node(data.initializer())),
+            ],
+            NodeDataRead::MissingDeclaration(data) => {
+                vec![(ChildRole::Modifiers, ChildSlot::List(data.modifiers()))]
+            }
+            NodeDataRead::FunctionDeclaration(data) => vec![
+                (ChildRole::Modifiers, ChildSlot::List(data.modifiers())),
+                (ChildRole::Node, ChildSlot::Node(data.asterisk_token())),
+                (ChildRole::Node, ChildSlot::Node(data.name())),
+                (ChildRole::Nodes, ChildSlot::List(data.type_parameters())),
+                (ChildRole::Parameters, ChildSlot::List(data.parameters())),
+                (ChildRole::Node, ChildSlot::Node(data.r#type())),
+                (ChildRole::Node, ChildSlot::Node(data.full_signature())),
+                (ChildRole::FunctionBody, ChildSlot::Node(data.body())),
+            ],
+            NodeDataRead::ClassDeclaration(data) => vec![
+                (ChildRole::Modifiers, ChildSlot::List(data.modifiers())),
+                (ChildRole::Node, ChildSlot::Node(data.name())),
+                (ChildRole::Nodes, ChildSlot::List(data.type_parameters())),
+                (ChildRole::Nodes, ChildSlot::List(data.heritage_clauses())),
+                (ChildRole::Nodes, ChildSlot::List(data.members())),
+            ],
+            NodeDataRead::ClassExpression(data) => vec![
+                (ChildRole::Modifiers, ChildSlot::List(data.modifiers())),
+                (ChildRole::Node, ChildSlot::Node(data.name())),
+                (ChildRole::Nodes, ChildSlot::List(data.type_parameters())),
+                (ChildRole::Nodes, ChildSlot::List(data.heritage_clauses())),
+                (ChildRole::Nodes, ChildSlot::List(data.members())),
+            ],
+            NodeDataRead::HeritageClause(data) => {
+                vec![(ChildRole::Nodes, ChildSlot::List(data.types()))]
+            }
+            NodeDataRead::InterfaceDeclaration(data) => vec![
+                (ChildRole::Modifiers, ChildSlot::List(data.modifiers())),
+                (ChildRole::Node, ChildSlot::Node(data.name())),
+                (ChildRole::Nodes, ChildSlot::List(data.type_parameters())),
+                (ChildRole::Nodes, ChildSlot::List(data.heritage_clauses())),
+                (ChildRole::Nodes, ChildSlot::List(data.members())),
+            ],
+            NodeDataRead::TypeAliasDeclaration(data) => vec![
+                (ChildRole::Modifiers, ChildSlot::List(data.modifiers())),
+                (ChildRole::Node, ChildSlot::Node(data.name())),
+                (ChildRole::Nodes, ChildSlot::List(data.type_parameters())),
+                (ChildRole::Node, ChildSlot::Node(data.r#type())),
+            ],
+            NodeDataRead::EnumMember(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.name())),
+                (ChildRole::Node, ChildSlot::Node(data.initializer())),
+            ],
+            NodeDataRead::EnumDeclaration(data) => vec![
+                (ChildRole::Modifiers, ChildSlot::List(data.modifiers())),
+                (ChildRole::Node, ChildSlot::Node(data.name())),
+                (ChildRole::Nodes, ChildSlot::List(data.members())),
+            ],
+            NodeDataRead::ModuleBlock(data) => {
+                vec![(ChildRole::Nodes, ChildSlot::List(data.statements()))]
+            }
+            NodeDataRead::ImportDeclaration(data) => vec![
+                (ChildRole::Modifiers, ChildSlot::List(data.modifiers())),
+                (ChildRole::Node, ChildSlot::Node(data.import_clause())),
+                (ChildRole::Node, ChildSlot::Node(data.module_specifier())),
+                (ChildRole::Node, ChildSlot::Node(data.attributes())),
+            ],
+            NodeDataRead::ExternalModuleReference(data) => {
+                vec![(ChildRole::Node, ChildSlot::Node(data.expression()))]
+            }
+            NodeDataRead::NamespaceImport(data) => {
+                vec![(ChildRole::Node, ChildSlot::Node(data.name()))]
+            }
+            NodeDataRead::NamedImports(data) => {
+                vec![(ChildRole::Nodes, ChildSlot::List(data.elements()))]
+            }
+            NodeDataRead::ExportAssignment(data) => vec![
+                (ChildRole::Modifiers, ChildSlot::List(data.modifiers())),
+                (ChildRole::Node, ChildSlot::Node(data.r#type())),
+                (ChildRole::Node, ChildSlot::Node(data.expression())),
+            ],
+            NodeDataRead::NamespaceExportDeclaration(data) => vec![
+                (ChildRole::Modifiers, ChildSlot::List(data.modifiers())),
+                (ChildRole::Node, ChildSlot::Node(data.name())),
+            ],
+            NodeDataRead::NamespaceExport(data) => {
+                vec![(ChildRole::Node, ChildSlot::Node(data.name()))]
+            }
+            NodeDataRead::NamedExports(data) => {
+                vec![(ChildRole::Nodes, ChildSlot::List(data.elements()))]
+            }
+            NodeDataRead::ExportSpecifier(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.property_name())),
+                (ChildRole::Node, ChildSlot::Node(data.name())),
+            ],
+            NodeDataRead::CallSignatureDeclaration(data) => vec![
+                (ChildRole::Nodes, ChildSlot::List(data.type_parameters())),
+                (ChildRole::Nodes, ChildSlot::List(data.parameters())),
+                (ChildRole::Node, ChildSlot::Node(data.r#type())),
+            ],
+            NodeDataRead::ConstructSignatureDeclaration(data) => vec![
+                (ChildRole::Nodes, ChildSlot::List(data.type_parameters())),
+                (ChildRole::Nodes, ChildSlot::List(data.parameters())),
+                (ChildRole::Node, ChildSlot::Node(data.r#type())),
+            ],
+            NodeDataRead::ConstructorDeclaration(data) => vec![
+                (ChildRole::Modifiers, ChildSlot::List(data.modifiers())),
+                (ChildRole::Nodes, ChildSlot::List(data.type_parameters())),
+                (ChildRole::Parameters, ChildSlot::List(data.parameters())),
+                (ChildRole::Node, ChildSlot::Node(data.r#type())),
+                (ChildRole::Node, ChildSlot::Node(data.full_signature())),
+                (ChildRole::FunctionBody, ChildSlot::Node(data.body())),
+            ],
+            NodeDataRead::GetAccessorDeclaration(data) => vec![
+                (ChildRole::Modifiers, ChildSlot::List(data.modifiers())),
+                (ChildRole::Node, ChildSlot::Node(data.name())),
+                (ChildRole::Nodes, ChildSlot::List(data.type_parameters())),
+                (ChildRole::Parameters, ChildSlot::List(data.parameters())),
+                (ChildRole::Node, ChildSlot::Node(data.r#type())),
+                (ChildRole::Node, ChildSlot::Node(data.full_signature())),
+                (ChildRole::FunctionBody, ChildSlot::Node(data.body())),
+            ],
+            NodeDataRead::SetAccessorDeclaration(data) => vec![
+                (ChildRole::Modifiers, ChildSlot::List(data.modifiers())),
+                (ChildRole::Node, ChildSlot::Node(data.name())),
+                (ChildRole::Nodes, ChildSlot::List(data.type_parameters())),
+                (ChildRole::Parameters, ChildSlot::List(data.parameters())),
+                (ChildRole::Node, ChildSlot::Node(data.r#type())),
+                (ChildRole::Node, ChildSlot::Node(data.full_signature())),
+                (ChildRole::FunctionBody, ChildSlot::Node(data.body())),
+            ],
+            NodeDataRead::IndexSignatureDeclaration(data) => vec![
+                (ChildRole::Modifiers, ChildSlot::List(data.modifiers())),
+                (ChildRole::Nodes, ChildSlot::List(data.parameters())),
+                (ChildRole::Node, ChildSlot::Node(data.r#type())),
+            ],
+            NodeDataRead::MethodSignatureDeclaration(data) => vec![
+                (ChildRole::Modifiers, ChildSlot::List(data.modifiers())),
+                (ChildRole::Node, ChildSlot::Node(data.name())),
+                (ChildRole::Node, ChildSlot::Node(data.postfix_token())),
+                (ChildRole::Nodes, ChildSlot::List(data.type_parameters())),
+                (ChildRole::Nodes, ChildSlot::List(data.parameters())),
+                (ChildRole::Node, ChildSlot::Node(data.r#type())),
+            ],
+            NodeDataRead::MethodDeclaration(data) => vec![
+                (ChildRole::Modifiers, ChildSlot::List(data.modifiers())),
+                (ChildRole::Node, ChildSlot::Node(data.asterisk_token())),
+                (ChildRole::Node, ChildSlot::Node(data.name())),
+                (ChildRole::Node, ChildSlot::Node(data.postfix_token())),
+                (ChildRole::Nodes, ChildSlot::List(data.type_parameters())),
+                (ChildRole::Parameters, ChildSlot::List(data.parameters())),
+                (ChildRole::Node, ChildSlot::Node(data.r#type())),
+                (ChildRole::Node, ChildSlot::Node(data.full_signature())),
+                (ChildRole::FunctionBody, ChildSlot::Node(data.body())),
+            ],
+            NodeDataRead::PropertySignatureDeclaration(data) => vec![
+                (ChildRole::Modifiers, ChildSlot::List(data.modifiers())),
+                (ChildRole::Node, ChildSlot::Node(data.name())),
+                (ChildRole::Node, ChildSlot::Node(data.postfix_token())),
+                (ChildRole::Node, ChildSlot::Node(data.r#type())),
+                (ChildRole::Node, ChildSlot::Node(data.initializer())),
+            ],
+            NodeDataRead::PropertyDeclaration(data) => vec![
+                (ChildRole::Modifiers, ChildSlot::List(data.modifiers())),
+                (ChildRole::Node, ChildSlot::Node(data.name())),
+                (ChildRole::Node, ChildSlot::Node(data.postfix_token())),
+                (ChildRole::Node, ChildSlot::Node(data.r#type())),
+                (ChildRole::Node, ChildSlot::Node(data.initializer())),
+            ],
+            NodeDataRead::ClassStaticBlockDeclaration(data) => vec![
+                (ChildRole::Modifiers, ChildSlot::List(data.modifiers())),
+                (ChildRole::Node, ChildSlot::Node(data.body())),
+            ],
+            NodeDataRead::BinaryExpression(data) => vec![
+                (ChildRole::Modifiers, ChildSlot::List(data.modifiers())),
+                (ChildRole::Node, ChildSlot::Node(data.left())),
+                (ChildRole::Node, ChildSlot::Node(data.r#type())),
+                (ChildRole::Node, ChildSlot::Node(data.operator_token())),
+                (ChildRole::Node, ChildSlot::Node(data.right())),
+            ],
+            NodeDataRead::PrefixUnaryExpression(data) => {
+                vec![(ChildRole::Node, ChildSlot::Node(data.operand()))]
+            }
+            NodeDataRead::PostfixUnaryExpression(data) => {
+                vec![(ChildRole::Node, ChildSlot::Node(data.operand()))]
+            }
+            NodeDataRead::YieldExpression(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.asterisk_token())),
+                (ChildRole::Node, ChildSlot::Node(data.expression())),
+            ],
+            NodeDataRead::ArrowFunction(data) => vec![
+                (ChildRole::Modifiers, ChildSlot::List(data.modifiers())),
+                (ChildRole::Nodes, ChildSlot::List(data.type_parameters())),
+                (ChildRole::Parameters, ChildSlot::List(data.parameters())),
+                (ChildRole::Node, ChildSlot::Node(data.r#type())),
+                (ChildRole::Node, ChildSlot::Node(data.full_signature())),
+                (
+                    ChildRole::Node,
+                    ChildSlot::Node(data.equals_greater_than_token()),
+                ),
+                (ChildRole::FunctionBody, ChildSlot::Node(data.body())),
+            ],
+            NodeDataRead::FunctionExpression(data) => vec![
+                (ChildRole::Modifiers, ChildSlot::List(data.modifiers())),
+                (ChildRole::Node, ChildSlot::Node(data.asterisk_token())),
+                (ChildRole::Node, ChildSlot::Node(data.name())),
+                (ChildRole::Nodes, ChildSlot::List(data.type_parameters())),
+                (ChildRole::Parameters, ChildSlot::List(data.parameters())),
+                (ChildRole::Node, ChildSlot::Node(data.r#type())),
+                (ChildRole::Node, ChildSlot::Node(data.full_signature())),
+                (ChildRole::FunctionBody, ChildSlot::Node(data.body())),
+            ],
+            NodeDataRead::AsExpression(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.expression())),
+                (ChildRole::Node, ChildSlot::Node(data.r#type())),
+            ],
+            NodeDataRead::SatisfiesExpression(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.expression())),
+                (ChildRole::Node, ChildSlot::Node(data.r#type())),
+            ],
+            NodeDataRead::ConditionalExpression(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.condition())),
+                (ChildRole::Node, ChildSlot::Node(data.question_token())),
+                (ChildRole::Node, ChildSlot::Node(data.when_true())),
+                (ChildRole::Node, ChildSlot::Node(data.colon_token())),
+                (ChildRole::Node, ChildSlot::Node(data.when_false())),
+            ],
+            NodeDataRead::PropertyAccessExpression(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.expression())),
+                (ChildRole::Node, ChildSlot::Node(data.question_dot_token())),
+                (ChildRole::Node, ChildSlot::Node(data.name())),
+            ],
+            NodeDataRead::ElementAccessExpression(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.expression())),
+                (ChildRole::Node, ChildSlot::Node(data.question_dot_token())),
+                (ChildRole::Node, ChildSlot::Node(data.argument_expression())),
+            ],
+            NodeDataRead::CallExpression(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.expression())),
+                (ChildRole::Node, ChildSlot::Node(data.question_dot_token())),
+                (ChildRole::Nodes, ChildSlot::List(data.type_arguments())),
+                (ChildRole::Nodes, ChildSlot::List(data.arguments())),
+            ],
+            NodeDataRead::NewExpression(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.expression())),
+                (ChildRole::Nodes, ChildSlot::List(data.type_arguments())),
+                (ChildRole::Nodes, ChildSlot::List(data.arguments())),
+            ],
+            NodeDataRead::MetaProperty(data) => {
+                vec![(ChildRole::Node, ChildSlot::Node(data.name()))]
+            }
+            NodeDataRead::NonNullExpression(data) => {
+                vec![(ChildRole::Node, ChildSlot::Node(data.expression()))]
+            }
+            NodeDataRead::SpreadElement(data) => {
+                vec![(ChildRole::Node, ChildSlot::Node(data.expression()))]
+            }
+            NodeDataRead::TemplateExpression(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.head())),
+                (ChildRole::Nodes, ChildSlot::List(data.template_spans())),
+            ],
+            NodeDataRead::TemplateSpan(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.expression())),
+                (ChildRole::Node, ChildSlot::Node(data.literal())),
+            ],
+            NodeDataRead::TaggedTemplateExpression(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.tag())),
+                (ChildRole::Node, ChildSlot::Node(data.question_dot_token())),
+                (ChildRole::Nodes, ChildSlot::List(data.type_arguments())),
+                (ChildRole::Node, ChildSlot::Node(data.template())),
+            ],
+            NodeDataRead::ParenthesizedExpression(data) => {
+                vec![(ChildRole::Node, ChildSlot::Node(data.expression()))]
+            }
+            NodeDataRead::ArrayLiteralExpression(data) => {
+                vec![(ChildRole::Nodes, ChildSlot::List(data.elements()))]
+            }
+            NodeDataRead::ObjectLiteralExpression(data) => {
+                vec![(ChildRole::Nodes, ChildSlot::List(data.properties()))]
+            }
+            NodeDataRead::SpreadAssignment(data) => {
+                vec![(ChildRole::Node, ChildSlot::Node(data.expression()))]
+            }
+            NodeDataRead::PropertyAssignment(data) => vec![
+                (ChildRole::Modifiers, ChildSlot::List(data.modifiers())),
+                (ChildRole::Node, ChildSlot::Node(data.name())),
+                (ChildRole::Node, ChildSlot::Node(data.postfix_token())),
+                (ChildRole::Node, ChildSlot::Node(data.r#type())),
+                (ChildRole::Node, ChildSlot::Node(data.initializer())),
+            ],
+            NodeDataRead::ShorthandPropertyAssignment(data) => vec![
+                (ChildRole::Modifiers, ChildSlot::List(data.modifiers())),
+                (ChildRole::Node, ChildSlot::Node(data.name())),
+                (ChildRole::Node, ChildSlot::Node(data.postfix_token())),
+                (ChildRole::Node, ChildSlot::Node(data.r#type())),
+                (ChildRole::Node, ChildSlot::Node(data.equals_token())),
+                (
+                    ChildRole::Node,
+                    ChildSlot::Node(data.object_assignment_initializer()),
+                ),
+            ],
+            NodeDataRead::DeleteExpression(data) => {
+                vec![(ChildRole::Node, ChildSlot::Node(data.expression()))]
+            }
+            NodeDataRead::TypeOfExpression(data) => {
+                vec![(ChildRole::Node, ChildSlot::Node(data.expression()))]
+            }
+            NodeDataRead::VoidExpression(data) => {
+                vec![(ChildRole::Node, ChildSlot::Node(data.expression()))]
+            }
+            NodeDataRead::AwaitExpression(data) => {
+                vec![(ChildRole::Node, ChildSlot::Node(data.expression()))]
+            }
+            NodeDataRead::TypeAssertion(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.r#type())),
+                (ChildRole::Node, ChildSlot::Node(data.expression())),
+            ],
+            NodeDataRead::UnionTypeNode(data) => {
+                vec![(ChildRole::Nodes, ChildSlot::List(data.types()))]
+            }
+            NodeDataRead::IntersectionTypeNode(data) => {
+                vec![(ChildRole::Nodes, ChildSlot::List(data.types()))]
+            }
+            NodeDataRead::ConditionalTypeNode(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.check_type())),
+                (ChildRole::Node, ChildSlot::Node(data.extends_type())),
+                (ChildRole::Node, ChildSlot::Node(data.true_type())),
+                (ChildRole::Node, ChildSlot::Node(data.false_type())),
+            ],
+            NodeDataRead::TypeOperatorNode(data) => {
+                vec![(ChildRole::Node, ChildSlot::Node(data.r#type()))]
+            }
+            NodeDataRead::InferTypeNode(data) => {
+                vec![(ChildRole::Node, ChildSlot::Node(data.type_parameter()))]
+            }
+            NodeDataRead::ArrayTypeNode(data) => {
+                vec![(ChildRole::Node, ChildSlot::Node(data.element_type()))]
+            }
+            NodeDataRead::IndexedAccessTypeNode(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.object_type())),
+                (ChildRole::Node, ChildSlot::Node(data.index_type())),
+            ],
+            NodeDataRead::TypeReferenceNode(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.type_name())),
+                (ChildRole::Nodes, ChildSlot::List(data.type_arguments())),
+            ],
+            NodeDataRead::ExpressionWithTypeArguments(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.expression())),
+                (ChildRole::Nodes, ChildSlot::List(data.type_arguments())),
+            ],
+            NodeDataRead::LiteralTypeNode(data) => {
+                vec![(ChildRole::Node, ChildSlot::Node(data.literal()))]
+            }
+            NodeDataRead::TypePredicateNode(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.asserts_modifier())),
+                (ChildRole::Node, ChildSlot::Node(data.parameter_name())),
+                (ChildRole::Node, ChildSlot::Node(data.r#type())),
+            ],
+            NodeDataRead::ImportAttribute(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.name())),
+                (ChildRole::Node, ChildSlot::Node(data.value())),
+            ],
+            NodeDataRead::ImportAttributes(data) => {
+                vec![(ChildRole::Nodes, ChildSlot::List(data.attributes()))]
+            }
+            NodeDataRead::TypeQueryNode(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.expr_name())),
+                (ChildRole::Nodes, ChildSlot::List(data.type_arguments())),
+            ],
+            NodeDataRead::MappedTypeNode(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.readonly_token())),
+                (ChildRole::Node, ChildSlot::Node(data.type_parameter())),
+                (ChildRole::Node, ChildSlot::Node(data.name_type())),
+                (ChildRole::Node, ChildSlot::Node(data.question_token())),
+                (ChildRole::Node, ChildSlot::Node(data.r#type())),
+                (ChildRole::Nodes, ChildSlot::List(data.members())),
+            ],
+            NodeDataRead::TypeLiteralNode(data) => {
+                vec![(ChildRole::Nodes, ChildSlot::List(data.members()))]
+            }
+            NodeDataRead::TupleTypeNode(data) => {
+                vec![(ChildRole::Nodes, ChildSlot::List(data.elements()))]
+            }
+            NodeDataRead::NamedTupleMember(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.dot_dot_dot_token())),
+                (ChildRole::Node, ChildSlot::Node(data.name())),
+                (ChildRole::Node, ChildSlot::Node(data.question_token())),
+                (ChildRole::Node, ChildSlot::Node(data.r#type())),
+            ],
+            NodeDataRead::OptionalTypeNode(data) => {
+                vec![(ChildRole::Node, ChildSlot::Node(data.r#type()))]
+            }
+            NodeDataRead::RestTypeNode(data) => {
+                vec![(ChildRole::Node, ChildSlot::Node(data.r#type()))]
+            }
+            NodeDataRead::ParenthesizedTypeNode(data) => {
+                vec![(ChildRole::Node, ChildSlot::Node(data.r#type()))]
+            }
+            NodeDataRead::FunctionTypeNode(data) => vec![
+                (ChildRole::Nodes, ChildSlot::List(data.type_parameters())),
+                (ChildRole::Nodes, ChildSlot::List(data.parameters())),
+                (ChildRole::Node, ChildSlot::Node(data.r#type())),
+            ],
+            NodeDataRead::ConstructorTypeNode(data) => vec![
+                (ChildRole::Modifiers, ChildSlot::List(data.modifiers())),
+                (ChildRole::Nodes, ChildSlot::List(data.type_parameters())),
+                (ChildRole::Nodes, ChildSlot::List(data.parameters())),
+                (ChildRole::Node, ChildSlot::Node(data.r#type())),
+            ],
+            NodeDataRead::TemplateLiteralTypeNode(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.head())),
+                (ChildRole::Nodes, ChildSlot::List(data.template_spans())),
+            ],
+            NodeDataRead::TemplateLiteralTypeSpan(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.r#type())),
+                (ChildRole::Node, ChildSlot::Node(data.literal())),
+            ],
+            NodeDataRead::SyntheticExpression(data) => {
+                vec![(ChildRole::Node, ChildSlot::Node(data.tuple_name_source()))]
+            }
+            NodeDataRead::PartiallyEmittedExpression(data) => {
+                vec![(ChildRole::Node, ChildSlot::Node(data.expression()))]
+            }
+            NodeDataRead::JsxElement(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.opening_element())),
+                (ChildRole::Nodes, ChildSlot::List(data.children())),
+                (ChildRole::Node, ChildSlot::Node(data.closing_element())),
+            ],
+            NodeDataRead::JsxAttributes(data) => {
+                vec![(ChildRole::Nodes, ChildSlot::List(data.properties()))]
+            }
+            NodeDataRead::JsxNamespacedName(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.namespace())),
+                (ChildRole::Node, ChildSlot::Node(data.name())),
+            ],
+            NodeDataRead::JsxOpeningElement(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.tag_name())),
+                (ChildRole::Nodes, ChildSlot::List(data.type_arguments())),
+                (ChildRole::Node, ChildSlot::Node(data.attributes())),
+            ],
+            NodeDataRead::JsxSelfClosingElement(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.tag_name())),
+                (ChildRole::Nodes, ChildSlot::List(data.type_arguments())),
+                (ChildRole::Node, ChildSlot::Node(data.attributes())),
+            ],
+            NodeDataRead::JsxFragment(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.opening_fragment())),
+                (ChildRole::Nodes, ChildSlot::List(data.children())),
+                (ChildRole::Node, ChildSlot::Node(data.closing_fragment())),
+            ],
+            NodeDataRead::JsxAttribute(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.name())),
+                (ChildRole::Node, ChildSlot::Node(data.initializer())),
+            ],
+            NodeDataRead::JsxSpreadAttribute(data) => {
+                vec![(ChildRole::Node, ChildSlot::Node(data.expression()))]
+            }
+            NodeDataRead::JsxClosingElement(data) => {
+                vec![(ChildRole::Node, ChildSlot::Node(data.tag_name()))]
+            }
+            NodeDataRead::JsxExpression(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.dot_dot_dot_token())),
+                (ChildRole::Node, ChildSlot::Node(data.expression())),
+            ],
+            NodeDataRead::SyntaxList(data) => {
+                vec![(ChildRole::RawNodes, ChildSlot::Nodes(data.children()))]
+            }
+            NodeDataRead::JSDoc(data) => vec![
+                (ChildRole::Nodes, ChildSlot::List(data.comment())),
+                (ChildRole::Nodes, ChildSlot::List(data.tags())),
+            ],
+            NodeDataRead::JSDocTypeExpression(data) => {
+                vec![(ChildRole::Node, ChildSlot::Node(data.r#type()))]
+            }
+            NodeDataRead::JSDocNonNullableType(data) => {
+                vec![(ChildRole::Node, ChildSlot::Node(data.r#type()))]
+            }
+            NodeDataRead::JSDocNullableType(data) => {
+                vec![(ChildRole::Node, ChildSlot::Node(data.r#type()))]
+            }
+            NodeDataRead::JSDocVariadicType(data) => {
+                vec![(ChildRole::Node, ChildSlot::Node(data.r#type()))]
+            }
+            NodeDataRead::JSDocOptionalType(data) => {
+                vec![(ChildRole::Node, ChildSlot::Node(data.r#type()))]
+            }
+            NodeDataRead::JSDocTypeTag(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.tag_name())),
+                (ChildRole::Node, ChildSlot::Node(data.type_expression())),
+                (ChildRole::Nodes, ChildSlot::List(data.comment())),
+            ],
+            NodeDataRead::JSDocUnknownTag(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.tag_name())),
+                (ChildRole::Nodes, ChildSlot::List(data.comment())),
+            ],
+            NodeDataRead::JSDocTemplateTag(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.tag_name())),
+                (ChildRole::Node, ChildSlot::Node(data.constraint())),
+                (ChildRole::Nodes, ChildSlot::List(data.type_parameters())),
+                (ChildRole::Nodes, ChildSlot::List(data.comment())),
+            ],
+            NodeDataRead::JSDocReturnTag(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.tag_name())),
+                (ChildRole::Node, ChildSlot::Node(data.type_expression())),
+                (ChildRole::Nodes, ChildSlot::List(data.comment())),
+            ],
+            NodeDataRead::JSDocPublicTag(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.tag_name())),
+                (ChildRole::Nodes, ChildSlot::List(data.comment())),
+            ],
+            NodeDataRead::JSDocPrivateTag(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.tag_name())),
+                (ChildRole::Nodes, ChildSlot::List(data.comment())),
+            ],
+            NodeDataRead::JSDocProtectedTag(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.tag_name())),
+                (ChildRole::Nodes, ChildSlot::List(data.comment())),
+            ],
+            NodeDataRead::JSDocReadonlyTag(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.tag_name())),
+                (ChildRole::Nodes, ChildSlot::List(data.comment())),
+            ],
+            NodeDataRead::JSDocOverrideTag(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.tag_name())),
+                (ChildRole::Nodes, ChildSlot::List(data.comment())),
+            ],
+            NodeDataRead::JSDocDeprecatedTag(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.tag_name())),
+                (ChildRole::Nodes, ChildSlot::List(data.comment())),
+            ],
+            NodeDataRead::JSDocSeeTag(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.tag_name())),
+                (ChildRole::Node, ChildSlot::Node(data.name_expression())),
+                (ChildRole::Nodes, ChildSlot::List(data.comment())),
+            ],
+            NodeDataRead::JSDocImplementsTag(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.tag_name())),
+                (ChildRole::Node, ChildSlot::Node(data.class_name())),
+                (ChildRole::Nodes, ChildSlot::List(data.comment())),
+            ],
+            NodeDataRead::JSDocAugmentsTag(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.tag_name())),
+                (ChildRole::Node, ChildSlot::Node(data.class_name())),
+                (ChildRole::Nodes, ChildSlot::List(data.comment())),
+            ],
+            NodeDataRead::JSDocSatisfiesTag(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.tag_name())),
+                (ChildRole::Node, ChildSlot::Node(data.type_expression())),
+                (ChildRole::Nodes, ChildSlot::List(data.comment())),
+            ],
+            NodeDataRead::JSDocThrowsTag(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.tag_name())),
+                (ChildRole::Node, ChildSlot::Node(data.type_expression())),
+                (ChildRole::Nodes, ChildSlot::List(data.comment())),
+            ],
+            NodeDataRead::JSDocThisTag(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.tag_name())),
+                (ChildRole::Node, ChildSlot::Node(data.type_expression())),
+                (ChildRole::Nodes, ChildSlot::List(data.comment())),
+            ],
+            NodeDataRead::JSDocImportTag(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.tag_name())),
+                (ChildRole::Node, ChildSlot::Node(data.import_clause())),
+                (ChildRole::Node, ChildSlot::Node(data.module_specifier())),
+                (ChildRole::Node, ChildSlot::Node(data.attributes())),
+                (ChildRole::Nodes, ChildSlot::List(data.comment())),
+            ],
+            NodeDataRead::JSDocCallbackTag(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.tag_name())),
+                (ChildRole::Node, ChildSlot::Node(data.type_expression())),
+                (ChildRole::Node, ChildSlot::Node(data.name())),
+                (ChildRole::Nodes, ChildSlot::List(data.comment())),
+            ],
+            NodeDataRead::JSDocOverloadTag(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.tag_name())),
+                (ChildRole::Node, ChildSlot::Node(data.type_expression())),
+                (ChildRole::Nodes, ChildSlot::List(data.comment())),
+            ],
+            NodeDataRead::JSDocTypedefTag(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.tag_name())),
+                (ChildRole::Node, ChildSlot::Node(data.type_expression())),
+                (ChildRole::Node, ChildSlot::Node(data.name())),
+                (ChildRole::Nodes, ChildSlot::List(data.comment())),
+            ],
+            NodeDataRead::JSDocSignature(data) => vec![
+                (ChildRole::Nodes, ChildSlot::List(data.type_parameters())),
+                (ChildRole::Nodes, ChildSlot::List(data.parameters())),
+                (ChildRole::Node, ChildSlot::Node(data.r#type())),
+            ],
+            NodeDataRead::JSDocNameReference(data) => {
+                vec![(ChildRole::Node, ChildSlot::Node(data.name()))]
+            }
+            NodeDataRead::SourceFile(data) => vec![
+                (
+                    ChildRole::TopLevelStatements,
+                    ChildSlot::List(data.statements()),
+                ),
+                (ChildRole::Token, ChildSlot::Node(data.end_of_file_token())),
+            ],
+            NodeDataRead::ModuleDeclaration(data) => vec![
+                (ChildRole::Modifiers, ChildSlot::List(data.modifiers())),
+                (ChildRole::Node, ChildSlot::Node(data.name())),
+                (ChildRole::Node, ChildSlot::Node(data.attributes())),
+                (ChildRole::Node, ChildSlot::Node(data.body())),
+            ],
+            NodeDataRead::ImportEqualsDeclaration(data) => vec![
+                (ChildRole::Modifiers, ChildSlot::List(data.modifiers())),
+                (ChildRole::Node, ChildSlot::Node(data.name())),
+                (ChildRole::Node, ChildSlot::Node(data.module_reference())),
+            ],
+            NodeDataRead::ExportDeclaration(data) => vec![
+                (ChildRole::Modifiers, ChildSlot::List(data.modifiers())),
+                (ChildRole::Node, ChildSlot::Node(data.export_clause())),
+                (ChildRole::Node, ChildSlot::Node(data.module_specifier())),
+                (ChildRole::Node, ChildSlot::Node(data.attributes())),
+            ],
+            NodeDataRead::ImportTypeNode(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.argument())),
+                (ChildRole::Node, ChildSlot::Node(data.attributes())),
+                (ChildRole::Node, ChildSlot::Node(data.qualifier())),
+                (ChildRole::Nodes, ChildSlot::List(data.type_arguments())),
+            ],
+            NodeDataRead::ImportClause(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.name())),
+                (ChildRole::Node, ChildSlot::Node(data.named_bindings())),
+            ],
+            NodeDataRead::ImportSpecifier(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.property_name())),
+                (ChildRole::Node, ChildSlot::Node(data.name())),
+            ],
+            NodeDataRead::JSDocLink(data) => vec![(ChildRole::Node, ChildSlot::Node(data.name()))],
+            NodeDataRead::JSDocLinkPlain(data) => {
+                vec![(ChildRole::Node, ChildSlot::Node(data.name()))]
+            }
+            NodeDataRead::JSDocLinkCode(data) => {
+                vec![(ChildRole::Node, ChildSlot::Node(data.name()))]
+            }
+            NodeDataRead::TypeParameterDeclaration(data) => vec![
+                (ChildRole::Modifiers, ChildSlot::List(data.modifiers())),
+                (ChildRole::Node, ChildSlot::Node(data.name())),
+                (ChildRole::Node, ChildSlot::Node(data.constraint())),
+                (ChildRole::Node, ChildSlot::Node(data.expression())),
+                (ChildRole::Node, ChildSlot::Node(data.default_type())),
+            ],
+            NodeDataRead::SyntheticReferenceExpression(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.expression())),
+                (ChildRole::Node, ChildSlot::Node(data.this_arg())),
+            ],
+            NodeDataRead::JSDocTypeLiteral(data) => vec![(
+                ChildRole::RawNodes,
+                ChildSlot::Nodes(data.js_doc_property_tags()),
+            )],
+            NodeDataRead::JSDocParameterOrPropertyTag(data) => vec![
+                (ChildRole::Node, ChildSlot::Node(data.tag_name())),
+                (ChildRole::Node, ChildSlot::Node(data.name())),
+                (ChildRole::Node, ChildSlot::Node(data.type_expression())),
+                (ChildRole::Nodes, ChildSlot::List(data.comment())),
+            ],
+            _ => Vec::new(),
+        }
+    }
+}

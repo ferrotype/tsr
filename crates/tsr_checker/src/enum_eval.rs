@@ -9,180 +9,38 @@ use tsr_arena::{NodeId, SymbolId};
 use tsr_ast::{node_flags as nf, symbol_flags as sf, SyntaxKind as K};
 use tsr_diagnostics as messages;
 use tsr_jsnum::Number;
-use tsr_jsstring::JsString;
 
 impl CheckerState {
-    // port: tsc/internal/evaluator/evaluator.go:NewEvaluator
     pub(crate) fn evaluate_enum_expression(
-        &mut self,
-        mut expression: NodeId,
-        location: Option<NodeId>,
-    ) -> Result<EnumEvaluation, Error> {
-        while self.node(expression)?.kind() == K::ParenthesizedExpression {
-            expression = self
-                .ast(expression)?
-                .node(expression)?
-                .expression()
-                .ok_or(Error::MissingLink("parenthesized enum expression"))?;
-        }
-        let read = self.node(expression)?;
-        let mut result = EnumEvaluation::default();
-        match read.kind().known() {
-            Some(K::PrefixUnaryExpression) => {
-                let data = read
-                    .data_source()
-                    .as_prefix_unary_expression()
-                    .ok_or(Error::MissingLink("enum unary expression"))?;
-                let operator = data.operator();
-                let operand = data
-                    .operand()
-                    .ok_or(Error::MissingLink("enum unary operand"))?;
-                let operand = self.evaluate_enum_expression(operand, location)?;
-                result.resolved_other_files = operand.resolved_other_files;
-                result.has_external_references = operand.has_external_references;
-                if let Some(EnumValue::Number(number)) = operand.value {
-                    result.value = match operator.known() {
-                        Some(K::PlusToken) => Some(EnumValue::Number(number)),
-                        Some(K::MinusToken) => {
-                            Some(EnumValue::Number(Number::new(-number.value())))
-                        }
-                        Some(K::TildeToken) => Some(EnumValue::Number(number.bitwise_not())),
-                        _ => None,
-                    };
-                }
-            }
-            Some(K::BinaryExpression) => {
-                let data = read
-                    .data_source()
-                    .as_binary_expression()
-                    .ok_or(Error::MissingLink("enum binary expression"))?;
-                let left = data.left().ok_or(Error::MissingLink("enum binary left"))?;
-                let right = data
-                    .right()
-                    .ok_or(Error::MissingLink("enum binary right"))?;
-                let operator = data
-                    .operator_token()
-                    .ok_or(Error::MissingLink("enum binary operator"))?;
-                let operator = self.node(operator)?.kind();
-                let left = self.evaluate_enum_expression(left, location)?;
-                let right = self.evaluate_enum_expression(right, location)?;
-                result.is_syntactically_string = (left.is_syntactically_string
-                    || right.is_syntactically_string)
-                    && operator == K::PlusToken;
-                result.resolved_other_files =
-                    left.resolved_other_files || right.resolved_other_files;
-                result.has_external_references =
-                    left.has_external_references || right.has_external_references;
-                if let (Some(EnumValue::Number(left)), Some(EnumValue::Number(right))) =
-                    (&left.value, &right.value)
-                {
-                    let value = match operator.known() {
-                        Some(K::BarToken) => Some(left.bitwise_or(*right)),
-                        Some(K::AmpersandToken) => Some(left.bitwise_and(*right)),
-                        Some(K::CaretToken) => Some(left.bitwise_xor(*right)),
-                        Some(K::GreaterThanGreaterThanToken) => {
-                            Some(left.signed_right_shift(*right))
-                        }
-                        Some(K::GreaterThanGreaterThanGreaterThanToken) => {
-                            Some(left.unsigned_right_shift(*right))
-                        }
-                        Some(K::LessThanLessThanToken) => Some(left.left_shift(*right)),
-                        Some(K::AsteriskToken) => Some(Number::new(left.value() * right.value())),
-                        Some(K::SlashToken) => Some(Number::new(left.value() / right.value())),
-                        Some(K::PlusToken) => Some(Number::new(left.value() + right.value())),
-                        Some(K::MinusToken) => Some(Number::new(left.value() - right.value())),
-                        Some(K::PercentToken) => Some(left.remainder(*right)),
-                        Some(K::AsteriskAsteriskToken) => Some(left.exponentiate(*right)),
-                        _ => None,
-                    };
-                    if let Some(value) = value {
-                        result.value = Some(EnumValue::Number(value));
-                        return Ok(result);
-                    }
-                }
-                if operator == K::PlusToken {
-                    if let (Some(left), Some(right)) = (left.value, right.value) {
-                        let mut text = left.text().as_bytes().to_vec();
-                        text.extend_from_slice(right.text().as_bytes());
-                        result.value = Some(EnumValue::String(JsString::from_bytes(text)));
-                    }
-                }
-            }
-            Some(K::StringLiteral | K::NoSubstitutionTemplateLiteral) => {
-                result.value = Some(EnumValue::String(
-                    self.node_text(expression)?.into_js_string(),
-                ));
-                result.is_syntactically_string = true;
-            }
-            Some(K::NumericLiteral) => {
-                result.value = Some(EnumValue::Number(tsr_jsnum::from_string(
-                    self.node_text(expression)?.as_bytes(),
-                )));
-            }
-            Some(K::TemplateExpression) => {
-                return self.evaluate_enum_template(expression, location)
-            }
-            Some(K::Identifier) => return self.evaluate_enum_entity(expression, location),
-            Some(K::ElementAccessExpression | K::PropertyAccessExpression) => {
-                let root = read
-                    .expression()
-                    .ok_or(Error::MissingLink("enum access expression"))?;
-                if tsr_ast::is_entity_name_expression(self.ast(root)?, root)? {
-                    return self.evaluate_enum_entity(expression, location);
-                }
-            }
-            _ => {}
-        }
-        Ok(result)
-    }
-
-    // port: tsc/internal/evaluator/evaluator.go:evaluateTemplateExpression
-    fn evaluate_enum_template(
         &mut self,
         expression: NodeId,
         location: Option<NodeId>,
     ) -> Result<EnumEvaluation, Error> {
-        let read = self.node(expression)?;
-        let data = read
-            .data_source()
-            .as_template_expression()
-            .ok_or(Error::MissingLink("enum template expression"))?;
-        let head = data
-            .head()
-            .ok_or(Error::MissingLink("enum template head"))?;
-        let spans = self.source_list(expression, data.template_spans())?;
-        let mut text = self.node_text(head)?.as_bytes().to_vec();
-        let mut result = EnumEvaluation {
-            is_syntactically_string: true,
-            ..Default::default()
-        };
-        for span in spans {
-            let read = self.node(span)?;
-            let data = read
-                .data_source()
-                .as_template_span()
-                .ok_or(Error::MissingLink("enum template span"))?;
-            let expression = data
-                .expression()
-                .ok_or(Error::MissingLink("enum template span expression"))?;
-            let literal = data
-                .literal()
-                .ok_or(Error::MissingLink("enum template span literal"))?;
-            let value = self.evaluate_enum_expression(expression, location)?;
-            let Some(part) = value.value else {
-                // Upstream discards accumulated external-reference flags on this exit.
-                return Ok(EnumEvaluation {
-                    is_syntactically_string: true,
-                    ..Default::default()
-                });
-            };
-            text.extend_from_slice(part.text().as_bytes());
-            text.extend_from_slice(self.node_text(literal)?.as_bytes());
-            result.resolved_other_files |= value.resolved_other_files;
-            result.has_external_references |= value.has_external_references;
-        }
-        result.value = Some(EnumValue::String(JsString::from_bytes(text)));
-        Ok(result)
+        let result = tsr_ast::evaluator::Evaluator::new(&mut EnumEvaluator(self), 0)
+            .evaluate(expression, location)
+            .map_err(|error| match error {
+                tsr_ast::evaluator::Error::Storage(error) => Error::from(error),
+                tsr_ast::evaluator::Error::Context(error) => error,
+                tsr_ast::evaluator::Error::MissingLink(link) => Error::MissingLink(link),
+                tsr_ast::evaluator::Error::Unhandled(_) => {
+                    Error::MissingLink("enum evaluator value")
+                }
+            })?;
+        Ok(EnumEvaluation {
+            value: result
+                .value
+                .map(|value| match value {
+                    tsr_ast::evaluator::EvaluatedValue::Number(number) => {
+                        Ok(EnumValue::Number(number))
+                    }
+                    tsr_ast::evaluator::EvaluatedValue::String(text) => Ok(EnumValue::String(text)),
+                    _ => Err(Error::MissingLink("enum evaluator value")),
+                })
+                .transpose()?,
+            is_syntactically_string: result.is_syntactically_string,
+            resolved_other_files: result.resolved_other_files,
+            has_external_references: result.has_external_references,
+        })
     }
 
     // port: tsc/internal/checker/checker.go:Checker.evaluateEntity
@@ -368,5 +226,34 @@ impl CheckerState {
             }
         }
         Ok(true)
+    }
+}
+
+// Keep the checker's entity resolver private; only this adapter implements the
+// public callback interface. It adds no owner retention or callback allocation.
+struct EnumEvaluator<'a>(&'a mut CheckerState);
+
+impl tsr_ast::evaluator::EvaluationContext for EnumEvaluator<'_> {
+    type Error = Error;
+
+    fn ast(&self, node: NodeId) -> Result<tsr_ast::AstView<'_>, Error> {
+        self.0.ast(node)
+    }
+
+    fn evaluate_entity(
+        &mut self,
+        expression: NodeId,
+        location: Option<NodeId>,
+    ) -> Result<tsr_ast::evaluator::EvaluationResult, Error> {
+        let result = self.0.evaluate_enum_entity(expression, location)?;
+        Ok(tsr_ast::evaluator::EvaluationResult::new(
+            result.value.map(|value| match value {
+                EnumValue::Number(number) => tsr_ast::evaluator::EvaluatedValue::Number(number),
+                EnumValue::String(text) => tsr_ast::evaluator::EvaluatedValue::String(text),
+            }),
+            result.is_syntactically_string,
+            result.resolved_other_files,
+            result.has_external_references,
+        ))
     }
 }

@@ -482,9 +482,11 @@ dependencies = [
  "tsr_bundled",
  "tsr_compiler",
  "tsr_core",
+ "tsr_jsnum",
  "tsr_jsstring",
  "tsr_module",
  "tsr_parser",
+ "tsr_scanner",
  "tsr_tsoptions",
  "tsr_tspath",
  "tsr_vfs",
@@ -814,6 +816,7 @@ dependencies = [
  "tsr_arena",
  "tsr_core",
  "tsr_diagnostics",
+ "tsr_jsnum",
  "tsr_jsstring",
 ]
 

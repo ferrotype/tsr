@@ -1,8 +1,8 @@
 //! `syntacticDiagnostics` group (F4a plan task 4). Each request is a small
 //! in-memory program. It is loaded by the production `Program::load` through
 //! the shared S07 loader bridge, observed through
-//! `Program::syntactic_diagnostics` -- for the whole program or for the one
-//! file the request names -- and rendered through the production
+//! `Program::syntactic_diagnostics` or `Program::bind_diagnostics`, for the
+//! requested phase and file scope, and rendered through the production
 //! `DiagnosticWriter`. Nothing semantic runs.
 //!
 //! Diagnostics travel as the probe's positional arrays, [file, pos, end, code,
@@ -15,12 +15,12 @@ use tsr_compiler::{FileCache, ProgramFile};
 use crate::api::{subject, Outcome};
 use crate::{hex, observation, ts_compiler_error};
 
-const SUBJECT: &str = "syntacticDiagnostics";
-
 pub fn observe(request: &Value) -> Option<Outcome> {
-    (subject(request) == SUBJECT).then(|| match run(request) {
-        Ok(value) => Outcome::Observed(value),
-        Err(error) => Outcome::Failed(error),
+    matches!(subject(request), "syntacticDiagnostics" | "bindDiagnostics").then(|| {
+        match run(request) {
+            Ok(value) => Outcome::Observed(value),
+            Err(error) => Outcome::Failed(error),
+        }
     })
 }
 
@@ -106,9 +106,12 @@ fn run(request: &Value) -> Result<Value, String> {
             Some(&program.files()[index])
         }
     };
-    let diagnostics = program
-        .syntactic_diagnostics(target.map(|file| &**file))
-        .map_err(|e: ts_compiler_error::Error| format!("syntactic_diagnostics failed: {e:?}"))?;
+    let diagnostics = if subject(request) == "bindDiagnostics" {
+        program.bind_diagnostics(target.map(|file| file.source()))
+    } else {
+        program.syntactic_diagnostics(target.map(|file| &**file))
+    }
+    .map_err(|e: ts_compiler_error::Error| format!("{} failed: {e:?}", subject(request)))?;
     let ordered: Vec<Value> = diagnostics
         .iter()
         .map(|d| positional(&observation::diagnostic(d, &program)))

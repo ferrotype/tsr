@@ -54,9 +54,11 @@ impl<F: ParserFactory> Parser<'_, F> {
                     .expect("identifier payload")
                     .text_owned();
             }
-            panic!(
-                "Debug failure. Unexpected reparser-transformed node kind\nNode {} was unexpected.",
-                node.kind()
+            tsr_core::debug::fail_bad_syntax_kind(
+                &node.kind(),
+                &[tsr_core::debug::Argument::String(
+                    "Unexpected reparser-transformed node kind",
+                )],
             );
         }
         match text {

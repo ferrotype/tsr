@@ -20,9 +20,11 @@ tsr_astnav = { version = "0.1.0", path = "../../../crates/tsr_astnav" }
 tsr_bundled = { version = "0.1.0", path = "../../../crates/tsr_bundled" }
 tsr_compiler = { version = "0.1.0", path = "../../../crates/tsr_compiler" }
 tsr_core = { version = "0.1.0", path = "../../../crates/tsr_core" }
+tsr_jsnum = { version = "0.1.0", path = "../../../crates/tsr_jsnum" }
 tsr_jsstring = { version = "0.1.0", path = "../../../crates/tsr_jsstring" }
 tsr_module = { version = "0.1.0", path = "../../../crates/tsr_module" }
 tsr_parser = { version = "0.1.0", path = "../../../crates/tsr_parser" }
+tsr_scanner = { version = "0.1.0", path = "../../../crates/tsr_scanner" }
 tsr_tsoptions = { version = "0.1.0", path = "../../../crates/tsr_tsoptions" }
 tsr_tspath = { version = "0.1.0", path = "../../../crates/tsr_tspath" }
 tsr_vfs = { version = "0.1.0", path = "../../../crates/tsr_vfs" }

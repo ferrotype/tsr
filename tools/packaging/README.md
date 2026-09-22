@@ -146,6 +146,7 @@ build and optional dependencies. It is for a later, explicitly authorized releas
 | `phase1_filesystem` | Private | Repository-only benchmark, experiment, test or capture tool |
 | `phase1_harness` | Private | Repository-only benchmark, experiment, test or capture tool |
 | `phase1_leaves` | Private | Repository-only Phase 1 foundation test harness |
+| `phase1_syntax` | Private | Repository-only Phase 1 syntax test harness |
 | `tsr_api` | Prepared | Rust library and its public dependency closure |
 | `tsr_arena` | Prepared | Rust library and its public dependency closure |
 | `tsr_ast` | Prepared | Rust library and its public dependency closure |

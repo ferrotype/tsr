@@ -1,10 +1,10 @@
 {
   "counts": {
-    "covered": 1439,
+    "covered": 1441,
     "equivalent_rust": 8,
-    "implemented_untested": 2697,
+    "implemented_untested": 2705,
     "later_phase": 18,
-    "missing": 633
+    "missing": 623
   },
   "dispositions": [
     "covered",
@@ -106597,14 +106597,13 @@
       "annotated_home": [
         "crates/tsr_ast/src/utilities.rs"
       ],
-      "basis": "witnessed by 8 exact link(s): syntax/diagnostics/later-directive-wins-check-then-nocheck, syntax/diagnostics/later-directive-wins-nocheck-then-check, syntax/diagnostics/parameter-decorator-in-unchecked-js",
+      "basis": "witnessed by 7 exact link(s): syntax/diagnostics/later-directive-wins-check-then-nocheck, syntax/diagnostics/later-directive-wins-nocheck-then-check, syntax/diagnostics/parameter-decorator-in-unchecked-js",
       "basis_kind": "rule",
       "cases": [
         "syntax/diagnostics/later-directive-wins-check-then-nocheck",
         "syntax/diagnostics/later-directive-wins-nocheck-then-check",
         "syntax/diagnostics/parameter-decorator-in-unchecked-js",
         "syntax/diagnostics/parameter-decorator-with-checkjs",
-        "syntax/diagnostics/parameter-decorator-with-experimental-decorators",
         "syntax/diagnostics/parameter-decorators-first-per-parameter-in-preorder",
         "syntax/diagnostics/ts-check-directive-enables-checking",
         "syntax/diagnostics/ts-nocheck-overrides-checkjs"
@@ -117541,16 +117540,12 @@
       "annotated_home": [
         "crates/tsr_ast/src/utilities.rs"
       ],
-      "basis": "witnessed by 8 exact link(s): syntax/diagnostics/later-directive-wins-check-then-nocheck, syntax/diagnostics/later-directive-wins-nocheck-then-check, syntax/diagnostics/parameter-decorator-in-unchecked-js",
+      "basis": "witnessed by 4 exact link(s): syntax/diagnostics/later-directive-wins-check-then-nocheck, syntax/diagnostics/parameter-decorator-in-unchecked-js, syntax/diagnostics/parameter-decorators-first-per-parameter-in-preorder",
       "basis_kind": "rule",
       "cases": [
         "syntax/diagnostics/later-directive-wins-check-then-nocheck",
-        "syntax/diagnostics/later-directive-wins-nocheck-then-check",
         "syntax/diagnostics/parameter-decorator-in-unchecked-js",
-        "syntax/diagnostics/parameter-decorator-with-checkjs",
-        "syntax/diagnostics/parameter-decorator-with-experimental-decorators",
         "syntax/diagnostics/parameter-decorators-first-per-parameter-in-preorder",
-        "syntax/diagnostics/ts-check-directive-enables-checking",
         "syntax/diagnostics/ts-nocheck-overrides-checkjs"
       ],
       "depends_on": [
@@ -126142,11 +126137,10 @@
       "annotated_home": [
         "crates/tsr_astnav/src/lib.rs"
       ],
-      "basis": "witnessed by 15 exact link(s): syntax/astnav/dotted-namespace-reparsed-nodes, syntax/astnav/empty-file, syntax/astnav/find-child-of-kind-stale-token",
+      "basis": "witnessed by 14 exact link(s): syntax/astnav/dotted-namespace-reparsed-nodes, syntax/astnav/find-child-of-kind-stale-token, syntax/astnav/js-jsdoc-reparsed-nodes",
       "basis_kind": "rule",
       "cases": [
         "syntax/astnav/dotted-namespace-reparsed-nodes",
-        "syntax/astnav/empty-file",
         "syntax/astnav/find-child-of-kind-stale-token",
         "syntax/astnav/js-jsdoc-reparsed-nodes",
         "syntax/astnav/jsx-less-than-less-than",
@@ -126197,11 +126191,10 @@
       "annotated_home": [
         "crates/tsr_astnav/src/lib.rs"
       ],
-      "basis": "witnessed by 14 exact link(s): syntax/astnav/dotted-namespace-reparsed-nodes, syntax/astnav/empty-file, syntax/astnav/js-jsdoc-reparsed-nodes",
+      "basis": "witnessed by 13 exact link(s): syntax/astnav/dotted-namespace-reparsed-nodes, syntax/astnav/js-jsdoc-reparsed-nodes, syntax/astnav/jsx-less-than-less-than",
       "basis_kind": "rule",
       "cases": [
         "syntax/astnav/dotted-namespace-reparsed-nodes",
-        "syntax/astnav/empty-file",
         "syntax/astnav/js-jsdoc-reparsed-nodes",
         "syntax/astnav/jsx-less-than-less-than",
         "syntax/astnav/mapcode-sweeps",
@@ -126251,11 +126244,10 @@
       "annotated_home": [
         "crates/tsr_astnav/src/lib.rs"
       ],
-      "basis": "witnessed by 14 exact link(s): syntax/astnav/dotted-namespace-reparsed-nodes, syntax/astnav/empty-file, syntax/astnav/js-jsdoc-reparsed-nodes",
+      "basis": "witnessed by 13 exact link(s): syntax/astnav/dotted-namespace-reparsed-nodes, syntax/astnav/js-jsdoc-reparsed-nodes, syntax/astnav/jsx-less-than-less-than",
       "basis_kind": "rule",
       "cases": [
         "syntax/astnav/dotted-namespace-reparsed-nodes",
-        "syntax/astnav/empty-file",
         "syntax/astnav/js-jsdoc-reparsed-nodes",
         "syntax/astnav/jsx-less-than-less-than",
         "syntax/astnav/mapcode-sweeps",
@@ -126305,11 +126297,10 @@
       "annotated_home": [
         "crates/tsr_astnav/src/lib.rs"
       ],
-      "basis": "witnessed by 14 exact link(s): syntax/astnav/dotted-namespace-reparsed-nodes, syntax/astnav/empty-file, syntax/astnav/js-jsdoc-reparsed-nodes",
+      "basis": "witnessed by 13 exact link(s): syntax/astnav/dotted-namespace-reparsed-nodes, syntax/astnav/js-jsdoc-reparsed-nodes, syntax/astnav/jsx-less-than-less-than",
       "basis_kind": "rule",
       "cases": [
         "syntax/astnav/dotted-namespace-reparsed-nodes",
-        "syntax/astnav/empty-file",
         "syntax/astnav/js-jsdoc-reparsed-nodes",
         "syntax/astnav/jsx-less-than-less-than",
         "syntax/astnav/mapcode-sweeps",
@@ -126359,11 +126350,10 @@
       "annotated_home": [
         "crates/tsr_astnav/src/lib.rs"
       ],
-      "basis": "witnessed by 14 exact link(s): syntax/astnav/dotted-namespace-reparsed-nodes, syntax/astnav/empty-file, syntax/astnav/js-jsdoc-reparsed-nodes",
+      "basis": "witnessed by 13 exact link(s): syntax/astnav/dotted-namespace-reparsed-nodes, syntax/astnav/js-jsdoc-reparsed-nodes, syntax/astnav/jsx-less-than-less-than",
       "basis_kind": "rule",
       "cases": [
         "syntax/astnav/dotted-namespace-reparsed-nodes",
-        "syntax/astnav/empty-file",
         "syntax/astnav/js-jsdoc-reparsed-nodes",
         "syntax/astnav/jsx-less-than-less-than",
         "syntax/astnav/mapcode-sweeps",
@@ -126575,7 +126565,7 @@
       "annotated_home": [
         "crates/tsr_astnav/src/lib.rs"
       ],
-      "basis": "witnessed by 15 exact link(s): syntax/astnav/dotted-namespace-reparsed-nodes, syntax/astnav/empty-file, syntax/astnav/find-child-of-kind-stale-token",
+      "basis": "witnessed by 16 exact link(s): syntax/astnav/dotted-namespace-reparsed-nodes, syntax/astnav/empty-file, syntax/astnav/find-child-of-kind-stale-token",
       "basis_kind": "rule",
       "cases": [
         "syntax/astnav/dotted-namespace-reparsed-nodes",
@@ -126668,24 +126658,9 @@
       "annotated_home": [
         "crates/tsr_astnav/src/lib.rs"
       ],
-      "basis": "witnessed by 14 exact link(s): syntax/astnav/dotted-namespace-reparsed-nodes, syntax/astnav/empty-file, syntax/astnav/js-jsdoc-reparsed-nodes",
+      "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
-      "cases": [
-        "syntax/astnav/dotted-namespace-reparsed-nodes",
-        "syntax/astnav/empty-file",
-        "syntax/astnav/js-jsdoc-reparsed-nodes",
-        "syntax/astnav/jsx-less-than-less-than",
-        "syntax/astnav/mapcode-sweeps",
-        "syntax/astnav/private-names-and-keyword-properties",
-        "syntax/astnav/single-token-and-whitespace",
-        "syntax/astnav/trivia-comments-and-unterminated-jsdoc",
-        "syntax/astnav/upstream-jsdoc-type-assertion",
-        "syntax/astnav/upstream-jsdoc-type-assertion-with-comment",
-        "syntax/astnav/upstream-pointer-equality",
-        "syntax/astnav/upstream-preceding-after-comma",
-        "syntax/astnav/upstream-preceding-after-dot-in-jsdoc",
-        "syntax/astnav/zero-width-and-missing-nodes"
-      ],
+      "cases": [],
       "depends_on": [
         "internal/ast",
         "internal/core",
@@ -126696,7 +126671,7 @@
         "internal/testutil/jstest"
       ],
       "destination_phase": 1,
-      "disposition": "covered",
+      "disposition": "implemented_untested",
       "go_package": "internal/astnav",
       "go_source": "tsc/internal/astnav/tokens.go",
       "id": "tsc/internal/astnav/tokens.go:findRightmostValidToken",
@@ -126709,7 +126684,7 @@
       "membership_reason": "syntax navigation",
       "roster": {
         "owner": null,
-        "state": "prepared",
+        "state": "pending",
         "step": "syntax"
       },
       "rust_home": [
@@ -126722,25 +126697,9 @@
       "annotated_home": [
         "crates/tsr_astnav/src/lib.rs"
       ],
-      "basis": "witnessed by 15 exact link(s): syntax/astnav/dotted-namespace-reparsed-nodes, syntax/astnav/empty-file, syntax/astnav/find-child-of-kind-stale-token",
+      "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
-      "cases": [
-        "syntax/astnav/dotted-namespace-reparsed-nodes",
-        "syntax/astnav/empty-file",
-        "syntax/astnav/find-child-of-kind-stale-token",
-        "syntax/astnav/js-jsdoc-reparsed-nodes",
-        "syntax/astnav/jsx-less-than-less-than",
-        "syntax/astnav/mapcode-sweeps",
-        "syntax/astnav/private-names-and-keyword-properties",
-        "syntax/astnav/single-token-and-whitespace",
-        "syntax/astnav/trivia-comments-and-unterminated-jsdoc",
-        "syntax/astnav/upstream-jsdoc-type-assertion",
-        "syntax/astnav/upstream-jsdoc-type-assertion-with-comment",
-        "syntax/astnav/upstream-pointer-equality",
-        "syntax/astnav/upstream-preceding-after-comma",
-        "syntax/astnav/upstream-preceding-after-dot-in-jsdoc",
-        "syntax/astnav/zero-width-and-missing-nodes"
-      ],
+      "cases": [],
       "depends_on": [
         "internal/ast",
         "internal/core",
@@ -126751,7 +126710,7 @@
         "internal/testutil/jstest"
       ],
       "destination_phase": 1,
-      "disposition": "covered",
+      "disposition": "implemented_untested",
       "go_package": "internal/astnav",
       "go_source": "tsc/internal/astnav/tokens.go",
       "id": "tsc/internal/astnav/tokens.go:getNodeVisitor",
@@ -126764,7 +126723,7 @@
       "membership_reason": "syntax navigation",
       "roster": {
         "owner": null,
-        "state": "prepared",
+        "state": "pending",
         "step": "syntax"
       },
       "rust_home": [
@@ -126777,24 +126736,9 @@
       "annotated_home": [
         "crates/tsr_astnav/src/lib.rs"
       ],
-      "basis": "witnessed by 14 exact link(s): syntax/astnav/dotted-namespace-reparsed-nodes, syntax/astnav/empty-file, syntax/astnav/js-jsdoc-reparsed-nodes",
+      "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
-      "cases": [
-        "syntax/astnav/dotted-namespace-reparsed-nodes",
-        "syntax/astnav/empty-file",
-        "syntax/astnav/js-jsdoc-reparsed-nodes",
-        "syntax/astnav/jsx-less-than-less-than",
-        "syntax/astnav/mapcode-sweeps",
-        "syntax/astnav/private-names-and-keyword-properties",
-        "syntax/astnav/single-token-and-whitespace",
-        "syntax/astnav/trivia-comments-and-unterminated-jsdoc",
-        "syntax/astnav/upstream-jsdoc-type-assertion",
-        "syntax/astnav/upstream-jsdoc-type-assertion-with-comment",
-        "syntax/astnav/upstream-pointer-equality",
-        "syntax/astnav/upstream-preceding-after-comma",
-        "syntax/astnav/upstream-preceding-after-dot-in-jsdoc",
-        "syntax/astnav/zero-width-and-missing-nodes"
-      ],
+      "cases": [],
       "depends_on": [
         "internal/ast",
         "internal/core",
@@ -126805,7 +126749,7 @@
         "internal/testutil/jstest"
       ],
       "destination_phase": 1,
-      "disposition": "covered",
+      "disposition": "implemented_untested",
       "go_package": "internal/astnav",
       "go_source": "tsc/internal/astnav/tokens.go",
       "id": "tsc/internal/astnav/tokens.go:getPosition",
@@ -126818,7 +126762,7 @@
       "membership_reason": "syntax navigation",
       "roster": {
         "owner": null,
-        "state": "prepared",
+        "state": "pending",
         "step": "syntax"
       },
       "rust_home": [
@@ -126831,24 +126775,9 @@
       "annotated_home": [
         "crates/tsr_astnav/src/lib.rs"
       ],
-      "basis": "witnessed by 14 exact link(s): syntax/astnav/dotted-namespace-reparsed-nodes, syntax/astnav/empty-file, syntax/astnav/js-jsdoc-reparsed-nodes",
+      "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
-      "cases": [
-        "syntax/astnav/dotted-namespace-reparsed-nodes",
-        "syntax/astnav/empty-file",
-        "syntax/astnav/js-jsdoc-reparsed-nodes",
-        "syntax/astnav/jsx-less-than-less-than",
-        "syntax/astnav/mapcode-sweeps",
-        "syntax/astnav/private-names-and-keyword-properties",
-        "syntax/astnav/single-token-and-whitespace",
-        "syntax/astnav/trivia-comments-and-unterminated-jsdoc",
-        "syntax/astnav/upstream-jsdoc-type-assertion",
-        "syntax/astnav/upstream-jsdoc-type-assertion-with-comment",
-        "syntax/astnav/upstream-pointer-equality",
-        "syntax/astnav/upstream-preceding-after-comma",
-        "syntax/astnav/upstream-preceding-after-dot-in-jsdoc",
-        "syntax/astnav/zero-width-and-missing-nodes"
-      ],
+      "cases": [],
       "depends_on": [
         "internal/ast",
         "internal/core",
@@ -126859,7 +126788,7 @@
         "internal/testutil/jstest"
       ],
       "destination_phase": 1,
-      "disposition": "covered",
+      "disposition": "implemented_untested",
       "go_package": "internal/astnav",
       "go_source": "tsc/internal/astnav/tokens.go",
       "id": "tsc/internal/astnav/tokens.go:getTokenAtPosition",
@@ -126872,7 +126801,7 @@
       "membership_reason": "syntax navigation",
       "roster": {
         "owner": null,
-        "state": "prepared",
+        "state": "pending",
         "step": "syntax"
       },
       "rust_home": [
@@ -126885,24 +126814,9 @@
       "annotated_home": [
         "crates/tsr_astnav/src/lib.rs"
       ],
-      "basis": "witnessed by 14 exact link(s): syntax/astnav/dotted-namespace-reparsed-nodes, syntax/astnav/empty-file, syntax/astnav/js-jsdoc-reparsed-nodes",
+      "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
-      "cases": [
-        "syntax/astnav/dotted-namespace-reparsed-nodes",
-        "syntax/astnav/empty-file",
-        "syntax/astnav/js-jsdoc-reparsed-nodes",
-        "syntax/astnav/jsx-less-than-less-than",
-        "syntax/astnav/mapcode-sweeps",
-        "syntax/astnav/private-names-and-keyword-properties",
-        "syntax/astnav/single-token-and-whitespace",
-        "syntax/astnav/trivia-comments-and-unterminated-jsdoc",
-        "syntax/astnav/upstream-jsdoc-type-assertion",
-        "syntax/astnav/upstream-jsdoc-type-assertion-with-comment",
-        "syntax/astnav/upstream-pointer-equality",
-        "syntax/astnav/upstream-preceding-after-comma",
-        "syntax/astnav/upstream-preceding-after-dot-in-jsdoc",
-        "syntax/astnav/zero-width-and-missing-nodes"
-      ],
+      "cases": [],
       "depends_on": [
         "internal/ast",
         "internal/core",
@@ -126913,7 +126827,7 @@
         "internal/testutil/jstest"
       ],
       "destination_phase": 1,
-      "disposition": "covered",
+      "disposition": "implemented_untested",
       "go_package": "internal/astnav",
       "go_source": "tsc/internal/astnav/tokens.go",
       "id": "tsc/internal/astnav/tokens.go:isValidPrecedingNode",
@@ -126926,7 +126840,7 @@
       "membership_reason": "syntax navigation",
       "roster": {
         "owner": null,
-        "state": "prepared",
+        "state": "pending",
         "step": "syntax"
       },
       "rust_home": [
@@ -126939,24 +126853,9 @@
       "annotated_home": [
         "crates/tsr_astnav/src/lib.rs"
       ],
-      "basis": "witnessed by 14 exact link(s): syntax/astnav/dotted-namespace-reparsed-nodes, syntax/astnav/empty-file, syntax/astnav/js-jsdoc-reparsed-nodes",
+      "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
-      "cases": [
-        "syntax/astnav/dotted-namespace-reparsed-nodes",
-        "syntax/astnav/empty-file",
-        "syntax/astnav/js-jsdoc-reparsed-nodes",
-        "syntax/astnav/jsx-less-than-less-than",
-        "syntax/astnav/mapcode-sweeps",
-        "syntax/astnav/private-names-and-keyword-properties",
-        "syntax/astnav/single-token-and-whitespace",
-        "syntax/astnav/trivia-comments-and-unterminated-jsdoc",
-        "syntax/astnav/upstream-jsdoc-type-assertion",
-        "syntax/astnav/upstream-jsdoc-type-assertion-with-comment",
-        "syntax/astnav/upstream-pointer-equality",
-        "syntax/astnav/upstream-preceding-after-comma",
-        "syntax/astnav/upstream-preceding-after-dot-in-jsdoc",
-        "syntax/astnav/zero-width-and-missing-nodes"
-      ],
+      "cases": [],
       "depends_on": [
         "internal/ast",
         "internal/core",
@@ -126967,7 +126866,7 @@
         "internal/testutil/jstest"
       ],
       "destination_phase": 1,
-      "disposition": "covered",
+      "disposition": "implemented_untested",
       "go_package": "internal/astnav",
       "go_source": "tsc/internal/astnav/tokens.go",
       "id": "tsc/internal/astnav/tokens.go:scanNavigationToken",
@@ -126980,7 +126879,7 @@
       "membership_reason": "syntax navigation",
       "roster": {
         "owner": null,
-        "state": "prepared",
+        "state": "pending",
         "step": "syntax"
       },
       "rust_home": [
@@ -126993,11 +126892,9 @@
       "annotated_home": [
         "crates/tsr_astnav/src/lib.rs"
       ],
-      "basis": "witnessed by 1 exact link(s): syntax/astnav/jsx-less-than-less-than",
+      "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
-      "cases": [
-        "syntax/astnav/jsx-less-than-less-than"
-      ],
+      "cases": [],
       "depends_on": [
         "internal/ast",
         "internal/core",
@@ -127008,7 +126905,7 @@
         "internal/testutil/jstest"
       ],
       "destination_phase": 1,
-      "disposition": "covered",
+      "disposition": "implemented_untested",
       "go_package": "internal/astnav",
       "go_source": "tsc/internal/astnav/tokens.go",
       "id": "tsc/internal/astnav/tokens.go:shouldRescanLessThanLessThanToken",
@@ -127021,7 +126918,7 @@
       "membership_reason": "syntax navigation",
       "roster": {
         "owner": null,
-        "state": "prepared",
+        "state": "pending",
         "step": "syntax"
       },
       "rust_home": [
@@ -127034,24 +126931,9 @@
       "annotated_home": [
         "crates/tsr_astnav/src/lib.rs"
       ],
-      "basis": "witnessed by 14 exact link(s): syntax/astnav/dotted-namespace-reparsed-nodes, syntax/astnav/empty-file, syntax/astnav/js-jsdoc-reparsed-nodes",
+      "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
-      "cases": [
-        "syntax/astnav/dotted-namespace-reparsed-nodes",
-        "syntax/astnav/empty-file",
-        "syntax/astnav/js-jsdoc-reparsed-nodes",
-        "syntax/astnav/jsx-less-than-less-than",
-        "syntax/astnav/mapcode-sweeps",
-        "syntax/astnav/private-names-and-keyword-properties",
-        "syntax/astnav/single-token-and-whitespace",
-        "syntax/astnav/trivia-comments-and-unterminated-jsdoc",
-        "syntax/astnav/upstream-jsdoc-type-assertion",
-        "syntax/astnav/upstream-jsdoc-type-assertion-with-comment",
-        "syntax/astnav/upstream-pointer-equality",
-        "syntax/astnav/upstream-preceding-after-comma",
-        "syntax/astnav/upstream-preceding-after-dot-in-jsdoc",
-        "syntax/astnav/zero-width-and-missing-nodes"
-      ],
+      "cases": [],
       "depends_on": [
         "internal/ast",
         "internal/core",
@@ -127062,7 +126944,7 @@
         "internal/testutil/jstest"
       ],
       "destination_phase": 1,
-      "disposition": "covered",
+      "disposition": "implemented_untested",
       "go_package": "internal/astnav",
       "go_source": "tsc/internal/astnav/tokens.go",
       "id": "tsc/internal/astnav/tokens.go:shouldSkipChild",
@@ -127075,7 +126957,7 @@
       "membership_reason": "syntax navigation",
       "roster": {
         "owner": null,
-        "state": "prepared",
+        "state": "pending",
         "step": "syntax"
       },
       "rust_home": [
@@ -152851,10 +152733,16 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_compiler/src/bind_diagnostics.rs"
+      ],
+      "basis": "witnessed by 3 exact link(s): syntax/diagnostics/bind-all-files-sorted, syntax/diagnostics/bind-excludes-parser-and-checker, syntax/diagnostics/bind-selected-file",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "syntax/diagnostics/bind-all-files-sorted",
+        "syntax/diagnostics/bind-excludes-parser-and-checker",
+        "syntax/diagnostics/bind-selected-file"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/binder",
@@ -152894,7 +152782,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/program.go",
       "id": "tsc/internal/compiler/program.go:Program.GetBindDiagnostics",
@@ -152907,7 +152795,7 @@
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -159135,9 +159023,10 @@
       "annotated_home": [
         "crates/tsr_compiler/src/syntactic_diagnostics.rs"
       ],
-      "basis": "witnessed by 18 exact link(s): syntax/diagnostics/empty-whitespace-and-bom-files, syntax/diagnostics/js-only-typescript-syntax, syntax/diagnostics/json-file-syntax",
+      "basis": "witnessed by 19 exact link(s): syntax/diagnostics/bind-all-files-sorted, syntax/diagnostics/empty-whitespace-and-bom-files, syntax/diagnostics/js-only-typescript-syntax",
       "basis_kind": "rule",
       "cases": [
+        "syntax/diagnostics/bind-all-files-sorted",
         "syntax/diagnostics/empty-whitespace-and-bom-files",
         "syntax/diagnostics/js-only-typescript-syntax",
         "syntax/diagnostics/json-file-syntax",
@@ -160486,17 +160375,10 @@
       "annotated_home": [
         "crates/tsr_compiler/src/program_diagnostics.rs"
       ],
-      "basis": "witnessed by 9 exact link(s): syntax/diagnostics/js-only-typescript-syntax, syntax/diagnostics/json-file-syntax, syntax/diagnostics/jsx-and-tsx-grammar",
+      "basis": "witnessed by 2 exact link(s): syntax/diagnostics/multi-file-sort-by-file-name, witness/s07-include-reasons-rust",
       "basis_kind": "rule",
       "cases": [
-        "syntax/diagnostics/js-only-typescript-syntax",
-        "syntax/diagnostics/json-file-syntax",
-        "syntax/diagnostics/jsx-and-tsx-grammar",
-        "syntax/diagnostics/malformed-source-many-errors",
-        "syntax/diagnostics/missing-nodes-zero-width",
         "syntax/diagnostics/multi-file-sort-by-file-name",
-        "syntax/diagnostics/parameter-decorators-first-per-parameter-in-preorder",
-        "syntax/diagnostics/unterminated-literals",
         "witness/s07-include-reasons-rust"
       ],
       "depends_on": [
@@ -161060,17 +160942,10 @@
       "annotated_home": [
         "crates/tsr_compiler/src/program_diagnostics.rs"
       ],
-      "basis": "witnessed by 8 exact link(s): syntax/diagnostics/js-only-typescript-syntax, syntax/diagnostics/json-file-syntax, syntax/diagnostics/jsx-and-tsx-grammar",
+      "basis": "witnessed by 1 exact link(s): syntax/diagnostics/multi-file-sort-by-file-name",
       "basis_kind": "rule",
       "cases": [
-        "syntax/diagnostics/js-only-typescript-syntax",
-        "syntax/diagnostics/json-file-syntax",
-        "syntax/diagnostics/jsx-and-tsx-grammar",
-        "syntax/diagnostics/malformed-source-many-errors",
-        "syntax/diagnostics/missing-nodes-zero-width",
-        "syntax/diagnostics/multi-file-sort-by-file-name",
-        "syntax/diagnostics/parameter-decorators-first-per-parameter-in-preorder",
-        "syntax/diagnostics/unterminated-literals"
+        "syntax/diagnostics/multi-file-sort-by-file-name"
       ],
       "depends_on": [
         "internal/ast",
@@ -161209,16 +161084,13 @@
       "annotated_home": [
         "crates/tsr_compiler/src/syntactic_diagnostics.rs"
       ],
-      "basis": "witnessed by 8 exact link(s): syntax/diagnostics/later-directive-wins-check-then-nocheck, syntax/diagnostics/later-directive-wins-nocheck-then-check, syntax/diagnostics/parameter-decorator-in-unchecked-js",
+      "basis": "witnessed by 5 exact link(s): syntax/diagnostics/later-directive-wins-check-then-nocheck, syntax/diagnostics/parameter-decorator-in-unchecked-js, syntax/diagnostics/parameter-decorator-with-experimental-decorators",
       "basis_kind": "rule",
       "cases": [
         "syntax/diagnostics/later-directive-wins-check-then-nocheck",
-        "syntax/diagnostics/later-directive-wins-nocheck-then-check",
         "syntax/diagnostics/parameter-decorator-in-unchecked-js",
-        "syntax/diagnostics/parameter-decorator-with-checkjs",
         "syntax/diagnostics/parameter-decorator-with-experimental-decorators",
         "syntax/diagnostics/parameter-decorators-first-per-parameter-in-preorder",
-        "syntax/diagnostics/ts-check-directive-enables-checking",
         "syntax/diagnostics/ts-nocheck-overrides-checkjs"
       ],
       "depends_on": [
@@ -164563,24 +164435,9 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "witnessed by 14 exact link(s): syntax/astnav/dotted-namespace-reparsed-nodes, syntax/astnav/empty-file, syntax/astnav/js-jsdoc-reparsed-nodes",
+      "basis": "unmapped in the audit input and absent from every Rust crate by name",
       "basis_kind": "rule",
-      "cases": [
-        "syntax/astnav/dotted-namespace-reparsed-nodes",
-        "syntax/astnav/empty-file",
-        "syntax/astnav/js-jsdoc-reparsed-nodes",
-        "syntax/astnav/jsx-less-than-less-than",
-        "syntax/astnav/mapcode-sweeps",
-        "syntax/astnav/private-names-and-keyword-properties",
-        "syntax/astnav/single-token-and-whitespace",
-        "syntax/astnav/trivia-comments-and-unterminated-jsdoc",
-        "syntax/astnav/upstream-jsdoc-type-assertion",
-        "syntax/astnav/upstream-jsdoc-type-assertion-with-comment",
-        "syntax/astnav/upstream-pointer-equality",
-        "syntax/astnav/upstream-preceding-after-comma",
-        "syntax/astnav/upstream-preceding-after-dot-in-jsdoc",
-        "syntax/astnav/zero-width-and-missing-nodes"
-      ],
+      "cases": [],
       "depends_on": [
         "internal/collections",
         "internal/debug",
@@ -164589,7 +164446,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "covered",
+      "disposition": "missing",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/binarysearch.go",
       "id": "tsc/internal/core/binarysearch.go:BinarySearchUniqueFunc",
@@ -164602,7 +164459,7 @@
       "membership_reason": "core helpers and option semantics",
       "roster": {
         "owner": "F4a (internal/astnav); a private Rust counterpart already lives at crates/tsr_astnav/src/lib.rs",
-        "state": "prepared",
+        "state": "exempt:later_step",
         "step": "leaves"
       },
       "rust_home": [],
@@ -171520,8 +171377,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: syntax/debug/assert-false, syntax/debug/assert-false-sprint-spacing, syntax/debug/assert-false-with-message; witnessed by 5 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/debug.rs"
+      ],
+      "basis": "witnessed by 5 exact link(s): syntax/debug/assert-false, syntax/debug/assert-false-sprint-spacing, syntax/debug/assert-false-with-message",
       "basis_kind": "rule",
       "cases": [
         "syntax/debug/assert-false",
@@ -171534,13 +171393,13 @@
         "internal/testutil"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/debug",
       "go_source": "tsc/internal/debug/debug.go",
       "id": "tsc/internal/debug/debug.go:Assert",
       "ledger_crate": "tsr_core",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "ported",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
@@ -171550,13 +171409,17 @@
         "state": "prepared",
         "step": "syntax"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_core/src/debug.rs"
+      ],
       "symbol": "Assert"
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: syntax/debug/assert-never-custom-message, syntax/debug/assert-never-fallback, syntax/debug/assert-never-kind-string; witnessed by 6 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/debug.rs"
+      ],
+      "basis": "witnessed by 6 exact link(s): syntax/debug/assert-never-custom-message, syntax/debug/assert-never-fallback, syntax/debug/assert-never-kind-string",
       "basis_kind": "rule",
       "cases": [
         "syntax/debug/assert-never-custom-message",
@@ -171570,13 +171433,13 @@
         "internal/testutil"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/debug",
       "go_source": "tsc/internal/debug/debug.go",
       "id": "tsc/internal/debug/debug.go:AssertNever",
       "ledger_crate": "tsr_core",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "ported",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
@@ -171586,15 +171449,31 @@
         "state": "prepared",
         "step": "syntax"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_core/src/debug.rs"
+      ],
       "symbol": "AssertNever"
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: syntax/debug/fail-empty-reason, syntax/debug/fail-with-reason; witnessed by 2 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/debug.rs"
+      ],
+      "basis": "witnessed by 14 exact link(s): syntax/debug/assert-false, syntax/debug/assert-false-sprint-spacing, syntax/debug/assert-false-with-message",
       "basis_kind": "rule",
       "cases": [
+        "syntax/debug/assert-false",
+        "syntax/debug/assert-false-sprint-spacing",
+        "syntax/debug/assert-false-with-message",
+        "syntax/debug/assert-never-custom-message",
+        "syntax/debug/assert-never-fallback",
+        "syntax/debug/assert-never-kind-string",
+        "syntax/debug/assert-never-kind-string-wins",
+        "syntax/debug/assert-never-nil",
+        "syntax/debug/assert-never-stringer",
+        "syntax/debug/fail-bad-syntax-kind-default",
+        "syntax/debug/fail-bad-syntax-kind-message",
+        "syntax/debug/fail-bad-syntax-kind-sprint-spacing",
         "syntax/debug/fail-empty-reason",
         "syntax/debug/fail-with-reason"
       ],
@@ -171602,13 +171481,13 @@
         "internal/testutil"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/debug",
       "go_source": "tsc/internal/debug/debug.go",
       "id": "tsc/internal/debug/debug.go:Fail",
       "ledger_crate": "tsr_core",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "ported",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
@@ -171618,13 +171497,17 @@
         "state": "prepared",
         "step": "syntax"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_core/src/debug.rs"
+      ],
       "symbol": "Fail"
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: syntax/debug/fail-bad-syntax-kind-default, syntax/debug/fail-bad-syntax-kind-message, syntax/debug/fail-bad-syntax-kind-sprint-spacing; witnessed by 3 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_core/src/debug.rs"
+      ],
+      "basis": "witnessed by 3 exact link(s): syntax/debug/fail-bad-syntax-kind-default, syntax/debug/fail-bad-syntax-kind-message, syntax/debug/fail-bad-syntax-kind-sprint-spacing",
       "basis_kind": "rule",
       "cases": [
         "syntax/debug/fail-bad-syntax-kind-default",
@@ -171635,13 +171518,13 @@
         "internal/testutil"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/debug",
       "go_source": "tsc/internal/debug/debug.go",
       "id": "tsc/internal/debug/debug.go:FailBadSyntaxKind",
       "ledger_crate": "tsr_core",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "ported",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
@@ -171651,36 +171534,46 @@
         "state": "prepared",
         "step": "syntax"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_core/src/debug.rs"
+      ],
       "symbol": "FailBadSyntaxKind"
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_core/src/debug.rs"
+      ],
+      "basis": "witnessed by 3 exact link(s): syntax/debug/assert-false, syntax/debug/assert-false-sprint-spacing, syntax/debug/assert-false-with-message",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "syntax/debug/assert-false",
+        "syntax/debug/assert-false-sprint-spacing",
+        "syntax/debug/assert-false-with-message"
+      ],
       "depends_on": [
         "internal/testutil"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/debug",
       "go_source": "tsc/internal/debug/debug.go",
       "id": "tsc/internal/debug/debug.go:assertSlow",
       "ledger_crate": "tsr_core",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "ported",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
       "membership_reason": "shared debug helpers used by in-scope packages",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_core/src/debug.rs"
+      ],
       "symbol": "assertSlow"
     },
     {
@@ -174098,12 +173991,17 @@
     {
       "actual_home": "partly tsr_checker::template",
       "annotated_home": [
+        "crates/tsr_ast/src/evaluator.rs",
         "crates/tsr_checker/src/template.rs"
       ],
-      "basis": "a prepared case runs and reports the Rust entry point absent: syntax/evaluator/any-to-string-every-type; witnessed by 1 prepared case(s)",
+      "basis": "witnessed by 5 exact link(s): syntax/evaluator/any-to-string-bytes, syntax/evaluator/any-to-string-every-type, syntax/evaluator/cross-file-flags",
       "basis_kind": "rule",
       "cases": [
-        "syntax/evaluator/any-to-string-every-type"
+        "syntax/evaluator/any-to-string-bytes",
+        "syntax/evaluator/any-to-string-every-type",
+        "syntax/evaluator/cross-file-flags",
+        "syntax/evaluator/template-string-bytes",
+        "syntax/evaluator/templates"
       ],
       "depends_on": [
         "internal/ast",
@@ -174111,13 +174009,13 @@
         "internal/jsnum"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/evaluator",
       "go_source": "tsc/internal/evaluator/evaluator.go",
       "id": "tsc/internal/evaluator/evaluator.go:AnyToString",
-      "ledger_crate": "tsr_evaluator",
+      "ledger_crate": "tsr_ast",
       "ledger_phase": 1,
-      "ledger_status": "in-progress",
+      "ledger_status": "ported",
       "ledger_verification": [],
       "mapped_in_ledger": true,
       "membership": "full",
@@ -174128,17 +174026,21 @@
         "step": "syntax"
       },
       "rust_home": [
-        "crates/tsr_checker/src/template.rs"
+        "crates/tsr_ast/src/evaluator.rs",
+        "crates/tsr_checker/src/enum_eval.rs"
       ],
       "symbol": "AnyToString"
     },
     {
       "actual_home": "partly tsr_checker::template",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: syntax/evaluator/is-truthy-every-type; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_ast/src/evaluator.rs"
+      ],
+      "basis": "witnessed by 2 exact link(s): syntax/evaluator/is-truthy-every-type, syntax/evaluator/is-truthy-string-bytes",
       "basis_kind": "rule",
       "cases": [
-        "syntax/evaluator/is-truthy-every-type"
+        "syntax/evaluator/is-truthy-every-type",
+        "syntax/evaluator/is-truthy-string-bytes"
       ],
       "depends_on": [
         "internal/ast",
@@ -174146,13 +174048,13 @@
         "internal/jsnum"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/evaluator",
       "go_source": "tsc/internal/evaluator/evaluator.go",
       "id": "tsc/internal/evaluator/evaluator.go:IsTruthy",
-      "ledger_crate": "tsr_evaluator",
+      "ledger_crate": "tsr_ast",
       "ledger_phase": 1,
-      "ledger_status": "in-progress",
+      "ledger_status": "ported",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
@@ -174163,16 +174065,17 @@
         "step": "syntax"
       },
       "rust_home": [
-        "crates/tsr_checker/src/template.rs"
+        "crates/tsr_ast/src/evaluator.rs",
+        "crates/tsr_checker/src/enum_eval.rs"
       ],
       "symbol": "IsTruthy"
     },
     {
       "actual_home": "partly tsr_checker::template",
       "annotated_home": [
-        "crates/tsr_checker/src/enum_eval.rs"
+        "crates/tsr_ast/src/evaluator.rs"
       ],
-      "basis": "a prepared case runs and reports the Rust entry point absent: syntax/evaluator/binary-numeric-edges, syntax/evaluator/cross-file-flags, syntax/evaluator/entity-forms; witnessed by 10 prepared case(s)",
+      "basis": "witnessed by 14 exact link(s): syntax/evaluator/binary-numeric-edges, syntax/evaluator/cross-file-flags, syntax/evaluator/entity-forms",
       "basis_kind": "rule",
       "cases": [
         "syntax/evaluator/binary-numeric-edges",
@@ -174184,7 +174087,11 @@
         "syntax/evaluator/outer-expressions-all",
         "syntax/evaluator/outer-expressions-parentheses-only",
         "syntax/evaluator/prefix-unary",
-        "syntax/evaluator/string-concatenation-and-stringness"
+        "syntax/evaluator/string-concatenation-and-stringness",
+        "syntax/evaluator/string-concatenation-bytes",
+        "syntax/evaluator/string-literal-bytes",
+        "syntax/evaluator/template-string-bytes",
+        "syntax/evaluator/templates"
       ],
       "depends_on": [
         "internal/ast",
@@ -174192,13 +174099,13 @@
         "internal/jsnum"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/evaluator",
       "go_source": "tsc/internal/evaluator/evaluator.go",
       "id": "tsc/internal/evaluator/evaluator.go:NewEvaluator",
-      "ledger_crate": "tsr_evaluator",
+      "ledger_crate": "tsr_ast",
       "ledger_phase": 1,
-      "ledger_status": "in-progress",
+      "ledger_status": "ported",
       "ledger_verification": [],
       "mapped_in_ledger": true,
       "membership": "full",
@@ -174209,14 +174116,17 @@
         "step": "syntax"
       },
       "rust_home": [
-        "crates/tsr_checker/src/template.rs"
+        "crates/tsr_ast/src/evaluator.rs",
+        "crates/tsr_checker/src/enum_eval.rs"
       ],
       "symbol": "NewEvaluator"
     },
     {
       "actual_home": "partly tsr_checker::template",
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: syntax/evaluator/new-result-positional-fields; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_ast/src/evaluator.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): syntax/evaluator/new-result-positional-fields",
       "basis_kind": "rule",
       "cases": [
         "syntax/evaluator/new-result-positional-fields"
@@ -174227,13 +174137,13 @@
         "internal/jsnum"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/evaluator",
       "go_source": "tsc/internal/evaluator/evaluator.go",
       "id": "tsc/internal/evaluator/evaluator.go:NewResult",
-      "ledger_crate": "tsr_evaluator",
+      "ledger_crate": "tsr_ast",
       "ledger_phase": 1,
-      "ledger_status": "in-progress",
+      "ledger_status": "ported",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
@@ -174244,18 +174154,21 @@
         "step": "syntax"
       },
       "rust_home": [
-        "crates/tsr_checker/src/template.rs"
+        "crates/tsr_ast/src/evaluator.rs",
+        "crates/tsr_checker/src/enum_eval.rs"
       ],
       "symbol": "NewResult"
     },
     {
       "actual_home": "partly tsr_checker::template",
       "annotated_home": [
-        "crates/tsr_checker/src/enum_eval.rs"
+        "crates/tsr_ast/src/evaluator.rs"
       ],
-      "basis": "a prepared case runs and reports the Rust entry point absent: syntax/evaluator/templates; witnessed by 1 prepared case(s)",
+      "basis": "witnessed by 3 exact link(s): syntax/evaluator/cross-file-flags, syntax/evaluator/template-string-bytes, syntax/evaluator/templates",
       "basis_kind": "rule",
       "cases": [
+        "syntax/evaluator/cross-file-flags",
+        "syntax/evaluator/template-string-bytes",
         "syntax/evaluator/templates"
       ],
       "depends_on": [
@@ -174264,13 +174177,13 @@
         "internal/jsnum"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/evaluator",
       "go_source": "tsc/internal/evaluator/evaluator.go",
       "id": "tsc/internal/evaluator/evaluator.go:evaluateTemplateExpression",
-      "ledger_crate": "tsr_evaluator",
+      "ledger_crate": "tsr_ast",
       "ledger_phase": 1,
-      "ledger_status": "in-progress",
+      "ledger_status": "ported",
       "ledger_verification": [],
       "mapped_in_ledger": true,
       "membership": "full",
@@ -174281,7 +174194,8 @@
         "step": "syntax"
       },
       "rust_home": [
-        "crates/tsr_checker/src/template.rs"
+        "crates/tsr_ast/src/evaluator.rs",
+        "crates/tsr_checker/src/enum_eval.rs"
       ],
       "symbol": "evaluateTemplateExpression"
     },

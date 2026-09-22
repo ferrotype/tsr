@@ -48,6 +48,25 @@ fn ids() -> (AstBuilder, [NodeId; 4]) {
 }
 
 #[test]
+fn synthetic_expression_child_slots_keep_optional_tuple_name_sources() {
+    let (mut builder, [child, ..]) = ids();
+    for tuple_name_source in [None, Some(child)] {
+        let node = builder.new_synthetic_expression_data(
+            SyntaxKind::SyntheticExpression.into(),
+            SyntheticExpressionData {
+                is_spread: false,
+                tuple_name_source,
+            },
+        );
+        assert_eq!(
+            builder.view().node(node).unwrap().child_slots(),
+            [(ChildRole::Node, ChildSlot::Node(tuple_name_source))],
+            "SyntheticExpression.VisitEachChild observes the tuple-name slot even when nil"
+        );
+    }
+}
+
+#[test]
 fn syntax_kind_values_round_trip_and_markers_keep_upstream_values() {
     assert_eq!(SyntaxKind::Unknown as u16, 0);
     assert_eq!(SyntaxKind::EndOfFile as u16, 1);

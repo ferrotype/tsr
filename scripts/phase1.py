@@ -75,6 +75,8 @@ def inventory_check() -> dict:
     problems += scope_module.witness_problems()
     problems += scope_module.roster_problems(scope, cases)
     problems += scope_module.gap_record_problems(cases)
+    problems += capture_module.operation_coverage_problems(
+        capture_module.load_requests(capture_module.FAMILIES["syntax"])["requests"], cases)
     problems += baselines.verify(index)
     problems += baselines.verify_written_subfolders()
     problems += baselines.exception_problems(index)
@@ -85,6 +87,7 @@ def inventory_check() -> dict:
     problems += syntax_module.problems()
     problems += syntax_module.schedule_problems()
     problems += syntax_module.smoke_problems()
+    problems += syntax_module.full_problems()
 
     pin = json.loads((ROOT / "data/upstream.json").read_text())["pin"]
     for name, document in (("scope", scope), ("cases", cases), ("config-baselines", index)):
