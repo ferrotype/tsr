@@ -148,7 +148,11 @@ jobs:
             --profile minimal --component miri --component rust-src --no-self-update
       - name: Tracker self-tests
         if: ${{ !cancelled() && steps.validate.outcome == 'success' }}
-        run: cargo xtask run selftest
+        run: |
+          # Phase 1 tests inspect the full workspace through offline metadata.
+          # Building xtask alone does not fetch every workspace dependency.
+          cargo metadata --locked --format-version 1 > /dev/null
+          cargo xtask run selftest
       - name: Phase 1 manifest, harness and producer contracts
         if: ${{ !cancelled() && steps.validate.outcome == 'success' }}
         # Preparation health is independent of unfinished production parity.
