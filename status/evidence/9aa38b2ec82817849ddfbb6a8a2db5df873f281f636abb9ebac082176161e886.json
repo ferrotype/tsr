@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "run_id": "binder",
+  "recorded_at": 1790072254,
+  "context": {
+    "revision": "de4d9ab6e8f5de96a1fbef6bccbab32fd1ec7964",
+    "source_sha256": "ea18c13abd9af43e6ac8efea355e213a978141db38f96780e45351b253b285ea",
+    "upstream_pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+    "environment": {
+      "CARGO_BUILD_TARGET": "",
+      "CARGO_ENCODED_RUSTFLAGS": "",
+      "CARGO_HOME": "/Users/cristian/.cargo",
+      "CGO_ENABLED": "",
+      "GOARCH": "",
+      "GOFLAGS": "",
+      "GOOS": "",
+      "RUSTC_WRAPPER": "",
+      "RUSTFLAGS": "",
+      "RUSTUP_HOME": "/Users/cristian/.rustup",
+      "RUSTUP_TOOLCHAIN": "1.97.1-aarch64-apple-darwin",
+      "S04_CACHE_HOME": "",
+      "S04_RUSTUP_HOME": ""
+    },
+    "host": "macos-aarch64",
+    "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n"
+  },
+  "spec_sha256": "2ad749515d21049b6a36767f835197a5e4474dffb6ffe7ce41d3a72e759b5d0f",
+  "inputs": {
+    ".gitmodules": "7f9e8e0a446a547c56d8444637b3ee73064ce52055bc3c983c05eb13f4331bdd",
+    "data/s04/toolchains.toml": "f7f747f45b0570c179771ba0e01e37a3fc3c1ca7e98dbf042b7eabf6d9f9c0be",
+    "data/s07/binder-cases.json": "9a48291e68e617a24dcc3f2cd525f0e3bb8630bedf8c4ddbd7154d22fa8b778f",
+    "data/s07/binder-probes.json": "66f39a179358f9e73f58f2c6ad5eedd35e52ae534f5d70ecbabefbcf424fce5f",
+    "data/s07/helper-tests.json": "2f416becae3dc45f72d1b76b3f2beb12c6c8466f1106f4ca2e31a52f9e99a4b0",
+    "data/upstream.json": "9f3a288befbb79b1dcd59c2fd0d87fd2cddf120563f8b4c129ce88e3c3957af9"
+  },
+  "command": [
+    "python3",
+    "scripts/s07_producers.py",
+    "binder"
+  ],
+  "target": "host",
+  "config": "S07 independent complete parser/binder graph comparison; fixed primary rows with separate supplemental, protocol, direct-Go helper and resolver obligations; complete named helper test inventory; both initial and repeated binding; raw failure classes, graph identities, lists, symbols, flows, source state and diagnostics retained",
+  "host": "macos-aarch64",
+  "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n",
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "+ git ls-tree -r --name-only 1f70213d4922b434345f639b441681e470c7cfc1 tsc/testdata/tests/cases/compiler/ tsc/testdata/tests/cases/conformance/ tsc/internal/bundled/libs/\n+ go version\ngo version go1.27.1 darwin/arm64\n+ git archive 1f70213d4922b434345f639b441681e470c7cfc1 tsc/go.mod tsc/go.sum tsc/internal tsc/testdata/tests/cases/compiler tsc/testdata/tests/cases/conformance\n+ go test -trimpath -mod=readonly -gcflags=github.com/microsoft/TypeScript/tsc/internal/repo=-trimpath=/Users/cristian/git/ts-rust/target/s06-oracle/export-kqp_b4vh/s06-unmatched-prefix ./internal/testrunner -run ^TestS06 -count=1 -timeout=5m\n+ /Users/cristian/.pyenv/versions/3.11.12/bin/python3 tools/s07/binder/generate_syntax.py --check\n+ go version\ngo version go1.27.1 darwin/arm64\n+ git archive 1f70213d4922b434345f639b441681e470c7cfc1 tsc/go.mod tsc/go.sum tsc/internal tsc/testdata/tests/cases/compiler tsc/testdata/tests/cases/conformance\n+ go test -trimpath -mod=readonly ./internal/s07binder -count=1\n+ go build -trimpath -mod=readonly -o /Users/cristian/git/ts-rust/target/s07-oracle/go-binder ./internal/s07binder\nS07 Go preflight 1/22343\nS07 Go preflight 251/22343\nS07 Go preflight 501/22343\nS07 Go preflight 751/22343\nS07 Go preflight 1001/22343\nS07 Go preflight 1251/22343\nS07 Go preflight 1501/22343\nS07 Go preflight 1751/22343\nS07 Go preflight 2001/22343\nS07 Go preflight 2251/22343\nS07 Go preflight 2501/22343\nS07 Go preflight 2751/22343\nS07 Go preflight 3001/22343\nS07 Go preflight 3251/22343\nS07 Go preflight 3501/22343\nS07 Go preflight 3751/22343\nS07 Go preflight 4001/22343\nS07 Go preflight 4251/22343\nS07 Go preflight 4501/22343\nS07 Go preflight 4751/22343\nS07 Go preflight 5001/22343\nS07 Go preflight 5251/22343\nS07 Go preflight 5501/22343\nS07 Go preflight 5751/22343\nS07 Go preflight 6001/22343\nS07 Go preflight 6251/22343\nS07 Go preflight 6501/22343\nS07 Go preflight 6751/22343\nS07 Go preflight 7001/22343\nS07 Go preflight 7251/22343\nS07 Go preflight 7501/22343\nS07 Go preflight 7751/22343\nS07 Go preflight 8001/22343\nS07 Go preflight 8251/22343\nS07 Go preflight 8501/22343\nS07 Go preflight 8751/22343\nS07 Go preflight 9001/22343\nS07 Go preflight 9251/22343\nS07 Go preflight 9501/22343\nS07 Go preflight 9751/22343\nS07 Go preflight 10001/22343\nS07 Go preflight 10251/22343\nS07 Go preflight 10501/22343\nS07 Go preflight 10751/22343\nS07 Go preflight 11001/22343\nS07 Go preflight 11251/22343\nS07 Go preflight 11501/22343\nS07 Go preflight 11751/22343\nS07 Go preflight 12001/22343\nS07 Go preflight 12251/22343\nS07 Go preflight 12501/22343\nS07 Go preflight 12751/22343\nS07 Go preflight 13001/22343\nS07 Go preflight 13251/22343\nS07 Go preflight 13501/22343\nS07 Go preflight 13751/22343\nS07 Go preflight 14001/22343\nS07 Go preflight 14251/22343\nS07 Go preflight 14501/22343\nS07 Go preflight 14751/22343\nS07 Go preflight 15001/22343\nS07 Go preflight 15251/22343\nS07 Go preflight 15501/22343\nS07 Go preflight 15751/22343\nS07 Go preflight 16001/22343\nS07 Go preflight 16251/22343\nS07 Go preflight 16501/22343\nS07 Go preflight 16751/22343\nS07 Go preflight 17001/22343\nS07 Go preflight 17251/22343\nS07 Go preflight 17501/22343\nS07 Go preflight 17751/22343\nS07 Go preflight 18001/22343\nS07 Go preflight 18251/22343\nS07 Go preflight 18501/22343\nS07 Go preflight 18751/22343\nS07 Go preflight 19001/22343\nS07 Go preflight 19251/22343\nS07 Go preflight 19501/22343\nS07 Go preflight 19751/22343\nS07 Go preflight 20001/22343\nS07 Go preflight 20251/22343\nS07 Go preflight 20501/22343\nS07 Go preflight 20751/22343\nS07 Go preflight 21001/22343\nS07 Go preflight 21251/22343\nS07 Go preflight 21501/22343\nS07 Go preflight 21751/22343\nS07 Go preflight 22001/22343\nS07 Go preflight 22251/22343\n+ cargo build --package tsr_binder --example binder --release --locked --message-format=json\n    Finished `release` profile [optimized] target(s) in 0.13s\n+ /Users/cristian/.pyenv/versions/3.11.12/bin/python3 scripts/s07_ast_helpers.py --check\n+ /Users/cristian/.pyenv/versions/3.11.12/bin/python3 scripts/s07_scanner_helpers.py --check\n+ /Users/cristian/.pyenv/versions/3.11.12/bin/python3 scripts/s07_resolver.py --check\nS07 producer failed: AST utility setup/check failed: ['/Users/cristian/.pyenv/versions/3.11.12/bin/python3', 'scripts/s07_resolver.py', '--check']; output retained at /Users/cristian/git/ts-rust/target/s07-binder-reports/helpers/resolver-oracle\n",
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr_sha256": "318382510824606c19e9eb68e842c2bc41b71d8821daced56bf2c97bd32d0e44",
+  "valid_capture": false
+}

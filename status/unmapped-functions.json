@@ -2088,7 +2088,6 @@
       "tsc/internal/compiler/program.go:Program.ForEachCheckerParallel",
       "tsc/internal/compiler/program.go:Program.ForEachResolvedModule",
       "tsc/internal/compiler/program.go:Program.ForEachResolvedTypeReferenceDirective",
-      "tsc/internal/compiler/program.go:Program.GetBindDiagnostics",
       "tsc/internal/compiler/program.go:Program.GetCheckerPool",
       "tsc/internal/compiler/program.go:Program.GetConfigFileParsingDiagnostics",
       "tsc/internal/compiler/program.go:Program.GetContentMapper",
@@ -2381,13 +2380,6 @@
       "tsc/internal/core/workgroup.go:singleThreadedWorkGroup.RunAndWait",
       "tsc/internal/core/workgroup.go:singleThreadedWorkGroup.pop"
     ],
-    "internal/debug": [
-      "tsc/internal/debug/debug.go:Assert",
-      "tsc/internal/debug/debug.go:AssertNever",
-      "tsc/internal/debug/debug.go:Fail",
-      "tsc/internal/debug/debug.go:FailBadSyntaxKind",
-      "tsc/internal/debug/debug.go:assertSlow"
-    ],
     "internal/diagnostics": [
       "tsc/internal/diagnostics/diagnostics.go:Message.Category",
       "tsc/internal/diagnostics/diagnostics.go:Message.Code",
@@ -2413,10 +2405,6 @@
       "tsc/internal/diagnosticwriter/diagnosticwriter.go:renamedFile.FileName",
       "tsc/internal/diagnosticwriter/diagnosticwriter.go:renamedFile.Text",
       "tsc/internal/diagnosticwriter/diagnosticwriter.go:writeWithStyleAndReset"
-    ],
-    "internal/evaluator": [
-      "tsc/internal/evaluator/evaluator.go:IsTruthy",
-      "tsc/internal/evaluator/evaluator.go:NewResult"
     ],
     "internal/execute": [
       "tsc/internal/execute/tsc.go:CommandLine",

@@ -152790,7 +152790,7 @@
       "ledger_phase": 4,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
@@ -171401,7 +171401,7 @@
       "ledger_phase": 1,
       "ledger_status": "ported",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "shared debug helpers used by in-scope packages",
       "roster": {
@@ -171441,7 +171441,7 @@
       "ledger_phase": 1,
       "ledger_status": "ported",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "shared debug helpers used by in-scope packages",
       "roster": {
@@ -171489,7 +171489,7 @@
       "ledger_phase": 1,
       "ledger_status": "ported",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "shared debug helpers used by in-scope packages",
       "roster": {
@@ -171526,7 +171526,7 @@
       "ledger_phase": 1,
       "ledger_status": "ported",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "shared debug helpers used by in-scope packages",
       "roster": {
@@ -171563,7 +171563,7 @@
       "ledger_phase": 1,
       "ledger_status": "ported",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "shared debug helpers used by in-scope packages",
       "roster": {
@@ -174056,7 +174056,7 @@
       "ledger_phase": 1,
       "ledger_status": "ported",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "the reusable constant evaluator",
       "roster": {
@@ -174145,7 +174145,7 @@
       "ledger_phase": 1,
       "ledger_status": "ported",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "the reusable constant evaluator",
       "roster": {

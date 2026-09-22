@@ -48,24 +48,24 @@
   },
   "evidence": [
     {
-      "artifact": "status/evidence/79c4514b84217208c97c6f02053dd215f7c941dd1a139d25c362bdf4334b2ea2.json",
-      "current": false,
+      "artifact": "status/evidence/66f3a46d3ddf483a8434e3efe95767f63d92014d08180810d329d1fbfceac2c4.json",
+      "current": true,
       "exit_code": 0,
       "observes": "parse, node_index_before, encode_source_file and node_index_after over every primary request: exact encoded AST bytes, the node table, SourceFile state and all parse-time diagnostics. It does not bind.",
       "producer": "e1",
-      "recorded_at": 1789831336,
-      "revision": "098941fd9e7a723bc606748bc85de5ad06d910c3",
-      "state": "stale: source, pin, command or inputs changed"
+      "recorded_at": 1790073029,
+      "revision": "c30471ef05bce0f7c869764ef8c9d1927ce036ff",
+      "state": "current"
     },
     {
-      "artifact": "status/evidence/14b49da69e6c1cc5b0a9a9778ffd14dbf7c6c606d33371c6a91267b74f4aa38f.json",
-      "current": false,
+      "artifact": "status/evidence/27e07492557442eb4e5c304b2ebd3d5b438907197529ab47e01527674a55474b.json",
+      "current": true,
       "exit_code": 0,
       "observes": "parse, bind and repeat_bind over every primary request, comparing the parsed, bound and repeated graphs record by record.",
       "producer": "binder",
-      "recorded_at": 1789832855,
-      "revision": "098941fd9e7a723bc606748bc85de5ad06d910c3",
-      "state": "stale: source, pin, command or inputs changed"
+      "recorded_at": 1790073521,
+      "revision": "c30471ef05bce0f7c869764ef8c9d1927ce036ff",
+      "state": "current"
     }
   ],
   "expected": {

@@ -14,7 +14,8 @@ moved pin invalidates it.
 | F1a — foundation leaf tests | **complete**: `leaves_prepared: true`; 225 leaf cases frozen, all 460 inventoried leaf operations prepared, witnessed or exempted by the reviewed ledger, and both divergences triaged |
 | F2a — filesystem, path and matching tests | **pending Linux observation**: `filesystem_prepared: false`; 359 cases, 314 of 316 roster operations accounted for; all 142 baselines prepared (68 exact, 74 owner-approved exceptions). The Linux realpath case must observe `Realpath` and `ignoringEINTR`. |
 | F3a — config, command-line and resolution tests | **complete**: `config_prepared: true`; 486 cases, all 402 roster operations prepared, witnessed or exempted, and all 309 reference outputs prepared (F2a's 142 plus F3a's 167, all 167 exact) |
-| F4a — syntax, binder and utility coverage | **prepared, roster open**: every primary and expanded request accounted for; all 15,206 variants scheduled (15,152 observed, 54 on named boundaries); 75 cases (44 match, 31 name their missing Rust entry point); a 908-row bounded smoke matches; `syntax_prepared: false` with 2,796 of 3,617 roster operations pending for F4b |
+| F4a — syntax, binder and utility coverage | **prepared, roster open**: every primary and expanded request accounted for; all 15,206 variants scheduled (15,152 observed, 54 on named boundaries). Review corrected source authentication, ordered requests and operation claims. F4b now passes all 83 utility cases and all 15,152 executable syntax variants. `syntax_prepared: false`: 2,803 of 3,617 operations still need exact witness attribution; this is separate from the implementation results below. |
+| F4b — syntax/binder implementation | **prepared production behavior implemented and validated**: 83/83 utility cases, 15,152/15,152 executable syntax variants, parser and binder primary parity 1.0. E1/binder evidence is refreshed; operation attribution and compiler disposition alignment remain for F5a, not claimed complete here. |
 | F5a — integration checks and the stage A review | not started |
 
 `python3 scripts/phase1.py inventory --check` computes this: it reports
@@ -833,6 +834,10 @@ lives. The refusal is recorded as a flag, not as the pin's panic wording: what
 the host does is the contract, how it phrases its own panic is not.
 
 ## F4a — syntax, binder and utility preparation
+
+This section records the original preparation result. The F4b section at the
+end records the review corrections, implemented gaps and final captures; its
+counts supersede the original 75-case and bounded-smoke results below.
 
 F4a is organized around **requests**, as the plan's completion rule is: every
 primary and expanded request accounted for, a syntax phase that cannot be
@@ -2661,3 +2666,114 @@ source ownership checks; formatting, package policy, tracker and inventory
 validation, and Rust 1.96 checks for the changed consumers. No benchmark was
 run. The older F2b foreign dynamic element/map differences, Linux-only
 observations and F4a/F5a preparation remain outside this F3b closure.
+
+
+## F4b — syntax utilities and complete correctness validation
+
+The F4a review corrected the request serializer to preserve ordered compiler
+option maps, made unexpected native/Rust failures invalidate captures, and
+closed native and Rust source-fingerprint omissions. Replay now derives the
+local Rust dependency closure independently of the recorded file list. Exact
+request hashes and reviewed per-action links prevent a removed action from
+keeping operation credit. Transitive-only claims were removed rather than
+credited from a broad corpus result. The private syntax harness is also in the
+publication policy.
+
+The production changes are:
+
+- `tsr_ast::evaluator` owns the reusable callback-based evaluator. AST reads
+  borrow the caller's view; returned strings retain their bytes, and callback
+  state stays with the caller. A private checker adapter shares this algorithm
+  while keeping name resolution and enum diagnostics in the checker. Typed
+  storage/context failures remain distinct from upstream contract failures.
+  The native protocol records string bytes as hex, including lone surrogates.
+- The generator supplies immediate `VisitEachChild` slot observations, including
+  nil child/list slots, raw slices and synthetic tuple-name sources. Navigation
+  retains list IDs and their load-bearing ranges; it does not manufacture a
+  second mutable tree. The existing filtered visitor and formatter consumers
+  use the same slot order. `FindChildOfKind` retains its separate native
+  `ForEachChild` ordering.
+- `tsr_core::debug` shares the five debug failure contracts with the scanner and
+  parser. Message operands borrow their values and retain Go's string/nonstring
+  spacing distinction; successful assertions do not format or allocate.
+- `Program::bind_diagnostics` exposes binder-only diagnostics for a selected
+  source file or the whole program. It rejects foreign/non-source IDs, filters
+  and sorts through the production diagnostic path, and never starts a checker.
+  The loader already binds before publishing `CompletedFile`; the native
+  on-demand binding step therefore becomes a read of the retained result.
+
+The focused native utility comparisons cover 19 evaluator cases, 16 navigation
+cases, 16 debug cases and three new binder-diagnostic cases. Regression tests
+also cover absent slots and trailing commas, foreign list identity, constructed
+synthetic nodes, nested evaluator callbacks on a small stack, and enum forward
+references/imported-value flags through the actual checker consumer.
+
+The bounded checker regression is recorded in
+`data/phase1/f4b-evaluator-e2-{selection,results}.json`. All 12 selected variants
+execute and retain their prior matches: 12 diagnostic comparisons and six
+type/symbol plus six public-display comparisons; the other six variants disable
+type/display baselines natively. It is a normal development recheck using
+authenticated historical native output, not a new full E2 acceptance result.
+Raw output and source snapshots remain in
+`target/phase1/f4b-evaluator-e2-recheck`.
+
+Final-source correctness results:
+
+| Comparison | Result |
+| --- | --- |
+| Syntax utility family | 83/83 match; zero missing, differing or failed cases |
+| Full program syntax | 15,152/15,152 executable variants match structured diagnostics and plain/pretty bytes; all 15,206 scheduled variants accounted for |
+| Native syntax boundaries | 39 rejected-option variants and 15 content-mapper variants retained explicitly |
+| Parser corpus | 12,829/12,829 physical/library rows pass over 22,343 primary requests; 135 supplemental requests remain separate |
+| Binder corpus | 22,343/22,343 primary requests exact; 12,829/12,829 rows pass; 18/18 supplemental requests pass |
+| Parser supporting checks | Decoder parity, watchdog, runtime/accessor utilities, regressions and depth checks pass |
+| Binder supporting checks | 18 helper tests and the full protocol/graph contract checks pass; depth passes all 12 graph cases; sources stable |
+
+The two pre-existing named parser diagnostic qualifications are unchanged and
+remain visible in the E1 record; no threshold or corpus selection was relaxed.
+The full syntax run is recorded in `data/phase1/syntax-full.json`; its 908-row
+smoke is derived from the authenticated complete capture, without rerunning
+Rust. The standard E1/binder evidence retains the raw metrics and source hashes.
+The first parser attempt and the first binder depth attempt encountered an
+`ENOTEMPTY` error while cleaning a temporary Go export. Their reports are kept;
+these are not recorded as successful checks. The parser and isolated depth
+retries passed on unchanged sources. A later repeated cleanup failure was
+confirmed to leave only newly created `.DS_Store` files. The export helper now
+retries cleanup on `ENOTEMPTY` at most three times, preserving body errors and
+all other cleanup failures. Seven tests cover the bounded retry, including an
+actual metadata-file race. Final captures use that fixed helper and refreshed
+native provenance; the earlier attempts remain retained.
+
+Workspace clippy with warnings denied, formatting, package policy, focused
+release/ownership regressions and all 837 script tests pass (one platform skip).
+The dependent subset-anchor refresh was independently reviewed; subset bytes,
+selection policy and all 675 checker obligations are unchanged. The suite also
+exposed an older S10 source fingerprint omission: `tsr_glob` is now included,
+and Finder metadata does not alter the source inventory. No benchmark was run.
+
+Reproduction commands (Go 1.27.1 on PATH):
+
+```sh
+python3 scripts/phase1.py compare --capture target/phase1-f4b-family-final --require-parity
+python3 scripts/phase1_syntax.py replay target/phase1-f4b-final/full
+cargo xtask run e1
+cargo xtask run binder
+python3 scripts/phase1.py inventory --check
+```
+
+Raw captures and previous reports are preserved under `target/`; F5b can reuse
+these captures while their normal source and contract validators accept them.
+
+The exact-witness roster remains open: 814 of 3,617 operations are accounted
+for, with 2,489 `implemented_untested` and 314 `missing` dispositions pending.
+The latter includes name-inferred gaps, not 314 reproduced missing APIs.
+`Program.GetBindDiagnostics` now has three exact witnesses; `NewProgram`,
+`GetSourceFiles` and the native bind-on-demand lifecycle already have production
+equivalents in `Program::load`, `Program::files` and bind-before-publication.
+All 4,795 Phase 1 operations have a disposition, so none is unclassified, but
+this does not turn the pending operations into witnessed ones. Review also
+corrected the roster's contradictory declaration: its 230 compiler `later_step`
+entries exempt this syntax preparation step, but still retain Phase 1 scope
+dispositions. F5a must reconcile their proposed later-phase homes explicitly;
+they are not already removed from Phase 1. Full parser/binder parity alone must
+not discharge pending witness links or settle that boundary.

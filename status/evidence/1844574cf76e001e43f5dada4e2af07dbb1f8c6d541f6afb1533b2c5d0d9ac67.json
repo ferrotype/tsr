@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "run_id": "e1",
+  "recorded_at": 1790072655,
+  "context": {
+    "revision": "c30471ef05bce0f7c869764ef8c9d1927ce036ff",
+    "source_sha256": "9587076741fd1799fa974dc17ecaff7482c59a8d01bcfed6c5384ed61e71c849",
+    "upstream_pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+    "environment": {
+      "CARGO_BUILD_TARGET": "",
+      "CARGO_ENCODED_RUSTFLAGS": "",
+      "CARGO_HOME": "/Users/cristian/.cargo",
+      "CGO_ENABLED": "",
+      "GOARCH": "",
+      "GOFLAGS": "",
+      "GOOS": "",
+      "RUSTC_WRAPPER": "",
+      "RUSTFLAGS": "",
+      "RUSTUP_HOME": "/Users/cristian/.rustup",
+      "RUSTUP_TOOLCHAIN": "1.97.1-aarch64-apple-darwin",
+      "S04_CACHE_HOME": "",
+      "S04_RUSTUP_HOME": ""
+    },
+    "host": "macos-aarch64",
+    "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n"
+  },
+  "spec_sha256": "5061da0604696a79be491513d222ca66d4a637b3785fa3fed5c2187670d69a37",
+  "inputs": {
+    ".gitmodules": "7f9e8e0a446a547c56d8444637b3ee73064ce52055bc3c983c05eb13f4331bdd",
+    "data/s04/toolchains.toml": "f7f747f45b0570c179771ba0e01e37a3fc3c1ca7e98dbf042b7eabf6d9f9c0be",
+    "data/s06/cases.json": "9a48291e68e617a24dcc3f2cd525f0e3bb8630bedf8c4ddbd7154d22fa8b778f",
+    "data/upstream.json": "9f3a288befbb79b1dcd59c2fd0d87fd2cddf120563f8b4c129ce88e3c3957af9",
+    "docs/design/ownership.md": "b44800c7dfccf4fc4e49e4a51e3a99f298836955e8d73b2e41cb236098f03780",
+    "docs/design/text.md": "53290725501fdd035c71e6bc9a9f5638191972b712c9f68d167c8ddbae4faa0f"
+  },
+  "command": [
+    "python3",
+    "scripts/s06.py",
+    "e1"
+  ],
+  "target": "host",
+  "config": "S06 direct parser and protocol-8 runtime; frozen 12,721 physical cases and 108 embedded libs, all eligible virtual units and effective option variants from clean pinned Go preprocessing; release Rust; independent stage framing and exact encoder outcomes/bytes; SourceFile state, node-index identities, constructed AST/codec/decoder, independently regenerated utility/accessor observations with exact Rust test inventory, and guarded depth fixtures gated separately; supplemental probes never add E1 rows; two frozen diagnostic-only ambiguity qualifications retain raw payloads, exactness and digests; separate measured cyclic decoder watchdog; no compiler/checker/mapper execution claim",
+  "host": "macos-aarch64",
+  "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n",
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "S06 capture failed: another S06 producer owns target/s06-producer.lock\n",
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr_sha256": "3bd92e5db81bb27f654e53472f3d6770b4453ec7208fa458793b31ce13e78d51",
+  "valid_capture": false
+}

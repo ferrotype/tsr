@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "run_id": "e1",
+  "recorded_at": 1790070946,
+  "context": {
+    "revision": "f4fd0e1f61af95ae637ff7881dbdb3824cc0c691",
+    "source_sha256": "0389c3f600a4482bf2d592d3a9decf677a88a38419da88176ce6215db53db47a",
+    "upstream_pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+    "environment": {
+      "CARGO_BUILD_TARGET": "",
+      "CARGO_ENCODED_RUSTFLAGS": "",
+      "CARGO_HOME": "/Users/cristian/.cargo",
+      "CGO_ENABLED": "",
+      "GOARCH": "",
+      "GOFLAGS": "",
+      "GOOS": "",
+      "RUSTC_WRAPPER": "",
+      "RUSTFLAGS": "",
+      "RUSTUP_HOME": "/Users/cristian/.rustup",
+      "RUSTUP_TOOLCHAIN": "1.97.1-aarch64-apple-darwin",
+      "S04_CACHE_HOME": "",
+      "S04_RUSTUP_HOME": ""
+    },
+    "host": "macos-aarch64",
+    "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n"
+  },
+  "spec_sha256": "5061da0604696a79be491513d222ca66d4a637b3785fa3fed5c2187670d69a37",
+  "inputs": {
+    ".gitmodules": "7f9e8e0a446a547c56d8444637b3ee73064ce52055bc3c983c05eb13f4331bdd",
+    "data/s04/toolchains.toml": "f7f747f45b0570c179771ba0e01e37a3fc3c1ca7e98dbf042b7eabf6d9f9c0be",
+    "data/s06/cases.json": "9a48291e68e617a24dcc3f2cd525f0e3bb8630bedf8c4ddbd7154d22fa8b778f",
+    "data/upstream.json": "9f3a288befbb79b1dcd59c2fd0d87fd2cddf120563f8b4c129ce88e3c3957af9",
+    "docs/design/ownership.md": "b44800c7dfccf4fc4e49e4a51e3a99f298836955e8d73b2e41cb236098f03780",
+    "docs/design/text.md": "53290725501fdd035c71e6bc9a9f5638191972b712c9f68d167c8ddbae4faa0f"
+  },
+  "command": [
+    "python3",
+    "scripts/s06.py",
+    "e1"
+  ],
+  "target": "host",
+  "config": "S06 direct parser and protocol-8 runtime; frozen 12,721 physical cases and 108 embedded libs, all eligible virtual units and effective option variants from clean pinned Go preprocessing; release Rust; independent stage framing and exact encoder outcomes/bytes; SourceFile state, node-index identities, constructed AST/codec/decoder, independently regenerated utility/accessor observations with exact Rust test inventory, and guarded depth fixtures gated separately; supplemental probes never add E1 rows; two frozen diagnostic-only ambiguity qualifications retain raw payloads, exactness and digests; separate measured cyclic decoder watchdog; no compiler/checker/mapper execution claim",
+  "host": "macos-aarch64",
+  "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n",
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "+ git ls-tree -r --name-only 1f70213d4922b434345f639b441681e470c7cfc1 tsc/testdata/tests/cases/compiler/ tsc/testdata/tests/cases/conformance/ tsc/internal/bundled/libs/\n+ go version\ngo version go1.27.1 darwin/arm64\n+ git archive 1f70213d4922b434345f639b441681e470c7cfc1 tsc/go.mod tsc/go.sum tsc/internal tsc/testdata/tests/cases/compiler tsc/testdata/tests/cases/conformance\n+ go test -trimpath -mod=readonly -gcflags=github.com/microsoft/TypeScript/tsc/internal/repo=-trimpath=/Users/cristian/git/ts-rust/target/s06-oracle/export-wbb7m530/s06-unmatched-prefix ./internal/testrunner -run ^TestS06 -count=1 -timeout=5m\n+ /Users/cristian/.pyenv/versions/3.11.12/bin/python3 tools/s06/node-index-sort/generate.py --check\n+ go version\ngo version go1.27.1 darwin/arm64\n+ go version\ngo version go1.27.1 darwin/arm64\n+ git archive 1f70213d4922b434345f639b441681e470c7cfc1 tsc/go.mod tsc/go.sum tsc/internal tsc/testdata/tests/cases/compiler tsc/testdata/tests/cases/conformance\n+ go test -trimpath -mod=readonly ./internal/s06oracle -count=1\n+ go build -trimpath -mod=readonly -o /Users/cristian/git/ts-rust/target/s06-oracle/go-oracle ./internal/s06oracle\n+ cargo build --package tsr_parser --example s06 --release --locked --message-format=json\n   Compiling tsr_encoder v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_encoder)\n   Compiling tsr_parser v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_parser)\n    Finished `release` profile [optimized] target(s) in 26.84s\n+ /Users/cristian/.pyenv/versions/3.11.12/bin/python3 scripts/s06_utilities_front.py --check\n+ /Users/cristian/.pyenv/versions/3.11.12/bin/python3 tools/s06/ast-utilities-middle/generate.py --check\n+ /Users/cristian/.pyenv/versions/3.11.12/bin/python3 scripts/s06_utilities_tail.py --check\n+ /Users/cristian/.pyenv/versions/3.11.12/bin/python3 scripts/s06_accessor_fixtures.py --check\nS06 capture failed: AST utility setup/check failed: ['/Users/cristian/.pyenv/versions/3.11.12/bin/python3', 'scripts/s06_accessor_fixtures.py', '--check']; output retained at /Users/cristian/git/ts-rust/target/s06-reports/utilities/accessors-oracle\n",
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr_sha256": "4a28cecd3058c635a94138b3be3f9fe585940486bf4983888e0aea7a2747218b",
+  "valid_capture": false
+}
