@@ -2243,3 +2243,24 @@ All **59/59 module cases** now match the newly executed native schedule at
 condition data and a compound-extra-extension witness. No module case remains
 `not_implemented`. All 13 module tests and focused clippy pass. These development
 comparisons will be folded into final authenticated F3b evidence together.
+
+### F3b continuation: parsed-config result accessors
+
+Parsed results now expose canonical file-name indexes, wildcard globs (including
+mapper extensions), extended sources, resolved project references, mapper
+selection, locale and explicit option/type-acquisition replacement. Initialized
+result caches survive those replacements as Go's once caches do. Config-spec
+replacement invalidates both directory and glob caches through the existing
+exclusive setter.
+
+Common-source-directory diagnostics are emitted only on first use. Source/output
+indexes share name records and supply the owning parsed result through borrowed
+views, avoiding self pointers and ownership cycles. Build-info and declaration
+output helpers were moved from the compiler to tsoptions and reused by both;
+this adds no emitter or scheduler.
+
+All 12 previously missing accessor cases match native, taking the command-line
+action schedule to **67/70** (three diagnostic-helper cases remain). Focused
+regressions cover cache lifetime across replacement/clone, once-only diagnostics,
+shared map records and lazy output-directory discovery. Focused clippy and the
+package asset/publication policy check pass.

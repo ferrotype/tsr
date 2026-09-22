@@ -19,11 +19,6 @@ use tsr_vfs::{FileSystem, MemoryBuilder};
 // The gaps, one reviewed record each.
 // ---------------------------------------------------------------------------
 
-/// Shared by the `ParsedCommandLine` accessors the port does not carry.
-const NO_ACCESSOR: &str = "crates/tsr_tsoptions/src/lib.rs:196-212 declares ParsedCommandLine and \
-     crates/tsr_tsoptions/src/config_specs.rs:70-117 carries its only accessor block; neither \
-     defines this operation (absent)";
-
 /// `(operation, go_authority, intended_signature, production_home)`.
 type Gap = (&'static str, &'static str, &'static str, &'static str);
 
@@ -62,141 +57,6 @@ const WORKER_DIAGNOSTICS: Gap = (
     "no Rust home: crates/tsr_tsoptions has no worker-diagnostics value at all; \
      fixture_options.rs:276-302 hard-codes the compiler-mode choices inline instead (absent)",
 );
-
-/// The `ParsedCommandLine` accessors with no Rust counterpart, by probe name.
-const ACCESSOR_GAPS: &[(&str, Gap)] = &[
-    (
-        "file_names_by_path",
-        (
-            "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.FileNamesByPath",
-            "tsc/internal/tsoptions/parsedcommandline.go:334, the once-built path -> file-name \
-             index over the parse's own file names",
-            "pub fn file_names_by_path(&self) -> &BTreeMap<Path, JsString>",
-            NO_ACCESSOR,
-        ),
-    ),
-
-
-    (
-        "wildcard_directory_globs",
-        (
-            "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.fileGlobPatterns",
-            "tsc/internal/tsoptions/parsedcommandline.go:31, which augments the built-in include \
-             glob with the extensions the config's content mappers registered; its only caller is \
-             WildcardDirectoryGlobs (:284)",
-            "fn file_glob_patterns(&self) -> (Vec<u8>, Vec<u8>)",
-            NO_ACCESSOR,
-        ),
-    ),
-    (
-        "extended_source_files",
-        (
-            "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.ExtendedSourceFiles",
-            "tsc/internal/tsoptions/parsedcommandline.go:386, which reads the extends chain the \
-             parse recorded on the config source file, and answers nil when there is no config",
-            "pub fn extended_source_files(&self) -> &[JsString]",
-            "crates/tsr_tsoptions/src/config_syntax.rs:11 carries extended_source_files on \
-             TsConfigSourceFile, so the state exists; no accessor on ParsedCommandLine reaches \
-             it, and the nil-when-no-config contract has no home (absent)",
-        ),
-    ),
-    (
-        "project_references",
-        (
-            "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.ResolvedProjectReferencePaths",
-            "tsc/internal/tsoptions/parsedcommandline.go:379, the once-only resolution of every \
-             project reference path, over ProjectReferences (:345)",
-            "pub fn resolved_project_reference_paths(&self) -> &[JsString]",
-            "crates/tsr_tsoptions/src/lib.rs:209 carries project_references as a public field, so \
-             the references themselves exist; core.ResolveProjectReferencePath has no Rust \
-             counterpart reachable from ParsedCommandLine (absent)",
-        ),
-    ),
-    (
-        "common_source_directory",
-        (
-            "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.CommonSourceDirectory",
-            "tsc/internal/tsoptions/parsedcommandline.go:157, which filters the file names and \
-             hands outputpaths.GetCommonSourceDirectory the checkSourceFilesBelongToPath callback \
-             at :176 -- the callback that appends File_0_is_not_under_rootDir_1 to Errors",
-            "pub fn common_source_directory(&mut self) -> &[u8]",
-            NO_ACCESSOR,
-        ),
-    ),
-    (
-        "build_info_file_name",
-        (
-            "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.GetBuildInfoFileName",
-            "tsc/internal/tsoptions/parsedcommandline.go:253, which forwards the compiler options \
-             and comparePathsOptions to outputpaths.GetBuildInfoFileName",
-            "pub fn build_info_file_name(&self) -> JsString",
-            NO_ACCESSOR,
-        ),
-    ),
-    (
-        "input_output_names",
-        (
-            "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.ParseInputOutputNames",
-            "tsc/internal/tsoptions/parsedcommandline.go:135, which walks \
-             getOutputDeclarationAndSourceFileNames (:197) once and fills both \
-             SourceToProjectReference (:127) and OutputDtsToProjectReference (:131)",
-            "pub fn parse_input_output_names(&mut self), plus the two path-keyed maps it fills",
-            NO_ACCESSOR,
-        ),
-    ),
-    (
-        "content_mappers",
-        (
-            "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.GetContentMapperForFileName",
-            "tsc/internal/tsoptions/parsedcommandline.go:366, which picks the configured mapper \
-             whose extensions match a file name, over ContentMapperExtensions (:358) and \
-             ContentMappers (:349)",
-            "pub fn content_mapper_for_file_name(&self, file_name: &[u8]) -> \
-             Option<&ContentMapper>",
-            "crates/tsr_tsoptions/src/lib.rs:211 carries content_mappers as a public field and \
-             crates/tsr_tsoptions/src/config_mappers.rs validates them, but no accessor selects a \
-             mapper by file name and nothing flattens the extension list (absent)",
-        ),
-    ),
-    (
-        "type_acquisition",
-        (
-            "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.SetTypeAcquisition",
-            "tsc/internal/tsoptions/parsedcommandline.go:321, and the accessor at :325 that reads \
-             back what it set",
-            "pub fn set_type_acquisition(&mut self, acquisition: TypeAcquisition)",
-            "crates/tsr_tsoptions/src/lib.rs:208 carries type_acquisition as a public field, so \
-             the state is reachable; no named operation sets or reads it, and writing the field \
-             from this harness would be the harness doing the port's job (absent)",
-        ),
-    ),
-    (
-        "set_compiler_options",
-        (
-            "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.SetCompilerOptions",
-            "tsc/internal/tsoptions/parsedcommandline.go:310, which replaces the compiler options \
-             without disturbing the rest of ParsedConfig, and Locale (:489), the once-only \
-             locale.Parse over whatever options are in place when it is first asked",
-            "pub fn set_compiler_options(&mut self, options: CompilerOptions) and pub fn \
-             locale(&self) -> Locale",
-            "crates/tsr_tsoptions/src/lib.rs:198 carries options as a public field; there is no \
-             setter operation, and no locale parsing anywhere in crates/tsr_tsoptions (absent)",
-        ),
-    ),
-    (
-        "set_parsed_options",
-        (
-            "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.SetParsedOptions",
-            "tsc/internal/tsoptions/parsedcommandline.go:306, which replaces the whole \
-             ParsedOptions block -- compiler options, watch options, type acquisition, file \
-             names, project references and content mappers -- in one call",
-            "pub fn set_parsed_options(&mut self, parsed: ParsedOptions)",
-            "crates/tsr_tsoptions/src/lib.rs:196-212 flattens ParsedOptions into \
-             ParsedCommandLine's own fields, so there is no block to replace and no setter \
-             (absent)",
-        ),
-    ),
-];
 
 // ---------------------------------------------------------------------------
 // Rendering.
@@ -723,17 +583,161 @@ fn config_probe(
 ) -> Result<Value, Outcome> {
     let requested = action_str(action, "probe");
     let (probe, argument) = requested.split_once(':').unwrap_or((requested, ""));
-    if let Some((_, record)) = ACCESSOR_GAPS.iter().find(|(name, _)| *name == probe) {
-        return Err(gap(*record));
-    }
     if parsed.is_none() {
         *parsed = Some(config_parse(request).map_err(Outcome::Failed)?);
     }
-    let parsed = parsed.as_ref().expect("config parse");
+    let parsed = parsed.as_mut().expect("config parse");
     let mut row = Map::new();
     row.insert("op".into(), Value::String("parsed_config".into()));
     row.insert("probe".into(), Value::String(requested.to_owned()));
     match probe {
+        "common_source_directory" => {
+            let before = parsed.errors.len();
+            row.insert(
+                "common_source_directory".into(),
+                text(parsed.common_source_directory()),
+            );
+            row.insert("errors_added".into(), json!(parsed.errors.len() - before));
+            row.insert("errors".into(), diagnostic_rows!(&parsed.errors[before..]));
+        }
+        "build_info_file_name" => {
+            row.insert(
+                "build_info_file_name".into(),
+                text(parsed.build_info_file_name().as_bytes()),
+            );
+        }
+        "input_output_names" => {
+            parsed.parse_input_output_names();
+            row.insert(
+                "source_to_project_reference".into(),
+                json!(parsed
+                    .source_to_project_reference()
+                    .map(|(key, entry)| json!([
+                        text(key.as_bytes()),
+                        text(entry.names.source.as_bytes()),
+                        text(entry.names.output_dts.as_bytes())
+                    ]))
+                    .collect::<Vec<_>>()),
+            );
+            row.insert(
+                "output_dts_to_project_reference".into(),
+                json!(parsed
+                    .output_dts_to_project_reference()
+                    .map(|(key, entry)| json!([
+                        text(key.as_bytes()),
+                        text(entry.names.source.as_bytes()),
+                        text(entry.names.output_dts.as_bytes())
+                    ]))
+                    .collect::<Vec<_>>()),
+            );
+        }
+        "file_names_by_path" => {
+            row.insert(
+                "file_names_by_path".into(),
+                json!(parsed
+                    .file_names_by_path()
+                    .iter()
+                    .map(|(key, value)| [text(key.as_bytes()), text(value.as_bytes())])
+                    .collect::<Vec<_>>()),
+            );
+        }
+        "wildcard_directory_globs" => {
+            let mut patterns = parsed
+                .wildcard_directory_globs()
+                .unwrap_or_default()
+                .iter()
+                .map(tsr_glob::Glob::to_bytes)
+                .collect::<Vec<_>>();
+            patterns.sort();
+            row.insert("glob_count".into(), json!(patterns.len()));
+            row.insert(
+                "patterns".into(),
+                json!(patterns
+                    .iter()
+                    .map(|pattern| text(pattern))
+                    .collect::<Vec<_>>()),
+            );
+        }
+        "extended_source_files" => {
+            row.insert(
+                "extended_source_files".into(),
+                strings(parsed.extended_source_files()),
+            );
+        }
+        "project_references" => {
+            row.insert(
+                "project_references".into(),
+                json!(parsed
+                    .project_references
+                    .iter()
+                    .flatten()
+                    .map(|reference| json!([
+                        text(reference.path.as_bytes()),
+                        text(reference.original_path.as_bytes()),
+                        reference.circular
+                    ]))
+                    .collect::<Vec<_>>()),
+            );
+            row.insert(
+                "resolved_paths".into(),
+                strings(parsed.resolved_project_reference_paths()),
+            );
+        }
+        "content_mappers" => {
+            row.insert(
+                "mapper_count".into(),
+                json!(parsed.content_mappers.as_ref().map_or(0, Vec::len)),
+            );
+            row.insert(
+                "extensions".into(),
+                strings(&parsed.content_mapper_extensions()),
+            );
+            row.insert("mapper_for_file".into(), json!(argument));
+            row.insert(
+                "has_mapper_for_file".into(),
+                json!(
+                    !argument.is_empty()
+                        && parsed
+                            .content_mapper_for_file_name(argument.as_bytes())
+                            .is_some()
+                ),
+            );
+        }
+        "type_acquisition" => {
+            parsed.set_type_acquisition(Some(tsr_tsoptions::TypeAcquisition {
+                enable: tsr_core::Tristate::TRUE,
+                ..Default::default()
+            }));
+            row.insert(
+                "set_then_read_enable".into(),
+                json!(parsed
+                    .type_acquisition
+                    .as_ref()
+                    .is_some_and(|value| value.enable.is_true())),
+            );
+        }
+        "set_compiler_options" => {
+            parsed.set_compiler_options(CompilerOptions {
+                locale: JsString::from_bytes(argument.as_bytes()),
+                ..Default::default()
+            });
+            row.insert("locale_input".into(), json!(argument));
+            row.insert(
+                "locale_is_default".into(),
+                json!(parsed.locale().is_default()),
+            );
+            row.insert(
+                "file_names_survived".into(),
+                json!(parsed.root_file_names.len()),
+            );
+        }
+        "set_parsed_options" => {
+            parsed.set_parsed_options(tsr_tsoptions::ParsedOptions {
+                file_names: vec![JsString::from_bytes(argument.as_bytes())],
+                ..Default::default()
+            });
+            row.insert("file_names".into(), strings(&parsed.root_file_names));
+        }
         "current_directory" => {
             row.insert("current_directory".into(), text(parsed.current_directory()));
             row.insert(

@@ -207,6 +207,7 @@ pub struct ParsedCommandLine {
     config_case_sensitive: bool,
     wildcard_directories_cache:
         std::sync::OnceLock<Option<tsr_core::collections::OrderedMap<JsString, bool>>>,
+    caches: parsed_accessors::ParsedCaches,
     pub config_dependencies: Vec<std::sync::Arc<TsConfigSourceFile>>,
     pub type_acquisition: Option<TypeAcquisition>,
     pub project_references: Option<Vec<ProjectReference>>,
@@ -247,6 +248,7 @@ impl ParsedCommandLine {
             config_specs: None,
             config_base_path: JsString::default(),
             config_case_sensitive: true,
+            caches: crate::parsed_accessors::ParsedCaches::default(),
             config_dependencies: Vec::new(),
             type_acquisition: None,
             project_references: None,
@@ -329,3 +331,11 @@ pub use command_line::{
 
 #[cfg(feature = "harness")]
 pub use command_line::parse_command_line_test_worker;
+
+mod parsed_accessors;
+pub use parsed_accessors::{
+    resolve_config_file_name_of_project_reference, resolve_project_reference_path, ParsedOptions,
+    SourceOutputAndProjectReference, SourceOutputNames,
+};
+
+pub mod output_paths;

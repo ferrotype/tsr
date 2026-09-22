@@ -797,6 +797,7 @@ fn finish_config(
         root_file_names: file_names,
         config_file: parsed.source.map(Arc::new),
         config_dependencies: parsed.dependencies,
+        caches: crate::parsed_accessors::ParsedCaches::default(),
         errors: parsed.errors,
         raw: parsed.raw,
         compile_on_save,

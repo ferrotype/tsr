@@ -150,13 +150,7 @@ impl ParsedBuildCommandLine {
                         self.current_directory.as_bytes(),
                         &[project.as_bytes()],
                     );
-                    // core.ResolveConfigFileNameOfProjectReference lives here
-                    // because Rust's core crate cannot depend on tspath.
-                    JsString::from_bytes(if tsr_tspath::file_extension_is(&path, b".json") {
-                        path
-                    } else {
-                        tsr_tspath::combine(&path, &[b"tsconfig.json"])
-                    })
+                    crate::resolve_config_file_name_of_project_reference(&path)
                 })
                 .collect()
         })

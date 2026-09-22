@@ -120,6 +120,7 @@ impl ParsedCommandLine {
         self.config_base_path = base;
         self.config_case_sensitive = case_sensitive;
         self.wildcard_directories_cache.take();
+        self.caches.globs.take();
     }
     /// port: tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.GetCurrentDirectory
     pub fn current_directory(&self) -> &[u8] {

@@ -18,6 +18,7 @@ default = []
 harness = []
 
 [dependencies]
+tsr_glob = { version = "0.1.0", path = "../tsr_glob" }
 tsr_locale = { version = "0.1.0", path = "../tsr_locale" }
 tsr_json = { path = "../tsr_json", version = "0.1.0" }
 stacker = "=0.1.25"
