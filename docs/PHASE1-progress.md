@@ -2273,3 +2273,23 @@ and command-line parsing call them; direct probes no longer duplicate message
 selection or report these operations absent. All **70/70 command-line action
 cases** match Go, including custom worker declaration lists, and all nine parser
 regressions pass. Focused clippy passes.
+
+### F3b continuation: config option and syntax helpers
+
+Absolute option conversion now shares one production implementation between the
+CLI and direct config API. The declaration-name map preserves original/lowercase
+keys and native spelling tie-breaking. Type-acquisition defaults and conditional
+config-directory array substitution are exposed without changing their existing
+callers' contracts.
+
+Direct config syntax queries now use the production property search and source
+ranges. This exposed and fixed an older duplicate-key bug: an absent array value
+in the first matching property must not resume searching later duplicate keys.
+Reference diagnostics and the deliberately kind-only `isDoubleQuotedString`
+predicate follow the pin. Config helper comparisons are **127/145 exact**, with
+18 explicitly missing cases and no differing results. Three syntax unit tests
+and focused clippy pass.
+
+The owner separately approved immutable published package contents on 2026-09-22;
+the pinned caller audit and narrowly scoped alias-mutation exception are recorded
+in `PHASE1-aliasing-audit.md`. Final package evidence must preserve this difference.

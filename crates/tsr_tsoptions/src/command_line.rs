@@ -48,31 +48,8 @@ pub fn parse_command_line(args: &[JsString], host: &dyn ParseConfigHost) -> Pars
 }
 
 fn absolute_value<'a>(key: &[u8], value: &'a V, cwd: &[u8]) -> std::borrow::Cow<'a, V> {
-    use std::borrow::Cow;
-    let Some(option) = find_declaration(COMPILER_OPTIONS, key, false) else {
-        return Cow::Borrowed(value);
-    };
-    let absolute = |name: &JsString| {
-        V::String(JsString::from_bytes(tsr_tspath::absolute(
-            name.as_bytes(),
-            cwd,
-        )))
-    };
-    if option.element.is_some_and(|element| element.is_file_path) {
-        if let V::Array(values) = value {
-            return Cow::Owned(V::Array(values.as_ref().map(|values| {
-                values
-                    .iter()
-                    .map(|value| value.as_string().map_or_else(|| value.clone(), absolute))
-                    .collect()
-            })));
-        }
-    } else if option.is_file_path {
-        if let V::String(name) = value {
-            return Cow::Owned(absolute(name));
-        }
-    }
-    Cow::Borrowed(value)
+    crate::convert_option_to_absolute_path(key, value, crate::compiler_option_name_map(), cwd)
+        .map_or(std::borrow::Cow::Borrowed(value), std::borrow::Cow::Owned)
 }
 
 /// port: tsc/internal/tsoptions/commandlineparser.go:ParseBuildCommandLine

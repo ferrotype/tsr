@@ -346,3 +346,16 @@ pub use option_diagnostics::{
     build_worker_diagnostics, extra_key_diagnostics, parse_command_line_worker_diagnostics,
     watch_worker_diagnostics, AlternateModeDiagnostics, ParseCommandLineWorkerDiagnostics,
 };
+
+mod option_maps;
+pub use config_substitution::substituted_strings;
+pub use option_maps::{
+    compiler_option_name_map, convert_option_to_absolute_path, convert_options_with_absolute_paths,
+    CommandLineOptionNameMap,
+};
+
+pub use config_parse::{
+    array_string as config_prop_array_element_value, diagnostic_at_reference_syntax,
+    options_syntax_by_array_element_value,
+};
+pub use config_syntax::is_double_quoted_string;

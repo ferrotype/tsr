@@ -36,7 +36,8 @@ impl TypeAcquisition {
             _ => {}
         }
     }
-    fn for_config(name: &[u8]) -> Self {
+    /// port: tsc/internal/tsoptions/tsconfigparsing.go:getDefaultTypeAcquisition
+    pub fn for_config(name: &[u8]) -> Self {
         Self {
             enable: if tsr_tspath::base_name(name) == b"jsconfig.json" {
                 Tristate::TRUE
@@ -102,42 +103,63 @@ pub(crate) fn array_element(
         .get(index)
         .copied()
 }
-fn array_string(config: &TsConfigSourceFile, key: &[u8], value: &[u8]) -> Option<NodeId> {
-    let view = config.file.view();
-    // ForEachPropertyAssignment continues after a callback returns nil.
-    let root = config.object()?;
-    let read = view.node(root).expect("config object");
-    let NodeDataRead::ObjectLiteralExpression(data) = read.data() else {
-        return None;
-    };
-    for node in view
-        .node_slice(view.list(data.properties()?).ok()?.nodes())
-        .ok()?
-        .iter()
-        .flatten()
+/// port: tsc/internal/tsoptions/tsconfigparsing.go:GetTsConfigPropArrayElementValue
+pub fn array_string(config: &TsConfigSourceFile, key: &[u8], value: &[u8]) -> Option<NodeId> {
+    options_syntax_by_array_element_value(config, config.object()?, key, value)
+}
+/// The first matching property wins even if its callback finds no matching
+/// element; duplicate JSON keys do not cause a search in later properties.
+/// port: tsc/internal/tsoptions/tsconfigparsing.go:GetOptionsSyntaxByArrayElementValue
+pub fn options_syntax_by_array_element_value(
+    config: &TsConfigSourceFile,
+    object: NodeId,
+    key: &[u8],
+    value: &[u8],
+) -> Option<NodeId> {
+    let property = find_property_in_object(config, object, &[key])?;
+    array_elements(config, initializer(config, property)?)
+        .into_iter()
+        .find(|element| {
+            config
+                .file
+                .view()
+                .node(*element)
+                .expect("config element")
+                .kind()
+                == K::StringLiteral
+                && config
+                    .file
+                    .view()
+                    .node_text(*element)
+                    .expect("config text")
+                    .as_bytes()
+                    == value
+        })
+}
+/// port: tsc/internal/tsoptions/tsconfigparsing.go:CreateDiagnosticAtReferenceSyntax
+pub fn diagnostic_at_reference_syntax(
+    config: &ParsedCommandLine,
+    index: isize,
+    message: &'static Message,
+    args: Vec<JsString>,
+) -> Option<Diagnostic> {
+    let source = config.config_file.as_ref()?;
+    let property = find_property(source, &[b"references"])?;
+    let initializer = initializer(source, property)?;
+    if source
+        .file
+        .view()
+        .node(initializer)
+        .expect("references value")
+        .kind()
+        != K::ArrayLiteralExpression
     {
-        let read = view.node(node).ok()?;
-        let NodeDataRead::PropertyAssignment(data) = read.data() else {
-            continue;
-        };
-        if data
-            .name()
-            .and_then(|name| crate::property_name(config, name))
-            .is_none_or(|name| name.as_bytes() != key)
-        {
-            continue;
-        }
-        for element in data
-            .initializer()
-            .into_iter()
-            .flat_map(|node| array_elements(config, node))
-        {
-            if view.node(element).expect("array element").kind() == K::StringLiteral
-                && view.node_text(element).expect("string element").as_bytes() == value
-            {
-                return Some(element);
-            }
-        }
+        return None;
+    }
+    let elements = array_elements(source, initializer);
+    if index < 0 || usize::try_from(index).is_ok_and(|index| index < elements.len()) {
+        let node = elements[usize::try_from(index).unwrap_or(usize::MAX)];
+        return Some(diagnostic_for_node(source, node, message, args));
     }
     None
 }

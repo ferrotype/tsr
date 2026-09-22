@@ -414,6 +414,7 @@ dependencies = [
  "tsr_ast",
  "tsr_compiler",
  "tsr_core",
+ "tsr_diagnostics",
  "tsr_glob",
  "tsr_jsstring",
  "tsr_module",

@@ -172,3 +172,19 @@ still require a Linux host.
 The case manifest's old preparation-time explanation described timestamps as
 unsupported. It is corrected to the implemented behavior and the single
 observed difference; no recorded observation is rewritten.
+
+## Parsed package contents: approved immutable publication
+
+On 2026-09-22 the owner approved keeping parsed package contents immutable while
+preserving their shared identity. `InfoCacheEntry::with_package_directory`
+retains the same contents Arc when it creates a directory-specific view. Neither
+view can mutate the published parsed fields.
+
+The pinned production audit found three `Parseable` initializations (module
+resolution and project auto-import construction) and one read in
+`internal/ls/autoimport/view.go`; no production assignment mutates an existing
+contents object's flag. The Phase 1 package probe deliberately does so through
+an alias in `with_package_directory_shares_contents`. That mutation is a named
+Go/Rust divergence, not evidence of an absent directory-alias operation and not
+covered implicitly by the earlier options or filesystem approvals. Comparison
+must retain the mutation difference and the separate shared-identity witness.

@@ -216,7 +216,7 @@ fn config_parse(request: &Value) -> Result<ParsedCommandLine, String> {
 // Production declarations have static metadata. This short-lived probe process
 // retains request-owned synthetic names for that lifetime; no production parser
 // or compiler options acquire a leaking dynamic-declaration API.
-fn worker_declaration(value: &Value) -> Result<OptionDeclaration, Outcome> {
+pub(super) fn worker_declaration(value: &Value) -> Result<OptionDeclaration, Outcome> {
     use tsr_tsoptions::OptionKind;
     let kind = match action_str(value, "kind") {
         "string" => OptionKind::String,
