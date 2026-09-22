@@ -18,8 +18,8 @@
 //!
 //! Standalone resolver traces explicitly use a live native-style test host.
 //! The production default constructor still requires an immutable snapshot.
-//! Redirects, entrypoint discovery and typings-location passes are the remaining
-//! recorded gaps; cache mutations and trace toggling call production APIs.
+//! Redirects, entrypoint discovery, typings fallback, cache mutations and trace
+//! toggling call production APIs.
 
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::{
@@ -43,49 +43,6 @@ use crate::api::{self, Outcome};
 /// config group and a subject string could collide with a neighbour's, so
 /// ownership is keyed on the case id this group was assigned.
 const CASE_PREFIX: &str = "config/module/";
-
-/// Every operation a case in this group names when the port cannot run it,
-/// with the pinned body that is its authority, the signature the port would
-/// need and the Rust home that does not have it.
-/// Keyed by the request's own operation id, so a recorded gap names the
-/// operation the case was written for rather than the subject it shares.
-///
-/// Each row was read against `crates/tsr_module` in this session; a row that
-/// says "present but not a counterpart" names the Rust function that was read
-/// and rejected, so the record cannot be mistaken for "nobody looked".
-const MISSING: &[(&str, &str, &str, &str)] = &[(
-    "tsc/internal/module/resolver.go:Resolver.tryResolveFromTypingsLocation",
-    "tsc/internal/module/resolver.go:339-366, called unconditionally from ResolveModuleName \
-         at :324",
-    "Resolver::new taking a typings location, a project name and extra extensions, plus the \
-         extra resolution pass that runs after an ordinary resolution failed to land on a \
-         TypeScript or JSON extension and that announces itself with the project name \
-         (resolver.go:339-366). crates/tsr_module/src/resolver.rs:90-104 has no such fields, so \
-         the pass never runs, the Auto_discovery_for_typings line is never written, and \
-         getPackageScopeForPath walks to the filesystem root where the pin stops at the global \
-         cache (resolver.go:495-504 vs resolver.rs:206-210)",
-    "crates/tsr_module/src/resolver.rs:90 (no typings location, project name or extra \
-         extensions on the resolver)",
-)];
-
-fn gap(request: &Value) -> Outcome {
-    let requested = request
-        .get("operation")
-        .and_then(Value::as_str)
-        .unwrap_or_default();
-    match MISSING
-        .iter()
-        .find(|(identity, _, _, _)| *identity == requested)
-    {
-        Some((identity, authority, signature, home)) => {
-            Outcome::missing(*identity, authority, signature, home)
-        }
-        None => Outcome::Failed(format!(
-            "the module group cannot run case operation {requested:?} and has no reviewed \
-             missing-operation record for it"
-        )),
-    }
-}
 
 fn hex(bytes: &[u8]) -> String {
     use std::fmt::Write;
@@ -326,11 +283,9 @@ fn type_reference_rows(resolved: &ResolvedTypeReferenceDirective) -> Value {
     Value::Array(rows)
 }
 
-/// What an action did. `Unreachable` is the port having no entry point for it;
-/// it is turned into the case's reviewed gap record by the caller.
+/// A completed action; malformed actions remain harness errors.
 enum Step {
     Done,
-    Unreachable,
 }
 
 fn apply_files(
@@ -386,22 +341,32 @@ fn apply(state: &mut State, action: &Value, row: &mut Map<String, Value>) -> Res
     let op = api::action_op(action);
     match op {
         "new_resolver" | "new_resolver_with_options" => {
-            // The pin's resolver carries a typings location, a project name
-            // and extra extensions; tsr_module's does not. A case that leaves
-            // all three empty is unaffected, so only a case that uses them is
-            // recorded as a gap.
-            if !text(action, "typings_location")?.is_empty()
-                || !text(action, "project_name")?.is_empty()
-                || op == "new_resolver" && !list(action, "extra_extensions")?.is_empty()
-            {
-                return Ok(Step::Unreachable);
-            }
             let cwd = text(action, "cwd")?.as_bytes().to_vec();
             let host = build_host(action)?;
             let compiler_options = Arc::new(options(field(action, "options")?)?);
             let dynamic: Arc<dyn FileSystem> = host.clone();
             let mut settings = tsr_module::ResolverOptions {
                 allow_live_host: true,
+                typings_location: JsString::from_bytes(
+                    text(action, "typings_location")?.as_bytes(),
+                ),
+                project_name: JsString::from_bytes(text(action, "project_name")?.as_bytes()),
+                extra_extensions: action
+                    .get("extra_extensions")
+                    .and_then(Value::as_array)
+                    .map(|values| {
+                        values
+                            .iter()
+                            .map(|value| {
+                                value
+                                    .as_str()
+                                    .map(|value| JsString::from_bytes(value.as_bytes()))
+                                    .ok_or_else(|| "invalid extra extension".to_owned())
+                            })
+                            .collect()
+                    })
+                    .transpose()?
+                    .unwrap_or_default(),
                 ..Default::default()
             };
             if op == "new_resolver_with_options" {
@@ -918,7 +883,6 @@ pub fn observe(request: &Value) -> Option<Outcome> {
             // The first action the port cannot run decides the whole case: a
             // partial trace would be a comparison against a shorter run, not a
             // result. The gap names the operation the case was written for.
-            Ok(Step::Unreachable) => return Some(gap(request)),
             Err(error) => {
                 return Some(Outcome::Failed(format!(
                     "case {identifier}, action {:?}: {error}",

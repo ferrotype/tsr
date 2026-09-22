@@ -72,34 +72,44 @@ impl Resolver {
                 if path::base_name(&dir) == b"node_modules" {
                     continue;
                 }
-                let node_modules = path::combine(&dir, &[b"node_modules"]);
-                if !self.host.directory_exists(&node_modules)? {
-                    trace!(
-                        self,
-                        diagnostics::Directory_0_does_not_exist_skipping_all_lookups_in_it,
-                        &node_modules
-                    );
-                    continue;
-                }
-                if let Some(r) = self.package(ext, name, &node_modules, context)? {
-                    return Ok(Some(r));
-                }
-                if ext & DTS != 0 {
-                    let types = path::combine(&node_modules, &[b"@types"]);
-                    if self.host.directory_exists(&types)? {
-                        let mangled = self.trace_mangle_scoped(name);
-                        if let Some(r) = self.package(DTS, &mangled, &types, context)? {
-                            return Ok(Some(r));
-                        }
-                    } else {
-                        trace!(
-                            self,
-                            diagnostics::Directory_0_does_not_exist_skipping_all_lookups_in_it,
-                            &types
-                        );
-                    }
+                if let Some(result) = self.immediate_node_modules(name, &dir, ext, context)? {
+                    return Ok(Some(result));
                 }
             }
+        }
+        Ok(None)
+    }
+    /// port: tsc/internal/module/resolver.go:resolutionState.loadModuleFromImmediateNodeModulesDirectory
+    pub(super) fn immediate_node_modules(
+        &mut self,
+        name: &[u8],
+        directory: &[u8],
+        extensions: u8,
+        context: &crate::package_maps::Context,
+    ) -> Result<Option<ResolvedModule>, Error> {
+        let node_modules = path::combine(directory, &[b"node_modules"]);
+        if !self.host.directory_exists(&node_modules)? {
+            trace!(
+                self,
+                diagnostics::Directory_0_does_not_exist_skipping_all_lookups_in_it,
+                &node_modules
+            );
+            return Ok(None);
+        }
+        if let Some(result) = self.package(extensions, name, &node_modules, context)? {
+            return Ok(Some(result));
+        }
+        if extensions & DTS != 0 {
+            let types = path::combine(&node_modules, &[b"@types"]);
+            if self.host.directory_exists(&types)? {
+                let mangled = self.trace_mangle_scoped(name);
+                return self.package(DTS, &mangled, &types, context);
+            }
+            trace!(
+                self,
+                diagnostics::Directory_0_does_not_exist_skipping_all_lookups_in_it,
+                &types
+            );
         }
         Ok(None)
     }

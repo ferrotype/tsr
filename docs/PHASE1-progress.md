@@ -2228,3 +2228,18 @@ to 58 implemented cases (the expanded entrypoint case is compared separately).
 A focused regression checks panic restoration, pattern-cache restoration, cache
 key isolation and nil-option fallback. Three relative-path tests and focused
 clippy pass. The remaining module fixture is global typings fallback.
+
+### F3b continuation: complete direct module-resolution schedule
+
+Resolver settings now carry the global typings location, project name and extra
+extensions. The fallback shares immediate node_modules lookup with ordinary
+resolution, runs after its completion trace, uses base options rather than a
+project redirect and preserves the original diagnostics before its own. Package
+scope stops at the global-cache boundary. Registered compound extensions use the
+longest match and retain the resolved-using-extra-extensions bit.
+
+All **59/59 module cases** now match the newly executed native schedule at
+`target/phase1/f3b-module-native-complete`, including the expanded entrypoint
+condition data and a compound-extra-extension witness. No module case remains
+`not_implemented`. All 13 module tests and focused clippy pass. These development
+comparisons will be folded into final authenticated F3b evidence together.

@@ -3966,7 +3966,10 @@
         {
           "case_sensitive": true,
           "cwd": "/p",
-          "extra_extensions": [],
+          "extra_extensions": [
+            ".view",
+            ".special.view"
+          ],
           "files": [
             {
               "content": "",
@@ -3997,6 +4000,16 @@
               "content": "{\"name\":\"typed\",\"version\":\"2.0.0\",\"types\":\"./index.d.ts\"}",
               "kind": "file",
               "path": "/p/node_modules/typed/package.json"
+            },
+            {
+              "kind": "file",
+              "path": "/p/src/widget.special.view",
+              "content": ""
+            },
+            {
+              "kind": "file",
+              "path": "/global/package.json",
+              "content": "{\"name\":\"outside-cache\"}"
             }
           ],
           "op": "new_resolver",
@@ -4026,6 +4039,12 @@
           "mode": 99,
           "name": "./missing",
           "op": "resolve"
+        },
+        {
+          "op": "resolve",
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "./widget.special.view"
         }
       ],
       "case": "config/module/typings/typings-location-fallback",

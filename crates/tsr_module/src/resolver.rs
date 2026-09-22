@@ -80,6 +80,9 @@ impl std::ops::Deref for PackageJson {
 pub struct ResolverOptions {
     pub package_json_cache: Option<Arc<crate::InfoCache>>,
     pub allow_live_host: bool,
+    pub typings_location: JsString,
+    pub project_name: JsString,
+    pub extra_extensions: Vec<JsString>,
 }
 impl PackageJson {
     pub fn parse(directory: &[u8], bytes: &[u8]) -> Self {
@@ -128,6 +131,9 @@ pub struct Resolver {
     pub(super) host: Arc<dyn FileSystem>,
     pub(super) options: Arc<CompilerOptions>,
     pub(super) operation_base_options: Option<Arc<CompilerOptions>>,
+    typings_location: JsString,
+    project_name: JsString,
+    extra_extensions: Vec<JsString>,
     pub(super) cwd: JsString,
     cache: BTreeMap<Key, ResolvedModule>,
     pub(super) option_patterns: std::sync::OnceLock<crate::ParsedPatterns>,
@@ -170,6 +176,9 @@ impl Resolver {
             host,
             options,
             operation_base_options: None,
+            typings_location: settings.typings_location,
+            project_name: settings.project_name,
+            extra_extensions: settings.extra_extensions,
             cwd: JsString::from_bytes(cwd),
             cache: BTreeMap::new(),
             option_patterns: std::sync::OnceLock::new(),
@@ -272,6 +281,9 @@ impl Resolver {
         for dir in path::ancestors(directory) {
             if let Some(info) = self.package_json(&dir)? {
                 return Ok(Some(info));
+            }
+            if dir == self.typings_location.as_bytes() {
+                break;
             }
         }
         Ok(None)
@@ -385,7 +397,7 @@ impl Resolver {
                     );
                 }
             }
-            outcome
+            outcome.and_then(|original| resolver.try_typings_location(name, original))
         })?;
         if self.cache.contains_key(&key) {
             // LoadOrStore retains the first entry, but a traced caller receives
@@ -396,6 +408,60 @@ impl Resolver {
             self.cache.insert(key.clone(), result);
             Ok(ResolutionSlot::Cached(key))
         }
+    }
+    /// port: tsc/internal/module/resolver.go:Resolver.tryResolveFromTypingsLocation
+    fn try_typings_location(
+        &mut self,
+        name: &[u8],
+        original: ResolvedModule,
+    ) -> Result<ResolvedModule, Error> {
+        if self.typings_location.is_empty()
+            || is_relative(name)
+            || original.is_resolved()
+                && matches!(
+                    original.extension.as_bytes(),
+                    b".ts"
+                        | b".tsx"
+                        | b".mts"
+                        | b".cts"
+                        | b".d.ts"
+                        | b".d.mts"
+                        | b".d.cts"
+                        | b".json"
+                )
+        {
+            return Ok(original);
+        }
+        let base = self
+            .operation_base_options
+            .as_ref()
+            .unwrap_or(&self.options)
+            .clone();
+        let location = self.typings_location.clone();
+        trace!(self, diagnostics::Auto_discovery_for_typings_is_enabled_in_project_0_Running_extra_resolution_pass_for_module_1_using_cache_location_2,
+            &self.project_name.clone(), name, &location);
+        // The fallback uses the base compiler options and no project redirect.
+        self.with_redirect(
+            Some(crate::ResolvedProjectReference {
+                config_name: b"",
+                compiler_options: Some(&base),
+            }),
+            |resolver| {
+                let context =
+                    crate::package_maps::Context::new(&resolver.options, ModuleKind::NONE);
+                let Some(mut result) =
+                    resolver.immediate_node_modules(name, location.as_bytes(), DTS, &context)?
+                else {
+                    return Ok(original);
+                };
+                // createResolvedModule, without symlink canonicalization on this path.
+                result.is_external_library_import = true;
+                let mut diagnostics = original.resolution_diagnostics;
+                diagnostics.append(&mut result.resolution_diagnostics);
+                result.resolution_diagnostics = diagnostics;
+                Ok(result)
+            },
+        )
     }
     pub(super) fn resolve_worker(
         &mut self,
@@ -670,10 +736,17 @@ impl Resolver {
         if path::base_name(candidate).contains(&b'.') {
             let stripped = path::remove_file_extension(candidate);
             let stripped = if stripped.len() == candidate.len() {
-                &candidate[..candidate
-                    .iter()
-                    .rposition(|&c| c == b'.')
-                    .expect("basename contains dot")]
+                let extension =
+                    path::longest_extension_from_path(candidate, &self.extra_extensions, false);
+                let end = if extension.is_empty() {
+                    candidate
+                        .iter()
+                        .rposition(|&c| c == b'.')
+                        .expect("basename contains dot")
+                } else {
+                    candidate.len() - extension.len()
+                };
+                &candidate[..end]
             } else {
                 stripped
             };
@@ -743,6 +816,17 @@ impl Resolver {
         }
         if self.config_lookup && matches!(original, b".ts" | b".d.ts" | b".js" | b"") {
             if let Some(result) = self.try_extension(base, b".json", false)? {
+                return Ok(Some(result));
+            }
+        }
+        if candidates.is_empty()
+            && self
+                .extra_extensions
+                .iter()
+                .any(|value| value.as_bytes() == original)
+        {
+            if let Some(mut result) = self.try_extension(base, original, false)? {
+                result.resolved_using_extra_extensions = true;
                 return Ok(Some(result));
             }
         }
