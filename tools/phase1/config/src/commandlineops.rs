@@ -647,6 +647,10 @@ fn run(
                 let parsed = tsr_tsoptions::parse_build_command_line(&args, &host);
                 row.insert("projects".into(), strings(&parsed.projects));
                 row.insert(
+                    "resolvedProjects".into(),
+                    strings(parsed.resolved_project_paths()),
+                );
+                row.insert(
                     "locale_is_default".into(),
                     json!(parsed.locale().is_default()),
                 );

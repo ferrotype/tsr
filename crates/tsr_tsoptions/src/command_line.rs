@@ -24,6 +24,7 @@ pub struct ParsedBuildCommandLine {
     pub current_directory: JsString,
     pub case_sensitive: bool,
     locale: std::sync::OnceLock<tsr_locale::Locale>,
+    resolved_project_paths: std::sync::OnceLock<Vec<JsString>>,
 }
 
 /// port: tsc/internal/tsoptions/commandlineparser.go:ParseCommandLine
@@ -90,6 +91,7 @@ pub fn parse_build_command_line(
         current_directory: JsString::from_bytes(host.current_directory()),
         case_sensitive: host.fs().use_case_sensitive_file_names(),
         locale: std::sync::OnceLock::new(),
+        resolved_project_paths: std::sync::OnceLock::new(),
     };
     for (key, value) in result.raw.as_object().expect("worker raw object") {
         // At the pin BuildOpts = commonOptionsWithBuild + OptionsForBuild;
@@ -136,6 +138,30 @@ pub fn parse_build_command_line(
 }
 
 impl ParsedBuildCommandLine {
+    /// Resolve lazily, retaining the first result just like the pinned once
+    /// cache. Later edits to `projects` or `current_directory` do not reset it.
+    /// port: tsc/internal/tsoptions/parsedbuildcommandline.go:ParsedBuildCommandLine.ResolvedProjectPaths
+    pub fn resolved_project_paths(&self) -> &[JsString] {
+        self.resolved_project_paths.get_or_init(|| {
+            self.projects
+                .iter()
+                .map(|project| {
+                    let path = tsr_tspath::resolve(
+                        self.current_directory.as_bytes(),
+                        &[project.as_bytes()],
+                    );
+                    // core.ResolveConfigFileNameOfProjectReference lives here
+                    // because Rust's core crate cannot depend on tspath.
+                    JsString::from_bytes(if tsr_tspath::file_extension_is(&path, b".json") {
+                        path
+                    } else {
+                        tsr_tspath::combine(&path, &[b"tsconfig.json"])
+                    })
+                })
+                .collect()
+        })
+    }
+
     /// As in Go, the first locale lookup freezes the value for this parse
     /// result. Updating options afterwards does not reset that result cache.
     /// port: tsc/internal/tsoptions/parsedbuildcommandline.go:ParsedBuildCommandLine.Locale
