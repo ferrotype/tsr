@@ -1,8 +1,9 @@
 """The Phase 1 operation scope: every in-scope Go symbol and its disposition.
 
-Built from the two audit inputs the plan names -- PORTS.toml and
-status/unmapped-functions.json -- joined against the actual Rust sources each
-ledger row claims as its home. The ledger is an audit input, not a task count:
+Built from PORTS.toml, the pinned function inventory and Rust port markers. The
+status/unmapped-functions.json audit view is derived from those same inputs;
+reading it as a producer input would introduce a generated-status cycle. The
+ledger is an audit input, not a task count:
 an unmapped Go function may already be represented in Rust, and a mapped file
 may still have no behavioral witness. Every row therefore carries how its
 disposition was reached, so a rule-derived guess is never mistaken for a review.
@@ -14,6 +15,7 @@ missing, equivalent_rust and later_phase.
 from __future__ import annotations
 
 import json
+import hashlib
 import re
 import tomllib
 from pathlib import Path
@@ -34,8 +36,30 @@ def unmapped() -> dict[str, list[str]]:
 
 
 def unmapped_ids() -> set[str]:
-    """Every operation id the audit input reports as unmapped."""
-    return {entry for entries in unmapped().values() for entry in entries}
+    """Derive xtask's unmapped set from sources, not its generated status view.
+
+    The generated worklist is an audit output, not an input to a producer: using
+    it makes recording status invalidate the next producer fingerprint. Keep
+    the same source-file eligibility and exact line-marker semantics as
+    xtask::scan_markers/read_inventory. Annotation-to-function attribution is
+    deliberately stricter elsewhere; this answers only xtask's mapped bit.
+    """
+    sources = {entry["go"] for entry in ledger()
+               if entry.get("kind") == "source" and entry.get("status") != "out-of-scope"}
+    known = {entry["id"] for entry in inventory() if entry["file"] in sources}
+    markers: set[str] = set()
+    for path in (ROOT / "crates").rglob("*.rs"):
+        if "target" in path.relative_to(ROOT / "crates").parts:
+            continue
+        for line in path.read_text(errors="replace").splitlines():
+            trimmed = line.lstrip()
+            for prefix in ("/// port:", "//! port:", "// port:"):
+                if trimmed.startswith(prefix):
+                    marker = trimmed.removeprefix(prefix).strip()
+                    if ":" in marker:
+                        markers.add(marker)
+                    break
+    return known - markers
 
 
 def inventory() -> list[dict]:
@@ -904,6 +928,7 @@ def build() -> dict:
     dependencies = package_dependencies()
     case_links = cases_by_operation()
     exemptions = roster_exemptions()
+    destinations = reviewed_destinations()
     for function in inventory():  # noqa: PLR1702
         package = function["package"]
         membership, reason = MEMBERSHIP[package]
@@ -935,6 +960,11 @@ def build() -> dict:
         if exemption and exemption.get("category") == "equivalent_rust" and not linked:
             disposition = "equivalent_rust"
             basis = exemption["evidence"]
+            basis_kind = "review"
+        destination = destinations.get(identity)
+        if destination:
+            disposition = "later_phase"
+            basis = destination["reason"] + " " + destination["evidence"]
             basis_kind = "review"
         linked = sorted(set(linked) | set(witnessing))
         if linked and disposition == "missing":
@@ -978,7 +1008,10 @@ def build() -> dict:
                     "owner": exemption["owner"] if exemption else None,
                 },
                 "depends_on": dependencies.get(package, []),
-                "destination_phase": PHASE if disposition != "later_phase" else None,
+                "destination_phase": (
+                    destination["destination_phase"] if destination
+                    else None if disposition == "later_phase" else PHASE
+                ),
             }
         )
     rows.sort(key=lambda r: r["id"])
@@ -1020,8 +1053,20 @@ def verify(scope: dict) -> list[str]:
             problems.append(f"{row.get('id')}: unclassified disposition {row.get('disposition')!r}")
         if not row.get("basis"):
             problems.append(f"{row.get('id')}: disposition has no recorded basis")
-        if row.get("disposition") == "later_phase" and row.get("destination_phase") is not None:
+        legacy_exclusion = (
+            row.get("ledger_status") == "out-of-scope"
+            and row.get("destination_phase") is None
+            and row.get("roster", {}).get("state") in (
+                "exempt:build_tooling", "exempt:build_variant", "exempt:later_step"
+            )
+        )
+        if row.get("disposition") == "later_phase" and not legacy_exclusion and (
+            type(row.get("destination_phase")) is not int
+            or row["destination_phase"] not in range(2, 8)
+        ):
             problems.append(f"{row.get('id')}: later_phase row must name a destination outside phase 1")
+        if row.get("disposition") == "later_phase" and not legacy_exclusion and row.get("basis_kind") != "review":
+            problems.append(f"{row.get('id')}: later_phase requires an explicit reviewed destination")
         if row.get("disposition") == "equivalent_rust" and row.get("basis_kind") != "review":
             problems.append(f"{row.get('id')}: equivalent_rust requires a reviewed behavioral witness")
         if row.get("disposition") == "covered" and not row.get("cases"):
@@ -1041,3 +1086,44 @@ def verify(scope: dict) -> list[str]:
     if scope.get("total_operations") != len(rows):
         problems.append("scope total_operations disagrees with its own operation rows")
     return problems
+
+
+def reviewed_destinations() -> dict[str, dict]:
+    """Apply exact accepted-plan boundaries, never a package/name heuristic.
+
+    The old ``later_step`` roster category only exempts a preparation step.
+    It does not remove an operation from Phase 1. This separate, pin-bound
+    review names the destination of the partial compiler surface explicitly.
+    Unknown IDs, a changed pinned source or duplicate decisions are errors.
+    """
+    path = ROOT / "data/phase1/coverage-review.json"
+    if not path.is_file():
+        return {}
+    review = json.loads(path.read_text())
+    pin = json.loads((ROOT / "data/upstream.json").read_text())["pin"]
+    if review.get("version") != 1 or review.get("pin") != pin or not review.get("authority"):
+        raise ValueError("coverage-review.json has no current pinned review authority")
+    known = {row["id"]: row for row in inventory()}
+    decisions: dict[str, dict] = {}
+    for row in review.get("reviewed_operation_destinations", []):
+        identity = row.get("operation")
+        original = known.get(identity)
+        if identity in decisions or original is None:
+            raise ValueError(f"coverage-review.json: duplicate or unknown operation {identity}")
+        if original["package"] != "internal/compiler":
+            raise ValueError(f"{identity}: only the reviewed partial compiler scope can move")
+        phase = row.get("destination_phase")
+        if type(phase) is not int or phase not in range(2, 8):
+            raise ValueError(f"{identity}: invalid reviewed destination phase {phase!r}")
+        if not row.get("reason") or not row.get("evidence"):
+            raise ValueError(f"{identity}: reviewed destination lacks a reason or source evidence")
+        source = ROOT / "upstream" / original["file"]
+        if hashlib.sha256(source.read_bytes()).hexdigest() != row.get("go_source_sha256"):
+            raise ValueError(f"{identity}: reviewed pinned source changed")
+        decisions[identity] = row
+    unresolved = review.get("unresolved_compiler_destinations", [])
+    if len(set(unresolved)) != len(unresolved) or set(unresolved) & decisions.keys():
+        raise ValueError("coverage-review.json: duplicate or simultaneously resolved destination")
+    if any(identity not in known for identity in unresolved):
+        raise ValueError("coverage-review.json: unknown unresolved operation")
+    return decisions

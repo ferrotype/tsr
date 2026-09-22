@@ -2777,3 +2777,39 @@ entries exempt this syntax preparation step, but still retain Phase 1 scope
 dispositions. F5a must reconcile their proposed later-phase homes explicitly;
 they are not already removed from Phase 1. Full parser/binder parity alone must
 not discharge pending witness links or settle that boundary.
+
+## F5a — integration and coverage review infrastructure
+
+The F5a branch is stacked on #51. The [review record](PHASE1-F5a.md) describes
+seven runnable cross-family witnesses, all 89 continuing S11 cases, locale
+regeneration, the three grouped producers and the separate P1A/P1B consumers.
+The coverage join is committed compactly as
+`data/phase1/coverage-report.json.gz`; it retains all 4,795 operations and 309
+unique config output paths. Scope classification no longer consumes generated
+status views. Reviewed compiler exclusions carry explicit destinations; the
+44 ambiguous cases retain Phase 1 membership.
+
+Phase A remains pending: 2,849 operation/preparation entries need attribution,
+implementation review or phase placement. Three owner-approved ownership
+qualifications have exact pin/request/observation matching and retain raw
+`different` outcomes. They cannot cover the two outstanding filesystem dynamic-type
+differences or the Linux-only observation.
+
+A bounded production fixture confirms the locale integration gap: config selects
+German and leaf localization works, while DiagnosticWriter returns English.
+The test records that difference against the pinned German catalog. The new
+integration adapter evaluates actual family rows and source-bound execution
+receipts; it does not hardcode success from fixture availability. The focused
+syntax utility family was recaptured for an end-to-end producer replay; no full
+parser/binder/checker corpus or benchmark was rerun for F5a.
+
+CI runs the preparation-health check separately from unfinished feature parity.
+The scheduled coverage review remains the next checkpoint before F5b; passing
+F4 corpora have not been used to invent operation witnesses.
+
+Validation for this increment: 902 script tests pass (one platform skip),
+focused Rust fixture execution and clippy pass, and formatting, package policy
+and tracker validation pass. The actual generator wrapper reproduces all managed
+outputs, untouched-client output and locale tables. The focused utility capture
+has 83/83 matches. Full correctness/benchmark histories were preserved and not
+rerun solely to refresh their timestamps.

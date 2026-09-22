@@ -1,0 +1,92 @@
+# Phase 1 production completion. Every grouped boolean is an independent
+# requirement; neither a preparation result nor a passing subset can close it.
+# The family inventories are data/phase1/{cases,*-roster}.json. Config consumes
+# exactly 309 output identities (142 + 87 + 53 + 27), shared with filesystem
+# cases rather than copied into a second denominator. Syntax retains the full
+# data/phase1/syntax-schedule.json schedule plus existing e1/binder inventories.
+# Phase 0 remains closed through S12. No S07/S08 timing refresh is required.
+id = "P1B"
+title = "Phase 1 stage B: foundational compiler services"
+goal = "Every required Phase 1 operation and integration witness passes on current inputs, all 309 config outputs and the complete syntax/parser/binder inventories match, and generation and transport contracts remain valid."
+exit = [
+  "sprint.P1A.done == 1",
+  "run.foundations.inventory_complete == true",
+  "run.foundations.leaves_complete == true",
+  "run.foundations.filesystem_complete == true",
+  "run.foundations.utilities_complete == true",
+  "run.foundations.integration_complete == true",
+  "run.config.inventory_complete == true",
+  "run.config.tests_total == 309",
+  "run.config.parity == 1",
+  "run.config.direct_complete == true",
+  "run.syntax.inventory_complete == true",
+  "run.syntax.parity == 1",
+  "run.e1.parity == 1",
+  "run.e1.frozen_denominator == true",
+  "run.e1.encoder_success_error == true",
+  "run.e1.encoder_output_bytes == true",
+  "run.e1.ast_runtime == true",
+  "run.e1.ast_utilities == true",
+  "run.e1.decoder_parity == true",
+  "run.e1.decoder_watchdog == true",
+  "run.e1.depth == true",
+  "run.e1.parser_regressions == true",
+  "run.binder.parity == 1",
+  "run.binder.reached_bind == true",
+  "run.binder.supplemental_parity == 1",
+  "run.binder.protocol == true",
+  "run.binder.helpers == true",
+  "run.binder.resolvers == true",
+  "run.binder.graph_contracts == true",
+  "run.binder.depth == true",
+  "run.gen.patches_apply == true",
+  "run.gen.ast_schema == true",
+  "run.gen.drift == false",
+  "run.gen.client_identical == true",
+  "run.gen.locale_complete == true",
+  "run.testhost.parity == 1",
+  "run.testhost.controls == true",
+  "run.workspace.build == true",
+  "run.fmt.clean == true",
+  "run.clippy.clean == true",
+  "run.deny.clean == true",
+  "run.selftest.pass == true",
+  "run.e3.ast_runtime == true",
+  "run.e3.miri == true",
+  "run.e3.address_sanitizer == true",
+]
+
+[[item]]
+id = "P1B-F1b"
+title = "Foundation leaf implementations satisfy the exact required operation traces"
+kind = "task"
+required = true
+done_when = ["run.foundations.leaves_complete == true"]
+
+[[item]]
+id = "P1B-F2b"
+title = "Filesystem, snapshots, paths and both matching dialects satisfy their required traces"
+kind = "task"
+required = true
+done_when = ["run.foundations.filesystem_complete == true"]
+
+[[item]]
+id = "P1B-F3b"
+title = "All 309 config/options output identities and supplementary package/resolution cases pass"
+kind = "task"
+required = true
+done_when = ["run.config.inventory_complete == true", "run.config.tests_total == 309", "run.config.parity == 1", "run.config.direct_complete == true"]
+
+[[item]]
+id = "P1B-F4b"
+title = "Complete syntax schedule, exact parser/binder inventories and shared utilities pass"
+kind = "task"
+required = true
+done_when = ["run.syntax.inventory_complete == true", "run.syntax.parity == 1", "run.foundations.utilities_complete == true", "run.e1.parity == 1", "run.e1.frozen_denominator == true", "run.binder.parity == 1", "run.binder.reached_bind == true", "run.binder.supplemental_parity == 1", "run.binder.graph_contracts == true"]
+
+[[item]]
+id = "P1B-F5b"
+title = "Integrated services, generated locale/library assets, original client and all 89 transport cases pass"
+kind = "task"
+required = true
+done_when = ["run.foundations.inventory_complete == true", "run.foundations.integration_complete == true", "run.gen.patches_apply == true", "run.gen.ast_schema == true", "run.gen.drift == false", "run.gen.client_identical == true", "run.gen.locale_complete == true", "run.testhost.parity == 1", "run.testhost.controls == true", "run.workspace.build == true", "run.fmt.clean == true", "run.clippy.clean == true", "run.deny.clean == true", "run.selftest.pass == true", "run.e3.ast_runtime == true", "run.e3.miri == true", "run.e3.address_sanitizer == true"]

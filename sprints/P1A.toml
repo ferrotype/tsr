@@ -9,10 +9,10 @@
 # A `prepared` metric checks complete case/authority/dispatch coverage, the
 # required smoke and the comparator controls. It may be true while the matching
 # production-completion metric is false; neither is a manually entered
-# acknowledgement. The `foundations`, `config` and `syntax` producers are NOT
-# registered in status/runs.toml at F0: the plan registers a producer only once
-# it can validate its complete declared inventory and report honest failures.
-# F1a-F5a register them as their family adapters land.
+# acknowledgement. F5a registers the grouped `foundations`, `config` and
+# `syntax` producers. They replay authenticated observations and retain named
+# missing implementation/coverage rows as pending; they do not synthesize
+# passing preparation from a broad production parity result.
 #
 # This sprint does not alter S01-S12 completion or E1's threshold.
 id = "P1A"
@@ -63,11 +63,11 @@ id = "P1A-F4a"
 title = "Syntax, binder, navigation and evaluator coverage"
 kind = "task"
 required = true
-done_when = ["run.syntax.prepared == true"]
+done_when = ["run.syntax.prepared == true", "run.foundations.utilities_prepared == true"]
 
 [[item]]
 id = "P1A-F5a"
 title = "Integration witnesses, producer wiring and the stage A coverage report"
 kind = "task"
 required = true
-done_when = ["run.foundations.integration_prepared == true"]
+done_when = ["run.foundations.integration_prepared == true", "run.foundations.harness_pass == true"]
