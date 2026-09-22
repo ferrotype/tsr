@@ -2880,22 +2880,72 @@ input changes. Localized-envelope comparisons authenticate both the native
 request and the renderer's actual Rust input. Targeted regressions cover these
 failure modes and platform supplementation.
 
+All seven composed integration witnesses now pass, including six localized
+config envelopes and the retained-snapshot/path-order regressions. The isolated
+consumer verifies **31 Cargo archives**, native/parser-only builds and both
+WASM modes, all 108 bundled libraries, the pinned German TS2322 message and
+owner counters returning to baseline. Generation reproduces all managed
+outputs, all 69 original-client files and the locale tables. All **89 S11
+transport cases** and their negative controls pass. The recorded foundations
+producer reports `integration_complete = true`; that does not turn unfinished
+operation preparation into a passing `integration_prepared` result.
+
 The S07 operation inventory refresh changes only six added Rust mappings and
 18 moved mapping locations. Independently reviewed replay of authenticated
 native observations preserves `subset.json`, checker obligations and the pin
 byte-for-byte. Existing classification and historical measurements are not
 regraded.
 
-Validation completed so far: workspace clippy with warnings denied, formatting,
-dependency policy and tracker validation; 60 affected Rust tests in each of
-debug and release; Rust 1.96 for compiler/scanner/VFS; all 44 targeted integration,
-receipt and packaging script tests. The full script run passed 869 tests and
-found one obsolete test demanding more than 1,000 untested rows; replacing that
-count with a negative classification control makes all five coverage-link tests
-pass. Full program-syntax and current parser/binder captures are being completed
-separately; the preceding full captures are not relabeled as current.
+Validation: workspace clippy with warnings denied, formatting, dependency policy
+and tracker validation; 60 affected Rust tests in each of debug and release;
+Rust 1.96 for compiler/scanner/VFS; all 44 targeted integration, receipt and
+packaging script tests. The final self-test run passes 932 script tests with one
+platform skip. An obsolete assertion requiring more than 1,000 untested rows
+was replaced with a negative classification control: a file-level metric alone
+still cannot certify an operation.
+
+The final full program-syntax capture is
+`target/phase1-f5b-full-04/full`: **15,152/15,152 executable variants match**;
+the 54 native selection boundaries remain separately reported. Its derived
+908-row smoke selection also matches. The current E1 capture records 22,478
+requests, 6,195,294 matching observations, no failed requests, and passing
+encoder, decoder, runtime, utility and depth checks. Historical captures were
+preserved rather than relabeled as current.
+The final binder capture matches all 12,829 primary rows across 22,343 requests
+and all 18 supplemental requests. All 19 helper tests, 32 protocol controls,
+resolver/graph contracts and depth fixtures pass, with stable source inputs.
+
+The parent PR's CI also exposed two stale metadata entries: the program helper
+manifest retained the old name of the resolution-refusal test, and the isolated
+Rust consumer lockfile omitted dependency edges to `tsr_jsnum` and `tsr_locale`.
+Both are corrected without changing dependency versions or production behavior.
+The saved CI self-test records also contain 34 failures of offline workspace
+metadata on each runner. CI now prepares locked workspace metadata before the
+self-tests, rather than relying on the dependencies fetched by building xtask.
+The tests themselves retain offline metadata and their existing checks.
+A bounded check with an empty temporary Cargo home reproduces exit 101 for
+offline metadata, then passes both locked online preparation and offline replay
+without compiling or changing lockfiles.
 
 The remaining work is explicit in `coverage-report.json.gz`: exact private
 parser/binder/helper witnesses, handwritten AST contracts, the four semantic
 SyntheticExpression operations, and the Linux observation. Finishing this
 integration increment does not satisfy those requirements automatically.
+The 1,250 pending entries consist of 945 missing exact witnesses and 305
+unverified implementation classifications: 558 AST, 473 parser, 151 binder,
+65 compiler, two scanner and one Linux filesystem entry. Apart from an explicit
+decision to defer the four SyntheticExpression obligations, these are
+engineering and validation tasks, not requests for another blanket exception.
+`cargo xtask check P1A` and `cargo xtask check P1B` both report these pending
+requirements. P1B also requires current E3 instrumentation on the final
+relevant sources; the previous ownership result is not relabeled as current.
+The config production item passes, as do E1, binder, generation, transport and
+the recorded quality checks. The Linux-only witness is wired into the two-runner
+CI matrix and remains unclaimed until an actual Linux capture is available.
+
+P1A now consumes `adr.0020.status == Accepted`, the same dated acceptance
+condition used by S12's exit and every required item. The tracker evaluates
+sprints in filename order, so P1A previously read S12's derived metric before
+it existed, even though the completed report showed S12 done. This removes that
+false unknown without reopening historical measurements or weakening any
+Phase 1 operation, integration or safety requirement.
