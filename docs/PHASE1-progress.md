@@ -2304,3 +2304,14 @@ slice distinctions. The raw and object-root-checked syntax converters remain
 separate. All **141/145 config cases** that now execute match native; the four
 remaining gaps concern extended-config cache entries and reuse. All 17
 tsoptions tests pass, and focused clippy passes.
+
+### F3b continuation: extended-config cache ownership
+
+All **145/145 config cases** now match native. Extended-config entries preserve
+parsed options before caller-specific substitution, cached diagnostics and their
+syntax owners. The cache is bound to one host, parses outside its map lock and
+publishes a first winner. Callers replace or clear it when the host changes.
+Resolution-stack cycles bypass lookup; extended filenames are sorted and unique,
+as in Go. Focused tests cover cache reuse across two config directories, source
+retention after cache disposal, and a cyclic diamond. Both tests and focused
+clippy pass.

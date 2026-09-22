@@ -54,7 +54,7 @@ pub struct ProjectReference {
     pub original_path: JsString,
     pub circular: bool,
 }
-struct Parsed {
+pub(crate) struct Parsed {
     raw: ConfigValue,
     options: Option<CompilerOptions>,
     types: TypeAcquisition,
@@ -430,12 +430,13 @@ fn parse_config(
     base: &[u8],
     name: &[u8],
     stack: &[JsString],
+    cache: Option<&crate::ExtendedConfigCache<'_>>,
 ) -> Result<Parsed, Error> {
     let base = tsr_tspath::normalize_slashes(base);
     let resolved = tsr_tspath::to_path(name, &base, host.fs().use_case_sensitive_file_names());
     if stack.contains(&resolved) {
         return Ok(Parsed {
-            raw: ConfigValue::Null,
+            raw: raw.unwrap_or(ConfigValue::Null),
             options: None,
             types: TypeAcquisition::default(),
             source,
@@ -460,46 +461,21 @@ fn parse_config(
     let mut inherited = ConfigValue::Object(tsr_core::collections::OrderedMap::default());
     let mut compile_on_save = false;
     for path in extended {
-        // ParseExtendedConfig returns a source-file record even when ReadFile
-        // fails; getExtendedConfig records its name before returning errors.
+        let entry = get_extended_config(path.as_bytes(), host, &stack, cache)?;
+        own.errors.extend(entry.errors.iter().cloned());
         if let Some(source) = &mut own.source {
-            source.extended_source_files.push(path.clone());
+            for name in std::iter::once(&path).chain(entry.source.extended_source_files.iter()) {
+                if !source.extended_source_files.contains(name) {
+                    source.extended_source_files.push(name.clone());
+                }
+            }
         }
-        let resolved = tsr_tspath::to_path(
-            path.as_bytes(),
-            host.current_directory(),
-            host.fs().use_case_sensitive_file_names(),
-        );
-        let Some(content) = host.fs().read_file(path.as_bytes())? else {
-            own.errors.push(Diagnostic::compiler(
-                d::Cannot_read_file_0,
-                vec![path.clone()],
-            ));
+        own.dependencies.push(entry.source.clone());
+        let Some(parsed) = entry.parsed.as_ref() else {
             continue;
         };
-        let source = TsConfigSourceFile::parse(path.clone(), resolved, content.text);
-        let diagnostics = source
-            .file
-            .view()
-            .source_file(source.root)
-            .expect("extended source")
-            .diagnostics
-            .clone();
-        if !diagnostics.is_empty() {
-            own.errors.extend(diagnostics);
-            own.dependencies.push(Arc::new(source));
-            continue;
-        }
-        let mut parsed = parse_config(
-            Some(source),
-            None,
-            host,
-            &tsr_tspath::directory(path.as_bytes()),
-            tsr_tspath::base_name(path.as_bytes()),
-            &stack,
-        )?;
-        own.errors.append(&mut parsed.errors);
-        if let Some(extended_options) = parsed.options {
+        own.dependencies.extend(parsed.dependencies.iter().cloned());
+        if let Some(extended_options) = &parsed.options {
             for key in [b"include".as_slice(), b"exclude", b"files"] {
                 if own.raw.get(key).is_none() {
                     if let Some(value @ ConfigValue::Array(Some(_))) = parsed.raw.get(key) {
@@ -524,17 +500,13 @@ fn parse_config(
             if let Some(ConfigValue::Boolean(value)) = parsed.raw.get(b"compileOnSave") {
                 compile_on_save = *value;
             }
-            merge_compiler_options(&mut options, &extended_options, &parsed.raw);
+            merge_compiler_options(&mut options, extended_options, &parsed.raw);
         }
-        if let Some(source) = parsed.source {
-            if let Some(own_source) = &mut own.source {
-                own_source
-                    .extended_source_files
-                    .extend(source.extended_source_files.iter().cloned());
-            }
-            own.dependencies.append(&mut parsed.dependencies);
-            own.dependencies.push(Arc::new(source));
-        }
+    }
+    if let Some(source) = &mut own.source {
+        source
+            .extended_source_files
+            .sort_by(|a, b| a.as_bytes().cmp(b.as_bytes()));
     }
     for (key, value) in inherited.as_object().expect("inherited property map") {
         if key.as_bytes() != b"contentMappers" || own.raw.get(key.as_bytes()).is_none() {
@@ -742,8 +714,19 @@ pub fn parse_json_source_file_config_file_content(
     existing_raw: &ConfigValue,
     name: &[u8],
 ) -> Result<ParsedCommandLine, Error> {
+    parse_source_with_cache(source, host, base, existing, existing_raw, name, None)
+}
+pub(crate) fn parse_source_with_cache(
+    source: TsConfigSourceFile,
+    host: &dyn ParseConfigHost,
+    base: &[u8],
+    existing: &CompilerOptions,
+    existing_raw: &ConfigValue,
+    name: &[u8],
+    cache: Option<&crate::ExtendedConfigCache<'_>>,
+) -> Result<ParsedCommandLine, Error> {
     tsr_parser::on_parser_worker(|| {
-        let parsed = parse_config(Some(source), None, host, base, name, &[])?;
+        let parsed = parse_config(Some(source), None, host, base, name, &[], cache)?;
         finish_config(parsed, host, base, existing, existing_raw, name)
     })
 }
@@ -828,7 +811,7 @@ fn json_specs(value: &ConfigValue) -> JsString {
 }
 
 /// Parse an already-decoded value without inventing source ranges. Config values
-/// carry ordered object members, so no reflection/normalization bridge is needed.
+/// normalize foreign maps/slices before applying the config object contract.
 /// port: tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent
 pub fn parse_json_config_file_content(
     raw: ConfigValue,
@@ -838,6 +821,17 @@ pub fn parse_json_config_file_content(
     name: &[u8],
     resolution_stack: &[JsString],
 ) -> Result<ParsedCommandLine, Error> {
+    parse_raw_with_cache(raw, host, base, existing, name, resolution_stack, None)
+}
+pub(crate) fn parse_raw_with_cache(
+    raw: ConfigValue,
+    host: &dyn ParseConfigHost,
+    base: &[u8],
+    existing: &CompilerOptions,
+    name: &[u8],
+    resolution_stack: &[JsString],
+    cache: Option<&crate::ExtendedConfigCache<'_>>,
+) -> Result<ParsedCommandLine, Error> {
     let raw = crate::normalize_json_value(raw);
     let raw = if raw.as_object().is_some() {
         raw
@@ -845,7 +839,7 @@ pub fn parse_json_config_file_content(
         ConfigValue::Object(tsr_core::collections::OrderedMap::default())
     };
     tsr_parser::on_parser_worker(|| {
-        let parsed = parse_config(None, Some(raw), host, base, name, resolution_stack)?;
+        let parsed = parse_config(None, Some(raw), host, base, name, resolution_stack, cache)?;
         finish_config(parsed, host, base, existing, &ConfigValue::Null, name)
     })
 }
@@ -1004,5 +998,103 @@ pub fn parse_project_reference(value: &ConfigValue) -> Option<ProjectReferencePa
         path_valid: path.and_then(ConfigValue::as_string).is_some(),
         has_circular: circular.is_some(),
         circular_valid: matches!(circular, Some(ConfigValue::Boolean(_))),
+    })
+}
+
+/// A cache entry retains every syntax owner its diagnostics can refer to.
+/// Its parsed options remain unsubstituted: ${configDir} belongs to the caller.
+pub struct ExtendedConfigCacheEntry {
+    pub(crate) source: Arc<TsConfigSourceFile>,
+    parsed: Option<Parsed>,
+    errors: Vec<Diagnostic>,
+}
+impl ExtendedConfigCacheEntry {
+    /// port: tsc/internal/tsoptions/tsconfigparsing.go:ExtendedConfigCacheEntry.ExtendedFileNames
+    pub fn extended_file_names(&self) -> &[JsString] {
+        &self.source.extended_source_files
+    }
+    pub fn diagnostics(&self) -> &[Diagnostic] {
+        &self.errors
+    }
+}
+/// port: tsc/internal/tsoptions/tsconfigparsing.go:getExtendedConfig
+fn get_extended_config(
+    name: &[u8],
+    host: &dyn ParseConfigHost,
+    stack: &[JsString],
+    cache: Option<&crate::ExtendedConfigCache<'_>>,
+) -> Result<Arc<ExtendedConfigCacheEntry>, Error> {
+    let path = tsr_tspath::to_path(
+        name,
+        host.current_directory(),
+        host.fs().use_case_sensitive_file_names(),
+    );
+    if let Some(cache) = cache.filter(|_| !stack.contains(&path)) {
+        cache.get_extended_config(name, path, stack)
+    } else {
+        parse_extended_with_cache(name, path, stack, host, cache).map(Arc::new)
+    }
+}
+/// Read and parse one extended config without resolving its source-file list.
+/// port: tsc/internal/tsoptions/tsconfigparsing.go:ParseExtendedConfig
+pub fn parse_extended_config(
+    name: &[u8],
+    path: JsString,
+    stack: &[JsString],
+    host: &dyn ParseConfigHost,
+) -> Result<ExtendedConfigCacheEntry, Error> {
+    parse_extended_with_cache(name, path, stack, host, None)
+}
+pub(crate) fn parse_extended_with_cache(
+    name: &[u8],
+    path: JsString,
+    stack: &[JsString],
+    host: &dyn ParseConfigHost,
+    cache: Option<&crate::ExtendedConfigCache<'_>>,
+) -> Result<ExtendedConfigCacheEntry, Error> {
+    tsr_parser::on_parser_worker(|| {
+        let content = host.fs().read_file(name)?;
+        let text = content.as_ref().map_or_else(
+            || tsr_jsstring::SourceText::from_loaded_bytes(Vec::new()),
+            |content| content.text.clone(),
+        );
+        let source = TsConfigSourceFile::parse(JsString::from_bytes(name), path, text);
+        let errors = if content.is_none() {
+            vec![Diagnostic::compiler(
+                d::Cannot_read_file_0,
+                vec![JsString::from_bytes(name)],
+            )]
+        } else {
+            source
+                .file
+                .view()
+                .source_file(source.root)
+                .expect("extended source")
+                .diagnostics
+                .clone()
+        };
+        if !errors.is_empty() {
+            return Ok(ExtendedConfigCacheEntry {
+                source: Arc::new(source),
+                parsed: None,
+                errors,
+            });
+        }
+        let mut parsed = parse_config(
+            Some(source),
+            None,
+            host,
+            &tsr_tspath::directory(name),
+            tsr_tspath::base_name(name),
+            stack,
+            cache,
+        )?;
+        let source = Arc::new(parsed.source.take().expect("extended source retained"));
+        let errors = std::mem::take(&mut parsed.errors);
+        Ok(ExtendedConfigCacheEntry {
+            source,
+            parsed: Some(parsed),
+            errors,
+        })
     })
 }

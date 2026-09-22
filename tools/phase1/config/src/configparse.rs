@@ -2,10 +2,8 @@
 //! `parsinghelpers.go` and `wildcarddirectories.go`.
 //!
 //! Both source-file and raw-JSON entry points, including wildcard directory
-//! calculation, execute the production `tsr_tsoptions` port. Remaining gaps
-//! (extended-config caching, watch/build options and private helper entry
-//! points) are reported at the handler that encounters them; this driver
-//! never implements a missing compiler operation.
+//! calculation and shared extended-config caching, execute the production port.
+//! This driver only assembles hosts and translates the declared probe values.
 
 use crate::api::{subject, Outcome};
 use serde_json::{json, Map, Value};
@@ -523,6 +521,7 @@ fn parse_source(
     host: &Host,
     name: &[u8],
     source_text: &[u8],
+    cache: Option<&tsr_tsoptions::ExtendedConfigCache<'_>>,
 ) -> Result<ParsedCommandLine, Error> {
     let path = tsr_tspath::to_path(
         name,
@@ -534,6 +533,15 @@ fn parse_source(
         path,
         SourceText::from_loaded_bytes(source_text.to_vec()),
     );
+    if let Some(cache) = cache {
+        return cache.parse_source_file(
+            source,
+            &base_of(request),
+            &CompilerOptions::default(),
+            &ConfigValue::Null,
+            name,
+        );
+    }
     parse_json_source_file_config_file_content(
         source,
         host,
@@ -544,42 +552,6 @@ fn parse_source(
     )
 }
 
-// --- the reviewed gap records -------------------------------------------------
-
-type Gap = (&'static str, &'static str, &'static str, &'static str);
-
-const EXTENDED_CONFIG: Gap = (
-    "tsc/internal/tsoptions/tsconfigparsing.go:ParseExtendedConfig",
-    "tsc/internal/tsoptions/tsconfigparsing.go:1052-1078, which reads the extended config through \
-     readJsonConfigFile, returns an ExtendedConfigCacheEntry carrying the source file, the parsed \
-     config and the errors, and stops at the first of read errors or parse diagnostics",
-    "pub fn parse_extended_config(name: &[u8], path: JsString, stack: &[JsString], \
-     host: &dyn ParseConfigHost, cache: Option<&dyn ExtendedConfigCache>) \
-     -> Result<ExtendedConfigCacheEntry, Error>",
-    "crates/tsr_tsoptions/src/config_parse.rs:440-509, which reads, parses and merges each \
-     extended config INLINE inside parse_config; there is no separable entry point, no cache \
-     entry type and no ExtendedConfigCache trait anywhere in crates/",
-);
-const GET_EXTENDED_CONFIG: Gap = (
-    "tsc/internal/tsoptions/tsconfigparsing.go:getExtendedConfig",
-    "tsc/internal/tsoptions/tsconfigparsing.go:1015-1050, which consults the supplied \
-     ExtendedConfigCache -- bypassing it on a resolution-stack cycle -- and re-emits the cached \
-     entry's errors on every hit, so a second parse of the same base still reports them",
-    "pub fn get_extended_config(config: Option<&TsConfigSourceFile>, name: &[u8], \
-     host: &dyn ParseConfigHost, stack: &[JsString], cache: Option<&dyn ExtendedConfigCache>) \
-     -> Result<(Option<Parsed>, Vec<Diagnostic>), Error>",
-    "crates/tsr_tsoptions/src/config_parse.rs:440-509: the extended read is inline and there is \
-     no cache, so a case that supplies one has nothing to supply it to (absent)",
-);
-
-fn missing(gap: Gap) -> Outcome {
-    let (operation, authority, signature, home) = gap;
-    Outcome::missing(operation, authority, signature, home)
-}
-
-// --- the group ---------------------------------------------------------------
-
-#[allow(clippy::too_many_lines, reason = "one arm per reviewed pinned action")]
 pub fn observe(request: &Value) -> Option<Outcome> {
     if subject(request) != "configParse" {
         return None;
@@ -598,13 +570,9 @@ fn answer(request: &Value) -> Result<Outcome, String> {
     let target = text_of(request, "target");
     match action {
         "parse_source_file" => {
-            if flag(request, "useCache") {
-                // The request asks for a shared ExtendedConfigCache. The Rust
-                // parse has nothing to give one to, so the honest answer is the
-                // gap, not a cacheless run dressed up as agreement.
-                return Ok(missing(GET_EXTENDED_CONFIG));
-            }
             let host = build_host(request);
+            let cache =
+                flag(request, "useCache").then(|| tsr_tsoptions::ExtendedConfigCache::new(&host));
             let name = text_of(request, "configFileName").as_bytes().to_vec();
             let also = text_of(request, "parseAlso");
             if !also.is_empty() {
@@ -616,37 +584,50 @@ fn answer(request: &Value) -> Result<Outcome, String> {
                     &host,
                     also.as_bytes(),
                     content.raw.as_ref(),
+                    cache.as_ref(),
                 ))?;
             }
             let source_text = text_of(request, "jsonText").as_bytes().to_vec();
-            let mut parsed = failed(parse_source(request, &host, &name, &source_text))?;
+            let mut parsed = failed(parse_source(
+                request,
+                &host,
+                &name,
+                &source_text,
+                cache.as_ref(),
+            ))?;
             if flag(request, "parseTwice") {
-                parsed = failed(parse_source(request, &host, &name, &source_text))?;
+                parsed = failed(parse_source(
+                    request,
+                    &host,
+                    &name,
+                    &source_text,
+                    cache.as_ref(),
+                ))?;
             }
             Ok(Outcome::Observed(Value::Object(describe_parsed(
                 request, &parsed,
             )?)))
         }
         "read_config_file" => {
-            if flag(request, "useCache") {
-                return Ok(missing(GET_EXTENDED_CONFIG));
-            }
             let host = build_host(request);
-            let also = text_of(request, "parseAlso");
-            if !also.is_empty() {
-                failed(get_parsed_command_line_of_config_file(
-                    also.as_bytes(),
+            let cache =
+                flag(request, "useCache").then(|| tsr_tsoptions::ExtendedConfigCache::new(&host));
+            let read = |name: &[u8]| match &cache {
+                Some(cache) => {
+                    cache.read_config_file(name, &CompilerOptions::default(), &ConfigValue::Null)
+                }
+                None => get_parsed_command_line_of_config_file(
+                    name,
                     &CompilerOptions::default(),
                     &ConfigValue::Null,
                     &host,
-                ))?;
+                ),
+            };
+            let also = text_of(request, "parseAlso");
+            if !also.is_empty() {
+                failed(read(also.as_bytes()))?;
             }
-            let result = failed(get_parsed_command_line_of_config_file(
-                text_of(request, "configFileName").as_bytes(),
-                &CompilerOptions::default(),
-                &ConfigValue::Null,
-                &host,
-            ))?;
+            let result = failed(read(text_of(request, "configFileName").as_bytes()))?;
             let Some(parsed) = result.command_line else {
                 return Ok(Outcome::Observed(json!({
                     "read_failed": true,
@@ -705,7 +686,19 @@ fn answer(request: &Value) -> Result<Outcome, String> {
                 json!({"value":render_value(&raw),"errors":render_diagnostics(&errors)}),
             ))
         }
-        "extended_config" => Ok(missing(EXTENDED_CONFIG)),
+        "extended_config" => {
+            let host = build_host(request);
+            let name = text_of(request, "configFileName").as_bytes();
+            let path = tsr_tspath::to_path(
+                name,
+                host.current_directory(),
+                host.fs().use_case_sensitive_file_names(),
+            );
+            let entry = failed(tsr_tsoptions::parse_extended_config(name, path, &[], &host))?;
+            Ok(Outcome::Observed(
+                json!({"has_entry":true,"extended_file_names":entry.extended_file_names().iter().map(|s|text(s.as_bytes())).collect::<Vec<_>>()}),
+            ))
+        }
         "spec_diagnostic" => {
             let message = spec_diagnostic(
                 text_of(request, "spec").as_bytes(),
@@ -826,6 +819,7 @@ fn answer(request: &Value) -> Result<Outcome, String> {
                 &host,
                 &name,
                 text_of(request, "jsonText").as_bytes(),
+                None,
             ))?;
             let mappers = parsed.content_mappers.as_deref().unwrap_or_default();
             let path = request["optionPath"]
@@ -1235,6 +1229,7 @@ fn answer(request: &Value) -> Result<Outcome, String> {
                 &host,
                 text_of(request, "configFileName").as_bytes(),
                 text_of(request, "jsonText").as_bytes(),
+                None,
             ))?;
             let index = request["index"].as_i64().ok_or("missing index")?;
             let diagnostic = tsr_tsoptions::diagnostic_at_reference_syntax(
