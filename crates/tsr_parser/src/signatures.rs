@@ -605,9 +605,11 @@ impl<F: ParserFactory> Parser<'_, F> {
         let jsdoc = self.jsdoc_scanner_info();
         let modifiers = self.parse_modifiers_for_constructor_type();
         let constructor = self.parse_optional(K::NewKeyword);
-        assert!(
+        tsr_core::debug::assert(
             modifiers.is_none() || constructor,
-            "Debug failure. False expression: Per isStartOfFunctionOrConstructorType, a function type cannot have modifiers."
+            &[tsr_core::debug::Argument::String(
+                "Per isStartOfFunctionOrConstructorType, a function type cannot have modifiers.",
+            )],
         );
         let type_parameters = self.parse_type_parameters();
         let parameters = self.parse_parameters(parse_flags::TYPE);

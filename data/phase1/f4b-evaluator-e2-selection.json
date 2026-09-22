@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "selection": "F4b shared evaluator bounded regression: all variants of 10 pinned enum fixtures exercising arithmetic and string constants, forward references, outer assertion stops, imported constants, cross-file flags, and isolated module/declaration restrictions. This is development evidence only; no full E2 acceptance claim.",
+  "ids": [
+    "compiler/computedEnumMemberSyntacticallyString.ts#configuration=0",
+    "compiler/computedEnumMemberSyntacticallyString.ts#configuration=1",
+    "compiler/computedEnumMemberSyntacticallyString2.ts#configuration=0",
+    "compiler/computedEnumMemberSyntacticallyString2.ts#configuration=1",
+    "compiler/constantEnumAssert.ts#configuration=0",
+    "compiler/enumNoInitializerFollowsNonLiteralInitializer.ts#configuration=0",
+    "compiler/enumWithNonLiteralStringInitializer.ts#configuration=0",
+    "compiler/forwardRefInEnum.ts#configuration=0",
+    "compiler/isolatedDeclarationErrorsEnums.ts#configuration=0",
+    "conformance/enums/enumConstantMemberWithString.ts#configuration=0",
+    "conformance/enums/enumConstantMemberWithTemplateLiterals.ts#configuration=0",
+    "conformance/enums/enumConstantMembers.ts#configuration=0"
+  ]
+}

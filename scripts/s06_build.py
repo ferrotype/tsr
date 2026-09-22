@@ -1,12 +1,14 @@
 """Access-only S06 preprocessing bridges over a fresh export of the Go pin."""
 
 from contextlib import contextmanager
+import errno
 import io
 import json
 from pathlib import Path
 import shutil
 import tarfile
 import tempfile
+import time
 
 from s04 import go_environment, verified_upstream
 from s04_common import command, strict_json_loads
@@ -21,6 +23,19 @@ EXPORT_PATHS = (
 GO_TEST_FLAGS = ("-trimpath", "-mod=readonly")
 
 
+def _cleanup_export(temporary):
+    # Finder can recreate .DS_Store while rmtree removes an exported subtree.
+    # Retry only that cleanup race, never the export or its caller's body.
+    for attempt in range(3):
+        try:
+            temporary.cleanup()
+            return
+        except OSError as error:
+            if error.errno != errno.ENOTEMPTY or attempt == 2:
+                raise
+            time.sleep(0.05)
+
+
 @contextmanager
 def oracle_export():
     upstream = verified_upstream()
@@ -28,8 +43,9 @@ def oracle_export():
     env = go_environment()
     destination = ROOT / "target/s06-oracle"
     destination.mkdir(parents=True, exist_ok=True)
-    with tempfile.TemporaryDirectory(prefix="export-", dir=destination) as temporary:
-        checkout = Path(temporary)
+    temporary = tempfile.TemporaryDirectory(prefix="export-", dir=destination)
+    try:
+        checkout = Path(temporary.name)
         archive = command(["git", "archive", pin, *EXPORT_PATHS], cwd=upstream)
         try:
             with tarfile.open(fileobj=io.BytesIO(archive)) as stream:
@@ -45,6 +61,8 @@ def oracle_export():
         for source, target in bridges.items():
             shutil.copyfile(ROOT / "scripts/s06_oracle" / source, checkout / "tsc" / target)
         yield checkout, env, pin
+    finally:
+        _cleanup_export(temporary)
 
 
 def export_cases(paths, destination, *, extract_only=False):

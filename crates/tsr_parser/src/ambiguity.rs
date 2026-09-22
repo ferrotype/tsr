@@ -82,10 +82,7 @@ impl<F: ParserFactory> Parser<'_, F> {
                 _ => Tristate::FALSE,
             }
         } else {
-            assert!(
-                first == K::LessThanToken,
-                "Debug failure. False expression."
-            );
+            tsr_core::debug::assert(first == K::LessThanToken, &[]);
             if !self.is_identifier() && self.token != K::ConstKeyword {
                 return Tristate::FALSE;
             }
@@ -358,9 +355,11 @@ impl<F: ParserFactory> Parser<'_, F> {
         jsdoc: u8,
         asynchronous: Option<NodeListId>,
     ) -> NodeId {
-        assert!(
+        tsr_core::debug::assert(
             self.token == SyntaxKind::EqualsGreaterThanToken,
-            "Debug failure. False expression: parseSimpleArrowFunctionExpression should only have been called if we had a =>"
+            &[tsr_core::debug::Argument::String(
+                "parseSimpleArrowFunctionExpression should only have been called if we had a =>",
+            )],
         );
         let parameter =
             self.factory

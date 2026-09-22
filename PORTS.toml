@@ -325,7 +325,6 @@ phase = 0
 kind = "source"
 status = "in-progress"
 rust = ["crates/tsr_ast/src/diagnostic.rs"]
-# Future AST diagnostic integration: scanner callbacks do not provide this metric.
 verify = ["run.e1.parity >= 0.999", "run.e4.diagnostics == true", "run.e1.ast_runtime == true", "run.e3.ast_runtime == true", "run.e1.ast_utilities == true"]
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "e7a3a521d0991a4880220d8114be20c411ddb9645ae11d4e1673bf1ab9889f38"
@@ -1676,8 +1675,8 @@ package = "internal/debug"
 crate = "tsr_core"
 phase = 1
 kind = "source"
-status = "planned"
-rust = []
+status = "ported"
+rust = ["crates/tsr_core/src/debug.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "dd3aca7541d9f41c2e40629d27d768c393d5f3d134f341388e89ebabb34a092d"
@@ -1777,11 +1776,11 @@ loc = 610
 [[file]]
 go = "tsc/internal/evaluator/evaluator.go"
 package = "internal/evaluator"
-crate = "tsr_evaluator"
+crate = "tsr_ast"
 phase = 1
 kind = "source"
-status = "in-progress"
-rust = ["crates/tsr_checker/src/template.rs"]
+status = "ported"
+rust = ["crates/tsr_ast/src/evaluator.rs", "crates/tsr_checker/src/enum_eval.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "4dfe5a4e7f33c838bfaf3c28be4c4c547d49a84390186002f6e7f83efb6d4ef3"

@@ -6,6 +6,67 @@ use tsr_arena::NodeId;
 use tsr_ast::{AstFile, SourceFileParseOptions, SyntaxKind as K};
 use tsr_jsstring::SourceText;
 
+#[test]
+fn child_hooks_preserve_absent_slots_and_the_original_list_range() {
+    use crate::HookVisit::{List, Node};
+
+    let (file, root) = parse(b"/a.ts", b"function f(a, b,) {}", tsr_core::ScriptKind::TS);
+    let view = file.view();
+    let statements = view
+        .node(root)
+        .unwrap()
+        .data_source()
+        .as_source_file()
+        .unwrap()
+        .statements()
+        .unwrap();
+    let function = view
+        .node_slice(view.list(statements).unwrap().nodes())
+        .unwrap()
+        .iter()
+        .next()
+        .unwrap()
+        .unwrap();
+    let function_read = view.node(function).unwrap();
+    let data = function_read
+        .data_source()
+        .as_function_declaration()
+        .unwrap();
+    let (name, parameters, body) = (data.name(), data.parameters().unwrap(), data.body());
+    drop(function_read);
+
+    let mut provider = tsr_parser::ParserJsDocProvider::default();
+    let mut nav = Navigator::new(view, root, &mut provider);
+    // VisitEachChild calls the ordinary nil hooks, but the navigation wrapper
+    // omits an absent modifiers list. These are the pinned hook arguments in
+    // FunctionDeclaration.VisitEachChild, not its ForEachChild enumeration.
+    assert_eq!(
+        nav.visit_child_slots_and_jsdoc(function).unwrap(),
+        [
+            Node(None),
+            Node(name),
+            List(None),
+            List(Some(parameters)),
+            Node(None),
+            Node(None),
+            Node(body)
+        ]
+    );
+    let list = view.list(parameters).unwrap();
+    assert_eq!((list.loc().pos(), list.loc().end()), (11, 16));
+    assert!(view.list_has_trailing_comma(parameters).unwrap());
+    assert_eq!(
+        nav.visit_child_slots_and_jsdoc(function).unwrap()[3],
+        List(Some(parameters))
+    );
+
+    let (foreign, _) = parse(b"/b.ts", b"function f(a, b,) {}", tsr_core::ScriptKind::TS);
+    assert!(
+        foreign.view().list(parameters).is_err(),
+        "the hook retains the list's owner identity"
+    );
+}
+
 fn parse(name: &[u8], text: &[u8], kind: tsr_core::ScriptKind) -> (AstFile, NodeId) {
     let file = tsr_parser::parse_source_file(
         SourceText::from_loaded_bytes(text.to_vec()),

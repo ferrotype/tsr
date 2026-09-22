@@ -18,8 +18,8 @@ use std::cmp::Ordering;
 use std::ops::ControlFlow;
 use tsr_arena::NodeId;
 use tsr_ast::{
-    node_flags, utilities, utilities_middle, AstView, ChildVisitor, JsDocProvider, NodeKind,
-    NodeListId, NodeRead, NodeSlice, SyntaxKind as K,
+    node_flags, utilities, utilities_middle, AstView, ChildRole, ChildSlot, ChildVisitor,
+    JsDocProvider, NodeKind, NodeListId, NodeRead, NodeSlice, SyntaxKind as K,
 };
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -61,6 +61,14 @@ pub enum Visit {
     List(NodeListId),
 }
 
+/// One observable call of the navigation visitor. A list remains an owner-
+/// checked handle so consumers can read its range as well as its members.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum HookVisit {
+    Node(Option<NodeId>),
+    List(Option<NodeListId>),
+}
+
 const LESS_THAN: Ordering = Ordering::Less;
 const EQUAL_TO: Ordering = Ordering::Equal;
 const GREATER_THAN: Ordering = Ordering::Greater;
@@ -96,30 +104,18 @@ fn kind_name(kind: NodeKind) -> String {
 /// The hook calls of `node.VisitEachChild`, in order: a node, or a list that
 /// upstream hands to `VisitNodes` or `VisitModifiers`.
 pub fn visit_each_child(view: AstView<'_>, id: NodeId) -> Result<Vec<Visit>, Error> {
-    let node = view.node(id)?;
-    let visits = if let Some(tag) = node.data_source().as_js_doc_parameter_or_property_tag() {
-        // `VisitEachChild` and `ForEachChild` disagree for this one kind.
-        // `ForEachChild` follows `IsNameFirst`; `VisitEachChild`, which
-        // the searches here and the formatter use, always visits the name before the type
-        // (ast.go:visitEachChild_JSDocParameterOrPropertyTag).
-        [tag.tag_name(), tag.name(), tag.type_expression()]
-            .into_iter()
-            .flatten()
-            .map(Visit::Node)
-            .chain(tag.comment().map(Visit::List))
-            .collect()
-    } else {
-        let mut collect = Collect {
-            view,
-            out: Vec::new(),
-            error: None,
-        };
-        let _ = node.for_each_child(&mut collect);
-        if let Some(error) = collect.error {
-            return Err(error.into());
+    let slots = view.node(id)?.child_slots();
+    let mut visits = Vec::with_capacity(slots.len());
+    for (_, slot) in slots {
+        match slot {
+            ChildSlot::Node(Some(child)) => visits.push(Visit::Node(child)),
+            ChildSlot::List(Some(list)) => visits.push(Visit::List(list)),
+            ChildSlot::Nodes(nodes) => {
+                visits.extend(view.node_slice(nodes)?.iter().flatten().map(Visit::Node));
+            }
+            ChildSlot::Node(None) | ChildSlot::List(None) => {}
         }
-        collect.out
-    };
+    }
     Ok(visits)
 }
 
@@ -215,38 +211,53 @@ impl<'a, 'p> Navigator<'a, 'p> {
         self.end(token)
     }
 
-    /// The hook calls of `node.VisitEachChild` under upstream's visitor, which
-    /// skips the comment of a JSDoc node whose comment is a single node.
-    fn child_visits(&self, id: NodeId) -> Result<Vec<Visit>, Error> {
-        let visits = visit_each_child(self.view, id)?;
-        let mut out = Vec::with_capacity(visits.len());
-        for visit in visits {
-            let skipped = match visit {
-                Visit::Node(node) => {
-                    utilities_middle::is_js_doc_single_comment_node_comment(self.view, Some(node))?
+    /// Read-only hook observations, retaining each list identity/range and
+    /// absent child slot. Modifiers omit the nil-list call, as getNodeVisitor
+    /// does; raw slices invoke the node hook once per element.
+    // port: tsc/internal/astnav/tokens.go:VisitEachChildAndJSDoc
+    // port: tsc/internal/astnav/tokens.go:getNodeVisitor
+    pub fn visit_child_slots_and_jsdoc(&mut self, id: NodeId) -> Result<Vec<HookVisit>, Error> {
+        let mut out = Vec::new();
+        for doc in self.jsdoc_of(id)? {
+            self.push_node_hook(&mut out, Some(doc))?;
+        }
+        let slots = self.node(id)?.child_slots();
+        for (role, slot) in slots {
+            match slot {
+                ChildSlot::Node(node) => self.push_node_hook(&mut out, node)?,
+                ChildSlot::List(list) => {
+                    if (role != ChildRole::Modifiers || list.is_some())
+                        && !utilities_middle::is_js_doc_single_comment_node_list(self.view, list)?
+                    {
+                        out.push(HookVisit::List(list));
+                    }
                 }
-                Visit::List(list) => {
-                    utilities_middle::is_js_doc_single_comment_node_list(self.view, Some(list))?
+                ChildSlot::Nodes(nodes) => {
+                    for node in self.view.node_slice(nodes)?.iter() {
+                        self.push_node_hook(&mut out, node)?;
+                    }
                 }
-            };
-            if !skipped {
-                out.push(visit);
             }
         }
         Ok(out)
     }
 
-    // port: tsc/internal/astnav/tokens.go:VisitEachChildAndJSDoc
-    // port: tsc/internal/astnav/tokens.go:getNodeVisitor
-    fn visits(&mut self, id: NodeId) -> Result<Vec<Visit>, Error> {
-        let mut out: Vec<Visit> = Vec::new();
-        for doc in self.jsdoc_of(id)? {
-            if !utilities_middle::is_js_doc_single_comment_node_comment(self.view, Some(doc))? {
-                out.push(Visit::Node(doc));
-            }
+    fn push_node_hook(&self, out: &mut Vec<HookVisit>, node: Option<NodeId>) -> Result<(), Error> {
+        if !utilities_middle::is_js_doc_single_comment_node_comment(self.view, node)? {
+            out.push(HookVisit::Node(node));
         }
-        out.extend(self.child_visits(id)?);
-        Ok(out)
+        Ok(())
+    }
+
+    fn visits(&mut self, id: NodeId) -> Result<Vec<Visit>, Error> {
+        Ok(self
+            .visit_child_slots_and_jsdoc(id)?
+            .into_iter()
+            .filter_map(|visit| match visit {
+                HookVisit::Node(node) => node.map(Visit::Node),
+                HookVisit::List(list) => list.map(Visit::List),
+            })
+            .collect())
     }
 
     /// Upstream's traversal as other packages use it: the hook calls for a

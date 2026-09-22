@@ -26,6 +26,12 @@
       "reason": "Repository-only Phase 1 foundation test harness"
     },
     {
+      "name": "phase1_syntax",
+      "manifest": "tools/phase1/syntax/Cargo.toml",
+      "publish": false,
+      "reason": "Repository-only Phase 1 syntax test harness"
+    },
+    {
       "name": "s08_relater_prototype",
       "manifest": "tools/s08/relater-prototype/Cargo.toml",
       "publish": false,

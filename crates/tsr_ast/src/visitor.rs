@@ -5,6 +5,16 @@ use crate::{
 };
 use tsr_core::TextRange;
 
+/// Immediate arguments to the pinned transformation visitor. Unlike
+/// `ForEachChild`, these retain absent slots. Raw slices are expanded by the
+/// caller using the same owning view, without allocating replacement nodes.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ChildSlot {
+    Node(Option<NodeId>),
+    List(Option<NodeListId>),
+    Nodes(NodeSlice),
+}
+
 /// Exclusive list and source-file operations needed by transformations. Source
 /// metadata creation belongs to a complete builder, not a lazy JSDoc transaction.
 pub trait RuntimeFactory: Factory {

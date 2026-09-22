@@ -644,6 +644,18 @@ STEP_PACKAGES: dict[str, frozenset[str]] = {
             "diagnosticwriter", "testutil/baseline", "testutil/filefixture",
         )
     ),
+    # F4a. Every package no earlier step owns: the syntax front end, the
+    # compiler (whose 340 operations F4a's survey classified but whose
+    # non-syntactic ones stay here until a disposition decision moves them),
+    # the reusable syntax services, and upstream's remaining test harness.
+    "syntax": frozenset(
+        "internal/" + name
+        for name in (
+            "ast", "scanner", "parser", "binder", "astnav", "evaluator", "debug",
+            "compiler", "repo", "testrunner", "testutil", "testutil/harnessutil",
+            "testutil/tsbaseline", "testutil/parsetestutil", "testutil/stringtestutil",
+        )
+    ),
 }
 
 # The step a package belongs to, for the per-operation roster field. A package
@@ -803,6 +815,7 @@ STEP_FAMILIES = {
     "leaves": ("leaves",),
     "filesystem": ("filesystem", "pilot"),
     "config": ("config",),
+    "syntax": ("syntax",),
 }
 
 

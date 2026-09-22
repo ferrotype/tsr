@@ -37,7 +37,7 @@ impl<'src> RegExpParser<'_, 'src> {
                 if !self.scan_character_class_escape() && !self.scan_decimal_escape() {
                     // Go debug.Assert always evaluates this scan, including in release.
                     let escaped = self.scan_character_escape(true);
-                    assert!(!escaped.is_empty(), "Debug failure. False expression.");
+                    tsr_core::debug::assert(!escaped.is_empty(), &[]);
                 }
             }
         }

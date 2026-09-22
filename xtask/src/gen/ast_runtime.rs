@@ -460,6 +460,45 @@ fn emit_transform(
     Ok(())
 }
 
+/// The read-only counterpart of emit_transform: preserve nil slots and the
+/// SameMap-before-Update argument order without requiring a mutable factory.
+fn emit_child_slots(code: &mut String, nodes: &[Value]) -> Result<(), String> {
+    code.push_str("impl NodeRead<'_> {\n    /// Snapshot immediate VisitEachChild hook arguments, including absent slots.\n    /// No node borrow escapes; callers can materialize lazy children afterwards.\n    pub fn child_slots(&self) -> Vec<(ChildRole, ChildSlot)> {\n        match self.data() {\n");
+    for node in nodes {
+        let name = string(node, "name")?;
+        let children = members(node)?
+            .into_iter()
+            .filter(|m| flag(m, "child"))
+            .collect::<Vec<_>>();
+        if children.is_empty() {
+            continue;
+        }
+        code.push_str(&format!(
+            "            NodeDataRead::{name}(data) => vec![\n"
+        ));
+        for raw in [true, false] {
+            for member in children
+                .iter()
+                .filter(|m| (m["type"]["list"] == "raw") == raw)
+            {
+                let field = snake(string(member, "name")?);
+                let variant = match rust_type(&member["type"])?.as_str() {
+                    "NodeSlice" => "Nodes",
+                    "NodeListId" => "List",
+                    _ => "Node",
+                };
+                code.push_str(&format!(
+                    "                (ChildRole::{}, ChildSlot::{variant}(data.{field}())),\n",
+                    child_role(name, member)?
+                ));
+            }
+        }
+        code.push_str("            ],\n");
+    }
+    code.push_str("            _ => Vec::new(),\n        }\n    }\n}\n");
+    Ok(())
+}
+
 fn child_call(code: &mut String, m: &Value, indent: &str) -> Result<(), String> {
     let field = snake(string(m, "name")?);
     let method = match rust_type(&m["type"])?.as_str() {
@@ -685,6 +724,7 @@ pub(super) fn emit(schema: &Value, pin: &str) -> Result<Emission, String> {
     stored_children.push_str("            _ => ControlFlow::Continue(()),\n        }\n    }\n}\n");
     runtime.push_str(&stored_children);
     transform.push_str("                _ => return original_id,\n            }\n        };\n        visit(self, original_id)\n    }\n}\nimpl<T: VisitContext + ?Sized> VisitorMethods for T {}\n");
+    emit_child_slots(&mut transform, nodes)?;
     runtime.push_str(&format!("impl NodeData {{\n    pub fn declaration_name_generated(&self) -> Option<NodeId> {{\n        match self {{\n{names}            _ => None,\n        }}\n    }}\n}}\n"));
     runtime.push_str("impl NodeData {\n    /// Validate every stored identity, including fields omitted by Go child visitors.\n    pub fn validate_references<E>(&self, mut node: impl FnMut(NodeId) -> Result<(), E>, mut list: impl FnMut(NodeListId) -> Result<(), E>, mut raw: impl FnMut(NodeSlice) -> Result<(), E>, mut text: impl FnMut(TextSlice) -> Result<(), E>) -> Result<(), E> {\n        match self {\n");
     let mut no_references = Vec::new();

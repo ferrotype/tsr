@@ -150,9 +150,9 @@ impl<F: ParserFactory> Parser<'_, F> {
     }
     /// port: tsc/internal/parser/parser.go:Parser.isInSomeParsingContext
     pub(crate) fn is_in_some_parsing_context(&mut self) -> bool {
-        assert!(
+        tsr_core::debug::assert(
             self.parsing_contexts != 0,
-            "Debug failure. False expression: Missing parsing context"
+            &[tsr_core::debug::Argument::String("Missing parsing context")],
         );
         for kind in ParsingContext::ALL {
             if self.parsing_contexts & (1 << kind as u8) != 0

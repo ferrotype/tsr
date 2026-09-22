@@ -199,9 +199,9 @@ impl<'src> RegExpParser<'_, 'src> {
     }
 
     fn assert_after(&self, expected: u8) {
-        assert!(
+        tsr_core::debug::assert(
             self.pos() > 0 && self.slice(self.pos() - 1, self.pos())[0] == expected,
-            "Debug failure. False expression."
+            &[],
         );
     }
 

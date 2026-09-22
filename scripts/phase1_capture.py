@@ -339,6 +339,53 @@ FAMILIES = {
         "rust_example": "phase1_config",
         "rust_target": "tools/phase1/config/src/main.rs",
     },
+    # F4a. The case layer of the syntax step; the corpus layer (the syntax
+    # schedule over every compiler variant) lives in scripts/phase1_syntax.py.
+    "syntax": {
+        "requests": [
+            "data/phase1/requests/syntax-diagnostics.json",
+            "data/phase1/requests/syntax-astnav.json",
+            "data/phase1/requests/syntax-evaluator.json",
+            "data/phase1/requests/syntax-parse-outputs.json",
+            "data/phase1/requests/syntax-debug.json",
+        ],
+        "native_probes": [
+            # In-package so a probe may reach unexported program state. The
+            # compiler package's tests link internal/repo, which panics under
+            # -trimpath, so the flag is dropped as for the config probes.
+            {"name": "diagnostics", "package": "compiler",
+             "probe": "tools/phase1/syntax/diagnostics_probe_test.go",
+             "test": "TestPhase1SyntaxDiagnostics",
+             "trimpath": False},
+            # astnav's own tests link internal/testutil/baseline and repo, so
+            # -trimpath is dropped here too.
+            {"name": "astnav", "package": "astnav",
+             "probe": "tools/phase1/syntax/astnav_probe_test.go",
+             "test": "TestPhase1SyntaxAstnav",
+             "trimpath": False},
+            # The evaluator package has no test file of its own; this is its
+            # first, and it links nothing that needs a real source path.
+            {"name": "evaluator", "package": "evaluator",
+             "probe": "tools/phase1/syntax/evaluator_probe_test.go",
+             "test": "TestPhase1SyntaxEvaluator"},
+            # In-package in the parser, which owns the side fields. Its tests
+            # link internal/repo, so -trimpath is dropped.
+            {"name": "parse_outputs", "package": "parser",
+             "probe": "tools/phase1/syntax/utilities_probe_test.go",
+             "test": "TestPhase1SyntaxParseOutputs",
+             "trimpath": False},
+            {"name": "debug", "package": "debug",
+             "probe": "tools/phase1/syntax/debug_probe_test.go",
+             "test": "TestPhase1SyntaxDebug"},
+        ],
+        "rust_package": "phase1_syntax",
+        "rust_target_kind": "bin",
+        "rust_example": "phase1_syntax",
+        "rust_target": "tools/phase1/syntax/src/main.rs",
+        # Included by #[path]; it lives outside the harness package directory,
+        # so the workspace closure would not see it.
+        "rust_driver": "tools/s07/program/rust_observation.rs",
+    },
 }
 # The six command families the plan names. Only `pilot` is wired at F0; the
 # rest are registered so `inventory --check` can report them as unprepared
@@ -375,6 +422,57 @@ def load_requests(spec: dict) -> dict:
             seen[case] = relative
             merged.append(request)
     return {"version": version, "requests": merged}
+
+
+def operation_coverage_problems(requests: list[dict], cases: dict | None = None) -> list[str]:
+    """Validate F4a's reviewed links against the exact requests they credit.
+
+    A successful request cannot keep credit for a removed action or a changed
+    source merely because its case id stayed the same. The per-action links
+    remain reviewed evidence; this check does not infer coverage from a call.
+    """
+    if cases is None:
+        cases = strict_json_loads((ROOT / "data/phase1/cases.json").read_bytes())
+    declared = {case["id"]: case for case in cases["cases"] if case.get("family") == "syntax"}
+    problems = []
+    for request in requests:
+        identity = request["case"]
+        case = declared.get(identity)
+        if case is None:
+            problems.append(f"{identity}: no syntax case owns its operation coverage")
+            continue
+        if case.get("request_sha256") != digest(canonical(request) + b"\n"):
+            problems.append(f"{identity}: request changed since its operation coverage was reviewed")
+        actions = request.get("actions")
+        if actions is None:
+            action_names = {request["operation"]}
+        elif (not isinstance(actions, list) or not actions
+              or any(not isinstance(action, dict) or not isinstance(action.get("op"), str)
+                     or not action["op"] for action in actions)):
+            problems.append(f"{identity}: invalid actions in the operation coverage request")
+            continue
+        else:
+            action_names = {action["op"] for action in actions}
+        links = case.get("operation_actions")
+        if not isinstance(links, dict) or set(links) != action_names:
+            problems.append(f"{identity}: operation_actions must name exactly its requested actions")
+            continue
+        if any(not isinstance(operations, list)
+               or any(not isinstance(operation, str) or not operation for operation in operations)
+               or len(operations) != len(set(operations)) for operations in links.values()):
+            problems.append(f"{identity}: invalid operation_actions coverage links")
+            continue
+        linked = {operation for operations in links.values() for operation in operations}
+        if linked != set(case.get("operations", [])):
+            problems.append(f"{identity}: operation_actions do not account for exactly its claimed operations")
+    return problems
+
+
+def validate_operation_coverage(family: str, requests: list[dict]) -> None:
+    if family == "syntax":
+        problems = operation_coverage_problems(requests)
+        if problems:
+            raise ValueError("invalid syntax operation coverage: " + "; ".join(problems[:5]))
 
 
 def sha_file(path: Path) -> str:
@@ -776,6 +874,8 @@ def capture(family: str, output: Path, cases: list[str] | None = None) -> dict:
             + ", ".join(DECLARED_FAMILIES)
         )
     spec = FAMILIES[family]
+    document = load_requests(spec)
+    validate_operation_coverage(family, document["requests"])
     output = Path(output).resolve()
     output.mkdir(parents=True, exist_ok=False)
 
@@ -784,7 +884,6 @@ def capture(family: str, output: Path, cases: list[str] | None = None) -> dict:
     if recorded_pin != recorded_gitlink:
         raise ValueError("data/upstream.json and the upstream gitlink disagree on the pin")
 
-    document = load_requests(spec)
     selected = document["requests"]
     partial = False
     if cases:
@@ -1023,6 +1122,7 @@ def validate_capture(directory: Path) -> tuple[dict, list[dict], dict[str, dict]
     directory = Path(directory).resolve()
     provenance = _authenticate(directory)
     requests = strict_json_loads((directory / "requests.json").read_bytes())["requests"]
+    validate_operation_coverage(provenance["family"], requests)
     # _merge_native raises on any native harness failure, across every probe.
     native_rows = _merge_native(directory, provenance, requests)
     if FAMILIES[provenance["family"]].get("renderer"):

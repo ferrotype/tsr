@@ -36,7 +36,7 @@ def sources():
     # ownership helpers and measurement inputs. The ledger is tested against
     # this manifest; unrelated project/API/formatter tools are not dependencies.
     paths = {path for pattern in source_patterns() for path in ROOT.glob(pattern)
-             if path.is_file() and '__pycache__' not in path.parts}
+             if path.is_file() and '__pycache__' not in path.parts and path.name != '.DS_Store'}
     return {str(path.relative_to(ROOT)): file_digest(path) for path in sorted(paths)}
 
 

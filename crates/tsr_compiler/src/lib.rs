@@ -1,6 +1,7 @@
 //! Immutable program loading, without checker or emitter construction.
 //! Every successful `Program::load` represents an executed loader closure;
 //! unsupported source operations fail with a named boundary.
+mod bind_diagnostics;
 mod cache;
 mod checker_diagnostics;
 mod checker_host;

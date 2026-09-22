@@ -1,0 +1,209 @@
+{
+  "family": "syntax",
+  "requests": [
+    {
+      "actions": [
+        {
+          "op": "side_fields"
+        }
+      ],
+      "case": "syntax/parse-outputs/comment-directives",
+      "discriminates": "The scanner's comment directives (scanner.go:968-1006, stored by finishSourceFile at parser.go:467): line and block forms, spacing, a trailing reason, a directive-like phrase that is not one, a triple-slash form and a JSDoc comment. E1 never encodes them; they decide @ts-expect-error and @ts-ignore filtering.",
+      "file": {
+        "name": "/a.ts",
+        "script_kind": 3,
+        "text": "// @ts-expect-error\nlet a: string = 1;\n/* @ts-ignore */\nlet b;\n// @ts-ignore: reason\nlet c;\n//  @ts-expect-error   spaced\nlet d;\n// not a directive @ts-ignore\n/// @ts-expect-error triple\nlet e;\n/** @ts-ignore */\nlet f;\n//@ts-ignore\nlet g;\n"
+      },
+      "host_applicability": "any",
+      "operation": "tsc/internal/scanner/scanner.go:Scanner.processCommentDirective",
+      "order_sensitive": true,
+      "subject": "parseOutputs"
+    },
+    {
+      "actions": [
+        {
+          "op": "side_fields"
+        }
+      ],
+      "case": "syntax/parse-outputs/pragmas",
+      "discriminates": "The pragma list (getCommentPragmas, parser.go:468): every triple-slash reference form and the JSX pragmas, with their argument names, values and ranges. E1 encodes the resolved reference lists, not the pragmas.",
+      "file": {
+        "name": "/a.tsx",
+        "script_kind": 4,
+        "text": "/// <reference path=\"a.ts\" />\n/// <reference types=\"node\" resolution-mode=\"import\" />\n/// <reference lib=\"es2015\" />\n/// <reference no-default-lib=\"true\" />\n/// <amd-module name=\"m\" />\n/// <amd-dependency path=\"dep\" name=\"d\" />\n/** @jsx h */\n/** @jsxFrag Fragment */\n/** @jsxImportSource preact */\n/** @jsxRuntime classic */\nlet x = 1;\n"
+      },
+      "host_applicability": "any",
+      "operation": "tsc/internal/parser/parser.go:getCommentPragmas",
+      "order_sensitive": true,
+      "subject": "parseOutputs"
+    },
+    {
+      "actions": [
+        {
+          "op": "side_fields"
+        }
+      ],
+      "case": "syntax/parse-outputs/check-js-directive-last-wins",
+      "discriminates": "processPragmasIntoFields keeps the check-js directive at the greatest position (parser.go:6684-6685). The syntax diagnostics cases see only its effect; this records the directive itself.",
+      "file": {
+        "name": "/a.js",
+        "script_kind": 1,
+        "text": "// @ts-check\n// @ts-nocheck\n// @ts-check\nlet x = 1;\n"
+      },
+      "host_applicability": "any",
+      "operation": "tsc/internal/parser/parser.go:Parser.processPragmasIntoFields",
+      "order_sensitive": true,
+      "subject": "parseOutputs"
+    },
+    {
+      "actions": [
+        {
+          "op": "side_fields"
+        }
+      ],
+      "case": "syntax/parse-outputs/check-js-directive-after-code",
+      "discriminates": "A directive after the first statement is still a comment pragma candidate only if pragma extraction reaches it; this records whether it does.",
+      "file": {
+        "name": "/a.js",
+        "script_kind": 1,
+        "text": "let x = 1;\n// @ts-nocheck\nlet y = 2;\n"
+      },
+      "host_applicability": "any",
+      "operation": "tsc/internal/parser/parser.go:Parser.processPragmasIntoFields",
+      "order_sensitive": true,
+      "subject": "parseOutputs"
+    },
+    {
+      "actions": [
+        {
+          "op": "side_fields"
+        }
+      ],
+      "case": "syntax/parse-outputs/node-core-modules-prefixed-wins",
+      "discriminates": "UsesUriStyleNodeCoreModules (references.go:35-42): a node: import makes it true and takes precedence over an earlier unprefixed core import.",
+      "file": {
+        "name": "/a.ts",
+        "script_kind": 3,
+        "text": "import path from \"path\";\nimport fs from \"node:fs\";\nexport {};\n"
+      },
+      "host_applicability": "any",
+      "operation": "tsc/internal/parser/references.go:collectModuleReferences",
+      "order_sensitive": true,
+      "subject": "parseOutputs"
+    },
+    {
+      "actions": [
+        {
+          "op": "side_fields"
+        }
+      ],
+      "case": "syntax/parse-outputs/node-core-modules-unprefixed-only",
+      "discriminates": "Only unprefixed core imports: false.",
+      "file": {
+        "name": "/a.ts",
+        "script_kind": 3,
+        "text": "import fs from \"fs\";\nimport \"lodash\";\nexport {};\n"
+      },
+      "host_applicability": "any",
+      "operation": "tsc/internal/parser/references.go:collectModuleReferences",
+      "order_sensitive": true,
+      "subject": "parseOutputs"
+    },
+    {
+      "actions": [
+        {
+          "op": "side_fields"
+        }
+      ],
+      "case": "syntax/parse-outputs/node-core-modules-exclusively-prefixed",
+      "discriminates": "node:test is exclusively prefixed, so it does not count: the value stays unknown.",
+      "file": {
+        "name": "/a.ts",
+        "script_kind": 3,
+        "text": "import test from \"node:test\";\nimport \"lodash\";\nexport {};\n"
+      },
+      "host_applicability": "any",
+      "operation": "tsc/internal/parser/references.go:collectModuleReferences",
+      "order_sensitive": true,
+      "subject": "parseOutputs"
+    },
+    {
+      "actions": [
+        {
+          "op": "side_fields"
+        }
+      ],
+      "case": "syntax/parse-outputs/node-core-modules-declaration-file",
+      "discriminates": "A declaration file never sets the flag.",
+      "file": {
+        "name": "/a.d.ts",
+        "script_kind": 3,
+        "text": "import fs from \"node:fs\";\nexport declare const x: number;\n"
+      },
+      "host_applicability": "any",
+      "operation": "tsc/internal/parser/references.go:collectModuleReferences",
+      "order_sensitive": true,
+      "subject": "parseOutputs"
+    },
+    {
+      "actions": [
+        {
+          "op": "side_fields"
+        }
+      ],
+      "case": "syntax/parse-outputs/reparsed-clones-from-jsdoc",
+      "discriminates": "JSDoc tags in a .js file are reparsed into TypeScript nodes; finishSourceFile sorts and stores the clones (parser.go:484-485). E1 encodes the tree, not this list.",
+      "file": {
+        "name": "/a.js",
+        "script_kind": 1,
+        "text": "/** @type {number} */\nconst n = /** @type {any} */ (x);\n/** @typedef {{a: number}} T */\n/**\n * @template U\n * @param {U} u\n * @returns {U}\n */\nfunction id(u) { return u; }\n/** @satisfies {T} */\nconst t = { a: 1 };\n/** @overload\n * @param {string} s\n */\nfunction o(s) {}\n"
+      },
+      "host_applicability": "any",
+      "operation": "tsc/internal/parser/parser.go:Parser.finishSourceFile",
+      "order_sensitive": true,
+      "subject": "parseOutputs"
+    },
+    {
+      "actions": [
+        {
+          "op": "lazy_jsdoc"
+        },
+        {
+          "op": "side_fields"
+        }
+      ],
+      "case": "syntax/parse-outputs/lazy-jsdoc-in-typescript",
+      "discriminates": "For a non-JS file JSDoc is lazy (parser.go:481-483): EagerJSDoc is empty before first use, JSDoc parses and caches, a repeated call returns the identical nodes, EagerJSDoc then returns them too, and the parsed subtree matches.",
+      "file": {
+        "name": "/a.ts",
+        "script_kind": 3,
+        "text": "/** A function.\n * @param x the input\n * @returns twice x\n */\nfunction f(x: number) { return x * 2; }\n/** @deprecated */\nclass C {\n    /** m */ m() {}\n    /** @internal */ p = 1;\n}\n/** first */\n/** second */\nconst v = 1;\n"
+      },
+      "host_applicability": "any",
+      "operation": "tsc/internal/ast/ast.go:Node.JSDoc",
+      "order_sensitive": true,
+      "subject": "parseOutputs"
+    },
+    {
+      "actions": [
+        {
+          "op": "lazy_jsdoc"
+        },
+        {
+          "op": "side_fields"
+        }
+      ],
+      "case": "syntax/parse-outputs/eager-jsdoc-in-javascript",
+      "discriminates": "The same text as JavaScript: JSDoc is eager, so EagerJSDoc already returns the nodes and JSDoc returns the same ones.",
+      "file": {
+        "name": "/a.js",
+        "script_kind": 1,
+        "text": "/** A function.\n * @param x the input\n * @returns twice x\n */\nfunction f(x) { return x * 2; }\n/** @deprecated */\nclass C {\n    /** m */ m() {}\n}\n/** first */\n/** second */\nconst v = 1;\n"
+      },
+      "host_applicability": "any",
+      "operation": "tsc/internal/ast/ast.go:Node.JSDoc",
+      "order_sensitive": true,
+      "subject": "parseOutputs"
+    }
+  ]
+}

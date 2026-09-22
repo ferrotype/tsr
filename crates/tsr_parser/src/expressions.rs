@@ -253,10 +253,7 @@ impl<F: ParserFactory> Parser<'_, F> {
             if kind == SyntaxKind::TypeAssertionExpression {
                 self.parse_error_at(pos, range.end(), diagnostics::A_type_assertion_expression_is_not_allowed_in_the_left_hand_side_of_an_exponentiation_expression_Consider_enclosing_the_expression_in_parentheses, vec![]);
             } else {
-                assert!(
-                    is_keyword_or_punctuation(unary_operator),
-                    "Debug failure. False expression."
-                );
+                tsr_core::debug::assert(is_keyword_or_punctuation(unary_operator), &[]);
                 self.parse_error_at(pos, range.end(), diagnostics::An_unary_expression_with_the_0_operator_is_not_allowed_in_the_left_hand_side_of_an_exponentiation_expression_Consider_enclosing_the_expression_in_parentheses, vec![token_text(unary_operator)]);
             }
         }
@@ -389,9 +386,9 @@ impl<F: ParserFactory> Parser<'_, F> {
     }
     /// port: tsc/internal/parser/parser.go:Parser.parseTypeAssertion
     pub(crate) fn parse_type_assertion(&mut self) -> NodeId {
-        assert!(
+        tsr_core::debug::assert(
             self.language_variant != LanguageVariant::JSX,
-            "Debug failure. False expression: Type assertions should never be parsed in JSX; they should be parsed as comparisons or JSX elements/fragments."
+            &[tsr_core::debug::Argument::String("Type assertions should never be parsed in JSX; they should be parsed as comparisons or JSX elements/fragments.")],
         );
         let pos = self.node_pos();
         self.parse_expected(SyntaxKind::LessThanToken);

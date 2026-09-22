@@ -4414,3 +4414,163 @@ fn index_keys_distinguish_generic_types_and_branded_primitives() {
         [(1337, 15, 18), (1337, 55, 58), (1268, 158, 161)]
     );
 }
+
+#[test]
+fn enum_forward_reference_callbacks_match_pinned_native_diagnostics() {
+    // Pinned compiler/forwardRefInEnum.errors.txt reports all four accesses:
+    // identifier, element access, property access, and the merged declaration.
+    let text =
+        include_bytes!("../../../upstream/tsc/testdata/tests/cases/compiler/forwardRefInEnum.ts");
+    let (owner, source) = checker(text, options());
+    for _ in 0..2 {
+        let diagnostics = owner
+            .operation()
+            .unwrap()
+            .semantic_diagnostics(source)
+            .unwrap();
+        assert_eq!(codes_and_args(&diagnostics), vec![(2651, vec![]); 4]);
+        assert_eq!(
+            diagnostics
+                .iter()
+                .map(|diagnostic| &text
+                    [diagnostic.loc.pos() as usize..diagnostic.loc.end() as usize])
+                .collect::<Vec<_>>(),
+            [b"Y".as_slice(), b"E1[\"Y\"]", b"E1.Z", b"E1[\"Z\"]"]
+        );
+    }
+}
+
+#[test]
+fn enum_callback_flags_and_opaque_assertions_match_pinned_native_diagnostics() {
+    // Exact virtual files from compiler/computedEnumMemberSyntacticallyString2.ts.
+    // Its false/true isolatedModules baselines distinguish imported string
+    // flags from local const/member callbacks and syntactic template strings.
+    const SOURCE: &[u8] = b"import { BAR } from './bar';
+const LOCAL = 'LOCAL';
+
+enum Foo {
+  A = `${BAR}`,
+
+  B = LOCAL,
+  C = B,
+  D = C + 'BAR',
+
+  E1 = (`${BAR}`) as string, // We could recognize these,
+  E2 = `${BAR}`!,             // but Babel doesn't
+
+  F = BAR,
+  G = 2 + BAR,
+
+  H = A,
+  I = H + BAR,
+  J = H
+}";
+    for isolated_modules in [Tristate::FALSE, Tristate::TRUE] {
+        let (owner, program, _) = fixture_files(
+            b"/foo.ts",
+            &[
+                (b"/foo.ts", SOURCE),
+                (b"/bar.ts", b"export const BAR = 'bar';"),
+            ],
+            CompilerOptions {
+                isolated_modules,
+                ..options()
+            },
+        );
+        let source = program.file(b"/foo.ts").unwrap().source();
+        let mut expected = vec![
+            (18033, strings(&["string", "number"])),
+            (18033, strings(&["string", "number"])),
+        ];
+        let mut ranges = vec![b"(`${BAR}`) as string".as_slice(), b"`${BAR}`!"];
+        if isolated_modules.is_true() {
+            expected.extend([(18055, strings(&["Foo.F"])), (18055, strings(&["Foo.G"]))]);
+            ranges.extend([b"BAR".as_slice(), b"2 + BAR"]);
+        }
+        for _ in 0..2 {
+            let mut operation = owner.operation().unwrap();
+            let diagnostics = operation.semantic_diagnostics(source).unwrap();
+            assert_eq!(
+                codes_and_args(&diagnostics),
+                expected,
+                "isolatedModules={isolated_modules:?}"
+            );
+            assert_eq!(
+                diagnostics
+                    .iter()
+                    .map(|diagnostic| &SOURCE
+                        [diagnostic.loc.pos() as usize..diagnostic.loc.end() as usize])
+                    .collect::<Vec<_>>(),
+                ranges,
+                "isolatedModules={isolated_modules:?}"
+            );
+            assert!(operation
+                .semantic_diagnostics(program.file(b"/bar.ts").unwrap().source())
+                .unwrap()
+                .is_empty());
+        }
+    }
+}
+
+#[test]
+fn enum_cross_file_numeric_flag_restricts_auto_increment_like_native() {
+    // The bad.ts/helpers.ts virtual files and both diagnostic spans from
+    // compiler/enumNoInitializerFollowsNonLiteralInitializer.errors.txt.
+    const SOURCE: &[u8] = b"import { foo } from \"./helpers\";
+enum A {
+    a = foo,
+    b,
+    c = 10,
+    d = (c)! satisfies number as any,
+    e,
+}";
+    let (owner, program, _) = fixture_files(
+        b"/bad.ts",
+        &[
+            (b"/bad.ts", SOURCE),
+            (b"/helpers.ts", b"export const foo = 2;"),
+        ],
+        CompilerOptions {
+            isolated_modules: Tristate::TRUE,
+            ..options()
+        },
+    );
+    let file = program.file(b"/bad.ts").unwrap();
+    let mut operation = owner.operation().unwrap();
+    let diagnostics = operation.semantic_diagnostics(file.source()).unwrap();
+    assert_eq!(
+        codes_and_args(&diagnostics),
+        [(18056, vec![]), (1061, vec![])]
+    );
+    assert_eq!(
+        diagnostics
+            .iter()
+            .map(|diagnostic| &SOURCE[diagnostic.loc.pos() as usize..diagnostic.loc.end() as usize])
+            .collect::<Vec<_>>(),
+        [b"b".as_slice(), b"e"]
+    );
+    // The public declaration resolver is a second consumer of the retained
+    // result. The pinned checker marks an imported const as both cross-file
+    // and external (checker.go:evaluateEntity), while preserving its number.
+    let view = file.bound().view().ast();
+    let statements = view.node(file.source()).unwrap().statements(view).unwrap();
+    let enum_node = view.node_slice(statements).unwrap().at(1).unwrap();
+    let members = view.node(enum_node).unwrap().member_list().unwrap();
+    let member = view
+        .node_slice(view.list(members).unwrap().nodes())
+        .unwrap()
+        .at(0)
+        .unwrap();
+    let result = tsr_printer::emit_resolver::DeclarationEmitResolver::enum_member_value(
+        &mut operation,
+        member,
+    )
+    .unwrap();
+    let Some(tsr_printer::emit_resolver::ConstantValue::Number(number)) = result.value else {
+        panic!("imported enum initializer must remain a number")
+    };
+    assert_eq!(number.value(), 2.0);
+    assert!(!result.is_syntactically_string);
+    assert!(result.resolved_other_files);
+    assert!(result.has_external_references);
+}

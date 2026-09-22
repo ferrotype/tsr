@@ -34,6 +34,7 @@ import phase1_baselines as baselines  # noqa: E402
 import phase1_capture as capture_module  # noqa: E402
 import phase1_invocations as invocations  # noqa: E402
 import phase1_scope as scope_module  # noqa: E402
+import phase1_syntax as syntax_module  # noqa: E402
 from s08_oracle import ROOT  # noqa: E402
 
 SCOPE = ROOT / "data/phase1/scope.json"
@@ -74,9 +75,19 @@ def inventory_check() -> dict:
     problems += scope_module.witness_problems()
     problems += scope_module.roster_problems(scope, cases)
     problems += scope_module.gap_record_problems(cases)
+    problems += capture_module.operation_coverage_problems(
+        capture_module.load_requests(capture_module.FAMILIES["syntax"])["requests"], cases)
     problems += baselines.verify(index)
     problems += baselines.verify_written_subfolders()
     problems += baselines.exception_problems(index)
+    # F4a task 1: every primary and expanded request of the parser/binder
+    # corpus accounted for against the manifests that own it. Tasks 2, 3 and
+    # 9: the syntax schedule, its native observation and the bounded Rust
+    # smoke, each checked against the committed documents without a child.
+    problems += syntax_module.problems()
+    problems += syntax_module.schedule_problems()
+    problems += syntax_module.smoke_problems()
+    problems += syntax_module.full_problems()
 
     pin = json.loads((ROOT / "data/upstream.json").read_text())["pin"]
     for name, document in (("scope", scope), ("cases", cases), ("config-baselines", index)):
@@ -182,7 +193,8 @@ def inventory_write() -> dict:
     scope = scope_module.build()
     SCOPE.write_text(json.dumps(scope, indent=2, sort_keys=True) + "\n")
     cases = load(CASES)
-    wrote = [str(SCOPE.relative_to(ROOT))]
+    syntax_module.write()
+    wrote = [str(SCOPE.relative_to(ROOT)), str(syntax_module.INVENTORY.relative_to(ROOT))]
     prepared, pending = {}, {}
     for step in scope_module.STEP_PACKAGES:
         report = scope_module.leaf_preparation(scope, cases, step)
