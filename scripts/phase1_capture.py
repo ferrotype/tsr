@@ -26,6 +26,7 @@ from __future__ import annotations
 import hashlib
 import json
 import platform
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -35,6 +36,45 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from s04 import go_environment, verified_upstream  # noqa: E402
 from s04_common import command, strict_json_loads  # noqa: E402
 from s08_oracle import ROOT, canonical, digest  # noqa: E402
+
+class StaleCapture(ValueError):
+    """Authenticated artifacts no longer describe the current inputs."""
+
+
+def request_bytes(value: object) -> bytes:
+    """Requests retain object insertion order, including ordered config maps.
+
+    Observation metadata may be canonicalized; compiler input cannot be sorted:
+    `paths` pattern precedence follows the order supplied by the caller.
+    """
+    return json.dumps(value, ensure_ascii=False, separators=(",", ":"), allow_nan=False).encode() + b"\n"
+
+
+def package_input_files(directory: Path) -> list[Path]:
+    """Package inputs excluding prose and host metadata, retaining embedded assets.
+
+    Literal include_str!/include_bytes! assets remain inputs regardless of suffix.
+    A build script or computed include can choose arbitrary files, so such a
+    package conservatively retains markdown too.
+    """
+    files = [p for p in directory.rglob("*") if p.is_file() and p.name != ".DS_Store"
+             and not any(part in (".git", "target", "__pycache__")
+                         for part in p.relative_to(directory).parts)]
+    embedded: set[Path] = set()
+    arbitrary_inputs = (directory / "build.rs").is_file()
+    for source in files:
+        if source.suffix != ".rs":
+            continue
+        text = source.read_text()
+        for match in re.finditer(r'include_(?:str|bytes)\s*!\s*\(\s*([^)]*)', text):
+            literal = re.fullmatch(r'"([^"\\]*)"\s*,?\s*', match[1])
+            if literal:
+                embedded.add((source.parent / literal[1]).resolve())
+            else:
+                arbitrary_inputs = True
+    return sorted({p for p in files if p.suffix.lower() != ".md" or arbitrary_inputs or p.resolve() in embedded}
+                  | {p for p in embedded if p.is_file()})
+
 
 RESULTS = ("match", "different", "not_implemented", "native_unavailable", "harness_failed", "not_run")
 
@@ -73,6 +113,7 @@ NATIVE_STATUSES = ("observed", "native_unavailable", "harness_failed")
 SHARED_SCRIPTS = (
     "scripts/phase1_capture.py",
     "scripts/phase1.py",
+    "scripts/phase1_scope.py",
     "scripts/phase1_invocations.py",
     "scripts/s04.py",
     "scripts/s04_common.py",
@@ -454,7 +495,7 @@ def operation_coverage_problems(requests: list[dict], cases: dict | None = None)
         if case is None:
             problems.append(f"{identity}: no syntax case owns its operation coverage")
             continue
-        if case.get("request_sha256") != digest(canonical(request) + b"\n"):
+        if case.get("request_sha256") != digest(request_bytes(request)):
             problems.append(f"{identity}: request changed since its operation coverage was reviewed")
         actions = request.get("actions")
         if actions is None:
@@ -580,7 +621,7 @@ def source_closure(family: str, packages: list[str] | None = None) -> dict[str, 
     # in a nested directory is not missed by a shallow glob.
     adapter = ROOT / "tools/phase1" / family
     if adapter.is_dir():
-        paths.update(p.relative_to(ROOT) for p in adapter.rglob("*") if p.is_file())
+        paths.update(p.resolve().relative_to(ROOT.resolve()) for p in package_input_files(adapter))
 
     for name in (*SHARED_SCRIPTS, *BUILD_INPUTS):
         paths.add(Path(name))
@@ -598,17 +639,7 @@ def source_closure(family: str, packages: list[str] | None = None) -> dict[str, 
         else workspace_closure(spec["rust_package"])
     )
     for directory in directories:
-        for path in directory.rglob("*"):
-            if not path.is_file():
-                continue
-            relative = path.relative_to(ROOT)
-            if relative.parts[0] == "target" or "target" in relative.parts[:2]:
-                continue
-            # Embedded assets and build-script inputs are compiler inputs too.
-            # Restricting this to Rust/TOML misses e.g. bundled/libs/*.d.ts,
-            # whose bytes are exactly what the leaf asset probes measure.
-            if not any(part in (".git", "target", "__pycache__") for part in path.relative_to(directory).parts):
-                paths.add(relative)
+        paths.update(path.resolve().relative_to(ROOT.resolve()) for path in package_input_files(directory))
 
     closure: dict[str, str] = {}
     for relative in sorted({str(p) for p in paths}):
@@ -680,8 +711,8 @@ def run_probe(directory: Path, package: str, source: str, request: dict, test: s
     source_path = directory / "export_test.go"
     source_path.write_text(source)
     request_path = directory / "requests.json"
-    request_bytes = canonical(request) + b"\n"
-    request_path.write_bytes(request_bytes)
+    serialized_request = request_bytes(request)
+    request_path.write_bytes(serialized_request)
     output = directory / "observations.json"
     virtual = upstream / "tsc/internal" / package / "phase1_probe_export_test.go"
     if virtual.exists():
@@ -717,14 +748,14 @@ def run_probe(directory: Path, package: str, source: str, request: dict, test: s
     (directory / "go-test.stdout").write_bytes(stdout)
     verified_upstream()
     report = strict_json_loads(output.read_bytes())
-    if report["request_sha256"] != digest(request_bytes):
+    if report["request_sha256"] != digest(serialized_request):
         raise ValueError(f"the {package} probe observed a different request inventory")
     (directory / "provenance.json").write_bytes(canonical({
         "pin": pin(), "package": package, "test": test, "trimpath": trimpath,
         "source_sha256": digest(source.encode()),
         "helper_sha256": digest(helper.encode()) if helper is not None else None,
         "extra_sources_sha256": {name:digest(source.encode()) for name, source in (extra_sources or {}).items()},
-        "request_sha256": digest(request_bytes),
+        "request_sha256": digest(serialized_request),
         "output_sha256": digest(output.read_bytes()),
         "go": report["go"], "goos": report["goos"], "goarch": report["goarch"],
         "toolchain_local": env["GOTOOLCHAIN"] == "local",
@@ -889,6 +920,18 @@ def validate_rendered_rows(requests: dict, raw: dict, rendered: dict) -> None:
             raise ValueError("renderer changed an unrelated Rust row")
 
 
+def case_claims(requests: list[dict]) -> dict[str, str | None]:
+    """Capture declarations, not the mutable results subsequently recorded there.
+
+    Undeclared development requests can be observed, but cannot grant coverage.
+    """
+    from phase1_scope import case_claims_digest
+    path = ROOT / "data/phase1/cases.json"
+    declarations = {row["id"]: row for row in strict_json_loads(path.read_bytes())["cases"]} if path.is_file() else {}
+    return {row["case"]: case_claims_digest(declarations[row["case"]])
+            if row["case"] in declarations else None for row in requests}
+
+
 def capture(family: str, output: Path, cases: list[str] | None = None) -> dict:
     if family not in FAMILIES:
         raise ValueError(
@@ -919,9 +962,10 @@ def capture(family: str, output: Path, cases: list[str] | None = None) -> dict:
     # The children read exactly these bytes; hash the serialized request, not an
     # earlier in-memory object.
     request_document = {"version": document["version"], "family": family, "requests": selected}
-    request_bytes = canonical(request_document) + b"\n"
+    serialized_request = request_bytes(request_document)
+    captured_claims = case_claims(selected)
     request_path = output / "requests.json"
-    request_path.write_bytes(request_bytes)
+    request_path.write_bytes(serialized_request)
 
     # One native probe per Go package. Each sees the whole schedule and declines
     # the operations it does not serve, so every case has a native row.
@@ -984,6 +1028,8 @@ def capture(family: str, output: Path, cases: list[str] | None = None) -> dict:
         )}
         validate_renderer(output, request_document, rendered)
 
+    if case_claims(selected) != captured_claims:
+        raise ValueError("case declarations changed while capturing; the capture is invalid")
     after = source_closure(family)
     if before != after:
         changed = sorted(
@@ -1002,7 +1048,8 @@ def capture(family: str, output: Path, cases: list[str] | None = None) -> dict:
         "upstream_gitlink": recorded_gitlink,
         "partial": partial,
         "selected_cases": sorted(r["case"] for r in selected),
-        "requests_sha256": digest(request_bytes),
+        "requests_sha256": digest(serialized_request),
+        "case_claims": captured_claims,
         "native_probes": native_reports,
         "rust_observations_sha256": sha_file(rust_path),
         "rust_binary_sha256": sha_file(executable),
@@ -1030,11 +1077,6 @@ def _authenticate(directory: Path) -> dict:
         )
     family = provenance["family"]
 
-    if provenance.get("pin") != pin():
-        raise ValueError("capture pin differs from the repository pin")
-    if provenance.get("upstream_gitlink") != gitlink():
-        raise ValueError("capture was taken against a different upstream gitlink")
-
     checks = {
         "requests.json": provenance["requests_sha256"],
         "rust-observations.json": provenance["rust_observations_sha256"],
@@ -1047,6 +1089,15 @@ def _authenticate(directory: Path) -> dict:
         if sha_file(directory / name) != expected:
             raise ValueError(f"capture artifact {name} does not match its recorded hash")
 
+    requests = strict_json_loads((directory / "requests.json").read_bytes())["requests"]
+    if provenance.get("case_claims") != case_claims(requests):
+        raise StaleCapture("reviewed case declarations changed or were not bound by the capture")
+
+    if provenance.get("pin") != pin():
+        raise StaleCapture("capture pin differs from the repository pin")
+    if provenance.get("upstream_gitlink") != gitlink():
+        raise StaleCapture("capture was taken against a different upstream gitlink")
+
     # Recompute the expected closure rather than trusting the recorded one: a
     # capture that recorded too few inputs must not authenticate just because
     # the few it recorded are unchanged.
@@ -1056,22 +1107,22 @@ def _authenticate(directory: Path) -> dict:
         raise ValueError("capture source closure size disagrees with its own contents")
     absent = sorted(set(expected_closure) - set(recorded))
     if absent:
-        raise ValueError(
+        raise StaleCapture(
             f"capture omitted {len(absent)} source input(s) that can change its observations: "
             + ", ".join(absent[:5])
         )
     extra = sorted(set(recorded) - set(expected_closure))
     if extra:
-        raise ValueError(
+        raise StaleCapture(
             f"capture recorded {len(extra)} input(s) that are no longer part of the closure: "
             + ", ".join(extra[:5])
         )
     for relative, expected in recorded.items():
         path = ROOT / relative
         if not path.is_file():
-            raise ValueError(f"capture input {relative} no longer exists")
+            raise StaleCapture(f"capture input {relative} no longer exists")
         if sha_file(path) != expected:
-            raise ValueError(f"capture input {relative} changed after the capture")
+            raise StaleCapture(f"capture input {relative} changed after the capture")
     return provenance
 
 
@@ -1187,6 +1238,11 @@ def compare(directory: Path, require_parity: bool = False) -> dict:
             "captured cases are absent from the frozen inventory: " + ", ".join(sorted(unknown))
         )
 
+    current_requests = {request["case"]: request for request in inventory["requests"]}
+    for request in requests:
+        if request_bytes(request) != request_bytes(current_requests[request["case"]]):
+            raise StaleCapture(f"{request['case']}: captured request differs from the current request")
+
     rows = []
     for case in all_cases:
         if case not in selected:
@@ -1230,6 +1286,12 @@ def compare(directory: Path, require_parity: bool = False) -> dict:
             **({} if same else {"native": native.get("observation"), "rust": rust.get("observation")}),
         })
 
+    captured_requests = {request["case"]: request for request in requests}
+    for row in rows:
+        if row["case"] in captured_requests:
+            row["request_sha256"] = digest(request_bytes(captured_requests[row["case"]]))
+            row["claims_sha256"] = provenance["case_claims"][row["case"]]
+
     counts = {result: 0 for result in RESULTS}
     for row in rows:
         counts[row["result"]] += 1
@@ -1241,6 +1303,7 @@ def compare(directory: Path, require_parity: bool = False) -> dict:
         "partial": provenance["partial"],
         "capture": str(directory),
         "requests_sha256": provenance["requests_sha256"],
+        "capture_sha256": sha_file(directory / "provenance.json"),
         "counts": counts,
         "parity": counts["match"] / len(rows) if rows else 0.0,
         "required_non_match": required_non_match,

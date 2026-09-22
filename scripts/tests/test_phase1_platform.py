@@ -41,6 +41,11 @@ class PlatformCaptureTests(unittest.TestCase):
         self.assertFalse(p.platform_matched("filesystem", raw[1], self.report))
         self.assertFalse(p.platform_matched("syntax", raw[0], self.report))
 
+    def test_authenticated_request_binding_metadata_does_not_hide_match(self):
+        self.supplemental["rows"][0].update(request_sha256="b" * 64, capture_sha256="c" * 64)
+        self.attach()
+        self.assertTrue(p.platform_matched("filesystem", self.report["rows"][0], self.report))
+
     def test_rejects_wrong_host_changed_input_or_missing_selection(self):
         for field, value in (("host", {"platform": "macOS-26-arm64"}),
                              ("source_closure", {"input": "old"}),
@@ -83,6 +88,22 @@ class PlatformCaptureTests(unittest.TestCase):
                      patch.object(p.capture, "source_closure", return_value={"input": "digest"}), \
                      self.assertRaisesRegex(ValueError, "tampered artifact"):
                     p.attach_platform_captures("filesystem", self.report, [root])
+
+    def test_platform_record_distinguishes_match_difference_and_unavailable(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "provenance.json").write_text(json.dumps(self.provenance))
+            for observed, state in (("match", "match"), ("different", "different"),
+                                    ("native_unavailable", "unavailable")):
+                with self.subTest(observed=observed), \
+                     patch.object(p, "rust_packages", return_value=[]), \
+                     patch.object(p.capture, "source_closure", return_value={"input": "digest"}), \
+                     patch.object(p.capture, "compare", return_value={"rows": [{"case": CASE, "result": observed}]}):
+                    summary = p.platform_summary(root, root / "records")
+                    self.assertEqual(summary["state"], state)
+                    raw = Path(summary["artifact"]).read_bytes()
+                    self.assertEqual(p.sha(raw), summary["sha256"])
+                    self.assertEqual(json.loads(raw)["capture_identity"], p.sha((root / "provenance.json").read_bytes()))
 
     def test_platform_preparation_closes_only_its_linked_gap(self):
         self.attach()

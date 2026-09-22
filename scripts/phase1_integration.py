@@ -36,6 +36,55 @@ BOUNDARIES = {
     "raw-plugin-stream-not-method-proxy",
 }
 
+# These contracts previously named `workspace`, whose producer only runs
+# cargo check. Keep a small, executable inventory for the otherwise ungated
+# Rust witnesses instead of crediting compilation as test execution.
+RUST_WITNESS_TESTS = {
+    "witness/ast-generated-concrete-update-clone-contracts": (
+        ["cargo", "test", "--locked", "-p", "tsr_ast", "--test", "generated_runtime", "--", "--test-threads=1"],
+        ["factory_masks_counts_and_hooks_follow_the_pinned_observation_order",
+         "raw_slice_updates_use_backing_identity_and_all_empty_slices_compare_same",
+         "enumeration_uses_kind_but_clone_and_transformation_use_payload",
+         "owner_validation_includes_references_omitted_from_child_enumeration",
+         "concrete_entries_preserve_custom_interception_and_prevalidation_text_counts",
+         "concrete_entries_validate_in_field_order_before_node_allocation_and_hooks",
+         "concrete_large_payload_keeps_all_fields_forged_kind_and_lazy_compatibility"]),
+    "witness/binder-container-flags-source-contract": (
+        ["cargo", "test", "--locked", "-p", "tsr_binder", "--lib", "container_classification_tests::", "--", "--test-threads=1"],
+        ["container_classification_tests::" + name for name in (
+            "fixed_container_rules_do_not_inspect_payload_or_parent", "method_rules_read_only_the_selected_parent_kind",
+            "block_rules_include_signature_and_static_block_parents", "property_rules_inspect_initializer_without_requiring_a_parent",
+            "local_dynamic_rules_preserve_checked_contract_failures")]),
+    "witness/nativepath-raw-eintr-retry": (
+        ["cargo", "test", "--locked", "-p", "tsr_vfs", "--lib", "os::native::tests::interrupted_syscalls_retry_but_other_and_wrapped_errors_return_once", "--", "--exact"],
+        ["os::native::tests::interrupted_syscalls_retry_but_other_and_wrapped_errors_return_once"]),
+    "f5b/native-navigation-rescan": (
+        ["cargo", "test", "--locked", "-p", "tsr_astnav", "--lib", "tests::jsx_shift_rescan_matches_the_pinned_private_operation", "--", "--exact"],
+        ["tests::jsx_shift_rescan_matches_the_pinned_private_operation"]),
+    "witness/s08-p5-errors-rust": (
+        ["cargo", "test", "--locked", "-p", "tsr_compiler", "--test", "diagnostic_writer", "native_plain_pretty_and_error_baseline_bytes_match", "--", "--exact"],
+        ["native_plain_pretty_and_error_baseline_bytes_match"]),
+}
+
+
+def rust_witness_result(rows):
+    if not isinstance(rows, list) or [row.get("id") for row in rows] != list(RUST_WITNESS_TESTS):
+        raise ValueError("Rust witness execution inventory differs")
+    result = {}
+    for row in rows:
+        command, expected = RUST_WITNESS_TESTS[row["id"]]
+        if row.get("command") != command or type(row.get("exit_code")) is not int or not isinstance(row.get("stdout"), str):
+            raise ValueError("Rust witness command/output is malformed")
+        outcomes = re.findall(r"^test (\S+) \.\.\. (\w+)$", row["stdout"], re.MULTILINE)
+        names = [name for name, _ in outcomes]
+        if sorted(names) != sorted(expected) or any(state not in ("ok", "FAILED") for _, state in outcomes):
+            raise ValueError(f"Rust witness did not execute its exact tests: {row['id']}")
+        passed = all(state == "ok" for _, state in outcomes)
+        if row["exit_code"] != (0 if passed else 101):
+            raise ValueError("Rust witness exit code disagrees with test outcomes")
+        result[row["id"]] = "match" if passed else "different"
+    return result
+
 
 def load(root, path):
     return strict_json_loads((root / path).read_bytes())
@@ -67,8 +116,10 @@ def input_paths(root=ROOT):
              "data/s04/toolchains.toml", "data/s03/generated.json",
              "data/phase1/locale-tables-manifest.json", "tools/packaging/packages.json", "tools/packaging/verification.json",
              "crates/tsr_bundled/bundled/manifest.json", "upstream/package.json", "scripts/package_assets.py",
-             "tools/s10/toolchains.json", "LICENSE", "NOTICE", "licenses/GO-BSD-3-Clause.txt"}
-    for folder in ("data/s11", "tools/s11", "tools/phase1/locale", "tools/s03"):
+             "tools/s10/toolchains.json", "LICENSE", "NOTICE", "licenses/GO-BSD-3-Clause.txt",
+             ".gitmodules", "data/s03/api-special-codecs.json", "scripts/s05_tables.py",
+             "crates/tsr_testhost/Cargo.toml", "data/s07/program-requests.json"}
+    for folder in ("data/s11", "tools/s11", "tools/phase1/locale", "tools/s03", "xtask"):
         paths.update(str(p.relative_to(root)) for p in (root / folder).rglob("*")
                      if p.is_file() and p.name != ".DS_Store" and "__pycache__" not in p.parts)
     # Archive verification builds every public package, including packages no
@@ -272,6 +323,7 @@ def evaluate(preparation, family_reports, receipts=(), *, source_inputs=None, ro
     expected.update({
         "transport": {"command": ["python3", "scripts/s11.py", "capture"]},
         "generation": {"command": document["generation"]["command"]},
+        "rust-witnesses": {"command": ["python3", "scripts/phase1_integration.py", "observe-rust-witnesses"]},
     })
     # Additional named tests are independent required observations. A passing
     # resolver case cannot stand in for the explicit source-order tie test.
@@ -279,6 +331,7 @@ def evaluate(preparation, family_reports, receipts=(), *, source_inputs=None, ro
         for test in row.get("additional_tests", []):
             expected[row["id"] + "/" + test["test"]] = {**test, "kind": "test"}
     measured = {}
+    unavailable = {}
     for item in receipts:
         identity = item.get("id")
         if identity in measured:
@@ -288,9 +341,6 @@ def evaluate(preparation, family_reports, receipts=(), *, source_inputs=None, ro
         if identity not in expected:
             problems.append(f"unknown integration receipt: {identity}")
             continue
-        if not source_inputs or item.get("source_inputs") != source_inputs:
-            problems.append(f"{identity}: stale or incomplete integration receipt inputs")
-            continue
         if item.get("command") != expected[identity]["command"]:
             problems.append(f"{identity}: integration receipt command differs")
             continue
@@ -299,6 +349,23 @@ def evaluate(preparation, family_reports, receipts=(), *, source_inputs=None, ro
             continue
         if type(item.get("exit_code")) is not int:
             problems.append(f"{identity}: missing measured exit code")
+            continue
+        if "artifact" in item or "artifact_sha256" in item:
+            raw = json.dumps(item.get("artifact"), sort_keys=True, separators=(",", ":")).encode()
+            if hashlib.sha256(raw).hexdigest() != item.get("artifact_sha256"):
+                problems.append(f"{identity}: integration artifact digest differs")
+                continue
+        recorded_inputs = item.get("source_inputs")
+        if not source_inputs or not isinstance(recorded_inputs, dict) or not recorded_inputs or any(
+                not isinstance(name, str) or not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest)
+                for name, digest in recorded_inputs.items()):
+            problems.append(f"{identity}: malformed integration receipt inputs")
+            continue
+        if recorded_inputs != source_inputs:
+            measured[identity] = "unavailable"
+            unavailable[identity] = {"reason": "integration receipt inputs changed", "changed_inputs": sorted(
+                name for name in recorded_inputs.keys() | source_inputs.keys()
+                if recorded_inputs.get(name) != source_inputs.get(name))}
             continue
         if item["exit_code"] != 0:
             measured[identity] = "failed"
@@ -331,6 +398,10 @@ def evaluate(preparation, family_reports, receipts=(), *, source_inputs=None, ro
                 if any(type(metrics.get(key)) is not bool for key in required):
                     raise ValueError("generation receipt omits a required measurement")
                 measured[identity] = "match" if all(metrics[k] is value for k, value in required.items()) else "different"
+            elif identity == "rust-witnesses":
+                observations = rust_witness_result(strict_json_loads(item["stdout"]))
+                result["rust_witness_observations"] = observations
+                measured[identity] = "match" if all(value == "match" for value in observations.values()) else "different"
             elif identity == "installed-generated-assets":
                 artifact = item.get("artifact")
                 raw = json.dumps(artifact, sort_keys=True, separators=(",", ":")).encode()
@@ -352,23 +423,39 @@ def evaluate(preparation, family_reports, receipts=(), *, source_inputs=None, ro
             outcomes += [measured.get(row["id"] + "/" + test["test"], "pending") for test in row.get("additional_tests", [])]
             row["observations"] = {identity: cases.get(identity, "pending") for identity in row["references"]}
             row["additional_test_observations"] = {test["test"]: measured.get(row["id"] + "/" + test["test"], "pending") for test in row.get("additional_tests", [])}
-            row["state"] = "match" if all(state == "match" for state in outcomes) else ("pending" if "pending" in outcomes else "different")
+            row["state"] = ("pending" if not outcomes else
+                            "match" if all(state == "match" for state in outcomes) else
+                            "pending" if "pending" in outcomes else "different")
         else:
             row["state"] = measured.get(row["id"], "pending")
         if row["state"] == "match":
             row.pop("reason", None)
     for key in ("transport", "generation"):
         result[key]["state"] = measured.get(key, "pending")
-    result["complete"] = not problems and all(row["state"] == "match" for row in result["witnesses"]) and all(result[k]["state"] == "match" for k in ("transport", "generation"))
+    result["unavailable"] = unavailable
+    result["rust_witnesses"] = {"state": measured.get("rust-witnesses", "pending")}
+    result["metric_observations"] = {"cases": dict(sorted(cases.items())), "receipts": dict(sorted(measured.items()))}
+    result["complete"] = (not problems and {row["id"] for row in result["witnesses"]} == WITNESSES
+                          and len(result["witnesses"]) == len(WITNESSES)
+                          and all(row["state"] == "match" for row in result["witnesses"])
+                          and all(result[k]["state"] == "match" for k in ("transport", "generation", "rust_witnesses")))
     return result
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("operation", choices=("check", "observe-localized-config"), default="check", nargs="?")
+    parser.add_argument("operation", choices=("check", "observe-localized-config", "observe-rust-witnesses"), default="check", nargs="?")
     args = parser.parse_args()
     if args.operation == "check":
         result = check()
+    elif args.operation == "observe-rust-witnesses":
+        result = []
+        for identity, (command, _) in RUST_WITNESS_TESTS.items():
+            child = subprocess.run(command, cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
+            result.append({"id": identity, "command": command, "exit_code": child.returncode,
+                           "stdout": child.stdout.decode(), "stderr": child.stderr.decode()})
+        # Preserve build failures/invalid test execution as recorded output;
+        # receipt replay will distinguish invalid execution from measured fail.
     else:
         import phase1_localized
         output = subprocess.run(["cargo", "run", "--locked", "-p", "tsr_compiler", "--example", "phase1_integration"],
@@ -376,7 +463,7 @@ def main():
         envelopes = phase1_localized.observe()
         result = localized_integration_result(ROOT, strict_json_loads(output.stdout), envelopes["observation"])
     print(json.dumps(result, indent=2, sort_keys=True))
-    return int(bool(result.get("problems")))
+    return int(isinstance(result, dict) and bool(result.get("problems")))
 
 
 if __name__ == "__main__":

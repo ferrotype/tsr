@@ -122,6 +122,12 @@ class IntegrationTests(unittest.TestCase):
         self.assertEqual({name for name in before if before[name] != after[name]},
                          {str(manifest.relative_to(ROOT))})
 
+    def test_build_and_generation_transitive_inputs_are_bound(self):
+        paths = set(integration.input_paths())
+        required = {"xtask/src/main.rs", ".gitmodules", "data/s03/api-special-codecs.json",
+                    "scripts/s05_tables.py", "crates/tsr_testhost/Cargo.toml", "data/s07/program-requests.json"}
+        self.assertLessEqual(required, paths)
+
     def test_localized_config_mismatch_stays_visible(self):
         observed = {"id": "localized-config-diagnostics", "locale": "de-DE", "code": 5023,
                     "leaf_localized": 'Unbekannte Compileroption "notAnOption".',
@@ -161,6 +167,8 @@ class IntegrationEvaluationTests(unittest.TestCase):
             command = document["generation"]["command"]
         elif identity == "transport":
             command = ["python3", "scripts/s11.py", "capture"]
+        elif identity == "rust-witnesses":
+            command = ["python3", "scripts/phase1_integration.py", "observe-rust-witnesses"]
         else:
             command = next(row["command"] for row in document["witnesses"] if row["id"] == identity)
         return integration.receipt(identity, command, self.inputs, stdout)
@@ -176,13 +184,22 @@ class IntegrationEvaluationTests(unittest.TestCase):
         self.assertEqual(result["witnesses"][2]["additional_test_observations"], {"paths_keep_source_order_on_equal_prefixes_but_exact_matches_win": "pending"})
         self.assertFalse(result["complete"])
 
+    def test_an_empty_case_witness_never_passes_vacuously(self):
+        preparation = copy.deepcopy(self.prepared)
+        row = next(row for row in preparation["witnesses"] if row["kind"] == "cases")
+        row["references"] = []
+        result = integration.evaluate(preparation, [], source_inputs=self.inputs)
+        observed = next(item for item in result["witnesses"] if item["id"] == row["id"])
+        self.assertEqual(observed["state"], "pending")
+        self.assertFalse(result["complete"])
+
     def test_duplicate_contributing_case_is_not_silently_folded(self):
         row = {"case": "config/case", "result": "match"}
         result = self.evaluate([{"rows": [row, row]}])
         self.assertTrue(any("duplicate contributing" in p for p in result["problems"]))
 
     def test_actual_named_test_and_stale_or_tampered_receipt(self):
-        receipt = self.receipt("retained-program-snapshot", "test tests::retained_snapshot_edit_reuses_only_equal_parse_inputs ... ok\n")
+        receipt = self.receipt("retained-program-snapshot", "test tests::live_filesystem_snapshots_preserve_retained_program_files ... ok\n")
         result = self.evaluate(receipts=[receipt])
         self.assertEqual(result["witnesses"][3]["state"], "match")
         altered = copy.deepcopy(receipt)
@@ -190,10 +207,34 @@ class IntegrationEvaluationTests(unittest.TestCase):
         self.assertTrue(any("output digest" in p for p in self.evaluate(receipts=[altered])["problems"]))
         altered = copy.deepcopy(receipt)
         altered["source_inputs"]["nested/changed.rs"] = "b" * 64
-        self.assertTrue(any("stale or incomplete" in p for p in self.evaluate(receipts=[altered])["problems"]))
+        stale = self.evaluate(receipts=[altered])
+        self.assertEqual(stale["problems"], [])
+        self.assertEqual(stale["witnesses"][3]["state"], "unavailable")
+        self.assertEqual(stale["unavailable"][receipt["id"]]["changed_inputs"], ["nested/changed.rs"])
+        self.assertFalse(stale["complete"])
+        altered["stdout"] += "tampered"
+        self.assertTrue(any("output digest" in p for p in self.evaluate(receipts=[altered])["problems"]))
+
+    def test_stale_receipt_does_not_discard_independent_current_result(self):
+        stale = self.receipt("retained-program-snapshot", "test tests::live_filesystem_snapshots_preserve_retained_program_files ... ok\n")
+        stale["source_inputs"] = {"old": "c" * 64}
+        current = self.receipt("generation", json.dumps({"metrics": {"ast_schema": True, "patches_apply": True,
+            "client_identical": True, "drift": False, "locale_complete": True}}))
+        result = self.evaluate(receipts=[stale, current])
+        self.assertEqual(result["problems"], [])
+        self.assertEqual(result["generation"]["state"], "match")
+        self.assertEqual(result["witnesses"][3]["state"], "unavailable")
+        self.assertFalse(result["complete"])
+
+    def test_malformed_receipt_input_map_is_not_staleness(self):
+        receipt = self.receipt("retained-program-snapshot", "test tests::live_filesystem_snapshots_preserve_retained_program_files ... ok\n")
+        for bad in (None, {}, [], {"source": "not-a-digest"}):
+            with self.subTest(inputs=bad):
+                result = self.evaluate(receipts=[{**receipt, "source_inputs": bad}])
+                self.assertTrue(any("malformed" in p for p in result["problems"]))
 
     def test_zero_or_duplicate_test_execution_is_invalid(self):
-        for output in ("0 tests\n", "test tests::retained_snapshot_edit_reuses_only_equal_parse_inputs ... ok\n" * 2):
+        for output in ("0 tests\n", "test tests::live_filesystem_snapshots_preserve_retained_program_files ... ok\n" * 2):
             receipt = self.receipt("retained-program-snapshot", output)
             self.assertTrue(any("exactly once" in p for p in self.evaluate(receipts=[receipt])["problems"]))
 
@@ -223,7 +264,7 @@ class IntegrationEvaluationTests(unittest.TestCase):
         from test_phase1_localized import fixture
         localized = integration.localized_integration_result(ROOT, observed, fixture())
         receipts = [self.receipt("localized-config-diagnostics", json.dumps(localized)),
-                    self.receipt("retained-program-snapshot", "test tests::retained_snapshot_edit_reuses_only_equal_parse_inputs ... ok\n"),
+                    self.receipt("retained-program-snapshot", "test tests::live_filesystem_snapshots_preserve_retained_program_files ... ok\n"),
                     self.receipt("transport", json.dumps({"metrics": {"controls": True}, "tests": {case: "pass" for case in integration.load(ROOT, "data/s11/cases.json")}})),
                     self.receipt("generation", json.dumps({"metrics": {"ast_schema": True, "patches_apply": True, "client_identical": True, "drift": False, "locale_complete": True}}))]
         for row in self.prepared["witnesses"]:
@@ -239,13 +280,30 @@ class IntegrationEvaluationTests(unittest.TestCase):
                         "localized_message": 'Der Typ "number" kann dem Typ "string" nicht zugewiesen werden.',
                         "owners_returned_to_baseline": True}}
         receipts.append(integration.receipt(installed["id"], installed["command"], self.inputs, "", artifact=artifact))
+        observations = [{"id": identity, "command": command, "exit_code": 0,
+                         "stdout": "".join("test " + name + " ... ok\n" for name in tests)}
+                        for identity, (command, tests) in integration.RUST_WITNESS_TESTS.items()]
+        receipts.append(self.receipt("rust-witnesses", json.dumps(observations)))
         result = self.evaluate(reports, receipts)
         self.assertEqual(result["problems"], [])
         self.assertTrue(result["complete"])
         self.assertFalse(self.evaluate(reports, receipts[:-1])["complete"])
 
+    def test_rust_witness_metric_requires_exact_executed_inventory(self):
+        observations = [{"id": identity, "command": command, "exit_code": 0,
+                         "stdout": "".join("test " + name + " ... ok\n" for name in tests)}
+                        for identity, (command, tests) in integration.RUST_WITNESS_TESTS.items()]
+        self.assertTrue(all(value == "match" for value in integration.rust_witness_result(observations).values()))
+        for mutate in (lambda rows: rows.pop(), lambda rows: rows.append(rows[0]),
+                       lambda rows: rows[0].update(stdout="running 0 tests\n"),
+                       lambda rows: rows[0].update(exit_code=101)):
+            changed = copy.deepcopy(observations)
+            mutate(changed)
+            with self.assertRaises(ValueError):
+                integration.rust_witness_result(changed)
+
     def test_duplicate_unknown_and_changed_command_receipts_are_invalid(self):
-        receipt = self.receipt("retained-program-snapshot", "test tests::retained_snapshot_edit_reuses_only_equal_parse_inputs ... ok\n")
+        receipt = self.receipt("retained-program-snapshot", "test tests::live_filesystem_snapshots_preserve_retained_program_files ... ok\n")
         self.assertTrue(any("duplicate integration" in p for p in self.evaluate(receipts=[receipt, receipt])["problems"]))
         receipt["command"] = ["true"]
         self.assertTrue(any("command differs" in p for p in self.evaluate(receipts=[receipt])["problems"]))

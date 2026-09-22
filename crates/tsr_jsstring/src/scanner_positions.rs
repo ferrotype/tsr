@@ -140,7 +140,10 @@ pub fn compute_position_of_line_and_utf16_character(
                 byte_offset != line_end || count >= character,
                 "Bad UTF-16 character offset. Line: {line}, character: {character}."
             );
-            assert!(byte_offset <= text.len() as isize);
+            assert!(
+                byte_offset <= text.len() as isize,
+                "Debug failure. False expression."
+            );
             return byte_offset;
         }
         return byte_offset.min(text.len() as isize);
@@ -148,7 +151,10 @@ pub fn compute_position_of_line_and_utf16_character(
     if allow_edits {
         line_start.min(text.len() as isize)
     } else {
-        assert!(line_start <= text.len() as isize);
+        assert!(
+            line_start <= text.len() as isize,
+            "Debug failure. False expression."
+        );
         line_start
     }
 }

@@ -419,7 +419,8 @@ class SyntaxReplayControls(unittest.TestCase):
     def test_an_omitted_source_input_is_not_current(self):
         self.provenance["rust_closure"] = {}
         self.write_capture()
-        self.assertFalse(syntax.replay(self.directory)["rust_sources_current"])
+        with self.assertRaisesRegex(ValueError, "syntax capture sources changed"):
+            syntax.replay(self.directory)
 
     def test_omitting_a_whole_parser_package_is_not_current(self):
         current = {"Cargo.toml": "workspace", "tools/phase1/syntax/Cargo.toml": "driver",
@@ -428,7 +429,8 @@ class SyntaxReplayControls(unittest.TestCase):
             name: digest for name, digest in current.items() if not name.startswith("crates/tsr_parser/")}
         self.write_capture()
         with patch.object(syntax, "rust_closure", return_value=current):
-            self.assertFalse(syntax.replay(self.directory)["rust_sources_current"])
+            with self.assertRaisesRegex(ValueError, "syntax capture sources changed"):
+                syntax.replay(self.directory)
 
     def test_rust_panic_cannot_produce_a_report(self):
         self.rust = [{"id": "case", "state": "panic", "panic": "boom"}]
@@ -579,7 +581,7 @@ class SyntaxOperationCoverageControls(unittest.TestCase):
         self.review_signature()
 
     def review_signature(self):
-        self.case["request_sha256"] = self.capture.digest(self.capture.canonical(self.request) + b"\n")
+        self.case["request_sha256"] = self.capture.digest(self.capture.request_bytes(self.request))
 
     def problems(self):
         return self.capture.operation_coverage_problems([self.request], self.cases)

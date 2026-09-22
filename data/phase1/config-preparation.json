@@ -17,10 +17,10 @@
   },
   "pending": [],
   "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
-  "prepared_operations": 310,
+  "prepared_operations": 312,
   "roster_problems": [],
   "step": "config",
   "total_operations": 402,
   "version": 2,
-  "witnessed_operations": 47
+  "witnessed_operations": 45
 }

@@ -417,6 +417,7 @@ dependencies = [
  "tsr_diagnostics",
  "tsr_glob",
  "tsr_jsstring",
+ "tsr_locale",
  "tsr_module",
  "tsr_parser",
  "tsr_tsoptions",

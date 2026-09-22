@@ -3,8 +3,8 @@
   "complete": false,
   "exempt_by_category": {
     "go_test_harness": 155,
-    "later_step": 229,
-    "unused_at_pin": 4
+    "later_step": 228,
+    "unused_at_pin": 5
   },
   "exempt_operations": 388,
   "gap_problems": [],
@@ -7505,7 +7505,7 @@
       ]
     },
     {
-      "disposition": "missing",
+      "disposition": "implemented_untested",
       "operation": "tsc/internal/ast/utilities.go:IsJSDocTypeAssertion",
       "rust_home": [
         "crates/tsr_ast/src/clone.rs",
@@ -7937,7 +7937,7 @@
       ]
     },
     {
-      "disposition": "missing",
+      "disposition": "implemented_untested",
       "operation": "tsc/internal/ast/utilities.go:IsOuterExpression",
       "rust_home": [
         "crates/tsr_ast/src/clone.rs",
@@ -25273,6 +25273,7 @@
       "disposition": "implemented_untested",
       "operation": "tsc/internal/scanner/scanner.go:cleared",
       "rust_home": [
+        "crates/tsr_scanner/src/binder_helpers.rs",
         "crates/tsr_scanner/src/state.rs",
         "crates/tsr_scanner/src/scan.rs",
         "crates/tsr_scanner/src/identifier.rs",
@@ -25286,10 +25287,10 @@
     }
   ],
   "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
-  "prepared_operations": 1468,
+  "prepared_operations": 1469,
   "roster_problems": [],
   "step": "syntax",
   "total_operations": 3617,
   "version": 2,
-  "witnessed_operations": 512
+  "witnessed_operations": 511
 }

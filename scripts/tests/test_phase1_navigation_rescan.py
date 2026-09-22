@@ -19,7 +19,7 @@ class NavigationRescanFixtureTests(unittest.TestCase):
         provenance = json.loads((path / "native-provenance.json").read_bytes())
         self.assertEqual(provenance["pin"], json.loads((ROOT / "data/upstream.json").read_bytes())["pin"])
         self.assertEqual(provenance["source_sha256"], hashlib.sha256((path / "probe_test.go").read_bytes()).hexdigest())
-        self.assertEqual(provenance["request_sha256"], capture.digest(capture.canonical(requests) + b"\n"))
+        self.assertEqual(provenance["request_sha256"], capture.digest(capture.request_bytes(requests)))
         self.assertEqual(provenance["output_sha256"], hashlib.sha256((path / "native-observations.json").read_bytes()).hexdigest())
         self.assertEqual(observed["request_sha256"], provenance["request_sha256"])
         self.assertTrue(provenance["toolchain_local"])

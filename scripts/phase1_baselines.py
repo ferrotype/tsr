@@ -462,6 +462,9 @@ def output_preparation(cases: dict, step: str) -> dict:
         for name, entry in exceptions_by_output().items()
         if entry.get("group") in GROUPS
     }
+    from phase1_scope import recorded_results
+
+    results = recorded_results(cases)
     exact = excepted = 0
     for name, expected_row in expected.items():
         linked = by_output.get(name, [])
@@ -469,8 +472,8 @@ def output_preparation(cases: dict, step: str) -> dict:
             problems.append(f"{name}: needs exactly one prepared case, found {len(linked)}")
             continue
         case = linked[0]
-        if case.get("last_result") not in ("match", "different", "not_implemented"):
-            problems.append(f"{name}: comparison is {case.get('last_result')!r}, not prepared")
+        if results[case["id"]] not in ("match", "different", "not_implemented"):
+            problems.append(f"{name}: comparison is {results[case['id']]!r}, not prepared")
             continue
         row = rows.get(case["id"], {})
         observation = row.get("observation", {})

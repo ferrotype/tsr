@@ -20681,6 +20681,12 @@
       "result": "native_unavailable"
     },
     {
+      "case": "config/module/paths/source-order-beats-sorted-order",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.tryLoadModuleUsingPathsIfEligible",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
       "case": "config/packagejson/expected-validity-survives-a-repeated-field",
       "operation": "tsc/internal/packagejson/expected.go:Expected.IsValid",
       "reason": "operation is not served by the command-line baseline probe",
@@ -20883,8 +20889,80 @@
       "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:TryClearScreen",
       "reason": "operation is not served by the command-line baseline probe",
       "result": "native_unavailable"
+    },
+    {
+      "case": "config/diagwriter/localized/de-DE/flatten-indents-each-chain-level-by-two-more-spaces",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:FlattenDiagnosticMessage",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/diagwriter/localized/ja-JP/flatten-indents-each-chain-level-by-two-more-spaces",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:FlattenDiagnosticMessage",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/diagwriter/localized/nl-NL/flatten-indents-each-chain-level-by-two-more-spaces",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:FlattenDiagnosticMessage",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/diagwriter/localized/de-DE/the-tabular-display-pads-the-count-column-and-relativises-the-path",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:writeTabularErrorsDisplay",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/diagwriter/localized/ja-JP/the-tabular-display-pads-the-count-column-and-relativises-the-path",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:writeTabularErrorsDisplay",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/diagwriter/localized/nl-NL/the-tabular-display-pads-the-count-column-and-relativises-the-path",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:writeTabularErrorsDisplay",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/diagwriter/localized/de-DE/the-coloured-status-line-brackets-a-caller-supplied-time",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:FormatDiagnosticsStatusWithColorAndTime",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/diagwriter/localized/ja-JP/the-coloured-status-line-brackets-a-caller-supplied-time",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:FormatDiagnosticsStatusWithColorAndTime",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/diagwriter/localized/nl-NL/the-coloured-status-line-brackets-a-caller-supplied-time",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:FormatDiagnosticsStatusWithColorAndTime",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/diagwriter/localized/de-DE/the-plain-status-line-joins-time-and-message-with-a-spaced-dash",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:FormatDiagnosticsStatusAndTime",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/diagwriter/localized/ja-JP/the-plain-status-line-joins-time-and-message-with-a-spaced-dash",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:FormatDiagnosticsStatusAndTime",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/diagwriter/localized/nl-NL/the-plain-status-line-joins-time-and-message-with-a-spaced-dash",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:FormatDiagnosticsStatusAndTime",
+      "reason": "operation is not served by the command-line baseline probe",
+      "result": "native_unavailable"
     }
   ],
-  "request_sha256": "346b193393d1c6c013e9c0a9b3c7fa6236166c70a24d0182bf4906fdc20edb11",
+  "request_sha256": "b45c717bf4e0a4070d6a33f5b3863c502cd39e703b5ee47783086439ee366a1b",
   "version": 1
 }

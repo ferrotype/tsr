@@ -62,33 +62,72 @@ impl std::fmt::Display for Unhandled {
 }
 impl std::error::Error for Unhandled {}
 
-// port: tsc/internal/evaluator/evaluator.go:AnyToString
-pub fn any_to_string(value: Option<&EvaluatedValue>) -> Result<JsString, Unhandled> {
-    match value {
-        Some(EvaluatedValue::String(text)) => Ok(text.clone()),
-        Some(EvaluatedValue::Number(number)) => {
-            Ok(JsString::from_bytes(number.to_string().into_bytes()))
+/// Borrowed primitive view used by the checker and evaluator. Converting an
+/// existing literal does not copy its string or bigint backing.
+#[derive(Clone, Copy)]
+pub enum PrimitiveValue<'a> {
+    String(&'a JsString),
+    Number(Number),
+    Bool(bool),
+    BigInt(&'a PseudoBigInt),
+}
+impl<'a> PrimitiveValue<'a> {
+    // port: tsc/internal/evaluator/evaluator.go:AnyToString
+    pub fn text_bytes(self) -> std::borrow::Cow<'a, [u8]> {
+        use std::borrow::Cow;
+        match self {
+            Self::String(text) => Cow::Borrowed(text.as_bytes()),
+            Self::Number(number) => Cow::Owned(number.to_string().into_bytes()),
+            Self::Bool(value) => Cow::Borrowed(if value { &b"true"[..] } else { &b"false"[..] }),
+            Self::BigInt(value) => Cow::Owned(value.to_text()),
         }
-        Some(EvaluatedValue::Bool(value)) => Ok(JsString::from_bytes(if *value {
-            &b"true"[..]
-        } else {
-            &b"false"[..]
-        })),
-        Some(EvaluatedValue::BigInt(value)) => Ok(JsString::from_bytes(value.to_text())),
-        _ => Err(Unhandled::AnyToString),
+    }
+
+    pub fn to_text(self) -> JsString {
+        match self {
+            Self::String(text) => text.clone(),
+            value => match value.text_bytes() {
+                std::borrow::Cow::Borrowed(bytes) => JsString::from_bytes(bytes),
+                std::borrow::Cow::Owned(bytes) => JsString::from_bytes(bytes),
+            },
+        }
+    }
+
+    // port: tsc/internal/evaluator/evaluator.go:IsTruthy
+    pub fn is_truthy(self) -> bool {
+        match self {
+            Self::String(text) => !text.is_empty(),
+            Self::Number(number) => number.value() != 0.0 && !number.is_nan(),
+            Self::Bool(value) => value,
+            // Go compares the struct, including its sign, with the zero value.
+            Self::BigInt(value) => *value != PseudoBigInt::default(),
+        }
+    }
+}
+impl EvaluatedValue {
+    fn primitive(&self) -> Option<PrimitiveValue<'_>> {
+        Some(match self {
+            Self::String(value) => PrimitiveValue::String(value),
+            Self::Number(value) => PrimitiveValue::Number(*value),
+            Self::Bool(value) => PrimitiveValue::Bool(*value),
+            Self::BigInt(value) => PrimitiveValue::BigInt(value),
+            Self::Unsupported => return None,
+        })
     }
 }
 
-// port: tsc/internal/evaluator/evaluator.go:IsTruthy
+pub fn any_to_string(value: Option<&EvaluatedValue>) -> Result<JsString, Unhandled> {
+    value
+        .and_then(EvaluatedValue::primitive)
+        .map(PrimitiveValue::to_text)
+        .ok_or(Unhandled::AnyToString)
+}
+
 pub fn is_truthy(value: Option<&EvaluatedValue>) -> Result<bool, Unhandled> {
-    match value {
-        Some(EvaluatedValue::String(text)) => Ok(!text.as_bytes().is_empty()),
-        Some(EvaluatedValue::Number(number)) => Ok(number.value() != 0.0 && !number.is_nan()),
-        Some(EvaluatedValue::Bool(value)) => Ok(*value),
-        // Upstream compares the struct, including its sign, with the zero value.
-        Some(EvaluatedValue::BigInt(value)) => Ok(*value != PseudoBigInt::default()),
-        _ => Err(Unhandled::IsTruthy),
-    }
+    value
+        .and_then(EvaluatedValue::primitive)
+        .map(PrimitiveValue::is_truthy)
+        .ok_or(Unhandled::IsTruthy)
 }
 
 pub type OuterExpressionKinds = u16;
@@ -172,78 +211,16 @@ impl<'a, C: EvaluationContext + ?Sized> Evaluator<'a, C> {
         self.context.ast(node).map_err(Error::Context)
     }
 
-    fn skip_outer_expressions(&self, mut expression: NodeId) -> Result<NodeId, Error<C::Error>> {
-        use outer_expression_kinds as o;
-        let skip = self.outer_expressions_to_skip;
-        loop {
-            let view = self.ast(expression)?;
-            let read = view.node(expression)?;
-            let outer = match read.kind().known() {
-                Some(K::ParenthesizedExpression) => {
-                    let mut jsdoc_assertion = false;
-                    if skip & o::EXCLUDE_JSDOC_TYPE_ASSERTION != 0
-                        && read.flags() & crate::node_flags::JAVA_SCRIPT_FILE != 0
-                    {
-                        let inner = read
-                            .expression()
-                            .ok_or(Error::MissingLink("parenthesized expression"))?;
-                        let inner = view.node(inner)?;
-                        if inner.kind() == K::AsExpression {
-                            if let Some(ty) = inner.type_node() {
-                                jsdoc_assertion =
-                                    view.node(ty)?.flags() & crate::node_flags::REPARSED != 0;
-                            }
-                        }
-                    }
-                    skip & o::PARENTHESES != 0 && !jsdoc_assertion
-                }
-                Some(K::TypeAssertionExpression | K::AsExpression) => {
-                    skip & o::TYPE_ASSERTIONS != 0
-                }
-                Some(K::SatisfiesExpression) => {
-                    skip & (o::EXPRESSIONS_WITH_TYPE_ARGUMENTS | o::SATISFIES) != 0
-                }
-                Some(K::ExpressionWithTypeArguments) => {
-                    skip & o::EXPRESSIONS_WITH_TYPE_ARGUMENTS != 0
-                }
-                Some(K::NonNullExpression) => skip & o::NON_NULL_ASSERTIONS != 0,
-                Some(K::PartiallyEmittedExpression) => skip & o::PARTIALLY_EMITTED_EXPRESSIONS != 0,
-                Some(K::BinaryExpression) => {
-                    let data = read
-                        .data_source()
-                        .as_binary_expression()
-                        .ok_or(Error::MissingLink("binary expression"))?;
-                    let operator = view
-                        .node(
-                            data.operator_token()
-                                .ok_or(Error::MissingLink("binary operator"))?,
-                        )?
-                        .kind();
-                    if (operator == K::EqualsToken && skip & o::ASSIGNMENTS != 0)
-                        || (operator == K::CommaToken && skip & o::COMMA != 0)
-                    {
-                        expression = data.right().ok_or(Error::MissingLink("binary right"))?;
-                        continue;
-                    }
-                    false
-                }
-                _ => false,
-            };
-            if !outer {
-                return Ok(expression);
-            }
-            expression = read
-                .expression()
-                .ok_or(Error::MissingLink("outer expression"))?;
-        }
-    }
-
     fn evaluate_worker(
         &mut self,
         expression: NodeId,
         location: Option<NodeId>,
     ) -> Result<EvaluationResult, Error<C::Error>> {
-        let expression = self.skip_outer_expressions(expression)?;
+        let expression = crate::utilities::skip_outer_expressions(
+            self.ast(expression)?,
+            expression,
+            self.outer_expressions_to_skip,
+        )?;
         let read = self.ast(expression)?.node(expression)?;
         match read.kind().known() {
             Some(K::PrefixUnaryExpression) => {

@@ -108,6 +108,7 @@ fn run(request: &Value) -> Result<Value, String> {
         .as_str()
         .ok_or("scanner request has no call")?;
     let expected = match call {
+        "default_state" => "tsc/internal/scanner/scanner.go:defaultScanner",
         "comment" | "comment_nil_element" => {
             "tsc/internal/scanner/utilities.go:GetTextOfJSDocComment"
         }
@@ -137,6 +138,29 @@ fn run(request: &Value) -> Result<Value, String> {
     );
     let mut out = Vec::new();
     match call {
+        "default_state" => {
+            let mut scanner = tsr_scanner::Scanner::new();
+            let snapshot = |s: &tsr_scanner::Scanner<'_>| {
+                json!([
+                    s.token() as u16,
+                    s.token_full_start(),
+                    s.token_start(),
+                    s.token_end(),
+                    s.token_flags(),
+                    crate::hex(s.token_text())
+                ])
+            };
+            out.push(snapshot(&scanner));
+            scanner.set_text(&text);
+            scanner.scan();
+            out.push(snapshot(&scanner));
+            scanner.set_skip_trivia(false);
+            scanner.reset();
+            out.push(snapshot(&scanner));
+            scanner.set_text(&text);
+            scanner.scan();
+            out.push(snapshot(&scanner));
+        }
         "lines" => {
             let source = f.view().source_file(file).map_err(|e| format!("{e:?}"))?;
             let first = source.ecma_line_map();

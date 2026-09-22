@@ -39,7 +39,7 @@ impl<'scope> Binder<'_, 'scope, '_> {
         replaceable: bool,
         computed: bool,
     ) -> BindingSymbol<'scope> {
-        assert!(computed || !self.target_has_dynamic_name(Some(node)));
+        tsr_core::debug::assert(computed || !self.target_has_dynamic_name(Some(node)), &[]);
         let default_export = self.target_has_syntactic_modifier(node, mf::DEFAULT)
             || self.node_kind(node) == K::ExportSpecifier
                 && checked(a::module_export_name_is_default(

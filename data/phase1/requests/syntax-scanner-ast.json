@@ -315,6 +315,14 @@
       "operation": "tsc/internal/scanner/utilities.go:IdentifierToKeywordKind",
       "source_hex": "",
       "subject": "scannerAst"
+    },
+    {
+      "call": "default_state",
+      "case": "syntax/scanner-ast/default-state-before-configuration",
+      "operation": "tsc/internal/scanner/scanner.go:defaultScanner",
+      "subject": "scannerAst",
+      "source_hex": "202f2a20636f6d6d656e74202a2f206964656e746966696572",
+      "discriminates": "A new scanner is observed before any setters, then only SetText is called: default skipTrivia must skip the leading space/comment. Reset after disabling skipTrivia must restore the same defaults; snapshots include token, offsets, flags and bytes."
     }
   ],
   "version": 1

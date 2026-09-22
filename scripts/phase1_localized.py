@@ -16,14 +16,14 @@ def schedule(root=ROOT):
 def compare(observation, root=ROOT):
     """Replay all six observations without executing a compiler or renderer."""
     requests = schedule(root)
-    if observation.get("requests_sha256") != capture.digest(capture.canonical(requests) + b"\n"):
+    if observation.get("requests_sha256") != capture.digest(capture.request_bytes(requests)):
         raise ValueError("localized envelope request schedule differs")
     if observation.get("pin") != strict_json_loads((root / "data/upstream.json").read_bytes())["pin"]:
         raise ValueError("localized envelope pin differs")
     if observation["native"].get("request_sha256") != observation["requests_sha256"]:
         raise ValueError("native localized output observed a different request")
     bridge = {**requests, "observations": observation["raw"]["observations"]}
-    if observation["rust"].get("request_sha256") != capture.digest(capture.canonical(bridge) + b"\n"):
+    if observation["rust"].get("request_sha256") != capture.digest(capture.request_bytes(bridge)):
         raise ValueError("localized renderer observed a different Rust request")
     native = capture.validate_response(observation["native"], requests["requests"], "native")
     capture.validate_rendered_rows(requests, observation["raw"], observation["rust"])
@@ -49,7 +49,7 @@ def observe(root=ROOT):
                                {name: (root / path).read_text() for name, path in probe["extra_sources"].items()})
     capture.validate_response(native, requests["requests"], "native")
     request_path = output / "requests.json"
-    request_path.write_bytes(capture.canonical(requests) + b"\n")
+    request_path.write_bytes(capture.request_bytes(requests))
     binary = capture.build_rust("config")
     raw_path = output / "rust-raw-observations.json"
     command([str(binary), str(request_path), str(raw_path)], cwd=root)

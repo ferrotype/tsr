@@ -88,14 +88,14 @@ class AggregationTests(unittest.TestCase):
     def test_authenticated_replay_rejects_tampering_and_partial_capture(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            (root / "provenance.json").write_text(json.dumps({"source_closure": {"source.rs": "old"}}))
+            (root / "provenance.json").write_text(json.dumps({"family": "leaves", "source_closure": {"source.rs": "old"}}))
             with patch.object(p, "rust_packages", return_value=[]), \
                  patch.object(p.capture, "source_closure", return_value={"source.rs": "new"}), \
-                 patch.object(p.capture, "compare") as compare:
+                 patch.object(p.capture, "compare", return_value={"family": "leaves", "partial": False}) as compare:
                 with self.assertRaisesRegex(ValueError, "inputs changed"):
                     p.replay_family("leaves", root)
-                compare.assert_not_called()
-            (root / "provenance.json").write_text(json.dumps({"source_closure": {}}))
+                compare.assert_called_once()  # Artifact integrity precedes staleness.
+            (root / "provenance.json").write_text(json.dumps({"family": "leaves", "source_closure": {}}))
             with patch.object(p, "rust_packages", return_value=[]), \
                  patch.object(p.capture, "source_closure", return_value={}), \
                  patch.object(p.capture, "compare", side_effect=ValueError("capture artifact changed")):
@@ -108,12 +108,68 @@ class AggregationTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "complete capture"):
                     p.replay_family("leaves", root)
 
+    def test_wrong_family_is_invalid_even_when_its_sources_are_stale(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "provenance.json").write_text(json.dumps({"family": "config", "source_closure": {"old": "old"}}))
+            with patch.object(p.capture, "compare", side_effect=p.capture.StaleCapture("changed source")) as compare:
+                with self.assertRaisesRegex(ValueError, "another family") as error:
+                    p.replay_family("leaves", root)
+                self.assertNotIsInstance(error.exception, p.capture.StaleCapture)
+                compare.assert_not_called()
+            (root / "provenance.json").write_text(json.dumps({"family": "leaves", "partial": True,
+                                                              "source_closure": {"old": "old"}}))
+            with patch.object(p.capture, "compare", side_effect=p.capture.StaleCapture("changed source")) as compare:
+                with self.assertRaisesRegex(ValueError, "complete capture") as error:
+                    p.replay_family("leaves", root)
+                self.assertNotIsInstance(error.exception, p.capture.StaleCapture)
+                compare.assert_not_called()
+
     def test_program_smoke_or_stale_full_never_passes(self):
         for mode, current in (("smoke", True), ("full", False)):
             with patch.object(p.syntax, "schedule_problems", return_value=[]), \
                  patch.object(p.syntax, "replay", return_value={"selection": mode, "rust_sources_current": current}), \
                  self.assertRaisesRegex(ValueError, "current full"):
                 p.replay_program(Path("unused"))
+
+    def test_stale_family_is_unavailable_without_discarding_other_family(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp)
+            captures = {family: directory / family for family in ("config", "filesystem")}
+            for path in captures.values():
+                path.mkdir()
+            def replay(family, _):
+                if family == "config":
+                    raise p.capture.StaleCapture("config production input changed")
+                return {"capture_identity": "f" * 64, "rows": [{"case": "one", "result": "match"}]}
+            with patch.object(p, "source_closure", return_value={"input": "a" * 64}), \
+                 patch.object(p, "harness_check", return_value=self.health), \
+                 patch.object(p, "replay_family", side_effect=replay), \
+                 patch.object(p, "baseline_owners", return_value={"fs-output": ("filesystem", "one")}), \
+                 patch.object(p.capture, "load_requests", return_value={"requests": [{"case": "one"}]}):
+                result = p.produce("config", captures, directory / "reports", platform_captures=[])
+            self.assertEqual(result["tests"], {"fs-output": "pass"})
+            self.assertFalse(result["metrics"]["direct_complete"])
+            detail = p.read(next((directory / "reports").glob("config-*.json")))
+            self.assertEqual(detail["unavailable"], {"config": "config production input changed"})
+            self.assertEqual(set(detail["reports"]), {"filesystem"})
+
+    def test_invalid_capture_is_not_downgraded_to_stale(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            with patch.object(p, "source_closure", return_value={"input": "a" * 64}), \
+                 patch.object(p, "harness_check", return_value=self.health), \
+                 patch.object(p, "replay_family", side_effect=ValueError("changed artifact")), \
+                 self.assertRaisesRegex(ValueError, "changed artifact"):
+                p.produce("config", {"config": Path(tmp)}, Path(tmp) / "reports")
+
+    def test_scoped_health_does_not_consume_integration_or_live_source_classification(self):
+        import phase1_integration
+        for producer in ("config", "syntax"):
+            with self.subTest(producer=producer), \
+                 patch.object(phase1_integration, "check", side_effect=AssertionError("unfingerprinted integration")), \
+                 patch.object(p.scope, "build", side_effect=AssertionError("unrelated Rust source audit")):
+                health = p.harness_check(producer)
+                self.assertEqual(health["integration"], {"prepared": False, "complete": False, "problems": []})
 
 
 class QualificationTests(unittest.TestCase):

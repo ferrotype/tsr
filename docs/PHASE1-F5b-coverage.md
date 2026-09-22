@@ -1,6 +1,6 @@
 # F5b coverage audit
 
-The compiler placement review is resolved against the existing Phase 1 plan.
+The original 44-operation compiler placement review was resolved against the existing Phase 1 plan.
 It does not waive any behavior or change a comparison denominator. Of the 44
 previously ambiguous operations, 43 have exact later destinations (two in
 Phase 3, 24 in Phase 4 and 17 in Phase 5); one Program wrapper is unused at the
@@ -15,6 +15,12 @@ loader's free `getModeForTypeReferenceDirectiveInFile` is not the same
 operation as the Program method with that name. `sourcemap`'s `LineCount`
 receiver is not Program. Initial loading of JSX runtime and helper imports is
 also distinct from the helpers that reject a program-reuse shortcut.
+
+The compiler review below does not certify every later-phase assignment in the
+full inventory. The follow-up review identified template evidence outside this
+43-operation table; the follow-up project-reference audit now retains 23 ordinary loader/configuration operations as pending Phase 1 work. See [the destination audit](PHASE1-F5b-destinations.md). The
+existing plan supplies phase boundaries, not automatic approval of an
+unexamined per-operation classification. See [the review disposition](PHASE1-F5b-review.md).
 
 ## Compiler destinations
 
@@ -214,11 +220,55 @@ payload cast and child visitor, using a nil native semantic Type. It does
 records those four as deferred. Their disposition needs the separate owner
 review, not an inferred exemption from this generator.
 
-Every case starts as `not_run` in the manifest until the normal syntax-family
-capture is authenticated and recorded. Native answers and operation/action
-links remain separate. Generation checks fail for missing Rust dispatch,
+These generated cases were subsequently captured and recorded as part of the
+complete 1,122-row syntax-utility tranche in `019ec1c`; the initial `not_run`
+state is no longer the history of that tranche. The reviewed 2026-09-23 refresh
+records them again in the complete **1,123/1,123** matching syntax-utility
+capture, with request/result/claim bindings on the changed production and
+harness sources. It does not inherit the historical capture's freshness.
+Native answers and operation/action links remain separate. Generation checks fail for missing Rust dispatch,
 unknown parameter categories, changed action membership or shape-inventory
 drift. The six focused generator regressions and the driver's malformed
 identity/action regression protect those boundaries. Existing accessor and
 runtime witnesses retain their own precise links; these results do not grant
 credit to unrelated handwritten AST, parser or binder helpers.
+
+## Reviewed completion checkpoint: 2026-09-23
+
+The final family captures at `target/phase1-f5b-review-20260923-03` have 229
+matching leaves, 355 matching filesystem cases, 498 matching config cases and
+1,123 matching syntax-utility cases. The five separately approved differences
+remain visible as raw differences: one leaves case, three filesystem cases
+and one config case. The Linux-only realpath observation remains
+`native_unavailable` on this host. The historical pilot records two matches
+and four not-implemented observations; it does not enter production metrics.
+
+The full program-syntax capture at
+`target/phase1-f5b-review-full-20260923/full` matches all **15,152** executable
+native rows. The **908** matching smoke rows are a selection from that full
+capture, not another independent corpus run. Full syntax parity is recorded
+against its own validated inventory; it grants no automatic operation links.
+
+The raw reviewed captures are preserved in
+[`f5b-reviewed-families.tar.gz`](../data/phase1/captures/f5b-reviewed-families.tar.gz)
+and
+[`f5b-reviewed-syntax-full.tar.gz`](../data/phase1/captures/f5b-reviewed-syntax-full.tar.gz).
+The script suite passed locally: **901 tests**, **1 skipped**, **1,425 subtests**.
+Program-producer and integration-receipt refresh results are recorded
+separately; this checkpoint does not claim those executions have finished or
+that remote CI is green.
+
+The complete operation report still contains **1,365 pending entries**:
+
+| Root cause | Pending entries | Meaning |
+| --- | ---: | --- |
+| Missing exact operation witness | 947 | No accepted request/output or executed Rust-contract link yet |
+| Unverified implementation mapping | 303 | Name-based mapping is not proof that a production port is absent |
+| Unresolved later-step transfer | 92 | Exemption from one preparation step did not remove Phase 1 ownership |
+| Ordinary project-reference loader/configuration work | 23 | The accepted build-scheduling exclusion does not cover these operations |
+
+The [destination audit](PHASE1-F5b-destinations.md) retains 205 later-phase
+destinations under the accepted plan and brings the 23 ordinary loader
+operations back into explicit pending work. P1A/P1B remain incomplete. These
+counts preserve the coverage obligations; neither matching corpora nor a
+passing grouped metric can discharge them without the missing evidence.

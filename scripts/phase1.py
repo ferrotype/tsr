@@ -266,6 +266,19 @@ def record_results(capture: Path, write: bool) -> dict:
         claimed = declared[case_id]
         if not isinstance(named, str) or not named or (claimed and named not in claimed):
             raise ValueError(f"{case_id}: driver names unclaimed missing operation {named!r}")
+    row_by_id = {row["case"]: row for row in report["rows"]}
+    current_requests = {
+        row["case"]: row for row in capture_module.load_requests(capture_module.FAMILIES[family])["requests"]
+    }
+    declarations = {case["id"]: case for case in document["cases"]}
+    for case_id, row in row_by_id.items():
+        request = current_requests.get(case_id)
+        if request is None or row.get("request_sha256") != capture_module.digest(capture_module.request_bytes(request)):
+            raise ValueError(f"{case_id}: result is not bound to the current request")
+        if row.get("claims_sha256") != scope_module.case_claims_digest(declarations[case_id]):
+            raise ValueError(f"{case_id}: capture is not bound to the current case declaration")
+    if not isinstance(report.get("capture_sha256"), str) or len(report["capture_sha256"]) != 64:
+        raise ValueError("comparison omitted the authenticated capture identity")
     changed = []
     for case in document["cases"]:
         if case.get("family") != family:
@@ -279,6 +292,13 @@ def record_results(capture: Path, write: bool) -> dict:
             case["missing_operations"] = [named]
         else:
             case.pop("missing_operations", None)
+        case["result_evidence"] = {
+            "request_sha256": row_by_id[case["id"]]["request_sha256"],
+            "capture_sha256": report["capture_sha256"],
+            "claims_sha256": row_by_id[case["id"]]["claims_sha256"],
+            "missing_operations": case.get("missing_operations", []),
+            "result": observed[case["id"]],
+        }
         if case.get("last_result") != observed[case["id"]]:
             changed.append({
                 "case": case["id"],

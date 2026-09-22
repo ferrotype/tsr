@@ -248,7 +248,7 @@
     },
     {
       "case": "syntax/diagnostics/unterminated-literals",
-      "discriminates": "Unterminated string, template, regular expression and block comment: each is reported where the scanner gives up, several at the end of file.",
+      "discriminates": "Unterminated string followed by an unterminated template. The template consumes the later regex/comment-looking bytes as template text; this request does not witness regex or block-comment diagnostics.",
       "host_applicability": "any",
       "operation": "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics",
       "order_sensitive": true,

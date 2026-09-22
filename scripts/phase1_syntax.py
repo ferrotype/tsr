@@ -541,14 +541,10 @@ def rust_closure() -> dict[str, str]:
     if cargo_config.is_dir():
         paths.update(str(path.relative_to(root)) for path in cargo_config.rglob("*")
                      if path.is_file() and path.name != ".DS_Store")
+    from phase1_capture import package_input_files
+
     for directory in rust_dependency_directories():
-        for path in directory.rglob("*"):
-            relative = path.relative_to(root)
-            # Finder metadata is not a build input; recording it makes the
-            # closure host-local and lets opening a folder stale a capture.
-            if (path.is_file() and path.name != ".DS_Store"
-                    and not any(part in (".git", "target", "__pycache__") for part in relative.parts)):
-                paths.add(str(relative))
+        paths.update(str(path.relative_to(root)) for path in package_input_files(directory))
     return {name: _digest(name) for name in sorted(paths) if (ROOT / name).is_file()}
 
 
@@ -670,16 +666,17 @@ def replay(smoke_dir: Path, *, smoke_only: bool = False) -> dict:
     validated and compared before the bounded report is produced.
     """
     from s04_common import strict_json_loads
+    from phase1_capture import StaleCapture
 
     smoke_dir = Path(smoke_dir).resolve()
     provenance = strict_json_loads((smoke_dir / "provenance.json").read_bytes())
-    if hashlib.sha256(SCHEDULE.read_bytes()).hexdigest() != provenance["schedule_sha256"]:
-        raise ValueError("the committed syntax schedule changed since the smoke")
     for name, key in (("requests.json", "requests_sha256"), ("rust-rows.jsonl", "rust_rows_sha256")):
         if hashlib.sha256((smoke_dir / name).read_bytes()).hexdigest() != provenance[key]:
             raise ValueError(f"stored smoke {name} changed since capture")
+    if hashlib.sha256(SCHEDULE.read_bytes()).hexdigest() != provenance["schedule_sha256"]:
+        raise StaleCapture("the committed syntax schedule changed since the smoke")
     if provenance["native_rows_sha256"] != native_rows_digest(json.loads(NATIVE.read_text())):
-        raise ValueError("the committed native syntax observation changed since the smoke")
+        raise StaleCapture("the committed native syntax observation changed since the smoke")
     schedule = json.loads(SCHEDULE.read_text())
     native = json.loads(NATIVE.read_text())
     mode = provenance.get("selection", "smoke")
@@ -714,6 +711,8 @@ def replay(smoke_dir: Path, *, smoke_only: bool = False) -> dict:
     recorded = provenance["rust_closure"]
     current = rust_closure()
     stale = sorted(name for name in set(recorded) | set(current) if recorded.get(name) != current.get(name))
+    if stale:
+        raise StaleCapture("syntax capture sources changed: " + ", ".join(stale[:5]))
     return {"version": 1, "selection": "smoke" if smoke_only else mode,
             "capture_selection": mode, "rule": SMOKE_RULE if smoke_only else rule, "selected": selected,
             "native_rows_sha256": provenance["native_rows_sha256"], "rust_binary_sha256": provenance["rust_binary_sha256"],

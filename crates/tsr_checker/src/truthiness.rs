@@ -1,5 +1,5 @@
 //! Known-truthy warnings inspect uses in the condition and its body before reporting.
-use crate::{type_facts as f, type_flags as tf, CheckerState, Error, LiteralValue, TypeId};
+use crate::{type_facts as f, type_flags as tf, CheckerState, Error, TypeId};
 use tsr_arena::{NodeId, SymbolId};
 use tsr_ast::{symbol_flags as sf, JsString, SyntaxKind as K};
 use tsr_diagnostics as d;
@@ -95,13 +95,13 @@ impl CheckerState {
                 .flatten()
                 .unwrap_or(self.builtins.unknown_symbol);
             if self.symbol(symbol)?.flags() & sf::ENUM != 0 {
-                let truthy = match &self.types.literal(ty)?.value {
-                    LiteralValue::String(value) => !value.is_empty(),
-                    LiteralValue::Number(value) => value.value() != 0.0 && !value.value().is_nan(),
-                    LiteralValue::Boolean(value) => *value,
-                    LiteralValue::BigInt(value) => *value != tsr_jsnum::PseudoBigInt::default(),
-                    LiteralValue::ComputedEnum => return Err(tsr_arena::Error::InvalidGraph.into()),
-                };
+                let truthy = self
+                    .types
+                    .literal(ty)?
+                    .value
+                    .primitive()
+                    .ok_or(tsr_arena::Error::InvalidGraph)?
+                    .is_truthy();
                 self.error_at(
                     Some(location),
                     d::This_condition_will_always_return_0,

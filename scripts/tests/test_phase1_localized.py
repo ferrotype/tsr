@@ -20,8 +20,8 @@ def fixture():
         text = request['case'] + '\nlocalized message\n'
         rendered.append({**row, 'observation': {'baseline': request['baseline'], 'typed': row['observation'],
                                               'rendered': text, 'rendered_sha256': capture.digest(text.encode())}})
-    request_sha = capture.digest(capture.canonical(requests) + b'\n')
-    bridge_sha = capture.digest(capture.canonical({**requests, 'observations': raw}) + b'\n')
+    request_sha = capture.digest(capture.request_bytes(requests))
+    bridge_sha = capture.digest(capture.request_bytes({**requests, 'observations': raw}))
     return {'pin': capture.pin(), 'requests_sha256': request_sha,
             'raw': {'observations': raw}, 'rust': {'observations': rendered, 'request_sha256': bridge_sha},
             'native': {'observations': copy.deepcopy(rendered), 'request_sha256': request_sha}}

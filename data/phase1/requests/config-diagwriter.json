@@ -1443,6 +1443,996 @@
       "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:TryClearScreen",
       "order_sensitive": true,
       "subject": "diagnosticWriter"
+    },
+    {
+      "actions": [
+        {
+          "diagnostic": {
+            "args": [
+              "A",
+              "B"
+            ],
+            "category": 1,
+            "chain": [
+              {
+                "args": [
+                  "x"
+                ],
+                "category": 1,
+                "chain": [
+                  {
+                    "args": [
+                      "y"
+                    ],
+                    "category": 1,
+                    "code": 2304,
+                    "end": 0,
+                    "file": "",
+                    "message_key": "Cannot_find_name_0_2304",
+                    "message_text": "",
+                    "pos": 0,
+                    "source": ""
+                  }
+                ],
+                "code": 2304,
+                "end": 0,
+                "file": "",
+                "message_key": "Cannot_find_name_0_2304",
+                "message_text": "",
+                "pos": 0,
+                "source": ""
+              }
+            ],
+            "code": 2322,
+            "end": 0,
+            "file": "",
+            "message_key": "Type_0_is_not_assignable_to_type_1_2322",
+            "message_text": "",
+            "pos": 0,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "chained"
+        },
+        {
+          "new_line": "\n",
+          "op": "flatten",
+          "target": "chained",
+          "locale": "de-DE"
+        },
+        {
+          "new_line": "\r\n",
+          "op": "flatten",
+          "target": "chained",
+          "locale": "de-DE"
+        }
+      ],
+      "case": "config/diagwriter/localized/de-DE/flatten-indents-each-chain-level-by-two-more-spaces",
+      "discriminates": "Native diagnostic writer with locale de-DE: A port that indents a nested chain by a fixed two spaces instead of two per level, or that emits the newline after the child message instead of before it. The chain is two deep, so level 1 and level 2 must differ by exactly two spaces, and the whole rendering is taken twice with different newlines so a port that hard-codes \\n is visible in the second row and not the first. The arguments are substituted from the message TABLE via the key, not from a message pointer the probe chose: both diagnostics are built through ast.NewDiagnosticFromSerialized (ast/diagnostic.go:166), which leaves `message` nil, so Localize resolves by key (ast/diagnostic.go:117-122).",
+      "host_applicability": "any",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:FlattenDiagnosticMessage",
+      "order_sensitive": true,
+      "subject": "diagnosticWriter"
+    },
+    {
+      "actions": [
+        {
+          "diagnostic": {
+            "args": [
+              "A",
+              "B"
+            ],
+            "category": 1,
+            "chain": [
+              {
+                "args": [
+                  "x"
+                ],
+                "category": 1,
+                "chain": [
+                  {
+                    "args": [
+                      "y"
+                    ],
+                    "category": 1,
+                    "code": 2304,
+                    "end": 0,
+                    "file": "",
+                    "message_key": "Cannot_find_name_0_2304",
+                    "message_text": "",
+                    "pos": 0,
+                    "source": ""
+                  }
+                ],
+                "code": 2304,
+                "end": 0,
+                "file": "",
+                "message_key": "Cannot_find_name_0_2304",
+                "message_text": "",
+                "pos": 0,
+                "source": ""
+              }
+            ],
+            "code": 2322,
+            "end": 0,
+            "file": "",
+            "message_key": "Type_0_is_not_assignable_to_type_1_2322",
+            "message_text": "",
+            "pos": 0,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "chained"
+        },
+        {
+          "new_line": "\n",
+          "op": "flatten",
+          "target": "chained",
+          "locale": "ja-JP"
+        },
+        {
+          "new_line": "\r\n",
+          "op": "flatten",
+          "target": "chained",
+          "locale": "ja-JP"
+        }
+      ],
+      "case": "config/diagwriter/localized/ja-JP/flatten-indents-each-chain-level-by-two-more-spaces",
+      "discriminates": "Native diagnostic writer with locale ja-JP: A port that indents a nested chain by a fixed two spaces instead of two per level, or that emits the newline after the child message instead of before it. The chain is two deep, so level 1 and level 2 must differ by exactly two spaces, and the whole rendering is taken twice with different newlines so a port that hard-codes \\n is visible in the second row and not the first. The arguments are substituted from the message TABLE via the key, not from a message pointer the probe chose: both diagnostics are built through ast.NewDiagnosticFromSerialized (ast/diagnostic.go:166), which leaves `message` nil, so Localize resolves by key (ast/diagnostic.go:117-122).",
+      "host_applicability": "any",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:FlattenDiagnosticMessage",
+      "order_sensitive": true,
+      "subject": "diagnosticWriter"
+    },
+    {
+      "actions": [
+        {
+          "diagnostic": {
+            "args": [
+              "A",
+              "B"
+            ],
+            "category": 1,
+            "chain": [
+              {
+                "args": [
+                  "x"
+                ],
+                "category": 1,
+                "chain": [
+                  {
+                    "args": [
+                      "y"
+                    ],
+                    "category": 1,
+                    "code": 2304,
+                    "end": 0,
+                    "file": "",
+                    "message_key": "Cannot_find_name_0_2304",
+                    "message_text": "",
+                    "pos": 0,
+                    "source": ""
+                  }
+                ],
+                "code": 2304,
+                "end": 0,
+                "file": "",
+                "message_key": "Cannot_find_name_0_2304",
+                "message_text": "",
+                "pos": 0,
+                "source": ""
+              }
+            ],
+            "code": 2322,
+            "end": 0,
+            "file": "",
+            "message_key": "Type_0_is_not_assignable_to_type_1_2322",
+            "message_text": "",
+            "pos": 0,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "chained"
+        },
+        {
+          "new_line": "\n",
+          "op": "flatten",
+          "target": "chained",
+          "locale": "nl-NL"
+        },
+        {
+          "new_line": "\r\n",
+          "op": "flatten",
+          "target": "chained",
+          "locale": "nl-NL"
+        }
+      ],
+      "case": "config/diagwriter/localized/nl-NL/flatten-indents-each-chain-level-by-two-more-spaces",
+      "discriminates": "Native diagnostic writer with locale nl-NL: A port that indents a nested chain by a fixed two spaces instead of two per level, or that emits the newline after the child message instead of before it. The chain is two deep, so level 1 and level 2 must differ by exactly two spaces, and the whole rendering is taken twice with different newlines so a port that hard-codes \\n is visible in the second row and not the first. The arguments are substituted from the message TABLE via the key, not from a message pointer the probe chose: both diagnostics are built through ast.NewDiagnosticFromSerialized (ast/diagnostic.go:166), which leaves `message` nil, so Localize resolves by key (ast/diagnostic.go:117-122).",
+      "host_applicability": "any",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:FlattenDiagnosticMessage",
+      "order_sensitive": true,
+      "subject": "diagnosticWriter"
+    },
+    {
+      "actions": [
+        {
+          "file_name": "/src/plain.ts",
+          "op": "define_file",
+          "target": "plain",
+          "text": "const a = 1;\nconst b = 2;\n"
+        },
+        {
+          "file_name": "/src/other.ts",
+          "op": "define_file",
+          "target": "other",
+          "text": "const c = 3;\n"
+        },
+        {
+          "diagnostic": {
+            "args": [
+              "a"
+            ],
+            "category": 1,
+            "code": 2304,
+            "end": 7,
+            "file": "plain",
+            "message_key": "Cannot_find_name_0_2304",
+            "message_text": "",
+            "pos": 6,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "p1"
+        },
+        {
+          "diagnostic": {
+            "args": [
+              "b"
+            ],
+            "category": 1,
+            "code": 2304,
+            "end": 20,
+            "file": "plain",
+            "message_key": "Cannot_find_name_0_2304",
+            "message_text": "",
+            "pos": 19,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "p2"
+        },
+        {
+          "diagnostic": {
+            "args": [
+              "c"
+            ],
+            "category": 1,
+            "code": 2304,
+            "end": 7,
+            "file": "other",
+            "message_key": "Cannot_find_name_0_2304",
+            "message_text": "",
+            "pos": 6,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "o1"
+        },
+        {
+          "case_sensitive": true,
+          "current_directory": "/src",
+          "errors": [
+            "p2",
+            "p1"
+          ],
+          "new_line": "\n",
+          "op": "pretty_path",
+          "target": "plain",
+          "locale": "de-DE"
+        },
+        {
+          "case_sensitive": true,
+          "current_directory": "",
+          "errors": [
+            "p1"
+          ],
+          "new_line": "\n",
+          "op": "pretty_path",
+          "target": "plain",
+          "locale": "de-DE"
+        },
+        {
+          "case_sensitive": true,
+          "current_directory": "/src",
+          "new_line": "\n",
+          "op": "pretty_path_nil_file",
+          "locale": "de-DE"
+        },
+        {
+          "case_sensitive": true,
+          "current_directory": "/src",
+          "files": [
+            [
+              "other",
+              "o1"
+            ],
+            [
+              "plain",
+              "p1",
+              "p2"
+            ]
+          ],
+          "new_line": "\n",
+          "op": "tabular_errors",
+          "locale": "de-DE"
+        },
+        {
+          "case_sensitive": true,
+          "current_directory": "",
+          "files": [
+            [
+              "plain",
+              "p1",
+              "p2"
+            ]
+          ],
+          "new_line": "\n",
+          "op": "tabular_errors",
+          "locale": "de-DE"
+        },
+        {
+          "op": "error_summary",
+          "targets": [],
+          "locale": "de-DE",
+          "current_directory": "/src",
+          "new_line": "\n",
+          "case_sensitive": true
+        },
+        {
+          "op": "error_summary",
+          "targets": [
+            "p1"
+          ],
+          "locale": "de-DE",
+          "current_directory": "/src",
+          "new_line": "\n",
+          "case_sensitive": true
+        },
+        {
+          "op": "error_summary",
+          "targets": [
+            "p1",
+            "p2"
+          ],
+          "locale": "de-DE",
+          "current_directory": "/src",
+          "new_line": "\n",
+          "case_sensitive": true
+        },
+        {
+          "op": "error_summary",
+          "targets": [
+            "p1",
+            "p2",
+            "o1"
+          ],
+          "locale": "de-DE",
+          "current_directory": "/src",
+          "new_line": "\n",
+          "case_sensitive": true
+        }
+      ],
+      "case": "config/diagwriter/localized/de-DE/the-tabular-display-pads-the-count-column-and-relativises-the-path",
+      "discriminates": "Native diagnostic writer with locale de-DE: Three separable rules the summary text hides. First, the count column is padded to max(len(\"Errors\"), digits) = 6 and the header itself is padded by max(digits-6, 0) = 0, so every count is right-aligned in six columns (diagnosticwriter.go:522-528) -- a port that pads to the widest count writes one column. Second, the line number comes from the FIRST entry of the file's error slice in the order it was given, not the smallest position: row 6 hands the two plain-file errors in the order p2 then p1 and must report p2's line, 2, not 1. Third, the relative conversion happens only when the file name and the current directory are BOTH absolute (:548-551), so row 7 with an empty current directory keeps the absolute /src/plain.ts while row 6 shortens it to plain.ts. The summary is assembled by this probe, not by getErrorSummary, so the grouping and sorting that normally precede the renderer are not part of the observation.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:writeTabularErrorsDisplay",
+      "order_sensitive": true,
+      "subject": "diagnosticWriter"
+    },
+    {
+      "actions": [
+        {
+          "file_name": "/src/plain.ts",
+          "op": "define_file",
+          "target": "plain",
+          "text": "const a = 1;\nconst b = 2;\n"
+        },
+        {
+          "file_name": "/src/other.ts",
+          "op": "define_file",
+          "target": "other",
+          "text": "const c = 3;\n"
+        },
+        {
+          "diagnostic": {
+            "args": [
+              "a"
+            ],
+            "category": 1,
+            "code": 2304,
+            "end": 7,
+            "file": "plain",
+            "message_key": "Cannot_find_name_0_2304",
+            "message_text": "",
+            "pos": 6,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "p1"
+        },
+        {
+          "diagnostic": {
+            "args": [
+              "b"
+            ],
+            "category": 1,
+            "code": 2304,
+            "end": 20,
+            "file": "plain",
+            "message_key": "Cannot_find_name_0_2304",
+            "message_text": "",
+            "pos": 19,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "p2"
+        },
+        {
+          "diagnostic": {
+            "args": [
+              "c"
+            ],
+            "category": 1,
+            "code": 2304,
+            "end": 7,
+            "file": "other",
+            "message_key": "Cannot_find_name_0_2304",
+            "message_text": "",
+            "pos": 6,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "o1"
+        },
+        {
+          "case_sensitive": true,
+          "current_directory": "/src",
+          "errors": [
+            "p2",
+            "p1"
+          ],
+          "new_line": "\n",
+          "op": "pretty_path",
+          "target": "plain",
+          "locale": "ja-JP"
+        },
+        {
+          "case_sensitive": true,
+          "current_directory": "",
+          "errors": [
+            "p1"
+          ],
+          "new_line": "\n",
+          "op": "pretty_path",
+          "target": "plain",
+          "locale": "ja-JP"
+        },
+        {
+          "case_sensitive": true,
+          "current_directory": "/src",
+          "new_line": "\n",
+          "op": "pretty_path_nil_file",
+          "locale": "ja-JP"
+        },
+        {
+          "case_sensitive": true,
+          "current_directory": "/src",
+          "files": [
+            [
+              "other",
+              "o1"
+            ],
+            [
+              "plain",
+              "p1",
+              "p2"
+            ]
+          ],
+          "new_line": "\n",
+          "op": "tabular_errors",
+          "locale": "ja-JP"
+        },
+        {
+          "case_sensitive": true,
+          "current_directory": "",
+          "files": [
+            [
+              "plain",
+              "p1",
+              "p2"
+            ]
+          ],
+          "new_line": "\n",
+          "op": "tabular_errors",
+          "locale": "ja-JP"
+        },
+        {
+          "op": "error_summary",
+          "targets": [],
+          "locale": "ja-JP",
+          "current_directory": "/src",
+          "new_line": "\n",
+          "case_sensitive": true
+        },
+        {
+          "op": "error_summary",
+          "targets": [
+            "p1"
+          ],
+          "locale": "ja-JP",
+          "current_directory": "/src",
+          "new_line": "\n",
+          "case_sensitive": true
+        },
+        {
+          "op": "error_summary",
+          "targets": [
+            "p1",
+            "p2"
+          ],
+          "locale": "ja-JP",
+          "current_directory": "/src",
+          "new_line": "\n",
+          "case_sensitive": true
+        },
+        {
+          "op": "error_summary",
+          "targets": [
+            "p1",
+            "p2",
+            "o1"
+          ],
+          "locale": "ja-JP",
+          "current_directory": "/src",
+          "new_line": "\n",
+          "case_sensitive": true
+        }
+      ],
+      "case": "config/diagwriter/localized/ja-JP/the-tabular-display-pads-the-count-column-and-relativises-the-path",
+      "discriminates": "Native diagnostic writer with locale ja-JP: Three separable rules the summary text hides. First, the count column is padded to max(len(\"Errors\"), digits) = 6 and the header itself is padded by max(digits-6, 0) = 0, so every count is right-aligned in six columns (diagnosticwriter.go:522-528) -- a port that pads to the widest count writes one column. Second, the line number comes from the FIRST entry of the file's error slice in the order it was given, not the smallest position: row 6 hands the two plain-file errors in the order p2 then p1 and must report p2's line, 2, not 1. Third, the relative conversion happens only when the file name and the current directory are BOTH absolute (:548-551), so row 7 with an empty current directory keeps the absolute /src/plain.ts while row 6 shortens it to plain.ts. The summary is assembled by this probe, not by getErrorSummary, so the grouping and sorting that normally precede the renderer are not part of the observation.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:writeTabularErrorsDisplay",
+      "order_sensitive": true,
+      "subject": "diagnosticWriter"
+    },
+    {
+      "actions": [
+        {
+          "file_name": "/src/plain.ts",
+          "op": "define_file",
+          "target": "plain",
+          "text": "const a = 1;\nconst b = 2;\n"
+        },
+        {
+          "file_name": "/src/other.ts",
+          "op": "define_file",
+          "target": "other",
+          "text": "const c = 3;\n"
+        },
+        {
+          "diagnostic": {
+            "args": [
+              "a"
+            ],
+            "category": 1,
+            "code": 2304,
+            "end": 7,
+            "file": "plain",
+            "message_key": "Cannot_find_name_0_2304",
+            "message_text": "",
+            "pos": 6,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "p1"
+        },
+        {
+          "diagnostic": {
+            "args": [
+              "b"
+            ],
+            "category": 1,
+            "code": 2304,
+            "end": 20,
+            "file": "plain",
+            "message_key": "Cannot_find_name_0_2304",
+            "message_text": "",
+            "pos": 19,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "p2"
+        },
+        {
+          "diagnostic": {
+            "args": [
+              "c"
+            ],
+            "category": 1,
+            "code": 2304,
+            "end": 7,
+            "file": "other",
+            "message_key": "Cannot_find_name_0_2304",
+            "message_text": "",
+            "pos": 6,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "o1"
+        },
+        {
+          "case_sensitive": true,
+          "current_directory": "/src",
+          "errors": [
+            "p2",
+            "p1"
+          ],
+          "new_line": "\n",
+          "op": "pretty_path",
+          "target": "plain",
+          "locale": "nl-NL"
+        },
+        {
+          "case_sensitive": true,
+          "current_directory": "",
+          "errors": [
+            "p1"
+          ],
+          "new_line": "\n",
+          "op": "pretty_path",
+          "target": "plain",
+          "locale": "nl-NL"
+        },
+        {
+          "case_sensitive": true,
+          "current_directory": "/src",
+          "new_line": "\n",
+          "op": "pretty_path_nil_file",
+          "locale": "nl-NL"
+        },
+        {
+          "case_sensitive": true,
+          "current_directory": "/src",
+          "files": [
+            [
+              "other",
+              "o1"
+            ],
+            [
+              "plain",
+              "p1",
+              "p2"
+            ]
+          ],
+          "new_line": "\n",
+          "op": "tabular_errors",
+          "locale": "nl-NL"
+        },
+        {
+          "case_sensitive": true,
+          "current_directory": "",
+          "files": [
+            [
+              "plain",
+              "p1",
+              "p2"
+            ]
+          ],
+          "new_line": "\n",
+          "op": "tabular_errors",
+          "locale": "nl-NL"
+        },
+        {
+          "op": "error_summary",
+          "targets": [],
+          "locale": "nl-NL",
+          "current_directory": "/src",
+          "new_line": "\n",
+          "case_sensitive": true
+        },
+        {
+          "op": "error_summary",
+          "targets": [
+            "p1"
+          ],
+          "locale": "nl-NL",
+          "current_directory": "/src",
+          "new_line": "\n",
+          "case_sensitive": true
+        },
+        {
+          "op": "error_summary",
+          "targets": [
+            "p1",
+            "p2"
+          ],
+          "locale": "nl-NL",
+          "current_directory": "/src",
+          "new_line": "\n",
+          "case_sensitive": true
+        },
+        {
+          "op": "error_summary",
+          "targets": [
+            "p1",
+            "p2",
+            "o1"
+          ],
+          "locale": "nl-NL",
+          "current_directory": "/src",
+          "new_line": "\n",
+          "case_sensitive": true
+        }
+      ],
+      "case": "config/diagwriter/localized/nl-NL/the-tabular-display-pads-the-count-column-and-relativises-the-path",
+      "discriminates": "Native diagnostic writer with locale nl-NL: Three separable rules the summary text hides. First, the count column is padded to max(len(\"Errors\"), digits) = 6 and the header itself is padded by max(digits-6, 0) = 0, so every count is right-aligned in six columns (diagnosticwriter.go:522-528) -- a port that pads to the widest count writes one column. Second, the line number comes from the FIRST entry of the file's error slice in the order it was given, not the smallest position: row 6 hands the two plain-file errors in the order p2 then p1 and must report p2's line, 2, not 1. Third, the relative conversion happens only when the file name and the current directory are BOTH absolute (:548-551), so row 7 with an empty current directory keeps the absolute /src/plain.ts while row 6 shortens it to plain.ts. The summary is assembled by this probe, not by getErrorSummary, so the grouping and sorting that normally precede the renderer are not part of the observation.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:writeTabularErrorsDisplay",
+      "order_sensitive": true,
+      "subject": "diagnosticWriter"
+    },
+    {
+      "actions": [
+        {
+          "diagnostic": {
+            "category": 3,
+            "code": 6031,
+            "end": 0,
+            "file": "",
+            "message_key": "Starting_compilation_in_watch_mode_6031",
+            "message_text": "",
+            "pos": 0,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "starting"
+        },
+        {
+          "case_sensitive": true,
+          "current_directory": "/src",
+          "new_line": "\n",
+          "op": "status_with_color_and_time",
+          "target": "starting",
+          "time": "12:00:00 AM",
+          "locale": "de-DE"
+        },
+        {
+          "case_sensitive": true,
+          "current_directory": "/src",
+          "new_line": "\r\n",
+          "op": "status_with_color_and_time",
+          "target": "starting",
+          "time": "",
+          "locale": "de-DE"
+        }
+      ],
+      "case": "config/diagwriter/localized/de-DE/the-coloured-status-line-brackets-a-caller-supplied-time",
+      "discriminates": "Native diagnostic writer with locale de-DE: The bracket-and-grey rendering: \"[\", the time styled grey and reset, \"] \", then the flattened message (diagnosticwriter.go:581-586). The timestamp is the caller's string, never a clock, so the observation is deterministic; the second row passes an EMPTY time, which still emits the grey escape and the reset around nothing -- a port that skips the styling for an empty string is visible there and nowhere else.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:FormatDiagnosticsStatusWithColorAndTime",
+      "order_sensitive": true,
+      "subject": "diagnosticWriter"
+    },
+    {
+      "actions": [
+        {
+          "diagnostic": {
+            "category": 3,
+            "code": 6031,
+            "end": 0,
+            "file": "",
+            "message_key": "Starting_compilation_in_watch_mode_6031",
+            "message_text": "",
+            "pos": 0,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "starting"
+        },
+        {
+          "case_sensitive": true,
+          "current_directory": "/src",
+          "new_line": "\n",
+          "op": "status_with_color_and_time",
+          "target": "starting",
+          "time": "12:00:00 AM",
+          "locale": "ja-JP"
+        },
+        {
+          "case_sensitive": true,
+          "current_directory": "/src",
+          "new_line": "\r\n",
+          "op": "status_with_color_and_time",
+          "target": "starting",
+          "time": "",
+          "locale": "ja-JP"
+        }
+      ],
+      "case": "config/diagwriter/localized/ja-JP/the-coloured-status-line-brackets-a-caller-supplied-time",
+      "discriminates": "Native diagnostic writer with locale ja-JP: The bracket-and-grey rendering: \"[\", the time styled grey and reset, \"] \", then the flattened message (diagnosticwriter.go:581-586). The timestamp is the caller's string, never a clock, so the observation is deterministic; the second row passes an EMPTY time, which still emits the grey escape and the reset around nothing -- a port that skips the styling for an empty string is visible there and nowhere else.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:FormatDiagnosticsStatusWithColorAndTime",
+      "order_sensitive": true,
+      "subject": "diagnosticWriter"
+    },
+    {
+      "actions": [
+        {
+          "diagnostic": {
+            "category": 3,
+            "code": 6031,
+            "end": 0,
+            "file": "",
+            "message_key": "Starting_compilation_in_watch_mode_6031",
+            "message_text": "",
+            "pos": 0,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "starting"
+        },
+        {
+          "case_sensitive": true,
+          "current_directory": "/src",
+          "new_line": "\n",
+          "op": "status_with_color_and_time",
+          "target": "starting",
+          "time": "12:00:00 AM",
+          "locale": "nl-NL"
+        },
+        {
+          "case_sensitive": true,
+          "current_directory": "/src",
+          "new_line": "\r\n",
+          "op": "status_with_color_and_time",
+          "target": "starting",
+          "time": "",
+          "locale": "nl-NL"
+        }
+      ],
+      "case": "config/diagwriter/localized/nl-NL/the-coloured-status-line-brackets-a-caller-supplied-time",
+      "discriminates": "Native diagnostic writer with locale nl-NL: The bracket-and-grey rendering: \"[\", the time styled grey and reset, \"] \", then the flattened message (diagnosticwriter.go:581-586). The timestamp is the caller's string, never a clock, so the observation is deterministic; the second row passes an EMPTY time, which still emits the grey escape and the reset around nothing -- a port that skips the styling for an empty string is visible there and nowhere else.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:FormatDiagnosticsStatusWithColorAndTime",
+      "order_sensitive": true,
+      "subject": "diagnosticWriter"
+    },
+    {
+      "actions": [
+        {
+          "diagnostic": {
+            "category": 3,
+            "code": 6032,
+            "end": 0,
+            "file": "",
+            "message_key": "File_change_detected_Starting_incremental_compilation_6032",
+            "message_text": "",
+            "pos": 0,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "changed"
+        },
+        {
+          "case_sensitive": true,
+          "current_directory": "/src",
+          "new_line": "\n",
+          "op": "status_and_time",
+          "target": "changed",
+          "time": "12:00:00 AM",
+          "locale": "de-DE"
+        },
+        {
+          "case_sensitive": true,
+          "current_directory": "/src",
+          "new_line": "\n",
+          "op": "status_and_time",
+          "target": "changed",
+          "time": "",
+          "locale": "de-DE"
+        }
+      ],
+      "case": "config/diagwriter/localized/de-DE/the-plain-status-line-joins-time-and-message-with-a-spaced-dash",
+      "discriminates": "Native diagnostic writer with locale de-DE: The uncoloured variant is not the coloured one with the escapes removed. It uses fmt.Fprint with TWO operands (diagnosticwriter.go:588-591), and Go's Fprint inserts a space between operands only when neither is a string -- both are -- so the separator is exactly the literal \" - \" with no added space, and there are no brackets at all. The empty-time row shows the dash is emitted regardless.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:FormatDiagnosticsStatusAndTime",
+      "order_sensitive": true,
+      "subject": "diagnosticWriter"
+    },
+    {
+      "actions": [
+        {
+          "diagnostic": {
+            "category": 3,
+            "code": 6032,
+            "end": 0,
+            "file": "",
+            "message_key": "File_change_detected_Starting_incremental_compilation_6032",
+            "message_text": "",
+            "pos": 0,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "changed"
+        },
+        {
+          "case_sensitive": true,
+          "current_directory": "/src",
+          "new_line": "\n",
+          "op": "status_and_time",
+          "target": "changed",
+          "time": "12:00:00 AM",
+          "locale": "ja-JP"
+        },
+        {
+          "case_sensitive": true,
+          "current_directory": "/src",
+          "new_line": "\n",
+          "op": "status_and_time",
+          "target": "changed",
+          "time": "",
+          "locale": "ja-JP"
+        }
+      ],
+      "case": "config/diagwriter/localized/ja-JP/the-plain-status-line-joins-time-and-message-with-a-spaced-dash",
+      "discriminates": "Native diagnostic writer with locale ja-JP: The uncoloured variant is not the coloured one with the escapes removed. It uses fmt.Fprint with TWO operands (diagnosticwriter.go:588-591), and Go's Fprint inserts a space between operands only when neither is a string -- both are -- so the separator is exactly the literal \" - \" with no added space, and there are no brackets at all. The empty-time row shows the dash is emitted regardless.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:FormatDiagnosticsStatusAndTime",
+      "order_sensitive": true,
+      "subject": "diagnosticWriter"
+    },
+    {
+      "actions": [
+        {
+          "diagnostic": {
+            "category": 3,
+            "code": 6032,
+            "end": 0,
+            "file": "",
+            "message_key": "File_change_detected_Starting_incremental_compilation_6032",
+            "message_text": "",
+            "pos": 0,
+            "source": ""
+          },
+          "op": "define_diagnostic",
+          "target": "changed"
+        },
+        {
+          "case_sensitive": true,
+          "current_directory": "/src",
+          "new_line": "\n",
+          "op": "status_and_time",
+          "target": "changed",
+          "time": "12:00:00 AM",
+          "locale": "nl-NL"
+        },
+        {
+          "case_sensitive": true,
+          "current_directory": "/src",
+          "new_line": "\n",
+          "op": "status_and_time",
+          "target": "changed",
+          "time": "",
+          "locale": "nl-NL"
+        }
+      ],
+      "case": "config/diagwriter/localized/nl-NL/the-plain-status-line-joins-time-and-message-with-a-spaced-dash",
+      "discriminates": "Native diagnostic writer with locale nl-NL: The uncoloured variant is not the coloured one with the escapes removed. It uses fmt.Fprint with TWO operands (diagnosticwriter.go:588-591), and Go's Fprint inserts a space between operands only when neither is a string -- both are -- so the separator is exactly the literal \" - \" with no added space, and there are no brackets at all. The empty-time row shows the dash is emitted regardless.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/diagnosticwriter/diagnosticwriter.go:FormatDiagnosticsStatusAndTime",
+      "order_sensitive": true,
+      "subject": "diagnosticWriter"
     }
   ]
 }

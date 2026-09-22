@@ -51,7 +51,7 @@ fn case_sensitive() -> bool {
     }
     let exe = native::executable().expect("vfs: failed to get executable path");
     let swapped = swap_case(&exe);
-    match std::fs::metadata(native::path(&swapped)) {
+    match native::metadata(native::path(&swapped)) {
         Ok(_) => false,
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => true,
         Err(e) => panic!(
@@ -123,7 +123,7 @@ impl OsFs {
     pub fn ensure_directory(&self, path: &[u8]) -> Result<(), Error> {
         let _permit = BLOCKING.acquire();
         // os.MkdirAll's stat fast path distinguishes a file from EEXIST.
-        match std::fs::metadata(native::path(path)) {
+        match native::metadata(native::path(path)) {
             Ok(m) if m.is_dir() => return Ok(()),
             Ok(_) => {
                 return Err(native::failure(
@@ -242,7 +242,7 @@ impl FileSystem for OsFs {
                 return Ok(());
             }
             let p = native::path(path);
-            let result = match std::fs::symlink_metadata(&p) {
+            let result = match native::symlink_metadata(&p) {
                 Ok(m) if m.is_dir() => std::fs::remove_dir_all(p),
                 Ok(_) => std::fs::remove_file(p),
                 Err(e) => Err(e),

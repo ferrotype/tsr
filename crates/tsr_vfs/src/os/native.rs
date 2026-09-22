@@ -33,18 +33,20 @@ pub fn failure(op: &'static str, path: &[u8], error: std::io::Error) -> IoError 
 /// port: tsc/internal/nativepath/symlink_other.go:IsSymlinkOrReparsePoint
 #[cfg(not(windows))]
 pub fn is_symlink_or_reparse_point(name: &[u8]) -> bool {
-    std::fs::symlink_metadata(path(name)).is_ok_and(|m| m.file_type().is_symlink())
+    symlink_metadata(path(name)).is_ok_and(|m| m.file_type().is_symlink())
 }
 #[cfg(windows)]
 pub fn is_symlink_or_reparse_point(name: &[u8]) -> bool {
     use std::os::windows::fs::MetadataExt;
-    std::fs::symlink_metadata(path(name)).is_ok_and(|m| m.file_attributes() & 0x400 != 0)
+    symlink_metadata(path(name)).is_ok_and(|m| m.file_attributes() & 0x400 != 0)
 }
 /// Retry only a raw syscall EINTR, not a caller-created or wrapped error that
 /// merely has `ErrorKind::Interrupted`.
 /// port: tsc/internal/nativepath/eintr_unix.go:ignoringEINTR
-#[cfg(any(target_os = "linux", all(test, unix)))]
-fn ignoring_eintr<T>(mut operation: impl FnMut() -> std::io::Result<T>) -> std::io::Result<T> {
+#[cfg(unix)]
+pub(super) fn ignoring_eintr<T>(
+    mut operation: impl FnMut() -> std::io::Result<T>,
+) -> std::io::Result<T> {
     loop {
         match operation() {
             Err(error) if error.raw_os_error() == Some(rustix::io::Errno::INTR.raw_os_error()) => {}
@@ -52,13 +54,31 @@ fn ignoring_eintr<T>(mut operation: impl FnMut() -> std::io::Result<T>) -> std::
         }
     }
 }
+// Rust's Unix std metadata/readlink functions do not retry EINTR; Go's os
+// functions do. Keep retries around each syscall, not whole filesystem actions.
+#[cfg(not(unix))]
+pub(super) fn ignoring_eintr<T>(
+    mut operation: impl FnMut() -> std::io::Result<T>,
+) -> std::io::Result<T> {
+    operation()
+}
+pub(super) fn metadata(path: impl AsRef<Path>) -> std::io::Result<std::fs::Metadata> {
+    ignoring_eintr(|| std::fs::metadata(path.as_ref()))
+}
+pub(super) fn symlink_metadata(path: impl AsRef<Path>) -> std::io::Result<std::fs::Metadata> {
+    ignoring_eintr(|| std::fs::symlink_metadata(path.as_ref()))
+}
+#[cfg(not(windows))]
+fn read_link(path: impl AsRef<Path>) -> std::io::Result<PathBuf> {
+    ignoring_eintr(|| std::fs::read_link(path.as_ref()))
+}
 /// port: tsc/internal/nativepath/realpath_linux.go:Realpath
 #[cfg(target_os = "linux")]
 pub fn realpath(name: &[u8]) -> Result<Vec<u8>, IoError> {
     use rustix::fs::{openat, Mode, OFlags, CWD};
     use std::os::fd::AsRawFd;
     static PROC: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
-    if !*PROC.get_or_init(|| std::fs::metadata("/proc/self/fd").is_ok()) {
+    if !*PROC.get_or_init(|| metadata("/proc/self/fd").is_ok()) {
         return eval_symlinks(name);
     }
     let fd = ignoring_eintr(|| {
@@ -72,8 +92,7 @@ pub fn realpath(name: &[u8]) -> Result<Vec<u8>, IoError> {
     })
     .map_err(|error| failure("open", name, error))?;
     let proc_path = format!("/proc/self/fd/{}", fd.as_raw_fd());
-    let resolved = ignoring_eintr(|| std::fs::read_link(&proc_path))
-        .map_err(|e| failure("readlink", name, e))?;
+    let resolved = read_link(&proc_path).map_err(|e| failure("readlink", name, e))?;
     Ok(bytes(&resolved))
 }
 /// port: tsc/internal/nativepath/realpath_other.go:Realpath
@@ -138,8 +157,7 @@ fn eval_symlinks(name: &[u8]) -> Result<Vec<u8>, IoError> {
             dest.push(b'/');
         }
         dest.extend_from_slice(part);
-        let info =
-            std::fs::symlink_metadata(path(&dest)).map_err(|e| failure("lstat", &dest, e))?;
+        let info = symlink_metadata(path(&dest)).map_err(|e| failure("lstat", &dest, e))?;
         if !info.file_type().is_symlink() {
             if !info.is_dir() && at < name.len() {
                 return Err(std::io::Error::from(std::io::ErrorKind::NotADirectory).into());
@@ -150,8 +168,7 @@ fn eval_symlinks(name: &[u8]) -> Result<Vec<u8>, IoError> {
         if links > 255 {
             return Err(IoError::message("EvalSymlinks: too many links"));
         }
-        let target =
-            bytes(&std::fs::read_link(path(&dest)).map_err(|e| failure("readlink", &dest, e))?);
+        let target = bytes(&read_link(path(&dest)).map_err(|e| failure("readlink", &dest, e))?);
         let mut next = target.clone();
         next.extend_from_slice(&name[at..]);
         name = next;

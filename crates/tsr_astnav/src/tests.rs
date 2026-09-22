@@ -240,7 +240,27 @@ fn jsx_shift_rescan_matches_the_pinned_private_operation() {
         scanner.set_text(&text);
         scanner.scan();
         let before = i64::from(scanner.token() as u16);
-        let after = super::scan_navigation_token(&mut scanner, fields[1] == "true");
+        // Build the containing node, then execute the same classification as
+        // both production navigation paths. Passing the fixture boolean here
+        // would miss a broken is_jsx_child implementation entirely.
+        use tsr_ast::{AstBuilder, FactoryMethods};
+        let mut builder = AstBuilder::new(SourceText::default(), &tsr_arena::Counters::new());
+        let containing = if fields[1] == "true" {
+            builder.new_jsx_expression(None, None)
+        } else {
+            builder.new_source_file(
+                SourceFileParseOptions {
+                    file_name: tsr_ast::JsString::from_bytes(b"/rescan.ts".as_slice()),
+                    ..Default::default()
+                },
+                SourceText::default(),
+                None,
+                None,
+            )
+        };
+        let jsx_child = tsr_ast::utilities::is_jsx_child(&builder.view().node(containing).unwrap());
+        assert_eq!(jsx_child, fields[1] == "true");
+        let after = super::scan_navigation_token(&mut scanner, jsx_child);
         assert_eq!(
             [
                 before,

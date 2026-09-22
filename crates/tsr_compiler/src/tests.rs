@@ -94,6 +94,143 @@ fn retained_snapshot_edit_reuses_only_equal_parse_inputs() {
 }
 
 #[test]
+fn live_filesystem_snapshots_preserve_retained_program_files() {
+    use tsr_vfs::{os::ScopedOsFs, FileSystem};
+    struct TempRoot(std::path::PathBuf);
+    impl Drop for TempRoot {
+        fn drop(&mut self) {
+            let _ = std::fs::remove_dir_all(&self.0);
+        }
+    }
+    let nonce = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
+        .as_nanos();
+    let root = TempRoot(
+        std::env::temp_dir().join(format!("tsr-live-program-{}-{nonce}", std::process::id())),
+    );
+    std::fs::create_dir(&root.0).unwrap();
+    let main = root.0.join("main.ts");
+    let dependency = root.0.join("dep.ts");
+    std::fs::write(&main, b"export const oldName = 1;").unwrap();
+    std::fs::write(&dependency, b"export const unchanged = 2;").unwrap();
+    let os = ScopedOsFs::new(&root.0, true).unwrap();
+    let before_snapshot = Arc::new(os.snapshot().unwrap());
+    let cwd = JsString::from_bytes(before_snapshot.current_directory());
+    let main_name = tsr_tspath::combine(cwd.as_bytes(), &[b"main.ts"]);
+    let dependency_name = tsr_tspath::combine(cwd.as_bytes(), &[b"dep.ts"]);
+    let config = || {
+        tsr_tsoptions::ParsedCommandLine::new(
+            tsr_core::CompilerOptions {
+                no_lib: tsr_core::Tristate::TRUE,
+                ..Default::default()
+            },
+            vec![
+                JsString::from_bytes(main_name.as_slice()),
+                JsString::from_bytes(dependency_name.as_slice()),
+            ],
+        )
+    };
+    let options = |host| ProgramOptions {
+        config: config(),
+        host,
+        current_directory: cwd.clone(),
+        default_library_path: JsString::from_bytes(tsr_bundled::LIB_PATH),
+        skip_module_resolution: false,
+    };
+    let counters = Counters::new();
+    let mut cache = FileCache::new();
+    let before = Program::load(options(before_snapshot.clone()), &mut cache, &counters).unwrap();
+    let old_main = before.file(&main_name).unwrap();
+    let old_source = old_main.source();
+    let unchanged = before.file(&dependency_name).unwrap().source();
+    let retained = old_main.bound().clone();
+    let old_locals = retained
+        .view()
+        .node_binding(old_source)
+        .unwrap()
+        .unwrap()
+        .locals
+        .unwrap();
+    let old_name = retained
+        .view()
+        .result()
+        .tables()
+        .get(old_locals)
+        .unwrap()
+        .get(b"oldName".as_slice())
+        .unwrap()
+        .unwrap();
+
+    // This is one pipeline: the second immutable program host comes from
+    // re-acquiring the same live directory after a physical edit.
+    std::fs::write(&main, b"export const newName = 3;").unwrap();
+    let after_snapshot = Arc::new(os.snapshot().unwrap());
+    assert_eq!(
+        before_snapshot
+            .read_file(&main_name)
+            .unwrap()
+            .unwrap()
+            .raw
+            .as_ref(),
+        b"export const oldName = 1;"
+    );
+    assert_eq!(
+        after_snapshot
+            .read_file(&main_name)
+            .unwrap()
+            .unwrap()
+            .raw
+            .as_ref(),
+        b"export const newName = 3;"
+    );
+    let after = Program::load(options(after_snapshot), &mut cache, &counters).unwrap();
+    let new_main = after.file(&main_name).unwrap();
+    assert_ne!(new_main.source(), old_source);
+    assert_eq!(after.file(&dependency_name).unwrap().source(), unchanged);
+    let new_locals = new_main
+        .bound()
+        .view()
+        .node_binding(new_main.source())
+        .unwrap()
+        .unwrap()
+        .locals
+        .unwrap();
+    let table = new_main
+        .bound()
+        .view()
+        .result()
+        .tables()
+        .get(new_locals)
+        .unwrap();
+    let new_name = table.get(b"newName".as_slice()).unwrap().unwrap();
+    assert_eq!(
+        new_main
+            .bound()
+            .view()
+            .symbol(new_name)
+            .unwrap()
+            .name_bytes(),
+        b"newName"
+    );
+    assert!(table.get(b"oldName".as_slice()).is_none());
+    drop(before);
+    drop(after);
+    cache.prune();
+    assert_eq!(
+        retained.view().source_file().unwrap().text().as_bytes(),
+        b"export const oldName = 1;"
+    );
+    assert_eq!(
+        retained.view().symbol(old_name).unwrap().name_bytes(),
+        b"oldName"
+    );
+    drop(retained);
+    cache.prune();
+    assert_eq!(counters.snapshot(), tsr_arena::Counts::default());
+}
+
+#[test]
 fn resolver_scope_routes_retained_files_and_rejects_foreign_generations() {
     use tsr_binder::name_resolver::ResolverHost;
     let requests: Vec<Value> =

@@ -65,6 +65,7 @@ func phase1ScannerNilElementComment(t *testing.T, call func() string) (out any) 
 func phase1ScannerCall(t *testing.T, r phase1ScannerRequest) any {
 	t.Helper()
 	operation := map[string]string{
+		"default_state":       "tsc/internal/scanner/scanner.go:defaultScanner",
 		"comment":             "tsc/internal/scanner/utilities.go:GetTextOfJSDocComment",
 		"comment_nil_element": "tsc/internal/scanner/utilities.go:GetTextOfJSDocComment",
 		"lines":               "tsc/internal/scanner/scanner.go:GetECMALineStarts",
@@ -83,6 +84,21 @@ func phase1ScannerCall(t *testing.T, r phase1ScannerRequest) any {
 	file := f.NewSourceFile(ast.SourceFileParseOptions{FileName: "/scanner.ts"}, text, nil, nil).AsSourceFile()
 	out := []any{}
 	switch r.Call {
+	case "default_state":
+		s := NewScanner()
+		snapshot := func() []any {
+			return []any{int(s.Token()), s.TokenFullStart(), s.TokenStart(), s.TokenEnd(), int(s.TokenFlags()), hex.EncodeToString([]byte(s.TokenText()))}
+		}
+		out = append(out, snapshot())
+		s.SetText(text)
+		s.Scan()
+		out = append(out, snapshot())
+		s.SetSkipTrivia(false)
+		s.Reset()
+		out = append(out, snapshot())
+		s.SetText(text)
+		s.Scan()
+		out = append(out, snapshot())
 	case "lines":
 		first := GetECMALineStarts(file)
 		second := GetECMALineStarts(file)

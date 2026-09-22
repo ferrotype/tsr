@@ -289,7 +289,7 @@
     },
     {
       "case": "syntax/evaluator/outer-expressions-all",
-      "discriminates": "The same expressions with every outer kind skipped: the skip set is a real parameter, OR'ed with parentheses (evaluator.go:42).",
+      "discriminates": "The same parsed parentheses, as, satisfies, non-null and angle-bracket type assertions with skip=all. This observes those five parsed forms, not synthesized PartiallyEmittedExpression or JSDoc assertions.",
       "entities": {
         "E.A": {
           "has_external_references": false,
@@ -432,7 +432,7 @@
     },
     {
       "case": "syntax/evaluator/prefix-unary",
-      "discriminates": "+, - and ~ on a number; ! ++ -- and any operator on a non-number fall through to nil while keeping the operand's cross-file flags and never setting string-ness.",
+      "discriminates": "+, - and ~ on a number; ! and numeric operators on non-numbers fall through to nil while keeping the operand's cross-file flags and never setting string-ness. No ++ or -- appears in this request.",
       "entities": {
         "E.A": {
           "has_external_references": false,
@@ -861,7 +861,7 @@
     },
     {
       "case": "syntax/evaluator/non-arithmetic-operators",
-      "discriminates": "Comparison, equality, logical, nullish, comma and assignment operators evaluate both sides and return nil with the OR'ed flags.",
+      "discriminates": "Comparison, equality, logical, nullish and comma operators evaluate both sides and return nil with the OR'ed flags. This request does not include assignments.",
       "entities": {
         "E.A": {
           "has_external_references": false,

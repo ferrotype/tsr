@@ -12,6 +12,7 @@ import gzip
 import hashlib
 import json
 from pathlib import Path
+import shlex
 
 import phase1_capture as capture
 import phase1_scope as scope
@@ -25,6 +26,58 @@ ROUTES = {
     "pilot": (None, "P1A-F0", None),
 }
 OWNERS = {"leaves": "F1b", "filesystem": "F2b", "config": "F3b", "syntax": "F4b"}
+
+# Audited execution routes, not guesses from the witness's human-readable
+# `producer` text. Each runner below checks an exact named test inventory or
+# compares every row of its declared corpus before emitting the metric.
+RUST_ROUTES = {
+    "run.program.helpers": ("scripts/s07_program_helpers.py", "data/s07/program-helper-tests.json", (
+        "rust-contract/tsr-tsoptions-boundary", "witness/s07-config-mappers-rust", "witness/s07-config-resolver-rust",
+        "witness/s07-config-source-rust", "witness/s07-include-reasons-rust", "witness/s07-module-trace-rust",
+        "witness/s07-packagejson-rust", "witness/s07-parsed-command-line-rust", "witness/s07-path-observations-rust",
+        "witness/s07-program-loader-rust", "witness/s07-verify-options-rust", "witness/s07-program-boundaries-rust",
+        "witness/s07-include-helper-paths-rust")),
+    "run.binder.helpers": ("scripts/s07_helpers.py", "data/s07/helper-tests.json", (
+        "witness/s07-ast-helpers-rust", "witness/s07-bound-clone-rust", "witness/s07-diagnostic-order-rust",
+        "witness/s07-helper-tests-go-sort", "witness/s07-helper-tests-pattern", "witness/s07-resolver-audited-helper-paths",
+        "witness/s07-resolver-rust", "witness/s07-scanner-declaration-text-path", "witness/s07-scanner-helpers-rust")),
+    "run.e1.ast_utilities": ("scripts/s06_utilities.py", "data/s06/utility-tests.json", (
+        "witness/s06-accessor-observations-rust", "witness/s06-ast-utilities-middle-rust",
+        "witness/s06-utilities-front-rust", "witness/s06-utilities-tail-rust")),
+    "run.e1.ast_runtime": ("scripts/s06.py", "data/s06/fixtures.json", (
+        "witness/s06-factory-fixtures-rust", "witness/s06-kind-stringer")),
+    "run.e1.parity": ("scripts/s06.py", "data/s06/cases.json", ("witness/s06-e1-parse-corpus",)),
+    "run.binder.parity": ("scripts/s07_producers.py", "data/s07/binder-cases.json", ("witness/s07-binder-corpus",)),
+    "run.binder.supplemental_parity": ("scripts/s07_producers.py", "data/s07/binder-probes.json", (
+        "witness/s07-binder-supplemental-diagnostics-paths", "witness/s07-binder-supplemental-generated-names")),
+    "run.scanner.parity": ("scripts/s05.py", "data/s05/cases.json", (
+        "witness/s05-scanner-cases", "witness/s05-scanner-operation-actions")),
+    "run.e4.parity": ("scripts/s04.py", "data/s04/e4-cases.json", (
+        "witness/s04-e4-probes", "witness/s04-scanner-position-actions")),
+}
+
+
+def metric_contributors(cases, witnesses, external_inventories=()):
+    """Every published behavior route must name at least one actual witness."""
+    contributors = defaultdict(list)
+    for row in cases:
+        for metric in row["producer_metrics"]:
+            contributors[metric].append(row["id"])
+    for row in witnesses:
+        for metric in row["producer_metrics"]:
+            contributors[metric].append(row["id"])
+    for row in external_inventories:
+        if type(row.get("contributor_count")) is not int or row["contributor_count"] <= 0:
+            raise ValueError("external metric inventory has no contributing observations: " + row["id"])
+        for metric in row["producer_metrics"]:
+            contributors[metric].append("inventory:" + row["id"])
+    required = {row[0] for row in ROUTES.values() if row[0]} | {"run.config.parity"} | set(RUST_ROUTES)
+    required.add("run.foundations.rust_witnesses_complete")
+    required.update(("run.syntax.parity", "run.foundations.integration_complete"))
+    empty = sorted(metric for metric in required if not contributors[metric])
+    if empty:
+        raise ValueError("metrics have no contributing observations: " + ", ".join(empty))
+    return {metric: sorted(set(ids)) for metric, ids in sorted(contributors.items())}
 
 
 def _bytes(value: object) -> bytes:
@@ -128,7 +181,7 @@ def build(root: Path = ROOT, *, supplemental_prepared_cases=()) -> dict:
         if identity in approvals or request is None:
             problems.append(f"{identity}: duplicate or unknown approved difference")
             continue
-        if row.get("family") != request[0] or row.get("request_sha256") != _sha(capture.canonical(request[2]) + b"\n"):
+        if row.get("family") != request[0] or row.get("request_sha256") != _sha(capture.request_bytes(request[2])):
             problems.append(f"{identity}: approved difference request changed")
         if not row.get("approved_by") or not (root / row.get("decision", "").split("#")[0]).is_file():
             problems.append(f"{identity}: approved difference lacks a recorded owner decision")
@@ -143,6 +196,7 @@ def build(root: Path = ROOT, *, supplemental_prepared_cases=()) -> dict:
             if row.get("result") == "observed":
                 native[row["case"]].append({"artifact": relative, "observation_sha256": _sha(_bytes(row.get("observation")))})
     links: dict[str, list[str]] = defaultdict(list)
+    recorded_results = scope.recorded_results(manifest)
     joined_cases = []
     baseline_links: dict[str, list[str]] = defaultdict(list)
     for row in sorted(cases, key=lambda value: value["id"]):
@@ -158,11 +212,15 @@ def build(root: Path = ROOT, *, supplemental_prepared_cases=()) -> dict:
             continue
         config = capture.FAMILIES[family]
         metric, preparation_item, production_item = ROUTES[family]
+        routes = [metric] if metric else []
         if row.get("baseline"):
             baseline = row["baseline"]
             baseline_path = baseline["path"] if isinstance(baseline, dict) else baseline
             baseline_links[baseline_path].append(identity)
             metric, production_item = "run.config.parity", "P1B-F3b"
+            routes = [metric]
+            if family == "filesystem":
+                routes.append("run.foundations.filesystem_complete")
         for operation in row.get("operations", []):
             if operation not in operations:
                 problems.append(f"{identity}: orphan operation {operation}")
@@ -174,19 +232,21 @@ def build(root: Path = ROOT, *, supplemental_prepared_cases=()) -> dict:
                 problems.append(f"{identity}/{action}: action claims an operation outside its case")
         if not row.get("native_authority"):
             problems.append(f"{identity}: missing native authority")
-        result = row.get("last_result", "not_run")
+        result = recorded_results.get(identity, "not_run")
         if result not in capture.RESULTS:
             problems.append(f"{identity}: unknown recorded result {result!r}")
         if result not in ("native_unavailable", "not_run") and not native[identity]:
             problems.append(f"{identity}: recorded comparison has no frozen native observation")
         joined_cases.append({
             "id": identity, "family": family, "request": request_path,
-            "request_sha256": _sha(capture.canonical(request) + b"\n"),
+            "request_sha256": _sha(capture.request_bytes(request)),
             "operations": row.get("operations", []), "actions": row.get("operation_actions", {}),
             "native_authority": row.get("native_authority"), "native_observations": native[identity],
+            "expected_contract": row.get("expected_contract"), "missing_operations": row.get("missing_operations", []),
             "rust_driver": config.get("rust_driver", config["rust_target"]),
             "comparator": "scripts/phase1_capture.py:compare", "recorded_result": result,
-            "producer_metric": metric, "preparation_sprint_item": preparation_item,
+            "historical_result": row.get("last_result", "not_run"),
+            "producer_metric": metric, "producer_metrics": routes, "preparation_sprint_item": preparation_item,
             "production_sprint_item": production_item,
             "acceptance": family != "pilot",
             "approved_difference": ({"decision": approvals[identity]["decision"],
@@ -202,6 +262,17 @@ def build(root: Path = ROOT, *, supplemental_prepared_cases=()) -> dict:
             problems.append(f"baseline {path}: duplicate case ownership {ids}")
 
     witness_ids: set[str] = set()
+    witness_routes = {}
+    for metric, (runner, inventory, identities) in RUST_ROUTES.items():
+        for relative in (runner, inventory):
+            inputs[relative] = _sha((root / relative).read_bytes())
+        for identity in identities:
+            witness_routes[identity] = {"producer_metrics": [metric], "runner": runner, "inventory": inventory}
+    from phase1_integration import RUST_WITNESS_TESTS
+    for identity, (command, tests) in RUST_WITNESS_TESTS.items():
+        witness_routes[identity] = {"producer_metrics": ["run.foundations.rust_witnesses_complete"],
+                                   "runner": "scripts/phase1_integration.py", "command": command, "tests": tests}
+    joined_witnesses = []
     for witness in manifest.get("witnesses", []):
         identity = witness["id"]
         if identity in witness_ids or identity in set(case_ids):
@@ -209,6 +280,12 @@ def build(root: Path = ROOT, *, supplemental_prepared_cases=()) -> dict:
         witness_ids.add(identity)
         if not (root / witness.get("artifact", "")).is_file():
             problems.append(f"{identity}: witness artifact missing")
+        if witness.get("kind") == "rust_gated" and witness.get("operations"):
+            route = witness_routes.get(identity)
+            if route is None:
+                problems.append(f"{identity}: Rust witness has no audited producer route")
+            joined_witnesses.append({"id": identity, "operations": witness["operations"],
+                                     **(route or {"producer_metrics": []})})
         for operation in witness.get("operations", []):
             if operation not in operations:
                 problems.append(f"{identity}: orphan witnessed operation {operation}")
@@ -235,6 +312,12 @@ def build(root: Path = ROOT, *, supplemental_prepared_cases=()) -> dict:
         root_cause = None
         if identity in unresolved:
             root_cause = "compiler_destination_unreviewed"
+        elif roster.get("state") == "exempt:later_step" and identity not in reviewed:
+            # A transfer out of F1a/F3a is not a transfer out of Phase 1. Keep
+            # these operations visible until an exact witness or a reviewed
+            # phase destination supplies their actual owner.
+            if not (set(links[identity]) & (preparing_cases | gated_witnesses)):
+                root_cause = "later_step_unresolved"
         elif roster.get("state") == "pending" and not (set(links[identity]) & (preparing_cases | gated_witnesses)):
             root_cause = ("implementation_unverified" if disposition == "missing" and row.get("basis_kind") == "rule"
                           else "operation_witness_missing")
@@ -246,8 +329,14 @@ def build(root: Path = ROOT, *, supplemental_prepared_cases=()) -> dict:
         if root_cause:
             gaps.append({**joined, "native": identity, "rust": row.get("annotated_home") or row.get("rust_home"),
                          "reason": row["basis"], "dependencies": row.get("depends_on", []),
-                         "reproduce": "python3 scripts/phase1_coverage.py check"})
+                         "reproduce": "python3 scripts/phase1_coverage.py explain --operation " + shlex.quote(identity)})
+    case_causes = {"different": "observation_difference", "not_implemented": "reported_missing_operation",
+                   "native_unavailable": "native_platform_unavailable", "harness_failed": "harness_failure",
+                   "not_run": "current_request_observation_missing"}
     case_gaps = [{"id": row["id"], "family": row["family"], "recorded_result": row["recorded_result"],
+                  "historical_result": row["historical_result"],
+                  "root_cause": "approved_semantic_difference" if row["approved_difference"] and row["recorded_result"] == "different" else case_causes[row["recorded_result"]],
+                  "expected_contract": row["expected_contract"], "missing_operations": row["missing_operations"],
                   "acceptance": row["acceptance"], "native": row["native_observations"],
                   "rust": {"driver": row["rust_driver"], "recorded_result": row["recorded_result"]},
                   "approved_difference": row["approved_difference"],
@@ -260,7 +349,39 @@ def build(root: Path = ROOT, *, supplemental_prepared_cases=()) -> dict:
     causes: dict[str, list[dict]] = defaultdict(list)
     for row in gaps:
         causes[row["root_cause"]].append(row)
-    for relative in ("scripts/phase1_coverage.py", "scripts/phase1_scope.py", "scripts/phase1_capture.py"):
+    # The complete program corpus and cross-family observations have their
+    # own validators. They are not leaf operation witnesses and must not be
+    # attributed to every operation reached by a large program. Record their
+    # exact, nonempty denominator and validator separately.
+    import phase1_syntax
+    import phase1_integration
+    syntax_schedule = load("data/phase1/syntax-schedule.json")
+    syntax_native = load("data/phase1/syntax-native.json")
+    syntax_cases = load("data/phase1/syntax-cases.json")
+    expected_syntax = phase1_syntax.select(syntax_schedule, syntax_native, full=True)
+    if not syntax_cases or syntax_cases != expected_syntax or len(set(syntax_cases)) != len(syntax_cases):
+        problems.append("external syntax metric inventory differs from the exact native schedule")
+    integration = load("data/phase1/integration.json")
+    integration_ids = [row.get("id") for row in integration["witnesses"]]
+    if set(integration_ids) != phase1_integration.WITNESSES or len(set(integration_ids)) != len(integration_ids):
+        problems.append("external integration metric inventory differs from the required witnesses")
+    external_inventories = [
+        {"id": "full-program-syntax", "producer_metrics": ["run.syntax.parity"],
+         "inventory": "data/phase1/syntax-cases.json", "inventory_sha256": inputs["data/phase1/syntax-cases.json"],
+         "contributor_count": len(syntax_cases), "validator": "scripts/phase1_producers.py:replay_program/require_rows",
+         "claim": "Every executable native schedule row must appear exactly once in the authenticated full program report."},
+        {"id": "integration", "producer_metrics": ["run.foundations.integration_complete"],
+         "inventory": "data/phase1/integration.json", "inventory_sha256": inputs["data/phase1/integration.json"],
+         "contributor_count": len(integration_ids) + 3, "observations": integration_ids + ["transport", "generation", "rust-witnesses"],
+         "validator": "scripts/phase1_integration.py:evaluate",
+         "claim": "All named cases and source-bound receipts must execute; transport requires 89 cases and the Rust witness receipt requires its exact test inventory."},
+    ]
+    try:
+        contributions = metric_contributors(joined_cases, joined_witnesses, external_inventories)
+    except ValueError as error:
+        problems.append(str(error))
+        contributions = {}
+    for relative in ("scripts/phase1_coverage.py", "scripts/phase1_scope.py", "scripts/phase1_capture.py", "scripts/phase1_integration.py"):
         inputs[relative] = _sha((root / relative).read_bytes())
     return {"version": 1, "pin": pin, "healthy": not problems,
             "preparation_complete": not problems and not gaps,
@@ -270,6 +391,8 @@ def build(root: Path = ROOT, *, supplemental_prepared_cases=()) -> dict:
                        "reviewed_later_phase_operations": len(reviewed),
                        "recorded_differences_with_scoped_approval": sum(row["recorded_result"] == "different" and row["approved_difference"] is not None for row in joined_cases)},
             "families": families, "operations": operation_rows, "cases": joined_cases,
+            "witnesses": joined_witnesses, "metric_contributors": contributions,
+            "external_inventories": external_inventories,
             "gaps": gaps, "case_gaps": case_gaps,
             "root_causes": [{"cause": cause, "count": len(rows), "example": rows[0]} for cause, rows in sorted(causes.items())],
             "input_sha256": dict(sorted(inputs.items())), "problems": problems,
@@ -287,10 +410,23 @@ def verify(document: dict, root: Path = ROOT) -> list[str]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=("report", "check"))
+    parser.add_argument("command", choices=("report", "check", "explain"))
     parser.add_argument("--output", type=Path)
+    parser.add_argument("--operation")
     args = parser.parse_args()
     document = build()
+    if args.command == "explain":
+        if args.output or not args.operation:
+            parser.error("explain requires --operation and cannot write a partial coverage report")
+        row = next((row for row in document["operations"] if row["id"] == args.operation), None)
+        if row is None:
+            parser.error("unknown pinned operation")
+        linked = set(row["links"])
+        print(json.dumps({"operation": row,
+                          "gap": next((gap for gap in document["gaps"] if gap["id"] == args.operation), None),
+                          "cases": [case for case in document["cases"] if case["id"] in linked],
+                          "witnesses": [witness for witness in document["witnesses"] if witness["id"] in linked]}, indent=2))
+        return
     if args.output and args.command == "report":
         args.output.parent.mkdir(parents=True, exist_ok=True)
         raw = _bytes(document)

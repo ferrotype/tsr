@@ -51,7 +51,8 @@
       "kind": "cases",
       "references": [
         "config/module/helpers/parsed-patterns-and-match",
-        "config/module/paths/substitution-and-ts-extension-suppression"
+        "config/module/paths/substitution-and-ts-extension-suppression",
+        "config/module/paths/source-order-beats-sorted-order"
       ],
       "command": [
         "python3",
@@ -64,7 +65,9 @@
         "--case",
         "config/module/helpers/parsed-patterns-and-match",
         "--case",
-        "config/module/paths/substitution-and-ts-extension-suppression"
+        "config/module/paths/substitution-and-ts-extension-suppression",
+        "--case",
+        "config/module/paths/source-order-beats-sorted-order"
       ],
       "owner": "F5b",
       "additional_tests": [
@@ -87,7 +90,7 @@
     },
     {
       "id": "retained-program-snapshot",
-      "claim": "An edited filesystem snapshot reloads changed text while retained bound files keep old text and symbols.",
+      "claim": "A physical edit is reacquired through ScopedOsFs into a new immutable program snapshot; changed files gain new text and symbols while an unchanged dependency is reused and a retained old bound file remains readable after both programs are dropped.",
       "kind": "test",
       "references": [
         "crates/tsr_compiler/src/tests.rs"
@@ -98,13 +101,13 @@
         "-p",
         "tsr_compiler",
         "--lib",
-        "tests::retained_snapshot_edit_reuses_only_equal_parse_inputs",
+        "tests::live_filesystem_snapshots_preserve_retained_program_files",
         "--",
         "--exact"
       ],
       "owner": "F5b",
-      "test": "retained_snapshot_edit_reuses_only_equal_parse_inputs",
-      "boundary": "The witness replaces an immutable MemorySnapshot; it does not prove polling a live OS filesystem or watch scheduling."
+      "test": "live_filesystem_snapshots_preserve_retained_program_files",
+      "boundary": "Exercises explicit live-directory acquisition into MemorySnapshot and retained program ownership. Watch scheduling is not claimed."
     },
     {
       "id": "live-cached-filesystem",
@@ -131,7 +134,7 @@
         "filesystem/cachedvfs/cached-hit-then-deletion"
       ],
       "owner": "F5b",
-      "boundary": "Composed with retained-program-snapshot for the Phase 1 contracts; no watch-mode connection or live filesystem freezing is claimed."
+      "boundary": "These rows directly witness the cached live filesystem API. The separate retained-program-snapshot test now physically edits and reacquires a live directory before loading the second program; it does not claim a watch-mode connection."
     },
     {
       "id": "installed-generated-assets",

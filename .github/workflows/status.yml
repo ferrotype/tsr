@@ -158,7 +158,10 @@ jobs:
         # Preparation health is independent of unfinished production parity.
         # This performs child-free contract validation; it does not capture
         # native corpora, run a benchmark, or require P1A/P1B to be complete.
-        run: python3 scripts/phase1_producers.py check
+        # Ordinary source changes stale their scoped captures; they do not
+        # invalidate the frozen operation-classification audit. Audit refresh
+        # remains phase1.py inventory --check, separate from harness contracts.
+        run: python3 scripts/phase1_producers.py check --structural
       - name: Workspace build
         if: ${{ !cancelled() && steps.validate.outcome == 'success' }}
         run: cargo xtask run workspace
@@ -196,12 +199,11 @@ jobs:
           case = "filesystem/osvfs/nativepath-realpath-linux-procfs"
           output = Path("target/phase1-platform/linux-realpath")
           capture.capture("filesystem", output, [case])
-          report = capture.compare(output)
-          (output / "comparison.json").write_text(json.dumps(report, indent=2) + "\n")
-          rows = [row for row in report["rows"] if row["case"] == case]
-          if len(rows) != 1 or rows[0]["result"] != "match":
-              raise SystemExit("Linux Realpath did not match: " + repr(rows))
           PY
+          python3 scripts/phase1_producers.py platform \
+            --capture filesystem=target/phase1-platform/linux-realpath \
+            --output target/phase1-platform/records \
+            > target/phase1-platform/record.json
       - name: Checker ownership, constructor and type-display contracts
         if: ${{ !cancelled() && steps.validate.outcome == 'success' }}
         run: |

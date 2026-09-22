@@ -4298,6 +4298,75 @@
       "operation": "tsc/internal/module/resolver.go:resolutionState.newResolutionState",
       "order_sensitive": true,
       "subject": "moduleResolution"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "cwd": "/p",
+          "extra_extensions": [],
+          "files": [
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/index.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/first.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/second.ts"
+            },
+            {
+              "content": "",
+              "kind": "file",
+              "path": "/p/src/exact.ts"
+            }
+          ],
+          "op": "new_resolver",
+          "options": {
+            "module": 199,
+            "moduleResolution": 99,
+            "paths": {
+              "x*z": [
+                "./src/first.ts"
+              ],
+              "x*": [
+                "./src/second.ts"
+              ],
+              "xy": [
+                "./src/exact.ts"
+              ]
+            },
+            "pathsBasePath": "/p",
+            "traceResolution": true
+          },
+          "project_name": "",
+          "typings_location": ""
+        },
+        {
+          "op": "resolve",
+          "file": "/p/src/index.ts",
+          "mode": 1,
+          "name": "xyz"
+        },
+        {
+          "op": "resolve",
+          "file": "/p/src/index.ts",
+          "mode": 1,
+          "name": "xy"
+        }
+      ],
+      "case": "config/module/paths/source-order-beats-sorted-order",
+      "discriminates": "Both wildcard patterns have the same prefix length and match xyz. Source order puts x*z before x*, the reverse of lexical order; the selected path and trace must therefore change if a JSON encoder or map sorts the keys. Exact xy still beats either wildcard.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/module/resolver.go:resolutionState.tryLoadModuleUsingPathsIfEligible",
+      "order_sensitive": true,
+      "subject": "moduleResolution"
     }
   ]
 }

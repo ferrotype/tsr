@@ -8,6 +8,89 @@ use crate::{
 use tsr_arena::Error;
 use tsr_core::TextRange;
 
+/// True only for the reparsed `as` expression inside JavaScript parentheses.
+/// A missing node is false, as in the pinned optional-node predicate.
+/// port: tsc/internal/ast/utilities.go:IsJSDocTypeAssertion
+pub fn is_jsdoc_type_assertion(view: AstView<'_>, node: Option<NodeId>) -> Result<bool, Error> {
+    let Some(node) = node else {
+        return Ok(false);
+    };
+    let read = view.node(node)?;
+    if read.kind() != K::ParenthesizedExpression || read.flags() & node_flags::JAVA_SCRIPT_FILE == 0
+    {
+        return Ok(false);
+    }
+    let expression = view.node(read.expression().ok_or(Error::InvalidGraph)?)?;
+    if expression.kind() != K::AsExpression {
+        return Ok(false);
+    }
+    Ok(match expression.type_node() {
+        Some(ty) => view.node(ty)?.flags() & node_flags::REPARSED != 0,
+        None => false,
+    })
+}
+
+/// port: tsc/internal/ast/utilities.go:IsOuterExpression
+pub fn is_outer_expression(
+    view: AstView<'_>,
+    node: NodeId,
+    kinds: crate::evaluator::OuterExpressionKinds,
+) -> Result<bool, Error> {
+    use crate::evaluator::outer_expression_kinds as o;
+    let read = view.node(node)?;
+    Ok(match read.kind().known() {
+        Some(K::ParenthesizedExpression) => {
+            kinds & o::PARENTHESES != 0
+                && !(kinds & o::EXCLUDE_JSDOC_TYPE_ASSERTION != 0
+                    && is_jsdoc_type_assertion(view, Some(node))?)
+        }
+        Some(K::TypeAssertionExpression | K::AsExpression) => kinds & o::TYPE_ASSERTIONS != 0,
+        Some(K::SatisfiesExpression) => {
+            kinds & (o::EXPRESSIONS_WITH_TYPE_ARGUMENTS | o::SATISFIES) != 0
+        }
+        Some(K::ExpressionWithTypeArguments) => kinds & o::EXPRESSIONS_WITH_TYPE_ARGUMENTS != 0,
+        Some(K::NonNullExpression) => kinds & o::NON_NULL_ASSERTIONS != 0,
+        Some(K::PartiallyEmittedExpression) => kinds & o::PARTIALLY_EMITTED_EXPRESSIONS != 0,
+        Some(K::BinaryExpression) => {
+            let data = read
+                .data_source()
+                .as_binary_expression()
+                .ok_or(Error::InvalidGraph)?;
+            match view
+                .node(data.operator_token().ok_or(Error::InvalidGraph)?)?
+                .kind()
+                .known()
+            {
+                Some(K::EqualsToken) => kinds & o::ASSIGNMENTS != 0,
+                Some(K::CommaToken) => kinds & o::COMMA != 0,
+                _ => false,
+            }
+        }
+        _ => false,
+    })
+}
+
+/// port: tsc/internal/ast/utilities.go:SkipOuterExpressions
+pub fn skip_outer_expressions(
+    view: AstView<'_>,
+    mut node: NodeId,
+    kinds: crate::evaluator::OuterExpressionKinds,
+) -> Result<NodeId, Error> {
+    while is_outer_expression(view, node, kinds)? {
+        let read = view.node(node)?;
+        node = if read.kind() == K::BinaryExpression {
+            read.data_source()
+                .as_binary_expression()
+                .ok_or(Error::InvalidGraph)?
+                .right()
+        } else {
+            read.expression()
+        }
+        .ok_or(Error::InvalidGraph)?;
+    }
+    Ok(node)
+}
+
 /// port: tsc/internal/ast/utilities.go:IsObjectBindingOrAssignmentElement
 pub fn is_object_binding_or_assignment_element(node: &(impl NodeAccess + ?Sized)) -> bool {
     matches!(

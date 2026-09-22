@@ -2,8 +2,9 @@
 
 No command here starts a compiler, corpus or benchmark. Supply existing capture
 roots with --capture FAMILY=DIR (program means the full syntax capture). Missing
-captures remain unavailable; supplied invalid/stale captures fail closed. `check`
-checks harness contracts only and deliberately does not require feature parity.
+captures and source-stale captures remain unavailable; malformed artifacts fail
+replay. Independent current families are retained. `check` checks harness
+contracts and deliberately does not require feature parity.
 """
 from __future__ import annotations
 
@@ -78,11 +79,13 @@ def source_closure(producer: str) -> dict[str, str]:
     if producer not in GROUPS:
         raise ValueError(f"unknown producer {producer}")
     paths = {"PORTS.toml", "data/go-functions.tsv", "status/runs.toml", "data/phase1/coverage-report.json.gz"}
+    import phase1_coverage
+    for runner, inventory, _ in phase1_coverage.RUST_ROUTES.values():
+        paths.update((runner, inventory))
     result = {}
-    # Scope classification scans all Rust declarations/port markers, including
-    # unrelated packages. Grouped records must bind that whole audit input;
-    # individual family captures still retain their smaller dependency closure.
-    paths.update(str(p.relative_to(ROOT)) for p in (ROOT / "crates").rglob("*.rs"))
+    # Live declaration/port-marker classification belongs to the inventory
+    # audit, not replay. Each group binds its executable dependency closures
+    # plus the frozen audit records it actually consumes.
     for family in GROUPS[producer]:
         if family == "program":
             result.update(syntax.rust_closure())
@@ -163,7 +166,7 @@ def qualifications() -> dict[str, dict]:
             raise ValueError(f"invalid approved difference: {identity}")
         requests = capture.load_requests(capture.FAMILIES[family])["requests"]
         request = next((r for r in requests if r["case"] == identity), None)
-        if request is None or sha(capture.canonical(request) + b"\n") != item["request_sha256"]:
+        if request is None or sha(capture.request_bytes(request)) != item["request_sha256"]:
             raise ValueError(f"approved difference request changed: {identity}")
         if not (ROOT / item["decision"].split("#")[0]).is_file():
             raise ValueError(f"approved difference decision missing: {identity}")
@@ -183,15 +186,21 @@ def accepted(row: dict, approved: dict[str, dict]) -> bool:
 def replay_family(family: str, directory: Path) -> dict:
     # Do not trust a provenance that omitted a dependency and its manifest.
     provenance = read(directory / "provenance.json")
+    if provenance.get("family") != family:
+        raise ValueError(f"{family} cannot consume a capture from another family")
+    if provenance.get("partial") is True:
+        raise ValueError(f"{family} needs its own complete capture")
     recorded = provenance.get("source_closure", {})
     current = capture.source_closure(family, rust_packages(family))
-    if recorded != current:
-        changed = sorted(k for k in recorded.keys() | current.keys() if recorded.get(k) != current.get(k))
-        raise ValueError(f"{family} capture inputs changed: {', '.join(changed[:8])}")
+    # Authenticate artifacts before reporting ordinary source staleness. A
+    # changed payload is invalid even if the source also changed afterwards.
     report = capture.compare(directory)
-    identities = [row["case"] for row in capture.load_requests(capture.FAMILIES[family])["requests"]]
     if report["family"] != family or report.get("partial"):
         raise ValueError(f"{family} needs its own complete capture")
+    if recorded != current:
+        changed = sorted(k for k in recorded.keys() | current.keys() if recorded.get(k) != current.get(k))
+        raise capture.StaleCapture(f"{family} capture inputs changed: {', '.join(changed[:8])}")
+    identities = [row["case"] for row in capture.load_requests(capture.FAMILIES[family])["requests"]]
     require_rows(report["rows"], identities)
     approved = qualifications()
     report["approved_differences"] = [row["case"] for row in report["rows"]
@@ -207,11 +216,13 @@ def attach_platform_captures(family: str, report: dict, directories: list[Path])
     for directory in directories:
         provenance = read(directory / "provenance.json")
         current = capture.source_closure(family, rust_packages(family))
-        if provenance.get("family") != family or provenance.get("source_closure") != current:
-            raise ValueError("platform capture family or current source closure differs")
+        if provenance.get("family") != family:
+            raise ValueError("platform capture family differs")
         # compare authenticates pin, gitlink, request bytes, child observations,
         # renderer outputs and the independently reconstructed input key set.
         supplemental = capture.compare(directory)
+        if provenance.get("source_closure") != current:
+            raise capture.StaleCapture("platform capture current source closure differs")
         selected = provenance.get("selected_cases")
         if not isinstance(selected, list) or not selected or len(set(selected)) != len(selected):
             raise ValueError("platform capture has no unique selected inventory")
@@ -240,7 +251,7 @@ def platform_matched(family: str, row: dict, report: dict) -> bool:
     witness = report.get("platform_witnesses", {}).get(row["case"])
     policy = PLATFORM_CASES.get(row["case"])
     return bool(row["result"] == "native_unavailable" and policy and policy[0] == family
-                and witness and witness["row"] == {"case": row["case"], "result": "match"}
+                and witness and witness["row"].get("case") == row["case"] and witness["row"].get("result") == "match"
                 and witness["platform"].startswith(policy[1]) and witness["capture_identity"])
 
 
@@ -257,13 +268,9 @@ def apply_platform_preparation(reports: dict, health: dict) -> None:
         return
     document = read(ROOT / "data/phase1/scope.json")
     cases = read(ROOT / "data/phase1/cases.json")
-    for case in cases["cases"]:
-        if case["id"] in observed:
-            if case.get("last_result") != "native_unavailable":
-                raise ValueError("platform preparation would replace an executed case")
-            case["last_result"] = "match"
     for family in scope.STEP_PACKAGES:
-        health["preparations"][family] = scope.leaf_preparation(document, cases, family)
+        health["preparations"][family] = scope.leaf_preparation(document, cases, family,
+                                                              supplemental_prepared_cases=observed)
     health["coverage"] = phase1_coverage.build(supplemental_prepared_cases=observed)
 
 
@@ -277,6 +284,36 @@ def replay_program(directory: Path) -> dict:
     require_rows(report["rows"], expected_tests("syntax"), key="id")
     report["capture_identity"] = sha((directory / "provenance.json").read_bytes())
     return report
+
+
+def platform_summary(directory: Path, output: Path) -> dict:
+    """Record one bounded platform capture without claiming a family run."""
+    provenance = read(directory / "provenance.json")
+    selected = provenance.get("selected_cases")
+    if provenance.get("family") != "filesystem" or selected != list(PLATFORM_CASES):
+        raise ValueError("platform summary requires the exact declared Linux case inventory")
+    if not provenance.get("host", {}).get("platform", "").startswith("Linux-"):
+        raise ValueError("platform summary did not execute on Linux")
+    try:
+        report = capture.compare(directory)
+        if provenance.get("source_closure") != capture.source_closure("filesystem", rust_packages("filesystem")):
+            raise capture.StaleCapture("platform source closure changed")
+        rows = [row for row in report["rows"] if row["result"] != "not_run"]
+        if [row["case"] for row in rows] != selected:
+            raise ValueError("platform summary observed inventory differs")
+        require_rows(rows, selected)
+        state = ("match" if all(row["result"] == "match" for row in rows) else
+                 "unavailable" if any(row["result"] == "native_unavailable" for row in rows) else "different")
+        detail = {"state": state, "report": report}
+    except capture.StaleCapture as error:
+        detail = {"state": "unavailable", "reason": str(error)}
+    detail.update(version=1, capture_identity=sha((directory / "provenance.json").read_bytes()),
+                  host=provenance["host"], cases=selected)
+    output.mkdir(parents=True, exist_ok=True)
+    payload = encode(detail)
+    artifact = output / ("platform-" + sha(payload) + ".json")
+    artifact.write_bytes(payload)
+    return {"state": detail["state"], "artifact": str(artifact), "sha256": sha(payload)}
 
 
 def comparator_controls() -> dict[str, bool]:
@@ -308,15 +345,17 @@ def comparator_controls() -> dict[str, bool]:
     return results
 
 
-def harness_check() -> dict:
+def harness_check(producer: str | None = None, *, current_classification: bool = True) -> dict:
     import phase1_coverage
     import phase1_integration
     # Manifest health is independent of pending behavior. It cannot certify
     # implementation; no comparison is reconstructed from `last_result` here.
     document = read(ROOT / "data/phase1/scope.json")
     cases = read(ROOT / "data/phase1/cases.json")
-    problems = scope.verify(document) + scope.witness_problems()
-    if document != scope.build():
+    problems = scope.verify(document)
+    if producer is None:
+        problems += scope.witness_problems()
+    if producer is None and current_classification and document != scope.build():
         problems.append("scope.json differs from current source classification; run phase1.py inventory --write")
     problems += scope.roster_problems(document, cases) + scope.gap_record_problems(cases)
     problems += baselines.verify(read(ROOT / "data/phase1/config-baselines.json"))
@@ -328,7 +367,10 @@ def harness_check() -> dict:
         problems.append("committed coverage report is missing")
     else:
         problems += phase1_coverage.verify(strict_json_loads(gzip.decompress(report_path.read_bytes())))
-    integration = phase1_integration.check()
+    # Config and syntax neither publish nor consume integration metrics. Do
+    # not let an unrelated archive/transport asset gate these two producers.
+    integration = (phase1_integration.check() if producer in (None, "foundations") else
+                   {"prepared": False, "complete": False, "problems": []})
     problems += coverage["problems"] + integration["problems"]
     controls = comparator_controls()
     problems += [f"comparator control failed: {name}" for name, passed in controls.items() if not passed]
@@ -363,6 +405,7 @@ def aggregate(producer: str, reports: dict[str, dict], health: dict) -> dict:
                        integration_prepared=health["healthy"] and health["integration"]["prepared"] and health["coverage"]["preparation_complete"],
                        leaves_complete=complete("leaves"), filesystem_complete=complete("filesystem"),
                        utilities_complete=complete("syntax"),
+                       rust_witnesses_complete=health["healthy"] and health["integration"].get("rust_witnesses", {}).get("state") == "match",
                        integration_complete=health["healthy"] and health["integration"].get("complete", False))
     elif producer == "config":
         owners = baseline_owners()
@@ -385,7 +428,7 @@ def aggregate(producer: str, reports: dict[str, dict], health: dict) -> dict:
 def produce(producer: str, captures: dict[str, Path], output: Path, receipts: list[dict] | None = None,
             platform_captures: list[Path] | None = None) -> dict:
     before = source_closure(producer)
-    health = harness_check()
+    health = harness_check(producer)
     if not health["healthy"]:
         raise ValueError("harness invalid: " + "; ".join(health["problems"][:12]))
     reports, unavailable = {}, {}
@@ -396,7 +439,10 @@ def produce(producer: str, captures: dict[str, Path], output: Path, receipts: li
                 raise ValueError(f"explicit capture does not exist: {directory}")
             unavailable[family] = f"no capture at {directory.relative_to(ROOT)}"
             continue
-        reports[family] = replay_program(directory) if family == "program" else replay_family(family, directory)
+        try:
+            reports[family] = replay_program(directory) if family == "program" else replay_family(family, directory)
+        except capture.StaleCapture as error:
+            unavailable[family] = str(error)
     if platform_captures is None and producer in ("foundations", "config"):
         default_platform = ROOT / "target/phase1-platform/linux-realpath"
         needs_platform = any(row["case"] in PLATFORM_CASES and row["result"] == "native_unavailable"
@@ -405,7 +451,10 @@ def produce(producer: str, captures: dict[str, Path], output: Path, receipts: li
     if platform_captures:
         if "filesystem" not in reports:
             raise ValueError("platform witnesses require a complete filesystem capture")
-        attach_platform_captures("filesystem", reports["filesystem"], platform_captures)
+        try:
+            attach_platform_captures("filesystem", reports["filesystem"], platform_captures)
+        except capture.StaleCapture as error:
+            unavailable["filesystem/platform"] = str(error)
         apply_platform_preparation(reports, health)
     if producer == "foundations":
         import phase1_integration
@@ -441,7 +490,8 @@ def observe(identity: str, output: Path) -> dict:
         for test in row.get("additional_tests", []):
             witnesses[row["id"] + "/" + test["test"]] = test
     witnesses.update(transport={"command": ["python3", "scripts/s11.py", "capture"]},
-                     generation={"command": manifest["generation"]["command"]})
+                     generation={"command": manifest["generation"]["command"]},
+                     **{"rust-witnesses": {"command": ["python3", "scripts/phase1_integration.py", "observe-rust-witnesses"]}})
     if identity not in witnesses:
         raise ValueError("unknown executable witness; case witnesses use normal family captures")
     command = witnesses[identity]["command"]
@@ -480,12 +530,14 @@ def observe(identity: str, output: Path) -> dict:
 
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=(*GROUPS, "check", "manifests", "observe"))
+    parser.add_argument("command", choices=(*GROUPS, "check", "manifests", "observe", "platform"))
     parser.add_argument("--capture", action="append", default=[], metavar="FAMILY=DIR")
     parser.add_argument("--receipt", type=Path, action="append", default=[])
     parser.add_argument("--platform-capture", type=Path, action="append", default=[],
                         help="authenticated platform-only filesystem capture (e.g. Linux CI)")
     parser.add_argument("--witness", help="integration test/driver, transport or generation identity")
+    parser.add_argument("--structural", action="store_true",
+                        help="check manifest/comparator contracts without refreshing the source-classification audit")
     parser.add_argument("--output", type=Path, default=ROOT / "target/phase1-producers")
     args = parser.parse_args(argv)
     try:
@@ -504,10 +556,16 @@ def main(argv=None) -> int:
                 raise ValueError("observe requires --witness")
             result = observe(args.witness, args.output.resolve())
         elif args.command == "check":
-            report = harness_check()
+            report = harness_check(current_classification=not args.structural)
             result = {k: report[k] for k in ("healthy", "problems")}
             print(json.dumps(result, sort_keys=True))
             return 0 if report["healthy"] else 1
+        elif args.command == "platform":
+            if set(captures) != {"filesystem"}:
+                raise ValueError("platform requires --capture filesystem=DIR")
+            result = platform_summary(captures["filesystem"], args.output.resolve())
+            print(json.dumps(result, sort_keys=True))
+            return int(result["state"] == "different")
         else:
             unused = set(captures) - set(GROUPS[args.command])
             if unused:
