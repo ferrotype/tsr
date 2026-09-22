@@ -460,11 +460,11 @@ def schedule_problems(*, check_inputs: bool = True) -> list[str]:
 # ---------------------------------------------------------------------------
 # Plan task 9, corpus half: a bounded Rust smoke over the schedule, replayed
 # from its stored outputs. The selection is every row with at least one native
-# syntactic diagnostic -- the only rows whose output a wrong parser, walk, sort
-# or renderer can change -- plus the first row of every stratum of root script
-# kinds, JS/decorator options and native selection, so each loader and
-# option path runs at least once. Every other loaded row is a prepared,
-# unexecuted case: F5b performs the full correctness capture.
+# syntactic diagnostic -- the rows whose output a wrong parser, walk, sort or
+# renderer is likeliest to change -- plus the first row of every stratum of
+# file extensions in the request, JS/decorator options and native selection,
+# so each loader and option path runs at least once. Every other loaded row is
+# a prepared, unexecuted case: F5b performs the full correctness capture.
 # ---------------------------------------------------------------------------
 
 SMOKE = ROOT / "data/phase1/syntax-smoke.json"
@@ -473,6 +473,8 @@ SMOKE_RULE = ("every schedule row with at least one native syntactic diagnostic,
               "experimentalDecorators, native selection)")
 RUST_EXTRA = ("tools/s07/program/rust_observation.rs", "Cargo.toml", "Cargo.lock", "rust-toolchain.toml")
 COMPARED = ("files", "file_names_sha256", "syntactic", "plain_hex", "pretty_hex")
+
+
 def select(schedule: dict, native: dict) -> list[str]:
     diagnosed = {row["id"] for row in native["rows"] if row.get("syntactic")}
     chosen, strata = set(diagnosed), set()
