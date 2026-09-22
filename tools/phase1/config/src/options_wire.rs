@@ -61,6 +61,8 @@ impl Wire for ConfigValue {
             Self::Object(m) => m.wire(),
             Self::Array(None) => json!(["slice", null]),
             Self::Array(Some(a)) => a.wire(),
+            Self::StringArray(a) => a.wire(),
+            Self::UnorderedObject(_) => tsr_tsoptions::normalize_json_value(self.clone()).wire(),
         }
     }
 }

@@ -359,3 +359,16 @@ pub use config_parse::{
     options_syntax_by_array_element_value,
 };
 pub use config_syntax::is_double_quoted_string;
+
+mod option_parser;
+pub use option_parser::{convert_map_to_options, OptionParser};
+
+pub use config_text::convert_to_object;
+
+pub use config_files::{
+    has_file_with_higher_priority_extension, remove_wildcard_files_with_lower_priority_extension,
+};
+
+pub use config_parse::{parse_project_reference, ProjectReferenceParseResult};
+
+pub use config_value::normalize_json_value;

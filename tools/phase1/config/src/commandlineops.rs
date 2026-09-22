@@ -56,6 +56,10 @@ macro_rules! diagnostic_rows {
 fn config_value(value: &ConfigValue) -> Value {
     match value {
         ConfigValue::Null => Value::Null,
+        ConfigValue::StringArray(values) => strings(values.as_deref().unwrap_or_default()),
+        ConfigValue::UnorderedObject(_) => {
+            config_value(&tsr_tsoptions::normalize_json_value(value.clone()))
+        }
         ConfigValue::EmptyStruct => Value::String("empty-struct".into()),
         ConfigValue::Boolean(value) => json!(value),
         ConfigValue::Number(value) => json!(value),

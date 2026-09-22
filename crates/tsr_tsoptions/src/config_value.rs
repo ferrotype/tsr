@@ -18,6 +18,10 @@ pub enum ConfigValue {
     String(JsString),
     Array(Option<Vec<Self>>),
     Object(OrderedMap<JsString, Self>),
+    /// Foreign typed input, before normalize_json_value erases slice type.
+    StringArray(Option<Vec<JsString>>),
+    /// Foreign map input has no stable order; normalization sorts its keys.
+    UnorderedObject(std::collections::HashMap<JsString, Self>),
 }
 impl ConfigValue {
     pub fn as_string(&self) -> Option<&JsString> {
@@ -52,5 +56,41 @@ impl ConfigValue {
     }
     pub fn is_null(&self) -> bool {
         matches!(self, Self::Null)
+    }
+}
+
+/// Normalize foreign JSON inputs at the raw config boundary. Preserve ordered
+/// object traversal; only unordered maps acquire a sorted key order.
+/// port: tsc/internal/tsoptions/tsconfigparsing.go:normalizeJsonValue
+pub fn normalize_json_value(value: ConfigValue) -> ConfigValue {
+    match value {
+        ConfigValue::Object(values) => ConfigValue::Object(
+            values
+                .into_iter()
+                .map(|(k, v)| (k, normalize_json_value(v)))
+                .collect(),
+        ),
+        ConfigValue::UnorderedObject(values) => {
+            let mut values: Vec<_> = values.into_iter().collect();
+            values.sort_by(|a, b| a.0.as_bytes().cmp(b.0.as_bytes()));
+            ConfigValue::Object(
+                values
+                    .into_iter()
+                    .map(|(k, v)| (k, normalize_json_value(v)))
+                    .collect(),
+            )
+        }
+        ConfigValue::Array(values) => ConfigValue::Array(Some(
+            values
+                .unwrap_or_default()
+                .into_iter()
+                .map(normalize_json_value)
+                .collect(),
+        )),
+        ConfigValue::StringArray(None) => ConfigValue::Null,
+        ConfigValue::StringArray(Some(values)) => {
+            ConfigValue::Array(Some(values.into_iter().map(ConfigValue::String).collect()))
+        }
+        scalar => scalar,
     }
 }

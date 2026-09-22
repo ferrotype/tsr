@@ -2293,3 +2293,14 @@ and focused clippy pass.
 The owner separately approved immutable published package contents on 2026-09-22;
 the pinned caller audit and narrowly scoped alias-mutation exception are recorded
 in `PHASE1-aliasing-audit.md`. Final package evidence must preserve this difference.
+
+### F3b continuation: remaining config helper contracts
+
+The four option-parser policies now delegate to the production assignments;
+ordered-map assignment, project-reference validation, extension priority and
+mapper option-path diagnostics are available at the same boundary. Raw JSON
+normalization sorts foreign maps while preserving ordered objects and typed
+slice distinctions. The raw and object-root-checked syntax converters remain
+separate. All **141/145 config cases** that now execute match native; the four
+remaining gaps concern extended-config cache entries and reuse. All 17
+tsoptions tests pass, and focused clippy passes.

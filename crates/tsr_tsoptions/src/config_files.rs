@@ -26,7 +26,11 @@ fn changed_extension(file: &[u8], extension: &[u8]) -> Vec<u8> {
     result
 }
 /// port: tsc/internal/tsoptions/tsconfigparsing.go:hasFileWithHigherPriorityExtension
-fn has_higher(file: &[u8], extensions: &[Vec<JsString>], has_file: impl Fn(&[u8]) -> bool) -> bool {
+pub fn has_file_with_higher_priority_extension(
+    file: &[u8],
+    extensions: &[Vec<JsString>],
+    has_file: impl Fn(&[u8]) -> bool,
+) -> bool {
     for group in extensions
         .iter()
         .filter(|group| group.iter().any(|ext| extension_is(file, ext.as_bytes())))
@@ -47,7 +51,7 @@ fn has_higher(file: &[u8], extensions: &[Vec<JsString>], has_file: impl Fn(&[u8]
     false
 }
 /// port: tsc/internal/tsoptions/tsconfigparsing.go:removeWildcardFilesWithLowerPriorityExtension
-fn remove_lower(
+pub fn remove_wildcard_files_with_lower_priority_extension(
     file: &[u8],
     map: &mut FileMap,
     extensions: &[Vec<JsString>],
@@ -124,13 +128,18 @@ pub fn file_names_from_specs(
                 }
                 continue;
             }
-            if has_higher(bytes, &supported, |name| {
+            if has_file_with_higher_priority_extension(bytes, &supported, |name| {
                 let key = key(name, case_sensitive);
                 literal.contains_key(&key) || wildcard.contains_key(&key)
             }) {
                 continue;
             }
-            remove_lower(bytes, &mut wildcard, &supported, case_sensitive);
+            remove_wildcard_files_with_lower_priority_extension(
+                bytes,
+                &mut wildcard,
+                &supported,
+                case_sensitive,
+            );
             let key = key(bytes, case_sensitive);
             if !literal.contains_key(&key) && !wildcard.contains_key(&key) {
                 wildcard.insert(key, file);

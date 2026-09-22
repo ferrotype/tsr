@@ -678,9 +678,9 @@ fn references(parsed: &mut Parsed, base: &[u8]) -> Option<Vec<ProjectReference>>
     let values = validated_raw_array(parsed, b"references", "object")?;
     let mut result = Vec::new();
     for (index, value) in values.iter().enumerate() {
-        if value.as_object().is_none() {
+        let Some(reference) = parse_project_reference(value) else {
             continue;
-        }
+        };
         let node_for = |key: &[u8]| {
             parsed.source.as_ref().and_then(|s| {
                 array_element(s, b"references", index).map(|element| {
@@ -690,7 +690,7 @@ fn references(parsed: &mut Parsed, base: &[u8]) -> Option<Vec<ProjectReference>>
                 })
             })
         };
-        let Some(path) = value.get(b"path").and_then(ConfigValue::as_string) else {
+        let Some(path) = reference.path_valid.then_some(&reference.reference.path) else {
             parsed.errors.push(diagnostic(
                 parsed.source.as_ref(),
                 node_for(b"path"),
@@ -711,22 +711,18 @@ fn references(parsed: &mut Parsed, base: &[u8]) -> Option<Vec<ProjectReference>>
             ));
             continue;
         }
-        let circular = match value.get(b"circular") {
-            Some(ConfigValue::Boolean(value)) => *value,
-            Some(_) => {
-                parsed.errors.push(diagnostic(
-                    parsed.source.as_ref(),
-                    node_for(b"circular"),
-                    d::Compiler_option_0_requires_a_value_of_type_1,
-                    vec![
-                        JsString::from_bytes(b"reference.circular".as_slice()),
-                        JsString::from_bytes(b"boolean".as_slice()),
-                    ],
-                ));
-                false
-            }
-            None => false,
-        };
+        if reference.has_circular && !reference.circular_valid {
+            parsed.errors.push(diagnostic(
+                parsed.source.as_ref(),
+                node_for(b"circular"),
+                d::Compiler_option_0_requires_a_value_of_type_1,
+                vec![
+                    JsString::from_bytes(b"reference.circular".as_slice()),
+                    JsString::from_bytes(b"boolean".as_slice()),
+                ],
+            ));
+        }
+        let circular = reference.reference.circular;
         result.push(ProjectReference {
             path: JsString::from_bytes(tsr_tspath::absolute(path.as_bytes(), base)),
             original_path: path.clone(),
@@ -842,6 +838,7 @@ pub fn parse_json_config_file_content(
     name: &[u8],
     resolution_stack: &[JsString],
 ) -> Result<ParsedCommandLine, Error> {
+    let raw = crate::normalize_json_value(raw);
     let raw = if raw.as_object().is_some() {
         raw
     } else {
@@ -979,4 +976,33 @@ fn validated_raw_array(parsed: &mut Parsed, key: &[u8], element: &str) -> Option
         }
     }
     raw_array(&parsed.raw, key)
+}
+
+#[derive(Clone, Debug)]
+pub struct ProjectReferenceParseResult {
+    pub reference: ProjectReference,
+    pub has_path: bool,
+    pub path_valid: bool,
+    pub has_circular: bool,
+    pub circular_valid: bool,
+}
+/// port: tsc/internal/tsoptions/parsinghelpers.go:parseProjectReference
+pub fn parse_project_reference(value: &ConfigValue) -> Option<ProjectReferenceParseResult> {
+    value.as_object()?;
+    let path = value.get(b"path");
+    let circular = value.get(b"circular");
+    Some(ProjectReferenceParseResult {
+        reference: ProjectReference {
+            path: path
+                .and_then(ConfigValue::as_string)
+                .cloned()
+                .unwrap_or_default(),
+            original_path: JsString::default(),
+            circular: matches!(circular, Some(ConfigValue::Boolean(true))),
+        },
+        has_path: path.is_some(),
+        path_valid: path.and_then(ConfigValue::as_string).is_some(),
+        has_circular: circular.is_some(),
+        circular_valid: matches!(circular, Some(ConfigValue::Boolean(_))),
+    })
 }
