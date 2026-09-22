@@ -40,3 +40,6 @@ pub use package_cache::{InfoCache, InfoCacheEntry};
 mod entrypoints;
 pub use entrypoints::{Ending, ResolvedEntrypoint};
 pub use util::js_extension_for_file;
+
+mod redirect;
+pub use redirect::{compiler_options_with_redirect, ResolvedProjectReference};

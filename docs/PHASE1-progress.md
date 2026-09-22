@@ -2213,3 +2213,18 @@ including every field and condition set, in the focused native capture at
 `target/phase1/f3b-entrypoints-native-03`. The original module schedule now has
 56 implemented matching cases, with three remaining production gaps. Focused
 clippy passes; final inventory/evidence regeneration will include the expansion.
+
+### F3b continuation: project-reference resolution
+
+Module, type-reference and package-directory resolution now accept a borrowed
+project-reference view. Redirect names partition both resolution caches even
+when the reference has no compiler options. An exclusive options scope restores
+base options and their lazy path-pattern cache on success, error or panic;
+caller options and other resolvers remain unchanged. Trace enablement continues
+to come from the base resolver, as in Go.
+
+Both frozen redirect cases match native, bringing the original module schedule
+to 58 implemented cases (the expanded entrypoint case is compared separately).
+A focused regression checks panic restoration, pattern-cache restoration, cache
+key isolation and nil-option fallback. Three relative-path tests and focused
+clippy pass. The remaining module fixture is global typings fallback.

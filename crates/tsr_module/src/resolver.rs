@@ -111,6 +111,11 @@ struct Key {
     directory: JsString,
     name: JsString,
     mode: ModuleKind,
+    redirect: JsString,
+}
+enum ResolutionSlot {
+    Cached(Key),
+    Fresh,
 }
 /// The host and options are immutable for this resolver's entire lifetime.
 /// Cache hits borrow the entry; callers explicitly clone only escaping values.
@@ -122,6 +127,7 @@ pub struct Resolver {
     pub(super) package_directory_only: bool,
     pub(super) host: Arc<dyn FileSystem>,
     pub(super) options: Arc<CompilerOptions>,
+    pub(super) operation_base_options: Option<Arc<CompilerOptions>>,
     pub(super) cwd: JsString,
     cache: BTreeMap<Key, ResolvedModule>,
     pub(super) option_patterns: std::sync::OnceLock<crate::ParsedPatterns>,
@@ -163,6 +169,7 @@ impl Resolver {
             package_directory_only: false,
             host,
             options,
+            operation_base_options: None,
             cwd: JsString::from_bytes(cwd),
             cache: BTreeMap::new(),
             option_patterns: std::sync::OnceLock::new(),
@@ -287,15 +294,40 @@ impl Resolver {
         containing_file: &[u8],
         mode: ModuleKind,
     ) -> Result<&ResolvedModule, Error> {
+        self.resolve_with_redirect(name, containing_file, mode, None)
+    }
+    pub fn resolve_with_redirect(
+        &mut self,
+        name: &[u8],
+        containing_file: &[u8],
+        mode: ModuleKind,
+        reference: Option<crate::ResolvedProjectReference<'_>>,
+    ) -> Result<&ResolvedModule, Error> {
+        let slot = self.with_redirect(reference, |resolver| {
+            resolver.resolve_in_context(name, containing_file, mode, reference)
+        })?;
+        Ok(match slot {
+            ResolutionSlot::Cached(key) => &self.cache[&key],
+            ResolutionSlot::Fresh => self.last_resolution.as_ref().expect("fresh resolution"),
+        })
+    }
+    fn resolve_in_context(
+        &mut self,
+        name: &[u8],
+        containing_file: &[u8],
+        mode: ModuleKind,
+        reference: Option<crate::ResolvedProjectReference<'_>>,
+    ) -> Result<ResolutionSlot, Error> {
         self.tracer.begin(self.trace_resolution);
         let directory = path::directory(containing_file);
         let key = Key {
             directory: JsString::from_bytes(directory.as_slice()),
             name: JsString::from_bytes(name),
             mode,
+            redirect: JsString::from_bytes(reference.map_or(b"".as_slice(), |r| r.config_name)),
         };
         if !self.trace_resolution && self.cache.contains_key(&key) {
-            return Ok(&self.cache[&key]);
+            return Ok(ResolutionSlot::Cached(key));
         }
         let result = self.trace_operation(|resolver| {
             trace!(
@@ -304,6 +336,7 @@ impl Resolver {
                 name,
                 containing_file
             );
+            resolver.trace_redirect(reference);
             let resolution = resolver.options.module_resolution_kind();
             let resolution_name = match resolution {
                 ModuleResolutionKind::NODE16 => b"Node16".as_slice(),
@@ -358,10 +391,10 @@ impl Resolver {
             // LoadOrStore retains the first entry, but a traced caller receives
             // its fresh result rather than the cached winner.
             self.last_resolution = Some(result);
-            Ok(self.last_resolution.as_ref().expect("fresh resolution"))
+            Ok(ResolutionSlot::Fresh)
         } else {
             self.cache.insert(key.clone(), result);
-            Ok(&self.cache[&key])
+            Ok(ResolutionSlot::Cached(key))
         }
     }
     pub(super) fn resolve_worker(
@@ -842,6 +875,25 @@ impl Resolver {
     /// Ordinary module resolutions are not recomputed by this operation.
     // port: tsc/internal/module/resolver.go:Resolver.ResolvePackageDirectory
     pub fn resolve_package_directory(
+        &mut self,
+        name: &[u8],
+        containing_file: &[u8],
+        mode: ModuleKind,
+    ) -> Result<Option<ResolvedModule>, Error> {
+        self.resolve_package_directory_with_redirect(name, containing_file, mode, None)
+    }
+    pub fn resolve_package_directory_with_redirect(
+        &mut self,
+        name: &[u8],
+        containing_file: &[u8],
+        mode: ModuleKind,
+        reference: Option<crate::ResolvedProjectReference<'_>>,
+    ) -> Result<Option<ResolvedModule>, Error> {
+        self.with_redirect(reference, |resolver| {
+            resolver.package_directory_in_context(name, containing_file, mode)
+        })
+    }
+    fn package_directory_in_context(
         &mut self,
         name: &[u8],
         containing_file: &[u8],

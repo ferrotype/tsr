@@ -27,6 +27,7 @@ pub(super) struct TypeKey {
     name: JsString,
     mode: ModuleKind,
     inferred: bool,
+    redirect: JsString,
 }
 /// port: tsc/internal/core/compileroptions.go:CompilerOptions.GetEffectiveTypeRoots
 pub fn effective_type_roots(options: &CompilerOptions, cwd: &[u8]) -> (Vec<JsString>, bool) {
@@ -108,6 +109,27 @@ impl Resolver {
         containing_file: &[u8],
         mode: ModuleKind,
     ) -> Result<&ResolvedTypeReferenceDirective, Error> {
+        self.resolve_type_reference_with_redirect(name, containing_file, mode, None)
+    }
+    pub fn resolve_type_reference_with_redirect(
+        &mut self,
+        name: &[u8],
+        containing_file: &[u8],
+        mode: ModuleKind,
+        reference: Option<crate::ResolvedProjectReference<'_>>,
+    ) -> Result<&ResolvedTypeReferenceDirective, Error> {
+        let key = self.with_redirect(reference, |resolver| {
+            resolver.type_reference_in_context(name, containing_file, mode, reference)
+        })?;
+        Ok(&self.type_cache[&key])
+    }
+    fn type_reference_in_context(
+        &mut self,
+        name: &[u8],
+        containing_file: &[u8],
+        mode: ModuleKind,
+        reference: Option<crate::ResolvedProjectReference<'_>>,
+    ) -> Result<TypeKey, Error> {
         self.tracer.begin(self.trace_resolution);
         let directory = path::directory(containing_file);
         let inferred = containing_file.ends_with(INFERRED_TYPES_CONTAINING_FILE);
@@ -116,9 +138,10 @@ impl Resolver {
             name: JsString::from_bytes(name),
             mode,
             inferred,
+            redirect: JsString::from_bytes(reference.map_or(b"".as_slice(), |r| r.config_name)),
         };
         if !self.trace_resolution && self.type_cache.contains_key(&key) {
-            return Ok(&self.type_cache[&key]);
+            return Ok(key);
         }
         let result = self.trace_operation(|resolver| {
         let (roots, from_config) = effective_type_roots(&resolver.options, resolver.cwd.as_bytes());
@@ -129,6 +152,7 @@ impl Resolver {
             containing_file,
             joined(&roots, b",")
         );
+        resolver.trace_redirect(reference);
         let outcome = resolver.resolve_type_reference_worker(
             name,
             &directory,
@@ -153,7 +177,7 @@ impl Resolver {
             outcome
         })?;
         self.type_cache.insert(key.clone(), result);
-        Ok(&self.type_cache[&key])
+        Ok(key)
     }
     fn resolve_type_reference_worker(
         &mut self,

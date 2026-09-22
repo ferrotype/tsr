@@ -53,46 +53,20 @@ const CASE_PREFIX: &str = "config/module/";
 /// Each row was read against `crates/tsr_module` in this session; a row that
 /// says "present but not a counterpart" names the Rust function that was read
 /// and rejected, so the record cannot be mistaken for "nobody looked".
-const MISSING: &[(&str, &str, &str, &str)] = &[
-    (
-        "tsc/internal/module/resolver.go:GetCompilerOptionsWithRedirect",
-        "tsc/internal/module/resolver.go:139-147, called from newResolutionState (:103), \
-         ResolveModuleName (:284) and ResolveTypeReferenceDirective (:246)",
-        "pub fn compiler_options_with_redirect<'a>(options: &'a CompilerOptions, redirect: \
-         Option<&'a dyn ResolvedProjectReference>) -> &'a CompilerOptions, returning the \
-         caller's own options both when there is no reference AND when the reference's options \
-         are absent. There is no ResolvedProjectReference trait anywhere in the workspace: \
-         `grep -rn \"ResolvedProjectReference\" crates --include=*.rs` is empty",
-        "crates/tsr_module/src/resolver.rs (absent; project reference redirects are not modelled)",
-    ),
-    (
-        "tsc/internal/module/resolver.go:tracer.traceResolutionUsingProjectReference",
-        "tsc/internal/module/resolver.go:216-220, with getRedirectConfigName at cache.go:84-89 \
-         feeding both cache keys (cache.go:11-16, :30-36)",
-        "the redirect trace line plus the redirect's config name as the fourth component of both \
-         cache keys (cache.go:11-16, :30-36, :84-89). tsr_module's keys are \
-         {directory, name, mode} (resolver.rs:81-86) and {directory, name, mode, inferred} \
-         (type_references.rs:24-30); neither carries a redirect, so two resolutions the pin \
-         keeps separate would collide. The message constant exists \
-         (tsr_diagnostics::Using_compiler_options_of_project_reference_redirect_0) and has no \
-         writer in tsr_module",
-        "crates/tsr_module/src/trace.rs (absent) and resolver.rs:81 (cache key omits the redirect)",
-    ),
-    (
-        "tsc/internal/module/resolver.go:Resolver.tryResolveFromTypingsLocation",
-        "tsc/internal/module/resolver.go:339-366, called unconditionally from ResolveModuleName \
+const MISSING: &[(&str, &str, &str, &str)] = &[(
+    "tsc/internal/module/resolver.go:Resolver.tryResolveFromTypingsLocation",
+    "tsc/internal/module/resolver.go:339-366, called unconditionally from ResolveModuleName \
          at :324",
-        "Resolver::new taking a typings location, a project name and extra extensions, plus the \
+    "Resolver::new taking a typings location, a project name and extra extensions, plus the \
          extra resolution pass that runs after an ordinary resolution failed to land on a \
          TypeScript or JSON extension and that announces itself with the project name \
          (resolver.go:339-366). crates/tsr_module/src/resolver.rs:90-104 has no such fields, so \
          the pass never runs, the Auto_discovery_for_typings line is never written, and \
          getPackageScopeForPath walks to the filesystem root where the pin stops at the global \
          cache (resolver.go:495-504 vs resolver.rs:206-210)",
-        "crates/tsr_module/src/resolver.rs:90 (no typings location, project name or extra \
+    "crates/tsr_module/src/resolver.rs:90 (no typings location, project name or extra \
          extensions on the resolver)",
-    ),
-];
+)];
 
 fn gap(request: &Value) -> Outcome {
     let requested = request
@@ -395,6 +369,18 @@ fn build_host(action: &Value) -> Result<Arc<Counting>, Bad> {
     }))
 }
 
+fn redirect_options(action: &Value) -> Result<(Option<&str>, Option<CompilerOptions>), Bad> {
+    let Some(reference) = action.get("redirect").filter(|value| !value.is_null()) else {
+        return Ok((None, None));
+    };
+    let options = reference
+        .get("options")
+        .filter(|value| !value.is_null())
+        .map(options)
+        .transpose()?;
+    Ok((Some(text(reference, "config_name")?), options))
+}
+
 #[allow(clippy::too_many_lines)]
 fn apply(state: &mut State, action: &Value, row: &mut Map<String, Value>) -> Result<Step, Bad> {
     let op = api::action_op(action);
@@ -458,7 +444,28 @@ fn apply(state: &mut State, action: &Value, row: &mut Map<String, Value>) -> Res
             Ok(Step::Done)
         }
         // Remaining production gaps are recorded before partial results escape.
-        "resolve_with_redirect" | "compiler_options_with_redirect" => Ok(Step::Unreachable),
+        "compiler_options_with_redirect" => {
+            let base = options(field(action, "options")?)?;
+            let (name, redirected) = redirect_options(action)?;
+            let reference = name.map(|name| tsr_module::ResolvedProjectReference {
+                config_name: name.as_bytes(),
+                compiler_options: redirected.as_ref(),
+            });
+            let effective = tsr_module::compiler_options_with_redirect(&base, reference);
+            row.insert(
+                "same_pointer_as_base".into(),
+                json!(std::ptr::eq(effective, &raw const base)),
+            );
+            row.insert(
+                "module_resolution".into(),
+                json!(effective.module_resolution_kind().0),
+            );
+            row.insert(
+                "trace_resolution".into(),
+                json!(effective.trace_resolution.is_true()),
+            );
+            Ok(Step::Done)
+        }
 
         "mutate" => {
             let host = state.host.as_ref().ok_or("mutate before resolver")?;
@@ -546,17 +553,23 @@ fn apply(state: &mut State, action: &Value, row: &mut Map<String, Value>) -> Res
             );
             Ok(Step::Done)
         }
-        "resolve" => {
+        "resolve" | "resolve_with_redirect" => {
             let resolver = state
                 .resolver
                 .as_mut()
                 .ok_or("action needs a resolver, but the case never built one")?;
             let host = state.host.as_ref().ok_or("no fixture host")?;
             let before = host.calls();
-            let outcome = resolver.resolve(
+            let (name, redirected) = redirect_options(action)?;
+            let reference = name.map(|name| tsr_module::ResolvedProjectReference {
+                config_name: name.as_bytes(),
+                compiler_options: redirected.as_ref(),
+            });
+            let outcome = resolver.resolve_with_redirect(
                 text(action, "name")?.as_bytes(),
                 text(action, "file")?.as_bytes(),
                 mode(action)?,
+                reference,
             );
             match outcome {
                 Ok(resolved) => {
