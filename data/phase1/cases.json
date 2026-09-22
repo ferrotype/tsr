@@ -1170,10 +1170,7 @@
       "family": "config",
       "host_applicability": "any",
       "id": "config/commandlineops/input-option-name-strips-at-most-two-dashes",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tsoptions/commandlineparser.go:getInputOptionName"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/config/commandlineops_probe_test.go with its in-package companion, against the pinned tsoptions package",
       "operation_actions": {
         "input_option_name": [
@@ -1250,7 +1247,7 @@
       "family": "config",
       "host_applicability": "any",
       "id": "config/commandlineops/list-option-empty-value-for-a-listorelement",
-      "last_result": "different",
+      "last_result": "match",
       "native_authority": "tools/phase1/config/commandlineops_probe_test.go with its in-package companion, against the pinned tsoptions package",
       "operation_actions": {
         "parse_list_type_option": [
@@ -1368,7 +1365,7 @@
       "family": "config",
       "host_applicability": "any",
       "id": "config/commandlineops/name-map-over-the-build-table",
-      "last_result": "different",
+      "last_result": "match",
       "native_authority": "tools/phase1/config/commandlineops_probe_test.go with its in-package companion, against the pinned tsoptions package",
       "operation_actions": {
         "name_map": [
@@ -1428,10 +1425,7 @@
       "family": "config",
       "host_applicability": "any",
       "id": "config/commandlineops/parse-build-command-line-defaults-the-project-list",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tsoptions/commandlineparser.go:ParseBuildCommandLine"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/config/commandlineops_probe_test.go with its in-package companion, against the pinned tsoptions package",
       "operation_actions": {
         "parse_build_command_line": [
@@ -1463,10 +1457,7 @@
       "family": "config",
       "host_applicability": "any",
       "id": "config/commandlineops/parse-build-command-line-diverts-a-compiler-only-option",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tsoptions/commandlineparser.go:ParseBuildCommandLine"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/config/commandlineops_probe_test.go with its in-package companion, against the pinned tsoptions package",
       "operation_actions": {
         "parse_build_command_line": [
@@ -1508,10 +1499,7 @@
       "family": "config",
       "host_applicability": "any",
       "id": "config/commandlineops/parse-build-command-line-keeps-the-compiler-options-it-shares",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tsoptions/commandlineparser.go:ParseBuildCommandLine"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/config/commandlineops_probe_test.go with its in-package companion, against the pinned tsoptions package",
       "operation_actions": {
         "parse_build_command_line": [
@@ -1543,10 +1531,7 @@
       "family": "config",
       "host_applicability": "any",
       "id": "config/commandlineops/parse-build-command-line-number-option-minimum",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tsoptions/commandlineparser.go:ParseBuildCommandLine"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/config/commandlineops_probe_test.go with its in-package companion, against the pinned tsoptions package",
       "operation_actions": {
         "parse_build_command_line": [
@@ -1578,10 +1563,7 @@
       "family": "config",
       "host_applicability": "any",
       "id": "config/commandlineops/parse-build-command-line-rejects-nonsensical-combinations",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tsoptions/commandlineparser.go:ParseBuildCommandLine"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/config/commandlineops_probe_test.go with its in-package companion, against the pinned tsoptions package",
       "operation_actions": {
         "parse_build_command_line": [
@@ -1613,10 +1595,7 @@
       "family": "config",
       "host_applicability": "any",
       "id": "config/commandlineops/parse-build-command-line-short-names",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tsoptions/commandlineparser.go:ParseBuildCommandLine"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/config/commandlineops_probe_test.go with its in-package companion, against the pinned tsoptions package",
       "operation_actions": {
         "parse_build_command_line": [
@@ -1648,10 +1627,7 @@
       "family": "config",
       "host_applicability": "any",
       "id": "config/commandlineops/parse-build-command-line-unknown-build-option",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tsoptions/commandlineparser.go:ParseBuildCommandLine"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/config/commandlineops_probe_test.go with its in-package companion, against the pinned tsoptions package",
       "operation_actions": {
         "parse_build_command_line": [
@@ -1695,10 +1671,7 @@
       "family": "config",
       "host_applicability": "any",
       "id": "config/commandlineops/parse-command-line-boolean-option-consumes-only-true-or-false",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tsoptions/commandlineparser.go:ParseCommandLine"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/config/commandlineops_probe_test.go with its in-package companion, against the pinned tsoptions package",
       "operation_actions": {
         "parse_command_line": [
@@ -1728,10 +1701,7 @@
       "family": "config",
       "host_applicability": "any",
       "id": "config/commandlineops/parse-command-line-build-option-is-diverted-by-alternate-mode",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tsoptions/commandlineparser.go:ParseCommandLine"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/config/commandlineops_probe_test.go with its in-package companion, against the pinned tsoptions package",
       "operation_actions": {
         "parse_command_line": [
@@ -1771,10 +1741,7 @@
       "family": "config",
       "host_applicability": "any",
       "id": "config/commandlineops/parse-command-line-converts-file-path-options-to-absolute",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tsoptions/commandlineparser.go:ParseCommandLine"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/config/commandlineops_probe_test.go with its in-package companion, against the pinned tsoptions package",
       "operation_actions": {
         "parse_command_line": [
@@ -1804,10 +1771,7 @@
       "family": "config",
       "host_applicability": "any",
       "id": "config/commandlineops/parse-command-line-enum-option-converts-through-its-map",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tsoptions/commandlineparser.go:ParseCommandLine"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/config/commandlineops_probe_test.go with its in-package companion, against the pinned tsoptions package",
       "operation_actions": {
         "parse_command_line": [
@@ -1849,10 +1813,7 @@
       "family": "config",
       "host_applicability": "any",
       "id": "config/commandlineops/parse-command-line-explicit-null-clears-an-option",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tsoptions/commandlineparser.go:ParseCommandLine"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/config/commandlineops_probe_test.go with its in-package companion, against the pinned tsoptions package",
       "operation_actions": {
         "parse_command_line": [
@@ -1882,10 +1843,7 @@
       "family": "config",
       "host_applicability": "any",
       "id": "config/commandlineops/parse-command-line-falls-back-to-the-watch-option-table",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tsoptions/commandlineparser.go:ParseCommandLine"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/config/commandlineops_probe_test.go with its in-package companion, against the pinned tsoptions package",
       "operation_actions": {
         "parse_command_line": [
@@ -1931,10 +1889,7 @@
       "family": "config",
       "host_applicability": "any",
       "id": "config/commandlineops/parse-command-line-list-option-takes-one-comma-separated-argument",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tsoptions/commandlineparser.go:ParseCommandLine"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/config/commandlineops_probe_test.go with its in-package companion, against the pinned tsoptions package",
       "operation_actions": {
         "parse_command_line": [
@@ -1970,10 +1925,7 @@
       "family": "config",
       "host_applicability": "any",
       "id": "config/commandlineops/parse-command-line-missing-argument-names-the-expected-type",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tsoptions/commandlineparser.go:ParseCommandLine"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/config/commandlineops_probe_test.go with its in-package companion, against the pinned tsoptions package",
       "operation_actions": {
         "parse_command_line": [
@@ -2017,10 +1969,7 @@
       "family": "config",
       "host_applicability": "any",
       "id": "config/commandlineops/parse-command-line-number-option-honours-its-minimum",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tsoptions/commandlineparser.go:ParseCommandLine"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/config/commandlineops_probe_test.go with its in-package companion, against the pinned tsoptions package",
       "operation_actions": {
         "parse_command_line": [
@@ -2050,10 +1999,7 @@
       "family": "config",
       "host_applicability": "any",
       "id": "config/commandlineops/parse-command-line-reads-a-response-file",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tsoptions/commandlineparser.go:ParseCommandLine"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/config/commandlineops_probe_test.go with its in-package companion, against the pinned tsoptions package",
       "operation_actions": {
         "parse_command_line": [
@@ -2091,10 +2037,7 @@
       "family": "config",
       "host_applicability": "any",
       "id": "config/commandlineops/parse-command-line-repeated-option-keeps-the-last-value",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tsoptions/commandlineparser.go:ParseCommandLine"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/config/commandlineops_probe_test.go with its in-package companion, against the pinned tsoptions package",
       "operation_actions": {
         "parse_command_line": [
@@ -2126,10 +2069,7 @@
       "family": "config",
       "host_applicability": "any",
       "id": "config/commandlineops/parse-command-line-response-file-cycles-are-broken",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tsoptions/commandlineparser.go:ParseCommandLine"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/config/commandlineops_probe_test.go with its in-package companion, against the pinned tsoptions package",
       "operation_actions": {
         "parse_command_line": [
@@ -2163,10 +2103,7 @@
       "family": "config",
       "host_applicability": "any",
       "id": "config/commandlineops/parse-command-line-response-file-that-cannot-be-read",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tsoptions/commandlineparser.go:ParseCommandLine"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/config/commandlineops_probe_test.go with its in-package companion, against the pinned tsoptions package",
       "operation_actions": {
         "parse_command_line": [
@@ -2198,10 +2135,7 @@
       "family": "config",
       "host_applicability": "any",
       "id": "config/commandlineops/parse-command-line-separates-options-from-file-names",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tsoptions/commandlineparser.go:ParseCommandLine"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/config/commandlineops_probe_test.go with its in-package companion, against the pinned tsoptions package",
       "operation_actions": {
         "parse_command_line": [
@@ -2235,10 +2169,7 @@
       "family": "config",
       "host_applicability": "any",
       "id": "config/commandlineops/parse-command-line-tsconfig-only-option-is-refused",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tsoptions/commandlineparser.go:ParseCommandLine"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/config/commandlineops_probe_test.go with its in-package companion, against the pinned tsoptions package",
       "operation_actions": {
         "parse_command_line": [
@@ -2268,10 +2199,7 @@
       "family": "config",
       "host_applicability": "any",
       "id": "config/commandlineops/parse-command-line-unknown-option-with-a-suggestion",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tsoptions/commandlineparser.go:ParseCommandLine"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/config/commandlineops_probe_test.go with its in-package companion, against the pinned tsoptions package",
       "operation_actions": {
         "parse_command_line": [
@@ -2313,10 +2241,7 @@
       "family": "config",
       "host_applicability": "any",
       "id": "config/commandlineops/parse-command-line-unknown-option-without-a-suggestion",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tsoptions/commandlineparser.go:ParseCommandLine"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/config/commandlineops_probe_test.go with its in-package companion, against the pinned tsoptions package",
       "operation_actions": {
         "parse_command_line": [
@@ -5796,10 +5721,7 @@
       "family": "config",
       "host_applicability": "any",
       "id": "config/option/build-builders",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tsoptions/parsinghelpers.go:ParseBuildOptions"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/config/configparse_probe_test.go with its in-package companion configparse_inpackage_test.go, against the pinned tsoptions package",
       "operation_actions": {
         "parse_option": [
@@ -5817,10 +5739,7 @@
       "family": "config",
       "host_applicability": "any",
       "id": "config/option/build-force",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tsoptions/parsinghelpers.go:ParseBuildOptions"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/config/configparse_probe_test.go with its in-package companion configparse_inpackage_test.go, against the pinned tsoptions package",
       "operation_actions": {
         "parse_option": [
@@ -5976,10 +5895,7 @@
       "family": "config",
       "host_applicability": "any",
       "id": "config/option/watch-exclude-directories",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tsoptions/parsinghelpers.go:ParseWatchOptions"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/config/configparse_probe_test.go with its in-package companion configparse_inpackage_test.go, against the pinned tsoptions package",
       "operation_actions": {
         "parse_option": [
@@ -5997,10 +5913,7 @@
       "family": "config",
       "host_applicability": "any",
       "id": "config/option/watch-interval",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/tsoptions/parsinghelpers.go:ParseWatchOptions"
-      ],
+      "last_result": "match",
       "native_authority": "tools/phase1/config/configparse_probe_test.go with its in-package companion configparse_inpackage_test.go, against the pinned tsoptions package",
       "operation_actions": {
         "parse_option": [

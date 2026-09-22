@@ -2011,3 +2011,64 @@ config regression target after it landed); the Rust 1.96 default VFS build;
 687 Python tests and 1,260 subtests (one platform skip); formatting; package
 assets; inventory consistency; tracker validation and committed-view checks;
 and extraction/replay of all three new archived captures.
+
+## F3b: command-line parsing, first production batch (2026-09-22)
+
+PR #48 was merged after adding review item 9 explicitly to F3b in the
+implementation plan. Wildcard-directory memoization remains scheduled there,
+including lazy/concurrent access and the mutable-input invalidation problem;
+this batch does not claim it is implemented.
+
+The production `tsr_tsoptions` API now parses argument vectors and response
+files in ordinary and build modes. Build/watch option records live in
+`tsr_core`; conversion preserves the pin's differences in canonical names,
+null handling, enum values and mode-specific diagnostics. Ordered raw options
+retain relative paths, while the ordinary compiler options receive absolute
+paths. Build options retain their original paths. Options and watch lists own
+their data under the already-approved clone policy.
+
+Response files use explicit continuation frames. The active canonical-path
+set prevents recursive cycles without suppressing later sibling references.
+Paths are relative to the host's current directory, including nested files.
+Tokenization preserves the pin's ASCII-control whitespace, double-quote rules,
+per-invalid-byte rune replacement and diagnostic order. There is no arbitrary
+nesting cutoff and no recursive Rust call per response file. A 2,048-file chain
+passes on a 128 KiB thread stack.
+
+The batch also fixes two existing prepared differences: the build name map's
+last-wins `-d` alias selects `dry`, and list-or-element parsing checks that
+branch before treating an empty value as an empty list (`extends` keeps `[""]`).
+The new build result's locale accessor uses `OnceLock`, matching native lazy
+first-observation semantics, including subsequent option mutation.
+
+Validation uses the existing native request schedule, without changing native
+expectations. The final capture is `target/phase1/f3b-command-line-final`.
+Config progresses from **185 match / 9 different / 292 not implemented** to
+**216 / 7 / 263**, with no previously matching row regressing: 29 formerly
+missing rows and the two differences now match. Eight focused regression tests
+cover the new API, with the prepared direct probes supplying native results.
+
+The 80 command-line baseline envelopes still require the test-only shared Go
+renderer bridge; ordinary baseline tests also inject synthetic declarations
+through a test worker. Their missing-operation reports now identify that
+integration boundary rather than falsely claiming the production parser is
+absent. Remaining F3b work also includes config watch-option interpretation,
+config/cache and result-accessor gaps, package/module cases, the other baseline
+envelopes, and wildcard-directory memoization. This is a completed first batch,
+not F3b completion.
+
+The S07 operation refresh changes only five Rust line anchors. Replaying the
+existing authenticated native syntax and loader observations preserves exact
+subset and checker-obligation bytes. This mapping refresh does not refresh
+historical correctness or performance measurements; no benchmark was run.
+
+The retained archive is `data/phase1/captures/f3b-command-line.tar.gz` (136 JSON files,
+3,449,467 bytes, SHA-256
+`668cd00b4687f6a0945dcb8631e5fe8aaa60e8ffa3f23a21eb1f490ceaecd119`). Leaf controls remain 229 matches and one
+approved difference; filesystem controls remain 355 matches, three differences
+(one approved) and one Linux-only native-unavailable row. No prior match in any
+of the three families regresses. Final package tests, focused all-targets
+Clippy with warnings denied, Rust 1.96 checks for both changed consumers,
+formatting, publication policy and the 164 Phase 1 Python tests (20 subtests)
+pass. Inventory validation has no problems; pending Linux observations remain
+explicit.

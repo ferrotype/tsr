@@ -792,6 +792,7 @@ fn finish_config(
         Some(ConfigValue::Boolean(true))
     ));
     Ok(ParsedCommandLine {
+        watch_options: None,
         options: parsed.options.expect("root config options"),
         root_file_names: file_names,
         config_file: parsed.source.map(Arc::new),

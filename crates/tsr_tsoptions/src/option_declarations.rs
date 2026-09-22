@@ -90,7 +90,7 @@ pub fn find_declaration(
         std::borrow::Cow::Owned(tsr_jsstring::helpers::to_lower_go(name))
     };
     if allow_short {
-        if let Some(found) = options.iter().find(|option| {
+        if let Some(found) = options.iter().rev().find(|option| {
             !option.short_name.is_empty()
                 && option.short_name.as_bytes().eq_ignore_ascii_case(&lower)
         }) {

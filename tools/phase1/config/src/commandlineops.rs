@@ -1,36 +1,6 @@
-//! The command-line and result half of `internal/tsoptions`: the 65 pending
-//! operations of `parsedcommandline.go`, `commandlineparser.go`, `errors.go`,
-//! `commandlineoption.go`, `namemap.go`, `wildcarddirectories.go`,
-//! `enummaps.go`, `diagnostics.go` and `parsedbuildcommandline.go`.
-//!
-//! This group is deliberately mixed, because the surface is. Three things are
-//! true of the port at once, and a single undifferentiated answer would hide
-//! two of them:
-//!
-//! 1. **There is no argument-vector parser.** `crates/tsr_tsoptions` has no
-//!    `parse_command_line` and no build-option mode. The closest thing,
-//!    `fixture_options::apply_fixture_settings`, takes already-split
-//!    `name`/`value` pairs and explicitly refuses a switch or a response-file
-//!    argument (crates/tsr_tsoptions/src/fixture_options.rs:270-275). So every
-//!    `parse_command_line` and `parse_build_command_line` action is a gap, and
-//!    so is everything only that parser reaches.
-//!
-//! 2. **The option DECLARATION semantics are present and comparable.** The
-//!    generated table carries `element`, `enum_values` and `deprecated_keys`
-//!    (crates/tsr_tsoptions/src/option_declarations.rs:38-40), and
-//!    `disallow_null` (:47), `value_type_name` (:50) and `enum_names` (:62) are
-//!    named functions. Those actions are really compared, not recorded as gaps.
-//!
-//! 3. **The config-parse result object is partly present.** `ParsedCommandLine`
-//!    in the port (crates/tsr_tsoptions/src/lib.rs:196-212) carries the fields
-//!    the pinned accessors read, but only four accessors exist as operations:
-//!    `config_name` (config_specs.rs:72), `config_file_parsing_diagnostics`
-//!    (lib.rs:217), `matched_file_spec` (config_specs.rs:87) and
-//!    `matched_include_spec` (config_specs.rs:98). The other twenty are gaps,
-//!    each named separately so the record says which.
-//!
-//! Preparation records a gap; it never emulates the missing algorithm to make a
-//! comparison run, and it never reads an expected value.
+//! Direct native action traces for command-line parsing and parsed config.
+//! Missing result accessors remain individually identified; argv operations
+//! now call the production parser, including response files and build mode.
 
 use crate::api::{action_op, action_str, actions, ordered, subject, Outcome};
 use serde_json::{json, Map, Value};
@@ -49,11 +19,6 @@ use tsr_vfs::{FileSystem, MemoryBuilder};
 // The gaps, one reviewed record each.
 // ---------------------------------------------------------------------------
 
-/// Shared by every action the absent argument-vector parser would have to run.
-const NO_PARSER: &str = "crates/tsr_tsoptions/src/parse_options.rs interprets option VALUES and \
-     crates/tsr_tsoptions/src/fixture_options.rs interprets already-split name/value pairs; \
-     neither takes an argv, and no file in crates/tsr_tsoptions defines one (absent)";
-
 /// Shared by the `ParsedCommandLine` accessors the port does not carry.
 const NO_ACCESSOR: &str = "crates/tsr_tsoptions/src/lib.rs:196-212 declares ParsedCommandLine and \
      crates/tsr_tsoptions/src/config_specs.rs:70-117 carries its only accessor block; neither \
@@ -61,37 +26,6 @@ const NO_ACCESSOR: &str = "crates/tsr_tsoptions/src/lib.rs:196-212 declares Pars
 
 /// `(operation, go_authority, intended_signature, production_home)`.
 type Gap = (&'static str, &'static str, &'static str, &'static str);
-
-const PARSE_COMMAND_LINE: Gap = (
-    "tsc/internal/tsoptions/commandlineparser.go:ParseCommandLine",
-    "tsc/internal/tsoptions/commandlineparser.go:43, which runs parseCommandLineWorker (:115), \
-     parseStrings (:134), getInputOptionName (:164), parseOptionValue (:237) and, for an \
-     unrecognised switch, commandLineParser.createUnknownOptionError (errors.go:39)",
-    "pub fn parse_command_line(command_line: &[JsString], host: &dyn ParseConfigHost) -> \
-     ParsedCommandLine, carrying the raw option map in argument order, the file names and the \
-     diagnostics each step raised",
-    NO_PARSER,
-);
-
-const PARSE_BUILD_COMMAND_LINE: Gap = (
-    "tsc/internal/tsoptions/commandlineparser.go:ParseBuildCommandLine",
-    "tsc/internal/tsoptions/commandlineparser.go:64, a distinct parsing mode over BuildOpts that \
-     also cross-checks CompilerNameMap (:75), defaults an empty project list to \".\" (:95) and \
-     raises the four nonsensical-combination diagnostics (:99-110)",
-    "pub fn parse_build_command_line(command_line: &[JsString], host: &dyn ParseConfigHost) -> \
-     ParsedBuildCommandLine, carrying the build options, the compiler options it still accepts, \
-     the project list and the build-only diagnostics",
-    "crates/tsr_tsoptions/src/option_declarations_generated.rs carries BUILD_OPTIONS, so the \
-     declarations exist; the build parsing MODE does not (absent)",
-);
-
-const INPUT_OPTION_NAME: Gap = (
-    "tsc/internal/tsoptions/commandlineparser.go:getInputOptionName",
-    "tsc/internal/tsoptions/commandlineparser.go:164, which strips at most two leading '-' from \
-     an argument before the name map is consulted (:146-147)",
-    "pub fn input_option_name(argument: &[u8]) -> &[u8]",
-    NO_PARSER,
-);
 
 const INVALID_ENUM_TYPE_DIAGNOSTIC: Gap = (
     "tsc/internal/tsoptions/errors.go:createDiagnosticForInvalidEnumType",
@@ -468,7 +402,7 @@ impl ParseConfigHost for Host {
 /// point, with the same file name and base path the pinned
 /// `tsoptionstest.GetParsedCommandLine` derives
 /// (tsoptionstest/parsedcommandline.go:11-13).
-fn config_parse(request: &Value) -> Result<ParsedCommandLine, String> {
+fn host(request: &Value) -> Host {
     let current = action_str(request, "currentDirectory").as_bytes().to_vec();
     let case_sensitive = request
         .get("caseSensitive")
@@ -483,20 +417,26 @@ fn config_parse(request: &Value) -> Result<ParsedCommandLine, String> {
             );
         }
     }
-    let host = Host {
+    Host {
         fs: Arc::new(builder.finish()),
-        cwd: JsString::from_bytes(current.clone()),
-    };
-    let name = tsr_tspath::combine(&current, &[b"tsconfig.json"]);
+        cwd: JsString::from_bytes(current),
+    }
+}
+
+fn config_parse(request: &Value) -> Result<ParsedCommandLine, String> {
+    let host = host(request);
+    let current = host.current_directory();
+    let case_sensitive = host.fs().use_case_sensitive_file_names();
+    let name = tsr_tspath::combine(current, &[b"tsconfig.json"]);
     let source = TsConfigSourceFile::parse(
         JsString::from_bytes(name.clone()),
-        tsr_tspath::to_path(&name, &current, case_sensitive),
+        tsr_tspath::to_path(&name, current, case_sensitive),
         SourceText::from_loaded_bytes(action_str(request, "jsonText").as_bytes().to_vec()),
     );
     parse_json_source_file_config_file_content(
         source,
         &host,
-        &current,
+        current,
         &CompilerOptions::default(),
         &ConfigValue::Null,
         &name,
@@ -676,9 +616,68 @@ fn run(
 
         "parsed_config" => return config_probe(request, action, parsed),
 
-        "parse_command_line" => return Err(gap(PARSE_COMMAND_LINE)),
-        "parse_build_command_line" => return Err(gap(PARSE_BUILD_COMMAND_LINE)),
-        "input_option_name" => return Err(gap(INPUT_OPTION_NAME)),
+        "parse_command_line" | "parse_build_command_line" => {
+            let args: Vec<_> = action
+                .get("args")
+                .and_then(Value::as_array)
+                .into_iter()
+                .flatten()
+                .map(|value| {
+                    value
+                        .as_str()
+                        .map(|value| JsString::from_bytes(value.as_bytes()))
+                        .ok_or_else(|| Outcome::Failed("argv member is not a string".into()))
+                })
+                .collect::<Result<_, _>>()?;
+            let host = host(request);
+            row.insert("args".into(), strings(&args));
+            let (options, raw, errors) = if action_op(action) == "parse_command_line" {
+                let parsed = tsr_tsoptions::parse_command_line(&args, &host);
+                row.insert("file_names".into(), strings(&parsed.root_file_names));
+                row.insert(
+                    "current_directory".into(),
+                    text(parsed.config_base_path.as_bytes()),
+                );
+                row.insert(
+                    "use_case_sensitive_file_names".into(),
+                    json!(parsed.config_case_sensitive),
+                );
+                (parsed.options, parsed.raw, parsed.errors)
+            } else {
+                let parsed = tsr_tsoptions::parse_build_command_line(&args, &host);
+                row.insert("projects".into(), strings(&parsed.projects));
+                row.insert(
+                    "locale_is_default".into(),
+                    json!(parsed.locale().is_default()),
+                );
+                (parsed.compiler_options, parsed.raw, parsed.errors)
+            };
+            row.insert("errors".into(), diagnostic_rows!(errors));
+            row.insert("raw".into(), config_value(&raw));
+            let values = tsr_tsoptions::compiler_options_value(&options);
+            let selected: Vec<_> = action
+                .get("options")
+                .and_then(Value::as_array)
+                .into_iter()
+                .flatten()
+                .map(|name| {
+                    let name = name
+                        .as_str()
+                        .ok_or_else(|| Outcome::Failed("option selector is not a string".into()))?;
+                    let value = values.get(name.as_bytes());
+                    Ok(json!([name, value.map(config_value), value.is_some()]))
+                })
+                .collect::<Result<_, Outcome>>()?;
+            row.insert("compiler_options".into(), json!(selected));
+        }
+        "input_option_name" => {
+            let input = action_str(action, "value");
+            row.insert("input".into(), json!(input));
+            row.insert(
+                "option_name".into(),
+                text(tsr_tsoptions::input_option_name(input.as_bytes())),
+            );
+        }
         "invalid_enum_type_diagnostic" => return Err(gap(INVALID_ENUM_TYPE_DIAGNOSTIC)),
         "extra_key_diagnostics" => return Err(gap(EXTRA_KEY_DIAGNOSTICS)),
         "worker_diagnostics" => return Err(gap(WORKER_DIAGNOSTICS)),

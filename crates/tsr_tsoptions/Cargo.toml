@@ -13,6 +13,7 @@ readme = "README.md"
 include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/licenses/**"]
 
 [dependencies]
+tsr_locale = { version = "0.1.0", path = "../tsr_locale" }
 tsr_json = { path = "../tsr_json", version = "0.1.0" }
 stacker = "=0.1.25"
 tsr_jsnum = { version = "0.1.0", path = "../tsr_jsnum" }

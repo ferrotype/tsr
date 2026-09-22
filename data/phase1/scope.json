@@ -1,10 +1,10 @@
 {
   "counts": {
-    "covered": 886,
+    "covered": 904,
     "equivalent_rust": 8,
     "implemented_untested": 3113,
     "later_phase": 18,
-    "missing": 770
+    "missing": 752
   },
   "dispositions": [
     "covered",
@@ -170007,7 +170007,7 @@
       "id": "tsc/internal/core/watchoptions.go:WatchOptions.WatchInterval",
       "ledger_crate": "tsr_core",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "in-progress",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
@@ -170017,7 +170017,9 @@
         "state": "exempt:unused_at_pin",
         "step": "leaves"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_core/src/watch_options.rs"
+      ],
       "symbol": "WatchOptions.WatchInterval"
     },
     {
@@ -236679,14 +236681,17 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "witnessed by 5 exact link(s): config/commandlineops/declaration-elements-only-for-list-options, config/commandlineops/declaration-enum-maps-keep-their-order, config/commandlineops/declaration-extends-is-the-only-option-disallowing-null",
+      "basis": "witnessed by 8 exact link(s): config/commandlineops/declaration-elements-only-for-list-options, config/commandlineops/declaration-enum-maps-keep-their-order, config/commandlineops/declaration-extends-is-the-only-option-disallowing-null",
       "basis_kind": "rule",
       "cases": [
         "config/commandlineops/declaration-elements-only-for-list-options",
         "config/commandlineops/declaration-enum-maps-keep-their-order",
         "config/commandlineops/declaration-extends-is-the-only-option-disallowing-null",
         "config/commandlineops/enum-type-keys-drop-deprecated-spellings",
-        "config/commandlineops/list-option-enum-elements-report-the-allowed-keys"
+        "config/commandlineops/list-option-enum-elements-report-the-allowed-keys",
+        "config/commandlineops/parse-command-line-enum-option-converts-through-its-map",
+        "config/commandlineops/parse-command-line-falls-back-to-the-watch-option-table",
+        "config/commandlineops/parse-command-line-missing-argument-names-the-expected-type"
       ],
       "depends_on": [
         "internal/ast",
@@ -236801,17 +236806,21 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "witnessed by 9 exact link(s): config/commandlineops/declaration-elements-only-for-list-options, config/commandlineops/declaration-enum-maps-keep-their-order, config/commandlineops/declaration-extends-is-the-only-option-disallowing-null",
+      "basis": "witnessed by 13 exact link(s): config/commandlineops/declaration-elements-only-for-list-options, config/commandlineops/declaration-enum-maps-keep-their-order, config/commandlineops/declaration-extends-is-the-only-option-disallowing-null",
       "basis_kind": "rule",
       "cases": [
         "config/commandlineops/declaration-elements-only-for-list-options",
         "config/commandlineops/declaration-enum-maps-keep-their-order",
         "config/commandlineops/declaration-extends-is-the-only-option-disallowing-null",
         "config/commandlineops/list-option-drops-empty-entries",
+        "config/commandlineops/list-option-empty-value-for-a-listorelement",
         "config/commandlineops/list-option-empty-value-for-a-plain-list",
         "config/commandlineops/list-option-enum-elements-report-the-allowed-keys",
         "config/commandlineops/list-option-object-elements-are-refused",
         "config/commandlineops/list-option-splits-on-commas-in-order",
+        "config/commandlineops/parse-command-line-falls-back-to-the-watch-option-table",
+        "config/commandlineops/parse-command-line-list-option-takes-one-comma-separated-argument",
+        "config/commandlineops/parse-command-line-missing-argument-names-the-expected-type",
         "config/commandlineops/value-type-string-per-option-kind"
       ],
       "depends_on": [
@@ -236867,14 +236876,17 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "witnessed by 5 exact link(s): config/commandlineops/declaration-elements-only-for-list-options, config/commandlineops/declaration-enum-maps-keep-their-order, config/commandlineops/declaration-extends-is-the-only-option-disallowing-null",
+      "basis": "witnessed by 8 exact link(s): config/commandlineops/declaration-elements-only-for-list-options, config/commandlineops/declaration-enum-maps-keep-their-order, config/commandlineops/declaration-extends-is-the-only-option-disallowing-null",
       "basis_kind": "rule",
       "cases": [
         "config/commandlineops/declaration-elements-only-for-list-options",
         "config/commandlineops/declaration-enum-maps-keep-their-order",
         "config/commandlineops/declaration-extends-is-the-only-option-disallowing-null",
         "config/commandlineops/enum-type-keys-drop-deprecated-spellings",
-        "config/commandlineops/list-option-enum-elements-report-the-allowed-keys"
+        "config/commandlineops/list-option-enum-elements-report-the-allowed-keys",
+        "config/commandlineops/parse-command-line-enum-option-converts-through-its-map",
+        "config/commandlineops/parse-command-line-falls-back-to-the-watch-option-table",
+        "config/commandlineops/parse-command-line-missing-argument-names-the-expected-type"
       ],
       "depends_on": [
         "internal/ast",
@@ -236928,8 +236940,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: config/commandlineops/parse-build-command-line-defaults-the-project-list, config/commandlineops/parse-build-command-line-diverts-a-compiler-only-option, config/commandlineops/parse-build-command-line-keeps-the-compiler-options-it-shares; witnessed by 8 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_tsoptions/src/command_line.rs"
+      ],
+      "basis": "witnessed by 7 exact link(s): config/commandlineops/parse-build-command-line-defaults-the-project-list, config/commandlineops/parse-build-command-line-diverts-a-compiler-only-option, config/commandlineops/parse-build-command-line-keeps-the-compiler-options-it-shares",
       "basis_kind": "rule",
       "cases": [
         "config/commandlineops/parse-build-command-line-defaults-the-project-list",
@@ -236970,7 +236984,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/tsoptions",
       "go_source": "tsc/internal/tsoptions/commandlineparser.go",
       "id": "tsc/internal/tsoptions/commandlineparser.go:ParseBuildCommandLine",
@@ -236987,14 +237001,18 @@
         "step": "config"
       },
       "rust_home": [
+        "crates/tsr_tsoptions/src/command_line.rs",
+        "crates/tsr_tsoptions/src/command_line/worker.rs",
         "crates/tsr_tsoptions/src/fixture_options.rs"
       ],
       "symbol": "ParseBuildCommandLine"
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: config/commandlineops/parse-command-line-boolean-option-consumes-only-true-or-false, config/commandlineops/parse-command-line-build-option-is-diverted-by-alternate-mode, config/commandlineops/parse-command-line-converts-file-path-options-to-absolute; witnessed by 18 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_tsoptions/src/command_line.rs"
+      ],
+      "basis": "witnessed by 17 exact link(s): config/commandlineops/parse-command-line-boolean-option-consumes-only-true-or-false, config/commandlineops/parse-command-line-build-option-is-diverted-by-alternate-mode, config/commandlineops/parse-command-line-converts-file-path-options-to-absolute",
       "basis_kind": "rule",
       "cases": [
         "config/commandlineops/parse-command-line-boolean-option-consumes-only-true-or-false",
@@ -237045,7 +237063,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/tsoptions",
       "go_source": "tsc/internal/tsoptions/commandlineparser.go",
       "id": "tsc/internal/tsoptions/commandlineparser.go:ParseCommandLine",
@@ -237062,6 +237080,8 @@
         "step": "config"
       },
       "rust_home": [
+        "crates/tsr_tsoptions/src/command_line.rs",
+        "crates/tsr_tsoptions/src/command_line/worker.rs",
         "crates/tsr_tsoptions/src/fixture_options.rs"
       ],
       "symbol": "ParseCommandLine"
@@ -237071,15 +237091,17 @@
       "annotated_home": [
         "crates/tsr_tsoptions/src/fixture_options.rs"
       ],
-      "basis": "witnessed by 6 exact link(s): config/commandlineops/list-option-drops-empty-entries, config/commandlineops/list-option-empty-value-for-a-plain-list, config/commandlineops/list-option-enum-elements-report-the-allowed-keys",
+      "basis": "witnessed by 8 exact link(s): config/commandlineops/list-option-drops-empty-entries, config/commandlineops/list-option-empty-value-for-a-listorelement, config/commandlineops/list-option-empty-value-for-a-plain-list",
       "basis_kind": "rule",
       "cases": [
         "config/commandlineops/list-option-drops-empty-entries",
+        "config/commandlineops/list-option-empty-value-for-a-listorelement",
         "config/commandlineops/list-option-empty-value-for-a-plain-list",
         "config/commandlineops/list-option-enum-elements-report-the-allowed-keys",
         "config/commandlineops/list-option-leading-dash-answers-an-empty-list",
         "config/commandlineops/list-option-object-elements-are-refused",
-        "config/commandlineops/list-option-splits-on-commas-in-order"
+        "config/commandlineops/list-option-splits-on-commas-in-order",
+        "config/commandlineops/parse-command-line-list-option-takes-one-comma-separated-argument"
       ],
       "depends_on": [
         "internal/ast",
@@ -237127,6 +237149,8 @@
         "step": "config"
       },
       "rust_home": [
+        "crates/tsr_tsoptions/src/command_line.rs",
+        "crates/tsr_tsoptions/src/command_line/worker.rs",
         "crates/tsr_tsoptions/src/fixture_options.rs"
       ],
       "symbol": "ParseListTypeOption"
@@ -237134,9 +237158,15 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 5 exact link(s): config/commandlineops/parse-build-command-line-diverts-a-compiler-only-option, config/commandlineops/parse-build-command-line-unknown-build-option, config/commandlineops/parse-command-line-build-option-is-diverted-by-alternate-mode",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/commandlineops/parse-build-command-line-diverts-a-compiler-only-option",
+        "config/commandlineops/parse-build-command-line-unknown-build-option",
+        "config/commandlineops/parse-command-line-build-option-is-diverted-by-alternate-mode",
+        "config/commandlineops/parse-command-line-unknown-option-with-a-suggestion",
+        "config/commandlineops/parse-command-line-unknown-option-without-a-suggestion"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -237166,7 +237196,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/tsoptions",
       "go_source": "tsc/internal/tsoptions/commandlineparser.go",
       "id": "tsc/internal/tsoptions/commandlineparser.go:commandLineParser.AlternateMode",
@@ -237179,10 +237209,12 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
+        "crates/tsr_tsoptions/src/command_line.rs",
+        "crates/tsr_tsoptions/src/command_line/worker.rs",
         "crates/tsr_tsoptions/src/fixture_options.rs"
       ],
       "symbol": "commandLineParser.AlternateMode"
@@ -237190,9 +237222,34 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 24 exact link(s): config/commandlineops/parse-build-command-line-defaults-the-project-list, config/commandlineops/parse-build-command-line-diverts-a-compiler-only-option, config/commandlineops/parse-build-command-line-keeps-the-compiler-options-it-shares",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/commandlineops/parse-build-command-line-defaults-the-project-list",
+        "config/commandlineops/parse-build-command-line-diverts-a-compiler-only-option",
+        "config/commandlineops/parse-build-command-line-keeps-the-compiler-options-it-shares",
+        "config/commandlineops/parse-build-command-line-number-option-minimum",
+        "config/commandlineops/parse-build-command-line-rejects-nonsensical-combinations",
+        "config/commandlineops/parse-build-command-line-short-names",
+        "config/commandlineops/parse-build-command-line-unknown-build-option",
+        "config/commandlineops/parse-command-line-boolean-option-consumes-only-true-or-false",
+        "config/commandlineops/parse-command-line-build-option-is-diverted-by-alternate-mode",
+        "config/commandlineops/parse-command-line-converts-file-path-options-to-absolute",
+        "config/commandlineops/parse-command-line-enum-option-converts-through-its-map",
+        "config/commandlineops/parse-command-line-explicit-null-clears-an-option",
+        "config/commandlineops/parse-command-line-falls-back-to-the-watch-option-table",
+        "config/commandlineops/parse-command-line-list-option-takes-one-comma-separated-argument",
+        "config/commandlineops/parse-command-line-missing-argument-names-the-expected-type",
+        "config/commandlineops/parse-command-line-number-option-honours-its-minimum",
+        "config/commandlineops/parse-command-line-reads-a-response-file",
+        "config/commandlineops/parse-command-line-repeated-option-keeps-the-last-value",
+        "config/commandlineops/parse-command-line-response-file-cycles-are-broken",
+        "config/commandlineops/parse-command-line-response-file-that-cannot-be-read",
+        "config/commandlineops/parse-command-line-separates-options-from-file-names",
+        "config/commandlineops/parse-command-line-tsconfig-only-option-is-refused",
+        "config/commandlineops/parse-command-line-unknown-option-with-a-suggestion",
+        "config/commandlineops/parse-command-line-unknown-option-without-a-suggestion"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -237222,7 +237279,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/tsoptions",
       "go_source": "tsc/internal/tsoptions/commandlineparser.go",
       "id": "tsc/internal/tsoptions/commandlineparser.go:commandLineParser.OptionsDeclarations",
@@ -237235,10 +237292,12 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
+        "crates/tsr_tsoptions/src/command_line.rs",
+        "crates/tsr_tsoptions/src/command_line/worker.rs",
         "crates/tsr_tsoptions/src/fixture_options.rs"
       ],
       "symbol": "commandLineParser.OptionsDeclarations"
@@ -237246,9 +237305,15 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 5 exact link(s): config/commandlineops/parse-build-command-line-diverts-a-compiler-only-option, config/commandlineops/parse-build-command-line-unknown-build-option, config/commandlineops/parse-command-line-build-option-is-diverted-by-alternate-mode",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/commandlineops/parse-build-command-line-diverts-a-compiler-only-option",
+        "config/commandlineops/parse-build-command-line-unknown-build-option",
+        "config/commandlineops/parse-command-line-build-option-is-diverted-by-alternate-mode",
+        "config/commandlineops/parse-command-line-unknown-option-with-a-suggestion",
+        "config/commandlineops/parse-command-line-unknown-option-without-a-suggestion"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -237278,7 +237343,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/tsoptions",
       "go_source": "tsc/internal/tsoptions/commandlineparser.go",
       "id": "tsc/internal/tsoptions/commandlineparser.go:commandLineParser.UnknownDidYouMeanDiagnostic",
@@ -237291,10 +237356,12 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
+        "crates/tsr_tsoptions/src/command_line.rs",
+        "crates/tsr_tsoptions/src/command_line/worker.rs",
         "crates/tsr_tsoptions/src/fixture_options.rs"
       ],
       "symbol": "commandLineParser.UnknownDidYouMeanDiagnostic"
@@ -237302,9 +237369,15 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 5 exact link(s): config/commandlineops/parse-build-command-line-diverts-a-compiler-only-option, config/commandlineops/parse-build-command-line-unknown-build-option, config/commandlineops/parse-command-line-build-option-is-diverted-by-alternate-mode",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/commandlineops/parse-build-command-line-diverts-a-compiler-only-option",
+        "config/commandlineops/parse-build-command-line-unknown-build-option",
+        "config/commandlineops/parse-command-line-build-option-is-diverted-by-alternate-mode",
+        "config/commandlineops/parse-command-line-unknown-option-with-a-suggestion",
+        "config/commandlineops/parse-command-line-unknown-option-without-a-suggestion"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -237334,7 +237407,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/tsoptions",
       "go_source": "tsc/internal/tsoptions/commandlineparser.go",
       "id": "tsc/internal/tsoptions/commandlineparser.go:commandLineParser.UnknownOptionDiagnostic",
@@ -237347,10 +237420,12 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
+        "crates/tsr_tsoptions/src/command_line.rs",
+        "crates/tsr_tsoptions/src/command_line/worker.rs",
         "crates/tsr_tsoptions/src/fixture_options.rs"
       ],
       "symbol": "commandLineParser.UnknownOptionDiagnostic"
@@ -237358,9 +237433,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): config/commandlineops/parse-command-line-list-option-takes-one-comma-separated-argument",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/commandlineops/parse-command-line-list-option-takes-one-comma-separated-argument"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -237390,7 +237467,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/tsoptions",
       "go_source": "tsc/internal/tsoptions/commandlineparser.go",
       "id": "tsc/internal/tsoptions/commandlineparser.go:commandLineParser.parseListTypeOption",
@@ -237403,20 +237480,43 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
+        "crates/tsr_tsoptions/src/command_line.rs",
+        "crates/tsr_tsoptions/src/command_line/worker.rs",
         "crates/tsr_tsoptions/src/fixture_options.rs"
       ],
       "symbol": "commandLineParser.parseListTypeOption"
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_tsoptions/src/command_line/worker.rs"
+      ],
+      "basis": "witnessed by 18 exact link(s): config/commandlineops/parse-build-command-line-defaults-the-project-list, config/commandlineops/parse-build-command-line-keeps-the-compiler-options-it-shares, config/commandlineops/parse-build-command-line-number-option-minimum",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/commandlineops/parse-build-command-line-defaults-the-project-list",
+        "config/commandlineops/parse-build-command-line-keeps-the-compiler-options-it-shares",
+        "config/commandlineops/parse-build-command-line-number-option-minimum",
+        "config/commandlineops/parse-build-command-line-rejects-nonsensical-combinations",
+        "config/commandlineops/parse-build-command-line-short-names",
+        "config/commandlineops/parse-command-line-boolean-option-consumes-only-true-or-false",
+        "config/commandlineops/parse-command-line-converts-file-path-options-to-absolute",
+        "config/commandlineops/parse-command-line-enum-option-converts-through-its-map",
+        "config/commandlineops/parse-command-line-explicit-null-clears-an-option",
+        "config/commandlineops/parse-command-line-falls-back-to-the-watch-option-table",
+        "config/commandlineops/parse-command-line-list-option-takes-one-comma-separated-argument",
+        "config/commandlineops/parse-command-line-missing-argument-names-the-expected-type",
+        "config/commandlineops/parse-command-line-number-option-honours-its-minimum",
+        "config/commandlineops/parse-command-line-reads-a-response-file",
+        "config/commandlineops/parse-command-line-repeated-option-keeps-the-last-value",
+        "config/commandlineops/parse-command-line-response-file-cycles-are-broken",
+        "config/commandlineops/parse-command-line-separates-options-from-file-names",
+        "config/commandlineops/parse-command-line-tsconfig-only-option-is-refused"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -237446,7 +237546,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/tsoptions",
       "go_source": "tsc/internal/tsoptions/commandlineparser.go",
       "id": "tsc/internal/tsoptions/commandlineparser.go:commandLineParser.parseOptionValue",
@@ -237459,20 +237559,28 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
+        "crates/tsr_tsoptions/src/command_line.rs",
+        "crates/tsr_tsoptions/src/command_line/worker.rs",
         "crates/tsr_tsoptions/src/fixture_options.rs"
       ],
       "symbol": "commandLineParser.parseOptionValue"
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_tsoptions/src/command_line/worker.rs"
+      ],
+      "basis": "witnessed by 3 exact link(s): config/commandlineops/parse-command-line-reads-a-response-file, config/commandlineops/parse-command-line-response-file-cycles-are-broken, config/commandlineops/parse-command-line-response-file-that-cannot-be-read",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/commandlineops/parse-command-line-reads-a-response-file",
+        "config/commandlineops/parse-command-line-response-file-cycles-are-broken",
+        "config/commandlineops/parse-command-line-response-file-that-cannot-be-read"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -237502,7 +237610,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/tsoptions",
       "go_source": "tsc/internal/tsoptions/commandlineparser.go",
       "id": "tsc/internal/tsoptions/commandlineparser.go:commandLineParser.parseResponseFile",
@@ -237515,10 +237623,12 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
+        "crates/tsr_tsoptions/src/command_line.rs",
+        "crates/tsr_tsoptions/src/command_line/worker.rs",
         "crates/tsr_tsoptions/src/fixture_options.rs"
       ],
       "symbol": "commandLineParser.parseResponseFile"
@@ -237526,9 +237636,34 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 24 exact link(s): config/commandlineops/parse-build-command-line-defaults-the-project-list, config/commandlineops/parse-build-command-line-diverts-a-compiler-only-option, config/commandlineops/parse-build-command-line-keeps-the-compiler-options-it-shares",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/commandlineops/parse-build-command-line-defaults-the-project-list",
+        "config/commandlineops/parse-build-command-line-diverts-a-compiler-only-option",
+        "config/commandlineops/parse-build-command-line-keeps-the-compiler-options-it-shares",
+        "config/commandlineops/parse-build-command-line-number-option-minimum",
+        "config/commandlineops/parse-build-command-line-rejects-nonsensical-combinations",
+        "config/commandlineops/parse-build-command-line-short-names",
+        "config/commandlineops/parse-build-command-line-unknown-build-option",
+        "config/commandlineops/parse-command-line-boolean-option-consumes-only-true-or-false",
+        "config/commandlineops/parse-command-line-build-option-is-diverted-by-alternate-mode",
+        "config/commandlineops/parse-command-line-converts-file-path-options-to-absolute",
+        "config/commandlineops/parse-command-line-enum-option-converts-through-its-map",
+        "config/commandlineops/parse-command-line-explicit-null-clears-an-option",
+        "config/commandlineops/parse-command-line-falls-back-to-the-watch-option-table",
+        "config/commandlineops/parse-command-line-list-option-takes-one-comma-separated-argument",
+        "config/commandlineops/parse-command-line-missing-argument-names-the-expected-type",
+        "config/commandlineops/parse-command-line-number-option-honours-its-minimum",
+        "config/commandlineops/parse-command-line-reads-a-response-file",
+        "config/commandlineops/parse-command-line-repeated-option-keeps-the-last-value",
+        "config/commandlineops/parse-command-line-response-file-cycles-are-broken",
+        "config/commandlineops/parse-command-line-response-file-that-cannot-be-read",
+        "config/commandlineops/parse-command-line-separates-options-from-file-names",
+        "config/commandlineops/parse-command-line-tsconfig-only-option-is-refused",
+        "config/commandlineops/parse-command-line-unknown-option-with-a-suggestion",
+        "config/commandlineops/parse-command-line-unknown-option-without-a-suggestion"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -237558,7 +237693,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/tsoptions",
       "go_source": "tsc/internal/tsoptions/commandlineparser.go",
       "id": "tsc/internal/tsoptions/commandlineparser.go:commandLineParser.parseStrings",
@@ -237571,10 +237706,12 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
+        "crates/tsr_tsoptions/src/command_line.rs",
+        "crates/tsr_tsoptions/src/command_line/worker.rs",
         "crates/tsr_tsoptions/src/fixture_options.rs"
       ],
       "symbol": "commandLineParser.parseStrings"
@@ -237582,10 +237719,15 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "witnessed by 1 exact link(s): config/commandlineops/list-option-enum-elements-report-the-allowed-keys",
+      "basis": "witnessed by 6 exact link(s): config/commandlineops/list-option-enum-elements-report-the-allowed-keys, config/commandlineops/parse-command-line-enum-option-converts-through-its-map, config/commandlineops/parse-command-line-falls-back-to-the-watch-option-table",
       "basis_kind": "rule",
       "cases": [
-        "config/commandlineops/list-option-enum-elements-report-the-allowed-keys"
+        "config/commandlineops/list-option-enum-elements-report-the-allowed-keys",
+        "config/commandlineops/parse-command-line-enum-option-converts-through-its-map",
+        "config/commandlineops/parse-command-line-falls-back-to-the-watch-option-table",
+        "config/commandlineops/parse-command-line-reads-a-response-file",
+        "config/commandlineops/parse-command-line-repeated-option-keeps-the-last-value",
+        "config/commandlineops/parse-command-line-separates-options-from-file-names"
       ],
       "depends_on": [
         "internal/ast",
@@ -237633,17 +237775,26 @@
         "step": "config"
       },
       "rust_home": [
+        "crates/tsr_tsoptions/src/command_line.rs",
+        "crates/tsr_tsoptions/src/command_line/worker.rs",
         "crates/tsr_tsoptions/src/fixture_options.rs"
       ],
       "symbol": "convertJsonOptionOfEnumType"
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: config/commandlineops/input-option-name-strips-at-most-two-dashes; witnessed by 1 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_tsoptions/src/command_line/worker.rs"
+      ],
+      "basis": "witnessed by 6 exact link(s): config/commandlineops/input-option-name-strips-at-most-two-dashes, config/commandlineops/parse-build-command-line-unknown-build-option, config/commandlineops/parse-command-line-reads-a-response-file",
       "basis_kind": "rule",
       "cases": [
-        "config/commandlineops/input-option-name-strips-at-most-two-dashes"
+        "config/commandlineops/input-option-name-strips-at-most-two-dashes",
+        "config/commandlineops/parse-build-command-line-unknown-build-option",
+        "config/commandlineops/parse-command-line-reads-a-response-file",
+        "config/commandlineops/parse-command-line-separates-options-from-file-names",
+        "config/commandlineops/parse-command-line-unknown-option-with-a-suggestion",
+        "config/commandlineops/parse-command-line-unknown-option-without-a-suggestion"
       ],
       "depends_on": [
         "internal/ast",
@@ -237674,7 +237825,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/tsoptions",
       "go_source": "tsc/internal/tsoptions/commandlineparser.go",
       "id": "tsc/internal/tsoptions/commandlineparser.go:getInputOptionName",
@@ -237691,16 +237842,45 @@
         "step": "config"
       },
       "rust_home": [
+        "crates/tsr_tsoptions/src/command_line.rs",
+        "crates/tsr_tsoptions/src/command_line/worker.rs",
         "crates/tsr_tsoptions/src/fixture_options.rs"
       ],
       "symbol": "getInputOptionName"
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_tsoptions/src/command_line/worker.rs"
+      ],
+      "basis": "witnessed by 24 exact link(s): config/commandlineops/parse-build-command-line-defaults-the-project-list, config/commandlineops/parse-build-command-line-diverts-a-compiler-only-option, config/commandlineops/parse-build-command-line-keeps-the-compiler-options-it-shares",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/commandlineops/parse-build-command-line-defaults-the-project-list",
+        "config/commandlineops/parse-build-command-line-diverts-a-compiler-only-option",
+        "config/commandlineops/parse-build-command-line-keeps-the-compiler-options-it-shares",
+        "config/commandlineops/parse-build-command-line-number-option-minimum",
+        "config/commandlineops/parse-build-command-line-rejects-nonsensical-combinations",
+        "config/commandlineops/parse-build-command-line-short-names",
+        "config/commandlineops/parse-build-command-line-unknown-build-option",
+        "config/commandlineops/parse-command-line-boolean-option-consumes-only-true-or-false",
+        "config/commandlineops/parse-command-line-build-option-is-diverted-by-alternate-mode",
+        "config/commandlineops/parse-command-line-converts-file-path-options-to-absolute",
+        "config/commandlineops/parse-command-line-enum-option-converts-through-its-map",
+        "config/commandlineops/parse-command-line-explicit-null-clears-an-option",
+        "config/commandlineops/parse-command-line-falls-back-to-the-watch-option-table",
+        "config/commandlineops/parse-command-line-list-option-takes-one-comma-separated-argument",
+        "config/commandlineops/parse-command-line-missing-argument-names-the-expected-type",
+        "config/commandlineops/parse-command-line-number-option-honours-its-minimum",
+        "config/commandlineops/parse-command-line-reads-a-response-file",
+        "config/commandlineops/parse-command-line-repeated-option-keeps-the-last-value",
+        "config/commandlineops/parse-command-line-response-file-cycles-are-broken",
+        "config/commandlineops/parse-command-line-response-file-that-cannot-be-read",
+        "config/commandlineops/parse-command-line-separates-options-from-file-names",
+        "config/commandlineops/parse-command-line-tsconfig-only-option-is-refused",
+        "config/commandlineops/parse-command-line-unknown-option-with-a-suggestion",
+        "config/commandlineops/parse-command-line-unknown-option-without-a-suggestion"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -237730,7 +237910,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/tsoptions",
       "go_source": "tsc/internal/tsoptions/commandlineparser.go",
       "id": "tsc/internal/tsoptions/commandlineparser.go:parseCommandLineWorker",
@@ -237743,10 +237923,12 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
+        "crates/tsr_tsoptions/src/command_line.rs",
+        "crates/tsr_tsoptions/src/command_line/worker.rs",
         "crates/tsr_tsoptions/src/fixture_options.rs"
       ],
       "symbol": "parseCommandLineWorker"
@@ -237754,9 +237936,13 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 3 exact link(s): config/commandlineops/parse-command-line-reads-a-response-file, config/commandlineops/parse-command-line-response-file-cycles-are-broken, config/commandlineops/parse-command-line-response-file-that-cannot-be-read",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/commandlineops/parse-command-line-reads-a-response-file",
+        "config/commandlineops/parse-command-line-response-file-cycles-are-broken",
+        "config/commandlineops/parse-command-line-response-file-that-cannot-be-read"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -237786,7 +237972,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/tsoptions",
       "go_source": "tsc/internal/tsoptions/commandlineparser.go",
       "id": "tsc/internal/tsoptions/commandlineparser.go:tryReadFile",
@@ -237799,10 +237985,12 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
+        "crates/tsr_tsoptions/src/command_line.rs",
+        "crates/tsr_tsoptions/src/command_line/worker.rs",
         "crates/tsr_tsoptions/src/fixture_options.rs"
       ],
       "symbol": "tryReadFile"
@@ -238442,10 +238630,18 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "witnessed by 2 exact link(s): config/commandlineops/list-option-enum-elements-report-the-allowed-keys, config/commandlineops/parsed-config-parsing-diagnostics-carry-node-ranges",
+      "basis": "witnessed by 10 exact link(s): config/commandlineops/list-option-enum-elements-report-the-allowed-keys, config/commandlineops/parse-build-command-line-diverts-a-compiler-only-option, config/commandlineops/parse-build-command-line-unknown-build-option",
       "basis_kind": "rule",
       "cases": [
         "config/commandlineops/list-option-enum-elements-report-the-allowed-keys",
+        "config/commandlineops/parse-build-command-line-diverts-a-compiler-only-option",
+        "config/commandlineops/parse-build-command-line-unknown-build-option",
+        "config/commandlineops/parse-command-line-build-option-is-diverted-by-alternate-mode",
+        "config/commandlineops/parse-command-line-enum-option-converts-through-its-map",
+        "config/commandlineops/parse-command-line-falls-back-to-the-watch-option-table",
+        "config/commandlineops/parse-command-line-missing-argument-names-the-expected-type",
+        "config/commandlineops/parse-command-line-unknown-option-with-a-suggestion",
+        "config/commandlineops/parse-command-line-unknown-option-without-a-suggestion",
         "config/commandlineops/parsed-config-parsing-diagnostics-carry-node-ranges"
       ],
       "depends_on": [
@@ -238501,9 +238697,15 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 5 exact link(s): config/commandlineops/parse-build-command-line-diverts-a-compiler-only-option, config/commandlineops/parse-build-command-line-unknown-build-option, config/commandlineops/parse-command-line-build-option-is-diverted-by-alternate-mode",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/commandlineops/parse-build-command-line-diverts-a-compiler-only-option",
+        "config/commandlineops/parse-build-command-line-unknown-build-option",
+        "config/commandlineops/parse-command-line-build-option-is-diverted-by-alternate-mode",
+        "config/commandlineops/parse-command-line-unknown-option-with-a-suggestion",
+        "config/commandlineops/parse-command-line-unknown-option-without-a-suggestion"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -238533,7 +238735,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/tsoptions",
       "go_source": "tsc/internal/tsoptions/errors.go",
       "id": "tsc/internal/tsoptions/errors.go:commandLineParser.createUnknownOptionError",
@@ -238546,7 +238748,7 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -238557,11 +238759,14 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "witnessed by 1 exact link(s): config/commandlineops/list-option-enum-elements-report-the-allowed-keys",
+      "basis": "witnessed by 4 exact link(s): config/commandlineops/list-option-enum-elements-report-the-allowed-keys, config/commandlineops/parse-command-line-enum-option-converts-through-its-map, config/commandlineops/parse-command-line-falls-back-to-the-watch-option-table",
       "basis_kind": "rule",
       "cases": [
         "config/commandlineops/invalid-enum-type-diagnostic-lists-the-allowed-keys",
-        "config/commandlineops/list-option-enum-elements-report-the-allowed-keys"
+        "config/commandlineops/list-option-enum-elements-report-the-allowed-keys",
+        "config/commandlineops/parse-command-line-enum-option-converts-through-its-map",
+        "config/commandlineops/parse-command-line-falls-back-to-the-watch-option-table",
+        "config/commandlineops/parse-command-line-missing-argument-names-the-expected-type"
       ],
       "depends_on": [
         "internal/ast",
@@ -238616,9 +238821,15 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 5 exact link(s): config/commandlineops/parse-build-command-line-diverts-a-compiler-only-option, config/commandlineops/parse-build-command-line-unknown-build-option, config/commandlineops/parse-command-line-build-option-is-diverted-by-alternate-mode",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/commandlineops/parse-build-command-line-diverts-a-compiler-only-option",
+        "config/commandlineops/parse-build-command-line-unknown-build-option",
+        "config/commandlineops/parse-command-line-build-option-is-diverted-by-alternate-mode",
+        "config/commandlineops/parse-command-line-unknown-option-with-a-suggestion",
+        "config/commandlineops/parse-command-line-unknown-option-without-a-suggestion"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -238648,7 +238859,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/tsoptions",
       "go_source": "tsc/internal/tsoptions/errors.go",
       "id": "tsc/internal/tsoptions/errors.go:createUnknownOptionError",
@@ -238661,7 +238872,7 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
       "rust_home": [
@@ -238786,11 +238997,14 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "witnessed by 2 exact link(s): config/commandlineops/enum-type-keys-drop-deprecated-spellings, config/commandlineops/list-option-enum-elements-report-the-allowed-keys",
+      "basis": "witnessed by 5 exact link(s): config/commandlineops/enum-type-keys-drop-deprecated-spellings, config/commandlineops/list-option-enum-elements-report-the-allowed-keys, config/commandlineops/parse-command-line-enum-option-converts-through-its-map",
       "basis_kind": "rule",
       "cases": [
         "config/commandlineops/enum-type-keys-drop-deprecated-spellings",
-        "config/commandlineops/list-option-enum-elements-report-the-allowed-keys"
+        "config/commandlineops/list-option-enum-elements-report-the-allowed-keys",
+        "config/commandlineops/parse-command-line-enum-option-converts-through-its-map",
+        "config/commandlineops/parse-command-line-falls-back-to-the-watch-option-table",
+        "config/commandlineops/parse-command-line-missing-argument-names-the-expected-type"
       ],
       "depends_on": [
         "internal/ast",
@@ -238845,9 +239059,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "witnessed by 1 exact link(s): config/commandlineops/value-type-string-per-option-kind",
+      "basis": "witnessed by 3 exact link(s): config/commandlineops/parse-command-line-falls-back-to-the-watch-option-table, config/commandlineops/parse-command-line-missing-argument-names-the-expected-type, config/commandlineops/value-type-string-per-option-kind",
       "basis_kind": "rule",
       "cases": [
+        "config/commandlineops/parse-command-line-falls-back-to-the-watch-option-table",
+        "config/commandlineops/parse-command-line-missing-argument-names-the-expected-type",
         "config/commandlineops/value-type-string-per-option-kind"
       ],
       "depends_on": [
@@ -238903,11 +239119,36 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "witnessed by 2 exact link(s): config/commandlineops/name-map-over-the-watch-table, config/commandlineops/name-map-short-names-case-folding-and-misses",
+      "basis": "witnessed by 27 exact link(s): config/commandlineops/name-map-over-the-build-table, config/commandlineops/name-map-over-the-watch-table, config/commandlineops/name-map-short-names-case-folding-and-misses",
       "basis_kind": "rule",
       "cases": [
+        "config/commandlineops/name-map-over-the-build-table",
         "config/commandlineops/name-map-over-the-watch-table",
-        "config/commandlineops/name-map-short-names-case-folding-and-misses"
+        "config/commandlineops/name-map-short-names-case-folding-and-misses",
+        "config/commandlineops/parse-build-command-line-defaults-the-project-list",
+        "config/commandlineops/parse-build-command-line-diverts-a-compiler-only-option",
+        "config/commandlineops/parse-build-command-line-keeps-the-compiler-options-it-shares",
+        "config/commandlineops/parse-build-command-line-number-option-minimum",
+        "config/commandlineops/parse-build-command-line-rejects-nonsensical-combinations",
+        "config/commandlineops/parse-build-command-line-short-names",
+        "config/commandlineops/parse-build-command-line-unknown-build-option",
+        "config/commandlineops/parse-command-line-boolean-option-consumes-only-true-or-false",
+        "config/commandlineops/parse-command-line-build-option-is-diverted-by-alternate-mode",
+        "config/commandlineops/parse-command-line-converts-file-path-options-to-absolute",
+        "config/commandlineops/parse-command-line-enum-option-converts-through-its-map",
+        "config/commandlineops/parse-command-line-explicit-null-clears-an-option",
+        "config/commandlineops/parse-command-line-falls-back-to-the-watch-option-table",
+        "config/commandlineops/parse-command-line-list-option-takes-one-comma-separated-argument",
+        "config/commandlineops/parse-command-line-missing-argument-names-the-expected-type",
+        "config/commandlineops/parse-command-line-number-option-honours-its-minimum",
+        "config/commandlineops/parse-command-line-reads-a-response-file",
+        "config/commandlineops/parse-command-line-repeated-option-keeps-the-last-value",
+        "config/commandlineops/parse-command-line-response-file-cycles-are-broken",
+        "config/commandlineops/parse-command-line-response-file-that-cannot-be-read",
+        "config/commandlineops/parse-command-line-separates-options-from-file-names",
+        "config/commandlineops/parse-command-line-tsconfig-only-option-is-refused",
+        "config/commandlineops/parse-command-line-unknown-option-with-a-suggestion",
+        "config/commandlineops/parse-command-line-unknown-option-without-a-suggestion"
       ],
       "depends_on": [
         "internal/ast",
@@ -238962,11 +239203,36 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "witnessed by 2 exact link(s): config/commandlineops/name-map-over-the-watch-table, config/commandlineops/name-map-short-names-case-folding-and-misses",
+      "basis": "witnessed by 27 exact link(s): config/commandlineops/name-map-over-the-build-table, config/commandlineops/name-map-over-the-watch-table, config/commandlineops/name-map-short-names-case-folding-and-misses",
       "basis_kind": "rule",
       "cases": [
+        "config/commandlineops/name-map-over-the-build-table",
         "config/commandlineops/name-map-over-the-watch-table",
-        "config/commandlineops/name-map-short-names-case-folding-and-misses"
+        "config/commandlineops/name-map-short-names-case-folding-and-misses",
+        "config/commandlineops/parse-build-command-line-defaults-the-project-list",
+        "config/commandlineops/parse-build-command-line-diverts-a-compiler-only-option",
+        "config/commandlineops/parse-build-command-line-keeps-the-compiler-options-it-shares",
+        "config/commandlineops/parse-build-command-line-number-option-minimum",
+        "config/commandlineops/parse-build-command-line-rejects-nonsensical-combinations",
+        "config/commandlineops/parse-build-command-line-short-names",
+        "config/commandlineops/parse-build-command-line-unknown-build-option",
+        "config/commandlineops/parse-command-line-boolean-option-consumes-only-true-or-false",
+        "config/commandlineops/parse-command-line-build-option-is-diverted-by-alternate-mode",
+        "config/commandlineops/parse-command-line-converts-file-path-options-to-absolute",
+        "config/commandlineops/parse-command-line-enum-option-converts-through-its-map",
+        "config/commandlineops/parse-command-line-explicit-null-clears-an-option",
+        "config/commandlineops/parse-command-line-falls-back-to-the-watch-option-table",
+        "config/commandlineops/parse-command-line-list-option-takes-one-comma-separated-argument",
+        "config/commandlineops/parse-command-line-missing-argument-names-the-expected-type",
+        "config/commandlineops/parse-command-line-number-option-honours-its-minimum",
+        "config/commandlineops/parse-command-line-reads-a-response-file",
+        "config/commandlineops/parse-command-line-repeated-option-keeps-the-last-value",
+        "config/commandlineops/parse-command-line-response-file-cycles-are-broken",
+        "config/commandlineops/parse-command-line-response-file-that-cannot-be-read",
+        "config/commandlineops/parse-command-line-separates-options-from-file-names",
+        "config/commandlineops/parse-command-line-tsconfig-only-option-is-refused",
+        "config/commandlineops/parse-command-line-unknown-option-with-a-suggestion",
+        "config/commandlineops/parse-command-line-unknown-option-without-a-suggestion"
       ],
       "depends_on": [
         "internal/ast",
@@ -239079,11 +239345,36 @@
       "annotated_home": [
         "crates/tsr_tsoptions/src/option_declarations.rs"
       ],
-      "basis": "witnessed by 2 exact link(s): config/commandlineops/name-map-over-the-watch-table, config/commandlineops/name-map-short-names-case-folding-and-misses",
+      "basis": "witnessed by 27 exact link(s): config/commandlineops/name-map-over-the-build-table, config/commandlineops/name-map-over-the-watch-table, config/commandlineops/name-map-short-names-case-folding-and-misses",
       "basis_kind": "rule",
       "cases": [
+        "config/commandlineops/name-map-over-the-build-table",
         "config/commandlineops/name-map-over-the-watch-table",
-        "config/commandlineops/name-map-short-names-case-folding-and-misses"
+        "config/commandlineops/name-map-short-names-case-folding-and-misses",
+        "config/commandlineops/parse-build-command-line-defaults-the-project-list",
+        "config/commandlineops/parse-build-command-line-diverts-a-compiler-only-option",
+        "config/commandlineops/parse-build-command-line-keeps-the-compiler-options-it-shares",
+        "config/commandlineops/parse-build-command-line-number-option-minimum",
+        "config/commandlineops/parse-build-command-line-rejects-nonsensical-combinations",
+        "config/commandlineops/parse-build-command-line-short-names",
+        "config/commandlineops/parse-build-command-line-unknown-build-option",
+        "config/commandlineops/parse-command-line-boolean-option-consumes-only-true-or-false",
+        "config/commandlineops/parse-command-line-build-option-is-diverted-by-alternate-mode",
+        "config/commandlineops/parse-command-line-converts-file-path-options-to-absolute",
+        "config/commandlineops/parse-command-line-enum-option-converts-through-its-map",
+        "config/commandlineops/parse-command-line-explicit-null-clears-an-option",
+        "config/commandlineops/parse-command-line-falls-back-to-the-watch-option-table",
+        "config/commandlineops/parse-command-line-list-option-takes-one-comma-separated-argument",
+        "config/commandlineops/parse-command-line-missing-argument-names-the-expected-type",
+        "config/commandlineops/parse-command-line-number-option-honours-its-minimum",
+        "config/commandlineops/parse-command-line-reads-a-response-file",
+        "config/commandlineops/parse-command-line-repeated-option-keeps-the-last-value",
+        "config/commandlineops/parse-command-line-response-file-cycles-are-broken",
+        "config/commandlineops/parse-command-line-response-file-that-cannot-be-read",
+        "config/commandlineops/parse-command-line-separates-options-from-file-names",
+        "config/commandlineops/parse-command-line-tsconfig-only-option-is-refused",
+        "config/commandlineops/parse-command-line-unknown-option-with-a-suggestion",
+        "config/commandlineops/parse-command-line-unknown-option-without-a-suggestion"
       ],
       "depends_on": [
         "internal/ast",
@@ -239137,10 +239428,20 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_tsoptions/src/command_line.rs"
+      ],
+      "basis": "witnessed by 7 exact link(s): config/commandlineops/parse-build-command-line-defaults-the-project-list, config/commandlineops/parse-build-command-line-diverts-a-compiler-only-option, config/commandlineops/parse-build-command-line-keeps-the-compiler-options-it-shares",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "config/commandlineops/parse-build-command-line-defaults-the-project-list",
+        "config/commandlineops/parse-build-command-line-diverts-a-compiler-only-option",
+        "config/commandlineops/parse-build-command-line-keeps-the-compiler-options-it-shares",
+        "config/commandlineops/parse-build-command-line-number-option-minimum",
+        "config/commandlineops/parse-build-command-line-rejects-nonsensical-combinations",
+        "config/commandlineops/parse-build-command-line-short-names",
+        "config/commandlineops/parse-build-command-line-unknown-build-option"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -239170,23 +239471,25 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/tsoptions",
       "go_source": "tsc/internal/tsoptions/parsedbuildcommandline.go",
       "id": "tsc/internal/tsoptions/parsedbuildcommandline.go:ParsedBuildCommandLine.Locale",
       "ledger_crate": "tsr_tsoptions",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "in-progress",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "config"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_tsoptions/src/command_line.rs"
+      ],
       "symbol": "ParsedBuildCommandLine.Locale"
     },
     {
@@ -239230,7 +239533,7 @@
       "id": "tsc/internal/tsoptions/parsedbuildcommandline.go:ParsedBuildCommandLine.ResolvedProjectPaths",
       "ledger_crate": "tsr_tsoptions",
       "ledger_phase": 1,
-      "ledger_status": "planned",
+      "ledger_status": "in-progress",
       "ledger_verification": [],
       "mapped_in_ledger": false,
       "membership": "full",
@@ -239240,7 +239543,9 @@
         "state": "exempt:later_step",
         "step": "config"
       },
-      "rust_home": [],
+      "rust_home": [
+        "crates/tsr_tsoptions/src/command_line.rs"
+      ],
       "symbol": "ParsedBuildCommandLine.ResolvedProjectPaths"
     },
     {
@@ -241469,8 +241774,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: config/option/build-builders, config/option/build-force; witnessed by 2 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_tsoptions/src/parse_options.rs"
+      ],
+      "basis": "witnessed by 2 exact link(s): config/option/build-builders, config/option/build-force",
       "basis_kind": "rule",
       "cases": [
         "config/option/build-builders",
@@ -241505,7 +241812,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/tsoptions",
       "go_source": "tsc/internal/tsoptions/parsinghelpers.go",
       "id": "tsc/internal/tsoptions/parsinghelpers.go:ParseBuildOptions",
@@ -241686,10 +241993,11 @@
       "annotated_home": [
         "crates/tsr_tsoptions/src/parse_options.rs"
       ],
-      "basis": "witnessed by 7 exact link(s): config/option/type-acquisition-include, config/parse/configdir-in-paths, config/parse/option-list-falsy-filtered",
+      "basis": "witnessed by 8 exact link(s): config/option/type-acquisition-include, config/option/watch-exclude-directories, config/parse/configdir-in-paths",
       "basis_kind": "rule",
       "cases": [
         "config/option/type-acquisition-include",
+        "config/option/watch-exclude-directories",
         "config/parse/configdir-in-paths",
         "config/parse/option-list-falsy-filtered",
         "config/parse/type-acquisition",
@@ -241755,10 +242063,11 @@
       "annotated_home": [
         "crates/tsr_tsoptions/src/parse_options.rs"
       ],
-      "basis": "witnessed by 17 exact link(s): config/json/parse-json-config-file-content, config/option/compiler-tristate, config/parse/content-mapper-shape-validation",
+      "basis": "witnessed by 18 exact link(s): config/json/parse-json-config-file-content, config/option/build-force, config/option/compiler-tristate",
       "basis_kind": "rule",
       "cases": [
         "config/json/parse-json-config-file-content",
+        "config/option/build-force",
         "config/option/compiler-tristate",
         "config/parse/content-mapper-shape-validation",
         "config/parse/content-mapper-unresolved-package",
@@ -241896,8 +242205,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "a prepared case runs and reports the Rust entry point absent: config/option/watch-exclude-directories, config/option/watch-interval; witnessed by 2 prepared case(s)",
+      "annotated_home": [
+        "crates/tsr_tsoptions/src/parse_options.rs"
+      ],
+      "basis": "witnessed by 2 exact link(s): config/option/watch-exclude-directories, config/option/watch-interval",
       "basis_kind": "rule",
       "cases": [
         "config/option/watch-exclude-directories",
@@ -241932,7 +242243,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/tsoptions",
       "go_source": "tsc/internal/tsoptions/parsinghelpers.go",
       "id": "tsc/internal/tsoptions/parsinghelpers.go:ParseWatchOptions",
@@ -242721,10 +243032,12 @@
       "annotated_home": [
         "crates/tsr_tsoptions/src/parse_options.rs"
       ],
-      "basis": "witnessed by 3 exact link(s): config/option/compiler-number-pointer, config/value/number-float, config/value/number-refuses-string",
+      "basis": "witnessed by 5 exact link(s): config/option/build-builders, config/option/compiler-number-pointer, config/option/watch-interval",
       "basis_kind": "rule",
       "cases": [
+        "config/option/build-builders",
         "config/option/compiler-number-pointer",
+        "config/option/watch-interval",
         "config/value/number-float",
         "config/value/number-refuses-string"
       ],
