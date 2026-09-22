@@ -1,0 +1,902 @@
+{
+  "version": 1,
+  "scope": "Phase 1 integration preparation; prepared linkage is not a measured parity claim.",
+  "witnesses": [
+    {
+      "id": "localized-config-diagnostics",
+      "claim": "A German config diagnostic reaches the compiler writer without reverting to English.",
+      "kind": "driver",
+      "references": [
+        "crates/tsr_compiler/examples/phase1_integration.rs",
+        "upstream/tsc/internal/diagnostics/loc/de-DE.json.gz"
+      ],
+      "command": [
+        "python3",
+        "scripts/phase1_integration.py",
+        "observe-localized-config"
+      ],
+      "owner": "F5b",
+      "dependency": "Compiler diagnostic writer locale parameter and config-envelope propagation; the leaf translation is already present."
+    },
+    {
+      "id": "ordered-package-resolution",
+      "claim": "Package export condition order survives JSON parsing into module resolution.",
+      "kind": "cases",
+      "references": [
+        "config/module/exports/condition-order-and-nesting",
+        "config/module/exports/non-matching-conditions-are-announced-in-key-order"
+      ],
+      "command": [
+        "python3",
+        "scripts/phase1.py",
+        "capture",
+        "--family",
+        "config",
+        "--output",
+        "target/phase1-f5-order",
+        "--case",
+        "config/module/exports/condition-order-and-nesting",
+        "--case",
+        "config/module/exports/non-matching-conditions-are-announced-in-key-order"
+      ],
+      "owner": "F5b"
+    },
+    {
+      "id": "ordered-config-resolution",
+      "claim": "Config path pattern source order is consumed by resolution, including equal-prefix ties.",
+      "kind": "cases",
+      "references": [
+        "config/module/helpers/parsed-patterns-and-match",
+        "config/module/paths/substitution-and-ts-extension-suppression"
+      ],
+      "command": [
+        "python3",
+        "scripts/phase1.py",
+        "capture",
+        "--family",
+        "config",
+        "--output",
+        "target/phase1-f5-paths",
+        "--case",
+        "config/module/helpers/parsed-patterns-and-match",
+        "--case",
+        "config/module/paths/substitution-and-ts-extension-suppression"
+      ],
+      "owner": "F5b",
+      "additional_tests": [
+        {
+          "path": "crates/tsr_module/tests/relative_paths.rs",
+          "test": "paths_keep_source_order_on_equal_prefixes_but_exact_matches_win",
+          "command": [
+            "cargo",
+            "test",
+            "-p",
+            "tsr_module",
+            "--test",
+            "relative_paths",
+            "paths_keep_source_order_on_equal_prefixes_but_exact_matches_win",
+            "--",
+            "--exact"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "retained-program-snapshot",
+      "claim": "An edited filesystem snapshot reloads changed text while retained bound files keep old text and symbols.",
+      "kind": "test",
+      "references": [
+        "crates/tsr_compiler/src/tests.rs"
+      ],
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "tsr_compiler",
+        "--lib",
+        "tests::retained_snapshot_edit_reuses_only_equal_parse_inputs",
+        "--",
+        "--exact"
+      ],
+      "owner": "F5b",
+      "test": "retained_snapshot_edit_reuses_only_equal_parse_inputs",
+      "boundary": "The witness replaces an immutable MemorySnapshot; it does not prove polling a live OS filesystem or watch scheduling."
+    },
+    {
+      "id": "live-cached-filesystem",
+      "claim": "Live mutations distinguish uncached reads from cached misses and deletions.",
+      "kind": "cases",
+      "references": [
+        "filesystem/cachedvfs/readfile-is-never-cached",
+        "filesystem/cachedvfs/cached-miss-then-creation",
+        "filesystem/cachedvfs/cached-hit-then-deletion"
+      ],
+      "command": [
+        "python3",
+        "scripts/phase1.py",
+        "capture",
+        "--family",
+        "filesystem",
+        "--output",
+        "target/phase1-f5-live",
+        "--case",
+        "filesystem/cachedvfs/readfile-is-never-cached",
+        "--case",
+        "filesystem/cachedvfs/cached-miss-then-creation",
+        "--case",
+        "filesystem/cachedvfs/cached-hit-then-deletion"
+      ],
+      "owner": "F5b",
+      "boundary": "Composed with retained-program-snapshot for the Phase 1 contracts; no watch-mode connection or live filesystem freezing is claimed."
+    },
+    {
+      "id": "installed-generated-assets",
+      "claim": "An isolated Cargo archive consumer loads all108 library assets and receives generated diagnostic code2322 through a checker.",
+      "kind": "installed",
+      "references": [
+        "tools/packaging/consumer.rs",
+        "scripts/package_verify.py",
+        "tools/packaging/packages.json"
+      ],
+      "command": [
+        "python3",
+        "scripts/package_verify.py",
+        "--output",
+        "target/phase1-f5-packages"
+      ],
+      "owner": "F5b",
+      "boundary": "Locale message rendering by an installed consumer remains pending until localized-config-diagnostics is implemented."
+    },
+    {
+      "id": "compiler-syntax-diagnostics",
+      "claim": "Program::syntactic_diagnostics joins parser and option-dependent JS diagnostics in the real compiler path.",
+      "kind": "cases",
+      "references": [
+        "syntax/diagnostics/js-only-typescript-syntax",
+        "syntax/diagnostics/parameter-decorator-in-unchecked-js",
+        "syntax/diagnostics/ts-check-directive-enables-checking",
+        "syntax/diagnostics/multi-file-sort-by-file-name"
+      ],
+      "command": [
+        "python3",
+        "scripts/phase1.py",
+        "capture",
+        "--family",
+        "syntax",
+        "--output",
+        "target/phase1-f5-syntax",
+        "--case",
+        "syntax/diagnostics/js-only-typescript-syntax",
+        "--case",
+        "syntax/diagnostics/parameter-decorator-in-unchecked-js",
+        "--case",
+        "syntax/diagnostics/ts-check-directive-enables-checking",
+        "--case",
+        "syntax/diagnostics/multi-file-sort-by-file-name"
+      ],
+      "owner": "F5b"
+    }
+  ],
+  "transport": {
+    "cases": [
+      {
+        "case": "fs/read-fallback-existing",
+        "obligations": [
+          "filesystem-callback-delegation",
+          "delegate-versus-missing"
+        ],
+        "authority": "pinned-Go-callbackFS"
+      },
+      {
+        "case": "fs/read-fallback-missing",
+        "obligations": [
+          "filesystem-callback-delegation",
+          "delegate-versus-missing"
+        ],
+        "authority": "pinned-Go-callbackFS"
+      },
+      {
+        "case": "fs/read-fallback-empty",
+        "obligations": [
+          "filesystem-callback-delegation",
+          "delegate-versus-missing"
+        ],
+        "authority": "pinned-Go-callbackFS"
+      },
+      {
+        "case": "fs/read-callback-content",
+        "obligations": [
+          "filesystem-callback-delegation"
+        ],
+        "authority": "pinned-Go-callbackFS"
+      },
+      {
+        "case": "fs/read-callback-missing-shadows-base",
+        "obligations": [
+          "filesystem-callback-delegation",
+          "delegate-versus-missing"
+        ],
+        "authority": "pinned-Go-callbackFS"
+      },
+      {
+        "case": "fs/read-callback-omitted-content-shadows-base",
+        "obligations": [
+          "filesystem-callback-delegation",
+          "delegate-versus-missing"
+        ],
+        "authority": "pinned-Go-callbackFS"
+      },
+      {
+        "case": "fs/read-callback-empty-shadows-base",
+        "obligations": [
+          "filesystem-callback-delegation",
+          "delegate-versus-missing"
+        ],
+        "authority": "pinned-Go-callbackFS"
+      },
+      {
+        "case": "fs/read-disabled-skips-callback",
+        "obligations": [
+          "filesystem-callback-delegation",
+          "delegate-versus-missing"
+        ],
+        "authority": "pinned-Go-callbackFS"
+      },
+      {
+        "case": "fs/read-base-strips-bom",
+        "obligations": [
+          "filesystem-callback-delegation"
+        ],
+        "authority": "pinned-Go-callbackFS"
+      },
+      {
+        "case": "fs/read-callback-preserves-bom",
+        "obligations": [
+          "filesystem-callback-delegation"
+        ],
+        "authority": "pinned-Go-callbackFS"
+      },
+      {
+        "case": "fs/read-unicode-path-and-content",
+        "obligations": [
+          "filesystem-callback-delegation"
+        ],
+        "authority": "pinned-Go-callbackFS"
+      },
+      {
+        "case": "fs/file-exists-fallback",
+        "obligations": [
+          "filesystem-callback-delegation",
+          "delegate-versus-missing"
+        ],
+        "authority": "pinned-Go-callbackFS"
+      },
+      {
+        "case": "fs/file-exists-false-shadows-base",
+        "obligations": [
+          "filesystem-callback-delegation",
+          "delegate-versus-missing"
+        ],
+        "authority": "pinned-Go-callbackFS"
+      },
+      {
+        "case": "fs/file-exists-case-insensitive",
+        "obligations": [
+          "filesystem-callback-delegation",
+          "casing-and-symlinks"
+        ],
+        "authority": "pinned-Go-callbackFS"
+      },
+      {
+        "case": "fs/file-exists-case-sensitive-miss",
+        "obligations": [
+          "filesystem-callback-delegation",
+          "casing-and-symlinks"
+        ],
+        "authority": "pinned-Go-callbackFS"
+      },
+      {
+        "case": "fs/file-exists-symlink",
+        "obligations": [
+          "filesystem-callback-delegation",
+          "casing-and-symlinks"
+        ],
+        "authority": "pinned-Go-callbackFS"
+      },
+      {
+        "case": "fs/directory-exists-fallback",
+        "obligations": [
+          "filesystem-callback-delegation",
+          "delegate-versus-missing"
+        ],
+        "authority": "pinned-Go-callbackFS"
+      },
+      {
+        "case": "fs/directory-exists-false-shadows-base",
+        "obligations": [
+          "filesystem-callback-delegation",
+          "delegate-versus-missing"
+        ],
+        "authority": "pinned-Go-callbackFS"
+      },
+      {
+        "case": "fs/directory-exists-callback-virtual",
+        "obligations": [
+          "filesystem-callback-delegation"
+        ],
+        "authority": "pinned-Go-callbackFS"
+      },
+      {
+        "case": "fs/directory-exists-symlink",
+        "obligations": [
+          "filesystem-callback-delegation",
+          "casing-and-symlinks"
+        ],
+        "authority": "pinned-Go-callbackFS"
+      },
+      {
+        "case": "fs/entries-fallback-sorted",
+        "obligations": [
+          "filesystem-callback-delegation",
+          "delegate-versus-missing"
+        ],
+        "authority": "pinned-Go-callbackFS"
+      },
+      {
+        "case": "fs/entries-callback-preserves-order",
+        "obligations": [
+          "filesystem-callback-delegation"
+        ],
+        "authority": "pinned-Go-callbackFS"
+      },
+      {
+        "case": "fs/entries-callback-empty-shadows-base",
+        "obligations": [
+          "filesystem-callback-delegation",
+          "delegate-versus-missing"
+        ],
+        "authority": "pinned-Go-callbackFS"
+      },
+      {
+        "case": "fs/entries-fallback-follows-links",
+        "obligations": [
+          "filesystem-callback-delegation",
+          "delegate-versus-missing",
+          "casing-and-symlinks"
+        ],
+        "authority": "pinned-Go-callbackFS"
+      },
+      {
+        "case": "fs/entries-through-directory-symlink",
+        "obligations": [
+          "filesystem-callback-delegation",
+          "casing-and-symlinks"
+        ],
+        "authority": "pinned-Go-callbackFS"
+      },
+      {
+        "case": "fs/realpath-corrects-case",
+        "obligations": [
+          "filesystem-callback-delegation",
+          "casing-and-symlinks"
+        ],
+        "authority": "pinned-Go-callbackFS"
+      },
+      {
+        "case": "fs/realpath-file-symlink",
+        "obligations": [
+          "filesystem-callback-delegation",
+          "casing-and-symlinks"
+        ],
+        "authority": "pinned-Go-callbackFS"
+      },
+      {
+        "case": "fs/realpath-directory-symlink-child",
+        "obligations": [
+          "filesystem-callback-delegation",
+          "casing-and-symlinks"
+        ],
+        "authority": "pinned-Go-callbackFS"
+      },
+      {
+        "case": "fs/realpath-missing-keeps-input",
+        "obligations": [
+          "filesystem-callback-delegation",
+          "delegate-versus-missing"
+        ],
+        "authority": "pinned-Go-callbackFS"
+      },
+      {
+        "case": "fs/realpath-callback-override",
+        "obligations": [
+          "filesystem-callback-delegation"
+        ],
+        "authority": "pinned-Go-callbackFS"
+      },
+      {
+        "case": "fs/realpath-disabled-skips-callback",
+        "obligations": [
+          "filesystem-callback-delegation",
+          "delegate-versus-missing"
+        ],
+        "authority": "pinned-Go-callbackFS"
+      },
+      {
+        "case": "mapper/mapper-verbatim-ascii",
+        "obligations": [
+          "raw-mapper-bytes",
+          "stream-lifecycle"
+        ],
+        "authority": "pinned-Go-stream"
+      },
+      {
+        "case": "mapper/mapper-verbatim-unicode",
+        "obligations": [
+          "raw-mapper-bytes",
+          "stream-lifecycle"
+        ],
+        "authority": "pinned-Go-stream"
+      },
+      {
+        "case": "mapper/mapper-module-verbatim",
+        "obligations": [
+          "raw-mapper-bytes",
+          "stream-lifecycle"
+        ],
+        "authority": "pinned-Go-stream"
+      },
+      {
+        "case": "mapper/mapper-transform-error",
+        "obligations": [
+          "raw-mapper-bytes",
+          "stream-lifecycle"
+        ],
+        "authority": "pinned-Go-stream"
+      },
+      {
+        "case": "mapper/mapper-option-diagnostic",
+        "obligations": [
+          "raw-mapper-bytes",
+          "stream-lifecycle"
+        ],
+        "authority": "pinned-Go-stream"
+      },
+      {
+        "case": "enabled-filesystem-callbacks",
+        "obligations": [
+          "callback-cancellation-progress",
+          "bounded-router"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "progress-while-outstanding",
+        "obligations": [
+          "callback-cancellation-progress",
+          "bounded-router"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "out-of-order-completion",
+        "obligations": [
+          "callback-cancellation-progress",
+          "bounded-router"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "cancel-late-result-next-request",
+        "obligations": [
+          "callback-cancellation-progress",
+          "bounded-router"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "remote-error-no-fallback",
+        "obligations": [
+          "framing-and-identity"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "malformed-callback-result",
+        "obligations": [
+          "callback-cancellation-progress",
+          "bounded-router"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "options-busy-barrier",
+        "obligations": [
+          "internal-options-completion"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "conflicting-injected-paths",
+        "obligations": [
+          "framing-and-identity"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "invalid-query-paths",
+        "obligations": [
+          "framing-and-identity"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "oversized-callback-error-wrapper",
+        "obligations": [
+          "callback-cancellation-progress",
+          "bounded-router"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "pending-limit-includes-canceled",
+        "obligations": [
+          "callback-cancellation-progress",
+          "bounded-router"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "shutdown-pending",
+        "obligations": [
+          "callback-cancellation-progress",
+          "bounded-router"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "eof-pending",
+        "obligations": [
+          "callback-cancellation-progress",
+          "bounded-router"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "fragmented-coalesced-input",
+        "obligations": [
+          "framing-and-identity"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "unknown-callback-id",
+        "obligations": [
+          "callback-cancellation-progress",
+          "bounded-router"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "duplicate-callback-id",
+        "obligations": [
+          "callback-cancellation-progress",
+          "bounded-router"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "malformed-envelope",
+        "obligations": [
+          "framing-and-identity"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "duplicate-content-length",
+        "obligations": [
+          "framing-and-identity"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "oversized-content-length",
+        "obligations": [
+          "framing-and-identity"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "truncated-frame-body",
+        "obligations": [
+          "framing-and-identity"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "recursive-duplicate-json-key",
+        "obligations": [
+          "framing-and-identity"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "invalid-utf8-payload",
+        "obligations": [
+          "framing-and-identity"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "options-internal-stub-roundtrip",
+        "obligations": [
+          "internal-options-completion"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "version2-lifecycle-registration-validation",
+        "obligations": [
+          "framing-and-identity"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "lsp-identities-reuse-and-directional-collision",
+        "obligations": [
+          "framing-and-identity"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "duplicate-inflight-client-id",
+        "obligations": [
+          "framing-and-identity"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "oversized-progress-preserves-unrelated-work",
+        "obligations": [
+          "callback-cancellation-progress",
+          "bounded-router"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "initialization-state-size-admission",
+        "obligations": [
+          "internal-options-completion"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "string-id-callback-result-expansion",
+        "obligations": [
+          "callback-cancellation-progress",
+          "bounded-router"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "options-reserve-plugin-state-capacity",
+        "obligations": [
+          "internal-options-completion"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "lossless-opaque-numbers",
+        "obligations": [
+          "framing-and-identity"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "stream-binary-chunks-and-stderr",
+        "obligations": [
+          "raw-mapper-bytes",
+          "stream-lifecycle"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "stream-concurrent-fragmented-coalesced-mapper-frames",
+        "obligations": [
+          "raw-mapper-bytes",
+          "stream-lifecycle"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "stream-backpressure-keeps-cancellation-live",
+        "obligations": [
+          "raw-mapper-bytes",
+          "stream-lifecycle",
+          "callback-cancellation-progress"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "stream-credit-overrun",
+        "obligations": [
+          "raw-mapper-bytes",
+          "stream-lifecycle"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "stream-receive-window-overrun",
+        "obligations": [
+          "raw-mapper-bytes",
+          "stream-lifecycle"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "stream-eof-exit-preserves-unread-bytes",
+        "obligations": [
+          "raw-mapper-bytes",
+          "stream-lifecycle"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "stream-exit-before-eof",
+        "obligations": [
+          "raw-mapper-bytes",
+          "stream-lifecycle"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "stream-local-close-late-data-unavailable-exit",
+        "obligations": [
+          "raw-mapper-bytes",
+          "stream-lifecycle"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "stream-client-close",
+        "obligations": [
+          "raw-mapper-bytes",
+          "stream-lifecycle"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "stream-noncanonical-base64",
+        "obligations": [
+          "raw-mapper-bytes",
+          "stream-lifecycle"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "stream-oversized-chunk",
+        "obligations": [
+          "raw-mapper-bytes",
+          "stream-lifecycle"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "stream-spawn-cancel-retires-late-child",
+        "obligations": [
+          "raw-mapper-bytes",
+          "stream-lifecycle",
+          "callback-cancellation-progress"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "stream-spawn-error-retry",
+        "obligations": [
+          "raw-mapper-bytes",
+          "stream-lifecycle"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "stream-duplicate-identity",
+        "obligations": [
+          "raw-mapper-bytes",
+          "stream-lifecycle"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "stream-shutdown",
+        "obligations": [
+          "raw-mapper-bytes",
+          "stream-lifecycle"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "stream-identity-budget-admission",
+        "obligations": [
+          "raw-mapper-bytes",
+          "stream-lifecycle"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "internal/internal-options-barrier-blocks-new-work-and-publishes-only-at-completion",
+        "obligations": [
+          "internal-options-completion"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "internal/canceled-options-hold-barrier-until-unapplied-or-committed-outcome",
+        "obligations": [
+          "internal-options-completion"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "internal/failed-initialization-retries-and-tokens-do-not-alias-across-sessions-or-shutdown",
+        "obligations": [
+          "internal-options-completion"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "internal/canceled-callback-cannot-complete-reused-id-or-conflict-with-directional-ids",
+        "obligations": [
+          "callback-cancellation-progress",
+          "bounded-router"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "internal/exact-opaque-numbers-survive-internal-options-commit",
+        "obligations": [
+          "internal-options-completion"
+        ],
+        "authority": "ADR-0019-contract"
+      },
+      {
+        "case": "internal/non-lsp-ids-and-duplicate-live-ids-are-terminal",
+        "obligations": [
+          "framing-and-identity"
+        ],
+        "authority": "ADR-0019-contract"
+      }
+    ],
+    "mapper_recordings": [
+      "mapper-verbatim-ascii",
+      "mapper-verbatim-unicode",
+      "mapper-module-verbatim",
+      "mapper-transform-error",
+      "mapper-option-diagnostic"
+    ],
+    "producer": "testhost",
+    "command": [
+      "cargo",
+      "xtask",
+      "run",
+      "testhost"
+    ]
+  },
+  "generation": {
+    "command": [
+      "python3",
+      "scripts/phase1_generation.py"
+    ],
+    "generated_manifest": "data/s03/generated.json",
+    "locale_manifest": "data/phase1/locale-tables-manifest.json",
+    "node_bootstrap": "target/s03-runtime/node_modules/node/bin/node",
+    "npm_bootstrap": "target/s03-runtime/node_modules/.bin/npm"
+  },
+  "boundaries": [
+    "strict-Unicode-filesystem-wire",
+    "blocked-synchronous-workers-deferred-Phase5",
+    "parse-cache-injection-deferred-Phase5",
+    "production-mapper-host-deferred-Phase5",
+    "semantic-fourslash-deferred-Phase5",
+    "no-wire-configuration-callback",
+    "raw-plugin-stream-not-method-proxy"
+  ]
+}

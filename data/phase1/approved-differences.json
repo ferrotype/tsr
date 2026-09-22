@@ -1,0 +1,460 @@
+{
+  "differences": [
+    {
+      "approved_by": "owner in task conversation, documented in aliasing audit",
+      "case": "leaves/options/clone-shares-pointer-backed-fields",
+      "decision": "docs/PHASE1-aliasing-audit.md#compiler-options-approved-divergence",
+      "family": "leaves",
+      "historical_artifact": "data/phase1/captures/f3b-complete.tar.gz",
+      "native": {
+        "ordered": [
+          {
+            "after_mutation": [
+              [
+                "source",
+                [
+                  7,
+                  [
+                    "rewritten",
+                    "beta"
+                  ]
+                ]
+              ],
+              [
+                "clone",
+                [
+                  7,
+                  [
+                    "rewritten",
+                    "beta"
+                  ]
+                ]
+              ]
+            ],
+            "applied": 2,
+            "op": "clone_then_mutate_source"
+          },
+          {
+            "after_mutation": [
+              [
+                "source",
+                [
+                  -1,
+                  [
+                    ""
+                  ]
+                ]
+              ],
+              [
+                "clone",
+                [
+                  -1,
+                  [
+                    ""
+                  ]
+                ]
+              ]
+            ],
+            "applied": 2,
+            "op": "clone_then_mutate_source"
+          },
+          {
+            "after_mutation": [
+              [
+                "source",
+                [
+                  null,
+                  null
+                ]
+              ],
+              [
+                "clone",
+                [
+                  null,
+                  null
+                ]
+              ]
+            ],
+            "applied": 0,
+            "op": "clone_then_mutate_source"
+          }
+        ]
+      },
+      "request_sha256": "d08c820ef6b229ae959b4798d5d9411374516314fe4616e7c1500d189e29bb30",
+      "rust": {
+        "ordered": [
+          {
+            "after_mutation": [
+              [
+                "source",
+                [
+                  7,
+                  [
+                    "rewritten",
+                    "beta"
+                  ]
+                ]
+              ],
+              [
+                "clone",
+                [
+                  2,
+                  [
+                    "alpha",
+                    "beta"
+                  ]
+                ]
+              ]
+            ],
+            "applied": 2,
+            "op": "clone_then_mutate_source"
+          },
+          {
+            "after_mutation": [
+              [
+                "source",
+                [
+                  -1,
+                  [
+                    ""
+                  ]
+                ]
+              ],
+              [
+                "clone",
+                [
+                  0,
+                  [
+                    "only"
+                  ]
+                ]
+              ]
+            ],
+            "applied": 2,
+            "op": "clone_then_mutate_source"
+          },
+          {
+            "after_mutation": [
+              [
+                "source",
+                [
+                  null,
+                  null
+                ]
+              ],
+              [
+                "clone",
+                [
+                  null,
+                  null
+                ]
+              ]
+            ],
+            "applied": 0,
+            "op": "clone_then_mutate_source"
+          }
+        ]
+      }
+    },
+    {
+      "approved_by": "owner in task conversation, documented in aliasing audit",
+      "case": "filesystem/vfstest/snapshot-mutation-leak-control",
+      "decision": "docs/PHASE1-aliasing-audit.md#filesystem-held-entry-snapshots-approved-follow-up",
+      "family": "filesystem",
+      "historical_artifact": "data/phase1/captures/f3b-complete.tar.gz",
+      "native": {
+        "ordered": [
+          {
+            "op": "build",
+            "result": [
+              "built",
+              1
+            ]
+          },
+          {
+            "name": "A",
+            "op": "publish",
+            "result": [
+              "published",
+              "A",
+              [
+                [
+                  "/a.ts",
+                  "present",
+                  "one"
+                ]
+              ]
+            ]
+          },
+          {
+            "op": "mutate_chtimes",
+            "path": "a.ts",
+            "result": [
+              "none",
+              ""
+            ]
+          },
+          {
+            "name": "A",
+            "op": "read_view",
+            "path": "/a.ts",
+            "result": [
+              "bytes",
+              "one"
+            ]
+          },
+          {
+            "name": "A",
+            "op": "view_unchanged",
+            "result": [
+              "unchanged",
+              false
+            ]
+          },
+          {
+            "op": "read_live",
+            "path": "/a.ts",
+            "result": [
+              "bytes",
+              "one"
+            ]
+          }
+        ]
+      },
+      "request_sha256": "e282be87187261df3e2a36af185c949c3da1c0f1db050eb0ff324a2c5e7ac9d6",
+      "rust": {
+        "ordered": [
+          {
+            "op": "build",
+            "result": [
+              "built",
+              1
+            ]
+          },
+          {
+            "name": "A",
+            "op": "publish",
+            "result": [
+              "published",
+              "A",
+              [
+                [
+                  "/a.ts",
+                  "present",
+                  "one"
+                ]
+              ]
+            ]
+          },
+          {
+            "op": "mutate_chtimes",
+            "path": "a.ts",
+            "result": [
+              "none",
+              ""
+            ]
+          },
+          {
+            "name": "A",
+            "op": "read_view",
+            "path": "/a.ts",
+            "result": [
+              "bytes",
+              "one"
+            ]
+          },
+          {
+            "name": "A",
+            "op": "view_unchanged",
+            "result": [
+              "unchanged",
+              true
+            ]
+          },
+          {
+            "op": "read_live",
+            "path": "/a.ts",
+            "result": [
+              "bytes",
+              "one"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "approved_by": "owner in task conversation, documented in aliasing audit",
+      "case": "config/packagejson/with-package-directory-copies-and-does-not-guard-nil",
+      "decision": "docs/PHASE1-aliasing-audit.md#package-parseable-approved-immutable-field-divergence",
+      "family": "config",
+      "historical_artifact": "data/phase1/captures/f3b-complete.tar.gz",
+      "native": {
+        "ordered": [
+          {
+            "directory": "/repo/pkg",
+            "op": "with_package_directory",
+            "receiver": "with_contents",
+            "result": [
+              "",
+              true,
+              true,
+              "/repo/pkg",
+              true
+            ]
+          },
+          {
+            "directory": "/repo/pkg/",
+            "op": "with_package_directory",
+            "receiver": "with_contents",
+            "result": [
+              "",
+              false,
+              true,
+              "/repo/pkg/",
+              true
+            ]
+          },
+          {
+            "directory": "",
+            "op": "with_package_directory",
+            "receiver": "with_contents",
+            "result": [
+              "",
+              false,
+              true,
+              "",
+              true
+            ]
+          },
+          {
+            "directory": "",
+            "op": "with_package_directory",
+            "receiver": "empty_directory",
+            "result": [
+              "",
+              true,
+              true,
+              "",
+              false
+            ]
+          },
+          {
+            "directory": "/repo/other",
+            "op": "with_package_directory",
+            "receiver": "with_contents_absent_directory",
+            "result": [
+              "",
+              false,
+              true,
+              "/repo/other",
+              false
+            ]
+          },
+          {
+            "directory": "/repo/pkg",
+            "op": "with_package_directory",
+            "receiver": "nil",
+            "result": [
+              "nil_pointer_dereference"
+            ]
+          },
+          {
+            "op": "with_package_directory_shares_contents",
+            "result": [
+              false,
+              true,
+              false,
+              true
+            ]
+          }
+        ]
+      },
+      "request_sha256": "eaf5d97b177f00510b569402a0aee5404067466d54a41a8a2b5a6e5cf789ae85",
+      "rust": {
+        "ordered": [
+          {
+            "directory": "/repo/pkg",
+            "op": "with_package_directory",
+            "receiver": "with_contents",
+            "result": [
+              "",
+              true,
+              true,
+              "/repo/pkg",
+              true
+            ]
+          },
+          {
+            "directory": "/repo/pkg/",
+            "op": "with_package_directory",
+            "receiver": "with_contents",
+            "result": [
+              "",
+              false,
+              true,
+              "/repo/pkg/",
+              true
+            ]
+          },
+          {
+            "directory": "",
+            "op": "with_package_directory",
+            "receiver": "with_contents",
+            "result": [
+              "",
+              false,
+              true,
+              "",
+              true
+            ]
+          },
+          {
+            "directory": "",
+            "op": "with_package_directory",
+            "receiver": "empty_directory",
+            "result": [
+              "",
+              true,
+              true,
+              "",
+              false
+            ]
+          },
+          {
+            "directory": "/repo/other",
+            "op": "with_package_directory",
+            "receiver": "with_contents_absent_directory",
+            "result": [
+              "",
+              false,
+              true,
+              "/repo/other",
+              false
+            ]
+          },
+          {
+            "directory": "/repo/pkg",
+            "op": "with_package_directory",
+            "receiver": "nil",
+            "result": [
+              "nil_pointer_dereference"
+            ]
+          },
+          {
+            "mutation_performed": false,
+            "op": "with_package_directory_shares_contents",
+            "result": [
+              false,
+              true,
+              false,
+              false
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "rule": "Only these complete observation pairs on these exact requests are approved. Keep raw comparison results. Any extra difference requires review.",
+  "version": 1
+}

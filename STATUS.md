@@ -251,6 +251,7 @@ E8: Separate Rust consumer feasibility and Node parse latency measured separatel
 | checkerbench | stale: source, pin, command or inputs changed | [result](status/evidence/5c877c889f3630fa74103cc142b2b07234e3bb68d28fbc875789b74e9d507c97.json) |
 | checkertext | stale: source, pin, command or inputs changed | [result](status/evidence/e19d93b1b2e77cd0a2bda635f9e50aecd53ca78e5e4a4c27d45adc3e2ed2dc70.json) |
 | clippy | stale: source, pin, command or inputs changed | [result](status/evidence/2d09f23327466d969f3802fe696309740929a8d87f3cb4d2186d88f87cb1ba70.json) |
+| config | missing | — |
 | deny | stale: source, pin, command or inputs changed | [result](status/evidence/252fadf205f09448300c7aadc8187d41934e19bc7d9ba1bc618b302dfcb77140.json) |
 | e1 | current | [result](status/evidence/66f3a46d3ddf483a8434e3efe95767f63d92014d08180810d329d1fbfceac2c4.json) |
 | e2 | stale: source, pin, command or inputs changed | [result](status/evidence/ea315699ea5079faf35a9d33257f266a4c20c5d8d7aebab5187cd5041b49e0b0.json) |
@@ -261,12 +262,14 @@ E8: Separate Rust consumer feasibility and Node parse latency measured separatel
 | e7 | stale: source, pin, command or inputs changed | [result](status/evidence/17a5f52a9809d5a6c148572c189148b42273c84e53005eccd24ab700dad8604b.json) |
 | e8 | stale: source, pin, command or inputs changed | [result](status/evidence/556276951ed1b6a50a1a7a17946129a76c78ce6659f311d05e5050b1a54e9d67.json) |
 | fmt | stale: source, pin, command or inputs changed | [result](status/evidence/af9d3221d4a11c5c873b319aee931ee99cf374bda56af8e5f2a75898ded0075d.json) |
+| foundations | current | [result](status/evidence/abe314c6405ed0d00b7908ad3aca8c8d3e10e011bbc1a59c91aa524a01da464a.json) |
 | gen | stale: source, pin, command or inputs changed | [result](status/evidence/18df800a71b64b7255a58d25907b6ed0a29fad807c9886d7573099299d810af1.json) |
 | oracle | stale: source, pin, command or inputs changed | [result](status/evidence/db9b5b2ec2719b6b57419acc4180632ba0a86b2ed29beb40ba799a720668ac7f.json) |
 | program | stale: source, pin, command or inputs changed | [result](status/evidence/561874e0c6df08b856dc4e595da900079fc4be78dde91ba0c27a3016ace9f10b.json) |
 | relater | stale: source, pin, command or inputs changed | [result](status/evidence/981fff12bacd54eab8b02804bdb78919731df5cccb1ad6a4c0890017a369c642.json) |
 | scanner | stale: source, pin, command or inputs changed | [result](status/evidence/a088df9f7c39827fc505dd973140afd89b8b19d7607a76be4497377fb2271394.json) |
 | selftest | stale: source, pin, command or inputs changed | [result](status/evidence/d6d5116f5f8058eae1f0be73e6cba00599e35e637e3a1777c1d3fb9f01c29b75.json) |
+| syntax | missing | — |
 | testhost | stale: source, pin, command or inputs changed | [result](status/evidence/add4c75d2d558f3e40130659376cfc364f6fdab3dd1dedea96de18ce910bba45.json) |
 | workspace | stale: source, pin, command or inputs changed | [result](status/evidence/0cf9cc95174085613ffed90cbfee4b7240359ce12fa3c6c9d7971ce66f92dd33.json) |
 
@@ -279,23 +282,83 @@ Every Phase 1 operation, the 309 config/options reference outputs and each famil
 Exit checks:
 
 - [ ] `sprint.S12.done == 1` (unknown metric)
-- [ ] `run.foundations.inventory_complete == true` (unknown metric)
-- [ ] `run.foundations.harness_pass == true` (unknown metric)
-- [ ] `run.foundations.leaves_prepared == true` (unknown metric)
-- [ ] `run.foundations.filesystem_prepared == true` (unknown metric)
-- [ ] `run.foundations.utilities_prepared == true` (unknown metric)
-- [ ] `run.foundations.integration_prepared == true` (unknown metric)
+- [x] `run.foundations.inventory_complete == true`
+- [x] `run.foundations.harness_pass == true`
+- [ ] `run.foundations.leaves_prepared == true`
+- [ ] `run.foundations.filesystem_prepared == true`
+- [ ] `run.foundations.utilities_prepared == true`
+- [ ] `run.foundations.integration_prepared == true`
 - [ ] `run.config.prepared == true` (unknown metric)
 - [ ] `run.syntax.prepared == true` (unknown metric)
 
 Items:
 
-- [ ] P1A-F0 Inventory, manifests, baseline index and an executable pilot
+- [x] P1A-F0 Inventory, manifests, baseline index and an executable pilot
 - [ ] P1A-F1a Foundation leaf tests: core/collections, text/number, JSON, locale, diagnostics and library access
 - [ ] P1A-F2a Filesystem, path and both matching dialects, including the 142 matching baseline outputs
 - [ ] P1A-F3a Config, command-line and resolution tests over all 309 reference outputs
 - [ ] P1A-F4a Syntax, binder, navigation and evaluator coverage
 - [ ] P1A-F5a Integration witnesses, producer wiring and the stage A coverage report
+
+### P1B Phase 1 stage B: foundational compiler services (open)
+
+Every required Phase 1 operation and integration witness passes on current inputs, all 309 config outputs and the complete syntax/parser/binder inventories match, and generation and transport contracts remain valid.
+
+Exit checks:
+
+- [ ] `sprint.P1A.done == 1`
+- [x] `run.foundations.inventory_complete == true`
+- [ ] `run.foundations.leaves_complete == true`
+- [ ] `run.foundations.filesystem_complete == true`
+- [ ] `run.foundations.utilities_complete == true`
+- [ ] `run.foundations.integration_complete == true`
+- [ ] `run.config.inventory_complete == true` (unknown metric)
+- [ ] `run.config.tests_total == 309` (unknown metric)
+- [ ] `run.config.parity == 1` (unknown metric)
+- [ ] `run.config.direct_complete == true` (unknown metric)
+- [ ] `run.syntax.inventory_complete == true` (unknown metric)
+- [ ] `run.syntax.parity == 1` (unknown metric)
+- [x] `run.e1.parity == 1`
+- [x] `run.e1.frozen_denominator == true`
+- [x] `run.e1.encoder_success_error == true`
+- [x] `run.e1.encoder_output_bytes == true`
+- [x] `run.e1.ast_runtime == true`
+- [x] `run.e1.ast_utilities == true`
+- [x] `run.e1.decoder_parity == true`
+- [x] `run.e1.decoder_watchdog == true`
+- [x] `run.e1.depth == true`
+- [x] `run.e1.parser_regressions == true`
+- [x] `run.binder.parity == 1`
+- [x] `run.binder.reached_bind == true`
+- [x] `run.binder.supplemental_parity == 1`
+- [x] `run.binder.protocol == true`
+- [x] `run.binder.helpers == true`
+- [x] `run.binder.resolvers == true`
+- [x] `run.binder.graph_contracts == true`
+- [x] `run.binder.depth == true`
+- [ ] `run.gen.patches_apply == true` (unknown metric)
+- [ ] `run.gen.ast_schema == true` (unknown metric)
+- [ ] `run.gen.drift == false` (unknown metric)
+- [ ] `run.gen.client_identical == true` (unknown metric)
+- [ ] `run.gen.locale_complete == true` (unknown metric)
+- [ ] `run.testhost.parity == 1` (unknown metric)
+- [ ] `run.testhost.controls == true` (unknown metric)
+- [ ] `run.workspace.build == true` (unknown metric)
+- [ ] `run.fmt.clean == true` (unknown metric)
+- [ ] `run.clippy.clean == true` (unknown metric)
+- [ ] `run.deny.clean == true` (unknown metric)
+- [ ] `run.selftest.pass == true` (unknown metric)
+- [ ] `run.e3.ast_runtime == true` (unknown metric)
+- [ ] `run.e3.miri == true` (unknown metric)
+- [ ] `run.e3.address_sanitizer == true` (unknown metric)
+
+Items:
+
+- [ ] P1B-F1b Foundation leaf implementations satisfy the exact required operation traces
+- [ ] P1B-F2b Filesystem, snapshots, paths and both matching dialects satisfy their required traces
+- [ ] P1B-F3b All 309 config/options output identities and supplementary package/resolution cases pass
+- [ ] P1B-F4b Complete syntax schedule, exact parser/binder inventories and shared utilities pass
+- [ ] P1B-F5b Integrated services, generated locale/library assets, original client and all 89 transport cases pass
 
 ### S01 Contracts, workspace, oracle (open)
 

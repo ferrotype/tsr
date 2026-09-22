@@ -1,0 +1,1356 @@
+{
+  "authority": "docs/PHASE1-implementation-plan.md section 2: Scope and boundaries; applies the accepted package-partial boundary to the exact pinned operations. These are scope decisions, not behavior waivers.",
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "reviewed_operation_destinations": [
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/checkerpool.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "149ee8eec37c7eade3fbdeabcca6489b23d3e100da91e06f2754231afc52c018",
+      "operation": "tsc/internal/compiler/checkerpool.go:checkerPool.GetChecker",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/checkerpool.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "149ee8eec37c7eade3fbdeabcca6489b23d3e100da91e06f2754231afc52c018",
+      "operation": "tsc/internal/compiler/checkerpool.go:checkerPool.GetGlobalDiagnostics",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/checkerpool.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "149ee8eec37c7eade3fbdeabcca6489b23d3e100da91e06f2754231afc52c018",
+      "operation": "tsc/internal/compiler/checkerpool.go:checkerPool.createCheckers",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/checkerpool.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "149ee8eec37c7eade3fbdeabcca6489b23d3e100da91e06f2754231afc52c018",
+      "operation": "tsc/internal/compiler/checkerpool.go:checkerPool.forEachCheckerGroupDo",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/checkerpool.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "149ee8eec37c7eade3fbdeabcca6489b23d3e100da91e06f2754231afc52c018",
+      "operation": "tsc/internal/compiler/checkerpool.go:checkerPool.forEachCheckerParallel",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/checkerpool.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "149ee8eec37c7eade3fbdeabcca6489b23d3e100da91e06f2754231afc52c018",
+      "operation": "tsc/internal/compiler/checkerpool.go:checkerPool.getCheckerForFileExclusive",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/checkerpool.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "149ee8eec37c7eade3fbdeabcca6489b23d3e100da91e06f2754231afc52c018",
+      "operation": "tsc/internal/compiler/checkerpool.go:checkerPool.getCheckerForFileNonExclusive",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/checkerpool.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "149ee8eec37c7eade3fbdeabcca6489b23d3e100da91e06f2754231afc52c018",
+      "operation": "tsc/internal/compiler/checkerpool.go:checkerPool.getCheckerNonExclusive",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/checkerpool.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "149ee8eec37c7eade3fbdeabcca6489b23d3e100da91e06f2754231afc52c018",
+      "operation": "tsc/internal/compiler/checkerpool.go:checkerPool.getImportAdjacency",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/checkerpool.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "149ee8eec37c7eade3fbdeabcca6489b23d3e100da91e06f2754231afc52c018",
+      "operation": "tsc/internal/compiler/checkerpool.go:getCheckerAssociationBaseWeight",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/checkerpool.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "149ee8eec37c7eade3fbdeabcca6489b23d3e100da91e06f2754231afc52c018",
+      "operation": "tsc/internal/compiler/checkerpool.go:getCheckerAssociationOrder",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/checkerpool.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "149ee8eec37c7eade3fbdeabcca6489b23d3e100da91e06f2754231afc52c018",
+      "operation": "tsc/internal/compiler/checkerpool.go:getCheckerAssociationPolicy",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/checkerpool.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "149ee8eec37c7eade3fbdeabcca6489b23d3e100da91e06f2754231afc52c018",
+      "operation": "tsc/internal/compiler/checkerpool.go:getCheckerAssociationWeights",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/checkerpool.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "149ee8eec37c7eade3fbdeabcca6489b23d3e100da91e06f2754231afc52c018",
+      "operation": "tsc/internal/compiler/checkerpool.go:getCheckerAssociationsInOrder",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/checkerpool.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "149ee8eec37c7eade3fbdeabcca6489b23d3e100da91e06f2754231afc52c018",
+      "operation": "tsc/internal/compiler/checkerpool.go:newCheckerPoolWithTracing",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/checkerpool.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "149ee8eec37c7eade3fbdeabcca6489b23d3e100da91e06f2754231afc52c018",
+      "operation": "tsc/internal/compiler/checkerpool.go:noop",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/checkerpool.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "149ee8eec37c7eade3fbdeabcca6489b23d3e100da91e06f2754231afc52c018",
+      "operation": "tsc/internal/compiler/checkerpool.go:shouldPrioritizeSourceFiles",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "8124a823366537c972bd93c36fc58afb47aa71c003193f8cf78cd5b32c46e882",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.CommonSourceDirectory",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "8124a823366537c972bd93c36fc58afb47aa71c003193f8cf78cd5b32c46e882",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.ContentMapperExtensions",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "8124a823366537c972bd93c36fc58afb47aa71c003193f8cf78cd5b32c46e882",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.FileExists",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "8124a823366537c972bd93c36fc58afb47aa71c003193f8cf78cd5b32c46e882",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetCurrentDirectory",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "8124a823366537c972bd93c36fc58afb47aa71c003193f8cf78cd5b32c46e882",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetDefaultResolutionModeForFile",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "8124a823366537c972bd93c36fc58afb47aa71c003193f8cf78cd5b32c46e882",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetEffectiveDeclarationFlags",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "8124a823366537c972bd93c36fc58afb47aa71c003193f8cf78cd5b32c46e882",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetEmitModuleFormatOfFile",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "8124a823366537c972bd93c36fc58afb47aa71c003193f8cf78cd5b32c46e882",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetEmitResolver",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "8124a823366537c972bd93c36fc58afb47aa71c003193f8cf78cd5b32c46e882",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetGlobalTypingsCacheLocation",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "8124a823366537c972bd93c36fc58afb47aa71c003193f8cf78cd5b32c46e882",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetModeForUsageLocation",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "8124a823366537c972bd93c36fc58afb47aa71c003193f8cf78cd5b32c46e882",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetNearestAncestorDirectoryWithPackageJson",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "8124a823366537c972bd93c36fc58afb47aa71c003193f8cf78cd5b32c46e882",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetOutputPathsFor",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "8124a823366537c972bd93c36fc58afb47aa71c003193f8cf78cd5b32c46e882",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetPackageJsonInfo",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "8124a823366537c972bd93c36fc58afb47aa71c003193f8cf78cd5b32c46e882",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetProjectReferenceFromSource",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "8124a823366537c972bd93c36fc58afb47aa71c003193f8cf78cd5b32c46e882",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetRedirectTargets",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "8124a823366537c972bd93c36fc58afb47aa71c003193f8cf78cd5b32c46e882",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetResolvedModuleFromModuleSpecifier",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "8124a823366537c972bd93c36fc58afb47aa71c003193f8cf78cd5b32c46e882",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetSourceFileFromReference",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "8124a823366537c972bd93c36fc58afb47aa71c003193f8cf78cd5b32c46e882",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetSourceOfProjectReferenceIfOutputIncluded",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "8124a823366537c972bd93c36fc58afb47aa71c003193f8cf78cd5b32c46e882",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.GetSymlinkCache",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "8124a823366537c972bd93c36fc58afb47aa71c003193f8cf78cd5b32c46e882",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.IsEmitBlocked",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "8124a823366537c972bd93c36fc58afb47aa71c003193f8cf78cd5b32c46e882",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.IsSourceFileFromExternalLibrary",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "8124a823366537c972bd93c36fc58afb47aa71c003193f8cf78cd5b32c46e882",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.Options",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "8124a823366537c972bd93c36fc58afb47aa71c003193f8cf78cd5b32c46e882",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.ResolveModuleName",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "8124a823366537c972bd93c36fc58afb47aa71c003193f8cf78cd5b32c46e882",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.SourceFileMayBeEmitted",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "8124a823366537c972bd93c36fc58afb47aa71c003193f8cf78cd5b32c46e882",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.SourceFiles",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "8124a823366537c972bd93c36fc58afb47aa71c003193f8cf78cd5b32c46e882",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.UseCaseSensitiveFileNames",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "8124a823366537c972bd93c36fc58afb47aa71c003193f8cf78cd5b32c46e882",
+      "operation": "tsc/internal/compiler/emitHost.go:emitHost.WriteFile",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitHost.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "8124a823366537c972bd93c36fc58afb47aa71c003193f8cf78cd5b32c46e882",
+      "operation": "tsc/internal/compiler/emitHost.go:newEmitHost",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitter.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "2d4cd7039dcae8a35528fca3104835c81660989c2fc4e10db8bbc94a2818987c",
+      "operation": "tsc/internal/compiler/emitter.go:declarationMapSource.ECMALineMap",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitter.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "2d4cd7039dcae8a35528fca3104835c81660989c2fc4e10db8bbc94a2818987c",
+      "operation": "tsc/internal/compiler/emitter.go:declarationMapSource.FileName",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitter.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "2d4cd7039dcae8a35528fca3104835c81660989c2fc4e10db8bbc94a2818987c",
+      "operation": "tsc/internal/compiler/emitter.go:declarationMapSource.Text",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitter.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "2d4cd7039dcae8a35528fca3104835c81660989c2fc4e10db8bbc94a2818987c",
+      "operation": "tsc/internal/compiler/emitter.go:emitter.emit",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitter.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "2d4cd7039dcae8a35528fca3104835c81660989c2fc4e10db8bbc94a2818987c",
+      "operation": "tsc/internal/compiler/emitter.go:emitter.emitDeclarationFile",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitter.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "2d4cd7039dcae8a35528fca3104835c81660989c2fc4e10db8bbc94a2818987c",
+      "operation": "tsc/internal/compiler/emitter.go:emitter.emitJSFile",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitter.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "2d4cd7039dcae8a35528fca3104835c81660989c2fc4e10db8bbc94a2818987c",
+      "operation": "tsc/internal/compiler/emitter.go:emitter.getDeclarationTransformers",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitter.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "2d4cd7039dcae8a35528fca3104835c81660989c2fc4e10db8bbc94a2818987c",
+      "operation": "tsc/internal/compiler/emitter.go:emitter.getSourceMapDirectory",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitter.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "2d4cd7039dcae8a35528fca3104835c81660989c2fc4e10db8bbc94a2818987c",
+      "operation": "tsc/internal/compiler/emitter.go:emitter.getSourceMappingURL",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitter.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "2d4cd7039dcae8a35528fca3104835c81660989c2fc4e10db8bbc94a2818987c",
+      "operation": "tsc/internal/compiler/emitter.go:emitter.printSourceFile",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitter.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "2d4cd7039dcae8a35528fca3104835c81660989c2fc4e10db8bbc94a2818987c",
+      "operation": "tsc/internal/compiler/emitter.go:emitter.runDeclarationTransformers",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitter.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "2d4cd7039dcae8a35528fca3104835c81660989c2fc4e10db8bbc94a2818987c",
+      "operation": "tsc/internal/compiler/emitter.go:emitter.runScriptTransformers",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitter.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "2d4cd7039dcae8a35528fca3104835c81660989c2fc4e10db8bbc94a2818987c",
+      "operation": "tsc/internal/compiler/emitter.go:emitter.writeText",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitter.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "2d4cd7039dcae8a35528fca3104835c81660989c2fc4e10db8bbc94a2818987c",
+      "operation": "tsc/internal/compiler/emitter.go:getDeclarationDiagnostics",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitter.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "2d4cd7039dcae8a35528fca3104835c81660989c2fc4e10db8bbc94a2818987c",
+      "operation": "tsc/internal/compiler/emitter.go:getModuleTransformer",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitter.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "2d4cd7039dcae8a35528fca3104835c81660989c2fc4e10db8bbc94a2818987c",
+      "operation": "tsc/internal/compiler/emitter.go:getScriptTransformers",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitter.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "2d4cd7039dcae8a35528fca3104835c81660989c2fc4e10db8bbc94a2818987c",
+      "operation": "tsc/internal/compiler/emitter.go:getSourceRoot",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitter.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "2d4cd7039dcae8a35528fca3104835c81660989c2fc4e10db8bbc94a2818987c",
+      "operation": "tsc/internal/compiler/emitter.go:isSourceFileNotJson",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitter.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "2d4cd7039dcae8a35528fca3104835c81660989c2fc4e10db8bbc94a2818987c",
+      "operation": "tsc/internal/compiler/emitter.go:newDeclarationMapSource",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/emitter.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "2d4cd7039dcae8a35528fca3104835c81660989c2fc4e10db8bbc94a2818987c",
+      "operation": "tsc/internal/compiler/emitter.go:shouldEmitSourceMaps",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 5,
+      "evidence": "upstream/tsc/internal/compiler/fileloader.go. Gated by a content-mapper extension (fileloader.go:410) or a content-mapper project; the F4a syntax schedule carries the 15 content-mapped variants as this named boundary. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
+      "operation": "tsc/internal/compiler/fileloader.go:ContentMapperInitializationDiagnostic",
+      "reason": "This operation executes or adapts production content-mapper services, explicitly retained for Phase 5 by section 2 and ADR 0019."
+    },
+    {
+      "destination_phase": 5,
+      "evidence": "upstream/tsc/internal/compiler/fileloader.go. Gated by a content-mapper extension (fileloader.go:410) or a content-mapper project; the F4a syntax schedule carries the 15 content-mapped variants as this named boundary. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
+      "operation": "tsc/internal/compiler/fileloader.go:ContentMapperProjectDiagnostic",
+      "reason": "This operation executes or adapts production content-mapper services, explicitly retained for Phase 5 by section 2 and ADR 0019."
+    },
+    {
+      "destination_phase": 5,
+      "evidence": "upstream/tsc/internal/compiler/fileloader.go. Gated by a content-mapper extension (fileloader.go:410) or a content-mapper project; the F4a syntax schedule carries the 15 content-mapped variants as this named boundary. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
+      "operation": "tsc/internal/compiler/fileloader.go:ContentMapperProjectErrorDiagnostic",
+      "reason": "This operation executes or adapts production content-mapper services, explicitly retained for Phase 5 by section 2 and ADR 0019."
+    },
+    {
+      "destination_phase": 5,
+      "evidence": "upstream/tsc/internal/compiler/fileloader.go. Gated by a content-mapper extension (fileloader.go:410) or a content-mapper project; the F4a syntax schedule carries the 15 content-mapped variants as this named boundary. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
+      "operation": "tsc/internal/compiler/fileloader.go:contentMapperMappingDiagnostic",
+      "reason": "This operation executes or adapts production content-mapper services, explicitly retained for Phase 5 by section 2 and ADR 0019."
+    },
+    {
+      "destination_phase": 5,
+      "evidence": "upstream/tsc/internal/compiler/fileloader.go. Gated by a content-mapper extension (fileloader.go:410) or a content-mapper project; the F4a syntax schedule carries the 15 content-mapped variants as this named boundary. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
+      "operation": "tsc/internal/compiler/fileloader.go:contentMapperTransformDiagnostic",
+      "reason": "This operation executes or adapts production content-mapper services, explicitly retained for Phase 5 by section 2 and ADR 0019."
+    },
+    {
+      "destination_phase": 5,
+      "evidence": "upstream/tsc/internal/compiler/fileloader.go. Gated by a content-mapper extension (fileloader.go:410) or a content-mapper project; the F4a syntax schedule carries the 15 content-mapped variants as this named boundary. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
+      "operation": "tsc/internal/compiler/fileloader.go:contentMapperTransformDiagnosticChain",
+      "reason": "This operation executes or adapts production content-mapper services, explicitly retained for Phase 5 by section 2 and ADR 0019."
+    },
+    {
+      "destination_phase": 5,
+      "evidence": "upstream/tsc/internal/compiler/fileloader.go. Gated by a content-mapper extension (fileloader.go:410) or a content-mapper project; the F4a syntax schedule carries the 15 content-mapped variants as this named boundary. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
+      "operation": "tsc/internal/compiler/fileloader.go:contentMapperTransformDiagnosticWithDetail",
+      "reason": "This operation executes or adapts production content-mapper services, explicitly retained for Phase 5 by section 2 and ADR 0019."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/fileloader.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
+      "operation": "tsc/internal/compiler/fileloader.go:fileLoader.addProjectReferenceTasks",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 5,
+      "evidence": "upstream/tsc/internal/compiler/fileloader.go. Gated by a content-mapper extension (fileloader.go:410) or a content-mapper project; the F4a syntax schedule carries the 15 content-mapped variants as this named boundary. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
+      "operation": "tsc/internal/compiler/fileloader.go:fileLoader.contentMapperUnavailable",
+      "reason": "This operation executes or adapts production content-mapper services, explicitly retained for Phase 5 by section 2 and ADR 0019."
+    },
+    {
+      "destination_phase": 5,
+      "evidence": "upstream/tsc/internal/compiler/fileloader.go. Gated by a content-mapper extension (fileloader.go:410) or a content-mapper project; the F4a syntax schedule carries the 15 content-mapped variants as this named boundary. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
+      "operation": "tsc/internal/compiler/fileloader.go:fileLoader.emptyContentMappedFile",
+      "reason": "This operation executes or adapts production content-mapper services, explicitly retained for Phase 5 by section 2 and ADR 0019."
+    },
+    {
+      "destination_phase": 5,
+      "evidence": "upstream/tsc/internal/compiler/fileloader.go. Gated by a content-mapper extension (fileloader.go:410) or a content-mapper project; the F4a syntax schedule carries the 15 content-mapped variants as this named boundary. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
+      "operation": "tsc/internal/compiler/fileloader.go:fileLoader.getContentMapperTransformIdentity",
+      "reason": "This operation executes or adapts production content-mapper services, explicitly retained for Phase 5 by section 2 and ADR 0019."
+    },
+    {
+      "destination_phase": 5,
+      "evidence": "upstream/tsc/internal/compiler/fileloader.go. Gated by a content-mapper extension (fileloader.go:410) or a content-mapper project; the F4a syntax schedule carries the 15 content-mapped variants as this named boundary. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
+      "operation": "tsc/internal/compiler/fileloader.go:fileLoader.parseContentMappedFile",
+      "reason": "This operation executes or adapts production content-mapper services, explicitly retained for Phase 5 by section 2 and ADR 0019."
+    },
+    {
+      "destination_phase": 5,
+      "evidence": "upstream/tsc/internal/compiler/fileloader.go. Gated by a content-mapper extension (fileloader.go:410) or a content-mapper project; the F4a syntax schedule carries the 15 content-mapped variants as this named boundary. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
+      "operation": "tsc/internal/compiler/fileloader.go:fileLoader.recordContentMapperFailure",
+      "reason": "This operation executes or adapts production content-mapper services, explicitly retained for Phase 5 by section 2 and ADR 0019."
+    },
+    {
+      "destination_phase": 5,
+      "evidence": "upstream/tsc/internal/compiler/fileloader.go. Gated by a content-mapper extension (fileloader.go:410) or a content-mapper project; the F4a syntax schedule carries the 15 content-mapped variants as this named boundary. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
+      "operation": "tsc/internal/compiler/fileloader.go:fileLoader.recordContentMapperInitializationFailure",
+      "reason": "This operation executes or adapts production content-mapper services, explicitly retained for Phase 5 by section 2 and ADR 0019."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/filesparser.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "411a9e85dceb77ddbfc64cd40f247d16a337b78462c35f6a0273d5ad9edaf777",
+      "operation": "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 5,
+      "evidence": "upstream/tsc/internal/compiler/host.go. Gated by a content-mapper extension (fileloader.go:410) or a content-mapper project; the F4a syntax schedule carries the 15 content-mapped variants as this named boundary. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "7f1cea0567a2817c8f6a1dc840fa6d24450e121832e4a516b1e85dfaf50ef6fb",
+      "operation": "tsc/internal/compiler/host.go:compilerHost.ContentMapperProject",
+      "reason": "This operation executes or adapts production content-mapper services, explicitly retained for Phase 5 by section 2 and ADR 0019."
+    },
+    {
+      "destination_phase": 5,
+      "evidence": "upstream/tsc/internal/compiler/host.go. Gated by a content-mapper extension (fileloader.go:410) or a content-mapper project; the F4a syntax schedule carries the 15 content-mapped variants as this named boundary. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "7f1cea0567a2817c8f6a1dc840fa6d24450e121832e4a516b1e85dfaf50ef6fb",
+      "operation": "tsc/internal/compiler/host.go:compilerHost.GetContentMappedSourceFiles",
+      "reason": "This operation executes or adapts production content-mapper services, explicitly retained for Phase 5 by section 2 and ADR 0019."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/host.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "7f1cea0567a2817c8f6a1dc840fa6d24450e121832e4a516b1e85dfaf50ef6fb",
+      "operation": "tsc/internal/compiler/host.go:compilerHost.GetResolvedProjectReference",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:CombineEmitResults",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:FilterNoEmitSemanticDiagnostics",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:HandleNoEmitOptions",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 5,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.ContentMapperExtensions",
+      "reason": "This operation executes or adapts production content-mapper services, explicitly retained for Phase 5 by section 2 and ADR 0019."
+    },
+    {
+      "destination_phase": 5,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Gated by a content-mapper extension (fileloader.go:410) or a content-mapper project; the F4a syntax schedule carries the 15 content-mapped variants as this named boundary. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.ContentMapperProject",
+      "reason": "This operation executes or adapts production content-mapper services, explicitly retained for Phase 5 by section 2 and ADR 0019."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.Emit",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.FileExists",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.ForEachCheckerParallel",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.ForEachResolvedModule",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.ForEachResolvedTypeReferenceDirective",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.GetCheckerPool",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 5,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Gated by a content-mapper extension (fileloader.go:410) or a content-mapper project; the F4a syntax schedule carries the 15 content-mapped variants as this named boundary. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.GetContentMapper",
+      "reason": "This operation executes or adapts production content-mapper services, explicitly retained for Phase 5 by section 2 and ADR 0019."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.GetDeclarationDiagnostics",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.GetDefaultResolutionModeForFile",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.GetEmitModuleFormatOfFile",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.GetEmitSyntaxForUsageLocation",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.GetGlobalDiagnostics",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.GetGlobalTypingsCacheLocation",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.GetImportHelpersImportSpecifier",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.GetIncludeProcessorDiagnostics",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.GetJSXRuntimeImportSpecifier",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.GetNearestAncestorDirectoryWithPackageJson",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.GetPackageJsonInfo",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.GetPackagesMap",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.GetParseFileRedirect",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.GetProjectReferenceFromOutputDts",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.GetProjectReferenceFromSource",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.GetRedirectForResolution",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.GetRedirectTargets",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.GetResolvedModules",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.GetResolvedProjectReferences",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.GetSemanticDiagnostics",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.GetSemanticDiagnosticsWithoutNoEmitFiltering",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.GetSourceFileForResolvedModule",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.GetSourceFileFromReference",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.GetSourceOfProjectReferenceIfOutputIncluded",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.GetSuggestionDiagnostics",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.GetSymlinkCache",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.GetTypeChecker",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.GetTypeCheckerForFile",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.GetTypeCheckerForFileExclusive",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.IsEmitBlocked",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.IsSourceFromProjectReference",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReferenceInChildConfig",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.SkipTypeChecking",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.SourceFileMayBeEmitted",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.canIncludeBindAndCheckDiagnostics",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.collectCheckerDiagnostics",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.collectCheckerDiagnosticsFromFiles",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 5,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Gated by a content-mapper extension (fileloader.go:410) or a content-mapper project; the F4a syntax schedule carries the 15 content-mapped variants as this named boundary. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.collectContentMapperOptionDiagnostics",
+      "reason": "This operation executes or adapts production content-mapper services, explicitly retained for Phase 5 by section 2 and ADR 0019."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.getBindAndCheckDiagnosticsWithChecker",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 3,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.getDeclarationDiagnosticsForFile",
+      "reason": "Declaration/JS emission and its resolver/host/source-map paths are the explicit Phase 3 boundary."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.getDiagnosticsWithPrecedingDirectives",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.getSemanticDiagnosticsWithChecker",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.getSuggestionDiagnosticsWithChecker",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.initCheckerPool",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:ProgramOptions.canUseProjectReferenceSource",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 5,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:applyContentMapperDiagnosticDirectives",
+      "reason": "This operation executes or adapts production content-mapper services, explicitly retained for Phase 5 by section 2 and ADR 0019."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:forEachResolution",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:isCommentOrBlankLine",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 2,
+      "evidence": "upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); no Phase 1 comparison observes it. Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+      "operation": "tsc/internal/compiler/program.go:lazyValue.getValue",
+      "reason": "Checker services and semantic/global/suggestion diagnostic orchestration are the Phase 2 boundary; this is not the Program parse/bind/syntactic entry point."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/projectreferencedtsfakinghost.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "3a49442ed27070c8af2392d12c316b588a956b8f538d5ef3c979ef97e3de9061",
+      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:newProjectReferenceDtsFakingHost",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/projectreferencedtsfakinghost.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "3a49442ed27070c8af2392d12c316b588a956b8f538d5ef3c979ef97e3de9061",
+      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingHost.FS",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/projectreferencedtsfakinghost.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "3a49442ed27070c8af2392d12c316b588a956b8f538d5ef3c979ef97e3de9061",
+      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingHost.GetCurrentDirectory",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/projectreferencedtsfakinghost.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "3a49442ed27070c8af2392d12c316b588a956b8f538d5ef3c979ef97e3de9061",
+      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.AppendFile",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/projectreferencedtsfakinghost.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "3a49442ed27070c8af2392d12c316b588a956b8f538d5ef3c979ef97e3de9061",
+      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.Chtimes",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/projectreferencedtsfakinghost.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "3a49442ed27070c8af2392d12c316b588a956b8f538d5ef3c979ef97e3de9061",
+      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.DirectoryExists",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/projectreferencedtsfakinghost.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "3a49442ed27070c8af2392d12c316b588a956b8f538d5ef3c979ef97e3de9061",
+      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.FileExists",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/projectreferencedtsfakinghost.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "3a49442ed27070c8af2392d12c316b588a956b8f538d5ef3c979ef97e3de9061",
+      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.GetAccessibleEntries",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/projectreferencedtsfakinghost.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "3a49442ed27070c8af2392d12c316b588a956b8f538d5ef3c979ef97e3de9061",
+      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.ReadFile",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/projectreferencedtsfakinghost.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "3a49442ed27070c8af2392d12c316b588a956b8f538d5ef3c979ef97e3de9061",
+      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.Realpath",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/projectreferencedtsfakinghost.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "3a49442ed27070c8af2392d12c316b588a956b8f538d5ef3c979ef97e3de9061",
+      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.Remove",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/projectreferencedtsfakinghost.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "3a49442ed27070c8af2392d12c316b588a956b8f538d5ef3c979ef97e3de9061",
+      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.Stat",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/projectreferencedtsfakinghost.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "3a49442ed27070c8af2392d12c316b588a956b8f538d5ef3c979ef97e3de9061",
+      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.UseCaseSensitiveFileNames",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/projectreferencedtsfakinghost.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "3a49442ed27070c8af2392d12c316b588a956b8f538d5ef3c979ef97e3de9061",
+      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.WalkDir",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/projectreferencedtsfakinghost.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "3a49442ed27070c8af2392d12c316b588a956b8f538d5ef3c979ef97e3de9061",
+      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.WriteFile",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/projectreferencedtsfakinghost.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "3a49442ed27070c8af2392d12c316b588a956b8f538d5ef3c979ef97e3de9061",
+      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.directoryExistsIfProjectReferenceDeclDir",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/projectreferencedtsfakinghost.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "3a49442ed27070c8af2392d12c316b588a956b8f538d5ef3c979ef97e3de9061",
+      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.fileExistsIfProjectReferenceDts",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/projectreferencedtsfakinghost.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "3a49442ed27070c8af2392d12c316b588a956b8f538d5ef3c979ef97e3de9061",
+      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.fileOrDirectoryExistsUsingSource",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/projectreferencedtsfakinghost.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "3a49442ed27070c8af2392d12c316b588a956b8f538d5ef3c979ef97e3de9061",
+      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.handleDirectoryCouldBeSymlink",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/projectreferencedtsfakinghost.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "3a49442ed27070c8af2392d12c316b588a956b8f538d5ef3c979ef97e3de9061",
+      "operation": "tsc/internal/compiler/projectreferencedtsfakinghost.go:projectReferenceDtsFakingVfs.toPath",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "9fe9076464b9e46ff27c456268c9be07464f00457f3a14bec141c1c0eb6b6a10",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getCompilerOptionsForFile",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "9fe9076464b9e46ff27c456268c9be07464f00457f3a14bec141c1c0eb6b6a10",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "9fe9076464b9e46ff27c456268c9be07464f00457f3a14bec141c1c0eb6b6a10",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromOutputDts",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "9fe9076464b9e46ff27c456268c9be07464f00457f3a14bec141c1c0eb6b6a10",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "9fe9076464b9e46ff27c456268c9be07464f00457f3a14bec141c1c0eb6b6a10",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getRedirectForResolution",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "9fe9076464b9e46ff27c456268c9be07464f00457f3a14bec141c1c0eb6b6a10",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getRedirectParsedCommandLineForResolution",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "9fe9076464b9e46ff27c456268c9be07464f00457f3a14bec141c1c0eb6b6a10",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getResolvedProjectReferences",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "9fe9076464b9e46ff27c456268c9be07464f00457f3a14bec141c1c0eb6b6a10",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getResolvedReferenceFor",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "9fe9076464b9e46ff27c456268c9be07464f00457f3a14bec141c1c0eb6b6a10",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getSourceToDtsIfSymlink",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "9fe9076464b9e46ff27c456268c9be07464f00457f3a14bec141c1c0eb6b6a10",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.isSourceFromProjectReference",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "9fe9076464b9e46ff27c456268c9be07464f00457f3a14bec141c1c0eb6b6a10",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "9fe9076464b9e46ff27c456268c9be07464f00457f3a14bec141c1c0eb6b6a10",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReferenceInChildConfig",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "9fe9076464b9e46ff27c456268c9be07464f00457f3a14bec141c1c0eb6b6a10",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "9fe9076464b9e46ff27c456268c9be07464f00457f3a14bec141c1c0eb6b6a10",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rootConfigPath",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/projectreferenceparser.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "5dd5e6790d4de30468a1de774196f9c5351036c1c254918afcd714ca73fd6b04",
+      "operation": "tsc/internal/compiler/projectreferenceparser.go:createProjectReferenceParseTasks",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/projectreferenceparser.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "5dd5e6790d4de30468a1de774196f9c5351036c1c254918afcd714ca73fd6b04",
+      "operation": "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParseTask.parse",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/projectreferenceparser.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "5dd5e6790d4de30468a1de774196f9c5351036c1c254918afcd714ca73fd6b04",
+      "operation": "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.initMapper",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/projectreferenceparser.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "5dd5e6790d4de30468a1de774196f9c5351036c1c254918afcd714ca73fd6b04",
+      "operation": "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.initMapperWorker",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/projectreferenceparser.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "5dd5e6790d4de30468a1de774196f9c5351036c1c254918afcd714ca73fd6b04",
+      "operation": "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.parse",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    },
+    {
+      "destination_phase": 4,
+      "evidence": "upstream/tsc/internal/compiler/projectreferenceparser.go. Runs only when a config declares references (fileloader.go:331-341); in a Phase 1 load the no-reference form returns early. No corpus variant declares references, and the Rust loader refuses them explicitly (crates/tsr_compiler/src/loader.rs:198-205, boundary_tests.rs:85). Classified by the F4a compiler survey, which read the callers of all 340 compiler operations at the pin. || RUST: not owed by Phase 1.",
+      "go_source_sha256": "5dd5e6790d4de30468a1de774196f9c5351036c1c254918afcd714ca73fd6b04",
+      "operation": "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.start",
+      "reason": "This operation loads, redirects, or schedules referenced projects; Phase 1 parses the project-reference option but excludes executing the project graph."
+    }
+  ],
+  "unresolved_compiler_destinations": [
+    "tsc/internal/compiler/host.go:NewCachedFSCompilerHost",
+    "tsc/internal/compiler/includeprocessor.go:updateFileIncludeProcessor",
+    "tsc/internal/compiler/program.go:GetDiagnosticsOfAnyProgram",
+    "tsc/internal/compiler/program.go:Program.CommandLine",
+    "tsc/internal/compiler/program.go:Program.DeepImportPackageNames",
+    "tsc/internal/compiler/program.go:Program.DuplicateSourceFiles",
+    "tsc/internal/compiler/program.go:Program.ExplainFiles",
+    "tsc/internal/compiler/program.go:Program.FilesByPath",
+    "tsc/internal/compiler/program.go:Program.GetDefaultLibFile",
+    "tsc/internal/compiler/program.go:Program.GetIncludeReasons",
+    "tsc/internal/compiler/program.go:Program.GetLibFileFromReference",
+    "tsc/internal/compiler/program.go:Program.GetResolvedTypeReferenceDirectiveFromTypeReferenceDirective",
+    "tsc/internal/compiler/program.go:Program.GetResolvedTypeReferenceDirectives",
+    "tsc/internal/compiler/program.go:Program.GetUnresolvedImports",
+    "tsc/internal/compiler/program.go:Program.HasSameFileNames",
+    "tsc/internal/compiler/program.go:Program.HasTSFile",
+    "tsc/internal/compiler/program.go:Program.IdentifierCount",
+    "tsc/internal/compiler/program.go:Program.InstantiationCount",
+    "tsc/internal/compiler/program.go:Program.IsGlobalTypingsFile",
+    "tsc/internal/compiler/program.go:Program.IsLibFile",
+    "tsc/internal/compiler/program.go:Program.IsMissingPath",
+    "tsc/internal/compiler/program.go:Program.LineCount",
+    "tsc/internal/compiler/program.go:Program.PackageJsonCacheEntries",
+    "tsc/internal/compiler/program.go:Program.ResolveModuleName",
+    "tsc/internal/compiler/program.go:Program.ResolvedPackageNames",
+    "tsc/internal/compiler/program.go:Program.ReuseProgram",
+    "tsc/internal/compiler/program.go:Program.SymbolCount",
+    "tsc/internal/compiler/program.go:Program.Tracing",
+    "tsc/internal/compiler/program.go:Program.TypeCount",
+    "tsc/internal/compiler/program.go:Program.UnresolvedPackageNames",
+    "tsc/internal/compiler/program.go:Program.UpdateProgram",
+    "tsc/internal/compiler/program.go:Program.UsesUriStyleNodeCoreModules",
+    "tsc/internal/compiler/program.go:Program.canReplaceFileInProgram",
+    "tsc/internal/compiler/program.go:Program.collectPackageNames",
+    "tsc/internal/compiler/program.go:Program.extractUnresolvedImports",
+    "tsc/internal/compiler/program.go:Program.extractUnresolvedImportsFromSourceFile",
+    "tsc/internal/compiler/program.go:Program.getModeForTypeReferenceDirectiveInFile",
+    "tsc/internal/compiler/program.go:Program.jsxRuntimeImportSpecifier",
+    "tsc/internal/compiler/program.go:Program.needsImportHelpersImportSpecifier",
+    "tsc/internal/compiler/program.go:equalCheckJSDirectives",
+    "tsc/internal/compiler/program.go:equalFileReferences",
+    "tsc/internal/compiler/program.go:equalModuleAugmentationNames",
+    "tsc/internal/compiler/program.go:equalModuleSpecifiers",
+    "tsc/internal/compiler/program.go:lazyValue.tryReuse"
+  ],
+  "unresolved_reason": "F4a grouped these under phases 4 to 6 without proving one destination. Keep the Phase 1 scope and report a review gap; no automatic promotion from a roster exemption.",
+  "version": 1
+}

@@ -45,6 +45,12 @@ matchFiles. This does not close F3b or replace the F5a coverage review.
 merging #48 and proceeding with the remaining F3b implementation. F4a/F5a and
 the pending Linux filesystem observations remain separate obligations.
 
+**Ordering amendment, 2026-09-22 (after #51):** the owner authorized F4b on
+F4a's branch, then F5a on a new stacked branch in the shared checkout. F1b–F3b
+have merged and F4b is in #51. The coverage review below now decides the remaining
+attribution and integration work; it does not ask to restart those implementations.
+Preparation gaps are still gaps even where production corpus comparisons pass.
+
 ### Remaining preparation and coverage review
 
 6. **F4a — Syntax/binder tests:** prepare the missing AST, parser/binder,
@@ -57,13 +63,14 @@ missing behavior stay visibly unmet. F1b must run its affected consumer and
 generator checks as it proceeds; future F5a integration tests may expose further
 foundation work and are still required.
 
-### Remaining production implementation
+### Production checkpoints (status at the F5a handoff)
 
-8. **F2b — Filesystem implementation:** implement missing filesystem adapters,
-   cache behavior, paths and matching against F2a's checks.
-9. **F3b — Config/resolution implementation:** complete command-line/config parsing,
-   package handling and module resolution against F3a's checks.
-10. **F4b — Syntax/binder implementation:** fix the production gaps exposed by F4a.
+8. **F2b — Filesystem implementation:** merged; retain the named dynamic-type
+   differences and Linux-only observations as remaining obligations.
+9. **F3b — Config/resolution implementation:** merged; preserve the 309-output
+   comparisons and the approved immutable-Parseable qualification.
+10. **F4b — Syntax/binder implementation:** implemented in #51; retain the
+    full parser/binder/syntax captures and finish exact operation attribution.
 11. **F5b — Integration and closure:** fix integration failures, run the required
     correctness checks and close Phase 1.
 
@@ -1394,8 +1401,8 @@ mutation leaking into an old snapshot; malformed bytes repaired too early;
 duplicate diagnostics; build options accepted with the wrong mode; lazy token
 identity changing after retention; an Unsupported result counted as unresolved.
 
-Stop for the scheduled Phase A coverage review after F5a, before starting F2b.
-F1b's early start is authorized by the ordering amendment above.
+Stop for the scheduled Phase A coverage review after F5a, before starting F5b.
+The amendments above authorized F1b–F4b; do not repeat them as a prerequisite.
 Outside that planned review, stop for owner input only when a real decision is
 needed: a new baseline behavior divergence, a change to an accepted transport/
 ownership contract, a new required platform/dependency policy decision, or an
@@ -1432,6 +1439,6 @@ such conflicts with a minimal reproducer and pinned Go output.
   Rust currently supports.
 
 F0 delivered the initial command-line baseline adapter and missing-operation
-result. F1a–F3a have been reviewed. Proceed with F1b, then resume F4a–F5a and
-review the complete coverage/gap report before F2b–F5b, in the execution order
-above.
+result. F1a–F4a have been reviewed and F1b–F4b have proceeded under the recorded
+amendments. Review the F5a coverage/gap report before F5b; a merged implementation
+does not discharge its unwitnessed operations.
