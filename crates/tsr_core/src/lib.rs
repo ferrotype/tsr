@@ -3,6 +3,11 @@
 //! This dependency slice does not implement compiler options or the remaining
 //! core algorithms. Integer newtypes retain Go's open numeric value domain.
 
+mod build_options;
+pub use build_options::BuildOptions;
+mod watch_options;
+pub use watch_options::{PollingKind, WatchDirectoryKind, WatchFileKind, WatchOptions};
+
 pub mod collections;
 pub mod path;
 pub mod pattern;

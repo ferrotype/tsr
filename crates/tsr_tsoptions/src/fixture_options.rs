@@ -23,7 +23,7 @@ impl std::error::Error for FixtureOptionError {}
 fn text(value: &[u8]) -> JsString {
     JsString::from_bytes(value)
 }
-fn trim(mut value: &[u8], predicate: impl Fn(i32) -> bool) -> &[u8] {
+pub(crate) fn trim(mut value: &[u8], predicate: impl Fn(i32) -> bool) -> &[u8] {
     while !value.is_empty() {
         let (rune, width) = decode_utf8(value);
         if !predicate(rune) {
@@ -45,7 +45,7 @@ fn trim(mut value: &[u8], predicate: impl Fn(i32) -> bool) -> &[u8] {
 fn go_space(rune: i32) -> bool {
     matches!(rune,0x09..=0x0d|0x20|0x85|0xa0|0x1680|0x2000..=0x200a|0x2028|0x2029|0x202f|0x205f|0x3000)
 }
-fn enum_value(option: &OptionDeclaration, value: &[u8]) -> Option<V> {
+pub(crate) fn enum_value(option: &OptionDeclaration, value: &[u8]) -> Option<V> {
     let lower = to_lower_go(value);
     option.enum_values.iter().find_map(|(key, value)| {
         (key.as_bytes() == lower).then(|| match value {
@@ -54,7 +54,7 @@ fn enum_value(option: &OptionDeclaration, value: &[u8]) -> Option<V> {
         })
     })
 }
-fn enum_error(option: &OptionDeclaration) -> Diagnostic {
+pub(crate) fn enum_error(option: &OptionDeclaration) -> Diagnostic {
     Diagnostic::compiler(
         d::Argument_for_0_option_must_be_Colon_1,
         vec![
@@ -70,7 +70,7 @@ pub fn parse_list_type_option(
 ) -> (V, Vec<Diagnostic>) {
     let value = trim(value, go_space);
     let mut errors = Vec::new();
-    if value.is_empty() || value.starts_with(b"-") {
+    if value.starts_with(b"-") {
         return (V::Array(Some(Vec::new())), errors);
     }
     if option.kind == OptionKind::ListOrElement && !value.contains(&b',') {
@@ -83,6 +83,9 @@ pub fn parse_list_type_option(
             }
         }
         return (V::Array(Some(vec![V::String(text(value))])), errors);
+    }
+    if value.is_empty() {
+        return (V::Array(Some(Vec::new())), errors);
     }
     let element = option.element.expect("list option element declaration");
     let mut values = None;

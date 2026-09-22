@@ -1,26 +1,7 @@
-//! The `tsoptions/commandLineParsing` baseline group: 53 `parseCommandLine`
-//! and 27 `parseBuildOptions` outputs.
-//!
-//! Unlike F2a's carried `config/matchFiles` envelope, these 80 have a real
-//! pinned producer, and `tools/phase1/config/commandline_probe_test.go` renders
-//! them through the pinned `formatNewBaseline` / `formatNewBaselineBuild`
-//! rather than through anything carried. The gap is on this side: the port has
-//! no argument-vector parser at all.
-//!
-//! That is a reading of the crate, not of the ledger. `crates/tsr_tsoptions`
-//! carries the generated option declarations and the whole config-file path,
-//! but nothing that consumes an `argv`: the closest thing,
-//! `fixture_options::apply_fixture_settings`, takes already-split
-//! `name`/`value` pairs from a compiler-test fixture comment and explicitly
-//! refuses a switch or a response-file argument -- "This is the source bridge's
-//! ParseCommandLine([\"--\"+name,value]) error path. A second switch/response
-//! argument requires the full CLI operation"
-//! (crates/tsr_tsoptions/src/fixture_options.rs:270-275). So the option
-//! *semantics* are partly present while the parser the baselines exercise is
-//! absent, which is what these rows record.
-//!
-//! Preparation records the gap; it never emulates the parser to make a
-//! comparison run, and it never reads the frozen bytes.
+//! The 80 baseline envelopes still need the shared Go-renderer bridge and
+//! the ordinary test worker's synthetic declaration input. Production argv
+//! parsing is implemented in command_line.rs and exercised by commandlineops.
+//! These rows identify the missing *baseline integration*, not an absent parser.
 
 use crate::api::Outcome;
 use serde_json::Value;
@@ -34,8 +15,8 @@ const PARSE_COMMAND_LINE: (&str, &str, &str, &str) = (
     "pub fn parse_command_line(command_line: &[JsString], host: &dyn ParseConfigHost) -> \
      ParsedCommandLine, carrying the option map in declaration order, the file names and the \
      diagnostics the Errors:: section renders",
-    "crates/tsr_tsoptions/src/parse_options.rs, which today parses option VALUES but has no \
-     argument-vector parser (absent)",
+    "production parser exists at crates/tsr_tsoptions/src/command_line.rs; missing test-only \
+     shared Go envelope bridge and synthetic option-declaration worker entry point",
 );
 
 const PARSE_BUILD_COMMAND_LINE: (&str, &str, &str, &str) = (
@@ -45,8 +26,8 @@ const PARSE_BUILD_COMMAND_LINE: (&str, &str, &str, &str) = (
     "pub fn parse_build_command_line(command_line: &[JsString], host: &dyn ParseConfigHost) -> \
      ParsedBuildCommandLine, a distinct mode carrying build options, the compiler options it \
      still accepts, the project list and the build-only diagnostics",
-    "crates/tsr_tsoptions/src/parse_options.rs (absent; BUILD_OPTIONS declarations exist in \
-     option_declarations_generated.rs, the parsing mode does not)",
+    "production build parser exists at crates/tsr_tsoptions/src/command_line.rs; missing \
+     test-only shared Go envelope bridge",
 );
 
 pub fn observe(request: &Value) -> Option<Outcome> {

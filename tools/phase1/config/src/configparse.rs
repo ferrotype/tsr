@@ -577,23 +577,7 @@ const GET_EXTENDED_CONFIG: Gap = (
     "crates/tsr_tsoptions/src/config_parse.rs:440-509: the extended read is inline and there is \
      no cache, so a case that supplies one has nothing to supply it to (absent)",
 );
-const PARSE_WATCH_OPTIONS: Gap = (
-    "tsc/internal/tsoptions/parsinghelpers.go:ParseWatchOptions",
-    "tsc/internal/tsoptions/parsinghelpers.go:567-594, the watch half of the option-parser \
-     family, reached through watchOptionsParser.ParseOption and convertMapToOptions",
-    "pub fn parse_watch_options(key: &[u8], value: &ConfigValue, options: &mut WatchOptions)",
-    "no Rust home: crates/tsr_core has no WatchOptions type at all, so neither the parser nor the \
-     struct it fills exists (absent)",
-);
-const PARSE_BUILD_OPTIONS: Gap = (
-    "tsc/internal/tsoptions/parsinghelpers.go:ParseBuildOptions",
-    "tsc/internal/tsoptions/parsinghelpers.go:616-642, which resolves the key through BuildNameMap \
-     before the switch, so a short or differently cased build option still lands",
-    "pub fn parse_build_options(key: &[u8], value: &ConfigValue, options: &mut BuildOptions)",
-    "no Rust home: crates/tsr_core has no BuildOptions type; crates/tsr_tsoptions carries the \
-     BUILD_OPTIONS declarations (option_declarations_generated.rs) and nothing that parses into a \
-     build-option struct (absent)",
-);
+
 const CONVERT_OPTION_TO_ABSOLUTE_PATH: Gap = (
     "tsc/internal/tsoptions/parsinghelpers.go:ConvertOptionToAbsolutePath",
     "tsc/internal/tsoptions/parsinghelpers.go:711-738, which resolves the option declaration, \
@@ -1050,8 +1034,37 @@ fn answer(request: &Value) -> Result<Outcome, String> {
                     "errors": Value::Array(vec![]),
                 })))
             }
-            "watch" => Ok(missing(PARSE_WATCH_OPTIONS)),
-            "build" => Ok(missing(PARSE_BUILD_OPTIONS)),
+            "watch" => {
+                let value = decode_value(request.get("value").ok_or("request has no value")?)?;
+                let mut options = tsr_core::WatchOptions::default();
+                tsr_tsoptions::parse_watch_options(text_of(request, "key").as_bytes(), &value, &mut options);
+                Ok(Outcome::Observed(json!({
+                    "watch": [
+                        ["watchInterval", options.interval.map_or_else(|| json!(["null"]), |v| json!(["int",v]))],
+                        ["watchFile", ["int", options.file_kind.0]],
+                        ["watchDirectory", ["int", options.directory_kind.0]],
+                        ["fallbackPolling", ["int", options.fallback_polling.0]],
+                        ["synchronousWatchDirectory", ["tristate", options.sync_watch_dir.0]],
+                        ["excludeDirectories", render_strings(options.exclude_dir.as_ref())],
+                        ["excludeFiles", render_strings(options.exclude_files.as_ref())],
+                    ], "errors": []
+                })))
+            }
+            "build" => {
+                let value = decode_value(request.get("value").ok_or("request has no value")?)?;
+                let mut options = tsr_core::BuildOptions::default();
+                tsr_tsoptions::parse_build_options(text_of(request, "key").as_bytes(), &value, &mut options);
+                Ok(Outcome::Observed(json!({
+                    "build": [
+                        ["clean", ["tristate", options.clean.0]],
+                        ["dry", ["tristate", options.dry.0]],
+                        ["force", ["tristate", options.force.0]],
+                        ["builders", options.builders.map_or_else(|| json!(["null"]), |v| json!(["int",v]))],
+                        ["stopBuildOnErrors", ["tristate", options.stop_build_on_errors.0]],
+                        ["verbose", ["tristate", options.verbose.0]],
+                    ], "errors": []
+                })))
+            }
             other => Err(format!("unknown parse_option target {other:?}")),
         },
         "default_options" => {

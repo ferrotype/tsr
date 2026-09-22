@@ -230,3 +230,47 @@ pub fn parse_compiler_options(key: &[u8], value: &ConfigValue, options: &mut Com
         _ => {}
     }
 }
+
+/// port: tsc/internal/tsoptions/parsinghelpers.go:ParseBuildOptions
+pub fn parse_build_options(key: &[u8], value: &ConfigValue, options: &mut tsr_core::BuildOptions) {
+    if value.is_null() {
+        return;
+    }
+    let key = crate::find_declaration(crate::BUILD_OPTIONS, key, false)
+        .map_or(key, |option| option.name.as_bytes());
+    match key {
+        b"clean" => options.clean = parse_tristate(value),
+        b"dry" => options.dry = parse_tristate(value),
+        b"force" => options.force = parse_tristate(value),
+        b"builders" => options.builders = parse_number(value),
+        b"stopBuildOnErrors" => options.stop_build_on_errors = parse_tristate(value),
+        b"verbose" => options.verbose = parse_tristate(value),
+        _ => {}
+    }
+}
+
+/// port: tsc/internal/tsoptions/parsinghelpers.go:ParseWatchOptions
+pub fn parse_watch_options(key: &[u8], value: &ConfigValue, options: &mut tsr_core::WatchOptions) {
+    // Unlike compiler/build parsing, this accepts canonical names only and
+    // null resets scalar/list fields but leaves enum fields unchanged.
+    let flag = || {
+        let ConfigValue::Enum(value) = value else {
+            panic!("watch option requires a converted enum")
+        };
+        *value
+    };
+    match key {
+        b"watchInterval" => options.interval = parse_number(value),
+        b"watchFile" if !value.is_null() => options.file_kind = tsr_core::WatchFileKind(flag()),
+        b"watchDirectory" if !value.is_null() => {
+            options.directory_kind = tsr_core::WatchDirectoryKind(flag());
+        }
+        b"fallbackPolling" if !value.is_null() => {
+            options.fallback_polling = tsr_core::PollingKind(flag());
+        }
+        b"synchronousWatchDirectory" => options.sync_watch_dir = parse_tristate(value),
+        b"excludeDirectories" => options.exclude_dir = parse_string_array(value),
+        b"excludeFiles" => options.exclude_files = parse_string_array(value),
+        _ => {}
+    }
+}

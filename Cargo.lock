@@ -1165,6 +1165,7 @@ dependencies = [
  "tsr_jsnum",
  "tsr_json",
  "tsr_jsstring",
+ "tsr_locale",
  "tsr_parser",
  "tsr_scanner",
  "tsr_tspath",

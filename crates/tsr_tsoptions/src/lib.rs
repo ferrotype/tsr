@@ -196,6 +196,7 @@ pub fn supported_extensions_with_json(
 #[derive(Clone, Debug)]
 pub struct ParsedCommandLine {
     pub options: CompilerOptions,
+    pub watch_options: Option<tsr_core::WatchOptions>,
     pub root_file_names: Vec<JsString>,
     pub config_file: Option<std::sync::Arc<TsConfigSourceFile>>,
     pub errors: Vec<tsr_ast::Diagnostic>,
@@ -234,6 +235,7 @@ impl ParsedCommandLine {
     pub fn new(options: CompilerOptions, root_file_names: Vec<JsString>) -> Self {
         Self {
             options,
+            watch_options: None,
             root_file_names,
             config_file: None,
             errors: Vec::new(),
@@ -266,8 +268,8 @@ pub use option_declarations::{
 };
 mod parse_options;
 pub use parse_options::{
-    parse_compiler_options, parse_number, parse_string, parse_string_array, parse_string_map,
-    parse_tristate,
+    parse_build_options, parse_compiler_options, parse_number, parse_string, parse_string_array,
+    parse_string_map, parse_tristate, parse_watch_options,
 };
 mod convert_options;
 pub use convert_options::{
@@ -316,3 +318,8 @@ pub use wildcard_directories::{
 };
 
 pub use config_parse::{parse_json_config_file_content, type_acquisition_from_json};
+
+mod command_line;
+pub use command_line::{
+    input_option_name, parse_build_command_line, parse_command_line, ParsedBuildCommandLine,
+};
