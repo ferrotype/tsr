@@ -1,0 +1,131 @@
+{
+  "counts": {
+    "binder_cases": 12829,
+    "binder_requests": 22343,
+    "extracted_units": 17264,
+    "libraries": 108,
+    "option_variants": 15206,
+    "physical_cases": 12721,
+    "primary_requests": 22343,
+    "primary_rows": 12829,
+    "script_kinds": {
+      "0": 29,
+      "1": 1360,
+      "2": 16,
+      "3": 14746,
+      "4": 472,
+      "6": 641
+    },
+    "supplemental_by_group": {
+      "ast_runtime": 56,
+      "codec": 23,
+      "decoder": 25,
+      "depth": 10,
+      "encoder": 6,
+      "parser_regression": 15
+    },
+    "supplemental_requests": 135,
+    "units_by_eligibility": {
+      "ancillary_asset": 8,
+      "direct_parser": 17235,
+      "mapper_native_asset": 21
+    },
+    "variant_inputs_by_route": {
+      "initial_config_direct": 160,
+      "virtual_file": 22075
+    },
+    "variants_by_option_outcome": {
+      "accepted": 15167,
+      "rejected": 39
+    },
+    "variants_by_subset_disposition": {
+      "eligible": 10728,
+      "excluded": 4478
+    }
+  },
+  "eligibility_filters": {
+    "e2_subset": "data/s07/subset.json excludes 4478 of 15206 variants from the E2 checker subset by checker-syntax features. That filter decides which variants the E2 CHECKER capture loads; it does not reach a parser or binder request, which is checked here: the E1 and binder request sets are identical and include every variant input of every excluded variant."
+  },
+  "evidence": [
+    {
+      "artifact": "status/evidence/79c4514b84217208c97c6f02053dd215f7c941dd1a139d25c362bdf4334b2ea2.json",
+      "current": false,
+      "exit_code": 0,
+      "observes": "parse, node_index_before, encode_source_file and node_index_after over every primary request: exact encoded AST bytes, the node table, SourceFile state and all parse-time diagnostics. It does not bind.",
+      "producer": "e1",
+      "recorded_at": 1789831336,
+      "revision": "098941fd9e7a723bc606748bc85de5ad06d910c3",
+      "state": "stale: source, pin, command or inputs changed"
+    },
+    {
+      "artifact": "status/evidence/14b49da69e6c1cc5b0a9a9778ffd14dbf7c6c606d33371c6a91267b74f4aa38f.json",
+      "current": false,
+      "exit_code": 0,
+      "observes": "parse, bind and repeat_bind over every primary request, comparing the parsed, bound and repeated graphs record by record.",
+      "producer": "binder",
+      "recorded_at": 1789832855,
+      "revision": "098941fd9e7a723bc606748bc85de5ad06d910c3",
+      "state": "stale: source, pin, command or inputs changed"
+    }
+  ],
+  "expected": {
+    "explicit_cwd_cases": 50,
+    "extracted_bytes": 7528194,
+    "extracted_units": 17264,
+    "libraries": 108,
+    "library_bytes": 3785075,
+    "multiunit_cases": 2078,
+    "physical_cases": 12721,
+    "primary_rows": 12829,
+    "script_kinds": {
+      "0": 29,
+      "1": 1360,
+      "2": 16,
+      "3": 14746,
+      "4": 472,
+      "6": 641
+    },
+    "symlink_cases": 25
+  },
+  "non_parser_units": [
+    {
+      "boundary": "a non-source file (for example a .tsbuildinfo) whose upstream script kind is Unknown; the harness retains it without coercing it into a parse",
+      "kind": "ancillary_asset",
+      "units": 8
+    },
+    {
+      "boundary": "content-mapper input: the external transformation that turns it into TypeScript is the named Phase 5 content-mapper boundary",
+      "kind": "mapper_native_asset",
+      "units": 21
+    }
+  ],
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "purpose": "Plan task 1: every primary and expanded request of the parser/binder corpus, accounted for against the manifests that already own it. This file points at those manifests by digest instead of copying them; `phase1.py inventory --check` re-derives every count from them and from the pin.",
+  "sources": {
+    "binder_cases": {
+      "path": "data/s07/binder-cases.json",
+      "sha256": "9a48291e68e617a24dcc3f2cd525f0e3bb8630bedf8c4ddbd7154d22fa8b778f"
+    },
+    "binder_requests": {
+      "path": "data/s07/binder-requests.json",
+      "sha256": "74815ff061c993101335f5b88868a6de3c98f35c68d7b2979a7685a3cf6e2426"
+    },
+    "corpus": {
+      "path": "data/s06/corpus.json",
+      "sha256": "5386361c453bc8f368ea9d0d282a42ad983092fedbd76bfe61c98361ce442a91"
+    },
+    "fixtures": {
+      "path": "data/s06/fixtures.json",
+      "sha256": "74269001e6fa84cc79a3765713151817d07b2de6a94e330176bf9a1df117afc3"
+    },
+    "requests": {
+      "path": "data/s06/requests.json",
+      "sha256": "a7107898501fb9bf885c23f403f9bf3c5e242b25e38606fc14d82ffa77b6fe13"
+    },
+    "subset": {
+      "path": "data/s07/subset.json",
+      "sha256": "8539ce8af2f0cd5245554114e8d257805fe266e46fcabbb4ac220d5bcd2c4f2a"
+    }
+  },
+  "version": 1
+}
