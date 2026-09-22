@@ -132,16 +132,9 @@ pub(super) fn conditions(values: &[JsString]) -> Vec<u8> {
     output
 }
 pub(super) fn package_id(package: &crate::PackageId) -> Vec<u8> {
-    let mut output = package.name.as_bytes().to_vec();
-    if !package.sub_module_name.is_empty() {
-        output.push(b'/');
-        output.extend_from_slice(package.sub_module_name.as_bytes());
-    }
-    output.push(b'@');
-    output.extend_from_slice(package.version.as_bytes());
-    output.extend_from_slice(package.peer_dependencies.as_bytes());
-    output
+    package.text().as_bytes().to_vec()
 }
+
 impl crate::Resolver {
     // A source tracer belongs to one call. If its caller recovers a native
     // panic, later metadata reads must not append into that abandoned call.

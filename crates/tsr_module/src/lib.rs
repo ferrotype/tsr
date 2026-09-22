@@ -27,3 +27,9 @@ pub use trace::{DiagAndArgs, TraceArg};
 
 mod config_mapper;
 pub use config_mapper::resolve_content_mapper_manifest;
+
+mod util;
+pub use paths::ParsedPatterns;
+pub use util::{
+    package_name_from_types_package_name, parse_node_module_from_path, unmangle_scoped_package_name,
+};

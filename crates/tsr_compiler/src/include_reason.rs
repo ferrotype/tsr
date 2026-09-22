@@ -678,15 +678,7 @@ fn file_name_for(program: &Program, file_name: &[u8], relative: bool) -> JsStrin
 }
 /// port: tsc/internal/module/types.go:PackageId.String
 fn package_id_text(package: &PackageId) -> JsString {
-    let mut result = package.name.as_bytes().to_vec();
-    if !package.sub_module_name.is_empty() {
-        result.push(b'/');
-        result.extend_from_slice(package.sub_module_name.as_bytes());
-    }
-    result.push(b'@');
-    result.extend_from_slice(package.version.as_bytes());
-    result.extend_from_slice(package.peer_dependencies.as_bytes());
-    JsString::from_bytes(result)
+    package.text()
 }
 // Stringer always returns a nonempty string, including open enum values.
 fn script_target_text(target: ScriptTarget) -> JsString {

@@ -5,6 +5,36 @@ use tsr_core::pattern::Pattern;
 use tsr_diagnostics as diagnostics;
 use tsr_jsstring::JsString;
 use tsr_tspath as path;
+/// Exact keys and patterns are parsed once for an immutable options map.
+#[derive(Debug, Default)]
+pub struct ParsedPatterns {
+    exact: std::collections::BTreeSet<Vec<u8>>,
+    patterns: Vec<Pattern>,
+}
+impl ParsedPatterns {
+    /// port: tsc/internal/module/resolver.go:TryParsePatterns
+    pub fn new(paths: &tsr_core::PathMappings) -> Self {
+        let mut result = Self::default();
+        for (key, _) in paths {
+            let pattern = Pattern::parse(key.as_bytes());
+            if pattern.is_valid() {
+                if pattern.star_index == -1 {
+                    result.exact.insert(key.as_bytes().to_vec());
+                } else {
+                    result.patterns.push(pattern);
+                }
+            }
+        }
+        result
+    }
+    /// port: tsc/internal/module/resolver.go:MatchPatternOrExact
+    pub fn match_pattern_or_exact(&self, candidate: &[u8]) -> Pattern {
+        if self.exact.contains(candidate) {
+            return Pattern::parse(candidate);
+        }
+        tsr_core::pattern::find_best_pattern_match(&self.patterns, Clone::clone, candidate)
+    }
+}
 impl Resolver {
     // resolver.go:tryLoadModuleUsingOptionalResolutionSettings. This pin has no
     // standalone baseUrl lookup; GetPathsBasePath only uses pathsBasePath/cwd.
@@ -52,11 +82,15 @@ impl Resolver {
         extensions: u8,
         esm: bool,
     ) -> Result<Option<ResolvedModule>, Error> {
-        self.paths_using(
+        let pattern = self
+            .option_patterns
+            .get_or_init(|| ParsedPatterns::new(paths))
+            .match_pattern_or_exact(name);
+        self.load_paths(
             name,
             base,
             paths,
-            extensions,
+            (extensions, pattern),
             |resolver, ext, candidate, from_config| {
                 resolver.relative(ext, candidate, esm, true, from_config)
             },
@@ -68,27 +102,26 @@ impl Resolver {
         base: &[u8],
         paths: &tsr_core::PathMappings,
         extensions: u8,
+        loader: impl FnMut(&mut Self, u8, &[u8], bool) -> Result<Option<ResolvedModule>, Error>,
+    ) -> Result<Option<ResolvedModule>, Error> {
+        let pattern = ParsedPatterns::new(paths).match_pattern_or_exact(name);
+        self.load_paths(name, base, paths, (extensions, pattern), loader)
+    }
+    fn load_paths(
+        &mut self,
+        name: &[u8],
+        base: &[u8],
+        paths: &tsr_core::PathMappings,
+        selection: (u8, Pattern),
         mut loader: impl FnMut(&mut Self, u8, &[u8], bool) -> Result<Option<ResolvedModule>, Error>,
     ) -> Result<Option<ResolvedModule>, Error> {
-        let mut best = None;
-        let mut longest = -1;
-        for (key, substitutions) in paths {
-            let pattern = Pattern::parse(key.as_bytes());
-            if !pattern.is_valid() {
-                continue;
-            }
-            if pattern.star_index == -1 && pattern.matches(name) {
-                best = Some((substitutions, pattern));
-                break;
-            }
-            if pattern.star_index > longest && pattern.matches(name) {
-                longest = pattern.star_index;
-                best = Some((substitutions, pattern));
-            }
-        }
-        let Some((substitutions, pattern)) = best else {
+        let (extensions, pattern) = selection;
+        if !pattern.is_valid() {
             return Ok(None);
-        };
+        }
+        let substitutions = paths
+            .get(&JsString::from_bytes(pattern.text.as_ref()))
+            .expect("pattern is a key in the supplied mappings");
         trace!(
             self,
             diagnostics::Module_name_0_matched_pattern_1,

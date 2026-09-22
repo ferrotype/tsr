@@ -2162,3 +2162,17 @@ and the newly implemented version-trace case match; all five module unit tests
 and focused clippy pass. The remaining resolver differences involve native
 failure behavior, not these successful-resolution paths. Inventory recording
 remains deferred to the final F3b batch.
+
+### F3b continuation: shared resolver helpers
+
+Package-name unmangling, node_modules path extraction and byte-preserving package
+identity rendering now have shared production homes; the checker and compiler
+reuse them. Compiler `paths` patterns are parsed lazily once for the resolver's
+immutable options and preserve exact-match precedence and insertion-order ties.
+The direct helper traces now run through those APIs. The native trailer-pattern
+case includes overlapping ends that panic during slicing; the Rust branch now
+preserves that bounds failure rather than silently returning unresolved. The
+adapter records the same distinct index/slice bounds classes per action and
+rejects unrelated panics. All 49 implemented module traces match; eight remain
+unimplemented and two retain visible failure-contract differences. Both path
+mapping regressions and focused clippy pass.

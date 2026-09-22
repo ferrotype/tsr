@@ -66,58 +66,6 @@ const CASE_PREFIX: &str = "config/module/";
 /// and rejected, so the record cannot be mistaken for "nobody looked".
 const MISSING: &[(&str, &str, &str, &str)] = &[
     (
-        "tsc/internal/module/util.go:UnmangleScopedPackageName",
-        "tsc/internal/module/util.go:69-75, the inverse of MangleScopedPackageName; its only pinned \
-         caller is GetPackageNameFromTypesPackageName (util.go:81-87)",
-        "pub fn unmangle_scoped_package_name(name: &[u8]) -> Vec<u8>, cutting at the FIRST `__` \
-         and re-adding `@` and `/` unconditionally. The only Rust code that performs the \
-         operation is three inlined lines inside \
-         crates/tsr_checker/src/module_specifiers_packages.rs:80-84, which is not callable as an \
-         operation and is not in tsr_module",
-        "crates/tsr_module/src/resolver.rs (absent; mangle_scoped_package_name at :860 has no \
-         inverse, and scope.json's rust_home for this row points at tsr_module, which is wrong)",
-    ),
-    (
-        "tsc/internal/module/util.go:ParseNodeModuleFromPath",
-        "tsc/internal/module/util.go:28-41, whose nine-row contract the pinned \
-         TestParseNodeModuleFromPath (resolver_test.go:301-330) fixes",
-        "pub fn parse_node_module_from_path(resolved: &[u8], is_folder: bool) -> Vec<u8>, \
-         normalizing first, cutting at the LAST `/node_modules/`, and advancing past the package \
-         name with the pin's moveToNextDirectorySeparatorIfAvailable, which for is_folder=false \
-         and no following separator returns the PREVIOUS separator index \
-         (resolver.go:1971-1984). crates/tsr_module/src/type_references.rs:467-472 \
-         (`node_module_directory`) was read and rejected: it is private, it has no is_folder \
-         parameter at all, and it uses parse_package_name so it always INCLUDES the package name",
-        "crates/tsr_module/src/type_references.rs:467 (present but not a counterpart and not \
-         callable)",
-    ),
-    (
-        "tsc/internal/module/types.go:PackageId.String",
-        "tsc/internal/module/types.go:54-56 with PackageName at :58-63, rendered into the \
-         Module_name_0_was_successfully_resolved_to_1_with_Package_ID_2 argument at \
-         resolver.go:313",
-        "impl Display for PackageId, or a public package_id(id: &PackageId) -> Vec<u8>, rendering \
-         `name[/subModuleName]@version` with the peerDependencies suffix appended raw. \
-         crates/tsr_module/src/trace.rs:134-144 is a correct transcription but is pub(super), so \
-         the rendering is reachable only as a trace argument; \
-         crates/tsr_compiler/src/include_reason.rs carries a second, independent copy, which is \
-         itself a divergence risk",
-        "crates/tsr_module/src/resolver.rs:29 (PackageId has no Display and no public renderer)",
-    ),
-    (
-        "tsc/internal/module/resolver.go:TryParsePatterns",
-        "tsc/internal/module/resolver.go:1995-2032 with MatchPatternOrExact at :2034-2045 and the \
-         ParsedPatterns type at :1986-1989",
-        "pub struct ParsedPatterns { matchable: HashSet<JsString>, patterns: Vec<Pattern> } with \
-         pub fn try_parse_patterns(mappings: &PathMappings) -> ParsedPatterns and pub fn \
-         match_pattern_or_exact(patterns: &ParsedPatterns, candidate: &[u8]) -> Pattern, so an \
-         exact key answers with StarIndex -1 and an empty MatchedText without consulting the \
-         pattern list. crates/tsr_module/src/paths.rs:75-88 was read and rejected: it re-parses \
-         every key on every call and selects inline, so there is no ParsedPatterns value to ask, \
-         and the pin's parsedPatternsCache (cache.go:50-60) has nothing to key on",
-        "crates/tsr_module/src/paths.rs:75 (behaviour inlined; no type, no entry point, no cache)",
-    ),
-    (
         "tsc/internal/module/resolver.go:resolutionState.getPackageJsonInfo",
         "tsc/internal/module/resolver.go:1764-1809, whose negative entry is written at :1804-1808 \
          and short-circuited at :1766-1779",
@@ -544,12 +492,7 @@ fn apply(state: &mut State, action: &Value, row: &mut Map<String, Value>) -> Res
         | "resolve_with_redirect"
         | "compiler_options_with_redirect"
         | "entrypoints"
-        | "package_json_cache_entries"
-        | "unmangle_scoped"
-        | "package_name_from_types_package_name"
-        | "parse_node_module_from_path"
-        | "package_id_string"
-        | "parsed_patterns" => Ok(Step::Unreachable),
+        | "package_json_cache_entries" => Ok(Step::Unreachable),
 
         "resolve" => {
             let resolver = state
@@ -668,6 +611,88 @@ fn apply(state: &mut State, action: &Value, row: &mut Map<String, Value>) -> Res
                         .collect(),
                 ),
             );
+            Ok(Step::Done)
+        }
+        "unmangle_scoped" | "package_name_from_types_package_name" => {
+            let convert = if api::action_op(action) == "unmangle_scoped" {
+                tsr_module::unmangle_scoped_package_name
+            } else {
+                tsr_module::package_name_from_types_package_name
+            };
+            row.insert(
+                "names".into(),
+                json!(strings(action, "names")?
+                    .iter()
+                    .map(|name| json!([hex(name), hex(&convert(name))]))
+                    .collect::<Vec<_>>()),
+            );
+            Ok(Step::Done)
+        }
+        "parse_node_module_from_path" => {
+            let values = list(action, "inputs")?
+                .iter()
+                .map(|input| {
+                    let path = text(input, "path")?;
+                    let folder = flag(input, "is_folder")?;
+                    Ok(json!([
+                        hex(path.as_bytes()),
+                        folder,
+                        hex(&tsr_module::parse_node_module_from_path(
+                            path.as_bytes(),
+                            folder
+                        ))
+                    ]))
+                })
+                .collect::<Result<Vec<_>, Bad>>()?;
+            row.insert("inputs".into(), json!(values));
+            Ok(Step::Done)
+        }
+        "package_id_string" => {
+            let values = list(action, "package_ids")?
+                .iter()
+                .map(|spec| {
+                    let id = PackageId {
+                        name: JsString::from_bytes(text(spec, "name")?.as_bytes()),
+                        sub_module_name: JsString::from_bytes(
+                            text(spec, "sub_module_name")?.as_bytes(),
+                        ),
+                        version: JsString::from_bytes(text(spec, "version")?.as_bytes()),
+                        peer_dependencies: JsString::from_bytes(
+                            text(spec, "peer_dependencies")?.as_bytes(),
+                        ),
+                    };
+                    Ok(json!([
+                        hex(id.package_name().as_bytes()),
+                        hex(id.text().as_bytes())
+                    ]))
+                })
+                .collect::<Result<Vec<_>, Bad>>()?;
+            row.insert("package_ids".into(), json!(values));
+            Ok(Step::Done)
+        }
+        "parsed_patterns" => {
+            let input = json!({"paths":field(action, "paths")?});
+            let mappings = options(&input)?.paths.unwrap_or_default();
+            let patterns = tsr_module::ParsedPatterns::new(&mappings);
+            let values: Vec<_> = strings(action, "candidates")?
+                .iter()
+                .map(|candidate| {
+                    let matched = patterns.match_pattern_or_exact(candidate);
+                    let inner = if matched.is_valid() {
+                        matched.matched_text(candidate)
+                    } else {
+                        b""
+                    };
+                    json!([
+                        hex(candidate),
+                        matched.is_valid(),
+                        hex(&matched.text),
+                        matched.star_index,
+                        hex(inner)
+                    ])
+                })
+                .collect();
+            row.insert("candidates".into(), json!(values));
             Ok(Step::Done)
         }
         "mangle_scoped" => {
@@ -789,7 +814,37 @@ pub fn observe(request: &Value) -> Option<Outcome> {
             "op".into(),
             Value::String(api::action_op(action).to_owned()),
         );
-        match apply(&mut state, action, &mut row) {
+        // Match native per-action recovery. Only known runtime bounds classes
+        // are canonicalized; unrelated panics remain harness failures.
+        let applied = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+            apply(&mut state, action, &mut row)
+        }));
+        let applied = match applied {
+            Ok(result) => result,
+            Err(payload) => {
+                let message = payload
+                    .downcast_ref::<String>()
+                    .map(String::as_str)
+                    .or_else(|| payload.downcast_ref::<&str>().copied())
+                    .unwrap_or("non-string panic");
+                let class = if message.starts_with("index out of bounds:") {
+                    "runtime: index out of range"
+                } else if message.starts_with("slice index starts at ")
+                    || message.starts_with("range start index ")
+                    || message.starts_with("range end index ")
+                {
+                    "runtime: slice bounds out of range"
+                } else {
+                    return Some(Outcome::Failed(format!("unexpected panic: {message}")));
+                };
+                row = Map::from_iter([
+                    ("op".into(), json!(api::action_op(action))),
+                    ("panic".into(), json!(class)),
+                ]);
+                Ok(Step::Done)
+            }
+        };
+        match applied {
             Ok(Step::Done) => rows.push(Value::Object(row)),
             // The first action the port cannot run decides the whole case: a
             // partial trace would be a comparison against a shorter run, not a

@@ -195,10 +195,9 @@ impl Resolver {
             if let Some(star) = pattern.iter().position(|&c| c == b'*') {
                 let prefix = &pattern[..star];
                 let suffix = &pattern[star + 1..];
-                if name.len() >= prefix.len() + suffix.len()
-                    && name.starts_with(prefix)
-                    && name.ends_with(suffix)
-                {
+                // matchesPatternWithTrailer checks the two ends independently.
+                // Overlapping matches preserve the pin's bounds failure below.
+                if name.starts_with(prefix) && name.ends_with(suffix) {
                     return self.map_target(
                         ext,
                         scope,

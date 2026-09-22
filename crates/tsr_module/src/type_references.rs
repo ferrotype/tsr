@@ -471,8 +471,6 @@ impl Resolver {
 }
 
 fn node_module_directory(file: &[u8]) -> Option<Vec<u8>> {
-    let start = file.windows(14).rposition(|w| w == b"/node_modules/")? + 14;
-    let rest = &file[start..];
-    let (package, _) = crate::resolver::parse_package_name(rest);
-    Some(file[..start + package.len()].to_vec())
+    let directory = crate::parse_node_module_from_path(file, false);
+    (!directory.is_empty()).then_some(directory)
 }

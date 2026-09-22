@@ -72,17 +72,8 @@ fn node_module_parts(file: &[u8]) -> Option<Parts> {
     }
     (state > 1).then_some(result)
 }
-// port: tsc/internal/module/util.go:GetPackageNameFromTypesPackageName
-fn package_name(file: &[u8]) -> Vec<u8> {
-    let Some(name) = file.strip_prefix(b"@types/") else {
-        return file.to_vec();
-    };
-    if let Some(split) = name.windows(2).position(|bytes| bytes == b"__") {
-        [b"@".as_slice(), &name[..split], b"/", &name[split + 2..]].concat()
-    } else {
-        name.to_vec()
-    }
-}
+use tsr_module::package_name_from_types_package_name as package_name;
+
 fn matching(key: &[u8]) -> Matching {
     if key.ends_with(b"/") {
         Matching::Directory
