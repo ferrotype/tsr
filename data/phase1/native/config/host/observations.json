@@ -1879,6 +1879,18 @@
       "result": "native_unavailable"
     },
     {
+      "case": "config/json/references-invalid-element-diagnosed-twice",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
+      "case": "config/json/references-non-array-diagnosed-twice",
+      "operation": "tsoptions.configParse",
+      "reason": "operation is not served by the parse-config host probe",
+      "result": "native_unavailable"
+    },
+    {
       "case": "config/namemap/build-map",
       "operation": "tsoptions.configParse",
       "reason": "operation is not served by the parse-config host probe",
@@ -3187,6 +3199,6 @@
       "result": "native_unavailable"
     }
   ],
-  "request_sha256": "32c3bfd8461fa06c0ec2dd838256eb681bb6aa3daf4dd923d07992c4acab0eb2",
+  "request_sha256": "addc8ee3b7be0629eb17e770ce758d992485be126db26a724cf14c9f1431cdde",
   "version": 1
 }

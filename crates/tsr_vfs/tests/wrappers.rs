@@ -4,13 +4,11 @@ use std::sync::{
 };
 use tsr_vfs::{
     cached::CachedFs,
-    recording::{Operation, RecordingFs},
-    tracking::TrackingFs,
     wrapped::{Replacements, WrappedFs},
-    FileContent, FileSystem, MemoryBuilder, ReadResult, WalkControl,
+    FileSystem, MemoryBuilder,
 };
 #[test]
-fn callbacks_reenter_without_holding_record_or_cache_locks() {
+fn callbacks_reenter_without_holding_cache_locks() {
     let calls = Arc::new(AtomicUsize::new(0));
     let slot = Arc::new(Mutex::new(None::<std::sync::Weak<CachedFs>>));
     let (calls2, slot2) = (calls.clone(), slot.clone());
@@ -39,7 +37,34 @@ fn callbacks_reenter_without_holding_record_or_cache_locks() {
     assert_eq!(calls.load(Ordering::SeqCst), 4);
 }
 #[test]
+fn borrowed_walk_can_reenter_wrapped_and_tracking_hosts() {
+    use tsr_vfs::{tracking::TrackingFs, WalkControl};
+    let mut base = MemoryBuilder::new(b"/", true);
+    base.insert_loaded(b"/a", b"a".to_vec());
+    let base = Arc::new(base.finish());
+    let wrapped = Arc::new(WrappedFs::new(base.clone(), Replacements::forwarding(base)));
+    let tracking = TrackingFs::new(Arc::new(CachedFs::new(wrapped)));
+    let mut seen = Vec::new();
+    tracking
+        .walk_dir(b"/", &mut |path, entry, error| {
+            assert!(error.is_none());
+            if entry.is_some_and(|entry| !entry.info.directory) {
+                assert!(tracking.file_exists(path).unwrap());
+                seen.push(path.to_vec());
+            }
+            Ok(WalkControl::Continue)
+        })
+        .unwrap();
+    assert_eq!(seen, [b"/a".to_vec()]);
+}
+#[cfg(feature = "harness")]
+#[test]
 fn wrappers_preserve_unsuccessful_read_bytes_and_retained_callbacks() {
+    use tsr_vfs::{
+        recording::{Operation, RecordingFs},
+        tracking::TrackingFs,
+        FileContent, ReadResult, WalkControl,
+    };
     let mut base = MemoryBuilder::new(b"/", true);
     base.insert_loaded(b"/a", b"a".to_vec());
     let base = Arc::new(base.finish());

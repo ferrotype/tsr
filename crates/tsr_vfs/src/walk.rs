@@ -98,6 +98,7 @@ pub(crate) fn walk<F: FileSystem + ?Sized>(
 
 /// An explicitly retained callback. Unlike a borrowed visitor, this may be
 /// kept by a recorder after traversal; captures must own their dependencies.
+#[cfg(feature = "harness")]
 pub type OwnedWalkCallback = std::sync::Arc<
     dyn Fn(&[u8], Option<&WalkEntry>, Option<Error>) -> Result<WalkControl, Error> + Send + Sync,
 >;

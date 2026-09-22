@@ -2092,6 +2092,64 @@
       "result": "observed"
     },
     {
+      "case": "config/json/references-invalid-element-diagnosed-twice",
+      "observation": {
+        "errors": [
+          {
+            "args": [
+              "references",
+              "object"
+            ],
+            "code": 5024,
+            "end": -1,
+            "has_file": false,
+            "pos": -1
+          },
+          {
+            "args": [
+              "references",
+              "object"
+            ],
+            "code": 5024,
+            "end": -1,
+            "has_file": false,
+            "pos": -1
+          }
+        ]
+      },
+      "operation": "tsoptions.configParse",
+      "result": "observed"
+    },
+    {
+      "case": "config/json/references-non-array-diagnosed-twice",
+      "observation": {
+        "errors": [
+          {
+            "args": [
+              "references",
+              "Array"
+            ],
+            "code": 5024,
+            "end": -1,
+            "has_file": false,
+            "pos": -1
+          },
+          {
+            "args": [
+              "references",
+              "Array"
+            ],
+            "code": 5024,
+            "end": -1,
+            "has_file": false,
+            "pos": -1
+          }
+        ]
+      },
+      "operation": "tsoptions.configParse",
+      "result": "observed"
+    },
+    {
       "case": "config/namemap/build-map",
       "observation": {
         "keys": [
@@ -5561,6 +5619,6 @@
       "result": "native_unavailable"
     }
   ],
-  "request_sha256": "32c3bfd8461fa06c0ec2dd838256eb681bb6aa3daf4dd923d07992c4acab0eb2",
+  "request_sha256": "addc8ee3b7be0629eb17e770ce758d992485be126db26a724cf14c9f1431cdde",
   "version": 1
 }

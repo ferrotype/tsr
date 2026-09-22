@@ -35978,7 +35978,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_tsoptions/src/config_parse.rs",
-          "line": 722
+          "line": 724
         }
       ],
       "source_sha256": "47336cbf405f93504b6d51e867ea75b3cebd48db044d511a15b61f183c4ba5a0",
@@ -36129,7 +36129,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_tsoptions/src/config_parse.rs",
-          "line": 893
+          "line": 895
         }
       ],
       "source_sha256": "47336cbf405f93504b6d51e867ea75b3cebd48db044d511a15b61f183c4ba5a0",
@@ -36414,7 +36414,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_tsoptions/src/config_parse.rs",
-          "line": 834
+          "line": 836
         }
       ],
       "source_sha256": "47336cbf405f93504b6d51e867ea75b3cebd48db044d511a15b61f183c4ba5a0",

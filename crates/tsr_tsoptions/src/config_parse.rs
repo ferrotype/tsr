@@ -657,7 +657,9 @@ fn specs(parsed: &mut Parsed, base: &[u8], name: &[u8]) -> ConfigFileSpecs {
     }
 }
 fn references(parsed: &mut Parsed, base: &[u8]) -> Option<Vec<ProjectReference>> {
-    let values = raw_array(&parsed.raw, b"references")?;
+    // The raw API validates twice at the pin: once in specs, then here.
+    // Preserve both diagnostics (the source-file API validates its AST instead).
+    let values = validated_raw_array(parsed, b"references", "object")?;
     let mut result = Vec::new();
     for (index, value) in values.iter().enumerate() {
         if value.as_object().is_none() {

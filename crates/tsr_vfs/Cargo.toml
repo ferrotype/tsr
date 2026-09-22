@@ -12,6 +12,11 @@ categories.workspace = true
 readme = "README.md"
 include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/licenses/**"]
 
+[features]
+default = []
+# Test-harness recording and retained callback compatibility; not a host API.
+harness = []
+
 [dependencies]
 tsr_core = { version = "0.1.0", path = "../tsr_core" }
 tsr_tspath = { version = "0.1.0", path = "../tsr_tspath" }

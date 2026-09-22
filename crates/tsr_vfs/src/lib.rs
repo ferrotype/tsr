@@ -11,6 +11,7 @@ mod io_adapter;
 pub mod iofs;
 pub mod iovfs;
 pub mod os;
+#[cfg(feature = "harness")]
 pub mod recording;
 pub mod tracking;
 pub mod vfstest;
@@ -18,7 +19,9 @@ mod walk;
 pub mod wrapped;
 use tsr_jsstring::{JsString, SourceText};
 use tsr_tspath as path;
-pub use walk::{OwnedWalkCallback, WalkCallback, WalkControl, WalkEntry};
+#[cfg(feature = "harness")]
+pub use walk::OwnedWalkCallback;
+pub use walk::{WalkCallback, WalkControl, WalkEntry};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Error {
@@ -156,7 +159,8 @@ pub trait FileSystem: Send + Sync {
     fn walk_dir(&self, root: &[u8], visit: &mut WalkCallback<'_>) -> Result<(), Error> {
         walk::walk(self, root, visit)
     }
-    /// Retaining adapters override this; ordinary hosts use the same walk.
+    /// Harness-only retained visitor; production hosts expose a borrowed walk.
+    #[cfg(feature = "harness")]
     fn walk_dir_owned(&self, root: &[u8], visit: OwnedWalkCallback) -> Result<(), Error> {
         self.walk_dir(root, &mut |path, entry, error| visit(path, entry, error))
     }

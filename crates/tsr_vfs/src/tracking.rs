@@ -20,6 +20,7 @@ impl TrackingFs {
     }
 }
 impl FileSystem for TrackingFs {
+    #[cfg(feature = "harness")]
     fn walk_dir_owned(&self, path: &[u8], visit: crate::OwnedWalkCallback) -> Result<(), Error> {
         self.seen_files.insert(JsString::from_bytes(path));
         let seen = self.seen_files.clone();

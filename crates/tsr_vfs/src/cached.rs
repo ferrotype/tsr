@@ -72,6 +72,7 @@ impl CachedFs {
     }
 }
 impl FileSystem for CachedFs {
+    #[cfg(feature = "harness")]
     fn walk_dir_owned(&self, path: &[u8], visit: crate::OwnedWalkCallback) -> Result<(), Error> {
         self.inner.walk_dir_owned(path, visit)
     }

@@ -1,28 +1,11 @@
 //! The config-parsing group: `internal/tsoptions/tsconfigparsing.go`,
 //! `parsinghelpers.go` and `wildcarddirectories.go`.
 //!
-//! `crates/tsr_tsoptions` carries a real port of the jsonSourceFile config
-//! path -- `parse_json_source_file_config_file_content` (config_parse.rs:691)
-//! down through `own_config`, `parse_config`, `specs`, `references`,
-//! `convert_json_option`, `file_names_from_specs` and the content-mapper
-//! validator -- so most of this group OBSERVES rather than reports a gap. What
-//! it reports as missing is reported as missing for a reason it can name, and
-//! it never emulates a pinned algorithm to make a comparison run:
-//!
-//!   * the whole JSON (non-source-file) API. `ParseJsonConfigFileContent`,
-//!     `parseOwnConfigOfJson`, `convertToObject` and `normalizeJsonValue` have
-//!     no counterpart: the Rust parse only accepts a parsed source file.
-//!   * the extended-config CACHE. `ExtendedConfigCache`, `getExtendedConfig`
-//!     and `ParseExtendedConfig` are one seam in the pin; the Rust
-//!     `parse_config` reads and parses each extended config inline
-//!     (config_parse.rs:440-509) with nothing to hand a cache to.
-//!   * `ParseWatchOptions`, `ParseBuildOptions`, `ConvertOptionToAbsolutePath`
-//!     and `convertToOptionsWithAbsolutePaths`: `core::WatchOptions` and
-//!     `core::BuildOptions` have no Rust type at all.
-//!   * `getWildcardDirectories` and its two helpers: absent from every crate.
-//!   * a handful of operations that ARE implemented but only privately, named
-//!     one by one below with the file:line that implements them, so the gap
-//!     recorded is "no reachable entry point", not "no code".
+//! Both source-file and raw-JSON entry points, including wildcard directory
+//! calculation, execute the production `tsr_tsoptions` port. Remaining gaps
+//! (extended-config caching, watch/build options and private helper entry
+//! points) are reported at the handler that encounters them; this driver
+//! never implements a missing compiler operation.
 
 use crate::api::{subject, Outcome};
 use serde_json::{json, Map, Value};
@@ -1216,5 +1199,34 @@ fn config_specs(request: &Value) -> ConfigFileSpecs {
         files_before_substitution: strings_of(request, "filesBefore"),
         includes_before_substitution: strings_of(request, "includesBefore"),
         is_default_include: flag(request, "isDefaultInclude"),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{observe, Outcome};
+    use serde_json::json;
+
+    #[test]
+    fn raw_references_reports_both_pinned_validation_calls() {
+        // getConfigFileSpecs and getProjectReferences each validate the raw
+        // property at the pin. These cases are also captured from native Go.
+        for (references, required) in [(json!(42), "Array"), (json!([42]), "object")] {
+            let request = json!({
+                "operation": "tsoptions.configParse", "subject": "configParse",
+                "action": "parse_json_api", "currentDirectory": "/project",
+                "configFileName": "/project/tsconfig.json", "caseSensitive": true,
+                "files": {"/project/index.ts": "export {};\n"}, "report": ["errors"],
+                "jsonText": json!({"files": ["index.ts"], "references": references}).to_string()
+            });
+            let Some(Outcome::Observed(result)) = observe(&request) else {
+                panic!("raw config must execute");
+            };
+            let expected = json!({
+                "code": 5024, "args": ["references", required],
+                "pos": -1, "end": -1, "has_file": false
+            });
+            assert_eq!(result["errors"], json!([expected, expected]));
+        }
     }
 }

@@ -4000,6 +4000,38 @@
       ]
     },
     {
+      "expected_contract": "The raw JSON entry point reports the references type error twice, from specs validation and getProjectReferences, in pinned source order.",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/json/references-invalid-element-diagnosed-twice",
+      "last_result": "match",
+      "native_authority": "tools/phase1/config/configparse_probe_test.go with its in-package companion configparse_inpackage_test.go, against the pinned tsoptions package",
+      "operation_actions": {
+        "parse_json_api": [
+          "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
+        ]
+      },
+      "operations": [
+        "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
+      ]
+    },
+    {
+      "expected_contract": "The raw JSON entry point reports the references type error twice, from specs validation and getProjectReferences, in pinned source order.",
+      "family": "config",
+      "host_applicability": "any",
+      "id": "config/json/references-non-array-diagnosed-twice",
+      "last_result": "match",
+      "native_authority": "tools/phase1/config/configparse_probe_test.go with its in-package companion configparse_inpackage_test.go, against the pinned tsoptions package",
+      "operation_actions": {
+        "parse_json_api": [
+          "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
+        ]
+      },
+      "operations": [
+        "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent"
+      ]
+    },
+    {
       "expected_contract": "NewResolverWithOptions takes an EXTERNAL packagejson.InfoCache and, when one is supplied, leaves the rest of the caches zero-valued (resolver.go:180-199). InfoCache.Set is a LoadOrStore that RETURNS the winner (packagejson/cache.go:190-194), so two seeds whose paths canonicalise onto one key -- here through a case-insensitive host -- hand the second caller the FIRST entry, which is the single-threaded form of the contract the pinned TestResolveModuleNameTrailingSlashRace exists for. The seeded negative entry then steers a real resolution, and PackageJsonCacheEntries reports what the resolver accumulated.",
       "family": "config",
       "host_applicability": "any",

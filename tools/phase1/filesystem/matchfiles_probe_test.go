@@ -663,7 +663,11 @@ func TestPhase1FilesystemMatchFiles(t *testing.T) {
 		row["result"] = result
 		switch result {
 		case "observed":
-			row["observation"] = payload
+			// Compiler output is comparable; renderer provenance is authenticated
+			// row metadata and is intentionally not a Rust result.
+			row["observation"] = map[string]any{"rendered": payload["rendered"]}
+			delete(payload, "rendered")
+			row["metadata"] = payload
 		case "native_unavailable":
 			row["reason"] = reason
 			if payload != nil {

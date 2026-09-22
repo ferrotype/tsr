@@ -4,6 +4,7 @@
 mod remove;
 mod snapshot;
 pub use snapshot::ScopedOsFs;
+mod cache_dir;
 mod dir;
 pub mod native;
 use crate::{
@@ -348,19 +349,8 @@ pub fn realpath(name: &[u8]) -> Vec<u8> {
 /// The versioned directory used by automatic type acquisition at this pin.
 /// port: tsc/internal/vfs/osvfs/os.go:GetGlobalTypingsCacheLocation
 pub fn global_typings_cache_location() -> Vec<u8> {
-    let base = if cfg!(windows) {
-        std::env::var_os("LocalAppData").map(std::path::PathBuf::from)
-    } else if cfg!(target_os = "macos") {
-        std::env::var_os("HOME").map(|h| std::path::PathBuf::from(h).join("Library/Caches"))
-    } else {
-        std::env::var_os("XDG_CACHE_HOME")
-            .filter(|v| !v.is_empty())
-            .map(std::path::PathBuf::from)
-            .or_else(|| {
-                std::env::var_os("HOME").map(|h| std::path::PathBuf::from(h).join(".cache"))
-            })
-    };
-    let base = base.unwrap_or_else(std::env::temp_dir);
+    let base =
+        cache_dir::user_cache_dir(|key| std::env::var_os(key)).unwrap_or_else(std::env::temp_dir);
     tsr_tspath::combine(
         &native::bytes(&base),
         &[

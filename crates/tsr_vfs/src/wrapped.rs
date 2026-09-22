@@ -1,9 +1,10 @@
 //! Per-method replacement over a retained filesystem. An arbitrary replacement
 //! may consult mutable state, so this wrapper never advertises snapshot identity.
 use crate::iofs::Time;
+#[cfg(feature = "harness")]
+use crate::OwnedWalkCallback;
 use crate::{
-    Entries, Error, FileContent, FileInfo, FileSystem, OwnedWalkCallback, ReadResult, SnapshotId,
-    WalkCallback,
+    Entries, Error, FileContent, FileInfo, FileSystem, ReadResult, SnapshotId, WalkCallback,
 };
 use std::sync::Arc;
 use tsr_jsstring::JsString;
@@ -20,6 +21,7 @@ pub type EntriesReplacement = Arc<dyn Fn(&[u8]) -> Result<Entries, Error> + Send
 pub type StatReplacement = Arc<dyn Fn(&[u8]) -> Result<Option<FileInfo>, Error> + Send + Sync>;
 pub type WalkDirReplacement =
     Arc<dyn Fn(&[u8], &mut WalkCallback<'_>) -> Result<(), Error> + Send + Sync>;
+#[cfg(feature = "harness")]
 pub type OwnedWalkDirReplacement =
     Arc<dyn Fn(&[u8], OwnedWalkCallback) -> Result<(), Error> + Send + Sync>;
 pub type RealpathReplacement = Arc<dyn Fn(&[u8]) -> Result<JsString, Error> + Send + Sync>;
@@ -40,11 +42,13 @@ pub struct Replacements {
     pub walk_dir: Option<WalkDirReplacement>,
     /// Retention-preserving form of the same operation, used for owned visitors.
     /// Set together with `walk_dir` when a replacement supports retained calls.
+    #[cfg(feature = "harness")]
     pub walk_dir_owned: Option<OwnedWalkDirReplacement>,
     pub realpath: Option<RealpathReplacement>,
 }
 impl Replacements {
     /// Number of source VFS operations with an installed delegate.
+    #[cfg(feature = "harness")]
     pub fn wired_count(&self) -> usize {
         [
             self.use_case_sensitive_file_names.is_some(),
@@ -111,6 +115,7 @@ impl Replacements {
                 let inner = inner.clone();
                 Arc::new(move |path, visit| inner.walk_dir(path, visit))
             }),
+            #[cfg(feature = "harness")]
             walk_dir_owned: Some({
                 let inner = inner.clone();
                 Arc::new(move |path, visit| inner.walk_dir_owned(path, visit))
@@ -133,6 +138,7 @@ impl WrappedFs {
     }
 }
 impl FileSystem for WrappedFs {
+    #[cfg(feature = "harness")]
     fn walk_dir_owned(&self, path: &[u8], visit: OwnedWalkCallback) -> Result<(), Error> {
         if let Some(replace) = &self.replacements.walk_dir_owned {
             replace(path, visit)

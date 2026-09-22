@@ -342,6 +342,38 @@
       "subject": "configParse"
     },
     {
+      "action": "parse_json_api",
+      "case": "config/json/references-invalid-element-diagnosed-twice",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/index.ts": "export {};\n"
+      },
+      "jsonText": "{\"files\":[\"index.ts\"],\"references\":[42]}",
+      "operation": "tsoptions.configParse",
+      "report": [
+        "errors"
+      ],
+      "subject": "configParse"
+    },
+    {
+      "action": "parse_json_api",
+      "case": "config/json/references-non-array-diagnosed-twice",
+      "caseSensitive": true,
+      "configFileName": "/project/tsconfig.json",
+      "currentDirectory": "/project",
+      "files": {
+        "/project/index.ts": "export {};\n"
+      },
+      "jsonText": "{\"files\":[\"index.ts\"],\"references\":42}",
+      "operation": "tsoptions.configParse",
+      "report": [
+        "errors"
+      ],
+      "subject": "configParse"
+    },
+    {
       "action": "option_name_map",
       "case": "config/namemap/build-map",
       "helper": "build_map",

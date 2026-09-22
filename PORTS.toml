@@ -3974,7 +3974,7 @@ loc = 491
 [[file]]
 go = "tsc/internal/nativepath/eintr_unix.go"
 package = "internal/nativepath"
-crate = "tsr_nativepath"
+crate = "tsr_vfs"
 phase = 4
 kind = "source"
 status = "planned"
@@ -3987,7 +3987,7 @@ loc = 14
 [[file]]
 go = "tsc/internal/nativepath/realpath_linux.go"
 package = "internal/nativepath"
-crate = "tsr_nativepath"
+crate = "tsr_vfs"
 phase = 4
 kind = "source"
 status = "in-progress"
@@ -4000,7 +4000,7 @@ loc = 70
 [[file]]
 go = "tsc/internal/nativepath/realpath_other.go"
 package = "internal/nativepath"
-crate = "tsr_nativepath"
+crate = "tsr_vfs"
 phase = 4
 kind = "source"
 status = "in-progress"
@@ -4013,7 +4013,7 @@ loc = 9
 [[file]]
 go = "tsc/internal/nativepath/realpath_windows.go"
 package = "internal/nativepath"
-crate = "tsr_nativepath"
+crate = "tsr_vfs"
 phase = 4
 kind = "out-of-scope"
 status = "out-of-scope"
@@ -4026,7 +4026,7 @@ loc = 100
 [[file]]
 go = "tsc/internal/nativepath/symlink_other.go"
 package = "internal/nativepath"
-crate = "tsr_nativepath"
+crate = "tsr_vfs"
 phase = 4
 kind = "source"
 status = "in-progress"
@@ -4039,7 +4039,7 @@ loc = 10
 [[file]]
 go = "tsc/internal/nativepath/symlink_windows.go"
 package = "internal/nativepath"
-crate = "tsr_nativepath"
+crate = "tsr_vfs"
 phase = 4
 kind = "out-of-scope"
 status = "out-of-scope"
@@ -4065,7 +4065,7 @@ loc = 78
 [[file]]
 go = "tsc/internal/osutil/os_android.go"
 package = "internal/osutil"
-crate = "tsr_core"
+crate = "tsr_vfs"
 phase = 1
 kind = "out-of-scope"
 status = "out-of-scope"
@@ -4078,7 +4078,7 @@ loc = 27
 [[file]]
 go = "tsc/internal/osutil/os_other.go"
 package = "internal/osutil"
-crate = "tsr_core"
+crate = "tsr_vfs"
 phase = 1
 kind = "source"
 status = "in-progress"
@@ -4091,7 +4091,7 @@ loc = 13
 [[file]]
 go = "tsc/internal/osutil/osutil.go"
 package = "internal/osutil"
-crate = "tsr_core"
+crate = "tsr_vfs"
 phase = 1
 kind = "source"
 status = "in-progress"
@@ -5339,7 +5339,7 @@ loc = 371
 [[file]]
 go = "tsc/internal/symlinks/knownsymlinks.go"
 package = "internal/symlinks"
-crate = "tsr_core"
+crate = "tsr_module"
 phase = 1
 kind = "source"
 status = "planned"

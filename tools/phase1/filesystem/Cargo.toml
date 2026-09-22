@@ -21,7 +21,7 @@ tsr_module = { version = "0.1.0", path = "../../../crates/tsr_module" }
 tsr_core = { version = "0.1.0", path = "../../../crates/tsr_core" }
 tsr_tsoptions = { version = "0.1.0", path = "../../../crates/tsr_tsoptions" }
 tsr_tspath = { version = "0.1.0", path = "../../../crates/tsr_tspath" }
-tsr_vfs = { version = "0.1.0", path = "../../../crates/tsr_vfs" }
+tsr_vfs = { version = "0.1.0", path = "../../../crates/tsr_vfs", features = ["harness"] }
 
 [target.'cfg(unix)'.dependencies]
 rustix = { version = "1.1", features = ["fs", "process"] }
