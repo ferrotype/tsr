@@ -12,23 +12,10 @@ use std::panic::{catch_unwind, AssertUnwindSafe};
 
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
-use tsr_compiler as ts_compiler_error;
 use tsr_compiler::diagnostic_writer::{DiagnosticWriter, FormattingOptions};
-use tsr_compiler::{FileCache, Program, ProgramOptions};
+use tsr_compiler::{FileCache, Program};
 
-// The corpus and embedding consumers share this host and config preparation;
-// its full loader observer is exercised by S07 program parity, not here.
-#[allow(dead_code)]
-#[path = "../../../s07/program/rust_observation.rs"]
-mod observation;
-
-fn hex(bytes: &[u8]) -> String {
-    use std::fmt::Write as _;
-    bytes.iter().fold(String::new(), |mut out, byte| {
-        let _ = write!(out, "{byte:02x}");
-        out
-    })
-}
+use crate::{hex, observation, ts_compiler_error};
 
 fn observe(request: &Value, cache: &mut FileCache, counters: &tsr_arena::Counters) -> Value {
     let program = match observation::try_load(request, cache, counters, None) {

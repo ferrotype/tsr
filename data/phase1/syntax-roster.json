@@ -1,0 +1,944 @@
+{
+  "exemptions": [
+    {
+      "category": "unused_at_pin",
+      "evidence": "upstream/tsc/internal/astnav/tokens.go:282. A bare-name search over the pinned tree returns exactly one occurrence, the definition itself (verified in this session). docs/S09-3-formatter-plan.md already records it as not ported. || RUST: Absent; tsr_astnav has no counterpart and needs none.",
+      "operation": "tsc/internal/astnav/tokens.go:findRightmostNode",
+      "owner": "nothing at the pin calls it"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/repo/paths.go. The package is every non-test caller is test harness: testrunner/compiler_runner.go, testutil/baseline/baseline.go, testutil/fixtures/benchfixtures.go, testutil/harnessutil/harnessutil.go, testutil/jstest/node.go. || RUST: Absent, intentionally. The port finds its roots with ROOT = Path(__file__).resolve().parents[1] in scripts and with include_str! in Rust tests.",
+      "operation": "tsc/internal/repo/paths.go:RootPath",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/repo/paths.go. The package is every non-test caller is test harness: testrunner/compiler_runner.go, testutil/baseline/baseline.go, testutil/fixtures/benchfixtures.go, testutil/harnessutil/harnessutil.go, testutil/jstest/node.go. || RUST: Absent, intentionally. The port finds its roots with ROOT = Path(__file__).resolve().parents[1] in scripts and with include_str! in Rust tests.",
+      "operation": "tsc/internal/repo/paths.go:TestDataPath",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testrunner/compiler_runner.go. The package is imported outside itself only by internal/fourslash/test_parser.go. || RUST: Absent, intentionally. The compiler runner's selection is observed natively per variant in data/phase1/syntax-schedule.json; the runner itself is not a compiler contract.",
+      "operation": "tsc/internal/testrunner/compiler_runner.go:CompilerBaselineRunner.EnumerateTestFiles",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testrunner/compiler_runner.go. The package is imported outside itself only by internal/fourslash/test_parser.go. || RUST: Absent, intentionally. The compiler runner's selection is observed natively per variant in data/phase1/syntax-schedule.json; the runner itself is not a compiler contract.",
+      "operation": "tsc/internal/testrunner/compiler_runner.go:CompilerBaselineRunner.RunTests",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testrunner/compiler_runner.go. The package is imported outside itself only by internal/fourslash/test_parser.go. || RUST: Absent, intentionally. The compiler runner's selection is observed natively per variant in data/phase1/syntax-schedule.json; the runner itself is not a compiler contract.",
+      "operation": "tsc/internal/testrunner/compiler_runner.go:CompilerBaselineRunner.cleanUpLocal",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testrunner/compiler_runner.go. The package is imported outside itself only by internal/fourslash/test_parser.go. || RUST: Absent, intentionally. The compiler runner's selection is observed natively per variant in data/phase1/syntax-schedule.json; the runner itself is not a compiler contract.",
+      "operation": "tsc/internal/testrunner/compiler_runner.go:CompilerBaselineRunner.runSingleConfigTest",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testrunner/compiler_runner.go. The package is imported outside itself only by internal/fourslash/test_parser.go. || RUST: Absent, intentionally. The compiler runner's selection is observed natively per variant in data/phase1/syntax-schedule.json; the runner itself is not a compiler contract.",
+      "operation": "tsc/internal/testrunner/compiler_runner.go:CompilerBaselineRunner.runTest",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testrunner/compiler_runner.go. The package is imported outside itself only by internal/fourslash/test_parser.go. || RUST: Absent, intentionally. The compiler runner's selection is observed natively per variant in data/phase1/syntax-schedule.json; the runner itself is not a compiler contract.",
+      "operation": "tsc/internal/testrunner/compiler_runner.go:CompilerTestType.String",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testrunner/compiler_runner.go. The package is imported outside itself only by internal/fourslash/test_parser.go. || RUST: Absent, intentionally. The compiler runner's selection is observed natively per variant in data/phase1/syntax-schedule.json; the runner itself is not a compiler contract.",
+      "operation": "tsc/internal/testrunner/compiler_runner.go:NewCompilerBaselineRunner",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testrunner/compiler_runner.go. The package is imported outside itself only by internal/fourslash/test_parser.go. || RUST: Absent, intentionally. The compiler runner's selection is observed natively per variant in data/phase1/syntax-schedule.json; the runner itself is not a compiler contract.",
+      "operation": "tsc/internal/testrunner/compiler_runner.go:compilerTest.contentMappedFileNames",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testrunner/compiler_runner.go. The package is imported outside itself only by internal/fourslash/test_parser.go. || RUST: Absent, intentionally. The compiler runner's selection is observed natively per variant in data/phase1/syntax-schedule.json; the runner itself is not a compiler contract.",
+      "operation": "tsc/internal/testrunner/compiler_runner.go:compilerTest.verifyContentMapper",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testrunner/compiler_runner.go. The package is imported outside itself only by internal/fourslash/test_parser.go. || RUST: Absent, intentionally. The compiler runner's selection is observed natively per variant in data/phase1/syntax-schedule.json; the runner itself is not a compiler contract.",
+      "operation": "tsc/internal/testrunner/compiler_runner.go:compilerTest.verifyDiagnostics",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testrunner/compiler_runner.go. The package is imported outside itself only by internal/fourslash/test_parser.go. || RUST: Absent, intentionally. The compiler runner's selection is observed natively per variant in data/phase1/syntax-schedule.json; the runner itself is not a compiler contract.",
+      "operation": "tsc/internal/testrunner/compiler_runner.go:compilerTest.verifyJavaScriptOutput",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testrunner/compiler_runner.go. The package is imported outside itself only by internal/fourslash/test_parser.go. || RUST: Absent, intentionally. The compiler runner's selection is observed natively per variant in data/phase1/syntax-schedule.json; the runner itself is not a compiler contract.",
+      "operation": "tsc/internal/testrunner/compiler_runner.go:compilerTest.verifyModuleResolution",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testrunner/compiler_runner.go. The package is imported outside itself only by internal/fourslash/test_parser.go. || RUST: Absent, intentionally. The compiler runner's selection is observed natively per variant in data/phase1/syntax-schedule.json; the runner itself is not a compiler contract.",
+      "operation": "tsc/internal/testrunner/compiler_runner.go:compilerTest.verifyParentPointers",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testrunner/compiler_runner.go. The package is imported outside itself only by internal/fourslash/test_parser.go. || RUST: Absent, intentionally. The compiler runner's selection is observed natively per variant in data/phase1/syntax-schedule.json; the runner itself is not a compiler contract.",
+      "operation": "tsc/internal/testrunner/compiler_runner.go:compilerTest.verifySourceMapOutput",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testrunner/compiler_runner.go. The package is imported outside itself only by internal/fourslash/test_parser.go. || RUST: Absent, intentionally. The compiler runner's selection is observed natively per variant in data/phase1/syntax-schedule.json; the runner itself is not a compiler contract.",
+      "operation": "tsc/internal/testrunner/compiler_runner.go:compilerTest.verifySourceMapRecord",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testrunner/compiler_runner.go. The package is imported outside itself only by internal/fourslash/test_parser.go. || RUST: Absent, intentionally. The compiler runner's selection is observed natively per variant in data/phase1/syntax-schedule.json; the runner itself is not a compiler contract.",
+      "operation": "tsc/internal/testrunner/compiler_runner.go:compilerTest.verifyTypesAndSymbols",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testrunner/compiler_runner.go. The package is imported outside itself only by internal/fourslash/test_parser.go. || RUST: Absent, intentionally. The compiler runner's selection is observed natively per variant in data/phase1/syntax-schedule.json; the runner itself is not a compiler contract.",
+      "operation": "tsc/internal/testrunner/compiler_runner.go:compilerTest.verifyUnionOrdering",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testrunner/compiler_runner.go. The package is imported outside itself only by internal/fourslash/test_parser.go. || RUST: Absent, intentionally. The compiler runner's selection is observed natively per variant in data/phase1/syntax-schedule.json; the runner itself is not a compiler contract.",
+      "operation": "tsc/internal/testrunner/compiler_runner.go:createHarnessTestFile",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testrunner/compiler_runner.go. The package is imported outside itself only by internal/fourslash/test_parser.go. || RUST: Absent, intentionally. The compiler runner's selection is observed natively per variant in data/phase1/syntax-schedule.json; the runner itself is not a compiler contract.",
+      "operation": "tsc/internal/testrunner/compiler_runner.go:getCompilerFileBasedTest",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testrunner/compiler_runner.go. The package is imported outside itself only by internal/fourslash/test_parser.go. || RUST: Absent, intentionally. The compiler runner's selection is observed natively per variant in data/phase1/syntax-schedule.json; the runner itself is not a compiler contract.",
+      "operation": "tsc/internal/testrunner/compiler_runner.go:getCompilerVaryByMap",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testrunner/compiler_runner.go. The package is imported outside itself only by internal/fourslash/test_parser.go. || RUST: Absent, intentionally. The compiler runner's selection is observed natively per variant in data/phase1/syntax-schedule.json; the runner itself is not a compiler contract.",
+      "operation": "tsc/internal/testrunner/compiler_runner.go:newCompilerTest",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testrunner/runner.go. The package is imported outside itself only by internal/fourslash/test_parser.go. || RUST: Absent, intentionally. The compiler runner's selection is observed natively per variant in data/phase1/syntax-schedule.json; the runner itself is not a compiler contract.",
+      "operation": "tsc/internal/testrunner/runner.go:runTests",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testrunner/test_case_parser.go. The package is imported outside itself only by internal/fourslash/test_parser.go. || RUST: Absent, intentionally. The compiler runner's selection is observed natively per variant in data/phase1/syntax-schedule.json; the runner itself is not a compiler contract.",
+      "operation": "tsc/internal/testrunner/test_case_parser.go:ParseTestFilesAndSymlinks",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testrunner/test_case_parser.go. The package is imported outside itself only by internal/fourslash/test_parser.go. || RUST: Absent, intentionally. The compiler runner's selection is observed natively per variant in data/phase1/syntax-schedule.json; the runner itself is not a compiler contract.",
+      "operation": "tsc/internal/testrunner/test_case_parser.go:ParseTestFilesAndSymlinksWithOptions",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testrunner/test_case_parser.go. The package is imported outside itself only by internal/fourslash/test_parser.go. || RUST: Absent, intentionally. The compiler runner's selection is observed natively per variant in data/phase1/syntax-schedule.json; the runner itself is not a compiler contract.",
+      "operation": "tsc/internal/testrunner/test_case_parser.go:extractCompilerSettings",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testrunner/test_case_parser.go. The package is imported outside itself only by internal/fourslash/test_parser.go. || RUST: Absent, intentionally. The compiler runner's selection is observed natively per variant in data/phase1/syntax-schedule.json; the runner itself is not a compiler contract.",
+      "operation": "tsc/internal/testrunner/test_case_parser.go:makeUnitsFromTest",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testrunner/test_case_parser.go. The package is imported outside itself only by internal/fourslash/test_parser.go. || RUST: Absent, intentionally. The compiler runner's selection is observed natively per variant in data/phase1/syntax-schedule.json; the runner itself is not a compiler contract.",
+      "operation": "tsc/internal/testrunner/test_case_parser.go:parseSymlinkFromTest",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testrunner/transpile_runner.go. The package is imported outside itself only by internal/fourslash/test_parser.go. || RUST: Absent, intentionally. The compiler runner's selection is observed natively per variant in data/phase1/syntax-schedule.json; the runner itself is not a compiler contract.",
+      "operation": "tsc/internal/testrunner/transpile_runner.go:NewTranspileBaselineRunner",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testrunner/transpile_runner.go. The package is imported outside itself only by internal/fourslash/test_parser.go. || RUST: Absent, intentionally. The compiler runner's selection is observed natively per variant in data/phase1/syntax-schedule.json; the runner itself is not a compiler contract.",
+      "operation": "tsc/internal/testrunner/transpile_runner.go:RunTranspileTests",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testrunner/transpile_runner.go. The package is imported outside itself only by internal/fourslash/test_parser.go. || RUST: Absent, intentionally. The compiler runner's selection is observed natively per variant in data/phase1/syntax-schedule.json; the runner itself is not a compiler contract.",
+      "operation": "tsc/internal/testrunner/transpile_runner.go:TranspileBaselineRunner.EnumerateTestFiles",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testrunner/transpile_runner.go. The package is imported outside itself only by internal/fourslash/test_parser.go. || RUST: Absent, intentionally. The compiler runner's selection is observed natively per variant in data/phase1/syntax-schedule.json; the runner itself is not a compiler contract.",
+      "operation": "tsc/internal/testrunner/transpile_runner.go:TranspileBaselineRunner.RunTests",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testrunner/transpile_runner.go. The package is imported outside itself only by internal/fourslash/test_parser.go. || RUST: Absent, intentionally. The compiler runner's selection is observed natively per variant in data/phase1/syntax-schedule.json; the runner itself is not a compiler contract.",
+      "operation": "tsc/internal/testrunner/transpile_runner.go:TranspileBaselineRunner.runKind",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testrunner/transpile_runner.go. The package is imported outside itself only by internal/fourslash/test_parser.go. || RUST: Absent, intentionally. The compiler runner's selection is observed natively per variant in data/phase1/syntax-schedule.json; the runner itself is not a compiler contract.",
+      "operation": "tsc/internal/testrunner/transpile_runner.go:TranspileBaselineRunner.runTest",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testrunner/transpile_runner.go. The package is imported outside itself only by internal/fourslash/test_parser.go. || RUST: Absent, intentionally. The compiler runner's selection is observed natively per variant in data/phase1/syntax-schedule.json; the runner itself is not a compiler contract.",
+      "operation": "tsc/internal/testrunner/transpile_runner.go:appendTranspileSection",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testrunner/transpile_runner.go. The package is imported outside itself only by internal/fourslash/test_parser.go. || RUST: Absent, intentionally. The compiler runner's selection is observed natively per variant in data/phase1/syntax-schedule.json; the runner itself is not a compiler contract.",
+      "operation": "tsc/internal/testrunner/transpile_runner.go:cleanTranspileBaselines",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testrunner/transpile_runner.go. The package is imported outside itself only by internal/fourslash/test_parser.go. || RUST: Absent, intentionally. The compiler runner's selection is observed natively per variant in data/phase1/syntax-schedule.json; the runner itself is not a compiler contract.",
+      "operation": "tsc/internal/testrunner/transpile_runner.go:formatTranspileConfigurationName",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:CompilationResult.FS",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:CompilationResult.GetInputsAndOutputsForFile",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:CompilationResult.GetInputsForFile",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:CompilationResult.GetNumberOfJSFiles",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:CompilationResult.GetOutput",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:CompilationResult.GetSourceMapRecord",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:CompilationResult.Inputs",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:CompilationResult.Outputs",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:CompilationResult.getOutputPath",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:CompileFiles",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:CompileFilesEx",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:EnumerateFiles",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:GetConfigNameFromFileName",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:GetFileBasedTestConfigurations",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:GetSourceFileCacheKey",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:NewTracerForBaselining",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:SetOptionsFromTestConfig",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:SkipUnsupportedCompilerOptions",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:TracerForBaselining.Reset",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:TracerForBaselining.String",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:TracerForBaselining.Trace",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:TracerForBaselining.TraceWithWriter",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:TracerForBaselining.sanitizeTrace",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:cachedCompilerHost.GetSourceFile",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:compareTestFiles",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:compileFilesWithHost",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:computeFileBasedTestConfigurationVariations",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:computeFileBasedTestConfigurationVariationsWorker",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:createCompilerHost",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:createProgram",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:failOnUnsupportedCompilerOptions",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:getAllValuesForOption",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:getCommandLineOption",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:getFileBasedTestConfigurationDescription",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:getHarnessOption",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:getOptionValue",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:getTestBuildInfoReader",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:getValueOfOptionString",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:listFiles",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:listFilesWorker",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:newCompilationResult",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:parseHarnessOption",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:splitOptionValues",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:testBuildInfoReader.ReadBuildInfo",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/harnessutil.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/harnessutil.go:tryGetValueOfOptionString",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/recorderfs.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/recorderfs.go:NewOutputRecorderFS",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/recorderfs.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/recorderfs.go:OutputRecorderFS.Outputs",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/recorderfs.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/recorderfs.go:OutputRecorderFS.WriteFile",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/sourcemap_recorder.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/sourcemap_recorder.go:newSourceMapDecoder",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/sourcemap_recorder.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/sourcemap_recorder.go:newSourceMapSpanWriter",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/sourcemap_recorder.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/sourcemap_recorder.go:recordedSpanWriter.getMarkerId",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/sourcemap_recorder.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/sourcemap_recorder.go:recordedSpanWriter.iterateSpans",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/sourcemap_recorder.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/sourcemap_recorder.go:recordedSpanWriter.writeRecordedSpans",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/sourcemap_recorder.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/sourcemap_recorder.go:recordedSpanWriter.writeSourceMapIndent",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/sourcemap_recorder.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/sourcemap_recorder.go:recordedSpanWriter.writeSourceMapMarker",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/sourcemap_recorder.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/sourcemap_recorder.go:recordedSpanWriter.writeSourceMapMarkerEx",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/sourcemap_recorder.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/sourcemap_recorder.go:recordedSpanWriter.writeSourceMapSourceText",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/sourcemap_recorder.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/sourcemap_recorder.go:recordedSpanWriter.writeSpanDetails",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/sourcemap_recorder.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/sourcemap_recorder.go:sourceMapDecoder.decodeNextEncodedSourceMapSpan",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/sourcemap_recorder.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/sourcemap_recorder.go:sourceMapDecoder.getRemainingDecodeString",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/sourcemap_recorder.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/sourcemap_recorder.go:sourceMapDecoder.hasCompletedDecoding",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/sourcemap_recorder.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/sourcemap_recorder.go:sourceMapSpanWriter.close",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/sourcemap_recorder.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/sourcemap_recorder.go:sourceMapSpanWriter.getSourceMapSpanString",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/sourcemap_recorder.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/sourcemap_recorder.go:sourceMapSpanWriter.getTextOfLine",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/sourcemap_recorder.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/sourcemap_recorder.go:sourceMapSpanWriter.recordNewSourceFileSpan",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/sourcemap_recorder.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/sourcemap_recorder.go:sourceMapSpanWriter.recordSourceMapSpan",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/sourcemap_recorder.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/sourcemap_recorder.go:sourceMapSpanWriter.writeJsFileLines",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/sourcemap_recorder.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/sourcemap_recorder.go:sourceMapSpanWriter.writeRecordedSpans",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/sourcemap_recorder.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/sourcemap_recorder.go:writerAggregator.WriteLine",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/sourcemap_recorder.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/sourcemap_recorder.go:writerAggregator.WriteLinef",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/harnessutil/sourcemap_recorder.go. The package is imported outside the harness only by internal/fourslash/fourslash.go (the language-service test framework) and internal/execute/tsctests/fs.go and sys.go (the tsc test framework). || RUST: Absent, intentionally. The port reproduces what the harness DECIDES -- test units, option variants, the SkipUnsupportedCompilerOptions and skippedTests selection -- as native authority: TestS07SubsetExport and the F4a syntax probe run these very functions at the pin, and data/phase1/syntax-schedule.json records their outcome per variant. Nothing in crates/ reimplements them.",
+      "operation": "tsc/internal/testutil/harnessutil/sourcemap_recorder.go:writerAggregator.WriteStringf",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/parsetestutil/parsetestutil.go. The package is no non-test importer outside internal/testutil. || RUST: Absent, intentionally: parse helpers for upstream's own tests.",
+      "operation": "tsc/internal/testutil/parsetestutil/parsetestutil.go:CheckDiagnostics",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/parsetestutil/parsetestutil.go. The package is no non-test importer outside internal/testutil. || RUST: Absent, intentionally: parse helpers for upstream's own tests.",
+      "operation": "tsc/internal/testutil/parsetestutil/parsetestutil.go:CheckDiagnosticsMessage",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/parsetestutil/parsetestutil.go. The package is no non-test importer outside internal/testutil. || RUST: Absent, intentionally: parse helpers for upstream's own tests.",
+      "operation": "tsc/internal/testutil/parsetestutil/parsetestutil.go:MarkSyntheticRecursive",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/parsetestutil/parsetestutil.go. The package is no non-test importer outside internal/testutil. || RUST: Absent, intentionally: parse helpers for upstream's own tests.",
+      "operation": "tsc/internal/testutil/parsetestutil/parsetestutil.go:ParseTypeScript",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/parsetestutil/parsetestutil.go. The package is no non-test importer outside internal/testutil. || RUST: Absent, intentionally: parse helpers for upstream's own tests.",
+      "operation": "tsc/internal/testutil/parsetestutil/parsetestutil.go:newSyntheticRecursiveVisitor",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/stringtestutil/stringtestutil.go. The package is imported outside the harness only by internal/execute/tsctests/sys.go. || RUST: Absent, intentionally: string helpers for upstream's own tests.",
+      "operation": "tsc/internal/testutil/stringtestutil/stringtestutil.go:Dedent",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/testutil.go. The package is 3 non-test importers, all inside internal/testutil. || RUST: Absent, intentionally: assertion and panic helpers for upstream's own tests.",
+      "operation": "tsc/internal/testutil/testutil.go:AssertPanics",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/testutil.go. The package is 3 non-test importers, all inside internal/testutil. || RUST: Absent, intentionally: assertion and panic helpers for upstream's own tests.",
+      "operation": "tsc/internal/testutil/testutil.go:RecoverAndFail",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/testutil.go. The package is 3 non-test importers, all inside internal/testutil. || RUST: Absent, intentionally: assertion and panic helpers for upstream's own tests.",
+      "operation": "tsc/internal/testutil/testutil.go:TestProgramIsSingleThreaded",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/tsbaseline/contentmapper_baseline.go. The package is imported outside the harness only by internal/fourslash/fourslash.go. || RUST: Absent from crates/, intentionally. The baselines themselves are the port's obligation and are compared through its own harness (tools/s08/p5 renders error baselines for E2); the baseline-writing driver is not.",
+      "operation": "tsc/internal/testutil/tsbaseline/contentmapper_baseline.go:DoContentMapperBaseline",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/tsbaseline/contentmapper_baseline.go. The package is imported outside the harness only by internal/fourslash/fourslash.go. || RUST: Absent from crates/, intentionally. The baselines themselves are the port's obligation and are compared through its own harness (tools/s08/p5 renders error baselines for E2); the baseline-writing driver is not.",
+      "operation": "tsc/internal/testutil/tsbaseline/contentmapper_baseline.go:ensureTrailingNewline",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/tsbaseline/contentmapper_baseline.go. The package is imported outside the harness only by internal/fourslash/fourslash.go. || RUST: Absent from crates/, intentionally. The baselines themselves are the port's obligation and are compared through its own harness (tools/s08/p5 renders error baselines for E2); the baseline-writing driver is not.",
+      "operation": "tsc/internal/testutil/tsbaseline/contentmapper_baseline.go:getContentMapperBaseline",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/tsbaseline/error_baseline.go. The package is imported outside the harness only by internal/fourslash/fourslash.go. || RUST: Absent from crates/, intentionally. The baselines themselves are the port's obligation and are compared through its own harness (tools/s08/p5 renders error baselines for E2); the baseline-writing driver is not.",
+      "operation": "tsc/internal/testutil/tsbaseline/error_baseline.go:DoErrorBaseline",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/tsbaseline/error_baseline.go. The package is imported outside the harness only by internal/fourslash/fourslash.go. || RUST: Absent from crates/, intentionally. The baselines themselves are the port's obligation and are compared through its own harness (tools/s08/p5 renders error baselines for E2); the baseline-writing driver is not.",
+      "operation": "tsc/internal/testutil/tsbaseline/error_baseline.go:GetErrorBaseline",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/tsbaseline/error_baseline.go. The package is imported outside the harness only by internal/fourslash/fourslash.go. || RUST: Absent from crates/, intentionally. The baselines themselves are the port's obligation and are compared through its own harness (tools/s08/p5 renders error baselines for E2); the baseline-writing driver is not.",
+      "operation": "tsc/internal/testutil/tsbaseline/error_baseline.go:formatLocation",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/tsbaseline/error_baseline.go. The package is imported outside the harness only by internal/fourslash/fourslash.go. || RUST: Absent from crates/, intentionally. The baselines themselves are the port's obligation and are compared through its own harness (tools/s08/p5 renders error baselines for E2); the baseline-writing driver is not.",
+      "operation": "tsc/internal/testutil/tsbaseline/error_baseline.go:iterateErrorBaseline",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/tsbaseline/error_baseline.go. The package is imported outside the harness only by internal/fourslash/fourslash.go. || RUST: Absent from crates/, intentionally. The baselines themselves are the port's obligation and are compared through its own harness (tools/s08/p5 renders error baselines for E2); the baseline-writing driver is not.",
+      "operation": "tsc/internal/testutil/tsbaseline/error_baseline.go:minimalDiagnosticsToString",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/tsbaseline/js_emit_baseline.go. The package is imported outside the harness only by internal/fourslash/fourslash.go. || RUST: Absent from crates/, intentionally. The baselines themselves are the port's obligation and are compared through its own harness (tools/s08/p5 renders error baselines for E2); the baseline-writing driver is not.",
+      "operation": "tsc/internal/testutil/tsbaseline/js_emit_baseline.go:DoJSEmitBaseline",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/tsbaseline/js_emit_baseline.go. The package is imported outside the harness only by internal/fourslash/fourslash.go. || RUST: Absent from crates/, intentionally. The baselines themselves are the port's obligation and are compared through its own harness (tools/s08/p5 renders error baselines for E2); the baseline-writing driver is not.",
+      "operation": "tsc/internal/testutil/tsbaseline/js_emit_baseline.go:compileDeclarationFiles",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/tsbaseline/js_emit_baseline.go. The package is imported outside the harness only by internal/fourslash/fourslash.go. || RUST: Absent from crates/, intentionally. The baselines themselves are the port's obligation and are compared through its own harness (tools/s08/p5 renders error baselines for E2); the baseline-writing driver is not.",
+      "operation": "tsc/internal/testutil/tsbaseline/js_emit_baseline.go:fileOutput",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/tsbaseline/js_emit_baseline.go. The package is imported outside the harness only by internal/fourslash/fourslash.go. || RUST: Absent from crates/, intentionally. The baselines themselves are the port's obligation and are compared through its own harness (tools/s08/p5 renders error baselines for E2); the baseline-writing driver is not.",
+      "operation": "tsc/internal/testutil/tsbaseline/js_emit_baseline.go:prepareDeclarationCompilationContext",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/tsbaseline/module_resolution_baseline.go. The package is imported outside the harness only by internal/fourslash/fourslash.go. || RUST: Absent from crates/, intentionally. The baselines themselves are the port's obligation and are compared through its own harness (tools/s08/p5 renders error baselines for E2); the baseline-writing driver is not.",
+      "operation": "tsc/internal/testutil/tsbaseline/module_resolution_baseline.go:DoModuleResolutionBaseline",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/tsbaseline/sourcemap_baseline.go. The package is imported outside the harness only by internal/fourslash/fourslash.go. || RUST: Absent from crates/, intentionally. The baselines themselves are the port's obligation and are compared through its own harness (tools/s08/p5 renders error baselines for E2); the baseline-writing driver is not.",
+      "operation": "tsc/internal/testutil/tsbaseline/sourcemap_baseline.go:DoSourcemapBaseline",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/tsbaseline/sourcemap_baseline.go. The package is imported outside the harness only by internal/fourslash/fourslash.go. || RUST: Absent from crates/, intentionally. The baselines themselves are the port's obligation and are compared through its own harness (tools/s08/p5 renders error baselines for E2); the baseline-writing driver is not.",
+      "operation": "tsc/internal/testutil/tsbaseline/sourcemap_baseline.go:base64EncodeChunk",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/tsbaseline/sourcemap_baseline.go. The package is imported outside the harness only by internal/fourslash/fourslash.go. || RUST: Absent from crates/, intentionally. The baselines themselves are the port's obligation and are compared through its own harness (tools/s08/p5 renders error baselines for E2); the baseline-writing driver is not.",
+      "operation": "tsc/internal/testutil/tsbaseline/sourcemap_baseline.go:createSourceMapPreviewLink",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/tsbaseline/sourcemap_record_baseline.go. The package is imported outside the harness only by internal/fourslash/fourslash.go. || RUST: Absent from crates/, intentionally. The baselines themselves are the port's obligation and are compared through its own harness (tools/s08/p5 renders error baselines for E2); the baseline-writing driver is not.",
+      "operation": "tsc/internal/testutil/tsbaseline/sourcemap_record_baseline.go:DoSourcemapRecordBaseline",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/tsbaseline/type_symbol_baseline.go. The package is imported outside the harness only by internal/fourslash/fourslash.go. || RUST: Absent from crates/, intentionally. The baselines themselves are the port's obligation and are compared through its own harness (tools/s08/p5 renders error baselines for E2); the baseline-writing driver is not.",
+      "operation": "tsc/internal/testutil/tsbaseline/type_symbol_baseline.go:DoTypeAndSymbolBaseline",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/tsbaseline/type_symbol_baseline.go. The package is imported outside the harness only by internal/fourslash/fourslash.go. || RUST: Absent from crates/, intentionally. The baselines themselves are the port's obligation and are compared through its own harness (tools/s08/p5 renders error baselines for E2); the baseline-writing driver is not.",
+      "operation": "tsc/internal/testutil/tsbaseline/type_symbol_baseline.go:checkBaselines",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/tsbaseline/type_symbol_baseline.go. The package is imported outside the harness only by internal/fourslash/fourslash.go. || RUST: Absent from crates/, intentionally. The baselines themselves are the port's obligation and are compared through its own harness (tools/s08/p5 renders error baselines for E2); the baseline-writing driver is not.",
+      "operation": "tsc/internal/testutil/tsbaseline/type_symbol_baseline.go:forEachASTNode",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/tsbaseline/type_symbol_baseline.go. The package is imported outside the harness only by internal/fourslash/fourslash.go. || RUST: Absent from crates/, intentionally. The baselines themselves are the port's obligation and are compared through its own harness (tools/s08/p5 renders error baselines for E2); the baseline-writing driver is not.",
+      "operation": "tsc/internal/testutil/tsbaseline/type_symbol_baseline.go:generateBaseline",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/tsbaseline/type_symbol_baseline.go. The package is imported outside the harness only by internal/fourslash/fourslash.go. || RUST: Absent from crates/, intentionally. The baselines themselves are the port's obligation and are compared through its own harness (tools/s08/p5 renders error baselines for E2); the baseline-writing driver is not.",
+      "operation": "tsc/internal/testutil/tsbaseline/type_symbol_baseline.go:isExportStatementName",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/tsbaseline/type_symbol_baseline.go. The package is imported outside the harness only by internal/fourslash/fourslash.go. || RUST: Absent from crates/, intentionally. The baselines themselves are the port's obligation and are compared through its own harness (tools/s08/p5 renders error baselines for E2); the baseline-writing driver is not.",
+      "operation": "tsc/internal/testutil/tsbaseline/type_symbol_baseline.go:isImportStatementName",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/tsbaseline/type_symbol_baseline.go. The package is imported outside the harness only by internal/fourslash/fourslash.go. || RUST: Absent from crates/, intentionally. The baselines themselves are the port's obligation and are compared through its own harness (tools/s08/p5 renders error baselines for E2); the baseline-writing driver is not.",
+      "operation": "tsc/internal/testutil/tsbaseline/type_symbol_baseline.go:isIntrinsicJsxTag",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/tsbaseline/type_symbol_baseline.go. The package is imported outside the harness only by internal/fourslash/fourslash.go. || RUST: Absent from crates/, intentionally. The baselines themselves are the port's obligation and are compared through its own harness (tools/s08/p5 renders error baselines for E2); the baseline-writing driver is not.",
+      "operation": "tsc/internal/testutil/tsbaseline/type_symbol_baseline.go:isTypeBaselineNodeReuseLine",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/tsbaseline/type_symbol_baseline.go. The package is imported outside the harness only by internal/fourslash/fourslash.go. || RUST: Absent from crates/, intentionally. The baselines themselves are the port's obligation and are compared through its own harness (tools/s08/p5 renders error baselines for E2); the baseline-writing driver is not.",
+      "operation": "tsc/internal/testutil/tsbaseline/type_symbol_baseline.go:iterateBaseline",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/tsbaseline/type_symbol_baseline.go. The package is imported outside the harness only by internal/fourslash/fourslash.go. || RUST: Absent from crates/, intentionally. The baselines themselves are the port's obligation and are compared through its own harness (tools/s08/p5 renders error baselines for E2); the baseline-writing driver is not.",
+      "operation": "tsc/internal/testutil/tsbaseline/type_symbol_baseline.go:newTypeWriterWalker",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/tsbaseline/type_symbol_baseline.go. The package is imported outside the harness only by internal/fourslash/fourslash.go. || RUST: Absent from crates/, intentionally. The baselines themselves are the port's obligation and are compared through its own harness (tools/s08/p5 renders error baselines for E2); the baseline-writing driver is not.",
+      "operation": "tsc/internal/testutil/tsbaseline/type_symbol_baseline.go:typeWriterWalker.getSymbols",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/tsbaseline/type_symbol_baseline.go. The package is imported outside the harness only by internal/fourslash/fourslash.go. || RUST: Absent from crates/, intentionally. The baselines themselves are the port's obligation and are compared through its own harness (tools/s08/p5 renders error baselines for E2); the baseline-writing driver is not.",
+      "operation": "tsc/internal/testutil/tsbaseline/type_symbol_baseline.go:typeWriterWalker.getTypeCheckerForCurrentFile",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/tsbaseline/type_symbol_baseline.go. The package is imported outside the harness only by internal/fourslash/fourslash.go. || RUST: Absent from crates/, intentionally. The baselines themselves are the port's obligation and are compared through its own harness (tools/s08/p5 renders error baselines for E2); the baseline-writing driver is not.",
+      "operation": "tsc/internal/testutil/tsbaseline/type_symbol_baseline.go:typeWriterWalker.getTypes",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/tsbaseline/type_symbol_baseline.go. The package is imported outside the harness only by internal/fourslash/fourslash.go. || RUST: Absent from crates/, intentionally. The baselines themselves are the port's obligation and are compared through its own harness (tools/s08/p5 renders error baselines for E2); the baseline-writing driver is not.",
+      "operation": "tsc/internal/testutil/tsbaseline/type_symbol_baseline.go:typeWriterWalker.visitNode",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/tsbaseline/type_symbol_baseline.go. The package is imported outside the harness only by internal/fourslash/fourslash.go. || RUST: Absent from crates/, intentionally. The baselines themselves are the port's obligation and are compared through its own harness (tools/s08/p5 renders error baselines for E2); the baseline-writing driver is not.",
+      "operation": "tsc/internal/testutil/tsbaseline/type_symbol_baseline.go:typeWriterWalker.writeTypeOrSymbol",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/tsbaseline/util.go. The package is imported outside the harness only by internal/fourslash/fourslash.go. || RUST: Absent from crates/, intentionally. The baselines themselves are the port's obligation and are compared through its own harness (tools/s08/p5 renders error baselines for E2); the baseline-writing driver is not.",
+      "operation": "tsc/internal/testutil/tsbaseline/util.go:isBuiltFile",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/tsbaseline/util.go. The package is imported outside the harness only by internal/fourslash/fourslash.go. || RUST: Absent from crates/, intentionally. The baselines themselves are the port's obligation and are compared through its own harness (tools/s08/p5 renders error baselines for E2); the baseline-writing driver is not.",
+      "operation": "tsc/internal/testutil/tsbaseline/util.go:isDefaultLibraryFile",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/tsbaseline/util.go. The package is imported outside the harness only by internal/fourslash/fourslash.go. || RUST: Absent from crates/, intentionally. The baselines themselves are the port's obligation and are compared through its own harness (tools/s08/p5 renders error baselines for E2); the baseline-writing driver is not.",
+      "operation": "tsc/internal/testutil/tsbaseline/util.go:isTsConfigFile",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/tsbaseline/util.go. The package is imported outside the harness only by internal/fourslash/fourslash.go. || RUST: Absent from crates/, intentionally. The baselines themselves are the port's obligation and are compared through its own harness (tools/s08/p5 renders error baselines for E2); the baseline-writing driver is not.",
+      "operation": "tsc/internal/testutil/tsbaseline/util.go:removeTestPathPrefixes",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "go_test_harness",
+      "evidence": "upstream/tsc/internal/testutil/tsbaseline/util.go. The package is imported outside the harness only by internal/fourslash/fourslash.go. || RUST: Absent from crates/, intentionally. The baselines themselves are the port's obligation and are compared through its own harness (tools/s08/p5 renders error baselines for E2); the baseline-writing driver is not.",
+      "operation": "tsc/internal/testutil/tsbaseline/util.go:sanitizeTestFilePath",
+      "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    }
+  ],
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "purpose": "Operations removed from F4a's syntax roster, each with the category, the owner that does have it, and the evidence read at the pin. An entry here is a claim that this step owes no prepared case for the operation, and it is validated like any other claim: see roster_problems in scripts/phase1_scope.py.",
+  "rule": "Only two kinds of removal are made here. Upstream's own test harness packages are go_test_harness, as F3a ruled for testutil/baseline: the port reproduces what the harness decides as native authority and compares through its own harness. unused_at_pin records a definition with no other occurrence. Every other operation stays on the roster, including the internal/compiler operations the F4a compiler survey classifies as checker, emit, project-reference, content-mapper or later-consumer work: moving those out of Phase 1 is a disposition change (a ledger or category decision), not an exemption this step can make.",
+  "version": 1
+}

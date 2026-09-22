@@ -1786,12 +1786,22 @@ class RosterLedgerTests(unittest.TestCase):
         }])
         self.assertTrue(any("not an operation in the frozen scope" in p for p in problems))
 
+    def test_every_phase1_operation_is_on_some_step_roster(self):
+        """Since F4a, no Phase 1 package is left without a step to account for it."""
+        owned = set().union(*scope.STEP_PACKAGES.values())
+        self.assertEqual({row["go_package"] for row in self.scope["operations"]} - owned, set())
+
     def test_an_exemption_outside_the_step_packages_is_rejected(self):
         """A step may not exempt what was never on its roster, including another step's."""
         owned = set().union(*scope.STEP_PACKAGES.values())
+        # Every real Phase 1 operation is now owned by a step, so an unowned one
+        # is forged into a copy of the scope to keep the first branch exercised.
+        unowned = {"id": "tsc/internal/checker/checker.go:phase1ForgedUnowned", "go_package": "internal/checker",
+                   "disposition": "missing", "cases": []}
+        self.assertNotIn(unowned["go_package"], owned)
+        self.scope["operations"].append(unowned)
         for outside, why in (
-            (next(row["id"] for row in self.scope["operations"]
-                  if row["go_package"] not in owned), "no step owns it"),
+            (unowned["id"], "no step owns it"),
             (next(row["id"] for row in self.scope["operations"]
                   if row["go_package"] in scope.FILESYSTEM_PACKAGES), "another step owns it"),
         ):

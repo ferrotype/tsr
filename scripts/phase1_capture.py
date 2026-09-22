@@ -339,6 +339,49 @@ FAMILIES = {
         "rust_example": "phase1_config",
         "rust_target": "tools/phase1/config/src/main.rs",
     },
+    # F4a. The case layer of the syntax step; the corpus layer (the syntax
+    # schedule over every compiler variant) lives in scripts/phase1_syntax.py.
+    "syntax": {
+        "requests": [
+            "data/phase1/requests/syntax-diagnostics.json",
+            "data/phase1/requests/syntax-astnav.json",
+            "data/phase1/requests/syntax-evaluator.json",
+            "data/phase1/requests/syntax-parse-outputs.json",
+        ],
+        "native_probes": [
+            # In-package so a probe may reach unexported program state. The
+            # compiler package's tests link internal/repo, which panics under
+            # -trimpath, so the flag is dropped as for the config probes.
+            {"name": "diagnostics", "package": "compiler",
+             "probe": "tools/phase1/syntax/diagnostics_probe_test.go",
+             "test": "TestPhase1SyntaxDiagnostics",
+             "trimpath": False},
+            # astnav's own tests link internal/testutil/baseline and repo, so
+            # -trimpath is dropped here too.
+            {"name": "astnav", "package": "astnav",
+             "probe": "tools/phase1/syntax/astnav_probe_test.go",
+             "test": "TestPhase1SyntaxAstnav",
+             "trimpath": False},
+            # The evaluator package has no test file of its own; this is its
+            # first, and it links nothing that needs a real source path.
+            {"name": "evaluator", "package": "evaluator",
+             "probe": "tools/phase1/syntax/evaluator_probe_test.go",
+             "test": "TestPhase1SyntaxEvaluator"},
+            # In-package in the parser, which owns the side fields. Its tests
+            # link internal/repo, so -trimpath is dropped.
+            {"name": "parse_outputs", "package": "parser",
+             "probe": "tools/phase1/syntax/utilities_probe_test.go",
+             "test": "TestPhase1SyntaxParseOutputs",
+             "trimpath": False},
+        ],
+        "rust_package": "phase1_syntax",
+        "rust_target_kind": "bin",
+        "rust_example": "phase1_syntax",
+        "rust_target": "tools/phase1/syntax/src/main.rs",
+        # Included by #[path]; it lives outside the harness package directory,
+        # so the workspace closure would not see it.
+        "rust_driver": "tools/s07/program/rust_observation.rs",
+    },
 }
 # The six command families the plan names. Only `pilot` is wired at F0; the
 # rest are registered so `inventory --check` can report them as unprepared

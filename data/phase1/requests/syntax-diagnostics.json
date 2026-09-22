@@ -1,0 +1,452 @@
+{
+  "family": "syntax",
+  "requests": [
+    {
+      "case": "syntax/diagnostics/js-only-typescript-syntax",
+      "discriminates": "The parser's JavaScript grammar records (file.JSDiagnostics(), parser.go checkJSSyntax): TypeScript-only syntax in a .js file is reported, the same text in a .ts file is not, and the two files sort by name. A port that drops JSDiagnostics, reports them for TypeScript, or appends them unsorted fails.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics",
+      "order_sensitive": true,
+      "program": {
+        "case_sensitive": true,
+        "cwd": "/",
+        "files": {
+          "/a.js": "let x: number = 1;\nfunction f(a?: string): void {}\ninterface I {}\nenum E { A }\nclass K { public m() {} }\nlet y = x!;\ntype T = number;\nlet z = <any>x;\n",
+          "/b.ts": "let x: number = 1;\nfunction f(a?: string): void {}\ninterface I {}\nenum E { A }\nclass K { public m() {} }\nlet y = x!;\ntype T = number;\n"
+        },
+        "options": {
+          "allowJs": true,
+          "noEmit": true,
+          "noLib": true
+        },
+        "roots": [
+          "/a.js",
+          "/b.ts"
+        ]
+      },
+      "scope": null,
+      "subject": "syntacticDiagnostics"
+    },
+    {
+      "case": "syntax/diagnostics/parameter-decorator-in-unchecked-js",
+      "discriminates": "getAdditionalJSSyntacticDiagnostics (program.go:737): an unchecked JS file reports a parameter decorator as TS1206 because the checker never runs on it. A port without the program-level walk reports nothing.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics",
+      "order_sensitive": true,
+      "program": {
+        "case_sensitive": true,
+        "cwd": "/",
+        "files": {
+          "/a.js": "class C {\n    m(@dec p) {}\n}\nfunction dec() {}\n"
+        },
+        "options": {
+          "allowJs": true,
+          "noEmit": true,
+          "noLib": true
+        },
+        "roots": [
+          "/a.js"
+        ]
+      },
+      "scope": null,
+      "subject": "syntacticDiagnostics"
+    },
+    {
+      "case": "syntax/diagnostics/parameter-decorator-with-checkjs",
+      "discriminates": "The same file with checkJs: IsCheckJSEnabledForFile is true, so the program-level walk is skipped (program.go:728) and the checker, which this operation never runs, would own the error.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics",
+      "order_sensitive": true,
+      "program": {
+        "case_sensitive": true,
+        "cwd": "/",
+        "files": {
+          "/a.js": "class C {\n    m(@dec p) {}\n}\nfunction dec() {}\n"
+        },
+        "options": {
+          "allowJs": true,
+          "checkJs": true,
+          "noEmit": true,
+          "noLib": true
+        },
+        "roots": [
+          "/a.js"
+        ]
+      },
+      "scope": null,
+      "subject": "syntacticDiagnostics"
+    },
+    {
+      "case": "syntax/diagnostics/parameter-decorator-with-experimental-decorators",
+      "discriminates": "experimentalDecorators makes parameter decorators valid, so the walk returns before visiting (program.go:738-740) even though the file is unchecked.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics",
+      "order_sensitive": true,
+      "program": {
+        "case_sensitive": true,
+        "cwd": "/",
+        "files": {
+          "/a.js": "class C {\n    m(@dec p) {}\n}\nfunction dec() {}\n"
+        },
+        "options": {
+          "allowJs": true,
+          "experimentalDecorators": true,
+          "noEmit": true,
+          "noLib": true
+        },
+        "roots": [
+          "/a.js"
+        ]
+      },
+      "scope": null,
+      "subject": "syntacticDiagnostics"
+    },
+    {
+      "case": "syntax/diagnostics/ts-check-directive-enables-checking",
+      "discriminates": "A // @ts-check directive with checkJs unset: the directive, not the option, decides (ast/utilities.go:2931-2936), so the walk is skipped.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics",
+      "order_sensitive": true,
+      "program": {
+        "case_sensitive": true,
+        "cwd": "/",
+        "files": {
+          "/a.js": "// @ts-check\nclass C {\n    m(@dec p) {}\n}\nfunction dec() {}\n"
+        },
+        "options": {
+          "allowJs": true,
+          "noEmit": true,
+          "noLib": true
+        },
+        "roots": [
+          "/a.js"
+        ]
+      },
+      "scope": null,
+      "subject": "syntacticDiagnostics"
+    },
+    {
+      "case": "syntax/diagnostics/ts-nocheck-overrides-checkjs",
+      "discriminates": "A // @ts-nocheck directive with checkJs true: the disabled directive wins over the option, the file is unchecked, and the walk reports TS1206.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics",
+      "order_sensitive": true,
+      "program": {
+        "case_sensitive": true,
+        "cwd": "/",
+        "files": {
+          "/a.js": "// @ts-nocheck\nclass C {\n    m(@dec p) {}\n}\nfunction dec() {}\n"
+        },
+        "options": {
+          "allowJs": true,
+          "checkJs": true,
+          "noEmit": true,
+          "noLib": true
+        },
+        "roots": [
+          "/a.js"
+        ]
+      },
+      "scope": null,
+      "subject": "syntacticDiagnostics"
+    },
+    {
+      "case": "syntax/diagnostics/later-directive-wins-nocheck-then-check",
+      "discriminates": "Two directives: the parser keeps the one at the greater position (parser.go:6684), so @ts-check after @ts-nocheck enables checking and the walk is skipped. A port that keeps the first directive reports TS1206.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics",
+      "order_sensitive": true,
+      "program": {
+        "case_sensitive": true,
+        "cwd": "/",
+        "files": {
+          "/a.js": "// @ts-nocheck\n// @ts-check\nclass C {\n    m(@dec p) {}\n}\nfunction dec() {}\n"
+        },
+        "options": {
+          "allowJs": true,
+          "noEmit": true,
+          "noLib": true
+        },
+        "roots": [
+          "/a.js"
+        ]
+      },
+      "scope": null,
+      "subject": "syntacticDiagnostics"
+    },
+    {
+      "case": "syntax/diagnostics/later-directive-wins-check-then-nocheck",
+      "discriminates": "The reverse order: @ts-nocheck last disables checking, so the walk runs and reports TS1206 even with checkJs true. Together with the previous case this fixes the precedence in both directions.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics",
+      "order_sensitive": true,
+      "program": {
+        "case_sensitive": true,
+        "cwd": "/",
+        "files": {
+          "/a.js": "// @ts-check\n// @ts-nocheck\nclass C {\n    m(@dec p) {}\n}\nfunction dec() {}\n"
+        },
+        "options": {
+          "allowJs": true,
+          "checkJs": true,
+          "noEmit": true,
+          "noLib": true
+        },
+        "roots": [
+          "/a.js"
+        ]
+      },
+      "scope": null,
+      "subject": "syntacticDiagnostics"
+    },
+    {
+      "case": "syntax/diagnostics/parameter-decorators-first-per-parameter-in-preorder",
+      "discriminates": "The walk reports only the FIRST decorator of each parameter (core.Find over ModifierNodes, program.go:748) and visits in preorder through nested classes, functions and object literals. A port that reports every decorator, or visits children before parents, orders or counts them differently.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics",
+      "order_sensitive": true,
+      "program": {
+        "case_sensitive": true,
+        "cwd": "/",
+        "files": {
+          "/a.js": "class Outer {\n    m(@a @b p, @c q) {\n        class Inner { n(@d r) {} }\n        return { o(@e s) {} };\n    }\n}\nfunction f() {\n    return class { k(@g t) {} };\n}\n"
+        },
+        "options": {
+          "allowJs": true,
+          "noEmit": true,
+          "noLib": true
+        },
+        "roots": [
+          "/a.js"
+        ]
+      },
+      "scope": null,
+      "subject": "syntacticDiagnostics"
+    },
+    {
+      "case": "syntax/diagnostics/malformed-source-many-errors",
+      "discriminates": "Many parse errors in one file: the result is the parser's list after SortAndDeduplicateDiagnostics, so position order and deduplication are both visible.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics",
+      "order_sensitive": true,
+      "program": {
+        "case_sensitive": true,
+        "cwd": "/",
+        "files": {
+          "/a.ts": "var = ;\nfunction (,) { if ( }\nclass { m( }\nlet [a,, = ;\nx = {a: , b};\n"
+        },
+        "options": {
+          "noEmit": true,
+          "noLib": true
+        },
+        "roots": [
+          "/a.ts"
+        ]
+      },
+      "scope": null,
+      "subject": "syntacticDiagnostics"
+    },
+    {
+      "case": "syntax/diagnostics/unterminated-literals",
+      "discriminates": "Unterminated string, template, regular expression and block comment: each is reported where the scanner gives up, several at the end of file.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics",
+      "order_sensitive": true,
+      "program": {
+        "case_sensitive": true,
+        "cwd": "/",
+        "files": {
+          "/s.ts": "let s = \"abc\nlet t = `abc${1}\nlet r = /abc\nlet n = 1;\n/* never closed\n"
+        },
+        "options": {
+          "noEmit": true,
+          "noLib": true
+        },
+        "roots": [
+          "/s.ts"
+        ]
+      },
+      "scope": null,
+      "subject": "syntacticDiagnostics"
+    },
+    {
+      "case": "syntax/diagnostics/missing-nodes-zero-width",
+      "discriminates": "Missing identifiers and expressions become zero-width nodes; their diagnostics carry the exact positions the parser synthesized.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics",
+      "order_sensitive": true,
+      "program": {
+        "case_sensitive": true,
+        "cwd": "/",
+        "files": {
+          "/m.ts": "const x = ;\nf(,);\nlet [a,,] = ;\nimport {} from ;\nfor (;;\n"
+        },
+        "options": {
+          "noEmit": true,
+          "noLib": true
+        },
+        "roots": [
+          "/m.ts"
+        ]
+      },
+      "scope": null,
+      "subject": "syntacticDiagnostics"
+    },
+    {
+      "case": "syntax/diagnostics/empty-whitespace-and-bom-files",
+      "discriminates": "An empty file, a whitespace-only file and a BOM-only file: no syntactic diagnostic, and none of the three is dropped from the program.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics",
+      "order_sensitive": true,
+      "program": {
+        "case_sensitive": true,
+        "cwd": "/",
+        "files": {
+          "/bom.ts": "\ufeff",
+          "/empty.ts": "",
+          "/space.ts": "   \n\t\r\n"
+        },
+        "options": {
+          "noEmit": true,
+          "noLib": true
+        },
+        "roots": [
+          "/bom.ts",
+          "/empty.ts",
+          "/space.ts"
+        ]
+      },
+      "scope": null,
+      "subject": "syntacticDiagnostics"
+    },
+    {
+      "case": "syntax/diagnostics/multi-file-sort-by-file-name",
+      "discriminates": "Two files with errors, rooted z before a: the whole-program list is sorted by file name, not by root or load order.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics",
+      "order_sensitive": true,
+      "program": {
+        "case_sensitive": true,
+        "cwd": "/",
+        "files": {
+          "/a.ts": "let a = ;\n",
+          "/z.ts": "let z = ;\n"
+        },
+        "options": {
+          "noEmit": true,
+          "noLib": true
+        },
+        "roots": [
+          "/z.ts",
+          "/a.ts"
+        ]
+      },
+      "scope": null,
+      "subject": "syntacticDiagnostics"
+    },
+    {
+      "case": "syntax/diagnostics/single-file-scope",
+      "discriminates": "The same program with one file requested: only that file's diagnostics, from the per-file branch of collectDiagnostics (program.go:648).",
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics",
+      "order_sensitive": true,
+      "program": {
+        "case_sensitive": true,
+        "cwd": "/",
+        "files": {
+          "/a.ts": "let a = ;\n",
+          "/z.ts": "let z = ;\n"
+        },
+        "options": {
+          "noEmit": true,
+          "noLib": true
+        },
+        "roots": [
+          "/z.ts",
+          "/a.ts"
+        ]
+      },
+      "scope": "/z.ts",
+      "subject": "syntacticDiagnostics"
+    },
+    {
+      "case": "syntax/diagnostics/jsx-and-tsx-grammar",
+      "discriminates": "JSX grammar errors in a .tsx and a .jsx file: unclosed and mismatched elements, and JSX in a .jsx file without type syntax.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics",
+      "order_sensitive": true,
+      "program": {
+        "case_sensitive": true,
+        "cwd": "/",
+        "files": {
+          "/a.tsx": "let a = <div><span></div>;\nlet b = <p>\n",
+          "/b.jsx": "let c = <div></span>;\n"
+        },
+        "options": {
+          "allowJs": true,
+          "jsx": 1,
+          "noEmit": true,
+          "noLib": true
+        },
+        "roots": [
+          "/a.tsx",
+          "/b.jsx"
+        ]
+      },
+      "scope": null,
+      "subject": "syntacticDiagnostics"
+    },
+    {
+      "case": "syntax/diagnostics/json-file-syntax",
+      "discriminates": "A JSON file reached through an import with resolveJsonModule: its parse diagnostics are syntactic diagnostics of the program too.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics",
+      "order_sensitive": true,
+      "program": {
+        "case_sensitive": true,
+        "cwd": "/",
+        "files": {
+          "/a.ts": "import data from \"./data.json\";\nexport default data;\n",
+          "/data.json": "{\"a\": 1,, \"b\": }\n"
+        },
+        "options": {
+          "esModuleInterop": true,
+          "module": 99,
+          "moduleResolution": 100,
+          "noEmit": true,
+          "noLib": true,
+          "resolveJsonModule": true
+        },
+        "roots": [
+          "/a.ts"
+        ]
+      },
+      "scope": null,
+      "subject": "syntacticDiagnostics"
+    },
+    {
+      "case": "syntax/diagnostics/malformed-jsdoc-in-js",
+      "discriminates": "Malformed JSDoc in a .js file: whether JSDoc parse errors are part of the syntactic list at all.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics",
+      "order_sensitive": true,
+      "program": {
+        "case_sensitive": true,
+        "cwd": "/",
+        "files": {
+          "/a.js": "/**\n * @param {number p\n * @returns {\n */\nfunction f(p) { return p; }\n/** @type {} */\nlet x;\n"
+        },
+        "options": {
+          "allowJs": true,
+          "noEmit": true,
+          "noLib": true
+        },
+        "roots": [
+          "/a.js"
+        ]
+      },
+      "scope": null,
+      "subject": "syntacticDiagnostics"
+    }
+  ]
+}

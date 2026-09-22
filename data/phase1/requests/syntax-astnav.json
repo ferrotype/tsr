@@ -1,0 +1,1035 @@
+{
+  "family": "syntax",
+  "requests": [
+    {
+      "actions": [
+        {
+          "op": "token_at"
+        },
+        {
+          "op": "touching_property_name"
+        },
+        {
+          "op": "touching_token"
+        },
+        {
+          "op": "preceding"
+        },
+        {
+          "op": "preceding_exclude_jsdoc"
+        },
+        {
+          "op": "next_in_file"
+        },
+        {
+          "op": "next_in_parent"
+        },
+        {
+          "op": "start_of_token"
+        },
+        {
+          "op": "start_of_token_with_jsdoc"
+        },
+        {
+          "op": "token_at_repeat"
+        },
+        {
+          "kinds": [
+            "KindOpenParenToken",
+            "KindCloseParenToken",
+            "KindOpenBracketToken",
+            "KindCloseBracketToken",
+            "KindOpenBraceToken",
+            "KindCloseBraceToken",
+            "KindCommaToken",
+            "KindSemicolonToken",
+            "KindDotToken",
+            "KindEqualsGreaterThanToken",
+            "KindColonToken",
+            "KindLessThanToken",
+            "KindGreaterThanToken",
+            "KindEqualsToken",
+            "KindQuestionToken",
+            "KindIdentifier"
+          ],
+          "op": "child_of_kind"
+        },
+        {
+          "op": "visit_nodes"
+        }
+      ],
+      "case": "syntax/astnav/mapcode-sweeps",
+      "discriminates": "The pinned astnav fixture swept at every byte offset through every navigation operation, plus FindChildOfKind and the JSDoc-aware visitor over every node. It subsumes the four upstream JSON baselines (GetTokenAtPosition, GetTouchingPropertyName, FindPrecedingToken, FindNextToken) and adds the end-of-file position, GetTouchingToken, FindPrecedingTokenEx with excludeJSDoc, FindNextToken with the token's own parent, GetStartOfNode and token identity across operations.",
+      "file": {
+        "name": "/mapCode.ts",
+        "script_kind": 3,
+        "text": "import {\n    Block,\n    ClassElement,\n    ClassLikeDeclaration,\n    createSourceFile,\n    FileTextChanges,\n    find,\n    findAncestor,\n    findLast,\n    flatten,\n    forEach,\n    formatting,\n    getTokenAtPosition,\n    isBlock,\n    isClassElement,\n    isClassLike,\n    isForInOrOfStatement,\n    isForStatement,\n    isIfStatement,\n    isInterfaceDeclaration,\n    isLabeledStatement,\n    isNamedDeclaration,\n    isSourceFile,\n    isTypeElement,\n    isWhileStatement,\n    LanguageServiceHost,\n    Mutable,\n    Node,\n    NodeArray,\n    or,\n    some,\n    SourceFile,\n    Statement,\n    SyntaxKind,\n    textChanges,\n    TextSpan,\n    TypeElement,\n    UserPreferences,\n} from \"./_namespaces/ts.js\";\nimport { ChangeTracker } from \"./textChanges.js\";\n\n/** @internal */\nexport function mapCode(\n    sourceFile: SourceFile,\n    contents: string[],\n    focusLocations: TextSpan[][] | undefined,\n    host: LanguageServiceHost,\n    formatContext: formatting.FormatContext,\n    preferences: UserPreferences,\n): FileTextChanges[] {\n    return textChanges.ChangeTracker.with(\n        { host, formatContext, preferences },\n        changeTracker => {\n            const parsed = contents.map(c => parse(sourceFile, c));\n            const flattenedLocations = focusLocations && flatten(focusLocations);\n            for (const nodes of parsed) {\n                placeNodeGroup(\n                    sourceFile,\n                    changeTracker,\n                    nodes,\n                    flattenedLocations,\n                );\n            }\n        },\n    );\n}\n\n/**\n * Tries to parse something into either \"top-level\" statements, or into blocks\n * of class-context definitions.\n */\nfunction parse(sourceFile: SourceFile, content: string): NodeArray<Node> {\n    // We're going to speculatively parse different kinds of contexts to see\n    // which one makes the most sense, and grab the NodeArray from there. Do\n    // this as lazily as possible.\n    const nodeKinds = [\n        {\n            parse: () =>\n                createSourceFile(\n                    \"__mapcode_content_nodes.ts\",\n                    content,\n                    sourceFile.languageVersion,\n                    /*setParentNodes*/ true,\n                    sourceFile.scriptKind,\n                ),\n            body: (sf: SourceFile) => sf.statements,\n        },\n        {\n            parse: () =>\n                createSourceFile(\n                    \"__mapcode_class_content_nodes.ts\",\n                    `class __class {\\n${content}\\n}`,\n                    sourceFile.languageVersion,\n                    /*setParentNodes*/ true,\n                    sourceFile.scriptKind,\n                ),\n            body: (cw: SourceFile) => (cw.statements[0] as ClassLikeDeclaration).members,\n        },\n    ];\n\n    const parsedNodes = [];\n    for (const { parse, body } of nodeKinds) {\n        const sourceFile = parse();\n        const bod = body(sourceFile);\n        if (bod.length && sourceFile.parseDiagnostics.length === 0) {\n            // If we run into a case with no parse errors, this is likely the right kind.\n            return bod;\n        }\n        // We only want to keep the ones that have some kind of body.\n        else if (bod.length) {\n            // Otherwise, we'll need to look at others.\n            parsedNodes.push({ sourceFile, body: bod });\n        }\n    }\n    // Heuristic: fewer errors = more likely to be the right kind.\n    parsedNodes.sort(\n        (a, b) =>\n            a.sourceFile.parseDiagnostics.length -\n            b.sourceFile.parseDiagnostics.length,\n    );\n    const { body } = parsedNodes[0];\n    return body;\n}\n\nfunction placeNodeGroup(\n    originalFile: SourceFile,\n    changeTracker: ChangeTracker,\n    changes: NodeArray<Node>,\n    focusLocations?: TextSpan[],\n) {\n    if (isClassElement(changes[0]) || isTypeElement(changes[0])) {\n        placeClassNodeGroup(\n            originalFile,\n            changeTracker,\n            changes as NodeArray<ClassElement>,\n            focusLocations,\n        );\n    }\n    else {\n        placeStatements(\n            originalFile,\n            changeTracker,\n            changes as NodeArray<Statement>,\n            focusLocations,\n        );\n    }\n}\n\nfunction placeClassNodeGroup(\n    originalFile: SourceFile,\n    changeTracker: ChangeTracker,\n    changes: NodeArray<ClassElement> | NodeArray<TypeElement>,\n    focusLocations?: TextSpan[],\n) {\n    let classOrInterface;\n    if (!focusLocations || !focusLocations.length) {\n        classOrInterface = find(originalFile.statements, or(isClassLike, isInterfaceDeclaration));\n    }\n    else {\n        classOrInterface = forEach(focusLocations, location =>\n            findAncestor(\n                getTokenAtPosition(originalFile, location.start),\n                or(isClassLike, isInterfaceDeclaration),\n            ));\n    }\n\n    if (!classOrInterface) {\n        // No class? don't insert.\n        return;\n    }\n\n    const firstMatch = classOrInterface.members.find(member => changes.some(change => matchNode(change, member)));\n    if (firstMatch) {\n        // can't be undefined here, since we know we have at least one match.\n        const lastMatch = findLast(\n            classOrInterface.members as NodeArray<ClassElement | TypeElement>,\n            member => changes.some(change => matchNode(change, member)),\n        )!;\n\n        forEach(changes, wipeNode);\n        changeTracker.replaceNodeRangeWithNodes(\n            originalFile,\n            firstMatch,\n            lastMatch,\n            changes,\n        );\n        return;\n    }\n\n    forEach(changes, wipeNode);\n    changeTracker.insertNodesAfter(\n        originalFile,\n        classOrInterface.members[classOrInterface.members.length - 1],\n        changes,\n    );\n}\n\nfunction placeStatements(\n    originalFile: SourceFile,\n    changeTracker: ChangeTracker,\n    changes: NodeArray<Statement>,\n    focusLocations?: TextSpan[],\n) {\n    if (!focusLocations?.length) {\n        changeTracker.insertNodesAtEndOfFile(\n            originalFile,\n            changes,\n            /*blankLineBetween*/ false,\n        );\n        return;\n    }\n\n    for (const location of focusLocations) {\n        const scope = findAncestor(\n            getTokenAtPosition(originalFile, location.start),\n            (block): block is Block | SourceFile =>\n                or(isBlock, isSourceFile)(block) &&\n                some(block.statements, origStmt => changes.some(newStmt => matchNode(newStmt, origStmt))),\n        );\n        if (scope) {\n            const start = scope.statements.find(stmt => changes.some(node => matchNode(node, stmt)));\n            if (start) {\n                // Can't be undefined here, since we know we have at least one match.\n                const end = findLast(scope.statements, stmt => changes.some(node => matchNode(node, stmt)))!;\n                forEach(changes, wipeNode);\n                changeTracker.replaceNodeRangeWithNodes(\n                    originalFile,\n                    start,\n                    end,\n                    changes,\n                );\n                return;\n            }\n        }\n    }\n\n    let scopeStatements: NodeArray<Statement> = originalFile.statements;\n    for (const location of focusLocations) {\n        const block = findAncestor(\n            getTokenAtPosition(originalFile, location.start),\n            isBlock,\n        );\n        if (block) {\n            scopeStatements = block.statements;\n            break;\n        }\n    }\n    forEach(changes, wipeNode);\n    changeTracker.insertNodesAfter(\n        originalFile,\n        scopeStatements[scopeStatements.length - 1],\n        changes,\n    );\n}\n\nfunction matchNode(a: Node, b: Node): boolean {\n    if (a.kind !== b.kind) {\n        return false;\n    }\n\n    if (a.kind === SyntaxKind.Constructor) {\n        return a.kind === b.kind;\n    }\n\n    if (isNamedDeclaration(a) && isNamedDeclaration(b)) {\n        return a.name.getText() === b.name.getText();\n    }\n\n    if (isIfStatement(a) && isIfStatement(b)) {\n        return (\n            a.expression.getText() === b.expression.getText()\n        );\n    }\n\n    if (isWhileStatement(a) && isWhileStatement(b)) {\n        return (\n            a.expression.getText() ===\n                b.expression.getText()\n        );\n    }\n\n    if (isForStatement(a) && isForStatement(b)) {\n        return (\n            a.initializer?.getText() ===\n                b.initializer?.getText() &&\n            a.incrementor?.getText() ===\n                b.incrementor?.getText() &&\n            a.condition?.getText() === b.condition?.getText()\n        );\n    }\n\n    if (isForInOrOfStatement(a) && isForInOrOfStatement(b)) {\n        return (\n            a.expression.getText() ===\n                b.expression.getText() &&\n            a.initializer.getText() ===\n                b.initializer.getText()\n        );\n    }\n\n    if (isLabeledStatement(a) && isLabeledStatement(b)) {\n        // If we're actually labeling/naming something, we should be a bit\n        // more lenient about when we match, so we don't care what the actual\n        // related statement is: we just replace.\n        return a.label.getText() === b.label.getText();\n    }\n\n    if (a.getText() === b.getText()) {\n        return true;\n    }\n\n    return false;\n}\n\nfunction wipeNode(node: Mutable<Node>) {\n    resetNodePositions(node);\n    node.parent = undefined!;\n}\n\nfunction resetNodePositions(node: Mutable<Node>) {\n    node.pos = -1;\n    node.end = -1;\n    node.forEachChild(resetNodePositions);\n}\n"
+      },
+      "host_applicability": "any",
+      "operation": "tsc/internal/astnav/tokens.go:GetTokenAtPosition",
+      "order_sensitive": true,
+      "source": "tsc/testdata/fixtures/services/mapCode.ts",
+      "subject": "astnav"
+    },
+    {
+      "actions": [
+        {
+          "op": "visit_lists"
+        }
+      ],
+      "case": "syntax/astnav/mapcode-visitor-list-ranges",
+      "discriminates": "VisitEachChildAndJSDoc hands its visitNodes hook the NodeList itself, whose position callers read (ls/utilities.go findContainingList). This records each visited list's range, not only its members.",
+      "file": {
+        "name": "/mapCode.ts",
+        "script_kind": 3,
+        "text": "import {\n    Block,\n    ClassElement,\n    ClassLikeDeclaration,\n    createSourceFile,\n    FileTextChanges,\n    find,\n    findAncestor,\n    findLast,\n    flatten,\n    forEach,\n    formatting,\n    getTokenAtPosition,\n    isBlock,\n    isClassElement,\n    isClassLike,\n    isForInOrOfStatement,\n    isForStatement,\n    isIfStatement,\n    isInterfaceDeclaration,\n    isLabeledStatement,\n    isNamedDeclaration,\n    isSourceFile,\n    isTypeElement,\n    isWhileStatement,\n    LanguageServiceHost,\n    Mutable,\n    Node,\n    NodeArray,\n    or,\n    some,\n    SourceFile,\n    Statement,\n    SyntaxKind,\n    textChanges,\n    TextSpan,\n    TypeElement,\n    UserPreferences,\n} from \"./_namespaces/ts.js\";\nimport { ChangeTracker } from \"./textChanges.js\";\n\n/** @internal */\nexport function mapCode(\n    sourceFile: SourceFile,\n    contents: string[],\n    focusLocations: TextSpan[][] | undefined,\n    host: LanguageServiceHost,\n    formatContext: formatting.FormatContext,\n    preferences: UserPreferences,\n): FileTextChanges[] {\n    return textChanges.ChangeTracker.with(\n        { host, formatContext, preferences },\n        changeTracker => {\n            const parsed = contents.map(c => parse(sourceFile, c));\n            const flattenedLocations = focusLocations && flatten(focusLocations);\n            for (const nodes of parsed) {\n                placeNodeGroup(\n                    sourceFile,\n                    changeTracker,\n                    nodes,\n                    flattenedLocations,\n                );\n            }\n        },\n    );\n}\n\n/**\n * Tries to parse something into either \"top-level\" statements, or into blocks\n * of class-context definitions.\n */\nfunction parse(sourceFile: SourceFile, content: string): NodeArray<Node> {\n    // We're going to speculatively parse different kinds of contexts to see\n    // which one makes the most sense, and grab the NodeArray from there. Do\n    // this as lazily as possible.\n    const nodeKinds = [\n        {\n            parse: () =>\n                createSourceFile(\n                    \"__mapcode_content_nodes.ts\",\n                    content,\n                    sourceFile.languageVersion,\n                    /*setParentNodes*/ true,\n                    sourceFile.scriptKind,\n                ),\n            body: (sf: SourceFile) => sf.statements,\n        },\n        {\n            parse: () =>\n                createSourceFile(\n                    \"__mapcode_class_content_nodes.ts\",\n                    `class __class {\\n${content}\\n}`,\n                    sourceFile.languageVersion,\n                    /*setParentNodes*/ true,\n                    sourceFile.scriptKind,\n                ),\n            body: (cw: SourceFile) => (cw.statements[0] as ClassLikeDeclaration).members,\n        },\n    ];\n\n    const parsedNodes = [];\n    for (const { parse, body } of nodeKinds) {\n        const sourceFile = parse();\n        const bod = body(sourceFile);\n        if (bod.length && sourceFile.parseDiagnostics.length === 0) {\n            // If we run into a case with no parse errors, this is likely the right kind.\n            return bod;\n        }\n        // We only want to keep the ones that have some kind of body.\n        else if (bod.length) {\n            // Otherwise, we'll need to look at others.\n            parsedNodes.push({ sourceFile, body: bod });\n        }\n    }\n    // Heuristic: fewer errors = more likely to be the right kind.\n    parsedNodes.sort(\n        (a, b) =>\n            a.sourceFile.parseDiagnostics.length -\n            b.sourceFile.parseDiagnostics.length,\n    );\n    const { body } = parsedNodes[0];\n    return body;\n}\n\nfunction placeNodeGroup(\n    originalFile: SourceFile,\n    changeTracker: ChangeTracker,\n    changes: NodeArray<Node>,\n    focusLocations?: TextSpan[],\n) {\n    if (isClassElement(changes[0]) || isTypeElement(changes[0])) {\n        placeClassNodeGroup(\n            originalFile,\n            changeTracker,\n            changes as NodeArray<ClassElement>,\n            focusLocations,\n        );\n    }\n    else {\n        placeStatements(\n            originalFile,\n            changeTracker,\n            changes as NodeArray<Statement>,\n            focusLocations,\n        );\n    }\n}\n\nfunction placeClassNodeGroup(\n    originalFile: SourceFile,\n    changeTracker: ChangeTracker,\n    changes: NodeArray<ClassElement> | NodeArray<TypeElement>,\n    focusLocations?: TextSpan[],\n) {\n    let classOrInterface;\n    if (!focusLocations || !focusLocations.length) {\n        classOrInterface = find(originalFile.statements, or(isClassLike, isInterfaceDeclaration));\n    }\n    else {\n        classOrInterface = forEach(focusLocations, location =>\n            findAncestor(\n                getTokenAtPosition(originalFile, location.start),\n                or(isClassLike, isInterfaceDeclaration),\n            ));\n    }\n\n    if (!classOrInterface) {\n        // No class? don't insert.\n        return;\n    }\n\n    const firstMatch = classOrInterface.members.find(member => changes.some(change => matchNode(change, member)));\n    if (firstMatch) {\n        // can't be undefined here, since we know we have at least one match.\n        const lastMatch = findLast(\n            classOrInterface.members as NodeArray<ClassElement | TypeElement>,\n            member => changes.some(change => matchNode(change, member)),\n        )!;\n\n        forEach(changes, wipeNode);\n        changeTracker.replaceNodeRangeWithNodes(\n            originalFile,\n            firstMatch,\n            lastMatch,\n            changes,\n        );\n        return;\n    }\n\n    forEach(changes, wipeNode);\n    changeTracker.insertNodesAfter(\n        originalFile,\n        classOrInterface.members[classOrInterface.members.length - 1],\n        changes,\n    );\n}\n\nfunction placeStatements(\n    originalFile: SourceFile,\n    changeTracker: ChangeTracker,\n    changes: NodeArray<Statement>,\n    focusLocations?: TextSpan[],\n) {\n    if (!focusLocations?.length) {\n        changeTracker.insertNodesAtEndOfFile(\n            originalFile,\n            changes,\n            /*blankLineBetween*/ false,\n        );\n        return;\n    }\n\n    for (const location of focusLocations) {\n        const scope = findAncestor(\n            getTokenAtPosition(originalFile, location.start),\n            (block): block is Block | SourceFile =>\n                or(isBlock, isSourceFile)(block) &&\n                some(block.statements, origStmt => changes.some(newStmt => matchNode(newStmt, origStmt))),\n        );\n        if (scope) {\n            const start = scope.statements.find(stmt => changes.some(node => matchNode(node, stmt)));\n            if (start) {\n                // Can't be undefined here, since we know we have at least one match.\n                const end = findLast(scope.statements, stmt => changes.some(node => matchNode(node, stmt)))!;\n                forEach(changes, wipeNode);\n                changeTracker.replaceNodeRangeWithNodes(\n                    originalFile,\n                    start,\n                    end,\n                    changes,\n                );\n                return;\n            }\n        }\n    }\n\n    let scopeStatements: NodeArray<Statement> = originalFile.statements;\n    for (const location of focusLocations) {\n        const block = findAncestor(\n            getTokenAtPosition(originalFile, location.start),\n            isBlock,\n        );\n        if (block) {\n            scopeStatements = block.statements;\n            break;\n        }\n    }\n    forEach(changes, wipeNode);\n    changeTracker.insertNodesAfter(\n        originalFile,\n        scopeStatements[scopeStatements.length - 1],\n        changes,\n    );\n}\n\nfunction matchNode(a: Node, b: Node): boolean {\n    if (a.kind !== b.kind) {\n        return false;\n    }\n\n    if (a.kind === SyntaxKind.Constructor) {\n        return a.kind === b.kind;\n    }\n\n    if (isNamedDeclaration(a) && isNamedDeclaration(b)) {\n        return a.name.getText() === b.name.getText();\n    }\n\n    if (isIfStatement(a) && isIfStatement(b)) {\n        return (\n            a.expression.getText() === b.expression.getText()\n        );\n    }\n\n    if (isWhileStatement(a) && isWhileStatement(b)) {\n        return (\n            a.expression.getText() ===\n                b.expression.getText()\n        );\n    }\n\n    if (isForStatement(a) && isForStatement(b)) {\n        return (\n            a.initializer?.getText() ===\n                b.initializer?.getText() &&\n            a.incrementor?.getText() ===\n                b.incrementor?.getText() &&\n            a.condition?.getText() === b.condition?.getText()\n        );\n    }\n\n    if (isForInOrOfStatement(a) && isForInOrOfStatement(b)) {\n        return (\n            a.expression.getText() ===\n                b.expression.getText() &&\n            a.initializer.getText() ===\n                b.initializer.getText()\n        );\n    }\n\n    if (isLabeledStatement(a) && isLabeledStatement(b)) {\n        // If we're actually labeling/naming something, we should be a bit\n        // more lenient about when we match, so we don't care what the actual\n        // related statement is: we just replace.\n        return a.label.getText() === b.label.getText();\n    }\n\n    if (a.getText() === b.getText()) {\n        return true;\n    }\n\n    return false;\n}\n\nfunction wipeNode(node: Mutable<Node>) {\n    resetNodePositions(node);\n    node.parent = undefined!;\n}\n\nfunction resetNodePositions(node: Mutable<Node>) {\n    node.pos = -1;\n    node.end = -1;\n    node.forEachChild(resetNodePositions);\n}\n"
+      },
+      "host_applicability": "any",
+      "operation": "tsc/internal/astnav/tokens.go:VisitEachChildAndJSDoc",
+      "order_sensitive": true,
+      "source": "tsc/testdata/fixtures/services/mapCode.ts",
+      "subject": "astnav"
+    },
+    {
+      "actions": [
+        {
+          "op": "token_at"
+        },
+        {
+          "op": "touching_property_name"
+        },
+        {
+          "op": "touching_token"
+        },
+        {
+          "op": "preceding"
+        },
+        {
+          "op": "preceding_exclude_jsdoc"
+        },
+        {
+          "op": "next_in_file"
+        },
+        {
+          "op": "next_in_parent"
+        },
+        {
+          "op": "start_of_token"
+        },
+        {
+          "op": "start_of_token_with_jsdoc"
+        },
+        {
+          "op": "token_at_repeat"
+        },
+        {
+          "kinds": [
+            "KindOpenParenToken",
+            "KindCloseParenToken",
+            "KindOpenBracketToken",
+            "KindCloseBracketToken",
+            "KindOpenBraceToken",
+            "KindCloseBraceToken",
+            "KindCommaToken",
+            "KindSemicolonToken",
+            "KindDotToken",
+            "KindEqualsGreaterThanToken",
+            "KindColonToken",
+            "KindLessThanToken",
+            "KindGreaterThanToken",
+            "KindEqualsToken",
+            "KindQuestionToken",
+            "KindIdentifier"
+          ],
+          "op": "child_of_kind"
+        },
+        {
+          "op": "visit_nodes"
+        }
+      ],
+      "case": "syntax/astnav/upstream-jsdoc-type-assertion",
+      "discriminates": "tokens_test.go 'JSDoc type assertion': a JSDoc cast in a .js file creates reparsed nodes, the case that used to panic in GetTouchingPropertyName. Upstream accepts either of two kinds; this records the exact answer at every position.",
+      "file": {
+        "name": "/test.js",
+        "script_kind": 1,
+        "text": "function foo(x) {\n    const s = /**@type {string}*/(x)\n}"
+      },
+      "host_applicability": "any",
+      "operation": "tsc/internal/astnav/tokens.go:GetTouchingPropertyName",
+      "order_sensitive": true,
+      "source": "tsc/internal/astnav/tokens_test.go",
+      "subject": "astnav"
+    },
+    {
+      "actions": [
+        {
+          "op": "token_at"
+        },
+        {
+          "op": "touching_property_name"
+        },
+        {
+          "op": "touching_token"
+        },
+        {
+          "op": "preceding"
+        },
+        {
+          "op": "preceding_exclude_jsdoc"
+        },
+        {
+          "op": "next_in_file"
+        },
+        {
+          "op": "next_in_parent"
+        },
+        {
+          "op": "start_of_token"
+        },
+        {
+          "op": "start_of_token_with_jsdoc"
+        },
+        {
+          "op": "token_at_repeat"
+        },
+        {
+          "kinds": [
+            "KindOpenParenToken",
+            "KindCloseParenToken",
+            "KindOpenBracketToken",
+            "KindCloseBracketToken",
+            "KindOpenBraceToken",
+            "KindCloseBraceToken",
+            "KindCommaToken",
+            "KindSemicolonToken",
+            "KindDotToken",
+            "KindEqualsGreaterThanToken",
+            "KindColonToken",
+            "KindLessThanToken",
+            "KindGreaterThanToken",
+            "KindEqualsToken",
+            "KindQuestionToken",
+            "KindIdentifier"
+          ],
+          "op": "child_of_kind"
+        },
+        {
+          "op": "visit_nodes"
+        }
+      ],
+      "case": "syntax/astnav/upstream-jsdoc-type-assertion-with-comment",
+      "discriminates": "tokens_test.go 'JSDoc type assertion with comment': the same cast followed by a line comment.",
+      "file": {
+        "name": "/test.js",
+        "script_kind": 1,
+        "text": "function foo(x) {\n    const s = /**@type {string}*/(x)  // Go-to-definition on x causes panic\n}"
+      },
+      "host_applicability": "any",
+      "operation": "tsc/internal/astnav/tokens.go:GetTouchingPropertyName",
+      "order_sensitive": true,
+      "source": "tsc/internal/astnav/tokens_test.go",
+      "subject": "astnav"
+    },
+    {
+      "actions": [
+        {
+          "op": "token_at"
+        },
+        {
+          "op": "touching_property_name"
+        },
+        {
+          "op": "touching_token"
+        },
+        {
+          "op": "preceding"
+        },
+        {
+          "op": "preceding_exclude_jsdoc"
+        },
+        {
+          "op": "next_in_file"
+        },
+        {
+          "op": "next_in_parent"
+        },
+        {
+          "op": "start_of_token"
+        },
+        {
+          "op": "start_of_token_with_jsdoc"
+        },
+        {
+          "op": "token_at_repeat"
+        },
+        {
+          "kinds": [
+            "KindOpenParenToken",
+            "KindCloseParenToken",
+            "KindOpenBracketToken",
+            "KindCloseBracketToken",
+            "KindOpenBraceToken",
+            "KindCloseBraceToken",
+            "KindCommaToken",
+            "KindSemicolonToken",
+            "KindDotToken",
+            "KindEqualsGreaterThanToken",
+            "KindColonToken",
+            "KindLessThanToken",
+            "KindGreaterThanToken",
+            "KindEqualsToken",
+            "KindQuestionToken",
+            "KindIdentifier"
+          ],
+          "op": "child_of_kind"
+        },
+        {
+          "op": "visit_nodes"
+        }
+      ],
+      "case": "syntax/astnav/upstream-pointer-equality",
+      "discriminates": "tokens_test.go 'pointer equality': repeated GetTokenAtPosition must return the identical node. Here every position is asked twice (token_at_repeat) and the ordinals must agree.",
+      "file": {
+        "name": "/file.ts",
+        "script_kind": 3,
+        "text": "\n\t\t\tfunction foo() {\n\t\t\t\treturn 0;\n\t\t\t}\n\t\t"
+      },
+      "host_applicability": "any",
+      "operation": "tsc/internal/astnav/tokens.go:GetTokenAtPosition",
+      "order_sensitive": true,
+      "source": "tsc/internal/astnav/tokens_test.go",
+      "subject": "astnav"
+    },
+    {
+      "actions": [
+        {
+          "op": "token_at"
+        },
+        {
+          "op": "touching_property_name"
+        },
+        {
+          "op": "touching_token"
+        },
+        {
+          "op": "preceding"
+        },
+        {
+          "op": "preceding_exclude_jsdoc"
+        },
+        {
+          "op": "next_in_file"
+        },
+        {
+          "op": "next_in_parent"
+        },
+        {
+          "op": "start_of_token"
+        },
+        {
+          "op": "start_of_token_with_jsdoc"
+        },
+        {
+          "op": "token_at_repeat"
+        },
+        {
+          "kinds": [
+            "KindOpenParenToken",
+            "KindCloseParenToken",
+            "KindOpenBracketToken",
+            "KindCloseBracketToken",
+            "KindOpenBraceToken",
+            "KindCloseBraceToken",
+            "KindCommaToken",
+            "KindSemicolonToken",
+            "KindDotToken",
+            "KindEqualsGreaterThanToken",
+            "KindColonToken",
+            "KindLessThanToken",
+            "KindGreaterThanToken",
+            "KindEqualsToken",
+            "KindQuestionToken",
+            "KindIdentifier"
+          ],
+          "op": "child_of_kind"
+        },
+        {
+          "op": "visit_nodes"
+        }
+      ],
+      "case": "syntax/astnav/upstream-preceding-after-dot-in-jsdoc",
+      "discriminates": "TestUnitFindPrecedingToken 'after dot in jsdoc' (position 839 expects DotToken), swept at every offset with its exact range and identity rather than the kind alone.",
+      "file": {
+        "name": "/file.ts",
+        "script_kind": 3,
+        "text": "import {\n    CharacterCodes,\n    compareStringsCaseInsensitive,\n    compareStringsCaseSensitive,\n    compareValues,\n    Comparison,\n    Debug,\n    endsWith,\n    equateStringsCaseInsensitive,\n    equateStringsCaseSensitive,\n    GetCanonicalFileName,\n    getDeclarationFileExtension,\n    getStringComparer,\n    identity,\n    lastOrUndefined,\n    Path,\n    some,\n    startsWith,\n} from \"./_namespaces/ts.js\";\n\n/**\n * Internally, we represent paths as strings with '/' as the directory separator.\n * When we make system calls (eg: LanguageServiceHost.getDirectory()),\n * we expect the host to correctly handle paths in our specified format.\n *\n * @internal\n */\nexport const directorySeparator = \"/\";\n/** @internal */\nexport const altDirectorySeparator = \"\\\\\";\nconst urlSchemeSeparator = \"://\";\nconst backslashRegExp = /\\\\/g;\n\n\nbackslashRegExp.\n\n//Path Tests\n\n/**\n * Determines whether a charCode corresponds to '/' or '\\'.\n *\n * @internal\n */\nexport function isAnyDirectorySeparator(charCode: number): boolean {\n    return charCode === CharacterCodes.slash || charCode === CharacterCodes.backslash;\n}"
+      },
+      "host_applicability": "any",
+      "operation": "tsc/internal/astnav/tokens.go:FindPrecedingToken",
+      "order_sensitive": true,
+      "source": "tsc/internal/astnav/tokens_test.go",
+      "subject": "astnav"
+    },
+    {
+      "actions": [
+        {
+          "op": "token_at"
+        },
+        {
+          "op": "touching_property_name"
+        },
+        {
+          "op": "touching_token"
+        },
+        {
+          "op": "preceding"
+        },
+        {
+          "op": "preceding_exclude_jsdoc"
+        },
+        {
+          "op": "next_in_file"
+        },
+        {
+          "op": "next_in_parent"
+        },
+        {
+          "op": "start_of_token"
+        },
+        {
+          "op": "start_of_token_with_jsdoc"
+        },
+        {
+          "op": "token_at_repeat"
+        },
+        {
+          "kinds": [
+            "KindOpenParenToken",
+            "KindCloseParenToken",
+            "KindOpenBracketToken",
+            "KindCloseBracketToken",
+            "KindOpenBraceToken",
+            "KindCloseBraceToken",
+            "KindCommaToken",
+            "KindSemicolonToken",
+            "KindDotToken",
+            "KindEqualsGreaterThanToken",
+            "KindColonToken",
+            "KindLessThanToken",
+            "KindGreaterThanToken",
+            "KindEqualsToken",
+            "KindQuestionToken",
+            "KindIdentifier"
+          ],
+          "op": "child_of_kind"
+        },
+        {
+          "op": "visit_nodes"
+        }
+      ],
+      "case": "syntax/astnav/upstream-preceding-after-comma",
+      "discriminates": "TestUnitFindPrecedingToken 'after comma in parameter list' (position 15 expects CommaToken).",
+      "file": {
+        "name": "/file.ts",
+        "script_kind": 3,
+        "text": "takesCb((n, s, ))"
+      },
+      "host_applicability": "any",
+      "operation": "tsc/internal/astnav/tokens.go:FindPrecedingToken",
+      "order_sensitive": true,
+      "source": "tsc/internal/astnav/tokens_test.go",
+      "subject": "astnav"
+    },
+    {
+      "actions": [
+        {
+          "op": "token_at"
+        },
+        {
+          "op": "touching_property_name"
+        },
+        {
+          "op": "touching_token"
+        },
+        {
+          "op": "preceding"
+        },
+        {
+          "op": "preceding_exclude_jsdoc"
+        },
+        {
+          "op": "next_in_file"
+        },
+        {
+          "op": "next_in_parent"
+        },
+        {
+          "op": "start_of_token"
+        },
+        {
+          "op": "start_of_token_with_jsdoc"
+        },
+        {
+          "op": "token_at_repeat"
+        },
+        {
+          "kinds": [
+            "KindOpenParenToken",
+            "KindCloseParenToken",
+            "KindOpenBracketToken",
+            "KindCloseBracketToken",
+            "KindOpenBraceToken",
+            "KindCloseBraceToken",
+            "KindCommaToken",
+            "KindSemicolonToken",
+            "KindDotToken",
+            "KindEqualsGreaterThanToken",
+            "KindColonToken",
+            "KindLessThanToken",
+            "KindGreaterThanToken",
+            "KindEqualsToken",
+            "KindQuestionToken",
+            "KindIdentifier"
+          ],
+          "op": "child_of_kind"
+        },
+        {
+          "op": "visit_nodes"
+        }
+      ],
+      "case": "syntax/astnav/jsx-less-than-less-than",
+      "discriminates": "`<<` inside a JSX expression and after a JSX element: the one input for which shouldRescanLessThanLessThanToken is true (tokens.go:11). mapCode.ts has no JSX, so no table reaches it.",
+      "file": {
+        "name": "/a.tsx",
+        "script_kind": 4,
+        "text": "const a = <div>{1 << 2}</div>;\nconst b = x << <span/>;\nconst c = <p>{y <<= 1}</p>;\n"
+      },
+      "host_applicability": "any",
+      "operation": "tsc/internal/astnav/tokens.go:shouldRescanLessThanLessThanToken",
+      "order_sensitive": true,
+      "subject": "astnav"
+    },
+    {
+      "actions": [
+        {
+          "op": "token_at"
+        },
+        {
+          "op": "touching_property_name"
+        },
+        {
+          "op": "touching_token"
+        },
+        {
+          "op": "preceding"
+        },
+        {
+          "op": "preceding_exclude_jsdoc"
+        },
+        {
+          "op": "next_in_file"
+        },
+        {
+          "op": "next_in_parent"
+        },
+        {
+          "op": "start_of_token"
+        },
+        {
+          "op": "start_of_token_with_jsdoc"
+        },
+        {
+          "op": "token_at_repeat"
+        },
+        {
+          "kinds": [
+            "KindOpenParenToken",
+            "KindCloseParenToken",
+            "KindOpenBracketToken",
+            "KindCloseBracketToken",
+            "KindOpenBraceToken",
+            "KindCloseBraceToken",
+            "KindCommaToken",
+            "KindSemicolonToken",
+            "KindDotToken",
+            "KindEqualsGreaterThanToken",
+            "KindColonToken",
+            "KindLessThanToken",
+            "KindGreaterThanToken",
+            "KindEqualsToken",
+            "KindQuestionToken",
+            "KindIdentifier"
+          ],
+          "op": "child_of_kind"
+        },
+        {
+          "op": "visit_nodes"
+        }
+      ],
+      "case": "syntax/astnav/js-jsdoc-reparsed-nodes",
+      "discriminates": "JSDoc tags and casts in a .js file produce reparsed nodes (parser/jsdoc.go), which every reparsed-node guard in tokens.go skips. The pinned TypeScript fixture never sets NodeFlagsReparsed.",
+      "file": {
+        "name": "/a.js",
+        "script_kind": 1,
+        "text": "/** @type {number} */\nconst n = /** @type {any} */ (x);\n/**\n * @param {string} s\n * @returns {number}\n */\nfunction f(s) { return s.length; }\n/** @typedef {{a: number}} T */\n/** @satisfies {T} */\nconst t = { a: 1 };\n"
+      },
+      "host_applicability": "any",
+      "operation": "tsc/internal/astnav/tokens.go:GetTokenAtPosition",
+      "order_sensitive": true,
+      "subject": "astnav"
+    },
+    {
+      "actions": [
+        {
+          "op": "token_at"
+        },
+        {
+          "op": "touching_property_name"
+        },
+        {
+          "op": "touching_token"
+        },
+        {
+          "op": "preceding"
+        },
+        {
+          "op": "preceding_exclude_jsdoc"
+        },
+        {
+          "op": "next_in_file"
+        },
+        {
+          "op": "next_in_parent"
+        },
+        {
+          "op": "start_of_token"
+        },
+        {
+          "op": "start_of_token_with_jsdoc"
+        },
+        {
+          "op": "token_at_repeat"
+        },
+        {
+          "kinds": [
+            "KindOpenParenToken",
+            "KindCloseParenToken",
+            "KindOpenBracketToken",
+            "KindCloseBracketToken",
+            "KindOpenBraceToken",
+            "KindCloseBraceToken",
+            "KindCommaToken",
+            "KindSemicolonToken",
+            "KindDotToken",
+            "KindEqualsGreaterThanToken",
+            "KindColonToken",
+            "KindLessThanToken",
+            "KindGreaterThanToken",
+            "KindEqualsToken",
+            "KindQuestionToken",
+            "KindIdentifier"
+          ],
+          "op": "child_of_kind"
+        },
+        {
+          "op": "visit_nodes"
+        }
+      ],
+      "case": "syntax/astnav/dotted-namespace-reparsed-nodes",
+      "discriminates": "A dotted namespace declaration is the TypeScript source of reparsed nodes (parser.go:2267-2270).",
+      "file": {
+        "name": "/a.ts",
+        "script_kind": 3,
+        "text": "namespace A.B.C { export const x = 1; }\nmodule D.E { }\nA.B.C.x;\n"
+      },
+      "host_applicability": "any",
+      "operation": "tsc/internal/astnav/tokens.go:GetTokenAtPosition",
+      "order_sensitive": true,
+      "subject": "astnav"
+    },
+    {
+      "actions": [
+        {
+          "op": "token_at"
+        },
+        {
+          "op": "touching_property_name"
+        },
+        {
+          "op": "touching_token"
+        },
+        {
+          "op": "preceding"
+        },
+        {
+          "op": "preceding_exclude_jsdoc"
+        },
+        {
+          "op": "next_in_file"
+        },
+        {
+          "op": "next_in_parent"
+        },
+        {
+          "op": "start_of_token"
+        },
+        {
+          "op": "start_of_token_with_jsdoc"
+        },
+        {
+          "op": "token_at_repeat"
+        },
+        {
+          "kinds": [
+            "KindOpenParenToken",
+            "KindCloseParenToken",
+            "KindOpenBracketToken",
+            "KindCloseBracketToken",
+            "KindOpenBraceToken",
+            "KindCloseBraceToken",
+            "KindCommaToken",
+            "KindSemicolonToken",
+            "KindDotToken",
+            "KindEqualsGreaterThanToken",
+            "KindColonToken",
+            "KindLessThanToken",
+            "KindGreaterThanToken",
+            "KindEqualsToken",
+            "KindQuestionToken",
+            "KindIdentifier"
+          ],
+          "op": "child_of_kind"
+        },
+        {
+          "op": "visit_nodes"
+        }
+      ],
+      "case": "syntax/astnav/trivia-comments-and-unterminated-jsdoc",
+      "discriminates": "Positions inside leading and trailing trivia, line and block comments, and a JSDoc comment left open at the end of file (tokens.go:84-88).",
+      "file": {
+        "name": "/a.ts",
+        "script_kind": 3,
+        "text": "// leading\nlet a = 1; // trailing\n/* block */ let b /* inner */ = 2;\n\n\t  \n/** open"
+      },
+      "host_applicability": "any",
+      "operation": "tsc/internal/astnav/tokens.go:GetTokenAtPosition",
+      "order_sensitive": true,
+      "subject": "astnav"
+    },
+    {
+      "actions": [
+        {
+          "op": "token_at"
+        },
+        {
+          "op": "touching_property_name"
+        },
+        {
+          "op": "touching_token"
+        },
+        {
+          "op": "preceding"
+        },
+        {
+          "op": "preceding_exclude_jsdoc"
+        },
+        {
+          "op": "next_in_file"
+        },
+        {
+          "op": "next_in_parent"
+        },
+        {
+          "op": "start_of_token"
+        },
+        {
+          "op": "start_of_token_with_jsdoc"
+        },
+        {
+          "op": "token_at_repeat"
+        },
+        {
+          "kinds": [
+            "KindOpenParenToken",
+            "KindCloseParenToken",
+            "KindOpenBracketToken",
+            "KindCloseBracketToken",
+            "KindOpenBraceToken",
+            "KindCloseBraceToken",
+            "KindCommaToken",
+            "KindSemicolonToken",
+            "KindDotToken",
+            "KindEqualsGreaterThanToken",
+            "KindColonToken",
+            "KindLessThanToken",
+            "KindGreaterThanToken",
+            "KindEqualsToken",
+            "KindQuestionToken",
+            "KindIdentifier"
+          ],
+          "op": "child_of_kind"
+        },
+        {
+          "op": "visit_nodes"
+        }
+      ],
+      "case": "syntax/astnav/zero-width-and-missing-nodes",
+      "discriminates": "Missing identifiers and expressions are zero-width nodes; token and preceding-token answers at and around them.",
+      "file": {
+        "name": "/a.ts",
+        "script_kind": 3,
+        "text": "const x = ;\nf(,);\nif (\nlet [a,,] = ;\n"
+      },
+      "host_applicability": "any",
+      "operation": "tsc/internal/astnav/tokens.go:GetTokenAtPosition",
+      "order_sensitive": true,
+      "subject": "astnav"
+    },
+    {
+      "actions": [
+        {
+          "op": "token_at"
+        },
+        {
+          "op": "touching_property_name"
+        },
+        {
+          "op": "touching_token"
+        },
+        {
+          "op": "preceding"
+        },
+        {
+          "op": "preceding_exclude_jsdoc"
+        },
+        {
+          "op": "next_in_file"
+        },
+        {
+          "op": "next_in_parent"
+        },
+        {
+          "op": "start_of_token"
+        },
+        {
+          "op": "start_of_token_with_jsdoc"
+        },
+        {
+          "op": "token_at_repeat"
+        },
+        {
+          "kinds": [
+            "KindOpenParenToken",
+            "KindCloseParenToken",
+            "KindOpenBracketToken",
+            "KindCloseBracketToken",
+            "KindOpenBraceToken",
+            "KindCloseBraceToken",
+            "KindCommaToken",
+            "KindSemicolonToken",
+            "KindDotToken",
+            "KindEqualsGreaterThanToken",
+            "KindColonToken",
+            "KindLessThanToken",
+            "KindGreaterThanToken",
+            "KindEqualsToken",
+            "KindQuestionToken",
+            "KindIdentifier"
+          ],
+          "op": "child_of_kind"
+        },
+        {
+          "op": "visit_nodes"
+        }
+      ],
+      "case": "syntax/astnav/private-names-and-keyword-properties",
+      "discriminates": "GetTouchingPropertyName accepts a property-name literal, a keyword or a private identifier (tokens.go:23-27). mapCode.ts has no private name, so without this case a port that dropped the private-identifier test would still match every sweep.",
+      "file": {
+        "name": "/a.ts",
+        "script_kind": 3,
+        "text": "class C {\n    #x = 1;\n    get #y() { return 2; }\n    m() { return this.#x + this.#y + this.delete; }\n    delete = 3;\n}\nconst o = { if: 1, class: 2, 'q': 3, 4: 5 };\no.if + o.class + o['q'];\n"
+      },
+      "host_applicability": "any",
+      "operation": "tsc/internal/astnav/tokens.go:GetTouchingPropertyName",
+      "order_sensitive": true,
+      "subject": "astnav"
+    },
+    {
+      "actions": [
+        {
+          "op": "token_at"
+        },
+        {
+          "op": "touching_property_name"
+        },
+        {
+          "op": "touching_token"
+        },
+        {
+          "op": "preceding"
+        },
+        {
+          "op": "preceding_exclude_jsdoc"
+        },
+        {
+          "op": "next_in_file"
+        },
+        {
+          "op": "next_in_parent"
+        },
+        {
+          "op": "start_of_token"
+        },
+        {
+          "op": "start_of_token_with_jsdoc"
+        },
+        {
+          "op": "token_at_repeat"
+        },
+        {
+          "kinds": [
+            "KindOpenParenToken",
+            "KindCloseParenToken",
+            "KindOpenBracketToken",
+            "KindCloseBracketToken",
+            "KindOpenBraceToken",
+            "KindCloseBraceToken",
+            "KindCommaToken",
+            "KindSemicolonToken",
+            "KindDotToken",
+            "KindEqualsGreaterThanToken",
+            "KindColonToken",
+            "KindLessThanToken",
+            "KindGreaterThanToken",
+            "KindEqualsToken",
+            "KindQuestionToken",
+            "KindIdentifier"
+          ],
+          "op": "child_of_kind"
+        },
+        {
+          "op": "visit_nodes"
+        }
+      ],
+      "case": "syntax/astnav/empty-file",
+      "discriminates": "An empty file: the single position is end of file.",
+      "file": {
+        "name": "/empty.ts",
+        "script_kind": 3,
+        "text": ""
+      },
+      "host_applicability": "any",
+      "operation": "tsc/internal/astnav/tokens.go:GetTokenAtPosition",
+      "order_sensitive": true,
+      "subject": "astnav"
+    },
+    {
+      "actions": [
+        {
+          "op": "token_at"
+        },
+        {
+          "op": "touching_property_name"
+        },
+        {
+          "op": "touching_token"
+        },
+        {
+          "op": "preceding"
+        },
+        {
+          "op": "preceding_exclude_jsdoc"
+        },
+        {
+          "op": "next_in_file"
+        },
+        {
+          "op": "next_in_parent"
+        },
+        {
+          "op": "start_of_token"
+        },
+        {
+          "op": "start_of_token_with_jsdoc"
+        },
+        {
+          "op": "token_at_repeat"
+        },
+        {
+          "kinds": [
+            "KindOpenParenToken",
+            "KindCloseParenToken",
+            "KindOpenBracketToken",
+            "KindCloseBracketToken",
+            "KindOpenBraceToken",
+            "KindCloseBraceToken",
+            "KindCommaToken",
+            "KindSemicolonToken",
+            "KindDotToken",
+            "KindEqualsGreaterThanToken",
+            "KindColonToken",
+            "KindLessThanToken",
+            "KindGreaterThanToken",
+            "KindEqualsToken",
+            "KindQuestionToken",
+            "KindIdentifier"
+          ],
+          "op": "child_of_kind"
+        },
+        {
+          "op": "visit_nodes"
+        }
+      ],
+      "case": "syntax/astnav/single-token-and-whitespace",
+      "discriminates": "One identifier surrounded by whitespace, including the end-of-file position after it.",
+      "file": {
+        "name": "/one.ts",
+        "script_kind": 3,
+        "text": "  x  "
+      },
+      "host_applicability": "any",
+      "operation": "tsc/internal/astnav/tokens.go:GetTokenAtPosition",
+      "order_sensitive": true,
+      "subject": "astnav"
+    },
+    {
+      "actions": [
+        {
+          "kinds": [
+            "KindOpenParenToken",
+            "KindCloseParenToken",
+            "KindOpenBracketToken",
+            "KindCloseBracketToken",
+            "KindOpenBraceToken",
+            "KindCloseBraceToken",
+            "KindCommaToken",
+            "KindSemicolonToken",
+            "KindDotToken",
+            "KindEqualsGreaterThanToken",
+            "KindColonToken",
+            "KindLessThanToken",
+            "KindGreaterThanToken",
+            "KindEqualsToken",
+            "KindQuestionToken",
+            "KindIdentifier"
+          ],
+          "op": "child_of_kind"
+        },
+        {
+          "op": "visit_nodes"
+        }
+      ],
+      "case": "syntax/astnav/find-child-of-kind-stale-token",
+      "discriminates": "FindChildOfKind resets the scanner position without clearing its token (tokens.go:767-768), so after a child the next scanned kind can be stale. In `f(x, [y])` a search of the call for OpenBracketToken is the case the survey predicted by reading; every node and kind is asked.",
+      "file": {
+        "name": "/a.ts",
+        "script_kind": 3,
+        "text": "f(x, [y]);\nconst o = { a: [1, (2)], b: <T>(v: T) => v };\n"
+      },
+      "host_applicability": "any",
+      "operation": "tsc/internal/astnav/tokens.go:FindChildOfKind",
+      "order_sensitive": true,
+      "subject": "astnav"
+    }
+  ]
+}

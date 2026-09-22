@@ -30195,11 +30195,1031 @@
       "operations": [
         "tsc/internal/vfs/vfsmatch/vfsmatch.go:ReadDirectory"
       ]
+    },
+    {
+      "expected_contract": "A dotted namespace declaration is the TypeScript source of reparsed nodes (parser.go:2267-2270).",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/astnav/dotted-namespace-reparsed-nodes",
+      "last_result": "match",
+      "native_authority": "tools/phase1/syntax/astnav_probe_test.go in the pinned astnav package, over a file parsed by the pinned parser",
+      "operations": [
+        "tsc/internal/astnav/tokens.go:FindChildOfKind",
+        "tsc/internal/astnav/tokens.go:FindNextToken",
+        "tsc/internal/astnav/tokens.go:FindPrecedingToken",
+        "tsc/internal/astnav/tokens.go:FindPrecedingTokenEx",
+        "tsc/internal/astnav/tokens.go:GetStartOfNode",
+        "tsc/internal/astnav/tokens.go:GetTokenAtPosition",
+        "tsc/internal/astnav/tokens.go:GetTouchingPropertyName",
+        "tsc/internal/astnav/tokens.go:GetTouchingToken",
+        "tsc/internal/astnav/tokens.go:VisitEachChildAndJSDoc",
+        "tsc/internal/astnav/tokens.go:findRightmostValidToken",
+        "tsc/internal/astnav/tokens.go:getNodeVisitor",
+        "tsc/internal/astnav/tokens.go:getPosition",
+        "tsc/internal/astnav/tokens.go:getTokenAtPosition",
+        "tsc/internal/astnav/tokens.go:isValidPrecedingNode",
+        "tsc/internal/astnav/tokens.go:scanNavigationToken",
+        "tsc/internal/astnav/tokens.go:shouldSkipChild",
+        "tsc/internal/core/binarysearch.go:BinarySearchUniqueFunc"
+      ]
+    },
+    {
+      "expected_contract": "An empty file: the single position is end of file.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/astnav/empty-file",
+      "last_result": "match",
+      "native_authority": "tools/phase1/syntax/astnav_probe_test.go in the pinned astnav package, over a file parsed by the pinned parser",
+      "operations": [
+        "tsc/internal/astnav/tokens.go:FindChildOfKind",
+        "tsc/internal/astnav/tokens.go:FindNextToken",
+        "tsc/internal/astnav/tokens.go:FindPrecedingToken",
+        "tsc/internal/astnav/tokens.go:FindPrecedingTokenEx",
+        "tsc/internal/astnav/tokens.go:GetStartOfNode",
+        "tsc/internal/astnav/tokens.go:GetTokenAtPosition",
+        "tsc/internal/astnav/tokens.go:GetTouchingPropertyName",
+        "tsc/internal/astnav/tokens.go:GetTouchingToken",
+        "tsc/internal/astnav/tokens.go:VisitEachChildAndJSDoc",
+        "tsc/internal/astnav/tokens.go:findRightmostValidToken",
+        "tsc/internal/astnav/tokens.go:getNodeVisitor",
+        "tsc/internal/astnav/tokens.go:getPosition",
+        "tsc/internal/astnav/tokens.go:getTokenAtPosition",
+        "tsc/internal/astnav/tokens.go:isValidPrecedingNode",
+        "tsc/internal/astnav/tokens.go:scanNavigationToken",
+        "tsc/internal/astnav/tokens.go:shouldSkipChild",
+        "tsc/internal/core/binarysearch.go:BinarySearchUniqueFunc"
+      ]
+    },
+    {
+      "expected_contract": "FindChildOfKind resets the scanner position without clearing its token (tokens.go:767-768), so after a child the next scanned kind can be stale.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/astnav/find-child-of-kind-stale-token",
+      "last_result": "match",
+      "native_authority": "tools/phase1/syntax/astnav_probe_test.go in the pinned astnav package, over a file parsed by the pinned parser",
+      "operations": [
+        "tsc/internal/astnav/tokens.go:FindChildOfKind",
+        "tsc/internal/astnav/tokens.go:VisitEachChildAndJSDoc",
+        "tsc/internal/astnav/tokens.go:getNodeVisitor"
+      ]
+    },
+    {
+      "expected_contract": "JSDoc tags and casts in a .js file produce reparsed nodes (parser/jsdoc.go), which every reparsed-node guard in tokens.go skips.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/astnav/js-jsdoc-reparsed-nodes",
+      "last_result": "match",
+      "native_authority": "tools/phase1/syntax/astnav_probe_test.go in the pinned astnav package, over a file parsed by the pinned parser",
+      "operations": [
+        "tsc/internal/astnav/tokens.go:FindChildOfKind",
+        "tsc/internal/astnav/tokens.go:FindNextToken",
+        "tsc/internal/astnav/tokens.go:FindPrecedingToken",
+        "tsc/internal/astnav/tokens.go:FindPrecedingTokenEx",
+        "tsc/internal/astnav/tokens.go:GetStartOfNode",
+        "tsc/internal/astnav/tokens.go:GetTokenAtPosition",
+        "tsc/internal/astnav/tokens.go:GetTouchingPropertyName",
+        "tsc/internal/astnav/tokens.go:GetTouchingToken",
+        "tsc/internal/astnav/tokens.go:VisitEachChildAndJSDoc",
+        "tsc/internal/astnav/tokens.go:findRightmostValidToken",
+        "tsc/internal/astnav/tokens.go:getNodeVisitor",
+        "tsc/internal/astnav/tokens.go:getPosition",
+        "tsc/internal/astnav/tokens.go:getTokenAtPosition",
+        "tsc/internal/astnav/tokens.go:isValidPrecedingNode",
+        "tsc/internal/astnav/tokens.go:scanNavigationToken",
+        "tsc/internal/astnav/tokens.go:shouldSkipChild",
+        "tsc/internal/core/binarysearch.go:BinarySearchUniqueFunc"
+      ]
+    },
+    {
+      "expected_contract": "`<<` inside a JSX expression and after a JSX element: the one input for which shouldRescanLessThanLessThanToken is true (tokens.go:11).",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/astnav/jsx-less-than-less-than",
+      "last_result": "match",
+      "native_authority": "tools/phase1/syntax/astnav_probe_test.go in the pinned astnav package, over a file parsed by the pinned parser",
+      "operations": [
+        "tsc/internal/astnav/tokens.go:FindChildOfKind",
+        "tsc/internal/astnav/tokens.go:FindNextToken",
+        "tsc/internal/astnav/tokens.go:FindPrecedingToken",
+        "tsc/internal/astnav/tokens.go:FindPrecedingTokenEx",
+        "tsc/internal/astnav/tokens.go:GetStartOfNode",
+        "tsc/internal/astnav/tokens.go:GetTokenAtPosition",
+        "tsc/internal/astnav/tokens.go:GetTouchingPropertyName",
+        "tsc/internal/astnav/tokens.go:GetTouchingToken",
+        "tsc/internal/astnav/tokens.go:VisitEachChildAndJSDoc",
+        "tsc/internal/astnav/tokens.go:findRightmostValidToken",
+        "tsc/internal/astnav/tokens.go:getNodeVisitor",
+        "tsc/internal/astnav/tokens.go:getPosition",
+        "tsc/internal/astnav/tokens.go:getTokenAtPosition",
+        "tsc/internal/astnav/tokens.go:isValidPrecedingNode",
+        "tsc/internal/astnav/tokens.go:scanNavigationToken",
+        "tsc/internal/astnav/tokens.go:shouldRescanLessThanLessThanToken",
+        "tsc/internal/astnav/tokens.go:shouldSkipChild",
+        "tsc/internal/core/binarysearch.go:BinarySearchUniqueFunc"
+      ]
+    },
+    {
+      "expected_contract": "The pinned astnav fixture swept at every byte offset through every navigation operation, plus FindChildOfKind and the JSDoc-aware visitor over every node.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/astnav/mapcode-sweeps",
+      "last_result": "match",
+      "native_authority": "tools/phase1/syntax/astnav_probe_test.go in the pinned astnav package, over a file parsed by the pinned parser",
+      "operations": [
+        "tsc/internal/astnav/tokens.go:FindChildOfKind",
+        "tsc/internal/astnav/tokens.go:FindNextToken",
+        "tsc/internal/astnav/tokens.go:FindPrecedingToken",
+        "tsc/internal/astnav/tokens.go:FindPrecedingTokenEx",
+        "tsc/internal/astnav/tokens.go:GetStartOfNode",
+        "tsc/internal/astnav/tokens.go:GetTokenAtPosition",
+        "tsc/internal/astnav/tokens.go:GetTouchingPropertyName",
+        "tsc/internal/astnav/tokens.go:GetTouchingToken",
+        "tsc/internal/astnav/tokens.go:VisitEachChildAndJSDoc",
+        "tsc/internal/astnav/tokens.go:findRightmostValidToken",
+        "tsc/internal/astnav/tokens.go:getNodeVisitor",
+        "tsc/internal/astnav/tokens.go:getPosition",
+        "tsc/internal/astnav/tokens.go:getTokenAtPosition",
+        "tsc/internal/astnav/tokens.go:isValidPrecedingNode",
+        "tsc/internal/astnav/tokens.go:scanNavigationToken",
+        "tsc/internal/astnav/tokens.go:shouldSkipChild",
+        "tsc/internal/core/binarysearch.go:BinarySearchUniqueFunc"
+      ]
+    },
+    {
+      "expected_contract": "VisitEachChildAndJSDoc hands its visitNodes hook the NodeList itself, whose position callers read (ls/utilities.go findContainingList).",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/astnav/mapcode-visitor-list-ranges",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/astnav/tokens.go:VisitEachChildAndJSDoc"
+      ],
+      "native_authority": "tools/phase1/syntax/astnav_probe_test.go in the pinned astnav package, over a file parsed by the pinned parser",
+      "operations": [
+        "tsc/internal/astnav/tokens.go:VisitEachChildAndJSDoc",
+        "tsc/internal/astnav/tokens.go:getNodeVisitor"
+      ]
+    },
+    {
+      "expected_contract": "GetTouchingPropertyName accepts a property-name literal, a keyword or a private identifier (tokens.go:23-27).",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/astnav/private-names-and-keyword-properties",
+      "last_result": "match",
+      "native_authority": "tools/phase1/syntax/astnav_probe_test.go in the pinned astnav package, over a file parsed by the pinned parser",
+      "operations": [
+        "tsc/internal/astnav/tokens.go:FindChildOfKind",
+        "tsc/internal/astnav/tokens.go:FindNextToken",
+        "tsc/internal/astnav/tokens.go:FindPrecedingToken",
+        "tsc/internal/astnav/tokens.go:FindPrecedingTokenEx",
+        "tsc/internal/astnav/tokens.go:GetStartOfNode",
+        "tsc/internal/astnav/tokens.go:GetTokenAtPosition",
+        "tsc/internal/astnav/tokens.go:GetTouchingPropertyName",
+        "tsc/internal/astnav/tokens.go:GetTouchingToken",
+        "tsc/internal/astnav/tokens.go:VisitEachChildAndJSDoc",
+        "tsc/internal/astnav/tokens.go:findRightmostValidToken",
+        "tsc/internal/astnav/tokens.go:getNodeVisitor",
+        "tsc/internal/astnav/tokens.go:getPosition",
+        "tsc/internal/astnav/tokens.go:getTokenAtPosition",
+        "tsc/internal/astnav/tokens.go:isValidPrecedingNode",
+        "tsc/internal/astnav/tokens.go:scanNavigationToken",
+        "tsc/internal/astnav/tokens.go:shouldSkipChild",
+        "tsc/internal/core/binarysearch.go:BinarySearchUniqueFunc"
+      ]
+    },
+    {
+      "expected_contract": "One identifier surrounded by whitespace, including the end-of-file position after it.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/astnav/single-token-and-whitespace",
+      "last_result": "match",
+      "native_authority": "tools/phase1/syntax/astnav_probe_test.go in the pinned astnav package, over a file parsed by the pinned parser",
+      "operations": [
+        "tsc/internal/astnav/tokens.go:FindChildOfKind",
+        "tsc/internal/astnav/tokens.go:FindNextToken",
+        "tsc/internal/astnav/tokens.go:FindPrecedingToken",
+        "tsc/internal/astnav/tokens.go:FindPrecedingTokenEx",
+        "tsc/internal/astnav/tokens.go:GetStartOfNode",
+        "tsc/internal/astnav/tokens.go:GetTokenAtPosition",
+        "tsc/internal/astnav/tokens.go:GetTouchingPropertyName",
+        "tsc/internal/astnav/tokens.go:GetTouchingToken",
+        "tsc/internal/astnav/tokens.go:VisitEachChildAndJSDoc",
+        "tsc/internal/astnav/tokens.go:findRightmostValidToken",
+        "tsc/internal/astnav/tokens.go:getNodeVisitor",
+        "tsc/internal/astnav/tokens.go:getPosition",
+        "tsc/internal/astnav/tokens.go:getTokenAtPosition",
+        "tsc/internal/astnav/tokens.go:isValidPrecedingNode",
+        "tsc/internal/astnav/tokens.go:scanNavigationToken",
+        "tsc/internal/astnav/tokens.go:shouldSkipChild",
+        "tsc/internal/core/binarysearch.go:BinarySearchUniqueFunc"
+      ]
+    },
+    {
+      "expected_contract": "Positions inside leading and trailing trivia, line and block comments, and a JSDoc comment left open at the end of file (tokens.go:84-88).",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/astnav/trivia-comments-and-unterminated-jsdoc",
+      "last_result": "match",
+      "native_authority": "tools/phase1/syntax/astnav_probe_test.go in the pinned astnav package, over a file parsed by the pinned parser",
+      "operations": [
+        "tsc/internal/astnav/tokens.go:FindChildOfKind",
+        "tsc/internal/astnav/tokens.go:FindNextToken",
+        "tsc/internal/astnav/tokens.go:FindPrecedingToken",
+        "tsc/internal/astnav/tokens.go:FindPrecedingTokenEx",
+        "tsc/internal/astnav/tokens.go:GetStartOfNode",
+        "tsc/internal/astnav/tokens.go:GetTokenAtPosition",
+        "tsc/internal/astnav/tokens.go:GetTouchingPropertyName",
+        "tsc/internal/astnav/tokens.go:GetTouchingToken",
+        "tsc/internal/astnav/tokens.go:VisitEachChildAndJSDoc",
+        "tsc/internal/astnav/tokens.go:findRightmostValidToken",
+        "tsc/internal/astnav/tokens.go:getNodeVisitor",
+        "tsc/internal/astnav/tokens.go:getPosition",
+        "tsc/internal/astnav/tokens.go:getTokenAtPosition",
+        "tsc/internal/astnav/tokens.go:isValidPrecedingNode",
+        "tsc/internal/astnav/tokens.go:scanNavigationToken",
+        "tsc/internal/astnav/tokens.go:shouldSkipChild",
+        "tsc/internal/core/binarysearch.go:BinarySearchUniqueFunc"
+      ]
+    },
+    {
+      "expected_contract": "tokens_test.go 'JSDoc type assertion': a JSDoc cast in a .js file creates reparsed nodes, the case that used to panic in GetTouchingPropertyName.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/astnav/upstream-jsdoc-type-assertion",
+      "last_result": "match",
+      "native_authority": "tools/phase1/syntax/astnav_probe_test.go in the pinned astnav package, over a file parsed by the pinned parser",
+      "operations": [
+        "tsc/internal/astnav/tokens.go:FindChildOfKind",
+        "tsc/internal/astnav/tokens.go:FindNextToken",
+        "tsc/internal/astnav/tokens.go:FindPrecedingToken",
+        "tsc/internal/astnav/tokens.go:FindPrecedingTokenEx",
+        "tsc/internal/astnav/tokens.go:GetStartOfNode",
+        "tsc/internal/astnav/tokens.go:GetTokenAtPosition",
+        "tsc/internal/astnav/tokens.go:GetTouchingPropertyName",
+        "tsc/internal/astnav/tokens.go:GetTouchingToken",
+        "tsc/internal/astnav/tokens.go:VisitEachChildAndJSDoc",
+        "tsc/internal/astnav/tokens.go:findRightmostValidToken",
+        "tsc/internal/astnav/tokens.go:getNodeVisitor",
+        "tsc/internal/astnav/tokens.go:getPosition",
+        "tsc/internal/astnav/tokens.go:getTokenAtPosition",
+        "tsc/internal/astnav/tokens.go:isValidPrecedingNode",
+        "tsc/internal/astnav/tokens.go:scanNavigationToken",
+        "tsc/internal/astnav/tokens.go:shouldSkipChild",
+        "tsc/internal/core/binarysearch.go:BinarySearchUniqueFunc"
+      ]
+    },
+    {
+      "expected_contract": "tokens_test.go 'JSDoc type assertion with comment': the same cast followed by a line comment.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/astnav/upstream-jsdoc-type-assertion-with-comment",
+      "last_result": "match",
+      "native_authority": "tools/phase1/syntax/astnav_probe_test.go in the pinned astnav package, over a file parsed by the pinned parser",
+      "operations": [
+        "tsc/internal/astnav/tokens.go:FindChildOfKind",
+        "tsc/internal/astnav/tokens.go:FindNextToken",
+        "tsc/internal/astnav/tokens.go:FindPrecedingToken",
+        "tsc/internal/astnav/tokens.go:FindPrecedingTokenEx",
+        "tsc/internal/astnav/tokens.go:GetStartOfNode",
+        "tsc/internal/astnav/tokens.go:GetTokenAtPosition",
+        "tsc/internal/astnav/tokens.go:GetTouchingPropertyName",
+        "tsc/internal/astnav/tokens.go:GetTouchingToken",
+        "tsc/internal/astnav/tokens.go:VisitEachChildAndJSDoc",
+        "tsc/internal/astnav/tokens.go:findRightmostValidToken",
+        "tsc/internal/astnav/tokens.go:getNodeVisitor",
+        "tsc/internal/astnav/tokens.go:getPosition",
+        "tsc/internal/astnav/tokens.go:getTokenAtPosition",
+        "tsc/internal/astnav/tokens.go:isValidPrecedingNode",
+        "tsc/internal/astnav/tokens.go:scanNavigationToken",
+        "tsc/internal/astnav/tokens.go:shouldSkipChild",
+        "tsc/internal/core/binarysearch.go:BinarySearchUniqueFunc"
+      ]
+    },
+    {
+      "expected_contract": "tokens_test.go 'pointer equality': repeated GetTokenAtPosition must return the identical node.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/astnav/upstream-pointer-equality",
+      "last_result": "match",
+      "native_authority": "tools/phase1/syntax/astnav_probe_test.go in the pinned astnav package, over a file parsed by the pinned parser",
+      "operations": [
+        "tsc/internal/astnav/tokens.go:FindChildOfKind",
+        "tsc/internal/astnav/tokens.go:FindNextToken",
+        "tsc/internal/astnav/tokens.go:FindPrecedingToken",
+        "tsc/internal/astnav/tokens.go:FindPrecedingTokenEx",
+        "tsc/internal/astnav/tokens.go:GetStartOfNode",
+        "tsc/internal/astnav/tokens.go:GetTokenAtPosition",
+        "tsc/internal/astnav/tokens.go:GetTouchingPropertyName",
+        "tsc/internal/astnav/tokens.go:GetTouchingToken",
+        "tsc/internal/astnav/tokens.go:VisitEachChildAndJSDoc",
+        "tsc/internal/astnav/tokens.go:findRightmostValidToken",
+        "tsc/internal/astnav/tokens.go:getNodeVisitor",
+        "tsc/internal/astnav/tokens.go:getPosition",
+        "tsc/internal/astnav/tokens.go:getTokenAtPosition",
+        "tsc/internal/astnav/tokens.go:isValidPrecedingNode",
+        "tsc/internal/astnav/tokens.go:scanNavigationToken",
+        "tsc/internal/astnav/tokens.go:shouldSkipChild",
+        "tsc/internal/core/binarysearch.go:BinarySearchUniqueFunc"
+      ]
+    },
+    {
+      "expected_contract": "TestUnitFindPrecedingToken 'after comma in parameter list' (position 15 expects CommaToken).",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/astnav/upstream-preceding-after-comma",
+      "last_result": "match",
+      "native_authority": "tools/phase1/syntax/astnav_probe_test.go in the pinned astnav package, over a file parsed by the pinned parser",
+      "operations": [
+        "tsc/internal/astnav/tokens.go:FindChildOfKind",
+        "tsc/internal/astnav/tokens.go:FindNextToken",
+        "tsc/internal/astnav/tokens.go:FindPrecedingToken",
+        "tsc/internal/astnav/tokens.go:FindPrecedingTokenEx",
+        "tsc/internal/astnav/tokens.go:GetStartOfNode",
+        "tsc/internal/astnav/tokens.go:GetTokenAtPosition",
+        "tsc/internal/astnav/tokens.go:GetTouchingPropertyName",
+        "tsc/internal/astnav/tokens.go:GetTouchingToken",
+        "tsc/internal/astnav/tokens.go:VisitEachChildAndJSDoc",
+        "tsc/internal/astnav/tokens.go:findRightmostValidToken",
+        "tsc/internal/astnav/tokens.go:getNodeVisitor",
+        "tsc/internal/astnav/tokens.go:getPosition",
+        "tsc/internal/astnav/tokens.go:getTokenAtPosition",
+        "tsc/internal/astnav/tokens.go:isValidPrecedingNode",
+        "tsc/internal/astnav/tokens.go:scanNavigationToken",
+        "tsc/internal/astnav/tokens.go:shouldSkipChild",
+        "tsc/internal/core/binarysearch.go:BinarySearchUniqueFunc"
+      ]
+    },
+    {
+      "expected_contract": "TestUnitFindPrecedingToken 'after dot in jsdoc' (position 839 expects DotToken), swept at every offset with its exact range and identity rather than the kind alone.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/astnav/upstream-preceding-after-dot-in-jsdoc",
+      "last_result": "match",
+      "native_authority": "tools/phase1/syntax/astnav_probe_test.go in the pinned astnav package, over a file parsed by the pinned parser",
+      "operations": [
+        "tsc/internal/astnav/tokens.go:FindChildOfKind",
+        "tsc/internal/astnav/tokens.go:FindNextToken",
+        "tsc/internal/astnav/tokens.go:FindPrecedingToken",
+        "tsc/internal/astnav/tokens.go:FindPrecedingTokenEx",
+        "tsc/internal/astnav/tokens.go:GetStartOfNode",
+        "tsc/internal/astnav/tokens.go:GetTokenAtPosition",
+        "tsc/internal/astnav/tokens.go:GetTouchingPropertyName",
+        "tsc/internal/astnav/tokens.go:GetTouchingToken",
+        "tsc/internal/astnav/tokens.go:VisitEachChildAndJSDoc",
+        "tsc/internal/astnav/tokens.go:findRightmostValidToken",
+        "tsc/internal/astnav/tokens.go:getNodeVisitor",
+        "tsc/internal/astnav/tokens.go:getPosition",
+        "tsc/internal/astnav/tokens.go:getTokenAtPosition",
+        "tsc/internal/astnav/tokens.go:isValidPrecedingNode",
+        "tsc/internal/astnav/tokens.go:scanNavigationToken",
+        "tsc/internal/astnav/tokens.go:shouldSkipChild",
+        "tsc/internal/core/binarysearch.go:BinarySearchUniqueFunc"
+      ]
+    },
+    {
+      "expected_contract": "Missing identifiers and expressions are zero-width nodes; token and preceding-token answers at and around them.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/astnav/zero-width-and-missing-nodes",
+      "last_result": "match",
+      "native_authority": "tools/phase1/syntax/astnav_probe_test.go in the pinned astnav package, over a file parsed by the pinned parser",
+      "operations": [
+        "tsc/internal/astnav/tokens.go:FindChildOfKind",
+        "tsc/internal/astnav/tokens.go:FindNextToken",
+        "tsc/internal/astnav/tokens.go:FindPrecedingToken",
+        "tsc/internal/astnav/tokens.go:FindPrecedingTokenEx",
+        "tsc/internal/astnav/tokens.go:GetStartOfNode",
+        "tsc/internal/astnav/tokens.go:GetTokenAtPosition",
+        "tsc/internal/astnav/tokens.go:GetTouchingPropertyName",
+        "tsc/internal/astnav/tokens.go:GetTouchingToken",
+        "tsc/internal/astnav/tokens.go:VisitEachChildAndJSDoc",
+        "tsc/internal/astnav/tokens.go:findRightmostValidToken",
+        "tsc/internal/astnav/tokens.go:getNodeVisitor",
+        "tsc/internal/astnav/tokens.go:getPosition",
+        "tsc/internal/astnav/tokens.go:getTokenAtPosition",
+        "tsc/internal/astnav/tokens.go:isValidPrecedingNode",
+        "tsc/internal/astnav/tokens.go:scanNavigationToken",
+        "tsc/internal/astnav/tokens.go:shouldSkipChild",
+        "tsc/internal/core/binarysearch.go:BinarySearchUniqueFunc"
+      ]
+    },
+    {
+      "expected_contract": "An empty file, a whitespace-only file and a BOM-only file: no syntactic diagnostic, and none of the three is dropped from the program.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/diagnostics/empty-whitespace-and-bom-files",
+      "last_result": "match",
+      "native_authority": "tools/phase1/syntax/diagnostics_probe_test.go in the pinned compiler package: NewProgram, then Program.GetSyntacticDiagnostics and the production diagnosticwriter",
+      "operations": [
+        "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics",
+        "tsc/internal/compiler/program.go:Program.collectDiagnostics"
+      ]
+    },
+    {
+      "expected_contract": "The parser's JavaScript grammar records (file.JSDiagnostics(), parser.go checkJSSyntax): TypeScript-only syntax in a .js file is reported, the same text in a .ts file is not, and the two files sort by name.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/diagnostics/js-only-typescript-syntax",
+      "last_result": "match",
+      "native_authority": "tools/phase1/syntax/diagnostics_probe_test.go in the pinned compiler package: NewProgram, then Program.GetSyntacticDiagnostics and the production diagnosticwriter",
+      "operations": [
+        "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics",
+        "tsc/internal/compiler/program.go:Program.collectDiagnostics",
+        "tsc/internal/compiler/program.go:Program.collectDiagnosticsFromFiles",
+        "tsc/internal/compiler/program.go:SortAndDeduplicateDiagnostics",
+        "tsc/internal/compiler/program.go:filterAndSortDiagnostics"
+      ]
+    },
+    {
+      "expected_contract": "A JSON file reached through an import with resolveJsonModule: its parse diagnostics are syntactic diagnostics of the program too.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/diagnostics/json-file-syntax",
+      "last_result": "match",
+      "native_authority": "tools/phase1/syntax/diagnostics_probe_test.go in the pinned compiler package: NewProgram, then Program.GetSyntacticDiagnostics and the production diagnosticwriter",
+      "operations": [
+        "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics",
+        "tsc/internal/compiler/program.go:Program.collectDiagnostics",
+        "tsc/internal/compiler/program.go:Program.collectDiagnosticsFromFiles",
+        "tsc/internal/compiler/program.go:SortAndDeduplicateDiagnostics",
+        "tsc/internal/compiler/program.go:filterAndSortDiagnostics"
+      ]
+    },
+    {
+      "expected_contract": "JSX grammar errors in a .tsx and a .jsx file: unclosed and mismatched elements, and JSX in a .jsx file without type syntax.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/diagnostics/jsx-and-tsx-grammar",
+      "last_result": "match",
+      "native_authority": "tools/phase1/syntax/diagnostics_probe_test.go in the pinned compiler package: NewProgram, then Program.GetSyntacticDiagnostics and the production diagnosticwriter",
+      "operations": [
+        "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics",
+        "tsc/internal/compiler/program.go:Program.collectDiagnostics",
+        "tsc/internal/compiler/program.go:Program.collectDiagnosticsFromFiles",
+        "tsc/internal/compiler/program.go:SortAndDeduplicateDiagnostics",
+        "tsc/internal/compiler/program.go:filterAndSortDiagnostics"
+      ]
+    },
+    {
+      "expected_contract": "The reverse order: @ts-nocheck last disables checking, so the walk runs and reports TS1206 even with checkJs true.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/diagnostics/later-directive-wins-check-then-nocheck",
+      "last_result": "match",
+      "native_authority": "tools/phase1/syntax/diagnostics_probe_test.go in the pinned compiler package: NewProgram, then Program.GetSyntacticDiagnostics and the production diagnosticwriter",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsCheckJSEnabledForFile",
+        "tsc/internal/ast/utilities.go:IsSourceFileJS",
+        "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics",
+        "tsc/internal/compiler/program.go:Program.collectDiagnostics",
+        "tsc/internal/compiler/program.go:getAdditionalJSSyntacticDiagnostics",
+        "tsc/internal/parser/parser.go:Parser.processPragmasIntoFields"
+      ]
+    },
+    {
+      "expected_contract": "Two directives: the parser keeps the one at the greater position (parser.go:6684), so @ts-check after @ts-nocheck enables checking and the walk is skipped.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/diagnostics/later-directive-wins-nocheck-then-check",
+      "last_result": "match",
+      "native_authority": "tools/phase1/syntax/diagnostics_probe_test.go in the pinned compiler package: NewProgram, then Program.GetSyntacticDiagnostics and the production diagnosticwriter",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsCheckJSEnabledForFile",
+        "tsc/internal/ast/utilities.go:IsSourceFileJS",
+        "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics",
+        "tsc/internal/compiler/program.go:Program.collectDiagnostics",
+        "tsc/internal/compiler/program.go:getAdditionalJSSyntacticDiagnostics",
+        "tsc/internal/parser/parser.go:Parser.processPragmasIntoFields"
+      ]
+    },
+    {
+      "expected_contract": "Malformed JSDoc in a .js file: whether JSDoc parse errors are part of the syntactic list at all.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/diagnostics/malformed-jsdoc-in-js",
+      "last_result": "match",
+      "native_authority": "tools/phase1/syntax/diagnostics_probe_test.go in the pinned compiler package: NewProgram, then Program.GetSyntacticDiagnostics and the production diagnosticwriter",
+      "operations": [
+        "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics",
+        "tsc/internal/compiler/program.go:Program.collectDiagnostics"
+      ]
+    },
+    {
+      "expected_contract": "Many parse errors in one file: the result is the parser's list after SortAndDeduplicateDiagnostics, so position order and deduplication are both visible.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/diagnostics/malformed-source-many-errors",
+      "last_result": "match",
+      "native_authority": "tools/phase1/syntax/diagnostics_probe_test.go in the pinned compiler package: NewProgram, then Program.GetSyntacticDiagnostics and the production diagnosticwriter",
+      "operations": [
+        "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics",
+        "tsc/internal/compiler/program.go:Program.collectDiagnostics",
+        "tsc/internal/compiler/program.go:SortAndDeduplicateDiagnostics",
+        "tsc/internal/compiler/program.go:filterAndSortDiagnostics"
+      ]
+    },
+    {
+      "expected_contract": "Missing identifiers and expressions become zero-width nodes; their diagnostics carry the exact positions the parser synthesized.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/diagnostics/missing-nodes-zero-width",
+      "last_result": "match",
+      "native_authority": "tools/phase1/syntax/diagnostics_probe_test.go in the pinned compiler package: NewProgram, then Program.GetSyntacticDiagnostics and the production diagnosticwriter",
+      "operations": [
+        "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics",
+        "tsc/internal/compiler/program.go:Program.collectDiagnostics",
+        "tsc/internal/compiler/program.go:SortAndDeduplicateDiagnostics",
+        "tsc/internal/compiler/program.go:filterAndSortDiagnostics"
+      ]
+    },
+    {
+      "expected_contract": "Two files with errors, rooted z before a: the whole-program list is sorted by file name, not by root or load order.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/diagnostics/multi-file-sort-by-file-name",
+      "last_result": "match",
+      "native_authority": "tools/phase1/syntax/diagnostics_probe_test.go in the pinned compiler package: NewProgram, then Program.GetSyntacticDiagnostics and the production diagnosticwriter",
+      "operations": [
+        "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics",
+        "tsc/internal/compiler/program.go:Program.collectDiagnostics",
+        "tsc/internal/compiler/program.go:Program.collectDiagnosticsFromFiles",
+        "tsc/internal/compiler/program.go:SortAndDeduplicateDiagnostics",
+        "tsc/internal/compiler/program.go:filterAndSortDiagnostics"
+      ]
+    },
+    {
+      "expected_contract": "getAdditionalJSSyntacticDiagnostics (program.go:737): an unchecked JS file reports a parameter decorator as TS1206 because the checker never runs on it.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/diagnostics/parameter-decorator-in-unchecked-js",
+      "last_result": "match",
+      "native_authority": "tools/phase1/syntax/diagnostics_probe_test.go in the pinned compiler package: NewProgram, then Program.GetSyntacticDiagnostics and the production diagnosticwriter",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsCheckJSEnabledForFile",
+        "tsc/internal/ast/utilities.go:IsSourceFileJS",
+        "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics",
+        "tsc/internal/compiler/program.go:Program.collectDiagnostics",
+        "tsc/internal/compiler/program.go:getAdditionalJSSyntacticDiagnostics"
+      ]
+    },
+    {
+      "expected_contract": "The same file with checkJs: IsCheckJSEnabledForFile is true, so the program-level walk is skipped (program.go:728) and the checker, which this operation never runs, would own the error.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/diagnostics/parameter-decorator-with-checkjs",
+      "last_result": "match",
+      "native_authority": "tools/phase1/syntax/diagnostics_probe_test.go in the pinned compiler package: NewProgram, then Program.GetSyntacticDiagnostics and the production diagnosticwriter",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsCheckJSEnabledForFile",
+        "tsc/internal/ast/utilities.go:IsSourceFileJS",
+        "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics",
+        "tsc/internal/compiler/program.go:Program.collectDiagnostics",
+        "tsc/internal/compiler/program.go:getAdditionalJSSyntacticDiagnostics"
+      ]
+    },
+    {
+      "expected_contract": "experimentalDecorators makes parameter decorators valid, so the walk returns before visiting (program.go:738-740) even though the file is unchecked.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/diagnostics/parameter-decorator-with-experimental-decorators",
+      "last_result": "match",
+      "native_authority": "tools/phase1/syntax/diagnostics_probe_test.go in the pinned compiler package: NewProgram, then Program.GetSyntacticDiagnostics and the production diagnosticwriter",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsCheckJSEnabledForFile",
+        "tsc/internal/ast/utilities.go:IsSourceFileJS",
+        "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics",
+        "tsc/internal/compiler/program.go:Program.collectDiagnostics",
+        "tsc/internal/compiler/program.go:getAdditionalJSSyntacticDiagnostics"
+      ]
+    },
+    {
+      "expected_contract": "The walk reports only the FIRST decorator of each parameter (core.Find over ModifierNodes, program.go:748) and visits in preorder through nested classes, functions and object literals.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/diagnostics/parameter-decorators-first-per-parameter-in-preorder",
+      "last_result": "match",
+      "native_authority": "tools/phase1/syntax/diagnostics_probe_test.go in the pinned compiler package: NewProgram, then Program.GetSyntacticDiagnostics and the production diagnosticwriter",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsCheckJSEnabledForFile",
+        "tsc/internal/ast/utilities.go:IsSourceFileJS",
+        "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics",
+        "tsc/internal/compiler/program.go:Program.collectDiagnostics",
+        "tsc/internal/compiler/program.go:SortAndDeduplicateDiagnostics",
+        "tsc/internal/compiler/program.go:filterAndSortDiagnostics",
+        "tsc/internal/compiler/program.go:getAdditionalJSSyntacticDiagnostics"
+      ]
+    },
+    {
+      "expected_contract": "The same program with one file requested: only that file's diagnostics, from the per-file branch of collectDiagnostics (program.go:648).",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/diagnostics/single-file-scope",
+      "last_result": "match",
+      "native_authority": "tools/phase1/syntax/diagnostics_probe_test.go in the pinned compiler package: NewProgram, then Program.GetSyntacticDiagnostics and the production diagnosticwriter",
+      "operations": [
+        "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics",
+        "tsc/internal/compiler/program.go:Program.collectDiagnostics"
+      ]
+    },
+    {
+      "expected_contract": "A // @ts-check directive with checkJs unset: the directive, not the option, decides (ast/utilities.go:2931-2936), so the walk is skipped.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/diagnostics/ts-check-directive-enables-checking",
+      "last_result": "match",
+      "native_authority": "tools/phase1/syntax/diagnostics_probe_test.go in the pinned compiler package: NewProgram, then Program.GetSyntacticDiagnostics and the production diagnosticwriter",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsCheckJSEnabledForFile",
+        "tsc/internal/ast/utilities.go:IsSourceFileJS",
+        "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics",
+        "tsc/internal/compiler/program.go:Program.collectDiagnostics",
+        "tsc/internal/compiler/program.go:getAdditionalJSSyntacticDiagnostics",
+        "tsc/internal/parser/parser.go:Parser.processPragmasIntoFields"
+      ]
+    },
+    {
+      "expected_contract": "A // @ts-nocheck directive with checkJs true: the disabled directive wins over the option, the file is unchecked, and the walk reports TS1206.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/diagnostics/ts-nocheck-overrides-checkjs",
+      "last_result": "match",
+      "native_authority": "tools/phase1/syntax/diagnostics_probe_test.go in the pinned compiler package: NewProgram, then Program.GetSyntacticDiagnostics and the production diagnosticwriter",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsCheckJSEnabledForFile",
+        "tsc/internal/ast/utilities.go:IsSourceFileJS",
+        "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics",
+        "tsc/internal/compiler/program.go:Program.collectDiagnostics",
+        "tsc/internal/compiler/program.go:getAdditionalJSSyntacticDiagnostics",
+        "tsc/internal/parser/parser.go:Parser.processPragmasIntoFields"
+      ]
+    },
+    {
+      "expected_contract": "Unterminated string, template, regular expression and block comment: each is reported where the scanner gives up, several at the end of file.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/diagnostics/unterminated-literals",
+      "last_result": "match",
+      "native_authority": "tools/phase1/syntax/diagnostics_probe_test.go in the pinned compiler package: NewProgram, then Program.GetSyntacticDiagnostics and the production diagnosticwriter",
+      "operations": [
+        "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics",
+        "tsc/internal/compiler/program.go:Program.collectDiagnostics",
+        "tsc/internal/compiler/program.go:SortAndDeduplicateDiagnostics",
+        "tsc/internal/compiler/program.go:filterAndSortDiagnostics"
+      ]
+    },
+    {
+      "expected_contract": "AnyToString on every value type: Number formatting including -0, NaN, the exponent thresholds, bool, bigint; nil and an unsupported type panic with the pinned text.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/evaluator/any-to-string-every-type",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/evaluator/evaluator.go:AnyToString"
+      ],
+      "native_authority": "tools/phase1/syntax/evaluator_probe_test.go in the pinned evaluator package, with a recording entity callback",
+      "operations": [
+        "tsc/internal/evaluator/evaluator.go:AnyToString"
+      ]
+    },
+    {
+      "expected_contract": "All twelve numeric operators at their edges: shifts at and past 32, negative remainders, division by zero, exponent with a negative power, and floating-point rounding.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/evaluator/binary-numeric-edges",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/evaluator/evaluator.go:NewEvaluator"
+      ],
+      "native_authority": "tools/phase1/syntax/evaluator_probe_test.go in the pinned evaluator package, with a recording entity callback",
+      "operations": [
+        "tsc/internal/evaluator/evaluator.go:NewEvaluator"
+      ]
+    },
+    {
+      "expected_contract": "ResolvedOtherFiles and HasExternalReferences propagate through unary and binary operators and templates, OR'ed across operands.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/evaluator/cross-file-flags",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/evaluator/evaluator.go:NewEvaluator"
+      ],
+      "native_authority": "tools/phase1/syntax/evaluator_probe_test.go in the pinned evaluator package, with a recording entity callback",
+      "operations": [
+        "tsc/internal/evaluator/evaluator.go:AnyToString",
+        "tsc/internal/evaluator/evaluator.go:NewEvaluator",
+        "tsc/internal/evaluator/evaluator.go:evaluateTemplateExpression"
+      ]
+    },
+    {
+      "expected_contract": "Identifiers and property or element accesses whose base is an entity name go to the callback, with the whole access as the expression; any other base is nil without a callback.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/evaluator/entity-forms",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/evaluator/evaluator.go:NewEvaluator"
+      ],
+      "native_authority": "tools/phase1/syntax/evaluator_probe_test.go in the pinned evaluator package, with a recording entity callback",
+      "operations": [
+        "tsc/internal/evaluator/evaluator.go:NewEvaluator"
+      ]
+    },
+    {
+      "expected_contract": "IsTruthy on every value type: 0, -0 and NaN are falsy, the empty string is falsy, bigint zero is falsy; nil and an unsupported type panic.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/evaluator/is-truthy-every-type",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/evaluator/evaluator.go:IsTruthy"
+      ],
+      "native_authority": "tools/phase1/syntax/evaluator_probe_test.go in the pinned evaluator package, with a recording entity callback",
+      "operations": [
+        "tsc/internal/evaluator/evaluator.go:IsTruthy"
+      ]
+    },
+    {
+      "expected_contract": "Binary evaluation always evaluates the left then the right, even when the left is nil; the callback log shows both calls in that order.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/evaluator/left-then-right-without-short-circuit",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/evaluator/evaluator.go:NewEvaluator"
+      ],
+      "native_authority": "tools/phase1/syntax/evaluator_probe_test.go in the pinned evaluator package, with a recording entity callback",
+      "operations": [
+        "tsc/internal/evaluator/evaluator.go:NewEvaluator"
+      ]
+    },
+    {
+      "expected_contract": "Numeric spellings go through jsnum.FromString; string and no-substitution template literals are syntactically strings; true, null, undefined and 1n are not evaluated (nil with all flags false).",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/evaluator/literals",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/evaluator/evaluator.go:NewEvaluator"
+      ],
+      "native_authority": "tools/phase1/syntax/evaluator_probe_test.go in the pinned evaluator package, with a recording entity callback",
+      "operations": [
+        "tsc/internal/evaluator/evaluator.go:AnyToString",
+        "tsc/internal/evaluator/evaluator.go:NewEvaluator",
+        "tsc/internal/evaluator/evaluator.go:evaluateTemplateExpression"
+      ]
+    },
+    {
+      "expected_contract": "NewResult is positional: distinct flag patterns make a swapped field visible.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/evaluator/new-result-positional-fields",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/evaluator/evaluator.go:NewResult"
+      ],
+      "native_authority": "tools/phase1/syntax/evaluator_probe_test.go in the pinned evaluator package, with a recording entity callback",
+      "operations": [
+        "tsc/internal/evaluator/evaluator.go:NewResult"
+      ]
+    },
+    {
+      "expected_contract": "Comparison, equality, logical, nullish, comma and assignment operators evaluate both sides and return nil with the OR'ed flags.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/evaluator/non-arithmetic-operators",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/evaluator/evaluator.go:NewEvaluator"
+      ],
+      "native_authority": "tools/phase1/syntax/evaluator_probe_test.go in the pinned evaluator package, with a recording entity callback",
+      "operations": [
+        "tsc/internal/evaluator/evaluator.go:NewEvaluator"
+      ]
+    },
+    {
+      "expected_contract": "The same expressions with every outer kind skipped: the skip set is a real parameter, OR'ed with parentheses (evaluator.go:42).",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/evaluator/outer-expressions-all",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/evaluator/evaluator.go:NewEvaluator"
+      ],
+      "native_authority": "tools/phase1/syntax/evaluator_probe_test.go in the pinned evaluator package, with a recording entity callback",
+      "operations": [
+        "tsc/internal/evaluator/evaluator.go:NewEvaluator"
+      ]
+    },
+    {
+      "expected_contract": "The pinned caller skips only parentheses (checker.go:939): as, satisfies, ! and <T> all stop evaluation.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/evaluator/outer-expressions-parentheses-only",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/evaluator/evaluator.go:NewEvaluator"
+      ],
+      "native_authority": "tools/phase1/syntax/evaluator_probe_test.go in the pinned evaluator package, with a recording entity callback",
+      "operations": [
+        "tsc/internal/evaluator/evaluator.go:NewEvaluator"
+      ]
+    },
+    {
+      "expected_contract": "+, - and ~ on a number; ! ++ -- and any operator on a non-number fall through to nil while keeping the operand's cross-file flags and never setting string-ness.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/evaluator/prefix-unary",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/evaluator/evaluator.go:NewEvaluator"
+      ],
+      "native_authority": "tools/phase1/syntax/evaluator_probe_test.go in the pinned evaluator package, with a recording entity callback",
+      "operations": [
+        "tsc/internal/evaluator/evaluator.go:NewEvaluator"
+      ]
+    },
+    {
+      "expected_contract": "+ with a string side concatenates using Number.String(); string-ness is (left or right is string-flagged) and the operator is +, even when the value is nil; other operators never set it.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/evaluator/string-concatenation-and-stringness",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/evaluator/evaluator.go:NewEvaluator"
+      ],
+      "native_authority": "tools/phase1/syntax/evaluator_probe_test.go in the pinned evaluator package, with a recording entity callback",
+      "operations": [
+        "tsc/internal/evaluator/evaluator.go:NewEvaluator"
+      ]
+    },
+    {
+      "expected_contract": "Template spans evaluate left to right and go through AnyToString; the first nil span returns {nil, true, false, false} at once, discarding flags already gathered and never calling the callback for later spans; bool and bigint parts print; an unsupported value panics in AnyToString.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/evaluator/templates",
+      "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/evaluator/evaluator.go:evaluateTemplateExpression"
+      ],
+      "native_authority": "tools/phase1/syntax/evaluator_probe_test.go in the pinned evaluator package, with a recording entity callback",
+      "operations": [
+        "tsc/internal/evaluator/evaluator.go:AnyToString",
+        "tsc/internal/evaluator/evaluator.go:NewEvaluator",
+        "tsc/internal/evaluator/evaluator.go:evaluateTemplateExpression"
+      ]
+    },
+    {
+      "expected_contract": "A directive after the first statement is still a comment pragma candidate only if pragma extraction reaches it; this records whether it does.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/parse-outputs/check-js-directive-after-code",
+      "last_result": "match",
+      "native_authority": "tools/phase1/syntax/utilities_probe_test.go in the pinned parser package",
+      "operations": [
+        "tsc/internal/parser/parser.go:getCommentPragmas"
+      ]
+    },
+    {
+      "expected_contract": "processPragmasIntoFields keeps the check-js directive at the greatest position (parser.go:6684-6685).",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/parse-outputs/check-js-directive-last-wins",
+      "last_result": "match",
+      "native_authority": "tools/phase1/syntax/utilities_probe_test.go in the pinned parser package",
+      "operations": [
+        "tsc/internal/parser/parser.go:Parser.processPragmasIntoFields"
+      ]
+    },
+    {
+      "expected_contract": "The scanner's comment directives (scanner.go:968-1006, stored by finishSourceFile at parser.go:467): line and block forms, spacing, a trailing reason, a directive-like phrase that is not one, a triple-slash form and a JSDoc comment.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/parse-outputs/comment-directives",
+      "last_result": "match",
+      "native_authority": "tools/phase1/syntax/utilities_probe_test.go in the pinned parser package",
+      "operations": [
+        "tsc/internal/parser/parser.go:Parser.finishSourceFile",
+        "tsc/internal/scanner/scanner.go:Scanner.processCommentDirective"
+      ]
+    },
+    {
+      "expected_contract": "The same text as JavaScript: JSDoc is eager, so EagerJSDoc already returns the nodes and JSDoc returns the same ones.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/parse-outputs/eager-jsdoc-in-javascript",
+      "last_result": "match",
+      "native_authority": "tools/phase1/syntax/utilities_probe_test.go in the pinned parser package",
+      "operations": [
+        "tsc/internal/ast/ast.go:Node.EagerJSDoc",
+        "tsc/internal/ast/ast.go:Node.JSDoc"
+      ]
+    },
+    {
+      "expected_contract": "For a non-JS file JSDoc is lazy (parser.go:481-483): EagerJSDoc is empty before first use, JSDoc parses and caches, a repeated call returns the identical nodes, EagerJSDoc then returns them too, and the parsed subtree matches.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/parse-outputs/lazy-jsdoc-in-typescript",
+      "last_result": "match",
+      "native_authority": "tools/phase1/syntax/utilities_probe_test.go in the pinned parser package",
+      "operations": [
+        "tsc/internal/ast/ast.go:Node.EagerJSDoc",
+        "tsc/internal/ast/ast.go:Node.JSDoc",
+        "tsc/internal/ast/ast.go:SourceFile.resolveJSDoc",
+        "tsc/internal/parser/parser.go:Parser.finishSourceFile"
+      ]
+    },
+    {
+      "expected_contract": "A declaration file never sets the flag.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/parse-outputs/node-core-modules-declaration-file",
+      "last_result": "match",
+      "native_authority": "tools/phase1/syntax/utilities_probe_test.go in the pinned parser package",
+      "operations": [
+        "tsc/internal/parser/references.go:collectModuleReferences"
+      ]
+    },
+    {
+      "expected_contract": "node:test is exclusively prefixed, so it does not count: the value stays unknown.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/parse-outputs/node-core-modules-exclusively-prefixed",
+      "last_result": "match",
+      "native_authority": "tools/phase1/syntax/utilities_probe_test.go in the pinned parser package",
+      "operations": [
+        "tsc/internal/parser/references.go:collectModuleReferences"
+      ]
+    },
+    {
+      "expected_contract": "UsesUriStyleNodeCoreModules (references.go:35-42): a node: import makes it true and takes precedence over an earlier unprefixed core import.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/parse-outputs/node-core-modules-prefixed-wins",
+      "last_result": "match",
+      "native_authority": "tools/phase1/syntax/utilities_probe_test.go in the pinned parser package",
+      "operations": [
+        "tsc/internal/parser/references.go:collectModuleReferences"
+      ]
+    },
+    {
+      "expected_contract": "Only unprefixed core imports: false.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/parse-outputs/node-core-modules-unprefixed-only",
+      "last_result": "match",
+      "native_authority": "tools/phase1/syntax/utilities_probe_test.go in the pinned parser package",
+      "operations": [
+        "tsc/internal/parser/references.go:collectModuleReferences"
+      ]
+    },
+    {
+      "expected_contract": "The pragma list (getCommentPragmas, parser.go:468): every triple-slash reference form and the JSX pragmas, with their argument names, values and ranges.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/parse-outputs/pragmas",
+      "last_result": "match",
+      "native_authority": "tools/phase1/syntax/utilities_probe_test.go in the pinned parser package",
+      "operations": [
+        "tsc/internal/parser/parser.go:Parser.finishSourceFile",
+        "tsc/internal/parser/parser.go:getCommentPragmas"
+      ]
+    },
+    {
+      "expected_contract": "JSDoc tags in a .js file are reparsed into TypeScript nodes; finishSourceFile sorts and stores the clones (parser.go:484-485).",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/parse-outputs/reparsed-clones-from-jsdoc",
+      "last_result": "match",
+      "native_authority": "tools/phase1/syntax/utilities_probe_test.go in the pinned parser package",
+      "operations": [
+        "tsc/internal/parser/parser.go:Parser.finishSourceFile"
+      ]
     }
   ],
   "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
   "version": 2,
   "witnesses": [
+    {
+      "artifact": "data/s06/ownership-cases.json",
+      "freshness": "gated on every E3 run",
+      "id": "rust-contract/s06-storage-ownership",
+      "kind": "rust_gated",
+      "operations": [],
+      "producer": "none: Rust design contracts with no Go rows",
+      "rust_gate": "scripts/s06_ownership.py (E3) runs the 30 storage_tests in four modes",
+      "witnesses": "Bundle and member retention, exclusive bind-before-publication and branded local readers: the Rust storage contracts plan task 5 requires be preserved. There is no Go operation to claim."
+    },
+    {
+      "artifact": "crates/tsr_compiler/src/syntactic_diagnostics.rs",
+      "freshness": "gated on every `cargo test`",
+      "id": "rust-contract/syntax-foreign-owner-rejection",
+      "kind": "rust_gated",
+      "operations": [],
+      "producer": "none: Go has no owner check. Program.GetSyntacticDiagnostics computes a foreign file's diagnostics with the receiver's options (program.go:722-735); the Rust handle model refuses it.",
+      "rust_gate": "`cargo test -p tsr_compiler --lib syntactic_diagnostics::tests::foreign_file_handles_are_rejected`",
+      "witnesses": "Plan task 4's cross-file owner rejection, a Rust-only contract: a file handle from another program is an error, not a result computed against the wrong program's options. The lazy JSDoc provider refuses a foreign source the same way (tsr_parser/src/lazy_jsdoc.rs)."
+    },
     {
       "artifact": "crates/tsr_compiler/src/boundary_tests.rs",
       "freshness": "gated on every `cargo test`; the three tests are also enumerated in data/s07/program-helper-tests.json.",
@@ -30285,6 +31305,557 @@
       "witnesses": "The pinned regular-expression scanner is the only in-scope caller of the spelling suggestions: upstream/tsc/internal/scanner/regexp.go:985, :993, :997 and :1086 all call core.GetSpellingSuggestionForStrings, which delegates to the unexported getSpellingSuggestion and through it to levenshteinWithMax. The Rust counterparts are crates/tsr_scanner/src/spelling.rs:18, :28 and its levenshtein_with_max, so the differential comparison over the frozen regexp cases exercises the same chain on both sides. The suggestion text is part of the compared diagnostic, not a separate assertion, so a wrong edit-distance weight changes the bytes. NOTE: the Rust home is tsr_scanner::spelling, not tsr_core, which is why a by-name search of tsr_core missed it."
     },
     {
+      "artifact": "data/s06/accessor-observations.tsv",
+      "freshness": "gated on every `cargo test`",
+      "id": "witness/s06-accessor-observations-rust",
+      "kind": "rust_gated",
+      "not_claimed": {
+        "constructors without observed child wiring (145)": "checked for kind, payload and text only",
+        "dispatch-only accessors (20)": "never return a non-nil value, so a wrong field for a handled kind would pass",
+        "tsc/internal/ast/ast.go:Node.ModifierNodes": "constant empty in every row"
+      },
+      "operations": [
+        "tsc/internal/ast/ast.go:MutableNode.SetExpression",
+        "tsc/internal/ast/ast.go:MutableNode.SetInitializer",
+        "tsc/internal/ast/ast.go:MutableNode.SetModifiers",
+        "tsc/internal/ast/ast.go:MutableNode.SetType",
+        "tsc/internal/ast/ast.go:Node.ArgumentList",
+        "tsc/internal/ast/ast.go:Node.Arguments",
+        "tsc/internal/ast/ast.go:Node.Body",
+        "tsc/internal/ast/ast.go:Node.CanHaveStatements",
+        "tsc/internal/ast/ast.go:Node.Expression",
+        "tsc/internal/ast/ast.go:Node.Initializer",
+        "tsc/internal/ast/ast.go:Node.IsTypeOnly",
+        "tsc/internal/ast/ast.go:Node.KindString",
+        "tsc/internal/ast/ast.go:Node.KindValue",
+        "tsc/internal/ast/ast.go:Node.ModifierFlags",
+        "tsc/internal/ast/ast.go:Node.Modifiers",
+        "tsc/internal/ast/ast.go:Node.Name",
+        "tsc/internal/ast/ast.go:Node.ParameterList",
+        "tsc/internal/ast/ast.go:Node.Parameters",
+        "tsc/internal/ast/ast.go:Node.PostfixToken",
+        "tsc/internal/ast/ast.go:Node.PropertyNameOrName",
+        "tsc/internal/ast/ast.go:Node.QuestionDotToken",
+        "tsc/internal/ast/ast.go:Node.QuestionToken",
+        "tsc/internal/ast/ast.go:Node.RawText",
+        "tsc/internal/ast/ast.go:Node.Text",
+        "tsc/internal/ast/ast.go:Node.Type",
+        "tsc/internal/ast/ast.go:Node.TypeArgumentList",
+        "tsc/internal/ast/ast.go:Node.TypeArguments",
+        "tsc/internal/ast/ast.go:Node.TypeParameterList",
+        "tsc/internal/ast/ast.go:Node.TypeParameters",
+        "tsc/internal/ast/ast.go:NodeFactory.NewModifierList",
+        "tsc/internal/ast/ast.go:NodeFactory.NewNodeList",
+        "tsc/internal/ast/ast.go:NodeFactory.NewSourceFile",
+        "tsc/internal/ast/ast.go:SourceFile.CanonicalSourceFile",
+        "tsc/internal/ast/ast.go:SourceFile.ContentMapper",
+        "tsc/internal/ast/ast.go:SourceFile.ContentMapperParseOptions",
+        "tsc/internal/ast/ast.go:SourceFile.ContentMapperTransformIdentity",
+        "tsc/internal/ast/ast.go:SourceFile.DiagnosticDirectives",
+        "tsc/internal/ast/ast.go:SourceFile.Diagnostics",
+        "tsc/internal/ast/ast.go:SourceFile.FileName",
+        "tsc/internal/ast/ast.go:SourceFile.GetPositionMap",
+        "tsc/internal/ast/ast.go:SourceFile.Imports",
+        "tsc/internal/ast/ast.go:SourceFile.IsContentMapperFailureStub",
+        "tsc/internal/ast/ast.go:SourceFile.IsContentMapperSupplemental",
+        "tsc/internal/ast/ast.go:SourceFile.IsJS",
+        "tsc/internal/ast/ast.go:SourceFile.JSDiagnostics",
+        "tsc/internal/ast/ast.go:SourceFile.JSDocDiagnostics",
+        "tsc/internal/ast/ast.go:SourceFile.OriginalFileName",
+        "tsc/internal/ast/ast.go:SourceFile.OriginalText",
+        "tsc/internal/ast/ast.go:SourceFile.ParseOptions",
+        "tsc/internal/ast/ast.go:SourceFile.Path",
+        "tsc/internal/ast/ast.go:SourceFile.SetContentMapperInfo",
+        "tsc/internal/ast/ast.go:SourceFile.SetDiagnostics",
+        "tsc/internal/ast/ast.go:SourceFile.SetHasLazyJSDoc",
+        "tsc/internal/ast/ast.go:SourceFile.SetJSDiagnostics",
+        "tsc/internal/ast/ast.go:SourceFile.SetJSDocDiagnostics",
+        "tsc/internal/ast/ast.go:SourceFile.SpanMap",
+        "tsc/internal/ast/ast.go:SourceFile.SupplementalSourceFiles",
+        "tsc/internal/ast/ast.go:SourceFile.Text",
+        "tsc/internal/ast/ast.go:SourceFile.VirtualFileName",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewArrayLiteralExpression",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewArrayTypeNode",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewAsExpression",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewBigIntLiteral",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewBinaryExpression",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewBindingElement",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewBreakStatement",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewCallExpression",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewComputedPropertyName",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewElementAccessExpression",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewEmptyStatement",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewExpressionStatement",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewFunctionDeclaration",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewIdentifier",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewImportClause",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewJSDoc",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewJSDocNameReference",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewJSDocText",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewJSDocUnknownTag",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewJsxExpression",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewJsxNamespacedName",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewJsxText",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewLabeledStatement",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewLiteralTypeNode",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewMetaProperty",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewNoSubstitutionTemplateLiteral",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewNumericLiteral",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewObjectLiteralExpression",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewParameterDeclaration",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewParenthesizedExpression",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewPrefixUnaryExpression",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewPrivateIdentifier",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewPropertyAccessExpression",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewPropertyAssignment",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewPropertyDeclaration",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewQualifiedName",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewShorthandPropertyAssignment",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewSpreadAssignment",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewSpreadElement",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewStringLiteral",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewTemplateHead",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewToken",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewTypeReferenceNode",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewVariableDeclaration",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewVariableDeclarationList",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewVariableStatement",
+        "tsc/internal/ast/positionmap.go:PositionMap.IsAsciiOnly",
+        "tsc/internal/ast/positionmap.go:PositionMap.UTF8ToUTF16"
+      ],
+      "producer": "scripts/s06_oracle/accessors_test.go through scripts/s06_accessor_fixtures.py",
+      "rust_gate": "crates/tsr_ast/tests/node_accessors.rs:358 asserts the row count and every key and :1122 the whole source map; `cargo test -p tsr_ast` (CI step 'Parser, AST runtime and codec contracts', debug and release) and E1's utility tests, which rerun the Go checker with --check first",
+      "witnesses": "27,827 accessor rows over every kind and constructor. Claimed: accessors that return a non-nil value in some row, the four setters, the SourceFile and PositionMap methods, and the constructors whose child wiring is observed."
+    },
+    {
+      "artifact": "data/s06/ast-utilities-middle.json",
+      "freshness": "gated on every `cargo test`; the manifest's source and output hashes match",
+      "id": "witness/s06-ast-utilities-middle-rust",
+      "kind": "rust_gated",
+      "not_claimed": {
+        "tsc/internal/ast/ast.go:NewNodeFactory": "no Rust port annotation",
+        "tsc/internal/ast/ast.go:NodeFactory.NewNodeList": "no Rust port annotation",
+        "tsc/internal/ast/utilities.go:IsPlainJSFile": "observed with nil input only"
+      },
+      "operations": [
+        "tsc/internal/ast/ast.go:NodeFactory.NewNodeList",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewAsExpression",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewBreakStatement",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewCallExpression",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewElementAccessExpression",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewEmptyStatement",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewIdentifier",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewJSDoc",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewJSDocText",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewJsxExpression",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewJsxText",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewLabeledStatement",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewNoSubstitutionTemplateLiteral",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewNumericLiteral",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewPropertyAccessExpression",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewQualifiedName",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewStringLiteral",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewTemplateHead",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewToken",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewTypeReferenceNode",
+        "tsc/internal/ast/utilities.go:ClimbPastPropertyAccess",
+        "tsc/internal/ast/utilities.go:CompareNodePositions",
+        "tsc/internal/ast/utilities.go:CreateModifiersFromModifierFlags",
+        "tsc/internal/ast/utilities.go:GetFirstIdentifier",
+        "tsc/internal/ast/utilities.go:GetInvokedExpression",
+        "tsc/internal/ast/utilities.go:GetLeftmostAccessExpression",
+        "tsc/internal/ast/utilities.go:GetSemanticJsxChildren",
+        "tsc/internal/ast/utilities.go:HasTypeArguments",
+        "tsc/internal/ast/utilities.go:IndexOfNode",
+        "tsc/internal/ast/utilities.go:IsArgumentExpressionOfElementAccess",
+        "tsc/internal/ast/utilities.go:IsBreakOrContinueStatement",
+        "tsc/internal/ast/utilities.go:IsCallLikeExpression",
+        "tsc/internal/ast/utilities.go:IsCallLikeOrFunctionLikeExpression",
+        "tsc/internal/ast/utilities.go:IsCallOrNewExpression",
+        "tsc/internal/ast/utilities.go:IsConstAssertion",
+        "tsc/internal/ast/utilities.go:IsConstTypeReference",
+        "tsc/internal/ast/utilities.go:IsContextualKeyword",
+        "tsc/internal/ast/utilities.go:IsDeclarationBindingElement",
+        "tsc/internal/ast/utilities.go:IsJSDocLinkLike",
+        "tsc/internal/ast/utilities.go:IsJSDocNode",
+        "tsc/internal/ast/utilities.go:IsJSDocSingleCommentNode",
+        "tsc/internal/ast/utilities.go:IsJSDocSingleCommentNodeComment",
+        "tsc/internal/ast/utilities.go:IsJSDocSingleCommentNodeList",
+        "tsc/internal/ast/utilities.go:IsJSDocTag",
+        "tsc/internal/ast/utilities.go:IsJsxCallLike",
+        "tsc/internal/ast/utilities.go:IsJsxOpeningLikeElement",
+        "tsc/internal/ast/utilities.go:IsJumpStatementTarget",
+        "tsc/internal/ast/utilities.go:IsLabelName",
+        "tsc/internal/ast/utilities.go:IsLabelOfLabeledStatement",
+        "tsc/internal/ast/utilities.go:IsLateVisibilityPaintedStatement",
+        "tsc/internal/ast/utilities.go:IsNonWhitespaceToken",
+        "tsc/internal/ast/utilities.go:IsObjectTypeDeclaration",
+        "tsc/internal/ast/utilities.go:IsParameterLike",
+        "tsc/internal/ast/utilities.go:IsParameterPropertyModifier",
+        "tsc/internal/ast/utilities.go:IsPropertyAccessOrQualifiedName",
+        "tsc/internal/ast/utilities.go:IsQuestionToken",
+        "tsc/internal/ast/utilities.go:IsRequireCall",
+        "tsc/internal/ast/utilities.go:IsResolutionModeOverrideHost",
+        "tsc/internal/ast/utilities.go:IsRightSideOfPropertyAccess",
+        "tsc/internal/ast/utilities.go:IsRightSideOfQualifiedNameOrPropertyAccess",
+        "tsc/internal/ast/utilities.go:IsStringTextContainingNode",
+        "tsc/internal/ast/utilities.go:IsSuperCall",
+        "tsc/internal/ast/utilities.go:IsTemplateLiteralKind",
+        "tsc/internal/ast/utilities.go:IsTemplateLiteralToken",
+        "tsc/internal/ast/utilities.go:IsTrivia",
+        "tsc/internal/ast/utilities.go:IsTypeKeywordToken",
+        "tsc/internal/ast/utilities.go:IsTypeReferenceType",
+        "tsc/internal/ast/utilities.go:IsUnterminatedLiteral",
+        "tsc/internal/ast/utilities.go:IsVariableLike",
+        "tsc/internal/ast/utilities.go:IsVariableParameterOrProperty",
+        "tsc/internal/ast/utilities.go:IsWhitespaceOnlyJsxText",
+        "tsc/internal/ast/utilities.go:NodeHasKind",
+        "tsc/internal/ast/utilities.go:climbPastPropertyOrElementAccess",
+        "tsc/internal/ast/utilities.go:hasComment",
+        "tsc/internal/ast/utilities.go:selectExpressionOfCallOrNewExpressionOrDecorator"
+      ],
+      "producer": "tools/s06/ast-utilities-middle/export_test.go",
+      "rust_gate": "crates/tsr_ast/src/utilities_middle_tests.rs:17 and :64 (`cargo test -p tsr_ast --lib utilities_middle::tests`) assert every mask and row and fail on any unused Go row; `cargo test -p tsr_ast` (CI step 'Parser, AST runtime and codec contracts', debug and release) and E1's utility tests, which rerun the Go checker with --check first",
+      "witnesses": "65,536 x 27 predicate bits and 26 graph rows. Transitive Go callees that Rust inlines as matches! are not claimed: their Rust ports never run."
+    },
+    {
+      "artifact": "data/s06/requests.json",
+      "freshness": "gated on every `cargo xtask run e1`; the committed record is stale in status/status.json",
+      "id": "witness/s06-e1-parse-corpus",
+      "kind": "rust_gated",
+      "operations": [
+        "tsc/internal/parser/parser.go:ParseSourceFile"
+      ],
+      "producer": "e1",
+      "rust_gate": "`cargo xtask run e1` (python3 scripts/s06.py e1): a live pinned Go oracle and the Rust examples compared stage by stage; check-metrics gates the metric over all 22,343 primary requests and 135 supplemental ones (metrics frozen_denominator, encoder_output_bytes, ast_runtime and the rest)",
+      "witnesses": "The whole encoded tree, parents, imports, module augmentations, ambient module names, the external-module indicator, file references, script kind, language variant and all three diagnostic collections, for every primary request. At operation granularity it demonstrably runs only its entry point; parser, scanner and AST internals below it are unmeasured without a Go and Rust coverage capture, so none is claimed here."
+    },
+    {
+      "artifact": "data/s06/factory-fixtures.json",
+      "freshness": "gated on every `cargo xtask run e1`; the committed E1 record predates the crate rename and is stale in status/status.json",
+      "id": "witness/s06-factory-fixtures-rust",
+      "kind": "rust_gated",
+      "not_claimed": {
+        "As* casts, Pos/End, NodeCount/TextCount": "field reads in Rust",
+        "tsc/internal/ast/ast.go:GetOrComputeSourceFileData": "Rust witnesses the panic-once rule on its node-index cache, a specialization, not the generic source-data cache",
+        "tsc/internal/ast/ast.go:NodeList.HasTrailingComma": "one observation (true); a constant-true port would pass"
+      },
+      "operations": [
+        "tsc/internal/ast/ast.go:Node.Clone",
+        "tsc/internal/ast/ast.go:Node.SubtreeFacts",
+        "tsc/internal/ast/ast.go:NodeFactory.NewNodeList",
+        "tsc/internal/ast/ast.go:NodeFactory.NewSourceFile",
+        "tsc/internal/ast/ast.go:NodeFactory.UpdateSourceFile",
+        "tsc/internal/ast/ast.go:SourceFile.Diagnostics",
+        "tsc/internal/ast/ast.go:SourceFile.FileName",
+        "tsc/internal/ast/ast.go:SourceFile.SetDiagnostics",
+        "tsc/internal/ast/ast.go:SourceFile.SetHasLazyJSDoc",
+        "tsc/internal/ast/ast.go:SourceFile.Text",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewArrayLiteralExpression",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewCallExpression",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewComputedPropertyName",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewIdentifier",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewPropertyAccessExpression",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewToken",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewVariableDeclaration",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.UpdatePropertyAccessExpression",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.UpdateSyntaxList",
+        "tsc/internal/ast/deepclone.go:NodeFactory.DeepCloneNode",
+        "tsc/internal/ast/deepclone.go:NodeFactory.DeepCloneReparse",
+        "tsc/internal/ast/precedence.go:GetBinaryOperatorPrecedence",
+        "tsc/internal/ast/utilities.go:GetNodeId",
+        "tsc/internal/ast/visitor.go:NewNodeVisitor",
+        "tsc/internal/ast/visitor.go:NodeVisitor.VisitEachChild",
+        "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
+        "tsc/internal/ast/visitor.go:NodeVisitor.VisitNode",
+        "tsc/internal/ast/visitor.go:NodeVisitor.VisitSlice"
+      ],
+      "producer": "scripts/s06_oracle/factory.go (Go) and crates/tsr_ast/examples/support/factory.rs (Rust)",
+      "rust_gate": "`cargo xtask run e1` (python3 scripts/s06.py e1): a live pinned Go oracle and the Rust examples compared stage by stage; check-metrics gates the metric (metric ast_runtime)",
+      "witnesses": "Twelve constructed-tree scenarios: update-returns-the-same-node identity and factory hooks, clone and deep-clone ranges, parents and reparse flags, the subtree-facts cache and its scope exclusions, every token's facts and binary precedence, SourceFile clone omissions, node-id order and the visitor's nil, flatten, lift and role contracts."
+    },
+    {
+      "artifact": "data/s06/node-kind-observations.json",
+      "freshness": "gated on every `cargo xtask run e1`",
+      "id": "witness/s06-kind-stringer",
+      "kind": "rust_gated",
+      "operations": [
+        "tsc/internal/ast/kind_stringer_generated.go:Kind.String"
+      ],
+      "producer": "e1",
+      "rust_gate": "`cargo xtask run e1` (python3 scripts/s06.py e1): a live pinned Go oracle and the Rust examples compared stage by stage; check-metrics gates the metric (fixture ast/kind-stringer/all-i16 against NodeKind::to_string, metric ast_runtime)",
+      "witnesses": "Kind.String over all 65,536 int16 values."
+    },
+    {
+      "artifact": "data/s06/utilities-front-observations.tsv",
+      "freshness": "gated on every `cargo test`; the Go rows are regenerated and required unchanged by E1",
+      "id": "witness/s06-utilities-front-rust",
+      "kind": "rust_gated",
+      "not_claimed": {
+        "tsc/internal/ast/ast.go:NewNodeFactory": "no Rust port annotation",
+        "tsc/internal/ast/utilities.go:IsGlobalScopeAugmentation": "observed only as a panic",
+        "tsc/internal/ast/utilities.go:IsObjectLiteralMethod": "observed with nil input only"
+      },
+      "operations": [
+        "tsc/internal/ast/ast.go:NodeFactory.NewSourceFile",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewBigIntLiteral",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewBinaryExpression",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewExpressionStatement",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewIdentifier",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewNoSubstitutionTemplateLiteral",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewNumericLiteral",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewParameterDeclaration",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewParenthesizedExpression",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewPrefixUnaryExpression",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewPrivateIdentifier",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewPropertyAccessExpression",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewPropertyDeclaration",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewStringLiteral",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewToken",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewVariableDeclaration",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewVariableStatement",
+        "tsc/internal/ast/utilities.go:CanHaveIllegalModifiers",
+        "tsc/internal/ast/utilities.go:CanHaveModifiers",
+        "tsc/internal/ast/utilities.go:CanHaveSymbol",
+        "tsc/internal/ast/utilities.go:FindAncestor",
+        "tsc/internal/ast/utilities.go:FindAncestorKind",
+        "tsc/internal/ast/utilities.go:FindAncestorOrQuit",
+        "tsc/internal/ast/utilities.go:FindLastVisibleNode",
+        "tsc/internal/ast/utilities.go:FindManyAncestors",
+        "tsc/internal/ast/utilities.go:GetCombinedModifierFlags",
+        "tsc/internal/ast/utilities.go:GetCombinedNodeFlags",
+        "tsc/internal/ast/utilities.go:GetContainingClass",
+        "tsc/internal/ast/utilities.go:GetRootDeclaration",
+        "tsc/internal/ast/utilities.go:GetSourceFileOfNode",
+        "tsc/internal/ast/utilities.go:HasSyntacticModifier",
+        "tsc/internal/ast/utilities.go:IsAccessExpression",
+        "tsc/internal/ast/utilities.go:IsAccessor",
+        "tsc/internal/ast/utilities.go:IsAnyImportOrReExport",
+        "tsc/internal/ast/utilities.go:IsAnyImportSyntax",
+        "tsc/internal/ast/utilities.go:IsAssertionExpression",
+        "tsc/internal/ast/utilities.go:IsAutoAccessorPropertyDeclaration",
+        "tsc/internal/ast/utilities.go:IsBindingPattern",
+        "tsc/internal/ast/utilities.go:IsBlockOrCatchScoped",
+        "tsc/internal/ast/utilities.go:IsBooleanLiteral",
+        "tsc/internal/ast/utilities.go:IsCatchClauseVariableDeclarationOrBindingElement",
+        "tsc/internal/ast/utilities.go:IsClassElement",
+        "tsc/internal/ast/utilities.go:IsClassLike",
+        "tsc/internal/ast/utilities.go:IsClassOrInterfaceLike",
+        "tsc/internal/ast/utilities.go:IsCommaExpression",
+        "tsc/internal/ast/utilities.go:IsCommaSequence",
+        "tsc/internal/ast/utilities.go:IsCompoundAssignment",
+        "tsc/internal/ast/utilities.go:IsDeclarationStatement",
+        "tsc/internal/ast/utilities.go:IsEntityName",
+        "tsc/internal/ast/utilities.go:IsEnumConst",
+        "tsc/internal/ast/utilities.go:IsExpressionOfOptionalChainRoot",
+        "tsc/internal/ast/utilities.go:IsForInOrOfStatement",
+        "tsc/internal/ast/utilities.go:IsFunctionBlock",
+        "tsc/internal/ast/utilities.go:IsFunctionExpressionOrArrowFunction",
+        "tsc/internal/ast/utilities.go:IsFunctionLike",
+        "tsc/internal/ast/utilities.go:IsFunctionLikeDeclaration",
+        "tsc/internal/ast/utilities.go:IsFunctionLikeKind",
+        "tsc/internal/ast/utilities.go:IsFunctionLikeOrClassStaticBlockDeclaration",
+        "tsc/internal/ast/utilities.go:IsFunctionOrModuleBlock",
+        "tsc/internal/ast/utilities.go:IsFunctionOrSourceFile",
+        "tsc/internal/ast/utilities.go:IsImportNode",
+        "tsc/internal/ast/utilities.go:IsImportOrExportSpecifier",
+        "tsc/internal/ast/utilities.go:IsInJSFile",
+        "tsc/internal/ast/utilities.go:IsInJsonFile",
+        "tsc/internal/ast/utilities.go:IsInstanceOfExpression",
+        "tsc/internal/ast/utilities.go:IsJSDocKind",
+        "tsc/internal/ast/utilities.go:IsJsxAttributeLike",
+        "tsc/internal/ast/utilities.go:IsJsxChild",
+        "tsc/internal/ast/utilities.go:IsLiteralExpression",
+        "tsc/internal/ast/utilities.go:IsLogicalBinaryOperator",
+        "tsc/internal/ast/utilities.go:IsLogicalExpression",
+        "tsc/internal/ast/utilities.go:IsLogicalOrCoalescingAssignmentExpression",
+        "tsc/internal/ast/utilities.go:IsLogicalOrCoalescingBinaryExpression",
+        "tsc/internal/ast/utilities.go:IsLogicalOrCoalescingBinaryOperator",
+        "tsc/internal/ast/utilities.go:IsMemberName",
+        "tsc/internal/ast/utilities.go:IsMethodOrAccessor",
+        "tsc/internal/ast/utilities.go:IsModifier",
+        "tsc/internal/ast/utilities.go:IsModifierLike",
+        "tsc/internal/ast/utilities.go:IsModuleOrEnumDeclaration",
+        "tsc/internal/ast/utilities.go:IsNodeDescendantOf",
+        "tsc/internal/ast/utilities.go:IsNullishCoalesce",
+        "tsc/internal/ast/utilities.go:IsObjectBindingOrAssignmentElement",
+        "tsc/internal/ast/utilities.go:IsObjectLiteralElement",
+        "tsc/internal/ast/utilities.go:IsOptionalChain",
+        "tsc/internal/ast/utilities.go:IsOptionalChainRoot",
+        "tsc/internal/ast/utilities.go:IsOutermostOptionalChain",
+        "tsc/internal/ast/utilities.go:IsParameterPropertyDeclaration",
+        "tsc/internal/ast/utilities.go:IsPartOfParameterDeclaration",
+        "tsc/internal/ast/utilities.go:IsPrivateIdentifierClassElementDeclaration",
+        "tsc/internal/ast/utilities.go:IsPrologueDirective",
+        "tsc/internal/ast/utilities.go:IsPropertyName",
+        "tsc/internal/ast/utilities.go:IsPropertyNameLiteral",
+        "tsc/internal/ast/utilities.go:IsSignedNumericLiteral",
+        "tsc/internal/ast/utilities.go:IsStatement",
+        "tsc/internal/ast/utilities.go:IsStatementButNotDeclaration",
+        "tsc/internal/ast/utilities.go:IsStatic",
+        "tsc/internal/ast/utilities.go:IsStringLiteralLike",
+        "tsc/internal/ast/utilities.go:IsStringOrNumericLiteralLike",
+        "tsc/internal/ast/utilities.go:IsTypeElement",
+        "tsc/internal/ast/utilities.go:IsTypeNode",
+        "tsc/internal/ast/utilities.go:IsTypeNodeKind",
+        "tsc/internal/ast/utilities.go:IsVarAwaitUsing",
+        "tsc/internal/ast/utilities.go:IsVarConst",
+        "tsc/internal/ast/utilities.go:IsVarConstLike",
+        "tsc/internal/ast/utilities.go:IsVarLet",
+        "tsc/internal/ast/utilities.go:IsVarUsing",
+        "tsc/internal/ast/utilities.go:NodeIsSynthesized",
+        "tsc/internal/ast/utilities.go:PositionIsSynthesized",
+        "tsc/internal/ast/utilities.go:RangeIsSynthesized",
+        "tsc/internal/ast/utilities.go:ToFindAncestorResult",
+        "tsc/internal/ast/utilities.go:WalkUpBindingElementsAndPatterns",
+        "tsc/internal/ast/utilities.go:WalkUpParenthesizedExpressions",
+        "tsc/internal/ast/utilities.go:WalkUpParenthesizedTypes",
+        "tsc/internal/ast/utilities.go:isDeclarationStatementKind",
+        "tsc/internal/ast/utilities.go:isExpressionKind",
+        "tsc/internal/ast/utilities.go:isFunctionLikeDeclarationKind",
+        "tsc/internal/ast/utilities.go:isStatementKindButNotDeclarationKind",
+        "tsc/internal/ast/utilities.go:isUnaryExpressionKind"
+      ],
+      "producer": "scripts/s06_oracle/utilities_front_test.go through scripts/s06_utilities.py",
+      "rust_gate": "crates/tsr_ast/tests/utilities_front.rs:7 asserts the row count and every key; `cargo test -p tsr_ast` (CI step 'Parser, AST runtime and codec contracts', debug and release) and E1's utility tests, which rerun the Go checker with --check first",
+      "witnesses": "65,536 kind masks of 56 AST predicates plus 358 graph rows. Kind predicates see their whole input domain; the claimed operations are those whose value varies across rows."
+    },
+    {
+      "artifact": "data/s06/utilities-tail-observations.tsv",
+      "freshness": "gated on every `cargo test`",
+      "id": "witness/s06-utilities-tail-rust",
+      "kind": "rust_gated",
+      "not_claimed": {
+        "tsc/internal/ast/ast.go:NewNodeFactory": "no Rust port annotation"
+      },
+      "operations": [
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewArrayLiteralExpression",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewArrayTypeNode",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewBigIntLiteral",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewBinaryExpression",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewBindingElement",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewComputedPropertyName",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewElementAccessExpression",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewIdentifier",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewJSDoc",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewJSDocNameReference",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewJSDocUnknownTag",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewJsxNamespacedName",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewLiteralTypeNode",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewNoSubstitutionTemplateLiteral",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewNumericLiteral",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewObjectLiteralExpression",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewParameterDeclaration",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewPrefixUnaryExpression",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewPropertyAccessExpression",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewPropertyAssignment",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewPropertyDeclaration",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewShorthandPropertyAssignment",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewSpreadAssignment",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewSpreadElement",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewStringLiteral",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewToken",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewTypeReferenceNode",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewVariableDeclaration",
+        "tsc/internal/ast/ast_generated.go:NodeFactory.NewVariableDeclarationList",
+        "tsc/internal/ast/utilities.go:GetJSDocHost",
+        "tsc/internal/ast/utilities.go:GetJSDocRoot",
+        "tsc/internal/ast/utilities.go:GetNextJSDocCommentLocation",
+        "tsc/internal/ast/utilities.go:GetRestIndicatorOfBindingOrAssignmentElement",
+        "tsc/internal/ast/utilities.go:GetRestParameterElementType",
+        "tsc/internal/ast/utilities.go:HasInferredType",
+        "tsc/internal/ast/utilities.go:IsEmptyArrayLiteral",
+        "tsc/internal/ast/utilities.go:IsEmptyObjectLiteral",
+        "tsc/internal/ast/utilities.go:IsExpandoPropertyDeclaration",
+        "tsc/internal/ast/utilities.go:IsImportOrImportEqualsDeclaration",
+        "tsc/internal/ast/utilities.go:IsInfinityOrNaNString",
+        "tsc/internal/ast/utilities.go:IsJSDocNameReferenceContext",
+        "tsc/internal/ast/utilities.go:IsKeyword",
+        "tsc/internal/ast/utilities.go:IsNamedEvaluationSource",
+        "tsc/internal/ast/utilities.go:IsNonContextualKeyword",
+        "tsc/internal/ast/utilities.go:IsPrimitiveLiteralValue",
+        "tsc/internal/ast/utilities.go:IsProtoSetter",
+        "tsc/internal/ast/utilities.go:IsStringLiteralLikeType",
+        "tsc/internal/ast/utilities.go:IsSuperProperty",
+        "tsc/internal/ast/utilities.go:IsTagName",
+        "tsc/internal/ast/utilities.go:TagNamesAreEquivalent",
+        "tsc/internal/ast/utilities.go:isArgumentOfElementAccessExpression"
+      ],
+      "producer": "scripts/s06_oracle/utilities_tail_test.go through scripts/s06_utilities.py",
+      "rust_gate": "crates/tsr_ast/tests/utilities_tail.rs:21 asserts the count and every key; `cargo test -p tsr_ast` (CI step 'Parser, AST runtime and codec contracts', debug and release) and E1's utility tests, which rerun the Go checker with --check first",
+      "witnesses": "65,536 kind masks of 5 predicates plus 121 graph rows."
+    },
+    {
+      "artifact": "data/s07/ast-helper-observations.json",
+      "freshness": "gated on every `cargo test`; adapter and observation hashes match",
+      "id": "witness/s07-ast-helpers-rust",
+      "kind": "rust_gated",
+      "not_claimed": {
+        "tsc/internal/ast/utilities.go:IsAssignmentExpression": "the excludeCompoundAssignment=false column is constant",
+        "tsc/internal/ast/utilities.go:IsDottedName": "one negative row; constant false would pass",
+        "tsc/internal/ast/utilities.go:IsPushOrUnshiftIdentifier": "one negative row; constant false would pass",
+        "tsc/internal/ast/utilities.go:NodeIsMissing": "observed with nil only"
+      },
+      "operations": [
+        "tsc/internal/ast/utilities.go:FindConstructorDeclaration",
+        "tsc/internal/ast/utilities.go:GetAssignmentDeclarationKind",
+        "tsc/internal/ast/utilities.go:GetDeclarationContainer",
+        "tsc/internal/ast/utilities.go:GetElementOrPropertyAccessName",
+        "tsc/internal/ast/utilities.go:GetImmediatelyInvokedFunctionExpression",
+        "tsc/internal/ast/utilities.go:GetModuleInstanceState",
+        "tsc/internal/ast/utilities.go:GetNonAssignedNameOfDeclaration",
+        "tsc/internal/ast/utilities.go:IsBindableObjectDefinePropertyCall",
+        "tsc/internal/ast/utilities.go:IsBindableStaticNameExpression",
+        "tsc/internal/ast/utilities.go:IsDeclaration",
+        "tsc/internal/ast/utilities.go:IsEntityNameExpressionEx",
+        "tsc/internal/ast/utilities.go:IsExpandoInitializer",
+        "tsc/internal/ast/utilities.go:IsExportsIdentifier",
+        "tsc/internal/ast/utilities.go:IsInstantiatedModule",
+        "tsc/internal/ast/utilities.go:IsModuleExportsAccessExpression",
+        "tsc/internal/ast/utilities.go:IsPropertyAccessEntityNameExpression",
+        "tsc/internal/ast/utilities.go:NodeHasName",
+        "tsc/internal/ast/utilities.go:NodeIsPresent",
+        "tsc/internal/ast/utilities.go:getModuleInstanceStateCached",
+        "tsc/internal/ast/utilities.go:getModuleInstanceStateForAliasTarget",
+        "tsc/internal/ast/utilities.go:getModuleInstanceStateWorker",
+        "tsc/internal/ast/utilities.go:isElementAccessEntityNameExpression"
+      ],
+      "producer": "tools/s07/ast-helpers/export_test.go through scripts/s07_ast_helpers.py",
+      "rust_gate": "crates/tsr_ast/src/binder_helpers_tests.rs:69 (`cargo test -p tsr_ast --lib binder_helpers::tests`) asserts every row and that none is unconsumed; `cargo test -p tsr_ast` and the binder producer's helper tests",
+      "witnesses": "46 rows over the binder's AST helpers, including every module-instance-state branch and the alias-order ancestor fallback."
+    },
+    {
+      "artifact": "data/s07/binder-requests.json",
+      "freshness": "gated on every `cargo xtask run binder`; the committed record is stale in status/status.json",
+      "id": "witness/s07-binder-corpus",
+      "kind": "rust_gated",
+      "operations": [
+        "tsc/internal/binder/binder.go:BindSourceFile",
+        "tsc/internal/parser/parser.go:ParseSourceFile"
+      ],
+      "producer": "binder",
+      "rust_gate": "`cargo xtask run binder`: parse, bind and repeat_bind over all 22,343 primary requests, the parsed, bound and repeated graphs compared record by record (CI gates run.binder.parity == 1)",
+      "witnesses": "The complete parsed, bound and repeated graphs, including the lists, parents, flow edges and symbol identities the F4a comparator controls perturb. Repeat binding must leave the graph unchanged, which is the independent-binding contract. Only the two entry points are claimed."
+    },
+    {
+      "artifact": "data/s07/bound-clone.json",
+      "freshness": "gated on every `cargo test`",
+      "id": "witness/s07-bound-clone-rust",
+      "kind": "rust_gated",
+      "not_claimed": {
+        "copyFrom, cloneNode, updateNode, IsBound, FunctionDeclaration.Clone": "no Rust port marker; one input"
+      },
+      "operations": [
+        "tsc/internal/ast/ast.go:Node.Clone",
+        "tsc/internal/ast/ast.go:NodeFactory.UpdateSourceFile",
+        "tsc/internal/ast/ast.go:NodeList.Clone",
+        "tsc/internal/ast/ast.go:SourceFile.Clone"
+      ],
+      "producer": "tools/s07/ownership/bound-clone.go",
+      "rust_gate": "crates/tsr_binder/src/bound_factory_tests.rs:9 asserts the whole object; `cargo test -p tsr_binder`",
+      "witnesses": "Cloning and updating a bound JS SourceFile without rebinding: identity of the unchanged update, the clone's retained and dropped fields and list clones."
+    },
+    {
       "artifact": "data/s07/config-mapper-observations.json",
       "freshness": "gated on every `cargo test`; also in data/s07/program-helper-tests.json.",
       "id": "witness/s07-config-mappers-rust",
@@ -30329,6 +31900,26 @@
       "producer": "scripts/s07_config.py (`go test ./internal/testrunner` through a copied adapter)",
       "rust_gate": "crates/tsr_compiler/tests/config_source_parity.rs:4 `source_config_values_ranges_inheritance_and_globs` runs under `cargo test -p tsr_compiler --test config_source_parity`, calls tools/s07/config/rust_observation.rs for each of the 25 requests and asserts each whole row equal",
       "witnesses": "25 config-source requests through the pinned `ParseJsonSourceFileConfigFileContent`, covering the extends chain (`extends`), extends circularity (`cycle`) and include-glob extension priority (`glob-priority`). Each transitive operation was confirmed to be on a path some frozen request actually takes, not merely reachable. `handleOptionConfigDirTemplateSubstitution` is the interesting one: a case-sensitive scan for `${configDir}` over the 25 finds nothing, which looks like a no-op, but `source-16` carries `${CONFIGDIR}` and `${confIgDir}` with a Turkish dotted capital I, and the pinned guard lowercases while the pinned replacement does not -- so both substitution branches are taken and produce the untouched string, which is what the frozen row records. NOT claimed: `ParsedCommandLine.FileNames` and `.CompilerOptions` are read here as accessors on the Go side and as the `root_file_names` and `options` fields on the Rust side, so they are claimed as accessors only. The `units`/`settings` arm of the Rust driver is dead with respect to THIS dataset -- no frozen request carries `units` -- but is live on the separate full-evidence path driven by tools/s07/config/fixture_export_test.go, so the dead-arm observation is scoped to the dataset and is not a reason to remove the code."
+    },
+    {
+      "artifact": "data/s07/diagnostic-order-observations.json",
+      "freshness": "gated on every `cargo test`",
+      "id": "witness/s07-diagnostic-order-rust",
+      "kind": "rust_gated",
+      "operations": [
+        "tsc/internal/ast/diagnostic.go:CompareDiagnostics",
+        "tsc/internal/ast/diagnostic.go:EqualDiagnostics",
+        "tsc/internal/ast/diagnostic.go:EqualDiagnosticsNoRelatedInfo",
+        "tsc/internal/ast/diagnostic.go:compareMessageChainContent",
+        "tsc/internal/ast/diagnostic.go:compareMessageChainSize",
+        "tsc/internal/ast/diagnostic.go:compareRelatedInfo",
+        "tsc/internal/ast/diagnostic.go:equalMessageChain",
+        "tsc/internal/ast/diagnostic.go:getDiagnosticMessageIdentity",
+        "tsc/internal/ast/diagnostic.go:getDiagnosticPath"
+      ],
+      "producer": "tools/s07/diagnostic-order/export_test.go",
+      "rust_gate": "crates/tsr_ast/src/diagnostic_order_tests.rs:30 (`cargo test -p tsr_ast --lib diagnostic_order::tests`) asserts the case count equals the row count; `cargo test -p tsr_ast`",
+      "witnesses": "21 rows over diagnostic ordering and equality, including localized and ad-hoc message identity. Go reads through getters; Rust reads fields, so the getters are not claimed."
     },
     {
       "artifact": "data/s07/helper-tests.json",
@@ -30531,6 +32122,58 @@
       "producer": "cargo test",
       "rust_gate": "crates/tsr_tspath/tests/go_observations.rs runs under `cargo test -p tsr_tspath --test go_observations --locked` and asserts the Rust answers equal the frozen Go rows for all 4096 requests",
       "witnesses": "The same frozen artifact has two relationships to the port, and only one of them was recorded before. Its PRODUCER, scripts/s07_path_helpers.py, runs `go test` only and never executes Rust, which is what witness/s07-path-observations records as a native authority. But a Rust test CONSUMES it: crates/tsr_tspath/tests/go_observations.rs:36-57 reads data/s07/path-requests.json and data/s07/path-observations.json through include_str!, calls tsr_tspath for each of the 4096 requests, and asserts the whole row equal -- so `cargo test` gates the port against the frozen Go answers. The eight operations listed are the ones the Go adapter tools/s07/paths/export_test.go actually drives and the Rust test actually calls, paired one to one: PathIsRelative/is_relative, TrimFilePathPrefix/trim_file_path_prefix, GetNormalizedPathComponents/normalized_components, ComparePaths/compare_paths, ContainsPath/contains_path, GetPathFromPathComponents/path_from_components, GetRelativePathFromDirectory/relative_from_directory and GetRelativePathFromFile/relative_from_file. The row's `fold` column is Go's strings.EqualFold, a standard library call rather than a tspath operation, so it confers nothing here. The panic arm is compared too: both sides catch the unwind and assert the literal text \"paths must either both be absolute or both be relative\"."
+    },
+    {
+      "artifact": "data/s07/resolver-observations.json",
+      "freshness": "gated on every `cargo test`",
+      "id": "witness/s07-resolver-rust",
+      "kind": "rust_gated",
+      "operations": [
+        "tsc/internal/binder/nameresolver.go:GetLocalSymbolForExportDefault",
+        "tsc/internal/binder/nameresolver.go:NameResolver.Resolve",
+        "tsc/internal/binder/nameresolver.go:NameResolver.requiresScopeChange",
+        "tsc/internal/binder/nameresolver.go:NameResolver.useOuterVariableScopeInParameter",
+        "tsc/internal/binder/nameresolver.go:getIsDeferredContext",
+        "tsc/internal/binder/nameresolver.go:isTypeParameterSymbolDeclaredInContainer",
+        "tsc/internal/binder/referenceresolver.go:NewReferenceResolver",
+        "tsc/internal/binder/referenceresolver.go:referenceResolver.GetElementAccessExpressionName",
+        "tsc/internal/binder/referenceresolver.go:referenceResolver.GetReferencedExportContainer",
+        "tsc/internal/binder/referenceresolver.go:referenceResolver.GetReferencedImportDeclaration",
+        "tsc/internal/binder/referenceresolver.go:referenceResolver.GetReferencedMemberValueDeclaration",
+        "tsc/internal/binder/referenceresolver.go:referenceResolver.GetReferencedValueDeclaration",
+        "tsc/internal/binder/referenceresolver.go:referenceResolver.GetReferencedValueDeclarations"
+      ],
+      "producer": "tools/s07/resolver/export_test.go in package binder",
+      "rust_gate": "the seven pinned_* tests in crates/tsr_binder/src/resolver_tests.rs, mounted as name_resolver::tests (`cargo test -p tsr_binder --lib name_resolver::tests`); `cargo test -p tsr_binder` (CI 'Binder, program and configuration contracts')",
+      "witnesses": "84 rows in 20 label families over name and reference resolution. Only the directly called entry points are claimed: rows are looked up by label with no completeness check, and per-branch execution of the one-hop helpers is unverified."
+    },
+    {
+      "artifact": "data/s07/scanner-helper-observations.json",
+      "freshness": "gated on every `cargo test`",
+      "id": "witness/s07-scanner-helpers-rust",
+      "kind": "rust_gated",
+      "not_claimed": {
+        "tsc/internal/scanner/scanner.go:GetECMALineOfPosition": "Go-only on this path; Rust bypasses it",
+        "tsc/internal/scanner/utilities.go:GetTextOfNode": "one row only"
+      },
+      "operations": [
+        "tsc/internal/scanner/scanner.go:GetECMAEndLinePosition",
+        "tsc/internal/scanner/scanner.go:GetErrorRangeForNode",
+        "tsc/internal/scanner/scanner.go:GetRangeOfTokenAtPosition",
+        "tsc/internal/scanner/scanner.go:GetScannerForSourceFile",
+        "tsc/internal/scanner/scanner.go:SkipTrivia",
+        "tsc/internal/scanner/scanner.go:findOriginatingJSDocSatisfiesTag",
+        "tsc/internal/scanner/scanner.go:getErrorRangeForArrowFunction",
+        "tsc/internal/scanner/utilities.go:DeclarationNameToString",
+        "tsc/internal/scanner/utilities.go:GetSourceTextOfNodeFromSourceFile",
+        "tsc/internal/scanner/utilities.go:GetTextOfNodeFromSourceText",
+        "tsc/internal/scanner/utilities.go:isJSDocTypeExpressionOrChild",
+        "tsc/internal/scanner/utilities.go:normalizeJSDocTypeSourceText",
+        "tsc/internal/scanner/utilities.go:stripLeadingJSDocComment"
+      ],
+      "producer": "tools/s07/scanner-helpers/export_test.go",
+      "rust_gate": "crates/tsr_scanner/src/binder_helpers_tests.rs:54 (`cargo test -p tsr_scanner --lib binder_helpers::tests`) with the same unconsumed-row check; `cargo test -p tsr_scanner` (CI 'Scanner, numeric and shared-range contracts')",
+      "witnesses": "34 rows over source-text access and error ranges: the source text of nodes, JSDoc type normalization, token ranges and declaration error spans."
     },
     {
       "artifact": "data/s07/semver-observations.json",
