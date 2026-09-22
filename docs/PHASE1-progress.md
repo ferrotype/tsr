@@ -19,8 +19,9 @@ moved pin invalidates it.
 
 `python3 scripts/phase1.py inventory --check` computes this: it reports
 `f0_complete: false` with the outstanding items, separately from whether the
-manifests are internally consistent. Stage A preparation is not Phase 1
-implementation; no production behavior has been added or changed.
+manifests are internally consistent. This table tracks preparation; the later
+sections record production implementation separately. **F3b is complete** under
+the approved immutable-package exception; see the completion record below.
 
 ## F1a — foundation leaf preparation
 
@@ -2351,3 +2352,61 @@ file text after its AST owner drops. The existing native diagnostic byte suite,
 config source parity and config diagnostic integration tests pass. Focused
 all-target clippy passes with warnings denied. The S07 config observer also
 handles the newly explicit foreign JSON input variants through normalization.
+
+
+## F3b completion (2026-09-22)
+
+The remaining config, package and resolution implementation is complete under
+the owner-approved immutable-package-contents decision. The 80 command-line
+and 87 config outputs pass through the shared pinned Go test renderer; the 142
+matchFiles outputs also match the observed native renderer byte for byte.
+The existing 74 exceptions concerning historical matchFiles reference files
+remain separate and unchanged. No renderer copies expected output sections.
+
+| Family | Final raw comparison |
+| --- | --- |
+| Config, command-line, resolution and display (486) | 485 match; 1 approved immutable-package alias difference |
+| Filesystem controls (359) | 355 match; 3 previously recorded differences; 1 Linux-only native unavailable |
+| Leaf controls (230) | 229 match; 1 previously approved options-clone difference |
+
+Every F3b case executes; none is missing or a harness failure. Package contents
+remain shared by identity and immutable after publication. The exact rejected
+mutation and its raw observation remain visible in the capture and
+[ownership audit](PHASE1-aliasing-audit.md).
+This approval does not suppress unrelated future differences.
+
+The final family captures are retained in
+`data/phase1/captures/f3b-complete.tar.gz` (3,723,174 bytes, SHA-256
+`d60a5741831573dfc88ccda94a46e5ed3de79d0cdbe7c675195687c6c3d432d2`).
+An extracted copy was authenticated and replayed without compiling or running
+children. Family provenance SHA-256 values:
+
+- config: `4bb0b895786e49b197c4a68303fbccbc1f53d320dec64ab36283c3fd517d4ae1`
+- filesystem: `9162d70f33e96fd82553db69028fead58c0cb9720649dd12bd2accfc5d7ad1ed`
+- leaves: `89836a22c0a917916bf890756ef4d95fd295898bce73a5a45e3deb9191cded42`
+
+Program integration checks retain the 48 native ordered-loader fixtures, 25
+native config observations and config diagnostic/source-owner tests. The bounded
+E2 recheck selects all 232 frozen variants naming the changed loading/resolution
+surfaces plus 50 deterministic controls: **214 acceptance matches, 67
+informational matches and one informational native-unavailable case**. There
+are no execution failures or comparison regressions in any checked domain.
+The selection and scoped report are committed as
+`data/phase1/f3b-program-{selection,results}.json`; the full local capture is
+`target/phase1/f3b-program-recheck`. This does not replace full E2 evidence or
+claim new checker performance measurements.
+
+The S07 graph and selection review were refreshed after 71 Rust mapping changes.
+All non-mapping graph fields, subset bytes and checker obligations are unchanged.
+Correcting the forward span-map crate home required new upstream-manifest
+provenance; regenerated native syntax/config observations are byte-identical.
+The glob dependency now participates in the relevant producer fingerprints and
+the external embedding consumer lockfile.
+
+Validation: workspace all-target/all-feature clippy with warnings denied; 692
+Python tests and 1,297 subtests (one platform skip); config/module package and
+compiler integration tests; native plain/pretty diagnostic fixtures and mapped
+source ownership checks; formatting, package policy, tracker and inventory
+validation, and Rust 1.96 checks for the changed consumers. No benchmark was
+run. The older F2b foreign dynamic element/map differences, Linux-only
+observations and F4a/F5a preparation remain outside this F3b closure.

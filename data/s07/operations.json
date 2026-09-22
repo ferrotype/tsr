@@ -32287,7 +32287,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_compiler/src/output_paths.rs",
-          "line": 82
+          "line": 57
         }
       ],
       "source_sha256": "2d4cd7039dcae8a35528fca3104835c81660989c2fc4e10db8bbc94a2818987c",
@@ -33327,7 +33327,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_module/src/type_references.rs",
-          "line": 31
+          "line": 32
         }
       ],
       "source_sha256": "5a60c4cd3fcd7fe2e1f37be6553b7097290219a39f1dbe1a30a113b544670ec4",
@@ -34173,7 +34173,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_module/src/type_references.rs",
-          "line": 386
+          "line": 420
         }
       ],
       "source_sha256": "2327bd2509887f401591035516b643411a8a4a2ed046c928c521fcaa791cf629",
@@ -34183,8 +34183,13 @@
       "end_line": 147,
       "file": "tsc/internal/module/resolver.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_module/src/redirect.rs",
+          "line": 13
+        }
+      ],
       "source_sha256": "2327bd2509887f401591035516b643411a8a4a2ed046c928c521fcaa791cf629",
       "start_line": 139
     },
@@ -34196,7 +34201,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_module/src/resolver.rs",
-          "line": 874
+          "line": 1076
         }
       ],
       "source_sha256": "2327bd2509887f401591035516b643411a8a4a2ed046c928c521fcaa791cf629",
@@ -34206,8 +34211,13 @@
       "end_line": 2045,
       "file": "tsc/internal/module/resolver.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_module/src/paths.rs",
+          "line": 30
+        }
+      ],
       "source_sha256": "2327bd2509887f401591035516b643411a8a4a2ed046c928c521fcaa791cf629",
       "start_line": 2034
     },
@@ -34228,7 +34238,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_module/src/resolver.rs",
-          "line": 739
+          "line": 922
         }
       ],
       "source_sha256": "2327bd2509887f401591035516b643411a8a4a2ed046c928c521fcaa791cf629",
@@ -34260,11 +34270,11 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_module/src/resolver.rs",
-          "line": 760
+          "line": 943
         },
         {
           "file": "crates/tsr_module/src/resolver.rs",
-          "line": 777
+          "line": 960
         }
       ],
       "source_sha256": "2327bd2509887f401591035516b643411a8a4a2ed046c928c521fcaa791cf629",
@@ -34305,7 +34315,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_module/src/resolver.rs",
-          "line": 740
+          "line": 923
         }
       ],
       "source_sha256": "2327bd2509887f401591035516b643411a8a4a2ed046c928c521fcaa791cf629",
@@ -34315,8 +34325,13 @@
       "end_line": 366,
       "file": "tsc/internal/module/resolver.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_module/src/resolver.rs",
+          "line": 412
+        }
+      ],
       "source_sha256": "2327bd2509887f401591035516b643411a8a4a2ed046c928c521fcaa791cf629",
       "start_line": 339
     },
@@ -34324,8 +34339,13 @@
       "end_line": 2032,
       "file": "tsc/internal/module/resolver.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_module/src/paths.rs",
+          "line": 15
+        }
+      ],
       "source_sha256": "2327bd2509887f401591035516b643411a8a4a2ed046c928c521fcaa791cf629",
       "start_line": 1995
     },
@@ -34369,8 +34389,13 @@
       "end_line": 1984,
       "file": "tsc/internal/module/resolver.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_module/src/util.rs",
+          "line": 33
+        }
+      ],
       "source_sha256": "2327bd2509887f401591035516b643411a8a4a2ed046c928c521fcaa791cf629",
       "start_line": 1971
     },
@@ -34387,8 +34412,13 @@
       "end_line": 2060,
       "file": "tsc/internal/module/resolver.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_module/src/resolver.rs",
+          "line": 1097
+        }
+      ],
       "source_sha256": "2327bd2509887f401591035516b643411a8a4a2ed046c928c521fcaa791cf629",
       "start_line": 2052
     },
@@ -34486,8 +34516,13 @@
       "end_line": 1809,
       "file": "tsc/internal/module/resolver.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_module/src/resolver.rs",
+          "line": 217
+        }
+      ],
       "source_sha256": "2327bd2509887f401591035516b643411a8a4a2ed046c928c521fcaa791cf629",
       "start_line": 1764
     },
@@ -34526,7 +34561,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_module/src/package_maps.rs",
-          "line": 406
+          "line": 412
         }
       ],
       "source_sha256": "2327bd2509887f401591035516b643411a8a4a2ed046c928c521fcaa791cf629",
@@ -34554,7 +34589,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_module/src/package_maps.rs",
-          "line": 162
+          "line": 169
         }
       ],
       "source_sha256": "2327bd2509887f401591035516b643411a8a4a2ed046c928c521fcaa791cf629",
@@ -34568,7 +34603,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_module/src/resolver.rs",
-          "line": 563
+          "line": 728
         }
       ],
       "source_sha256": "2327bd2509887f401591035516b643411a8a4a2ed046c928c521fcaa791cf629",
@@ -34587,8 +34622,13 @@
       "end_line": 1052,
       "file": "tsc/internal/module/resolver.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_module/src/type_references.rs",
+          "line": 82
+        }
+      ],
       "source_sha256": "2327bd2509887f401591035516b643411a8a4a2ed046c928c521fcaa791cf629",
       "start_line": 1025
     },
@@ -34646,7 +34686,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_module/src/package_maps.rs",
-          "line": 562
+          "line": 568
         }
       ],
       "source_sha256": "2327bd2509887f401591035516b643411a8a4a2ed046c928c521fcaa791cf629",
@@ -34660,7 +34700,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_module/src/package_maps.rs",
-          "line": 223
+          "line": 229
         }
       ],
       "source_sha256": "2327bd2509887f401591035516b643411a8a4a2ed046c928c521fcaa791cf629",
@@ -34764,7 +34804,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_module/src/resolver.rs",
-          "line": 599
+          "line": 771
         }
       ],
       "source_sha256": "2327bd2509887f401591035516b643411a8a4a2ed046c928c521fcaa791cf629",
@@ -34778,7 +34818,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_module/src/resolver.rs",
-          "line": 662
+          "line": 845
         }
       ],
       "source_sha256": "2327bd2509887f401591035516b643411a8a4a2ed046c928c521fcaa791cf629",
@@ -34792,7 +34832,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_module/src/resolver.rs",
-          "line": 678
+          "line": 861
         }
       ],
       "source_sha256": "2327bd2509887f401591035516b643411a8a4a2ed046c928c521fcaa791cf629",
@@ -34806,7 +34846,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_module/src/resolver.rs",
-          "line": 718
+          "line": 901
         }
       ],
       "source_sha256": "2327bd2509887f401591035516b643411a8a4a2ed046c928c521fcaa791cf629",
@@ -34820,7 +34860,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_module/src/package_maps.rs",
-          "line": 439
+          "line": 445
         }
       ],
       "source_sha256": "2327bd2509887f401591035516b643411a8a4a2ed046c928c521fcaa791cf629",
@@ -34907,8 +34947,13 @@
       "end_line": 220,
       "file": "tsc/internal/module/resolver.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_module/src/redirect.rs",
+          "line": 56
+        }
+      ],
       "source_sha256": "2327bd2509887f401591035516b643411a8a4a2ed046c928c521fcaa791cf629",
       "start_line": 216
     },
@@ -34948,8 +34993,13 @@
       "end_line": 63,
       "file": "tsc/internal/module/types.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_module/src/util.rs",
+          "line": 43
+        }
+      ],
       "source_sha256": "05ceb4962ff7740f7a09c8b42b926828b6963b8f6f4d439415a7f5fff9b74794",
       "start_line": 58
     },
@@ -34962,6 +35012,10 @@
         {
           "file": "crates/tsr_compiler/src/include_reason.rs",
           "line": 679
+        },
+        {
+          "file": "crates/tsr_module/src/util.rs",
+          "line": 51
         }
       ],
       "source_sha256": "05ceb4962ff7740f7a09c8b42b926828b6963b8f6f4d439415a7f5fff9b74794",
@@ -35002,7 +35056,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_module/src/package_maps.rs",
-          "line": 690
+          "line": 698
         }
       ],
       "source_sha256": "991ae120a3d749544cd509665c76923eb2c79d8ef64e2878f3930a9325ccd480",
@@ -35030,7 +35084,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_module/src/package_maps.rs",
-          "line": 706
+          "line": 714
         }
       ],
       "source_sha256": "991ae120a3d749544cd509665c76923eb2c79d8ef64e2878f3930a9325ccd480",
@@ -35044,7 +35098,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_module/src/resolver.rs",
-          "line": 859
+          "line": 1061
         }
       ],
       "source_sha256": "991ae120a3d749544cd509665c76923eb2c79d8ef64e2878f3930a9325ccd480",
@@ -35054,8 +35108,13 @@
       "end_line": 41,
       "file": "tsc/internal/module/util.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_module/src/util.rs",
+          "line": 20
+        }
+      ],
       "source_sha256": "991ae120a3d749544cd509665c76923eb2c79d8ef64e2878f3930a9325ccd480",
       "start_line": 28
     },
@@ -35072,8 +35131,13 @@
       "end_line": 188,
       "file": "tsc/internal/packagejson/cache.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_module/src/package_cache.rs",
+          "line": 57
+        }
+      ],
       "source_sha256": "791379a5393c89351db510879e14d296a9ec37700268aabf6fff8dee2bc45172",
       "start_line": 182
     },
@@ -35081,8 +35145,13 @@
       "end_line": 194,
       "file": "tsc/internal/packagejson/cache.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_module/src/package_cache.rs",
+          "line": 66
+        }
+      ],
       "source_sha256": "791379a5393c89351db510879e14d296a9ec37700268aabf6fff8dee2bc45172",
       "start_line": 190
     },
@@ -35090,8 +35159,13 @@
       "end_line": 131,
       "file": "tsc/internal/packagejson/cache.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_module/src/package_cache.rs",
+          "line": 17
+        }
+      ],
       "source_sha256": "791379a5393c89351db510879e14d296a9ec37700268aabf6fff8dee2bc45172",
       "start_line": 129
     },
@@ -35099,8 +35173,13 @@
       "end_line": 167,
       "file": "tsc/internal/packagejson/cache.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_module/src/package_cache.rs",
+          "line": 23
+        }
+      ],
       "source_sha256": "791379a5393c89351db510879e14d296a9ec37700268aabf6fff8dee2bc45172",
       "start_line": 158
     },
@@ -35108,8 +35187,13 @@
       "end_line": 180,
       "file": "tsc/internal/packagejson/cache.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_module/src/package_cache.rs",
+          "line": 46
+        }
+      ],
       "source_sha256": "791379a5393c89351db510879e14d296a9ec37700268aabf6fff8dee2bc45172",
       "start_line": 175
     },
@@ -35121,7 +35205,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_module/src/package_maps.rs",
-          "line": 725
+          "line": 770
         }
       ],
       "source_sha256": "791379a5393c89351db510879e14d296a9ec37700268aabf6fff8dee2bc45172",
@@ -35131,8 +35215,13 @@
       "end_line": 96,
       "file": "tsc/internal/packagejson/cache.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_module/src/package_maps.rs",
+          "line": 735
+        }
+      ],
       "source_sha256": "791379a5393c89351db510879e14d296a9ec37700268aabf6fff8dee2bc45172",
       "start_line": 94
     },
@@ -35140,8 +35229,13 @@
       "end_line": 121,
       "file": "tsc/internal/packagejson/cache.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_module/src/package_maps.rs",
+          "line": 739
+        }
+      ],
       "source_sha256": "791379a5393c89351db510879e14d296a9ec37700268aabf6fff8dee2bc45172",
       "start_line": 98
     },
@@ -35230,8 +35324,13 @@
       "end_line": 39,
       "file": "tsc/internal/packagejson/jsonvalue.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_module/src/package_json_api.rs",
+          "line": 159
+        }
+      ],
       "source_sha256": "3084fd38a697fbb576a1aa8c7971d71943a1546b5b1083ed4a59e21b95ac5b77",
       "start_line": 22
     },
@@ -35520,8 +35619,13 @@
       "end_line": 19,
       "file": "tsc/internal/tsoptions/errors.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_tsoptions/src/convert_options.rs",
+          "line": 30
+        }
+      ],
       "source_sha256": "a128a5e905fb7bd82dd4cd52a866b96128f427c759abf4126630954a89cfbe24",
       "start_line": 14
     },
@@ -35538,8 +35642,13 @@
       "end_line": 116,
       "file": "tsc/internal/tsoptions/errors.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_tsoptions/src/option_diagnostics.rs",
+          "line": 55
+        }
+      ],
       "source_sha256": "a128a5e905fb7bd82dd4cd52a866b96128f427c759abf4126630954a89cfbe24",
       "start_line": 103
     },
@@ -35547,8 +35656,13 @@
       "end_line": 131,
       "file": "tsc/internal/tsoptions/errors.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_tsoptions/src/option_diagnostics.rs",
+          "line": 56
+        }
+      ],
       "source_sha256": "a128a5e905fb7bd82dd4cd52a866b96128f427c759abf4126630954a89cfbe24",
       "start_line": 118
     },
@@ -35606,8 +35720,13 @@
       "end_line": 362,
       "file": "tsc/internal/tsoptions/parsedcommandline.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_tsoptions/src/parsed_accessors.rs",
+          "line": 74
+        }
+      ],
       "source_sha256": "2b1423ed3a9827d34245d5d0ea9c96f25cfaac038e5beda280792de06c946b02",
       "start_line": 358
     },
@@ -35633,8 +35752,13 @@
       "end_line": 255,
       "file": "tsc/internal/tsoptions/parsedcommandline.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_tsoptions/src/parsed_accessors.rs",
+          "line": 237
+        }
+      ],
       "source_sha256": "2b1423ed3a9827d34245d5d0ea9c96f25cfaac038e5beda280792de06c946b02",
       "start_line": 253
     },
@@ -35818,8 +35942,13 @@
       "end_line": 103,
       "file": "tsc/internal/tsoptions/parsinghelpers.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_tsoptions/src/config_parse.rs",
+          "line": 983
+        }
+      ],
       "source_sha256": "c899d92fbf8167867b749283517e3c19f0688d3b2300ec04ed27facf0e90e62c",
       "start_line": 83
     },
@@ -35855,8 +35984,13 @@
       "end_line": 604,
       "file": "tsc/internal/tsoptions/tsconfigparsing.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_tsoptions/src/option_maps.rs",
+          "line": 19
+        }
+      ],
       "source_sha256": "47336cbf405f93504b6d51e867ea75b3cebd48db044d511a15b61f183c4ba5a0",
       "start_line": 598
     },
@@ -35864,8 +35998,13 @@
       "end_line": 613,
       "file": "tsc/internal/tsoptions/tsconfigparsing.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_tsoptions/src/option_maps.rs",
+          "line": 26
+        }
+      ],
       "source_sha256": "47336cbf405f93504b6d51e867ea75b3cebd48db044d511a15b61f183c4ba5a0",
       "start_line": 606
     },
@@ -35873,8 +36012,13 @@
       "end_line": 1640,
       "file": "tsc/internal/tsoptions/tsconfigparsing.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_tsoptions/src/config_parse.rs",
+          "line": 139
+        }
+      ],
       "source_sha256": "47336cbf405f93504b6d51e867ea75b3cebd48db044d511a15b61f183c4ba5a0",
       "start_line": 1630
     },
@@ -35909,7 +36053,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_compiler/src/include_reason.rs",
-          "line": 695
+          "line": 687
         }
       ],
       "source_sha256": "47336cbf405f93504b6d51e867ea75b3cebd48db044d511a15b61f183c4ba5a0",
@@ -35919,8 +36063,13 @@
       "end_line": 1676,
       "file": "tsc/internal/tsoptions/tsconfigparsing.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_tsoptions/src/config_parse.rs",
+          "line": 112
+        }
+      ],
       "source_sha256": "47336cbf405f93504b6d51e867ea75b3cebd48db044d511a15b61f183c4ba5a0",
       "start_line": 1674
     },
@@ -35956,8 +36105,13 @@
       "end_line": 1621,
       "file": "tsc/internal/tsoptions/tsconfigparsing.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_tsoptions/src/config_parse.rs",
+          "line": 106
+        }
+      ],
       "source_sha256": "47336cbf405f93504b6d51e867ea75b3cebd48db044d511a15b61f183c4ba5a0",
       "start_line": 1613
     },
@@ -35965,8 +36119,13 @@
       "end_line": 1078,
       "file": "tsc/internal/tsoptions/tsconfigparsing.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_tsoptions/src/config_parse.rs",
+          "line": 1039
+        }
+      ],
       "source_sha256": "47336cbf405f93504b6d51e867ea75b3cebd48db044d511a15b61f183c4ba5a0",
       "start_line": 1052
     },
@@ -35978,7 +36137,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_tsoptions/src/config_parse.rs",
-          "line": 724
+          "line": 708
         }
       ],
       "source_sha256": "47336cbf405f93504b6d51e867ea75b3cebd48db044d511a15b61f183c4ba5a0",
@@ -36038,7 +36197,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_tsoptions/src/convert_options.rs",
-          "line": 271
+          "line": 278
         }
       ],
       "source_sha256": "47336cbf405f93504b6d51e867ea75b3cebd48db044d511a15b61f183c4ba5a0",
@@ -36116,8 +36275,13 @@
       "end_line": 925,
       "file": "tsc/internal/tsoptions/tsconfigparsing.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_tsoptions/src/config_text.rs",
+          "line": 319
+        }
+      ],
       "source_sha256": "47336cbf405f93504b6d51e867ea75b3cebd48db044d511a15b61f183c4ba5a0",
       "start_line": 919
     },
@@ -36129,7 +36293,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_tsoptions/src/config_parse.rs",
-          "line": 896
+          "line": 905
         }
       ],
       "source_sha256": "47336cbf405f93504b6d51e867ea75b3cebd48db044d511a15b61f183c4ba5a0",
@@ -36208,8 +36372,13 @@
       "end_line": 947,
       "file": "tsc/internal/tsoptions/tsconfigparsing.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_tsoptions/src/config_parse.rs",
+          "line": 39
+        }
+      ],
       "source_sha256": "47336cbf405f93504b6d51e867ea75b3cebd48db044d511a15b61f183c4ba5a0",
       "start_line": 941
     },
@@ -36217,8 +36386,13 @@
       "end_line": 1050,
       "file": "tsc/internal/tsoptions/tsconfigparsing.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_tsoptions/src/config_parse.rs",
+          "line": 1020
+        }
+      ],
       "source_sha256": "47336cbf405f93504b6d51e867ea75b3cebd48db044d511a15b61f183c4ba5a0",
       "start_line": 1015
     },
@@ -36230,7 +36404,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_tsoptions/src/config_parse.rs",
-          "line": 177
+          "line": 193
         }
       ],
       "source_sha256": "47336cbf405f93504b6d51e867ea75b3cebd48db044d511a15b61f183c4ba5a0",
@@ -36244,7 +36418,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_tsoptions/src/config_parse.rs",
-          "line": 225
+          "line": 241
         }
       ],
       "source_sha256": "47336cbf405f93504b6d51e867ea75b3cebd48db044d511a15b61f183c4ba5a0",
@@ -36258,7 +36432,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_tsoptions/src/config_files.rs",
-          "line": 70
+          "line": 74
         }
       ],
       "source_sha256": "47336cbf405f93504b6d51e867ea75b3cebd48db044d511a15b61f183c4ba5a0",
@@ -36282,8 +36456,13 @@
       "end_line": 1821,
       "file": "tsc/internal/tsoptions/tsconfigparsing.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_tsoptions/src/config_substitution.rs",
+          "line": 22
+        }
+      ],
       "source_sha256": "47336cbf405f93504b6d51e867ea75b3cebd48db044d511a15b61f183c4ba5a0",
       "start_line": 1807
     },
@@ -36304,7 +36483,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_tsoptions/src/config_substitution.rs",
-          "line": 28
+          "line": 40
         }
       ],
       "source_sha256": "47336cbf405f93504b6d51e867ea75b3cebd48db044d511a15b61f183c4ba5a0",
@@ -36350,7 +36529,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_tsoptions/src/convert_options.rs",
-          "line": 34
+          "line": 49
         }
       ],
       "source_sha256": "47336cbf405f93504b6d51e867ea75b3cebd48db044d511a15b61f183c4ba5a0",
@@ -36360,8 +36539,13 @@
       "end_line": 816,
       "file": "tsc/internal/tsoptions/tsconfigparsing.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/tsr_tsoptions/src/config_syntax.rs",
+          "line": 168
+        }
+      ],
       "source_sha256": "47336cbf405f93504b6d51e867ea75b3cebd48db044d511a15b61f183c4ba5a0",
       "start_line": 814
     },
@@ -36391,7 +36575,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_tsoptions/src/config_parse.rs",
-          "line": 409
+          "line": 425
         }
       ],
       "source_sha256": "47336cbf405f93504b6d51e867ea75b3cebd48db044d511a15b61f183c4ba5a0",
@@ -36414,7 +36598,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_tsoptions/src/config_parse.rs",
-          "line": 837
+          "line": 846
         }
       ],
       "source_sha256": "47336cbf405f93504b6d51e867ea75b3cebd48db044d511a15b61f183c4ba5a0",
@@ -36428,7 +36612,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_tsoptions/src/config_parse.rs",
-          "line": 284
+          "line": 300
         }
       ],
       "source_sha256": "47336cbf405f93504b6d51e867ea75b3cebd48db044d511a15b61f183c4ba5a0",
@@ -36451,7 +36635,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_tsoptions/src/config_files.rs",
-          "line": 49
+          "line": 53
         }
       ],
       "source_sha256": "47336cbf405f93504b6d51e867ea75b3cebd48db044d511a15b61f183c4ba5a0",

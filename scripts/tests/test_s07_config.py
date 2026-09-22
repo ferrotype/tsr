@@ -24,6 +24,12 @@ def object_value(entries):
 
 
 class ConfigProducerTests(unittest.TestCase):
+    def test_glob_dependency_is_in_both_config_and_program_fingerprints(self):
+        import s07_program_compare as program
+        path = "crates/tsr_glob/src/lib.rs"
+        self.assertIn(path, program.config_provenance_inputs()["rust_inputs"])
+        self.assertIn(path, program.input_fingerprints())
+
     def setUp(self):
         self.directory = tempfile.TemporaryDirectory()
         self.addCleanup(self.directory.cleanup)
