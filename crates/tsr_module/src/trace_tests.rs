@@ -166,10 +166,21 @@ fn directory_alias_preserves_uncomputed_and_initialized_version_cache_identity()
     assert!(!Arc::ptr_eq(&first, &alias));
     assert!(Arc::ptr_eq(&first.shared, &alias.shared));
     assert!(alias.version_paths.get().is_none());
-    let (_, paths) = resolver.version_paths(&first).unwrap();
-    let original = std::ptr::from_ref(paths);
-    let (_, paths) = resolver.version_paths(&alias).unwrap();
-    assert!(std::ptr::eq(original, paths));
+    let original = resolver.version_paths(&first);
+    let alias_paths = resolver.version_paths(&alias);
+    assert!(std::ptr::eq(
+        first.version_paths.get().unwrap(),
+        alias.version_paths.get().unwrap()
+    ));
+    assert!(std::ptr::eq(
+        original.paths().unwrap(),
+        original.paths().unwrap()
+    ));
+    assert!(!std::ptr::eq(
+        original.paths().unwrap(),
+        alias_paths.paths().unwrap()
+    ));
+    assert_eq!(original.paths(), alias_paths.paths());
     let repeated = resolver
         .package_json(b"/repo/node_modules/pkg")
         .unwrap()

@@ -135,7 +135,12 @@ impl Resolver {
         if subpath == b"." {
             let main = match exports {
                 Value::String(_) | Value::Array(_) => Some(exports),
-                Value::Object(table) if table.keys().all(|k| !k.starts_with('.')) => Some(exports),
+                Value::Object(_)
+                    if crate::package_json::object_kind(exports)
+                        == Some(crate::package_json::ObjectKind::Conditions) =>
+                {
+                    Some(exports)
+                }
                 Value::Object(table) => table.get("."),
                 _ => None,
             };
@@ -144,7 +149,9 @@ impl Resolver {
                     .map_target(ext, scope, false, main, b"", false, subpath, b".", context);
             }
         } else if let Value::Object(table) = exports {
-            if table.keys().all(|k| k.starts_with('.')) {
+            if crate::package_json::object_kind(exports)
+                == Some(crate::package_json::ObjectKind::Subpaths)
+            {
                 let result = self.map_entries(ext, subpath, table, scope, false, context)?;
                 if result.is_some() {
                     return Ok(result);
@@ -614,7 +621,9 @@ impl Resolver {
                 return self.exports(info, ext, &path::combine(b".", &[rest]), context);
             }
             if !rest.is_empty() {
-                if let Some((version, paths)) = self.version_paths(info) {
+                let versions = self.version_paths(info);
+                if let Some(paths) = versions.paths() {
+                    let version = versions.version;
                     trace!(self,diagnostics::X_package_json_has_a_typesVersions_entry_0_that_matches_compiler_version_1_looking_for_a_pattern_to_match_module_name_2,version,b"7.1.0-dev",rest);
                     if let Some(result) = self.paths_using(
                         rest,
@@ -711,22 +720,62 @@ pub fn is_applicable_versioned_types_key(key: &[u8]) -> bool {
 }
 /// Source cache state is shared by every package-directory view of the package.
 #[derive(Clone, Debug, Default)]
-pub(super) struct VersionPaths {
+pub(super) struct VersionSelection {
     version: JsString,
     traces: Vec<crate::DiagAndArgs>,
+}
+/// A retrieval owns its lazy mapping table; only selection and trace recording
+/// are shared by the package. This mirrors Go's by-value VersionPaths result.
+#[derive(Debug)]
+pub struct VersionPaths<'a> {
+    pub version: &'a JsString,
+    raw: Option<&'a Map<String, Value>>,
     paths: std::sync::OnceLock<tsr_core::PathMappings>,
 }
-impl PackageJson {
-    /// The package and module-specifier consumers share the source first-use cache.
-    /// Reading the mappings here does not emit resolution trace messages.
-    pub fn version_paths(&self) -> Option<&tsr_core::PathMappings> {
-        self.selected_version_paths().map(|(_, paths)| paths)
+impl VersionPaths<'_> {
+    /// port: tsc/internal/packagejson/cache.go:VersionPaths.Exists
+    pub fn exists(&self) -> bool {
+        !self.version.is_empty() && self.raw.is_some()
     }
-    // port: tsc/internal/packagejson/cache.go:PackageJson.GetVersionPaths
-    fn selected_version_paths(&self) -> Option<(&JsString, &tsr_core::PathMappings)> {
+    /// port: tsc/internal/packagejson/cache.go:VersionPaths.GetPaths
+    pub fn paths(&self) -> Option<&tsr_core::PathMappings> {
+        let raw = self.raw.filter(|_| self.exists())?;
+        Some(self.paths.get_or_init(|| {
+            raw.iter()
+                .filter_map(|(name, values)| {
+                    Some((
+                        JsString::from_bytes(name.as_bytes()),
+                        Some(
+                            values
+                                .as_array()?
+                                .iter()
+                                .map(|value| {
+                                    JsString::from_bytes(
+                                        value.as_str().unwrap_or_default().as_bytes(),
+                                    )
+                                })
+                                .collect(),
+                        ),
+                    ))
+                })
+                .collect()
+        }))
+    }
+}
+impl PackageJson {
+    /// Each call returns an independent lazy mapping table. A directory alias
+    /// still shares the package's once-only version selection.
+    pub fn version_paths(&self) -> VersionPaths<'_> {
+        self.version_paths_traced(|_| {})
+    }
+    /// port: tsc/internal/packagejson/cache.go:PackageJson.GetVersionPaths
+    pub fn version_paths_traced(
+        &self,
+        mut trace: impl FnMut(&crate::DiagAndArgs),
+    ) -> VersionPaths<'_> {
         let package = self;
         let selected=package.version_paths.get_or_init(|| {
-            let mut result=VersionPaths::default();
+            let mut result=VersionSelection::default();
             let mut emit=|message,args|result.traces.push(crate::DiagAndArgs{message,args});
             let Some(raw)=package.contents.get("typesVersions") else {
                 emit(diagnostics::X_package_json_does_not_have_a_0_field,vec!["typesVersions".into()]);return result;
@@ -748,62 +797,36 @@ impl PackageJson {
             emit(diagnostics::X_package_json_does_not_have_a_typesVersions_entry_that_matches_version_0,vec!["7.1".into()]);
             result
         });
-        if selected.version.is_empty() {
-            return None;
+        for message in &selected.traces {
+            trace(message);
         }
-        let paths = selected.paths.get_or_init(|| {
-            package
-                .contents
-                .get("typesVersions")
-                .and_then(Value::as_object)
-                .and_then(|versions| {
-                    versions.get(
-                        std::str::from_utf8(selected.version.as_bytes()).expect("JSON version key"),
-                    )
-                })
-                .and_then(Value::as_object)
-                .expect("selected object version mapping")
-                .iter()
-                .filter_map(|(name, values)| {
-                    Some((
-                        JsString::from_bytes(name.as_bytes()),
-                        Some(
-                            values
-                                .as_array()?
-                                .iter()
-                                .map(|value| {
-                                    JsString::from_bytes(
-                                        value.as_str().unwrap_or_default().as_bytes(),
-                                    )
-                                })
-                                .collect(),
-                        ),
-                    ))
-                })
-                .collect()
-        });
-        Some((&selected.version, paths))
+        let raw = package
+            .contents
+            .get("typesVersions")
+            .and_then(Value::as_object)
+            .and_then(|versions| {
+                versions.get(
+                    std::str::from_utf8(selected.version.as_bytes()).expect("JSON version key"),
+                )
+            })
+            .and_then(Value::as_object);
+        VersionPaths {
+            version: &selected.version,
+            raw,
+            paths: std::sync::OnceLock::new(),
+        }
     }
 }
 impl Resolver {
-    pub(super) fn version_paths<'a>(
-        &mut self,
-        package: &'a PackageJson,
-    ) -> Option<(&'a JsString, &'a tsr_core::PathMappings)> {
-        let result = package.selected_version_paths();
-        if self.tracer.active {
-            for message in &package
-                .version_paths
-                .get()
-                .expect("version selection initialized")
-                .traces
-            {
+    pub(super) fn version_paths<'a>(&mut self, package: &'a PackageJson) -> VersionPaths<'a> {
+        package.version_paths_traced(|message| {
+            if self.tracer.active {
                 self.tracer.write(message.message, message.args.clone());
             }
-        }
-        result
+        })
     }
 }
+
 fn json_type(value: &Value) -> &'static str {
     match value {
         Value::Null => "null",

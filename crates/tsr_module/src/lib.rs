@@ -18,7 +18,7 @@ pub use type_references::{
 };
 
 mod package_maps;
-pub use package_maps::is_applicable_versioned_types_key;
+pub use package_maps::{is_applicable_versioned_types_key, VersionPaths};
 
 pub mod package_json;
 

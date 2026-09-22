@@ -2144,3 +2144,21 @@ serve their direct harness cases. All 55 implemented command-line action
 traces match Go (15 other traces remain pending), all 142 matchFiles envelopes
 are unchanged, and the compiler's two include-reason tests pass. Focused
 clippy with warnings denied passes. Tracker refresh remains at the final step.
+
+### F3b continuation: package selection and resolver fidelity
+
+Package version selection and its trace list remain initialized once per source
+package, including directory aliases. Each retrieval now owns a separate lazy
+mapping table, as Go's returned-by-value `VersionPaths` does; repeated reads of
+one retrieval share that table. The resolver and checker consume that same API.
+A public traced retrieval makes recorded diagnostics observable on every call.
+The previous snapshot/options clone decisions do not cover this distinct cache
+contract, so the native behavior is preserved rather than silently excepted.
+
+Exports now use the existing package object classification (including hash-key
+and mixed objects), and relative type references use the same trailing-directory
+normalization as ordinary module references. All three corrected native traces
+and the newly implemented version-trace case match; all five module unit tests
+and focused clippy pass. The remaining resolver differences involve native
+failure behavior, not these successful-resolution paths. Inventory recording
+remains deferred to the final F3b batch.

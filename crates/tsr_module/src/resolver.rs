@@ -65,7 +65,7 @@ pub struct PackageJson {
 pub struct PackageContents {
     pub contents: crate::package_json::Fields,
     pub parseable: bool,
-    pub(super) version_paths: std::sync::OnceLock<crate::package_maps::VersionPaths>,
+    pub(super) version_paths: std::sync::OnceLock<crate::package_maps::VersionSelection>,
 }
 impl std::ops::Deref for PackageJson {
     type Target = PackageContents;
@@ -319,10 +319,7 @@ impl Resolver {
             return self.finish_external(result);
         }
         if is_relative(name) {
-            let mut candidate = path::resolve(directory, &[name]);
-            if matches!(path::base_name(name), b"." | b"..") && !candidate.ends_with(b"/") {
-                candidate.push(b'/');
-            }
+            let candidate = normalize_cjs_path(directory, name);
             return Ok(self
                 .relative(extensions, &candidate, esm, true, false)?
                 .map_or_else(ResolvedModule::default, |mut r| {
@@ -463,7 +460,7 @@ impl Resolver {
         } else {
             candidate
         };
-        let version_paths = package.and_then(|info| self.version_paths(info));
+        let version_paths = package.map(|info| self.version_paths(info));
         let mut package_file = None;
         if let Some(info) = package.filter(|info| {
             path::to_path(
@@ -487,7 +484,10 @@ impl Resolver {
                 package_file = self.package_json_path_field(info, "main");
             }
         }
-        if let Some((version, paths)) = version_paths {
+        if let Some((version, paths)) = version_paths
+            .as_ref()
+            .and_then(|v| Some((v.version, v.paths()?)))
+        {
             let selected = package_file.as_deref().unwrap_or_default();
             if selected.is_empty()
                 || selected
@@ -890,4 +890,14 @@ pub fn get_conditions(options: &CompilerOptions, mut mode: ModuleKind) -> Vec<Js
     }
     result.extend(options.custom_conditions.iter().flatten().cloned());
     result
+}
+
+/// port: tsc/internal/module/resolver.go:normalizePathForCJSResolution
+pub(super) fn normalize_cjs_path(directory: &[u8], name: &[u8]) -> Vec<u8> {
+    let combined = path::combine(directory, &[name]);
+    let mut candidate = path::normalize(&combined).into_owned();
+    if matches!(path::base_name(&combined), b"." | b"..") && !candidate.ends_with(b"/") {
+        candidate.push(b'/');
+    }
+    candidate
 }

@@ -212,7 +212,7 @@ impl Resolver {
                 directory
             );
             resolved = if is_relative(name) {
-                let candidate = path::resolve(directory, &[name]);
+                let candidate = crate::resolver::normalize_cjs_path(directory, name);
                 self.relative(DTS, &candidate, esm, true, false)?
             } else {
                 self.nearest_node_modules(

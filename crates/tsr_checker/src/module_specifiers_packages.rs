@@ -250,7 +250,8 @@ impl Generation<'_> {
         }
         let mut result = DirectoryResult::file(file);
         let mut maybe_blocked = false;
-        let versions = package.version_paths();
+        let version_paths = package.version_paths();
+        let versions = version_paths.paths();
         if let Some(paths) = versions {
             let submodule = &file[root.len() + 1..];
             let from = self.module_name_from_paths(submodule, paths, endings, root)?;

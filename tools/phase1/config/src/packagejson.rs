@@ -1,8 +1,8 @@
 //! The `internal/packagejson` group: the part of the package.json surface the
 //! s07 dataset never reaches.
 //!
-//! Three of the sixteen cases are answered by production Rust. The other
-//! thirteen are recorded gaps, and they are not all the same gap; the split is
+//! Four of the sixteen cases are answered by production Rust. The other
+//! twelve are recorded gaps, and they are not all the same gap; the split is
 //! read off `crates/`, not off the ledger.
 //!
 //! **What exists.** `crates/tsr_module/src/package_json.rs` is a port of
@@ -13,10 +13,9 @@
 //! `get_value` (:39), `is_falsy` (:465) and `object_kind` (:481). So the
 //! *validity* half of the `TypeValidatedField` quartet is present as data and
 //! the `expected-validity` case compares it directly.
-//! `crates/tsr_module/src/package_maps.rs:726` ports
-//! `PackageJson.GetVersionPaths` under the name `selected_version_paths`, and
-//! `PackageJson::version_paths` (:722) is its public reader, so the two
-//! typesVersions cases compare that.
+//! `PackageJson::version_paths` returns a retrieval with its own lazy mappings;
+//! `version_paths_traced` also replays the package's recorded selection traces.
+//! The version cases exercise both the contents and these cache boundaries.
 //!
 //! **What does not.** Four distinct absences, each recorded against the exact
 //! file that would carry it:
@@ -294,26 +293,6 @@ const GAPS: &[Gap] = &[
             Resolver.packages is private and Resolver exposes no iterator over it",
         home: CACHE_HOME,
     },
-    Gap {
-        case: "config/packagejson/version-paths-traces-replay-on-every-traced-call",
-        operation: "tsc/internal/packagejson/cache.go:PackageJson.GetVersionPaths",
-        authority: "tsc/internal/packagejson/cache.go:28-86, whose trace callback \
-            resolver.go:1139 and :1628 supply and whose diagnostics are the \
-            typesVersions half of a --traceResolution log",
-        signature: "a PUBLIC traced reader -- pub fn version_paths_traced(&self) -> \
-            (Option<&PathMappings>, &[DiagAndArgs]) or the equivalent -- replaying the \
-            recorded diagnostics on every traced call, including a call that follows an \
-            untraced one. The port has the mechanism and not the reach: \
-            crates/tsr_module/src/package_maps.rs:726-786 records the diagnostics into \
-            VersionPaths.traces under a OnceLock and replays them, but the replaying reader \
-            is `pub(super) fn version_paths` on Resolver (package_maps.rs:786), which is \
-            crate-private, and the public reader PackageJson::version_paths (:722) is \
-            documented as deliberately emitting nothing. So the traces are unreachable from \
-            outside tsr_module except by driving a whole module resolution and reading \
-            Resolver::take_trace, which would attribute dozens of other operations",
-        home: "crates/tsr_module/src/package_maps.rs:722 (the public reader emits no traces) \
-            and :786 (the replaying reader is pub(super))",
-    },
 ];
 
 fn text(value: &JsString) -> String {
@@ -416,10 +395,7 @@ fn expected_validity(request: &Value) -> Outcome {
     Outcome::Observed(ordered(rows))
 }
 
-/// The two typesVersions cases. `PackageJson::version_paths` is the public
-/// reader for the port of `GetVersionPaths`; it answers `None` for every way
-/// the selection can come to nothing, which is the pin's
-/// `VersionPaths.Exists()` being false.
+/// Native version selection, retrieval-local mappings and replayed traces.
 fn version_paths(request: &Value) -> Outcome {
     let mut package: Option<Arc<PackageJson>> = None;
     let mut rows = Vec::new();
@@ -433,16 +409,34 @@ fn version_paths(request: &Value) -> Outcome {
                 }
                 Err(error) => return Outcome::Failed(error),
             },
-            "get_version_paths" => {
+            "get_version_paths" | "get_version_paths_traced" => {
                 let Some(package) = package.as_ref() else {
                     return Outcome::Failed(
                         "get_version_paths ran before a load action built the package".to_owned(),
                     );
                 };
-                rows.push(json!({
-                    "op": "get_version_paths",
-                    "result": [package.version_paths().is_some()],
-                }));
+                let mut traces = Vec::new();
+                let paths = package.version_paths_traced(|message| traces.push(message.clone()));
+                let row = if action_op(action) == "get_version_paths_traced" {
+                    let traces: Vec<_> = traces
+                        .iter()
+                        .map(|message| {
+                            let args: Vec<_> = message
+                                .args
+                                .iter()
+                                .map(|arg| match arg {
+                                    tsr_module::TraceArg::Text(value) => text(value),
+                                    tsr_module::TraceArg::Bool(value) => value.to_string(),
+                                })
+                                .collect();
+                            json!([message.message.code, args])
+                        })
+                        .collect();
+                    json!({"op": action_op(action), "exists": paths.exists(), "traces": traces})
+                } else {
+                    json!({"op": action_op(action), "result": [paths.exists()]})
+                };
+                rows.push(row);
             }
             "version_paths_mappings" => {
                 let Some(package) = package.as_ref() else {
@@ -453,6 +447,7 @@ fn version_paths(request: &Value) -> Outcome {
                 };
                 let result = package
                     .version_paths()
+                    .paths()
                     .map_or(Value::Null, |paths| Value::Array(render_mappings(paths)));
                 rows.push(json!({"op": "version_paths_mappings", "result": result}));
             }
@@ -463,13 +458,11 @@ fn version_paths(request: &Value) -> Outcome {
                             .to_owned(),
                     );
                 };
-                // The port has no retrieval object: there is one table behind a
-                // OnceLock and every read borrows it. So both comparisons the
-                // pin distinguishes -- two reads of one retrieved value, and
-                // two separate retrievals -- are the same read here.
-                let first = package.version_paths();
-                let second = package.version_paths();
-                let third = package.version_paths();
+                let retrieval = package.version_paths();
+                let other = package.version_paths();
+                let first = retrieval.paths();
+                let second = retrieval.paths();
+                let third = other.paths();
                 let sizes = match (first, third) {
                     (Some(first), Some(third)) => first.len() == third.len(),
                     (None, None) => true,
@@ -526,7 +519,8 @@ pub fn observe(request: &Value) -> Option<Outcome> {
             expected_validity(request)
         }
         "config/packagejson/version-paths-selection-and-mappings"
-        | "config/packagejson/version-paths-mappings-are-rebuilt-per-retrieval" => {
+        | "config/packagejson/version-paths-mappings-are-rebuilt-per-retrieval"
+        | "config/packagejson/version-paths-traces-replay-on-every-traced-call" => {
             version_paths(request)
         }
         other => gap(request, other),
