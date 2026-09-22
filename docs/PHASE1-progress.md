@@ -2315,3 +2315,19 @@ Resolution-stack cycles bypass lookup; extended filenames are sorted and unique,
 as in Go. Focused tests cover cache reuse across two config directories, source
 retention after cache disposal, and a cyclic diamond. Both tests and focused
 clippy pass.
+
+### F3b continuation: package fields and test-host composition
+
+Package declarations now expose expected-type metadata independently of decoded
+JSON; resolver diagnostics consume that same metadata. Borrowed JSON views keep
+absence distinct from null and reject off-type string reads. Dependency queries
+cover all four fields with native field order and early termination. The package
+probes also exercise the already-implemented first-writer info cache and shared
+contents. **15/16 package cases match**; the remaining case reports immutable
+publication explicitly (`mutation_performed: false`) under the owner's recorded
+exception, while preserving shared identity.
+
+The tsoptionstest helpers remain private harness composition. Host observation
+now uses the actual TestFs adapter, including its relative-path refusal, and the
+one-shot helper calls production config parsing. **11/11 host cases match.**
+Focused module tests and clippy pass.

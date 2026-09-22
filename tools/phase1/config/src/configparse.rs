@@ -113,7 +113,7 @@ fn wants(request: &Value, section: &str) -> bool {
         Some(sections) => sections.iter().any(|name| name.as_str() == Some(section)),
     }
 }
-fn build_host(request: &Value) -> Host {
+pub(super) fn build_host(request: &Value) -> Host {
     let cwd = text_of(request, "currentDirectory").as_bytes().to_vec();
     let case_sensitive = flag(request, "caseSensitive");
     let mut builder = MemoryBuilder::new(&cwd, case_sensitive);
@@ -516,7 +516,7 @@ fn describe_parsed(
     Ok(observation)
 }
 
-fn parse_source(
+pub(super) fn parse_source(
     request: &Value,
     host: &Host,
     name: &[u8],

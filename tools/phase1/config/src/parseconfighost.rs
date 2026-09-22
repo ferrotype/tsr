@@ -1,37 +1,12 @@
-//! The parse-config host group: `internal/tsoptions/tsoptionstest`.
-//!
-//! The pinned package is a host *factory*: it turns a `{path -> content}` map
-//! plus a case-sensitivity flag into something satisfying
-//! `tsoptions.ParseConfigHost`. Rust has the same two pieces --
-//! `tsr_vfs::MemoryBuilder` builds the filesystem and
-//! `tsr_tsoptions::ParseConfigHost` is the trait the parse consumes -- but no
-//! factory joining them, so each caller assembles its own (for instance
-//! `tools/s07/config/host.rs:27`).
-//!
-//! That is a real difference and this group reports it as one rather than
-//! papering over it: the two host-construction cases assemble the pieces here
-//! and compare what the built host exposes, because the pieces exist; the
-//! one-shot `GetParsedCommandLine` case reports the gap, because the pinned
-//! helper's whole job -- derive the config file name, build the source file,
-//! parse -- has no Rust counterpart to compare against.
+//! Test-only composition of the pinned tsoptionstest host helpers. Production
+//! parsing and filesystem behavior are supplied by their respective crates.
 
 use crate::api::{subject, Outcome};
 use serde_json::{json, Map, Value};
-use tsr_vfs::{FileSystem, MemoryBuilder};
-
-const GET_PARSED_COMMAND_LINE: (&str, &str, &str) = (
-    "tsc/internal/tsoptions/tsoptionstest/parsedcommandline.go:GetParsedCommandLine, which \
-     combines the current directory with \"tsconfig.json\", builds a TsConfigSourceFile through \
-     the pinned NewTsconfigSourceFileFromFilePath and returns \
-     ParseJsonSourceFileConfigFileContent over it",
-    "pub fn parsed_command_line_from_map(json_text: &[u8], files: &BTreeMap<Vec<u8>, Vec<u8>>, \
-     current_directory: &[u8], case_sensitive: bool) -> ParsedCommandLine -- the one-shot helper; \
-     its three steps all exist separately in tsr_tsoptions, the composition does not",
-    "no Rust home: crates/tsr_tsoptions has the parse (config_parse.rs:691) and the source-file \
-     constructor, and crates/tsr_vfs has MemoryBuilder, but nothing joins them the way the pinned \
-     tsoptionstest package does; every caller assembles its own host \
-     (for example tools/s07/config/host.rs:27)",
-);
+use tsr_vfs::{
+    vfstest::{self, InputFile},
+    FileSystem,
+};
 
 fn files_of(request: &Value, key: &str) -> Vec<(Vec<u8>, Vec<u8>)> {
     request
@@ -67,10 +42,10 @@ fn describe(request: &Value, with_symlinks: bool) -> Outcome {
         .get("caseSensitive")
         .and_then(Value::as_bool)
         .unwrap_or(true);
-    let mut builder = MemoryBuilder::new(&current, case_sensitive);
-    for (path, content) in files_of(request, "files") {
-        builder.insert_physical(&path, content);
-    }
+    let mut files: std::collections::BTreeMap<_, _> = files_of(request, "files")
+        .into_iter()
+        .map(|(name, content)| (name, InputFile::Text(content)))
+        .collect();
     let mut links: Vec<Value> = Vec::new();
     if with_symlinks {
         // The pinned factory normalizes BOTH sides against the current
@@ -86,7 +61,10 @@ fn describe(request: &Value, with_symlinks: bool) -> Outcome {
             // `different` rather than being quietly routed around.
             let normalized_link = tsr_tspath::absolute(&link, &current);
             let normalized_target = tsr_tspath::absolute(&target, &current);
-            builder.insert_symlink(&normalized_link, &normalized_target);
+            files.insert(
+                normalized_link.clone(),
+                InputFile::File(vfstest::symlink(&normalized_target)),
+            );
             links.push(json!({
                 "declared_link": text(&link),
                 "declared_target": text(&target),
@@ -95,7 +73,8 @@ fn describe(request: &Value, with_symlinks: bool) -> Outcome {
             }));
         }
     }
-    let snapshot = builder.finish();
+    let storage = vfstest::from_map(&files, case_sensitive).into_vfs();
+    let snapshot: &dyn FileSystem = &storage;
     let mut rows = Vec::new();
     for path in request
         .get("probe")
@@ -103,11 +82,20 @@ fn describe(request: &Value, with_symlinks: bool) -> Outcome {
         .map_or(&[][..], |items| items.as_slice())
     {
         let path = path.as_str().unwrap_or_default().as_bytes();
-        // The pinned filesystem refuses a non-absolute path by panicking, and
-        // the probe records that as `refused`. `tsr_vfs` has no such refusal:
-        // it answers a relative path like any other. Reporting the Rust answer
-        // here, rather than manufacturing a matching refusal, is what makes the
-        // difference visible instead of hidden.
+        let refused =
+            std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| snapshot.file_exists(path)));
+        if let Err(payload) = refused {
+            let message = payload
+                .downcast_ref::<String>()
+                .map(String::as_str)
+                .or_else(|| payload.downcast_ref::<&str>().copied())
+                .unwrap_or("");
+            if !message.contains("is not absolute") {
+                return Outcome::Failed(format!("unexpected fixture path panic: {message}"));
+            }
+            rows.push(json!({"path":text(path),"refused":true}));
+            continue;
+        }
         let content = match snapshot.read_file(path) {
             Ok(Some(found)) => text(&found.raw),
             Ok(None) => Value::Null,
@@ -156,13 +144,27 @@ pub fn observe(request: &Value) -> Option<Outcome> {
         "from_map" => describe(request, false),
         "from_map_with_symlinks" => describe(request, true),
         "get_parsed_command_line" => {
-            let (authority, signature, home) = GET_PARSED_COMMAND_LINE;
-            Outcome::missing(
-                "tsc/internal/tsoptions/tsoptionstest/parsedcommandline.go:GetParsedCommandLine",
-                authority,
-                signature,
-                home,
-            )
+            let current = request["currentDirectory"]
+                .as_str()
+                .unwrap_or_default()
+                .as_bytes();
+            let name = tsr_tspath::combine(current, &[b"tsconfig.json"]);
+            let host = super::configparse::build_host(request);
+            let mut config_request = request.clone();
+            config_request["basePath"] = text(current);
+            let result = super::configparse::parse_source(
+                &config_request,
+                &host,
+                &name,
+                request["jsonText"].as_str().unwrap_or_default().as_bytes(),
+                None,
+            );
+            match result {
+                Ok(parsed) => Outcome::Observed(
+                    json!({"config_file_name":text(&name),"file_names":parsed.root_file_names.iter().map(|s|text(s.as_bytes())).collect::<Vec<_>>(),"error_codes":parsed.errors.iter().map(|d|d.code).collect::<Vec<_>>(),"has_config_file":parsed.config_file.is_some()}),
+                ),
+                Err(error) => Outcome::Failed(format!("config parse: {error}")),
+            }
         }
         other => Outcome::Failed(format!("unknown parse-config host action {other:?}")),
     })

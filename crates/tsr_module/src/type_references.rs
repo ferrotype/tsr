@@ -356,7 +356,7 @@ impl Resolver {
             return Ok(PackageId::default());
         };
         let mut peers = Vec::new();
-        let peers_valid = self.validate_package_field(package, "peerDependencies", "object");
+        let peers_valid = self.validate_package_field(package, "peerDependencies");
         if let Some(values) = package
             .contents
             .get("peerDependencies")

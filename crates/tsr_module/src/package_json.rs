@@ -604,3 +604,7 @@ mod tests {
         }
     }
 }
+
+#[path = "package_json_api.rs"]
+mod api;
+pub use api::{DeclaredJsonType, JsonValue, JsonValueType, ValidatedField};

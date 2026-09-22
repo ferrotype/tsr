@@ -153,13 +153,8 @@ impl crate::Resolver {
         }
     }
 
-    pub(super) fn validate_package_field(
-        &mut self,
-        info: &crate::PackageJson,
-        name: &str,
-        expected: &str,
-    ) -> bool {
-        if let Some(field) = info.contents.field(name) {
+    pub(super) fn validate_package_field(&mut self, info: &crate::PackageJson, name: &str) -> bool {
+        if let Some(field) = info.contents.validated_field(name) {
             if field.state.is_present() {
                 if field.state.valid {
                     return true;
@@ -168,7 +163,7 @@ impl crate::Resolver {
                     self,
                     tsr_diagnostics::Expected_type_of_0_field_in_package_json_to_be_1_got_2,
                     name,
-                    expected,
+                    field.expected_json_type,
                     field.state.actual_type
                 );
             }
@@ -185,7 +180,7 @@ impl crate::Resolver {
         info: &crate::PackageJson,
         name: &str,
     ) -> Option<Vec<u8>> {
-        if !self.validate_package_field(info, name, "string") {
+        if !self.validate_package_field(info, name) {
             return None;
         }
         let field = info.string(name).unwrap_or_default();
