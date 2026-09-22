@@ -20,6 +20,7 @@ import tomllib
 
 import phase1_baselines as baselines
 import phase1_capture as capture
+import phase1_hosts as hosts
 import phase1_scope as scope
 import phase1_syntax as syntax
 from s04_common import strict_json_loads
@@ -29,11 +30,6 @@ GROUPS = {"foundations": ("leaves", "filesystem", "config", "syntax"),
           "config": ("config", "filesystem"), "syntax": ("syntax", "program")}
 CASE_FILES = {"config": "data/phase1/config-cases.json", "syntax": "data/phase1/syntax-cases.json"}
 DEFAULT = ROOT / "target/phase1-acceptance"
-# Platform-only requests keep their raw native_unavailable row on other hosts.
-# A separately authenticated capture can supply that exact missing witness.
-PLATFORM_CASES = {
-    "filesystem/osvfs/nativepath-realpath-linux-procfs": ("filesystem", "Linux-"),
-}
 
 
 def read(path: Path):
@@ -184,6 +180,14 @@ def accepted(row: dict, approved: dict[str, dict]) -> bool:
 
 
 def replay_family(family: str, directory: Path) -> dict:
+    if family == "filesystem":
+        archive = replay_host_capture(directory)
+        report = archive["report"]
+        report["capture_identity"] = archive["capture_identity"]
+        approved = qualifications()
+        report["approved_differences"] = [row["case"] for row in report["rows"]
+                                          if row["result"] == "different" and accepted(row, approved)]
+        return report
     # Do not trust a provenance that omitted a dependency and its manifest.
     provenance = read(directory / "provenance.json")
     if provenance.get("family") != family:
@@ -209,65 +213,123 @@ def replay_family(family: str, directory: Path) -> dict:
     return report
 
 
-def attach_platform_captures(family: str, report: dict, directories: list[Path]) -> None:
-    """Keep raw rows intact; attest only explicitly platform-scoped missing rows."""
-    witnesses = {}
-    rows = {row["case"]: row for row in report["rows"]}
+def filesystem_requests() -> list[dict]:
+    return capture.load_requests(capture.FAMILIES["filesystem"])["requests"]
+
+
+def host_inventory(goos: str, requests: list[dict] | None = None) -> list[str]:
+    """Select exactly this host's applicable rows; any/posix require both CI OSes."""
+    requests = filesystem_requests() if requests is None else requests
+    required = {target for request in requests for target in hosts.required_goos(request)}
+    if goos not in required:
+        raise ValueError(f"unsupported filesystem capture host: {goos}")
+    return [request["case"] for request in requests if hosts.applies(request, goos)]
+
+
+def replay_host_capture(directory: Path) -> dict:
+    """Authenticate a separate archive covering its host's complete inventory."""
+    provenance = read(directory / "provenance.json")
+    if provenance.get("family") != "filesystem":
+        raise ValueError("host capture family differs")
+    report = capture.compare(directory)
+    goos = provenance.get("host", {}).get("goos")
+    if report.get("host", {}).get("goos") != goos:
+        raise ValueError("host capture authenticated GOOS differs")
+    expected = host_inventory(goos)
+    selected = provenance.get("selected_cases")
+    full = [request["case"] for request in filesystem_requests()]
+    # A full capture may also retain native-unavailable rows on excluded hosts.
+    # Bounded CI captures select only applicable requests, without recapturing
+    # another host's cases or inserting its responses into this archive.
+    if (not isinstance(selected, list) or not selected or len(selected) != len(set(selected))
+            or set(selected) not in (set(expected), set(full))):
+        raise ValueError("host capture selection differs from its applicable inventory")
+    actual = [row for row in report["rows"] if row["result"] != "not_run"]
+    # Provenance records sorted selected IDs. Observations retain request-file
+    # ordering, which is independently checked instead of sorted to hide drift.
+    require_rows(actual, full if set(selected) == set(full) else expected)
+    current = capture.source_closure("filesystem", rust_packages("filesystem"))
+    if provenance.get("source_closure") != current:
+        raise capture.StaleCapture(f"{goos} host capture current source closure differs")
+    return {"capture_identity": sha((directory / "provenance.json").read_bytes()),
+            "host": provenance["host"], "selected_cases": selected, "report": report}
+
+
+def attach_platform_captures(family: str, report: dict, directories: list[Path]) -> dict[str, str]:
+    """Attach per-host archives without replacing any row of the base capture.
+
+    Missing/stale hosts cannot certify preparation. Keep other current hosts
+    available when one archive is stale; malformed artifacts still fail replay.
+    """
+    if family != "filesystem":
+        raise ValueError("host captures are only consumed by filesystem")
+    archives = {}
+    unavailable = {}
+    seen = {report.get("host", {}).get("goos")}
     for directory in directories:
-        provenance = read(directory / "provenance.json")
-        current = capture.source_closure(family, rust_packages(family))
-        if provenance.get("family") != family:
-            raise ValueError("platform capture family differs")
-        # compare authenticates pin, gitlink, request bytes, child observations,
-        # renderer outputs and the independently reconstructed input key set.
-        supplemental = capture.compare(directory)
-        if provenance.get("source_closure") != current:
-            raise capture.StaleCapture("platform capture current source closure differs")
-        selected = provenance.get("selected_cases")
-        if not isinstance(selected, list) or not selected or len(set(selected)) != len(selected):
-            raise ValueError("platform capture has no unique selected inventory")
-        actual = {row["case"]: row for row in supplemental["rows"] if row["result"] != "not_run"}
-        if set(actual) != set(selected):
-            raise ValueError("platform capture selection differs from its observed rows")
-        for identity in selected:
-            policy = PLATFORM_CASES.get(identity)
-            if policy is None or policy[0] != family:
-                raise ValueError(f"case has no platform supplementation policy: {identity}")
-            if not provenance.get("host", {}).get("platform", "").startswith(policy[1]):
-                raise ValueError(f"platform capture ran on the wrong host: {identity}")
-            if identity in witnesses:
-                raise ValueError(f"duplicate platform witness: {identity}")
-            if identity not in rows or rows[identity]["result"] != "native_unavailable":
-                raise ValueError(f"platform witness cannot replace an executed result: {identity}")
-            if actual[identity]["result"] != "match":
-                raise ValueError(f"platform witness does not match: {identity}")
-            witnesses[identity] = {"row": actual[identity],
-                "capture_identity": sha((directory / "provenance.json").read_bytes()),
-                "platform": provenance["host"]["platform"], "report": supplemental}
-    report["platform_witnesses"] = witnesses
+        try:
+            archive = replay_host_capture(directory)
+        except capture.StaleCapture as error:
+            unavailable[str(directory)] = str(error)
+            continue
+        goos = archive["host"]["goos"]
+        if goos in seen:
+            raise ValueError(f"duplicate filesystem host capture: {goos}")
+        seen.add(goos)
+        archives[goos] = archive
+    report["host_captures"] = archives
+    return unavailable
 
 
-def platform_matched(family: str, row: dict, report: dict) -> bool:
-    witness = report.get("platform_witnesses", {}).get(row["case"])
-    policy = PLATFORM_CASES.get(row["case"])
-    return bool(row["result"] == "native_unavailable" and policy and policy[0] == family
-                and witness and witness["row"].get("case") == row["case"] and witness["row"].get("result") == "match"
-                and witness["platform"].startswith(policy[1]) and witness["capture_identity"])
+def host_coverage(report: dict, approved: dict[str, dict] | None = None) -> dict:
+    """Require each (case, GOOS) observation; another host cannot replace it."""
+    approved = qualifications() if approved is None else approved
+    requests = filesystem_requests()
+    required = sorted({goos for request in requests for goos in hosts.required_goos(request)})
+    archives = dict(report.get("host_captures", {}))
+    goos = report.get("host", {}).get("goos")
+    if goos in archives:
+        raise ValueError(f"duplicate filesystem host capture: {goos}")
+    if goos and report.get("capture_identity"):
+        archives[goos] = {"capture_identity": report["capture_identity"], "report": report}
+    indexed = {target: {row["case"]: row for row in archive["report"]["rows"]}
+               for target, archive in archives.items() if archive.get("capture_identity")}
+    missing, failures, complete_cases = [], [], []
+    for request in requests:
+        identity = request["case"]
+        complete = True
+        for target in hosts.required_goos(request):
+            row = indexed.get(target, {}).get(identity)
+            if row is None or row["result"] == "not_run":
+                missing.append({"case": identity, "goos": target})
+                complete = False
+            elif not accepted(row, approved):
+                failures.append({"case": identity, "goos": target, "result": row["result"]})
+                complete = False
+        if complete:
+            complete_cases.append(identity)
+    return {"required_hosts": required,
+            "captures": {target: archive["capture_identity"] for target, archive in sorted(archives.items())},
+            "missing_hosts": [target for target in required if target not in indexed],
+            "missing": missing, "failures": failures, "complete_cases": complete_cases,
+            "complete": bool(requests) and not missing and not failures}
 
 
 def apply_platform_preparation(reports: dict, health: dict) -> None:
-    """Use authenticated platform observations for precisely their own links.
-
-    The checked-in report is validated by harness_check before this call.
-    Neither that historical report nor any raw comparison row is rewritten.
-    """
+    """Close historical unavailable links only after all required hosts pass."""
     import phase1_coverage
-    observed = {row["case"] for family, report in reports.items()
-                for row in report["rows"] if platform_matched(family, row, report)}
+    report = reports.get("filesystem")
+    if report is None:
+        return
+    coverage = host_coverage(report)
+    report["host_coverage"] = coverage
+    cases = read(ROOT / "data/phase1/cases.json")
+    recorded = scope.recorded_results(cases)
+    observed = {identity for identity in coverage["complete_cases"]
+                if recorded.get(identity) in ("native_unavailable", "not_applicable")}
     if not observed:
         return
     document = read(ROOT / "data/phase1/scope.json")
-    cases = read(ROOT / "data/phase1/cases.json")
     for family in scope.STEP_PACKAGES:
         health["preparations"][family] = scope.leaf_preparation(document, cases, family,
                                                               supplemental_prepared_cases=observed)
@@ -287,31 +349,25 @@ def replay_program(directory: Path) -> dict:
 
 
 def platform_summary(directory: Path, output: Path) -> dict:
-    """Record one bounded platform capture without claiming a family run."""
+    """Record a separate host archive without claiming multi-host preparation."""
     provenance = read(directory / "provenance.json")
-    selected = provenance.get("selected_cases")
-    if provenance.get("family") != "filesystem" or selected != list(PLATFORM_CASES):
-        raise ValueError("platform summary requires the exact declared Linux case inventory")
-    if not provenance.get("host", {}).get("platform", "").startswith("Linux-"):
-        raise ValueError("platform summary did not execute on Linux")
     try:
-        report = capture.compare(directory)
-        if provenance.get("source_closure") != capture.source_closure("filesystem", rust_packages("filesystem")):
-            raise capture.StaleCapture("platform source closure changed")
-        rows = [row for row in report["rows"] if row["result"] != "not_run"]
-        if [row["case"] for row in rows] != selected:
-            raise ValueError("platform summary observed inventory differs")
-        require_rows(rows, selected)
-        state = ("match" if all(row["result"] == "match" for row in rows) else
+        archive = replay_host_capture(directory)
+        goos = archive["host"]["goos"]
+        applicable = set(host_inventory(goos))
+        rows = [row for row in archive["report"]["rows"] if row["case"] in applicable]
+        approved = qualifications()
+        state = ("match" if all(accepted(row, approved) for row in rows) else
                  "unavailable" if any(row["result"] == "native_unavailable" for row in rows) else "different")
-        detail = {"state": state, "report": report}
+        detail = {"state": state, **archive}
     except capture.StaleCapture as error:
-        detail = {"state": "unavailable", "reason": str(error)}
-    detail.update(version=1, capture_identity=sha((directory / "provenance.json").read_bytes()),
-                  host=provenance["host"], cases=selected)
+        detail = {"state": "unavailable", "reason": str(error),
+                  "capture_identity": sha((directory / "provenance.json").read_bytes()),
+                  "host": provenance.get("host"), "selected_cases": provenance.get("selected_cases")}
+    detail["version"] = 2
     output.mkdir(parents=True, exist_ok=True)
     payload = encode(detail)
-    artifact = output / ("platform-" + sha(payload) + ".json")
+    artifact = output / ("host-" + sha(payload) + ".json")
     artifact.write_bytes(payload)
     return {"state": detail["state"], "artifact": str(artifact), "sha256": sha(payload)}
 
@@ -391,12 +447,21 @@ def aggregate(producer: str, reports: dict[str, dict], health: dict) -> dict:
             rows[family] = require_rows(report["rows"], expected_tests("syntax"), key="id")
         else:
             identities = [r["case"] for r in capture.load_requests(capture.FAMILIES[family])["requests"]]
-            rows[family] = require_rows(report["rows"], identities)
+            if family == "filesystem":
+                if [row["case"] for row in report["rows"]] != identities:
+                    raise ValueError("report rows must cover the nonempty ordered inventory exactly once")
+                applicable = host_inventory(report.get("host", {}).get("goos"))
+                rows[family] = require_rows([row for row in report["rows"] if row["case"] in applicable], applicable)
+            else:
+                rows[family] = require_rows(report["rows"], identities)
+    filesystem_coverage = host_coverage(reports["filesystem"], approved) if "filesystem" in reports else None
     def complete(family):
-        return prepared(family) and bool(rows.get(family)) and all(accepted(r, approved) or platform_matched(family, r, reports[family])
-                                                                     for r in rows[family].values())
+        if family == "filesystem":
+            return prepared(family)
+        return prepared(family) and bool(rows.get(family)) and all(accepted(r, approved) for r in rows[family].values())
     def prepared(family):
-        return health["healthy"] and health["preparations"][family]["complete"] and family in rows
+        return (health["healthy"] and health["preparations"][family]["complete"] and family in rows
+                and (family != "filesystem" or filesystem_coverage["complete"]))
     metrics = {"inventory_complete": health["healthy"]}
     tests = {}
     if producer == "foundations":
@@ -443,19 +508,23 @@ def produce(producer: str, captures: dict[str, Path], output: Path, receipts: li
             reports[family] = replay_program(directory) if family == "program" else replay_family(family, directory)
         except capture.StaleCapture as error:
             unavailable[family] = str(error)
-    if platform_captures is None and producer in ("foundations", "config"):
-        default_platform = ROOT / "target/phase1-platform/linux-realpath"
-        needs_platform = any(row["case"] in PLATFORM_CASES and row["result"] == "native_unavailable"
-                             for row in reports.get("filesystem", {}).get("rows", []))
-        platform_captures = [default_platform] if needs_platform and default_platform.is_dir() else []
+    if platform_captures is None and producer in ("foundations", "config") and "filesystem" in reports:
+        base_host = reports.get("filesystem", {}).get("host", {}).get("goos")
+        required = {goos for request in filesystem_requests() for goos in hosts.required_goos(request)}
+        platform_captures = [path for goos in sorted(required) if goos != base_host
+                             if (path := ROOT / "target/phase1-platform" / goos).is_dir()]
+    unattached_hosts = {}
     if platform_captures:
-        if "filesystem" not in reports:
-            raise ValueError("platform witnesses require a complete filesystem capture")
-        try:
-            attach_platform_captures("filesystem", reports["filesystem"], platform_captures)
-        except capture.StaleCapture as error:
-            unavailable["filesystem/platform"] = str(error)
-        apply_platform_preparation(reports, health)
+        base = reports.get("filesystem")
+        # An unavailable base cannot certify filesystem preparation, but it
+        # must not discard independent current families or other host archives.
+        # Authenticate explicit host inputs even when they cannot be consumed.
+        destination = base if base is not None else {}
+        stale = attach_platform_captures("filesystem", destination, platform_captures)
+        unavailable.update({"filesystem/host/" + path: reason for path, reason in stale.items()})
+        if base is None:
+            unattached_hosts = destination["host_captures"]
+    apply_platform_preparation(reports, health)
     if producer == "foundations":
         import phase1_integration
         health["integration"] = phase1_integration.evaluate(
@@ -465,6 +534,7 @@ def produce(producer: str, captures: dict[str, Path], output: Path, receipts: li
     result = aggregate(producer, reports, health)
     detail = {"version": 1, "producer": producer, "source_closure": before,
               "reports": reports, "unavailable": unavailable,
+              **({"unattached_host_captures": unattached_hosts} if unattached_hosts else {}),
               "coverage": health["coverage"], "integration": health["integration"], "receipts": receipts or [], "result": result}
     if before != source_closure(producer):
         raise ValueError("producer inputs changed during replay")
@@ -530,11 +600,11 @@ def observe(identity: str, output: Path) -> dict:
 
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=(*GROUPS, "check", "manifests", "observe", "platform"))
+    parser.add_argument("command", choices=(*GROUPS, "check", "manifests", "observe", "platform", "host"))
     parser.add_argument("--capture", action="append", default=[], metavar="FAMILY=DIR")
     parser.add_argument("--receipt", type=Path, action="append", default=[])
-    parser.add_argument("--platform-capture", type=Path, action="append", default=[],
-                        help="authenticated platform-only filesystem capture (e.g. Linux CI)")
+    parser.add_argument("--host-capture", "--platform-capture", dest="platform_capture", type=Path, action="append", default=[],
+                        help="separate authenticated filesystem capture covering its host's applicable inventory")
     parser.add_argument("--witness", help="integration test/driver, transport or generation identity")
     parser.add_argument("--structural", action="store_true",
                         help="check manifest/comparator contracts without refreshing the source-classification audit")
@@ -560,12 +630,12 @@ def main(argv=None) -> int:
             result = {k: report[k] for k in ("healthy", "problems")}
             print(json.dumps(result, sort_keys=True))
             return 0 if report["healthy"] else 1
-        elif args.command == "platform":
+        elif args.command in ("platform", "host"):
             if set(captures) != {"filesystem"}:
-                raise ValueError("platform requires --capture filesystem=DIR")
+                raise ValueError("host requires --capture filesystem=DIR")
             result = platform_summary(captures["filesystem"], args.output.resolve())
             print(json.dumps(result, sort_keys=True))
-            return int(result["state"] == "different")
+            return int(result["state"] != "match")
         else:
             unused = set(captures) - set(GROUPS[args.command])
             if unused:

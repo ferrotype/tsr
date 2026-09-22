@@ -198,6 +198,14 @@ class IntegrationEvaluationTests(unittest.TestCase):
         result = self.evaluate([{"rows": [row, row]}])
         self.assertTrue(any("duplicate contributing" in p for p in result["problems"]))
 
+    def test_excluded_host_case_is_valid_but_cannot_certify_integration(self):
+        witness = next(row for row in self.prepared["witnesses"] if row["kind"] == "cases")
+        report = {"rows": [{"case": ref, "result": "not_applicable"} for ref in witness["references"]]}
+        result = self.evaluate([report])
+        self.assertEqual(result["problems"], [])
+        observed = next(row for row in result["witnesses"] if row["id"] == witness["id"])
+        self.assertNotEqual(observed["state"], "match")
+
     def test_actual_named_test_and_stale_or_tampered_receipt(self):
         receipt = self.receipt("retained-program-snapshot", "test tests::live_filesystem_snapshots_preserve_retained_program_files ... ok\n")
         result = self.evaluate(receipts=[receipt])

@@ -315,7 +315,7 @@ def evaluate(preparation, family_reports, receipts=(), *, source_inputs=None, ro
             identity = row.get("case")
             if identity in cases:
                 problems.append(f"duplicate contributing integration case: {identity}")
-            if row.get("result") not in {"match", "different", "not_implemented", "native_unavailable", "harness_failed", "not_run"}:
+            if row.get("result") not in {"match", "different", "not_implemented", "native_unavailable", "not_applicable", "harness_failed", "not_run"}:
                 problems.append(f"{identity}: malformed contributing comparison")
             cases[identity] = row.get("result")
     document = load(root, MANIFEST)

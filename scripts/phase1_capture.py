@@ -5,7 +5,7 @@ provenance record. `compare` re-reads a stored capture and never runs a child,
 so a replay is read-only. Neither step may change the reviewed inventory.
 
 The result vocabulary is the plan's: match, different, not_implemented,
-native_unavailable, harness_failed and not_run. Only `match` is feature parity;
+native_unavailable, not_applicable, harness_failed and not_run. Only `match` is feature parity;
 `harness_failed` invalidates a capture rather than counting as a non-match.
 
 Two properties this module has to get right, because getting them wrong lets a
@@ -36,6 +36,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from s04 import go_environment, verified_upstream  # noqa: E402
 from s04_common import command, strict_json_loads  # noqa: E402
 from s08_oracle import ROOT, canonical, digest  # noqa: E402
+import phase1_hosts as hosts  # noqa: E402
 
 class StaleCapture(ValueError):
     """Authenticated artifacts no longer describe the current inputs."""
@@ -76,7 +77,7 @@ def package_input_files(directory: Path) -> list[Path]:
                   | {p for p in embedded if p.is_file()})
 
 
-RESULTS = ("match", "different", "not_implemented", "native_unavailable", "harness_failed", "not_run")
+RESULTS = ("match", "different", "not_implemented", "native_unavailable", "not_applicable", "harness_failed", "not_run")
 
 # `s08_oracle.canonical` serialises with sort_keys=True, so two observations
 # whose JSON objects differ only in member order compare equal. That is fatal
@@ -114,6 +115,7 @@ SHARED_SCRIPTS = (
     "scripts/phase1_capture.py",
     "scripts/phase1.py",
     "scripts/phase1_scope.py",
+    "scripts/phase1_hosts.py",
     "scripts/phase1_invocations.py",
     "scripts/s04.py",
     "scripts/s04_common.py",
@@ -247,6 +249,7 @@ FAMILIES = {
             "data/phase1/requests/filesystem-symlinks.json",
             "data/phase1/requests/filesystem-osvfs.json",
             "data/phase1/requests/filesystem-matchfiles.json",
+            "data/phase1/requests/filesystem-composed.json",
         ],
         "native_probes": [
             {"name": "tspath", "package": "tspath",
@@ -284,6 +287,9 @@ FAMILIES = {
             {"name": "osvfs", "package": "vfs/osvfs",
              "probe": "tools/phase1/filesystem/osvfs_probe_test.go",
              "test": "TestPhase1FilesystemOsvfs"},
+            {"name": "composed", "package": "execute",
+             "probe": "tools/phase1/filesystem/composed_probe_test.go",
+             "test": "TestPhase1FilesystemComposed"},
             # The carried config/matchFiles renderer. It compiles into the
             # pinned tsoptions_test package to reach that package's own
             # helpers, which links internal/testutil/baseline, whose init calls
@@ -469,6 +475,10 @@ def load_requests(spec: dict) -> dict:
         version = document.get("version", version)
         for request in document["requests"]:
             case = request["case"]
+            if document.get("family") == "filesystem" or spec.get("rust_package") == "phase1_filesystem":
+                if "hosts" not in request:
+                    raise ValueError(f"{case}: filesystem request must declare structured hosts")
+                hosts.request_hosts(request)
             if case in seen:
                 raise ValueError(
                     f"duplicate case id {case!r} in {relative} and {seen[case]}"
@@ -928,6 +938,10 @@ def case_claims(requests: list[dict]) -> dict[str, str | None]:
     from phase1_scope import case_claims_digest
     path = ROOT / "data/phase1/cases.json"
     declarations = {row["id"]: row for row in strict_json_loads(path.read_bytes())["cases"]} if path.is_file() else {}
+    for request in requests:
+        case = declarations.get(request["case"])
+        if case is not None and case.get("family") == "filesystem":
+            hosts.validate_case(request, case)
     return {row["case"]: case_claims_digest(declarations[row["case"]])
             if row["case"] in declarations else None for row in requests}
 
@@ -1041,6 +1055,10 @@ def capture(family: str, output: Path, cases: list[str] | None = None) -> dict:
             + ", ".join(changed[:5])
         )
 
+    native_hosts = {(record.get("goos"), record.get("goarch")) for record in native_reports.values()}
+    if len(native_hosts) != 1 or any(not goos or not goarch for goos, goarch in native_hosts):
+        raise ValueError("native probes disagree on their capture host or omit GOOS/GOARCH")
+    goos, goarch = next(iter(native_hosts))
     provenance = {
         "version": 3,
         "family": family,
@@ -1057,7 +1075,8 @@ def capture(family: str, output: Path, cases: list[str] | None = None) -> dict:
         "workspace_packages": workspace_package_paths(spec["rust_package"]),
         "source_closure": before,
         "source_closure_size": len(before),
-        "host": {"platform": platform.platform(), "python": platform.python_version()},
+        "host": {"platform": platform.platform(), "python": platform.python_version(),
+                 "goos": goos, "goarch": goarch},
     }
     (output / "provenance.json").write_bytes(canonical(provenance) + b"\n")
     return provenance
@@ -1088,6 +1107,25 @@ def _authenticate(directory: Path) -> dict:
     for name, expected in checks.items():
         if sha_file(directory / name) != expected:
             raise ValueError(f"capture artifact {name} does not match its recorded hash")
+
+    # Host applicability is an evidence boundary, not a user-editable label.
+    # Tie it to each authenticated raw native response, including probes that
+    # declined every selected request. Legacy non-host families may omit it.
+    host = provenance.get("host", {})
+    if family == "filesystem" or "goos" in host:
+        goos = host.get("goos")
+        if family == "filesystem" and goos is None:
+            raise StaleCapture("filesystem capture predates authenticated host applicability; recapture this host")
+        if family == "filesystem":
+            hosts.applies({"hosts": ["any"]}, goos)
+        if not goos or not provenance["native_probes"]:
+            raise ValueError("capture has no authenticated native GOOS")
+        for name, probe in provenance["native_probes"].items():
+            raw = strict_json_loads((directory / probe["directory"] / "observations.json").read_bytes())
+            if raw.get("goos") != goos or probe.get("goos") != goos:
+                raise ValueError(f"capture host GOOS disagrees with native probe {name}")
+            if "goarch" in host and (raw.get("goarch") != host["goarch"] or probe.get("goarch") != host["goarch"]):
+                raise ValueError(f"capture host GOARCH disagrees with native probe {name}")
 
     requests = strict_json_loads((directory / "requests.json").read_bytes())["requests"]
     if provenance.get("case_claims") != case_claims(requests):
@@ -1262,7 +1300,10 @@ def compare(directory: Path, require_parity: bool = False) -> dict:
                          "reason": native.get("error") or native.get("reason", "")})
             continue
         if native["result"] == "native_unavailable":
-            rows.append({"case": case, "result": "native_unavailable",
+            applicable = (provenance["family"] != "filesystem"
+                          or hosts.applies(current_requests[case], provenance["host"]["goos"]))
+            rows.append({"case": case, "result": "native_unavailable" if applicable else "not_applicable",
+                         "native_result": native["result"],
                          "reason": native.get("reason", ""), "rust_result": rust["result"],
                          **({"missing_operation": rust["missing_operation"]}
                             if rust["result"] == "not_implemented" else {})})
@@ -1288,6 +1329,7 @@ def compare(directory: Path, require_parity: bool = False) -> dict:
 
     captured_requests = {request["case"]: request for request in requests}
     for row in rows:
+        row["hosts"] = hosts.request_hosts(current_requests[row["case"]])
         if row["case"] in captured_requests:
             row["request_sha256"] = digest(request_bytes(captured_requests[row["case"]]))
             row["claims_sha256"] = provenance["case_claims"][row["case"]]
@@ -1296,6 +1338,13 @@ def compare(directory: Path, require_parity: bool = False) -> dict:
     for row in rows:
         counts[row["result"]] += 1
     required_non_match = counts["different"] + counts["not_implemented"] + counts["native_unavailable"]
+    # A host-applicable partial capture leaves excluded, unselected rows visibly
+    # not_run. They still make --require-parity reject a partial schedule, but
+    # they are not part of this host's denominator.
+    excluded_unrun = sum(row["result"] == "not_run"
+                        and not hosts.applies(current_requests[row["case"]], provenance["host"]["goos"])
+                        for row in rows) if provenance["family"] == "filesystem" else 0
+    denominator = len(rows) - counts["not_applicable"] - excluded_unrun
     report = {
         "version": 2,
         "family": provenance["family"],
@@ -1304,8 +1353,10 @@ def compare(directory: Path, require_parity: bool = False) -> dict:
         "capture": str(directory),
         "requests_sha256": provenance["requests_sha256"],
         "capture_sha256": sha_file(directory / "provenance.json"),
+        "host": provenance.get("host", {}),
         "counts": counts,
-        "parity": counts["match"] / len(rows) if rows else 0.0,
+        "applicable_cases": denominator,
+        "parity": counts["match"] / denominator if denominator else 0.0,
         "required_non_match": required_non_match,
         "rows": rows,
     }
@@ -1325,8 +1376,13 @@ def join(reports: list[dict], selection_required: bool = False) -> dict:
     """Join verified reports by case id, rejecting duplicates and conflicts."""
     rows: dict[str, dict] = {}
     families: dict[str, str] = {}
+    family_hosts: dict[str, str | None] = {}
     for report in reports:
         family = report["family"]
+        goos = report.get("host", {}).get("goos")
+        if family in family_hosts and family_hosts[family] != goos:
+            raise ValueError(f"reports for family {family} have different hosts; retain separate host captures")
+        family_hosts[family] = goos
         if family in families and families[family] != report["requests_sha256"]:
             raise ValueError(f"reports for family {family} use different request schedules")
         families[family] = report["requests_sha256"]

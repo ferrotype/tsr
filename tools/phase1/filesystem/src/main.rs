@@ -21,6 +21,7 @@ use serde_json::{json, Map, Value};
 #[allow(dead_code)]
 use phase1_harness as api;
 mod cachedvfs;
+mod composed;
 mod fs_trace;
 mod glob;
 mod iovfs;
@@ -41,6 +42,7 @@ type GroupHandler = fn(&Value) -> Option<Outcome>;
 /// Group modules, tried in order. The first to claim a request answers it.
 const GROUPS: &[(&str, GroupHandler)] = &[
     ("cachedvfs", cachedvfs::observe),
+    ("composed", composed::observe),
     ("glob", glob::observe),
     ("iovfs", iovfs::observe),
     ("matchfiles", matchfiles::observe),

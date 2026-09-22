@@ -141,7 +141,8 @@ class AggregationTests(unittest.TestCase):
             def replay(family, _):
                 if family == "config":
                     raise p.capture.StaleCapture("config production input changed")
-                return {"capture_identity": "f" * 64, "rows": [{"case": "one", "result": "match"}]}
+                return {"capture_identity": "f" * 64, "host": {"goos": "darwin"},
+                        "rows": [{"case": "one", "result": "match"}]}
             with patch.object(p, "source_closure", return_value={"input": "a" * 64}), \
                  patch.object(p, "harness_check", return_value=self.health), \
                  patch.object(p, "replay_family", side_effect=replay), \
@@ -161,6 +162,32 @@ class AggregationTests(unittest.TestCase):
                  patch.object(p, "replay_family", side_effect=ValueError("changed artifact")), \
                  self.assertRaisesRegex(ValueError, "changed artifact"):
                 p.produce("config", {"config": Path(tmp)}, Path(tmp) / "reports")
+
+    def test_explicit_host_with_stale_base_retains_current_independent_family(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp)
+            captures = {family: directory / family for family in ("config", "filesystem")}
+            for path in captures.values():
+                path.mkdir()
+            host = {"capture_identity": "linux-archive", "host": {"goos": "linux"},
+                    "report": {"rows": [{"case": "filesystem/one", "result": "match"}]}}
+            def replay(family, _):
+                if family == "filesystem":
+                    raise p.capture.StaleCapture("filesystem production input changed")
+                return {"capture_identity": "config-archive", "rows": [{"case": "config/one", "result": "match"}]}
+            with patch.object(p, "source_closure", return_value={"input": "a" * 64}), \
+                 patch.object(p, "harness_check", return_value=self.health), \
+                 patch.object(p, "replay_family", side_effect=replay), \
+                 patch.object(p, "replay_host_capture", return_value=host), \
+                 patch.object(p, "baseline_owners", return_value={"config-output": ("config", "config/one")}), \
+                 patch.object(p.capture, "load_requests", return_value={"requests": [{"case": "config/one"}]}):
+                result = p.produce("config", captures, directory / "reports", platform_captures=[directory / "linux"])
+            self.assertEqual(result["tests"], {"config-output": "pass"})
+            self.assertFalse(result["metrics"]["prepared"])
+            detail = p.read(next((directory / "reports").glob("config-*.json")))
+            self.assertEqual(detail["unavailable"], {"filesystem": "filesystem production input changed"})
+            self.assertEqual(set(detail["reports"]), {"config"})
+            self.assertEqual(detail["unattached_host_captures"], {"linux": host})
 
     def test_scoped_health_does_not_consume_integration_or_live_source_classification(self):
         import phase1_integration

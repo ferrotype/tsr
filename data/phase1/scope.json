@@ -1,10 +1,10 @@
 {
   "counts": {
-    "covered": 2996,
+    "covered": 2997,
     "equivalent_rust": 8,
     "implemented_untested": 1141,
     "later_phase": 223,
-    "missing": 427
+    "missing": 426
   },
   "dispositions": [
     "covered",
@@ -158095,9 +158095,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): filesystem/composed/live-program-rebuild",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "filesystem/composed/live-program-rebuild"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/binder",
@@ -158137,7 +158139,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/program.go",
       "id": "tsc/internal/compiler/program.go:NewProgram",
@@ -158150,7 +158152,7 @@
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [

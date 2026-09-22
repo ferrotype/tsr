@@ -898,7 +898,7 @@ def leaf_preparation(scope: dict, cases: dict, step: str = "leaves", *, suppleme
     by_id = {case["id"]: case for case in cases.get("cases", [])}
     for identity in supplemental:
         case = by_id.get(identity)
-        if case is None or results.get(identity) != "native_unavailable":
+        if case is None or results.get(identity) not in ("native_unavailable", "not_applicable"):
             raise ValueError(f"{identity}: platform witness may only supplement a bound native-unavailable case")
         results[identity] = "match"
     for case in cases.get("cases", []):

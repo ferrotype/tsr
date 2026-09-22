@@ -175,10 +175,13 @@
       "case": "filesystem/glob/parse-grammar-battery",
       "dialect": "lsp",
       "discriminates": "Four acceptances a port gets wrong by being sensible, and one rejection it gets wrong by being lenient. [!a-z] is ACCEPTED and its negate flag is stored (glob.go:104-107, :127) though nothing downstream reads it, so the element row records char_range true 97 122; [\\ufffd-a] is ACCEPTED because readRangeRune only errors on decode size 0 or 1 (glob.go:142-147), so a properly encoded U+FFFD is a legal bound and a port testing rune == U+FFFD rejects it, while [\\xff-\\xff] IS rejected as invalid UTF-8; [z-a] is accepted unvalidated; and }, , and a,b are ordinary literals at top level while {} is a group of ONE empty member and {,} a group of two. The element lists are the second half: a//b is four elements (literal, slash, slash, literal), never a normalized one, and ** is a single star_star, never two stars -- the two representations that every later case depends on and that a rendering alone cannot tell apart.",
-      "host_applicability": "any",
       "operation": "tsc/internal/glob/glob.go:Parse",
       "order_sensitive": true,
-      "subject": "glob.Glob"
+      "subject": "glob.Glob",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -266,10 +269,13 @@
       "case": "filesystem/glob/parse-nested-residual",
       "dialect": "lsp",
       "discriminates": "The nested flag is a behavioural switch, not decoration, and this carries the lost-argument control: a port that dropped the argument, or that hardcoded it the way Parse does at glob.go:48, produces the nested=false column twice. Every pattern here answers differently under the two flags except \"a\" and \"\": a,b} yields glob \"a\" residual \",b}\" nested and glob \"a,b}\" residual \"\" non-nested; } yields an EMPTY element list and residual \"}\" nested, consuming nothing, against a one-literal glob non-nested. The residual is the other half: it is what the '{' arm loops on (glob.go:78-89) and Parse throws away (glob.go:48), so a port that returned only the glob would be unable to parse a group at all.",
-      "host_applicability": "any",
       "operation": "tsc/internal/glob/glob.go:parse",
       "order_sensitive": true,
-      "subject": "glob.parse"
+      "subject": "glob.parse",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -472,10 +478,13 @@
       "case": "filesystem/glob/string-round-trip",
       "dialect": "lsp",
       "discriminates": "The round trip is faithful for every accepted pattern EXCEPT a negated range: [!a-z] renders \"[a-z]\", because charRange.String (glob.go:210-212) never reads the negate field the parser stored. A port that renders the '!' diverges here on the one case that matters. Three more: a//b and a///b must render with every separator, catching a port that collapses a run at parse time (which also flips the match rows in filesystem/glob/match-star-separator); {a,}, {,a}, {,} and {} must keep their empty alternatives, catching a port that prunes them as a tidy-up; and the lone \\xff must survive, catching a port that stores a literal as String and repairs it to U+FFFD.",
-      "host_applicability": "any",
       "operation": "tsc/internal/glob/glob.go:Glob.String",
       "order_sensitive": true,
-      "subject": "glob.Glob"
+      "subject": "glob.Glob",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -886,10 +895,13 @@
       "case": "filesystem/glob/element-render-direct",
       "dialect": "lsp",
       "discriminates": "The seven element renderings, reached one at a time instead of through a pattern, so each one's contribution is separable. The discriminating rows are the ones a pattern cannot produce: charRange{true,'a','z'} renders \"[a-z]\" exactly like charRange{false,'a','z'}, which is the negate flag being dropped rather than a parser choice; charRange{false,'z','a'} and charRange{true,U+10FFFF,U+0000} render inverted bounds unvalidated; a nil group, an empty group and a group whose one member is the empty Glob all render \"{}\", because strings.Join over no parts is \"\" (glob.go:207); and literal(\"\\xff\") renders one byte, which a port storing a literal as String cannot do. Two star elements and one starStar element BOTH render \"**\": the rendering cannot tell the representations apart, which is exactly why the parse rows in filesystem/glob/parse-grammar-battery are the ones that resolve it -- ** parses to a single star_star.",
-      "host_applicability": "any",
       "operation": "tsc/internal/glob/glob.go:charRange.String",
       "order_sensitive": true,
-      "subject": "glob.element"
+      "subject": "glob.element",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -1136,10 +1148,13 @@
       "case": "filesystem/glob/match-star-separator",
       "dialect": "lsp",
       "discriminates": "Three pin behaviours that a correct-looking port contradicts. (1) A '*' immediately followed by '/' makes the pattern unmatchable against any input carrying that separator: */a vs x/a, src/*/x vs src/y/x, *x/y vs ax/y, */* vs a/b and **/*/x vs a/b/x are all FALSE, because the star arm consumes the separator through split (glob.go:266) and then hands the slash element an input that has already lost it -- while ?/a, [a-z]/b and {a,b}/c against the same shape are TRUE, so the defect is the star arm alone and not separators in general. (2) A separator RUN in the pattern is unmatchable from either side: a//b matches neither a/b nor a//b, while a/b matches a/b, a//b and a///b, because one slash element consumes a whole run (glob.go:228-230) and two demand two runs. (3) Match PANICS on an input whose separator run reaches the end -- a/ vs a/ and / vs / -- because that same loop has no length guard, and panics again on a nil receiver. A port that returns true, false or an error for any of the five in (1), or that normalizes a run, or that answers instead of failing in (3), diverges.",
-      "host_applicability": "any",
       "operation": "tsc/internal/glob/glob.go:Glob.Match",
       "order_sensitive": true,
-      "subject": "glob.Glob"
+      "subject": "glob.Glob",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -1550,10 +1565,13 @@
       "case": "filesystem/glob/match-group-branch-buffer",
       "dialect": "lsp",
       "discriminates": "Carries this bucket's mutation-leaking control. The group arm reuses ONE branch buffer across alternatives and resets it with branch[:0] before each (glob.go:305-309); a port that forgets the reset, or that appends the trailing elements once outside the loop, answers FALSE for {a,b,c}x vs \"bx\" and \"cx\" where the pin answers true, while still answering true for \"ax\" -- so only the second and third alternatives expose it. {a,ab}c and {ab,a}c vs abc pin that the arm returns on the first member that matches with the REMAINING elements appended, not on the first member that matches a prefix. An empty alternative is live: {a,} matches both \"a\" and \"\", so a port that prunes empty alternatives changes the result. A nil group and an empty group both match nothing, including \"\". The foreign element is the default arm (glob.go:326-327), which no pinned element type can reach.",
-      "host_applicability": "any",
       "operation": "tsc/internal/glob/glob.go:match",
       "order_sensitive": true,
-      "subject": "glob.match"
+      "subject": "glob.match",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -1673,10 +1691,13 @@
       "case": "filesystem/glob/match-byte-vs-rune",
       "dialect": "lsp",
       "discriminates": "The two arms that look alike and are not. anyChar consumes one BYTE (glob.go:300 input = input[1:]), so ? does not match \"\\u00e9\" and ?? does -- a port that consumes a rune passes every rendering row and fails both of these. charRange decodes a RUNE and advances by its size (glob.go:320, :324), so [\\u00e0-\\u00e9] matches the two-byte \"\\u00e9\" whole. And the negate flag is read by nothing: [!a-z] matches \"b\" TRUE and \"A\" false, exactly like [a-z], so a port that implements the negation documented at glob.go:34-36 reverses both answers. [\\ufffd-a] parses but matches nothing, including U+FFFD itself, and a literal \\xff matches itself byte-wise (glob.go:259 HasPrefix), which a port holding literals as String cannot do.",
-      "host_applicability": "any",
       "operation": "tsc/internal/glob/glob.go:match",
       "order_sensitive": true,
-      "subject": "glob.match"
+      "subject": "glob.match",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -1732,10 +1753,13 @@
       "case": "filesystem/glob/split-separator-runs",
       "dialect": "lsp",
       "discriminates": "A whole run of consecutive separators collapses into one boundary, and a run that reaches the end yields rest \"\" rather than a string of slashes: split(\"a//\") is (\"a\",\"\") and split(\"//\") is (\"\",\"\"), indistinguishable from split(\"a\") and split(\"\") in the second field. A port that split on a single separator returns (\"a\",\"/\") for \"a//\" and flips both callers -- the star arm would then see a leftover separator in the segment remainder and the starStar backtrack would loop over a different sequence of suffixes. The doc comment above it claims it returns nil rest, which is false: it returns the empty string, and no caller could tell the difference in Go anyway.",
-      "host_applicability": "any",
       "operation": "tsc/internal/glob/glob.go:split",
       "order_sensitive": true,
-      "subject": "glob.split"
+      "subject": "glob.split",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -1787,10 +1811,13 @@
       "case": "filesystem/glob/read-range-rune-decode",
       "dialect": "lsp",
       "discriminates": "Catches the value-then-size gate. readRangeRune does not error on the size alone: the whole switch is inside `if r == utf8.RuneError` (glob.go:140), and only a RuneError decode reaches the size arms (glob.go:142-147). A properly encoded U+FFFD decodes to RuneError with size 3 and is accepted, so a port that rejects the rune U+FFFD rejects the legal pattern [\\ufffd-a]; an invalid byte decodes to RuneError with size 1 and is rejected, so a port that accepts any RuneError accepts [\\xff-\\xff]; and an empty input decodes with size 0 and is rejected with the OTHER error, errBadRange rather than errInvalidUTF8. A decode that is NOT RuneError never errors whatever its size: action 01 records \"a\" as rune 97, size 1, no error against action 03's \"\\xff\" as rune 65533, size 1, invalid UTF-8 -- same size, opposite outcome, decided by the value. A port that switched on the size alone would return errInvalidUTF8 for every ASCII bound and fail to parse [a-z] at all. The size is load-bearing and otherwise unobservable: the '[' arm advances with pattern = pattern[sz:] twice (glob.go:113, :122), so a port returning 1 for a multi-byte bound would land mid-rune and read the wrong delimiter.",
-      "host_applicability": "any",
       "operation": "tsc/internal/glob/glob.go:readRangeRune",
       "order_sensitive": true,
-      "subject": "glob.readRangeRune"
+      "subject": "glob.readRangeRune",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -1938,10 +1965,13 @@
       "case": "filesystem/glob/parse-literal-nested-specials",
       "dialect": "lsp",
       "discriminates": "Two things. The nested flag changes exactly two bytes, '}' and ',' (glob.go:160 against :162): a}b,c appends the single literal \"a}b,c\" and leaves no residual non-nested, and appends \"a\" leaving \"}b,c\" nested. And parseLiteral appends an EMPTY literal that consumes nothing when the first byte is already special -- *a appends literal \"\" under both flags, and so does \"\" -- so a port that returned without appending, or that skipped the special byte, produces a different element count for the same input. The element count is the observation that catches both: it is always exactly one. The last pair is the ']' row: ']' is in neither special set (glob.go:160 \"*?{[/},\" and :162 \"*?{[/\"), so \"a]b\" appends the single literal \"a]b\" under BOTH flags and leaves no residual -- the one character the literal type comment names (glob.go:186) that a literal can actually hold.",
-      "host_applicability": "any",
       "operation": "tsc/internal/glob/glob.go:Glob.parseLiteral",
       "order_sensitive": true,
-      "subject": "glob.parseLiteral"
+      "subject": "glob.parseLiteral",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     }
   ]
 }

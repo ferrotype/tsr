@@ -2986,3 +2986,28 @@ loader parity remains 10,727/10,728 because of the named pre-existing
 `typesVersions` package-directory trace defect in the review disposition.
 The Linux-only observation and operation audit still prevent complete Phase 1
 acceptance.
+
+## F5b — per-host applicability and composed rebuild, 2026-09-23
+
+The B1-3/B2-3 owner decisions are implemented in
+[the review record](PHASE1-F5b-review.md#b1-3-and-b2-3--owner-decisions-2026-09-23).
+Filesystem requests carry structured hosts and preserve their explanatory prose.
+Comparison derives host exclusions from authenticated native GOOS; an applicable
+native failure still fails. Filesystem preparation requires all applicable rows
+on both Linux and Darwin, in separate archives. CI captures the complete
+applicable inventory on each runner.
+
+The real OS → cached → tracking → program witness now rebuilds after physical
+create/delete/edit operations on both runtimes. It compares file sets, text,
+syntactic diagnostics, retained first-file symbols/text and the rebuild's full
+SeenFiles set, including misses and wildcard directories. An explicit
+`Program::load_live` enables this path; the existing `Program::load` retains its
+snapshot requirement. Watch scheduling remains outside this witness.
+
+A new Darwin capture records 356 matches, three existing approved differences
+and one Linux-only `not_applicable` row. The composed witness matches exactly.
+The separate archive, identity and replay command are in
+[data/phase1/captures/F5b-README.md](../data/phase1/captures/F5b-README.md).
+The Linux CI artifact is still required; no historical Darwin observation is
+substituted for it. The owner left stale family evidence and local-versus-CI
+confirmation for phase-end green-up; no broad corpus or benchmark was rerun.

@@ -186,24 +186,25 @@ jobs:
         run: |
           cargo test -p tsr_binder -p tsr_compiler -p tsr_tsoptions -p tsr_module -p tsr_semver -p tsr_tspath -p tsr_vfs -p tsr_bundled --all-targets --all-features --locked
           cargo test -p tsr_binder -p tsr_compiler -p tsr_tsoptions -p tsr_module -p tsr_semver -p tsr_tspath -p tsr_vfs -p tsr_bundled --all-targets --all-features --locked --release
-      - name: Linux procfs realpath against the pinned native operation
-        if: ${{ !cancelled() && steps.validate.outcome == 'success' && runner.os == 'Linux' }}
-        # Darwin cannot execute this operation. Preserve an authenticated,
-        # bounded Linux capture instead of qualifying native_unavailable.
+      - name: Filesystem observations applicable to this native host
+        if: ${{ !cancelled() && steps.validate.outcome == 'success' }}
+        # Each runner preserves its own complete applicable inventory. any and
+        # posix require Linux and Darwin evidence; host-exclusive rows run only
+        # on their declared target. Producer replay consumes separate archives.
         run: |
           python3 - <<'PY'
           import json, sys
           from pathlib import Path
           sys.path.insert(0, "scripts")
           import phase1_capture as capture
-          case = "filesystem/osvfs/nativepath-realpath-linux-procfs"
-          output = Path("target/phase1-platform/linux-realpath")
-          capture.capture("filesystem", output, [case])
+          import phase1_producers as producers
+          goos = {"linux": "linux", "darwin": "darwin"}[sys.platform]
+          output = Path("target/phase1-platform") / goos
+          capture.capture("filesystem", output, producers.host_inventory(goos))
+          result = producers.platform_summary(output, output.parent / "records" / goos)
+          (output.parent / (goos + "-record.json")).write_text(json.dumps(result) + "\n")
+          sys.exit(result["state"] != "match")
           PY
-          python3 scripts/phase1_producers.py platform \
-            --capture filesystem=target/phase1-platform/linux-realpath \
-            --output target/phase1-platform/records \
-            > target/phase1-platform/record.json
       - name: Checker ownership, constructor and type-display contracts
         if: ${{ !cancelled() && steps.validate.outcome == 'success' }}
         run: |

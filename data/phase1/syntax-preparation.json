@@ -12653,7 +12653,7 @@
       ]
     },
     {
-      "disposition": "missing",
+      "disposition": "covered",
       "operation": "tsc/internal/compiler/program.go:NewProgram",
       "rust_home": [
         "crates/tsr_compiler/src/loader.rs",

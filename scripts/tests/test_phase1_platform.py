@@ -1,4 +1,4 @@
-"""A native-unavailable platform row needs its own authenticated execution."""
+"""Every applicable (request, GOOS) needs its own authenticated observation."""
 import copy
 import json
 from pathlib import Path
@@ -9,158 +9,203 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import phase1_producers as p
-import phase1_coverage as coverage
 
-CASE = "filesystem/osvfs/nativepath-realpath-linux-procfs"
+REQUESTS = [{"case": name, "hosts": targets} for name, targets in (
+    ("any", ["any"]), ("linux", ["linux"]), ("darwin", ["darwin"]), ("posix", ["posix"]))]
 
 
-class PlatformCaptureTests(unittest.TestCase):
+def comparison(goos, selected=None):
+    selected = [r["case"] for r in REQUESTS] if selected is None else selected
+    return {"family": "filesystem", "host": {"goos": goos}, "rows": [
+        {"case": r["case"], "hosts": r["hosts"],
+         "result": "not_run" if r["case"] not in selected else
+                   "match" if p.hosts.applies(r, goos) else "not_applicable"}
+        for r in REQUESTS]}
+
+
+class HostCaptureTests(unittest.TestCase):
     def setUp(self):
+        for mock in (patch.object(p, "filesystem_requests", return_value=REQUESTS),
+                     patch.object(p, "qualifications", return_value={}),
+                     patch.object(p, "rust_packages", return_value=[]),
+                     patch.object(p.capture, "source_closure", return_value={"input": "digest"})):
+            mock.start()
+            self.addCleanup(mock.stop)
+        self.report = {**comparison("darwin"), "capture_identity": "darwin-archive"}
         self.provenance = {"family": "filesystem", "source_closure": {"input": "digest"},
-                           "selected_cases": [CASE], "host": {"platform": "Linux-6.8-x86_64"}}
-        self.supplemental = {"rows": [{"case": CASE, "result": "match"},
-                                      {"case": "another", "result": "not_run"}]}
-        self.report = {"rows": [{"case": CASE, "result": "native_unavailable"},
-                                {"case": "another", "result": "match"}]}
+                           "selected_cases": p.host_inventory("linux"), "host": {"goos": "linux"}}
+        self.supplemental = comparison("linux", self.provenance["selected_cases"])
 
     def attach(self, provenance=None, supplemental=None, directories=1):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            (root / "provenance.json").write_text(json.dumps(provenance or self.provenance))
-            with patch.object(p, "rust_packages", return_value=[]), \
-                 patch.object(p.capture, "source_closure", return_value={"input": "digest"}), \
-                 patch.object(p.capture, "compare", return_value=supplemental or self.supplemental) as compare:
-                p.attach_platform_captures("filesystem", self.report, [root] * directories)
+            (root / "provenance.json").write_text(json.dumps(self.provenance if provenance is None else provenance))
+            with patch.object(p.capture, "compare", return_value=self.supplemental if supplemental is None else supplemental) as compare:
+                unavailable = p.attach_platform_captures("filesystem", self.report, [root] * directories)
                 self.assertEqual(compare.call_count, directories)
+                return unavailable
 
-    def test_separate_linux_witness_keeps_mac_raw_row(self):
-        raw = copy.deepcopy(self.report["rows"])
-        self.attach()
-        self.assertEqual(self.report["rows"], raw)
-        self.assertTrue(p.platform_matched("filesystem", raw[0], self.report))
-        self.assertFalse(p.platform_matched("filesystem", raw[1], self.report))
-        self.assertFalse(p.platform_matched("syntax", raw[0], self.report))
+    def test_any_and_posix_explicitly_require_both_supported_ci_hosts(self):
+        self.assertEqual(p.host_inventory("linux"), ["any", "linux", "posix"])
+        self.assertEqual(p.host_inventory("darwin"), ["any", "darwin", "posix"])
+        for request in (REQUESTS[0], REQUESTS[3]):
+            self.assertEqual(set(p.hosts.required_goos(request)), {"linux", "darwin"})
+        with self.assertRaisesRegex(ValueError, "unsupported"):
+            p.host_inventory("freebsd")
 
-    def test_authenticated_request_binding_metadata_does_not_hide_match(self):
-        self.supplemental["rows"][0].update(request_sha256="b" * 64, capture_sha256="c" * 64)
-        self.attach()
-        self.assertTrue(p.platform_matched("filesystem", self.report["rows"][0], self.report))
+    def test_separate_archives_preserve_raw_rows_and_exclude_other_host_rows(self):
+        raw = copy.deepcopy(self.report)
+        linux_raw = copy.deepcopy(self.supplemental)
+        self.assertEqual(self.attach(), {})
+        self.assertEqual(self.report["rows"], raw["rows"])
+        self.assertEqual(self.report["capture_identity"], raw["capture_identity"])
+        self.assertEqual(self.report["host_captures"]["linux"]["report"], linux_raw)
+        self.assertEqual(self.supplemental, linux_raw)
+        coverage = p.host_coverage(self.report)
+        self.assertTrue(coverage["complete"], coverage)
+        self.assertEqual(coverage["required_hosts"], ["darwin", "linux"])
+        self.assertEqual(set(coverage["captures"]), {"darwin", "linux"})
 
-    def test_rejects_wrong_host_changed_input_or_missing_selection(self):
-        for field, value in (("host", {"platform": "macOS-26-arm64"}),
-                             ("source_closure", {"input": "old"}),
-                             ("selected_cases", []), ("selected_cases", [CASE, CASE]),
-                             ("selected_cases", ["unknown"]), ("family", "syntax")):
-            doc = copy.deepcopy(self.provenance)
-            doc[field] = value
+    def test_exact_applicable_partial_capture_can_be_the_base(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp)
+            provenance = {**self.provenance, "partial": True}
+            (directory / "provenance.json").write_text(json.dumps(provenance))
+            with patch.object(p.capture, "compare", return_value=copy.deepcopy(self.supplemental)):
+                base = p.replay_family("filesystem", directory)
+        self.assertEqual(base["rows"], self.supplemental["rows"])
+        self.assertEqual(base["rows"][2]["result"], "not_run")
+        self.assertFalse(p.host_coverage(base)["complete"])
+        base["host_captures"] = {"darwin": {"capture_identity": "darwin-archive",
+            "report": comparison("darwin", p.host_inventory("darwin"))}}
+        health = {"healthy": True, "preparations": {f: {"complete": True} for f in p.scope.STEP_PACKAGES},
+                  "coverage": {"preparation_complete": False}, "integration": {"prepared": False}}
+        with patch.object(p.capture, "load_requests", return_value={"requests": REQUESTS}):
+            metrics = p.aggregate("foundations", {"filesystem": base}, health)["metrics"]
+        self.assertTrue(metrics["filesystem_prepared"])
+        self.assertTrue(metrics["filesystem_complete"])
+
+    def test_missing_host_cannot_be_prepared_despite_all_local_rows_matching(self):
+        coverage = p.host_coverage(self.report)
+        self.assertFalse(coverage["complete"])
+        self.assertEqual(coverage["missing_hosts"], ["linux"])
+        self.assertEqual(coverage["missing"], [{"case": c, "goos": "linux"} for c in ("any", "linux", "posix")])
+        self.assertEqual(coverage["complete_cases"], ["darwin"])
+
+    def test_wrong_host_missing_or_duplicate_inventory_is_rejected(self):
+        for field, value in (("host", {"goos": "darwin"}), ("host", {}),
+                             ("selected_cases", []), ("selected_cases", ["linux", "linux"]),
+                             ("selected_cases", ["linux"]), ("family", "syntax")):
+            provenance = copy.deepcopy(self.provenance)
+            provenance[field] = value
             with self.subTest(field=field, value=value), self.assertRaises(ValueError):
-                self.attach(provenance=doc)
+                self.attach(provenance=provenance)
 
-    def test_failed_or_unavailable_linux_cannot_pass(self):
-        for outcome in ("different", "native_unavailable", "not_implemented", "not_run"):
-            rows = {"rows": [{"case": CASE, "result": outcome}]}
-            with self.subTest(outcome=outcome), self.assertRaises(ValueError):
-                self.attach(supplemental=rows)
+    def test_sorted_selection_does_not_change_non_alphabetical_request_order(self):
+        requests = [{"case": identity, "hosts": ["any"]} for identity in ("z", "a", "b")]
+        provenance = {**self.provenance, "selected_cases": ["a", "b", "z"]}
+        report = {"host": {"goos": "linux"}, "rows": [
+            {"case": request["case"], "result": "match"} for request in requests]}
+        with patch.object(p, "filesystem_requests", return_value=requests):
+            self.attach(provenance=provenance, supplemental=report)
+            report["rows"].reverse()
+            with self.assertRaisesRegex(ValueError, "exactly once"):
+                self.attach(provenance=provenance, supplemental=report)
 
-    def test_does_not_override_executed_rows_or_duplicate_witnesses(self):
-        for result in ("different", "not_implemented", "match"):
-            self.report["rows"][0]["result"] = result
-            with self.subTest(result=result), self.assertRaisesRegex(ValueError, "executed result"):
-                self.attach()
-        self.report["rows"][0]["result"] = "native_unavailable"
-        with self.assertRaisesRegex(ValueError, "duplicate platform witness"):
+    def test_stale_host_stays_unavailable_without_replacing_base(self):
+        provenance = {**self.provenance, "source_closure": {"input": "old"}}
+        raw = copy.deepcopy(self.report["rows"])
+        unavailable = self.attach(provenance=provenance)
+        self.assertEqual(len(unavailable), 1)
+        self.assertIn("linux host capture current source closure differs", next(iter(unavailable.values())))
+        self.assertEqual(self.report["rows"], raw)
+        self.assertEqual(self.report["host_captures"], {})
+        self.assertFalse(p.host_coverage(self.report)["complete"])
+
+    def test_applicable_failure_remains_failure_on_either_host(self):
+        for target in ("darwin", "linux"):
+            for result in ("native_unavailable", "different", "not_implemented", "not_applicable"):
+                with self.subTest(target=target, result=result):
+                    self.report = {**comparison("darwin"), "capture_identity": "darwin-archive"}
+                    supplemental = copy.deepcopy(self.supplemental)
+                    rows = self.report["rows"] if target == "darwin" else supplemental["rows"]
+                    rows[0]["result"] = result
+                    self.attach(supplemental=supplemental)
+                    coverage = p.host_coverage(self.report)
+                    self.assertFalse(coverage["complete"])
+                    self.assertIn({"case": "any", "goos": target, "result": result}, coverage["failures"])
+
+    def test_one_hosts_match_cannot_override_other_hosts_executed_difference(self):
+        self.report["rows"][0]["result"] = "different"
+        self.attach()
+        self.assertEqual(self.report["rows"][0]["result"], "different")
+        self.assertFalse(p.host_coverage(self.report)["complete"])
+
+    def test_duplicate_host_captures_are_rejected(self):
+        with self.assertRaisesRegex(ValueError, "duplicate filesystem host"):
             self.attach(directories=2)
+        provenance = {**self.provenance, "host": {"goos": "darwin"}, "selected_cases": p.host_inventory("darwin")}
+        with self.assertRaisesRegex(ValueError, "duplicate filesystem host"):
+            self.attach(provenance=provenance, supplemental=comparison("darwin", provenance["selected_cases"]))
 
-    def test_unscoped_case_cannot_be_replaced(self):
-        self.provenance["selected_cases"] = ["another"]
-        self.supplemental["rows"] = [{"case": "another", "result": "match"}]
-        with self.assertRaisesRegex(ValueError, "no platform supplementation policy"):
-            self.attach()
+    def test_exact_approved_difference_is_consumed_for_each_required_host(self):
+        row = self.supplemental["rows"][0]
+        row.update(result="different", native={"value": "native"}, rust={"value": "rust"})
+        self.attach()
+        approval = {"any": {"native": {"value": "native"}, "rust": {"value": "rust"}}}
+        self.assertTrue(p.host_coverage(self.report, approval)["complete"])
+        row = self.report["host_captures"]["linux"]["report"]["rows"][0]
+        row["rust"]["extra"] = True
+        self.assertFalse(p.host_coverage(self.report, approval)["complete"])
 
-    def test_comparator_rejection_propagates(self):
-        with patch.object(p.capture, "compare", side_effect=ValueError("tampered artifact")):
-            # Exercise the real attach call without the convenience helper's
-            # comparator patch: authentication failure must never be waived.
-            with tempfile.TemporaryDirectory() as tmp:
-                root = Path(tmp)
-                (root / "provenance.json").write_text(json.dumps(self.provenance))
-                with patch.object(p, "rust_packages", return_value=[]), \
-                     patch.object(p.capture, "source_closure", return_value={"input": "digest"}), \
-                     self.assertRaisesRegex(ValueError, "tampered artifact"):
-                    p.attach_platform_captures("filesystem", self.report, [root])
+    def test_comparator_rejection_is_not_downgraded_to_staleness(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "provenance.json").write_text(json.dumps({**self.provenance, "source_closure": {}}))
+            with patch.object(p.capture, "compare", side_effect=ValueError("tampered artifact")), \
+                 self.assertRaisesRegex(ValueError, "tampered artifact"):
+                p.attach_platform_captures("filesystem", self.report, [root])
 
-    def test_platform_record_distinguishes_match_difference_and_unavailable(self):
+    def test_host_summary_preserves_raw_report_and_records_applicable_failures(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             (root / "provenance.json").write_text(json.dumps(self.provenance))
             for observed, state in (("match", "match"), ("different", "different"),
                                     ("native_unavailable", "unavailable")):
-                with self.subTest(observed=observed), \
-                     patch.object(p, "rust_packages", return_value=[]), \
-                     patch.object(p.capture, "source_closure", return_value={"input": "digest"}), \
-                     patch.object(p.capture, "compare", return_value={"rows": [{"case": CASE, "result": observed}]}):
+                report = copy.deepcopy(self.supplemental)
+                report["rows"][0]["result"] = observed
+                with self.subTest(observed=observed), patch.object(p.capture, "compare", return_value=report):
                     summary = p.platform_summary(root, root / "records")
                     self.assertEqual(summary["state"], state)
                     raw = Path(summary["artifact"]).read_bytes()
                     self.assertEqual(p.sha(raw), summary["sha256"])
-                    self.assertEqual(json.loads(raw)["capture_identity"], p.sha((root / "provenance.json").read_bytes()))
+                    artifact = json.loads(raw)
+                    self.assertEqual(artifact["capture_identity"], p.sha((root / "provenance.json").read_bytes()))
+                    self.assertEqual(artifact["report"], report)
+                    self.assertEqual(artifact["host"]["goos"], "linux")
 
-    def test_platform_preparation_closes_only_its_linked_gap(self):
+    def test_preparation_requires_every_host_and_leaves_raw_reports_intact(self):
+        health = {"healthy": True, "preparations": {f: {"complete": True} for f in p.scope.STEP_PACKAGES},
+                  "coverage": {"preparation_complete": False}, "integration": {"prepared": False}}
+        requests = {"requests": REQUESTS}
+        with patch.object(p.capture, "load_requests", return_value=requests):
+            self.assertFalse(p.aggregate("foundations", {"filesystem": self.report}, health)["metrics"]["filesystem_prepared"])
+            self.attach()
+            self.assertTrue(p.aggregate("foundations", {"filesystem": self.report}, health)["metrics"]["filesystem_prepared"])
+            self.report["rows"][0]["result"] = "native_unavailable"
+            self.assertFalse(p.aggregate("foundations", {"filesystem": self.report}, health)["metrics"]["filesystem_prepared"])
+
+    def test_supplemental_preparation_uses_only_complete_historical_unavailable_rows(self):
         self.attach()
-        document = p.read(p.ROOT / "data/phase1/scope.json")
-        cases = p.read(p.ROOT / "data/phase1/cases.json")
-        health = {"healthy": True, "coverage": coverage.build(), "preparations": {
-            family: p.scope.leaf_preparation(document, cases, family)
-            for family in p.scope.STEP_PACKAGES}}
-        before = copy.deepcopy(health)
-        reports = {"filesystem": self.report}
-        raw_reports = copy.deepcopy(reports)
-        frozen = {path: (p.ROOT / path).read_bytes() for path in (
-            "data/phase1/scope.json", "data/phase1/cases.json", "data/phase1/coverage-report.json.gz")}
-        self.assertTrue(before["coverage"]["healthy"], before["coverage"]["problems"])
-        self.assertFalse(before["preparations"]["filesystem"]["complete"])
-
-        p.apply_platform_preparation(reports, health)
-
-        self.assertTrue(health["preparations"]["filesystem"]["complete"])
-        self.assertEqual(health["preparations"]["filesystem"]["pending"], [])
-        for family in p.scope.STEP_PACKAGES:
-            if family != "filesystem":
-                self.assertEqual(health["preparations"][family], before["preparations"][family])
-        removed = {row["id"] for row in before["coverage"]["gaps"]} - {
-            row["id"] for row in health["coverage"]["gaps"]}
-        self.assertEqual(removed, {"tsc/internal/nativepath/realpath_linux.go:Realpath"})
-        self.assertTrue(health["coverage"]["healthy"], health["coverage"]["problems"])
-        self.assertFalse(health["coverage"]["preparation_complete"])
-        self.assertEqual(health["coverage"]["supplemental_prepared_cases"], [CASE])
-        for key in ("cases", "case_gaps", "families"):
-            self.assertEqual(health["coverage"][key], before["coverage"][key])
-        self.assertEqual(reports, raw_reports)
-        self.assertEqual({path: (p.ROOT / path).read_bytes() for path in frozen}, frozen)
-        full_report = {"rows": [{"case": row["case"],
-                                 "result": "native_unavailable" if row["case"] == CASE else "match"}
-                                for row in p.capture.load_requests(p.capture.FAMILIES["filesystem"])["requests"]],
-                       "platform_witnesses": self.report["platform_witnesses"]}
-        health["integration"] = {"prepared": False}
-        metrics = p.aggregate("foundations", {"filesystem": full_report}, health)["metrics"]
-        self.assertTrue(metrics["filesystem_prepared"])
-        self.assertTrue(metrics["filesystem_complete"])
-        self.assertFalse(metrics["utilities_complete"])
-
-    def test_preparation_without_authenticated_witness_is_unchanged(self):
-        health = {"preparations": {"filesystem": {"complete": False}}, "coverage": {"healthy": True}}
-        before = copy.deepcopy(health)
-        p.apply_platform_preparation({"filesystem": self.report}, health)
-        self.assertEqual(health, before)
-
-    def test_invalid_supplemental_preparation_case_is_rejected(self):
-        cases = p.read(p.ROOT / "data/phase1/cases.json")["cases"]
-        executed = next(row["id"] for row in cases if row["family"] == "filesystem"
-                        and row["last_result"] == "match")
-        pilot = next(row["id"] for row in cases if row["family"] == "pilot")
-        for identity in ("unknown", executed, pilot):
-            with self.subTest(identity=identity), self.assertRaisesRegex(ValueError, "native-unavailable acceptance"):
-                coverage.build(supplemental_prepared_cases={identity})
+        health = {"preparations": {}, "coverage": {}}
+        cases = {"cases": []}
+        with patch.object(p, "read", return_value=cases), \
+             patch.object(p.scope, "recorded_results", return_value={"linux": "not_applicable", "any": "match"}), \
+             patch.object(p.scope, "leaf_preparation", return_value={"complete": True}) as prepare, \
+             patch("phase1_coverage.build", return_value={}) as coverage:
+            p.apply_platform_preparation({"filesystem": self.report}, health)
+        self.assertEqual(coverage.call_args.kwargs["supplemental_prepared_cases"], {"linux"})
+        self.assertTrue(all(c.kwargs["supplemental_prepared_cases"] == {"linux"} for c in prepare.call_args_list))
 
 
 if __name__ == "__main__":

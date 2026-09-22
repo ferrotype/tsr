@@ -207,6 +207,11 @@ def build(root: Path = ROOT, *, supplemental_prepared_cases=()) -> dict:
         request_family, request_path, request = scheduled
         if request_family != family:
             problems.append(f"{identity}: request belongs to {request_family}, case claims {family}")
+        if family == "filesystem":
+            try:
+                capture.hosts.validate_case(request, row)
+            except ValueError as error:
+                problems.append(str(error))
         if family not in ROUTES:
             problems.append(f"{identity}: no producer/sprint route for {family}")
             continue
@@ -235,10 +240,12 @@ def build(root: Path = ROOT, *, supplemental_prepared_cases=()) -> dict:
         result = recorded_results.get(identity, "not_run")
         if result not in capture.RESULTS:
             problems.append(f"{identity}: unknown recorded result {result!r}")
-        if result not in ("native_unavailable", "not_run") and not native[identity]:
+        if result not in ("native_unavailable", "not_applicable", "not_run") and not native[identity]:
             problems.append(f"{identity}: recorded comparison has no frozen native observation")
         joined_cases.append({
             "id": identity, "family": family, "request": request_path,
+            **({"hosts": capture.hosts.request_hosts(request), "host_note": request.get("host_note")}
+               if family == "filesystem" else {}),
             "request_sha256": _sha(capture.request_bytes(request)),
             "operations": row.get("operations", []), "actions": row.get("operation_actions", {}),
             "native_authority": row.get("native_authority"), "native_observations": native[identity],
@@ -296,7 +303,7 @@ def build(root: Path = ROOT, *, supplemental_prepared_cases=()) -> dict:
                        if row["acceptance"] and row["recorded_result"] in scope.PREPARING_RESULTS}
     supplemental = set(supplemental_prepared_cases)
     eligible_supplements = {row["id"] for row in joined_cases
-                            if row["acceptance"] and row["recorded_result"] == "native_unavailable"}
+                            if row["acceptance"] and row["recorded_result"] in ("native_unavailable", "not_applicable")}
     if not supplemental <= eligible_supplements:
         raise ValueError("supplemental preparation must name native-unavailable acceptance cases")
     # Only the producer passes these IDs, after authenticating a platform
@@ -331,7 +338,8 @@ def build(root: Path = ROOT, *, supplemental_prepared_cases=()) -> dict:
                          "reason": row["basis"], "dependencies": row.get("depends_on", []),
                          "reproduce": "python3 scripts/phase1_coverage.py explain --operation " + shlex.quote(identity)})
     case_causes = {"different": "observation_difference", "not_implemented": "reported_missing_operation",
-                   "native_unavailable": "native_platform_unavailable", "harness_failed": "harness_failure",
+                   "native_unavailable": "native_platform_unavailable", "not_applicable": "other_host_evidence_required",
+                   "harness_failed": "harness_failure",
                    "not_run": "current_request_observation_missing"}
     case_gaps = [{"id": row["id"], "family": row["family"], "recorded_result": row["recorded_result"],
                   "historical_result": row["historical_result"],
@@ -381,7 +389,7 @@ def build(root: Path = ROOT, *, supplemental_prepared_cases=()) -> dict:
     except ValueError as error:
         problems.append(str(error))
         contributions = {}
-    for relative in ("scripts/phase1_coverage.py", "scripts/phase1_scope.py", "scripts/phase1_capture.py", "scripts/phase1_integration.py"):
+    for relative in ("scripts/phase1_coverage.py", "scripts/phase1_scope.py", "scripts/phase1_capture.py", "scripts/phase1_integration.py", "scripts/phase1_hosts.py"):
         inputs[relative] = _sha((root / relative).read_bytes())
     return {"version": 1, "pin": pin, "healthy": not problems,
             "preparation_complete": not problems and not gaps,

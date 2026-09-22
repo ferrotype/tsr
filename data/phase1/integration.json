@@ -111,12 +111,10 @@
     },
     {
       "id": "live-cached-filesystem",
-      "claim": "Live mutations distinguish uncached reads from cached misses and deletions.",
+      "claim": "A real OS create/delete/edit sequence is rebuilt through fresh cached and tracking filesystems into compiler programs. Pinned Go and Rust observations compare discovered files, bound text and symbols, syntactic diagnostics, cache disable/clear behavior, unchanged file reuse, retained first-file ownership, and rebuild SeenFiles including missing roots and explicitly seeded wildcard directories.",
       "kind": "cases",
       "references": [
-        "filesystem/cachedvfs/readfile-is-never-cached",
-        "filesystem/cachedvfs/cached-miss-then-creation",
-        "filesystem/cachedvfs/cached-hit-then-deletion"
+        "filesystem/composed/live-program-rebuild"
       ],
       "command": [
         "python3",
@@ -125,16 +123,12 @@
         "--family",
         "filesystem",
         "--output",
-        "target/phase1-f5-live",
+        "target/phase1-f5-composed",
         "--case",
-        "filesystem/cachedvfs/readfile-is-never-cached",
-        "--case",
-        "filesystem/cachedvfs/cached-miss-then-creation",
-        "--case",
-        "filesystem/cachedvfs/cached-hit-then-deletion"
+        "filesystem/composed/live-program-rebuild"
       ],
       "owner": "F5b",
-      "boundary": "These rows directly witness the cached live filesystem API. The separate retained-program-snapshot test now physically edits and reacquires a live directory before loading the second program; it does not claim a watch-mode connection."
+      "boundary": "Uses the pinned watcher composition at watcher.go:431-490 and its actual watchCompilerHost through a same-package test overlay. This is a synchronous rebuild witness on each applicable host; watcher scheduling, incremental fast-path updates, emit, and semantic diagnostics are not exercised."
     },
     {
       "id": "installed-generated-assets",

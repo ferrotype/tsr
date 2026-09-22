@@ -41,3 +41,27 @@ binder test filter); it is not passing acceptance evidence. Use the registry in
 and their `target/phase1-acceptance/{leaves,filesystem,config,syntax}` links.
 These seven receipts cover the required executable witnesses; the three
 case-based integration witnesses are evaluated from the family captures.
+
+## Separate host capture after B1-3/B2-3
+
+`f5b-filesystem-darwin-20260923.tar.gz` (1,704,979 bytes) preserves the complete
+Darwin capture under `filesystem-darwin/`, its child bytes, comparison and
+single-host record. SHA-256:
+`68dbc06cee4c1edc7bfb37a23ae31648c9ce358bd470ba0a21a424d4e4147b69`.
+Capture identity:
+`c4b4496205832745435692a0c7391d8b8a00ebf6a927bd777e764f498bc5afac`.
+
+It records 356 matches, three unchanged approved differences, and one
+`not_applicable` Linux-only realpath row. The composed live-filesystem/program
+witness matches. The raw native Linux row remains `native_unavailable` with its
+reason; only the comparison excludes it from Darwin's 359-row denominator.
+This archive does **not** certify Linux. CI preserves a distinct Linux archive,
+which must cover every Linux-applicable case, including the composed witness.
+
+After extraction, use `python3 scripts/phase1_producers.py host --capture
+filesystem=PATH/filesystem-darwin --output target/phase1-host-records` to verify
+this host. Pass the other independently authenticated host directory using
+`--host-capture` when recording foundations/config. Replay still rejects changed
+sources or case claims. The earlier family/receipt archives above are historical
+after this increment; their former current-state descriptions apply to their
+checkpoint, not to the host-metadata and live-loader edits.

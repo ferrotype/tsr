@@ -109,7 +109,20 @@ impl Program {
         cache: &mut FileCache,
         counters: &Counters,
     ) -> Result<Self, Error> {
-        Loader::new(options, cache, counters)?.run()
+        Loader::new(options, cache, counters, false)?.run()
+    }
+    /// Load one program from a live host, with fresh resolution caches.
+    ///
+    /// The caller must keep the filesystem stable for the duration of the load
+    /// and create a new program after mutations. Loaded source files remain
+    /// owned and immutable, but subsequent host-dependent operations may observe
+    /// the live filesystem. `load` retains its immutable-host requirement.
+    pub fn load_live(
+        options: ProgramOptions,
+        cache: &mut FileCache,
+        counters: &Counters,
+    ) -> Result<Self, Error> {
+        Loader::new(options, cache, counters, true)?.run()
     }
     pub fn config(&self) -> &tsr_tsoptions::ParsedCommandLine {
         &self.config
@@ -196,6 +209,7 @@ impl<'a> Loader<'a> {
         input: ProgramOptions,
         cache: &'a mut FileCache,
         counters: &'a Counters,
+        allow_live_host: bool,
     ) -> Result<Self, Error> {
         if input
             .config
@@ -214,10 +228,14 @@ impl<'a> Loader<'a> {
             return Err(Error::Unsupported("content-mapper execution"));
         }
         let options = Arc::new(input.config.options.clone());
-        let resolver = Resolver::new(
+        let resolver = Resolver::with_options(
             input.host.clone(),
             options.clone(),
             input.current_directory.as_bytes(),
+            tsr_module::ResolverOptions {
+                allow_live_host,
+                ..Default::default()
+            },
         )?;
         let lib_path = JsString::from_bytes(path::absolute(
             input.default_library_path.as_bytes(),

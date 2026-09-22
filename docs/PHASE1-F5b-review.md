@@ -19,7 +19,7 @@ inherit their acceptance.
 | I37 | Partly confirmed. The directives row cannot witness default settings overwritten by setup, nor a callback it never invokes. Those credits are removed. A new default-state request observes `NewScanner` before configuration and trivia skipping after `Reset`. `SetOnError` already has a separate valid `state/reset` witness: callback reinstallation affects the later invalid-byte diagnostic. |
 | I31 | Confirmed. The native writer probe now accepts a locale. Twelve native/Rust traces compare German, Japanese and unsupported-locale fallback for nested chains, table headings, summary branches and plain/colored status lines. All twelve match and are included in the reviewed config-family capture recorded below. |
 | I21 | Confirmed. The new paths request inserts `x*z` before `x*`, opposite lexical order, with equal prefix lengths and a separate exact-match control. Native and Rust choose the same file. Deliberately sorting the request changes the Rust observation, so the witness detects the claimed defect. |
-| I23 | Confirmed. The integration test now physically edits a directory, reacquires it through `ScopedOsFs`, loads a second program and checks changed symbols/text, reuse of an unchanged dependency and retained old-file access after both programs are dropped. The separate cached-filesystem rows are no longer described as completing this composition. Watch scheduling remains outside the claim. |
+| I23 | Confirmed. The snapshot-retention regression remains useful but did not exercise cached/tracking composition. B2-3 below adds the actual live OS → cached → tracking → program rebuild witness on both runtimes. Watch scheduling remains outside the claim. |
 | I40 | Confirmed. `scripts/phase1_navigation_rescan.py` reproduces the five pinned private-operation observations without editing upstream. Its README gives the command; `--write` explicitly refreshes observations/provenance and the derived Rust TSV. The reproduced operation results match all five retained rows. |
 
 ## Harness and evidence corrections
@@ -159,3 +159,58 @@ The six native localized envelopes pass both stdout and artifact round trips.
 The final receipt set is checked through the aggregate validator before metric
 recording; a successful child exit alone is not accepted. Earlier rejected
 receipts and failed producer records remain preserved for diagnosis.
+
+## B1-3 and B2-3 — owner decisions, 2026-09-23
+
+**B1-3:** retain one independently authenticated capture per host. All filesystem
+requests now declare `hosts`; `host_note` preserves the former prose. `any` and
+`posix` require both supported CI hosts, Linux and Darwin. This is not evidence
+for additional operating systems. The two native realpath implementations
+remain Linux-only and Darwin-only respectively.
+
+Comparison derives `not_applicable` only when native reports
+`native_unavailable` and the declared hosts exclude the capture's GOOS. It keeps
+the native reason and Rust outcome, and removes that row from the local parity
+denominator. Native unavailability on an applicable host remains a failure;
+harness failures are never excluded. Provenance GOOS must agree with every
+hashed native probe response. Reports from different hosts cannot be folded by
+`join`.
+
+`filesystem_prepared` and completion require an authenticated acceptable result
+for every `(case, required GOOS)` pair. Existing owner-approved differences
+still require the exact native/Rust pair. Their request hashes were migrated
+only after checking that removing the host metadata yields byte-identical
+requests; their observations and exception scopes did not change. Neither a
+Darwin result nor a prose note substitutes for the Linux observation. A missing
+or stale host remains pending without discarding independent current families.
+
+CI captures each runner's complete applicable inventory in
+`target/phase1-platform/{linux,darwin}` and preserves the artifacts separately.
+Replay accepts either that exact selection or a whole-family capture. Supply a
+base with `--capture filesystem=DIR` and the other host with
+`--host-capture OTHER_DIR` to `scripts/phase1_producers.py foundations` (or
+`config`). `scripts/phase1_producers.py host --capture filesystem=DIR` verifies
+and records one host without claiming multi-host preparation.
+
+**B2-3:** `filesystem/composed/live-program-rebuild` follows the composition at
+pinned `execute/watcher.go:431–490`. Native uses the real `watchCompilerHost` and
+source-file cache from a same-package overlay. Rust uses production `OsFs`,
+`CachedFs`, `TrackingFs`, `FileCache` and `Program::load_live`. The new explicit
+live-host entry point creates fresh resolution caches; `Program::load` keeps its
+snapshot-host requirement. Loaded bound files remain immutable, while the live
+entry point documents that later host-dependent operations can observe changes.
+
+The witness reads a physical config, seeds wildcard directories and the config
+path in `SeenFiles`, builds, disables and clears metadata caches, physically
+creates/deletes/edits files, then rebuilds with fresh cached/tracking wrappers.
+Both observations include the new files/text/syntactic diagnostics, retained
+first-file text/symbols after both programs are dropped, and the rebuild's full
+tracking set including misses and wildcard directories. Paths are normalized
+relative to `<root>`/`<realroot>`; no machine temp spelling enters the comparison.
+An unchanged source must be reused, and the edited source must be replaced.
+The observation does not claim watcher scheduling, incremental updates, emit,
+or semantic diagnostics.
+
+These changes do not close the operation-witness backlog. The owner explicitly
+left stale family evidence and local-versus-CI confirmation for phase-end
+refresh; neither is disguised as current by this increment.

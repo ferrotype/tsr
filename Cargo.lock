@@ -432,6 +432,7 @@ dependencies = [
  "phase1_harness",
  "rustix",
  "serde_json",
+ "tsr_arena",
  "tsr_compiler",
  "tsr_core",
  "tsr_diagnostics",
