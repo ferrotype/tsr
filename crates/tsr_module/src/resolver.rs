@@ -612,7 +612,7 @@ impl Resolver {
         };
         self.directory(ext, candidate, info.as_deref(), esm)
     }
-    // Source: resolver.go:loadNodeModuleFromDirectoryWorker, excluding typesVersions (typed error).
+    // Source: resolver.go:loadNodeModuleFromDirectoryWorker.
     pub(super) fn directory(
         &mut self,
         ext: u8,
@@ -620,23 +620,19 @@ impl Resolver {
         package: Option<&PackageJson>,
         esm: bool,
     ) -> Result<Option<ResolvedModule>, Error> {
-        let candidate = if candidate.len() > path::root_length(candidate) {
-            candidate.strip_suffix(b"/").unwrap_or(candidate)
-        } else {
-            candidate
-        };
         let version_paths = package.map(|info| self.version_paths(info));
         let mut package_file = None;
         if let Some(info) = package.filter(|info| {
-            path::to_path(
+            // The pin compares the caller's spelling before constructing child
+            // paths. Trimming here would skip `types` for a directory import
+            // such as `../`, whose package metadata also retains the slash.
+            path::compare_paths(
                 candidate,
-                self.cwd.as_bytes(),
-                self.host.use_case_sensitive_file_names(),
-            ) == path::to_path(
                 info.directory.as_bytes(),
-                self.cwd.as_bytes(),
+                b"",
                 self.host.use_case_sensitive_file_names(),
             )
+            .is_eq()
         }) {
             if self.config_lookup {
                 package_file = self.package_json_path_field(info, "tsconfig");
@@ -649,6 +645,11 @@ impl Resolver {
                 package_file = self.package_json_path_field(info, "main");
             }
         }
+        let candidate = if candidate.len() > path::root_length(candidate) {
+            candidate.strip_suffix(b"/").unwrap_or(candidate)
+        } else {
+            candidate
+        };
         if let Some((version, paths)) = version_paths
             .as_ref()
             .and_then(|v| Some((v.version, v.paths()?)))

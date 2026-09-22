@@ -3011,3 +3011,10 @@ The separate archive, identity and replay command are in
 The Linux CI artifact is still required; no historical Darwin observation is
 substituted for it. The owner left stale family evidence and local-versus-CI
 confirmation for phase-end green-up; no broad corpus or benchmark was rerun.
+
+The pre-existing `typesVersions` loader defect is now fixed. A fresh native/Rust
+run of `typesVersionsDeclarationEmit.multiFileBackReferenceToSelf` matches every
+field and all 68 trace entries. Three native module-trace regressions also cover
+actual entry-versus-index selection, cold/warm caches and directory imports
+without `typesVersions`. The original full 10,727/10,728 result is historical;
+this bounded fix does not re-label it as a fresh full pass.

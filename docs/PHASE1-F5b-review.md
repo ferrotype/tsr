@@ -145,7 +145,8 @@ Its graph matches, but Rust omits two package-field resolution trace messages.
 comparing it with a cached package directory whose spelling retains it. The
 pinned resolver keeps the candidate spelling at that comparison. This is a
 pre-existing module-resolution defect, outside the reviewed production edits;
-it remains a named failure, not an approved difference.
+it was retained as a named failure, not an approved difference. The follow-up
+below fixes it; the quoted full-run result remains historical.
 
 
 Aggregate replay also exposed two receipt-format defects after the child
@@ -214,3 +215,27 @@ or semantic diagnostics.
 These changes do not close the operation-witness backlog. The owner explicitly
 left stale family evidence and local-versus-CI confirmation for phase-end
 refresh; neither is disguised as current by this increment.
+
+
+## `typesVersions` trailing-directory follow-up
+
+The resolver now compares the original candidate with the package directory
+using pinned `ComparePaths` semantics, before trimming the separator for child
+path arithmetic. A `../` import previously skipped `typings`/`types` lookup
+because `/pkg` did not equal the cached `/pkg/`. This could also resolve the
+wrong file when the declared `types` entry differs from `index`.
+
+Three new pinned-Go module-trace fixtures cover cold and warm package caches
+with distinct `entry`/`index` targets, plus the directory-import path without
+`typesVersions`. The existing trace test failed before the fix on the first
+new callback and passes after it. All 29 operations / 361 callbacks and all
+13 module tests pass; scoped Clippy and formatting pass. An independent
+read-only review found no further issues.
+
+A fresh native/Rust run of the exact conformance variant named above now
+matches every loader observation, including all 68 trace entries (Rust
+previously emitted 66). The bounded comparison is preserved at
+`target/f5b-typesversions-loader/comparison.json`. No full 10,728-row capture
+was rerun or relabeled as passing; that producer refresh remains phase-end
+work. Existing filesystem evidence likewise retains its original source
+identity after this resolver change.
