@@ -97,10 +97,14 @@ class S10Evidence(unittest.TestCase):
             (root / 'scripts').mkdir()
             dependent = root / 'scripts/s10_measure.py'
             unrelated = root / 'scripts/s09_format.py'
+            finder_metadata = root / 'tools/s10/.DS_Store'
+            finder_metadata.write_text('original')
             dependent.write_text('original'); unrelated.write_text('original')
             with patch.object(corpus, 'ROOT', root):
                 before = corpus.sources()
+                self.assertNotIn('tools/s10/.DS_Store', before)
                 unrelated.write_text('changed')
+                finder_metadata.write_text('changed')
                 self.assertEqual(before, corpus.sources())
                 dependent.write_text('changed')
                 self.assertNotEqual(before, corpus.sources())
