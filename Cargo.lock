@@ -470,6 +470,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "phase1_syntax"
+version = "0.1.0"
+dependencies = [
+ "phase1_harness",
+ "serde_json",
+ "sha2",
+ "tsr_arena",
+ "tsr_ast",
+ "tsr_bundled",
+ "tsr_compiler",
+ "tsr_core",
+ "tsr_jsstring",
+ "tsr_module",
+ "tsr_tsoptions",
+ "tsr_tspath",
+ "tsr_vfs",
+]
+
+[[package]]
 name = "pin-project-lite"
 version = "0.2.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"

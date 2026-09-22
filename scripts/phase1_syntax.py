@@ -12,6 +12,13 @@ module owns the corpus half of that accounting:
   cover them. It points at those manifests rather than copying them: the S06
   corpus already records units, configurations and options per primary, and a
   second copy would only be a second thing to drift.
+* ``capture`` -- plan tasks 2 and 3. The syntax-only program schedule over all
+  15,206 declared compiler variants, rebuilt from native preprocessing, and the
+  pinned ``Program.GetSyntacticDiagnostics`` observed once per loadable row
+  (data/phase1/syntax-schedule.json, data/phase1/syntax-native.json).
+* ``smoke`` / ``replay`` -- plan task 9, corpus half. A bounded run of the Rust
+  production ``Program::syntactic_diagnostics`` over a rule-selected subset,
+  and a child-free recomputation of its report (data/phase1/syntax-smoke.json).
 
 The inventory re-derives physical membership from the pin itself through the
 existing ``s06_corpus.membership`` and holds every count to ``s06_corpus.EXPECTED``,
@@ -323,3 +330,358 @@ def write() -> dict:
     document = build()
     INVENTORY.write_text(json.dumps(document, indent=2, sort_keys=True) + "\n")
     return document
+
+
+# ---------------------------------------------------------------------------
+# Plan tasks 2 and 3: the syntax-only program schedule and its native capture.
+# The producer lives in scripts/phase1_syntax_schedule.py, which alone is a
+# recorded capture input; the checks below read only committed documents.
+# ---------------------------------------------------------------------------
+
+from phase1_syntax_schedule import (  # noqa: E402
+    BOUNDARIES, NATIVE, SCHEDULE, SELECTIONS, _json_canonical, _write_rows, capture,
+    schedule_inputs, schedule_requests,
+)
+
+
+def _schedule_problems(schedule: dict, native: dict, subset_variants: dict[str, dict],
+                       policy: dict | None) -> list[str]:
+    """Why a schedule and native document do not account for every variant.
+
+    Checks the documents against data/s07/subset.json and against each other,
+    without rerunning Go. Freshness against the producer inputs is checked by
+    the caller.
+    """
+    found: list[str] = []
+    rows = schedule.get("rows", [])
+    ids = [row["id"] for row in rows]
+    if ids != list(subset_variants):
+        missing = set(subset_variants) - set(ids)
+        extra = set(ids) - set(subset_variants)
+        found.append(f"syntax schedule rows differ from the S07 variants: {len(missing)} missing, "
+                     f"{len(extra)} extra, or reordered")
+    native_rows = native.get("rows", [])
+    native_by_id = {}
+    for row in native_rows:
+        if row["id"] in native_by_id:
+            found.append(f"native syntax row {row['id']} is duplicated")
+        native_by_id[row["id"]] = row
+    expected_native = []
+    for row in rows:
+        variant = subset_variants.get(row["id"])
+        if variant is None:
+            continue
+        rid = row["id"]
+        if row["loading_request_sha256"] != variant["loading_request_sha256"]:
+            found.append(f"{rid}: loading request differs from the S07 frozen request")
+        rejected = variant["option_outcome"] == "rejected"
+        mapped = any(reason["rule"] == "content_mapper_execution" for reason in variant["reasons"])
+        boundary = "options_rejected" if rejected else "content_mapper" if mapped else None
+        if row["boundary"] != boundary:
+            found.append(f"{rid}: boundary is {row['boundary']!r}, the S07 variant says {boundary!r}")
+        if row["boundary"] is not None and row["boundary"] not in BOUNDARIES:
+            found.append(f"{rid}: unnamed boundary {row['boundary']!r}")
+        if rejected and (not row["option_diagnostics"] or row["option_diagnostics"] != variant["option_diagnostics"]):
+            found.append(f"{rid}: a rejected variant must keep its native option diagnostics")
+        if not rejected and row["option_diagnostics"]:
+            found.append(f"{rid}: an accepted variant carries option diagnostics")
+        if row["e2_disposition"] != variant["disposition"]:
+            found.append(f"{rid}: E2 disposition differs from the S07 subset")
+        expected_selection = ("filename_skip" if row["filename_skip"] else
+                              {"allowed": "runs", "skipped": "option_guard_skip",
+                               "not_reached": "options_rejected"}.get(row["option_guard"]))
+        if row["native_selection"] != expected_selection or row["native_selection"] not in SELECTIONS:
+            found.append(f"{rid}: native selection {row['native_selection']!r} does not follow from its guard")
+        if (row["option_guard"] == "not_reached") != rejected:
+            found.append(f"{rid}: only a rejected variant may skip the native option guard")
+        # A boundary row never loads; every other row loaded or panicked, and
+        # its syntactic status says which. None becomes an empty success.
+        want = {"loaded": "observed", "panic": "load_panicked", "not_loaded": "boundary"}.get(row["load"])
+        if want is None or row["syntactic"] != want:
+            found.append(f"{rid}: load {row['load']!r} and syntactic {row['syntactic']!r} disagree")
+        if (row["load"] == "not_loaded") != (boundary is not None):
+            found.append(f"{rid}: only a named boundary may leave a variant unloaded")
+        if row["load"] in ("loaded", "panic"):
+            expected_native.append(rid)
+            observed = native_by_id.get(rid)
+            if observed is None:
+                found.append(f"{rid}: {row['syntactic']} without a native row")
+            elif row["load"] == "loaded" and not {"syntactic", "plain_hex", "pretty_hex"} <= set(observed):
+                found.append(f"{rid}: native row lacks its structured or rendered diagnostics")
+            elif row["load"] == "panic" and not observed.get("panic"):
+                found.append(f"{rid}: a panicked load lacks its panic text")
+        elif rid in native_by_id:
+            found.append(f"{rid}: a boundary row carries a native observation")
+    if [row["id"] for row in native_rows] != expected_native:
+        found.append("native syntax rows are not exactly the loaded schedule rows, in order")
+    # The E2 policy's own native observation of the same guard, over the rows
+    # it covers. It ran the guard on the accepted subset of a rejected
+    # variant's settings; the harness never reaches the guard for those.
+    if policy is not None:
+        by_id = {row["id"]: row for row in rows}
+        for observed in policy["rows"]:
+            row = by_id.get(observed["id"])
+            if row is None:
+                found.append(f"{observed['id']}: E2 policy row without a schedule row")
+                continue
+            if observed["filename_skip"] != row["filename_skip"]:
+                found.append(f"{observed['id']}: filename skip differs from the E2 policy observation")
+            if row["option_guard"] != "not_reached" and observed["option_guard"] != row["option_guard"]:
+                found.append(f"{observed['id']}: option guard differs from the E2 policy observation")
+    if schedule.get("phase") != "Program.GetSyntacticDiagnostics only; not the whole .errors.txt baseline":
+        found.append("the syntax schedule no longer names its phase")
+    return found
+
+
+def schedule_problems(*, check_inputs: bool = True) -> list[str]:
+    """The committed schedule and native observation, checked without Go."""
+    if not SCHEDULE.is_file() or not NATIVE.is_file():
+        return ["the syntax schedule is absent; run `phase1_syntax.py capture --write`"]
+    schedule = json.loads(SCHEDULE.read_text())
+    native = json.loads(NATIVE.read_text())
+    subset = {variant["id"]: variant for case in _rows(_load(SOURCES["subset"]), "cases")
+              for variant in case["variants"]}
+    policy = json.loads((ROOT / "data/s07/e2-policy-observations.json").read_text())
+    found = _schedule_problems(schedule, native, subset, policy)
+    if schedule.get("provenance") != native.get("provenance"):
+        found.append("the schedule and native documents come from different captures")
+    if check_inputs:
+        recorded = schedule.get("provenance", {}).get("inputs", {})
+        current = schedule_inputs()
+        changed = sorted(name for name in set(recorded) | set(current) if recorded.get(name) != current.get(name))
+        if changed:
+            found.append("the syntax schedule is stale against " + ", ".join(changed))
+        pin = json.loads((ROOT / "data/upstream.json").read_text())["pin"]
+        if schedule.get("provenance", {}).get("pin") != pin:
+            found.append("the syntax schedule was captured at a different pin")
+    return found
+
+
+# ---------------------------------------------------------------------------
+# Plan task 9, corpus half: a bounded Rust smoke over the schedule, replayed
+# from its stored outputs. The selection is every row with at least one native
+# syntactic diagnostic -- the only rows whose output a wrong parser, walk, sort
+# or renderer can change -- plus the first row of every stratum of root script
+# kinds, JS/decorator options and native selection, so each loader and
+# option path runs at least once. Every other loaded row is a prepared,
+# unexecuted case: F5b performs the full correctness capture.
+# ---------------------------------------------------------------------------
+
+SMOKE = ROOT / "data/phase1/syntax-smoke.json"
+SMOKE_RULE = ("every schedule row with at least one native syntactic diagnostic, plus the first row "
+              "(schedule order) of each stratum of (extensions present in the request, checkJs, allowJs, "
+              "experimentalDecorators, native selection)")
+RUST_EXTRA = ("tools/s07/program/rust_observation.rs", "Cargo.toml", "Cargo.lock", "rust-toolchain.toml")
+COMPARED = ("files", "file_names_sha256", "syntactic", "plain_hex", "pretty_hex")
+def select(schedule: dict, native: dict) -> list[str]:
+    diagnosed = {row["id"] for row in native["rows"] if row.get("syntactic")}
+    chosen, strata = set(diagnosed), set()
+    for row in schedule["rows"]:
+        if row["load"] != "loaded":
+            continue
+        stratum = json.dumps([row["request_shape"], row["native_selection"]])
+        if stratum not in strata:
+            strata.add(stratum)
+            chosen.add(row["id"])
+    return [row["id"] for row in schedule["rows"] if row["id"] in chosen]
+
+
+def rust_closure() -> dict[str, str]:
+    import phase1_capture
+
+    paths = set(RUST_EXTRA)
+    for directory in phase1_capture.workspace_closure("phase1_syntax"):
+        for path in directory.rglob("*"):
+            relative = path.relative_to(ROOT)
+            if path.is_file() and not any(part in (".git", "target", "__pycache__") for part in relative.parts):
+                paths.add(str(relative))
+    return {name: _digest(name) for name in sorted(paths) if (ROOT / name).is_file()}
+
+
+def build_rust() -> Path:
+    from s04_common import command
+
+    messages = command(["cargo", "build", "--locked", "--offline", "--release", "-p", "phase1_syntax",
+                        "--bin", "phase1_syntax", "--message-format=json"], cwd=ROOT)
+    executables = [record["executable"] for record in map(json.loads, filter(str.strip, messages.decode().splitlines()))
+                   if record.get("reason") == "compiler-artifact"
+                   and record.get("target", {}).get("name") == "phase1_syntax" and record.get("executable")]
+    if len(executables) != 1:
+        raise ValueError("cargo reported no single phase1_syntax executable")
+    return Path(executables[0])
+
+
+def compare_row(native_row: dict, rust_row: dict) -> dict:
+    """One smoke row's result in the Phase 1 vocabulary."""
+    state = rust_row.get("state")
+    if state == "not_implemented":
+        return {"id": native_row["id"], "result": "not_implemented", "operation": rust_row.get("operation")}
+    if state != "observed":
+        # A Rust load error or panic on a program Go loaded is a finding, not a
+        # harness failure: the harness ran and the production path failed.
+        return {"id": native_row["id"], "result": "different", "rust_state": state,
+                "detail": rust_row.get("error") or rust_row.get("panic")}
+    differs = [field for field in COMPARED if native_row.get(field) != rust_row.get(field)]
+    return {"id": native_row["id"], "result": "different" if differs else "match",
+            **({"differs": differs} if differs else {})}
+
+
+def _smoke_report(directory: Path, selected: list[str], native: dict, schedule: dict) -> dict:
+    from s04_common import strict_json_loads
+
+    rust_rows = [strict_json_loads(line) for line in (directory / "rust-rows.jsonl").read_bytes().splitlines() if line.strip()]
+    if [row.get("id") for row in rust_rows] != selected:
+        raise ValueError("Rust smoke rows are missing, extra, duplicated or reordered")
+    native_by_id = {row["id"]: row for row in native["rows"]}
+    rows = [compare_row(native_by_id[rid], rust) for rid, rust in zip(selected, rust_rows, strict=True)]
+    loaded = [row["id"] for row in schedule["rows"] if row["load"] == "loaded"]
+    counts = dict(sorted(Counter(row["result"] for row in rows).items()))
+    counts["not_run"] = len(loaded) - len(selected)
+    return {"counts": counts, "rows": rows,
+            "not_implemented_operations": dict(sorted(Counter(row["operation"] for row in rows
+                                                              if row["result"] == "not_implemented").items()))}
+
+
+def smoke(directory: Path, *, write_committed: bool = False) -> dict:
+    """Run the bounded Rust smoke once and store every input it read."""
+    import s07_subset
+
+    directory = Path(directory).resolve()
+    problems_found = schedule_problems()
+    if problems_found:
+        raise ValueError("the committed syntax schedule is not current: " + problems_found[0])
+    schedule = json.loads(SCHEDULE.read_text())
+    native = json.loads(NATIVE.read_text())
+    observations = directory / "source-observations.ndjson"
+    if not observations.is_file():
+        s07_subset.export_observations(observations)
+    rows, probes = schedule_requests(observations)
+    if [row["loading_request_sha256"] for row in rows] != [row["loading_request_sha256"] for row in schedule["rows"]]:
+        raise ValueError("fresh native preprocessing differs from the committed schedule")
+    selected = select(schedule, native)
+    wanted = set(selected)
+    smoke_dir = directory / "smoke"
+    smoke_dir.mkdir(parents=True, exist_ok=False)
+    request_bytes = _json_canonical([probe for probe in probes if probe["id"] in wanted])
+    (smoke_dir / "requests.json").write_bytes(request_bytes)
+    before = rust_closure()
+    executable = build_rust()
+    from s04_common import command
+    command([str(executable), "--schedule", str(smoke_dir / "requests.json"), str(smoke_dir / "rust-rows.jsonl")], cwd=ROOT)
+    if rust_closure() != before:
+        raise ValueError("a Rust source input changed during the smoke; the capture is invalid")
+    provenance = {"schedule_sha256": _digest(str(SCHEDULE.relative_to(ROOT))),
+                  "native_rows_sha256": native_rows_digest(native),
+                  "requests_sha256": hashlib.sha256(request_bytes).hexdigest(),
+                  "rust_rows_sha256": hashlib.sha256((smoke_dir / "rust-rows.jsonl").read_bytes()).hexdigest(),
+                  "rust_binary_sha256": hashlib.sha256(executable.read_bytes()).hexdigest(),
+                  "rust_closure": before, "selected": selected}
+    (smoke_dir / "provenance.json").write_bytes(_json_canonical(provenance))
+    report = replay(smoke_dir)
+    if write_committed:
+        _write_rows(SMOKE, report)
+    return report["counts"]
+
+
+def replay(smoke_dir: Path) -> dict:
+    """Recompute the smoke report from a stored capture. Runs no child."""
+    from s04_common import strict_json_loads
+
+    smoke_dir = Path(smoke_dir).resolve()
+    provenance = strict_json_loads((smoke_dir / "provenance.json").read_bytes())
+    for name, key in (("requests.json", "requests_sha256"), ("rust-rows.jsonl", "rust_rows_sha256")):
+        if hashlib.sha256((smoke_dir / name).read_bytes()).hexdigest() != provenance[key]:
+            raise ValueError(f"stored smoke {name} changed since capture")
+    if provenance["native_rows_sha256"] != native_rows_digest(json.loads(NATIVE.read_text())):
+        raise ValueError("the committed native syntax observation changed since the smoke")
+    schedule = json.loads(SCHEDULE.read_text())
+    native = json.loads(NATIVE.read_text())
+    requests = strict_json_loads((smoke_dir / "requests.json").read_bytes())
+    if [request["id"] for request in requests] != provenance["selected"]:
+        raise ValueError("stored smoke requests are not the recorded selection")
+    report = _smoke_report(smoke_dir, provenance["selected"], native, schedule)
+    stale = sorted(name for name, sha in provenance["rust_closure"].items()
+                   if not (ROOT / name).is_file() or _digest(name) != sha)
+    return {"version": 1, "rule": SMOKE_RULE, "selected": provenance["selected"],
+            "native_rows_sha256": provenance["native_rows_sha256"], "rust_binary_sha256": provenance["rust_binary_sha256"],
+            "rust_closure": provenance["rust_closure"],
+            "rust_sources_current": not stale, **report}
+
+
+def native_rows_digest(native: dict) -> str:
+    """The native observation's content, independent of the provenance that
+    records which script version captured it."""
+    return hashlib.sha256(_json_canonical(native["rows"])).hexdigest()
+
+
+def smoke_problems() -> list[str]:
+    """The committed smoke report checked against the committed schedule, without a child."""
+    if not SMOKE.is_file():
+        return ["the syntax smoke report is absent; run `phase1_syntax.py smoke --write`"]
+    smoke_report = json.loads(SMOKE.read_text())
+    schedule = json.loads(SCHEDULE.read_text())
+    native = json.loads(NATIVE.read_text())
+    found = []
+    if smoke_report.get("native_rows_sha256") != native_rows_digest(native):
+        found.append("the syntax smoke compared against a different native observation")
+    if smoke_report.get("rule") != SMOKE_RULE or smoke_report.get("selected") != select(schedule, native):
+        found.append("the syntax smoke selection is not the committed rule's selection")
+    rows = smoke_report.get("rows", [])
+    if [row.get("id") for row in rows] != smoke_report.get("selected"):
+        found.append("the syntax smoke rows are not exactly its selection, in order")
+    results = Counter(row.get("result") for row in rows)
+    if set(results) - {"match", "different", "not_implemented"}:
+        found.append(f"the syntax smoke has unknown results {sorted(set(results) - {'match', 'different', 'not_implemented'})}")
+    loaded = sum(1 for row in schedule["rows"] if row["load"] == "loaded")
+    expected = dict(sorted(results.items()))
+    expected["not_run"] = loaded - len(rows)
+    if smoke_report.get("counts") != expected:
+        found.append("the syntax smoke counts do not follow from its rows")
+    return found
+
+
+def smoke_freshness() -> dict:
+    """Whether the Rust sources the committed smoke ran are still the current ones.
+
+    Informational: a later production change is expected to move them, and F4b
+    reruns the smoke when it does. It is reported, never hidden.
+    """
+    if not SMOKE.is_file():
+        return {"rust_sources_current": False, "changed": []}
+    recorded = json.loads(SMOKE.read_text()).get("rust_closure", {})
+    current = rust_closure()
+    changed = sorted(name for name in set(recorded) | set(current) if recorded.get(name) != current.get(name))
+    return {"rust_sources_current": not changed, "changed": changed[:20], "changed_count": len(changed)}
+
+
+def main(argv: list[str] | None = None) -> int:
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Phase 1 F4a corpus syntax schedule, native capture and Rust smoke.")
+    commands = parser.add_subparsers(dest="command", required=True)
+    for name, text in (("capture", "native preprocessing and the native syntax probe, once"),
+                       ("smoke", "the bounded Rust smoke over the committed schedule")):
+        sub = commands.add_parser(name, help=text)
+        sub.add_argument("--output", type=Path, required=True, help="a scratch directory, never an owner capture")
+        sub.add_argument("--write", action="store_true", help="also rewrite the committed documents")
+    sub = commands.add_parser("replay", help="recompute a stored smoke report without running anything")
+    sub.add_argument("directory", type=Path)
+    commands.add_parser("check", help="check the committed inventory, schedule and native observation")
+    args = parser.parse_args(argv)
+    if args.command == "capture":
+        print(json.dumps(capture(args.output, write_committed=args.write), indent=2))
+    elif args.command == "smoke":
+        print(json.dumps(smoke(args.output, write_committed=args.write), indent=2))
+    elif args.command == "replay":
+        report = replay(args.directory)
+        print(json.dumps({"counts": report["counts"], "rust_sources_current": report["rust_sources_current"]},
+                         indent=2))
+    else:
+        found = problems() + schedule_problems() + smoke_problems()
+        print(json.dumps({"problems": found, "smoke": smoke_freshness()}, indent=2))
+        return 1 if found else 0
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

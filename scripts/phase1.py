@@ -79,8 +79,12 @@ def inventory_check() -> dict:
     problems += baselines.verify_written_subfolders()
     problems += baselines.exception_problems(index)
     # F4a task 1: every primary and expanded request of the parser/binder
-    # corpus accounted for against the manifests that own it.
+    # corpus accounted for against the manifests that own it. Tasks 2, 3 and
+    # 9: the syntax schedule, its native observation and the bounded Rust
+    # smoke, each checked against the committed documents without a child.
     problems += syntax_module.problems()
+    problems += syntax_module.schedule_problems()
+    problems += syntax_module.smoke_problems()
 
     pin = json.loads((ROOT / "data/upstream.json").read_text())["pin"]
     for name, document in (("scope", scope), ("cases", cases), ("config-baselines", index)):
