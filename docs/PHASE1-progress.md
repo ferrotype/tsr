@@ -2176,3 +2176,22 @@ adapter records the same distinct index/slice bounds classes per action and
 rejects unrelated panics. All 49 implemented module traces match; eight remain
 unimplemented and two retain visible failure-contract differences. Both path
 mapping regressions and focused clippy pass.
+
+### F3b continuation: real resolver cache ownership
+
+`InfoCache` now owns canonical package entries, including negative observations,
+with first-writer-wins publication and callback-safe enumeration. Resolvers can
+share it explicitly. Standalone tools can opt into a live host; the default
+constructor still refuses one, preserving the program snapshot boundary. Trace
+toggling is an exclusive resolver operation and never mutates shared options.
+Module results retain the first cached value but return a fresh traced result;
+type-reference results retain the latest value, matching their different Go
+stores. Concurrent cache publication and callback reentry have focused tests.
+
+The module adapter now uses the already-ported vfstest/iovfs host rather than
+MemorySnapshot, so live updates and absolute-path refusal exercise real host
+operations. Module resolution preserves the containing-file spelling and the
+pin's explicit invalid-resolution-kind failure. All **55 implemented module
+traces match**, including injected negative caches and both write policies;
+four other traces remain pending. Nine module tests, the compiler refusal
+regression and focused clippy pass. No benchmark or full corpus was run.

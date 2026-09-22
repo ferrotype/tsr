@@ -16,24 +16,16 @@
 //! on both sides, because a path is not required to be valid UTF-8 and
 //! `JsString` carries bytes.
 //!
-//! Three whole classes of action have no Rust counterpart, and each is
-//! recorded rather than worked around:
-//!
-//!   * A filesystem whose answers change. `Resolver::new` refuses a host with
-//!     no snapshot identity (crates/tsr_module/src/resolver.rs:111-113), so
-//!     the `mutate` action cannot be expressed at all.
-//!   * Changing `traceResolution` between two requests on one resolver. The
-//!     options are an `Arc<CompilerOptions>` fixed at construction
-//!     (resolver.rs:106-125), where the pin re-reads the field from the
-//!     caller's struct on every request (resolver.go:201-206). This is the only
-//!     way to reach a cache WRITE twice for one key, so the two cache-write
-//!     cases are unreachable here.
-//!   * Project reference redirects, entrypoint discovery, the typings
-//!     location and an injected package.json cache, none of which exist in
-//!     `tsr_module` at all.
+//! Standalone resolver traces explicitly use a live native-style test host.
+//! The production default constructor still requires an immutable snapshot.
+//! Redirects, entrypoint discovery and typings-location passes are the remaining
+//! recorded gaps; cache mutations and trace toggling call production APIs.
 
 use std::sync::atomic::{AtomicUsize, Ordering};
-use std::sync::Arc;
+use std::{
+    collections::BTreeMap,
+    sync::{Arc, RwLock},
+};
 
 use serde_json::{json, Map, Value};
 use tsr_core::{CompilerOptions, ModuleKind};
@@ -43,10 +35,7 @@ use tsr_module::{
     mangle_scoped_package_name, resolution_diagnostic, PackageId, ResolvedModule,
     ResolvedTypeReferenceDirective, Resolver, TraceArg,
 };
-use tsr_vfs::{
-    Entries, Error as VfsError, FileContent, FileInfo, FileSystem, MemoryBuilder, MemorySnapshot,
-    SnapshotId,
-};
+use tsr_vfs::{Entries, Error as VfsError, FileContent, FileInfo, FileSystem, SnapshotId};
 
 use crate::api::{self, Outcome};
 
@@ -65,67 +54,6 @@ const CASE_PREFIX: &str = "config/module/";
 /// says "present but not a counterpart" names the Rust function that was read
 /// and rejected, so the record cannot be mistaken for "nobody looked".
 const MISSING: &[(&str, &str, &str, &str)] = &[
-    (
-        "tsc/internal/module/resolver.go:resolutionState.getPackageJsonInfo",
-        "tsc/internal/module/resolver.go:1764-1809, whose negative entry is written at :1804-1808 \
-         and short-circuited at :1766-1779",
-        "the operation itself is present at crates/tsr_module/src/resolver.rs:139-199 and caches \
-         the negative answer as (exists, None) the same way. What is missing is the ability to \
-         OBSERVE the pinned contract: the case needs the host to gain a package.json between two \
-         requests, and Resolver::new returns Err(Error::MutableHost) for any host without a \
-         snapshot identity (resolver.rs:111-113), so a resolver can never see a second state of \
-         the filesystem. A port would need a resolver that accepts a live host, or an explicit \
-         invalidation entry point",
-        "crates/tsr_module/src/resolver.rs:111 (present but unreachable: no live host, no \
-         invalidation)",
-    ),
-    (
-        "tsc/internal/module/cache.go:moduleResolutionCache.Set",
-        "tsc/internal/module/cache.go:26-28 (LoadOrStore), written from resolver.go:325 after the \
-         read that skips it at :278-283",
-        "a resolution cache whose write is first-writer-wins, like the pin's LoadOrStore \
-         (cache.go:26-28). crates/tsr_module/src/resolver.rs:298 was read and rejected: it is a \
-         plain BTreeMap insert, which is LAST-writer-wins. Observing either semantics also needs \
-         the trace mode to change between two requests on one resolver, and the options are an \
-         Arc fixed at construction (resolver.rs:106-125) where the pin re-reads \
-         TraceResolution per request (resolver.go:201-206)",
-        "crates/tsr_module/src/resolver.rs:298 (wrong write semantics, and unobservable: options \
-         and host are both fixed for the resolver's lifetime)",
-    ),
-    (
-        "tsc/internal/module/cache.go:typeRefDirectiveResolutionCache.Set",
-        "tsc/internal/module/cache.go:46-48 (Store), written from resolver.go:262 after the read \
-         that skips it at :241-245",
-        "a type-reference cache whose write is last-writer-wins, like the pin's Store \
-         (cache.go:46-48). crates/tsr_module/src/type_references.rs:155 is a BTreeMap insert and \
-         its semantics DO match, but the case cannot run for the same two reasons as its module \
-         companion: no live host and no per-request trace mode",
-        "crates/tsr_module/src/type_references.rs:155 (matching semantics, unobservable)",
-    ),
-    (
-        "tsc/internal/module/resolver.go:NewResolverWithOptions",
-        "tsc/internal/module/resolver.go:180-199 with ResolverOptions at :159-161 and \
-         packagejson.InfoCache.Set at packagejson/cache.go:190-194",
-        "pub fn Resolver::with_options(host, options, typings_location, project_name, opts: \
-         ResolverOptions) taking an external package.json info cache, plus a public InfoCache \
-         type whose Set is a LoadOrStore that RETURNS the winning entry \
-         (packagejson/cache.go:190-194) and whose entries carry the three-state \
-         absent / present-with-nil-contents / present-with-contents. \
-         crates/tsr_module/src/resolver.rs:99 was read and rejected: the cache is a private \
-         BTreeMap field of Resolver, it is not injectable, its write is a plain insert, and its \
-         value tuple cannot represent a present entry with no contents",
-        "crates/tsr_module/src/resolver.rs:99 (private field; no injectable cache type)",
-    ),
-    (
-        "tsc/internal/module/resolver.go:Resolver.PackageJsonCacheEntries",
-        "tsc/internal/module/resolver.go:212-214, forwarding to packagejson.InfoCache.Range \
-         (packagejson/cache.go:196-198)",
-        "pub fn package_json_cache_entries(&self) -> impl Iterator<Item = (&JsString, &Entry)>, \
-         reporting the canonical key, the stored package directory and whether contents were \
-         read. The cache is the private BTreeMap at crates/tsr_module/src/resolver.rs:99 and \
-         nothing exposes it",
-        "crates/tsr_module/src/resolver.rs:99 (no accessor)",
-    ),
     (
         "tsc/internal/module/resolver.go:GetCompilerOptionsWithRedirect",
         "tsc/internal/module/resolver.go:139-147, called from newResolutionState (:103), \
@@ -215,7 +143,8 @@ fn hex(bytes: &[u8]) -> String {
 /// directory_exists through its own `stat`, which is below this wrapper and is
 /// therefore not counted twice.
 struct Counting {
-    inner: MemorySnapshot,
+    inner: RwLock<Arc<dyn FileSystem>>,
+    files: RwLock<BTreeMap<Vec<u8>, tsr_vfs::vfstest::InputFile>>,
     calls: AtomicUsize,
 }
 
@@ -230,34 +159,46 @@ impl Counting {
 
 impl FileSystem for Counting {
     fn use_case_sensitive_file_names(&self) -> bool {
-        self.inner.use_case_sensitive_file_names()
+        self.inner
+            .read()
+            .expect("fixture host lock")
+            .use_case_sensitive_file_names()
     }
     fn snapshot_id(&self) -> Option<SnapshotId> {
-        self.inner.snapshot_id()
+        None
     }
     fn read_file(&self, path: &[u8]) -> Result<Option<FileContent>, VfsError> {
         self.hit();
-        self.inner.read_file(path)
+        self.inner
+            .read()
+            .expect("fixture host lock")
+            .read_file(path)
     }
     fn stat(&self, path: &[u8]) -> Result<Option<FileInfo>, VfsError> {
         self.hit();
-        self.inner.stat(path)
+        self.inner.read().expect("fixture host lock").stat(path)
     }
     fn entries(&self, path: &[u8]) -> Result<Entries, VfsError> {
         self.hit();
-        self.inner.entries(path)
+        self.inner.read().expect("fixture host lock").entries(path)
     }
     fn realpath(&self, path: &[u8]) -> Result<JsString, VfsError> {
         self.hit();
-        self.inner.realpath(path)
+        self.inner.read().expect("fixture host lock").realpath(path)
     }
     fn file_exists(&self, path: &[u8]) -> Result<bool, VfsError> {
         self.hit();
-        self.inner.file_exists(path)
+        self.inner
+            .read()
+            .expect("fixture host lock")
+            .file_exists(path)
     }
     fn directory_exists(&self, path: &[u8]) -> Result<bool, VfsError> {
         self.hit();
-        self.inner.directory_exists(path)
+        self.inner
+            .read()
+            .expect("fixture host lock")
+            .directory_exists(path)
     }
 }
 
@@ -433,21 +374,38 @@ enum Step {
     Unreachable,
 }
 
-fn build_host(action: &Value) -> Result<Arc<Counting>, Bad> {
-    let cwd = text(action, "cwd")?.as_bytes().to_vec();
-    let case_sensitive = flag(action, "case_sensitive")?;
-    let mut builder = MemoryBuilder::new(&cwd, case_sensitive);
-    for entry in list(action, "files")? {
+fn apply_files(
+    files: &mut BTreeMap<Vec<u8>, tsr_vfs::vfstest::InputFile>,
+    entries: &[Value],
+) -> Result<(), Bad> {
+    use tsr_vfs::{
+        iofs::{FileMode, MapFile},
+        vfstest::InputFile,
+    };
+    for entry in entries {
         let path = text(entry, "path")?.as_bytes().to_vec();
-        match text(entry, "kind")? {
-            "file" => builder.insert_loaded(&path, text(entry, "content")?.as_bytes().to_vec()),
-            "symlink" => builder.insert_symlink(&path, text(entry, "target")?.as_bytes()),
-            "directory" => builder.insert_directory(&path),
+        let file = match text(entry, "kind")? {
+            "file" => InputFile::Text(text(entry, "content")?.as_bytes().to_vec()),
+            "symlink" => {
+                InputFile::File(tsr_vfs::vfstest::symlink(text(entry, "target")?.as_bytes()))
+            }
+            "directory" => InputFile::File(MapFile {
+                mode: FileMode::DIR,
+                ..MapFile::default()
+            }),
             other => return Err(format!("unknown fixture entry kind {other:?}")),
-        }
+        };
+        files.insert(path, file);
     }
+    Ok(())
+}
+fn build_host(action: &Value) -> Result<Arc<Counting>, Bad> {
+    let mut files = BTreeMap::new();
+    apply_files(&mut files, list(action, "files")?)?;
+    let fs = tsr_vfs::vfstest::from_map(&files, flag(action, "case_sensitive")?).into_vfs();
     Ok(Arc::new(Counting {
-        inner: builder.finish(),
+        inner: RwLock::new(Arc::new(fs)),
+        files: RwLock::new(files),
         calls: AtomicUsize::new(0),
     }))
 }
@@ -456,14 +414,14 @@ fn build_host(action: &Value) -> Result<Arc<Counting>, Bad> {
 fn apply(state: &mut State, action: &Value, row: &mut Map<String, Value>) -> Result<Step, Bad> {
     let op = api::action_op(action);
     match op {
-        "new_resolver" => {
+        "new_resolver" | "new_resolver_with_options" => {
             // The pin's resolver carries a typings location, a project name
             // and extra extensions; tsr_module's does not. A case that leaves
             // all three empty is unaffected, so only a case that uses them is
             // recorded as a gap.
             if !text(action, "typings_location")?.is_empty()
                 || !text(action, "project_name")?.is_empty()
-                || !list(action, "extra_extensions")?.is_empty()
+                || op == "new_resolver" && !list(action, "extra_extensions")?.is_empty()
             {
                 return Ok(Step::Unreachable);
             }
@@ -471,29 +429,101 @@ fn apply(state: &mut State, action: &Value, row: &mut Map<String, Value>) -> Res
             let host = build_host(action)?;
             let compiler_options = Arc::new(options(field(action, "options")?)?);
             let dynamic: Arc<dyn FileSystem> = host.clone();
-            let resolver = Resolver::new(dynamic, compiler_options, &cwd)
+            let mut settings = tsr_module::ResolverOptions {
+                allow_live_host: true,
+                ..Default::default()
+            };
+            if op == "new_resolver_with_options" {
+                let cache = Arc::new(tsr_module::InfoCache::new(
+                    &cwd,
+                    flag(action, "case_sensitive")?,
+                ));
+                let mut seeds = Vec::new();
+                for seed in list(action, "package_json_cache")? {
+                    let path = text(seed, "package_json_path")?.as_bytes();
+                    let directory = tsr_tspath::directory(path);
+                    let contents = match seed.get("contents") {
+                        None | Some(Value::Null) => None,
+                        Some(Value::String(source)) => Some(Arc::new(
+                            tsr_module::PackageJson::parse(&directory, source.as_bytes()),
+                        )),
+                        _ => return Err("cache contents must be a string or null".into()),
+                    };
+                    let entry = Arc::new(tsr_module::InfoCacheEntry {
+                        package_directory: JsString::from_bytes(directory.as_slice()),
+                        directory_exists: flag(seed, "directory_exists")?,
+                        contents,
+                    });
+                    let actual = cache.set(path, entry.clone());
+                    seeds.push(json!([
+                        hex(path),
+                        Arc::ptr_eq(&actual, &entry),
+                        hex(actual.package_directory.as_bytes()),
+                        actual.exists()
+                    ]));
+                }
+                row.insert("cache_seeds".into(), json!(seeds));
+                settings.package_json_cache = Some(cache);
+            }
+            let resolver = Resolver::with_options(dynamic, compiler_options, &cwd, settings)
                 .map_err(|error| format!("Resolver::new refused the fixture host: {error:?}"))?;
             state.host = Some(host);
             state.resolver = Some(resolver);
             row.insert("created".into(), Value::Bool(true));
             Ok(Step::Done)
         }
-        // Nothing in `tsr_module` can run these, and each one's reason is the
-        // MISSING row of the case's own operation:
-        //   * an injected package.json cache, a filesystem whose answers
-        //     change and a per-request trace mode are structural gaps;
-        //   * project reference redirects, entrypoint discovery and the cache
-        //     accessor do not exist at all;
-        //   * the five pure helpers exist only as private or foreign-crate
-        //     code, so there is no entry point to call.
-        "new_resolver_with_options"
-        | "mutate"
-        | "set_trace"
-        | "resolve_with_redirect"
-        | "compiler_options_with_redirect"
-        | "entrypoints"
-        | "package_json_cache_entries" => Ok(Step::Unreachable),
+        // Remaining production gaps are recorded before partial results escape.
+        "resolve_with_redirect" | "compiler_options_with_redirect" | "entrypoints" => {
+            Ok(Step::Unreachable)
+        }
 
+        "mutate" => {
+            let host = state.host.as_ref().ok_or("mutate before resolver")?;
+            let sensitive = host.use_case_sensitive_file_names();
+            let mut files = host.files.write().expect("fixture files lock");
+            apply_files(&mut files, list(action, "add")?)?;
+            for path in strings(action, "remove")? {
+                files.remove(&path);
+            }
+            let fs = tsr_vfs::vfstest::from_map(&files, sensitive).into_vfs();
+            *host.inner.write().expect("fixture host lock") = Arc::new(fs);
+            row.insert("file_count".into(), json!(files.len()));
+            Ok(Step::Done)
+        }
+        "set_trace" => {
+            let enabled = flag(action, "enabled")?;
+            state
+                .resolver
+                .as_mut()
+                .ok_or("set_trace before resolver")?
+                .set_trace_resolution(enabled);
+            row.insert("trace_resolution".into(), json!(enabled));
+            Ok(Step::Done)
+        }
+        "package_json_cache_entries" => {
+            let mut entries = Vec::new();
+            state
+                .resolver
+                .as_ref()
+                .ok_or("cache entries before resolver")?
+                .package_json_cache_entries(|key, entry| {
+                    entries.push((key.clone(), entry.clone()));
+                    true
+                });
+            entries.sort_by(|a, b| a.0.cmp(&b.0));
+            row.insert(
+                "entries".into(),
+                json!(entries
+                    .iter()
+                    .map(|(key, entry)| json!([
+                        hex(key.as_bytes()),
+                        hex(entry.package_directory.as_bytes()),
+                        entry.exists()
+                    ]))
+                    .collect::<Vec<_>>()),
+            );
+            Ok(Step::Done)
+        }
         "resolve" => {
             let resolver = state
                 .resolver
@@ -834,6 +864,10 @@ pub fn observe(request: &Value) -> Option<Outcome> {
                     || message.starts_with("range end index ")
                 {
                     "runtime: slice bounds out of range"
+                } else if message.starts_with("Unexpected moduleResolution: ")
+                    || message.starts_with("vfs: path ")
+                {
+                    message
                 } else {
                     return Some(Outcome::Failed(format!("unexpected panic: {message}")));
                 };

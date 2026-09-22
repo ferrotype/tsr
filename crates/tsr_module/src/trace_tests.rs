@@ -117,13 +117,20 @@ fn trace_scope_retires_after_error_and_native_unwind() {
         ..Default::default()
     };
     let mut resolver = Resolver::new(Arc::new(files), Arc::new(options), b"/repo").unwrap();
-    assert!(resolver
-        .resolve(
+    let outcome = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+        let _ = resolver.resolve(
             b"missing",
             b"/repo/main.ts",
-            tsr_core::ModuleKind::COMMON_JS
-        )
-        .is_err());
+            tsr_core::ModuleKind::COMMON_JS,
+        );
+    }));
+    assert_eq!(
+        outcome
+            .unwrap_err()
+            .downcast_ref::<String>()
+            .map(String::as_str),
+        Some("Unexpected moduleResolution: 999")
+    );
     assert!(!resolver.tracer.active);
     resolver.take_trace();
     resolver.package_scope(b"/repo").unwrap();

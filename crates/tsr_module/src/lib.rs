@@ -5,7 +5,7 @@ mod resolver;
 pub use resolver::{
     get_conditions, get_types_package_name, is_relative, mangle_scoped_package_name,
     resolve_config, resolve_package_directory, Error, PackageContents, PackageId, PackageJson,
-    Probe, ResolvedModule, Resolver,
+    Probe, ResolvedModule, Resolver, ResolverOptions,
 };
 
 mod diagnostic;
@@ -33,3 +33,6 @@ pub use paths::ParsedPatterns;
 pub use util::{
     package_name_from_types_package_name, parse_node_module_from_path, unmangle_scoped_package_name,
 };
+
+mod package_cache;
+pub use package_cache::{InfoCache, InfoCacheEntry};

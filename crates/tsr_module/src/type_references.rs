@@ -108,7 +108,7 @@ impl Resolver {
         containing_file: &[u8],
         mode: ModuleKind,
     ) -> Result<&ResolvedTypeReferenceDirective, Error> {
-        self.tracer.begin(self.options.trace_resolution.is_true());
+        self.tracer.begin(self.trace_resolution);
         let directory = path::directory(containing_file);
         let inferred = containing_file.ends_with(INFERRED_TYPES_CONTAINING_FILE);
         let key = TypeKey {
@@ -117,7 +117,7 @@ impl Resolver {
             mode,
             inferred,
         };
-        if !self.options.trace_resolution.is_true() && self.type_cache.contains_key(&key) {
+        if !self.trace_resolution && self.type_cache.contains_key(&key) {
             return Ok(&self.type_cache[&key]);
         }
         let result = self.trace_operation(|resolver| {
