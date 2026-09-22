@@ -2195,3 +2195,21 @@ pin's explicit invalid-resolution-kind failure. All **55 implemented module
 traces match**, including injected negative caches and both write policies;
 four other traces remain pending. Nine module tests, the compiler refusal
 regression and focused clippy pass. No benchmark or full corpus was run.
+
+### F3b continuation: reverse package entrypoints
+
+The resolver now discovers package entrypoints from exact/wildcard export maps
+and from directory fallback. Results retain symlink and real paths, rewriteable
+ending categories and required/excluded conditions. An explicit work stack
+preserves native depth-first order through nested arrays and condition objects.
+The checker reuses the shared JS-extension conversion instead of its duplicate.
+
+The native fixture was expanded without dropping its original symlink/pattern
+observations: it now covers nested condition exclusions, `types` short-circuiting,
+invalid/null targets, array alternatives, directory-search enablement and nested
+node_modules exclusion. Both adapters expose condition sets with nilness and
+sorted members. All four discovery calls match Go (5, 5, 2 and 1 entrypoints),
+including every field and condition set, in the focused native capture at
+`target/phase1/f3b-entrypoints-native-03`. The original module schedule now has
+56 implemented matching cases, with three remaining production gaps. Focused
+clippy passes; final inventory/evidence regeneration will include the expansion.

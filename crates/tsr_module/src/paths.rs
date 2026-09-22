@@ -233,7 +233,7 @@ impl Resolver {
         Ok(None)
     }
 }
-fn replace_first(pattern: &[u8], replacement: &[u8]) -> Vec<u8> {
+pub(super) fn replace_first(pattern: &[u8], replacement: &[u8]) -> Vec<u8> {
     if let Some(index) = pattern.iter().position(|&b| b == b'*') {
         [&pattern[..index], replacement, &pattern[index + 1..]].concat()
     } else {

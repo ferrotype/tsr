@@ -61,3 +61,15 @@ impl crate::PackageId {
         )
     }
 }
+
+/// port: tsc/internal/module/util.go:TryGetJSExtensionForFile
+pub fn js_extension_for_file(file: &[u8], options: &tsr_core::CompilerOptions) -> &'static [u8] {
+    match path::try_get_extension_from_path(file) {
+        b".tsx" if options.jsx == tsr_core::JsxEmit::PRESERVE => b".jsx",
+        b".ts" | b".d.ts" | b".tsx" => b".js",
+        ext @ (b".js" | b".jsx" | b".json") => ext,
+        b".d.mts" | b".mts" | b".mjs" => b".mjs",
+        b".d.cts" | b".cts" | b".cjs" => b".cjs",
+        _ => b"",
+    }
+}

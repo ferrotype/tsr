@@ -36,3 +36,7 @@ pub use util::{
 
 mod package_cache;
 pub use package_cache::{InfoCache, InfoCacheEntry};
+
+mod entrypoints;
+pub use entrypoints::{Ending, ResolvedEntrypoint};
+pub use util::js_extension_for_file;

@@ -79,21 +79,6 @@ const MISSING: &[(&str, &str, &str, &str)] = &[
         "crates/tsr_module/src/trace.rs (absent) and resolver.rs:81 (cache key omits the redirect)",
     ),
     (
-        "tsc/internal/module/resolver.go:Resolver.GetEntrypointsFromPackageJsonInfo",
-        "tsc/internal/module/resolver.go:2168-2225 with loadEntrypointsFromExportMap at :2244-2357, \
-         createResolvedEntrypointHandlingSymlink at :2227-2242 and ResolvedEntrypoint at \
-         :2147-2166",
-        "pub fn entrypoints(&mut self, package: &PackageJson, package_name: &[u8], \
-         directory_search: bool) -> Vec<ResolvedEntrypoint>, where ResolvedEntrypoint carries \
-         the real path, the symlinked path, the module specifier that reaches it, an Ending and \
-         the include/exclude condition sets (resolver.go:2133-2159). The whole reverse direction \
-         is absent: loadEntrypointsFromExportMap, createResolvedEntrypointHandlingSymlink, \
-         getMatchedStarForPatternEntrypoint and extensions.Array have no Rust counterpart. \
-         tsr_checker has an unrelated `Ending` from modulespecifiers/preferences.go and a \
-         tryGetModuleNameFromExports, which computes the opposite direction",
-        "crates/tsr_module/src/package_maps.rs (absent; the crate only resolves forwards)",
-    ),
-    (
         "tsc/internal/module/resolver.go:Resolver.tryResolveFromTypingsLocation",
         "tsc/internal/module/resolver.go:339-366, called unconditionally from ResolveModuleName \
          at :324",
@@ -473,9 +458,7 @@ fn apply(state: &mut State, action: &Value, row: &mut Map<String, Value>) -> Res
             Ok(Step::Done)
         }
         // Remaining production gaps are recorded before partial results escape.
-        "resolve_with_redirect" | "compiler_options_with_redirect" | "entrypoints" => {
-            Ok(Step::Unreachable)
-        }
+        "resolve_with_redirect" | "compiler_options_with_redirect" => Ok(Step::Unreachable),
 
         "mutate" => {
             let host = state.host.as_ref().ok_or("mutate before resolver")?;
@@ -498,6 +481,45 @@ fn apply(state: &mut State, action: &Value, row: &mut Map<String, Value>) -> Res
                 .ok_or("set_trace before resolver")?
                 .set_trace_resolution(enabled);
             row.insert("trace_resolution".into(), json!(enabled));
+            Ok(Step::Done)
+        }
+        "entrypoints" => {
+            let resolver = state
+                .resolver
+                .as_mut()
+                .ok_or("entrypoints before resolver")?;
+            let package = resolver
+                .package_scope(text(action, "directory")?.as_bytes())
+                .map_err(|e| e.to_string())?
+                .ok_or("entrypoints without package scope")?;
+            let entries = resolver
+                .entrypoints(
+                    &package,
+                    text(action, "package_name")?.as_bytes(),
+                    flag(action, "enable_directory_search")?,
+                )
+                .map_err(|e| e.to_string())?;
+            row.insert(
+                "entrypoints".into(),
+                json!(entries
+                    .iter()
+                    .map(|entry| json!([
+                        hex(entry.resolved_file_name.as_bytes()),
+                        hex(entry.original_file_name.as_bytes()),
+                        hex(entry.symlink_or_realpath()),
+                        hex(entry.module_specifier.as_bytes()),
+                        entry.ending as u8,
+                        entry.include_conditions.as_ref().map(|values| values
+                            .iter()
+                            .map(|value| hex(value.as_bytes()))
+                            .collect::<Vec<_>>()),
+                        entry.exclude_conditions.as_ref().map(|values| values
+                            .iter()
+                            .map(|value| hex(value.as_bytes()))
+                            .collect::<Vec<_>>()),
+                    ]))
+                    .collect::<Vec<_>>()),
+            );
             Ok(Step::Done)
         }
         "package_json_cache_entries" => {
