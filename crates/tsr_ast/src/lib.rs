@@ -374,3 +374,5 @@ pub mod utilities;
 pub mod utilities_tail;
 
 pub mod utilities_middle;
+
+pub mod span_map;

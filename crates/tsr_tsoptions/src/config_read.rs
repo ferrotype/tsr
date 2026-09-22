@@ -34,6 +34,16 @@ pub fn get_parsed_command_line_of_config_file_path(
     raw: &ConfigValue,
     host: &dyn ParseConfigHost,
 ) -> Result<ReadConfigResult, Error> {
+    read_with_cache(name, path, options, raw, host, None)
+}
+pub(crate) fn read_with_cache(
+    name: &[u8],
+    path: JsString,
+    options: &CompilerOptions,
+    raw: &ConfigValue,
+    host: &dyn ParseConfigHost,
+    cache: Option<&crate::ExtendedConfigCache<'_>>,
+) -> Result<ReadConfigResult, Error> {
     let Some(content) = host.fs().read_file(name)? else {
         return Ok(ReadConfigResult {
             command_line: None,
@@ -44,13 +54,14 @@ pub fn get_parsed_command_line_of_config_file_path(
         });
     };
     let source = TsConfigSourceFile::parse(JsString::from_bytes(name), path, content.text);
-    let command_line = crate::parse_json_source_file_config_file_content(
+    let command_line = crate::config_parse::parse_source_with_cache(
         source,
         host,
         &tsr_tspath::directory(name),
         options,
         raw,
         name,
+        cache,
     )?;
     Ok(ReadConfigResult {
         command_line: Some(command_line),

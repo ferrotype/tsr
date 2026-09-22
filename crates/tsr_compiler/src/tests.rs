@@ -123,7 +123,7 @@ fn resolver_scope_routes_retained_files_and_rejects_foreign_generations() {
 }
 
 #[test]
-fn unimplemented_resolution_does_not_become_unresolved_success() {
+fn invalid_resolution_kind_preserves_the_native_refusal() {
     use tsr_vfs::FileSystem;
     let mut builder = MemoryBuilder::new(b"/src", true);
     builder.insert_physical(b"/src/main.ts", b"import 'pkg'".as_slice());
@@ -141,8 +141,14 @@ fn unimplemented_resolution_does_not_become_unresolved_success() {
         b"/src",
     )
     .unwrap();
-    assert!(matches!(
-        resolver.resolve(b"pkg", b"/src/main.ts", tsr_core::ModuleKind::ESNEXT),
-        Err(tsr_module::Error::Unsupported("module resolution kind"))
-    ));
+    let outcome = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+        let _ = resolver.resolve(b"pkg", b"/src/main.ts", tsr_core::ModuleKind::ESNEXT);
+    }));
+    assert_eq!(
+        outcome
+            .unwrap_err()
+            .downcast_ref::<String>()
+            .map(String::as_str),
+        Some("Unexpected moduleResolution: -1")
+    );
 }

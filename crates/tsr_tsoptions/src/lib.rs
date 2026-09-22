@@ -202,9 +202,12 @@ pub struct ParsedCommandLine {
     pub errors: Vec<tsr_ast::Diagnostic>,
     pub raw: ConfigValue,
     pub compile_on_save: Option<bool>,
-    pub config_specs: Option<ConfigFileSpecs>,
-    pub config_base_path: JsString,
-    pub config_case_sensitive: bool,
+    config_specs: Option<ConfigFileSpecs>,
+    config_base_path: JsString,
+    config_case_sensitive: bool,
+    wildcard_directories_cache:
+        std::sync::OnceLock<Option<tsr_core::collections::OrderedMap<JsString, bool>>>,
+    caches: parsed_accessors::ParsedCaches,
     pub config_dependencies: Vec<std::sync::Arc<TsConfigSourceFile>>,
     pub type_acquisition: Option<TypeAcquisition>,
     pub project_references: Option<Vec<ProjectReference>>,
@@ -241,9 +244,11 @@ impl ParsedCommandLine {
             errors: Vec::new(),
             raw: ConfigValue::Null,
             compile_on_save: None,
+            wildcard_directories_cache: std::sync::OnceLock::new(),
             config_specs: None,
             config_base_path: JsString::default(),
             config_case_sensitive: true,
+            caches: crate::parsed_accessors::ParsedCaches::default(),
             config_dependencies: Vec::new(),
             type_acquisition: None,
             project_references: None,
@@ -314,7 +319,7 @@ pub use config_read::{
 
 mod wildcard_directories;
 pub use wildcard_directories::{
-    wildcard_directories, wildcard_directory_from_spec, WildcardDirectory,
+    canonical_key, wildcard_directories, wildcard_directory_from_spec, WildcardDirectory,
 };
 
 pub use config_parse::{parse_json_config_file_content, type_acquisition_from_json};
@@ -323,3 +328,51 @@ mod command_line;
 pub use command_line::{
     input_option_name, parse_build_command_line, parse_command_line, ParsedBuildCommandLine,
 };
+
+#[cfg(feature = "harness")]
+pub use command_line::parse_command_line_test_worker;
+
+mod parsed_accessors;
+pub use parsed_accessors::{
+    resolve_config_file_name_of_project_reference, resolve_project_reference_path, ParsedOptions,
+    SourceOutputAndProjectReference, SourceOutputNames,
+};
+
+pub mod output_paths;
+
+mod option_diagnostics;
+pub use convert_options::invalid_enum_type_diagnostic;
+pub use option_diagnostics::{
+    build_worker_diagnostics, extra_key_diagnostics, parse_command_line_worker_diagnostics,
+    watch_worker_diagnostics, AlternateModeDiagnostics, ParseCommandLineWorkerDiagnostics,
+};
+
+mod option_maps;
+pub use config_substitution::substituted_strings;
+pub use option_maps::{
+    compiler_option_name_map, convert_option_to_absolute_path, convert_options_with_absolute_paths,
+    CommandLineOptionNameMap,
+};
+
+pub use config_parse::{
+    array_string as config_prop_array_element_value, diagnostic_at_reference_syntax,
+    options_syntax_by_array_element_value,
+};
+pub use config_syntax::is_double_quoted_string;
+
+mod option_parser;
+pub use option_parser::{convert_map_to_options, OptionParser};
+
+pub use config_text::convert_to_object;
+
+pub use config_files::{
+    has_file_with_higher_priority_extension, remove_wildcard_files_with_lower_priority_extension,
+};
+
+pub use config_parse::{parse_project_reference, ProjectReferenceParseResult};
+
+pub use config_value::normalize_json_value;
+
+mod extended_config;
+pub use config_parse::{parse_extended_config, ExtendedConfigCacheEntry};
+pub use extended_config::ExtendedConfigCache;

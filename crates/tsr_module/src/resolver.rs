@@ -65,7 +65,7 @@ pub struct PackageJson {
 pub struct PackageContents {
     pub contents: crate::package_json::Fields,
     pub parseable: bool,
-    pub(super) version_paths: std::sync::OnceLock<crate::package_maps::VersionPaths>,
+    pub(super) version_paths: std::sync::OnceLock<crate::package_maps::VersionSelection>,
 }
 impl std::ops::Deref for PackageJson {
     type Target = PackageContents;
@@ -73,7 +73,38 @@ impl std::ops::Deref for PackageJson {
         &self.shared
     }
 }
+/// Resolver construction policy. Program snapshots use the default immutable
+/// host requirement. Standalone tools may explicitly opt into a live host;
+/// such resolvers retain observations until discarded, as the pin does.
+#[derive(Default)]
+pub struct ResolverOptions {
+    pub package_json_cache: Option<Arc<crate::InfoCache>>,
+    pub allow_live_host: bool,
+    pub typings_location: JsString,
+    pub project_name: JsString,
+    pub extra_extensions: Vec<JsString>,
+}
 impl PackageJson {
+    pub fn parse(directory: &[u8], bytes: &[u8]) -> Self {
+        let parsed = crate::package_json::parse(bytes);
+        Self {
+            directory: JsString::from_bytes(directory),
+            shared: Arc::new(PackageContents {
+                contents: parsed.fields,
+                parseable: parsed.parseable,
+                version_paths: std::sync::OnceLock::new(),
+            }),
+        }
+    }
+    pub(crate) fn with_directory(self: &Arc<Self>, directory: &[u8]) -> Arc<Self> {
+        if self.directory.as_bytes() == directory {
+            return self.clone();
+        }
+        Arc::new(Self {
+            directory: JsString::from_bytes(directory),
+            shared: self.shared.clone(),
+        })
+    }
     pub fn string(&self, key: &str) -> Option<&[u8]> {
         self.contents.get(key)?.as_str().map(str::as_bytes)
     }
@@ -83,6 +114,11 @@ struct Key {
     directory: JsString,
     name: JsString,
     mode: ModuleKind,
+    redirect: JsString,
+}
+enum ResolutionSlot {
+    Cached(Key),
+    Fresh,
 }
 /// The host and options are immutable for this resolver's entire lifetime.
 /// Cache hits borrow the entry; callers explicitly clone only escaping values.
@@ -94,9 +130,16 @@ pub struct Resolver {
     pub(super) package_directory_only: bool,
     pub(super) host: Arc<dyn FileSystem>,
     pub(super) options: Arc<CompilerOptions>,
+    pub(super) operation_base_options: Option<Arc<CompilerOptions>>,
+    typings_location: JsString,
+    project_name: JsString,
+    extra_extensions: Vec<JsString>,
     pub(super) cwd: JsString,
     cache: BTreeMap<Key, ResolvedModule>,
-    packages: BTreeMap<JsString, (bool, Option<Arc<PackageJson>>)>,
+    pub(super) option_patterns: std::sync::OnceLock<crate::ParsedPatterns>,
+    packages: Arc<crate::InfoCache>,
+    pub(super) trace_resolution: bool,
+    last_resolution: Option<ResolvedModule>,
     pub(super) tracer: crate::trace::Tracer,
     probes: Vec<Probe>,
     pub(super) type_cache:
@@ -108,17 +151,40 @@ impl Resolver {
         options: Arc<CompilerOptions>,
         cwd: &[u8],
     ) -> Result<Self, Error> {
-        if host.snapshot_id().is_none() {
+        Self::with_options(host, options, cwd, ResolverOptions::default())
+    }
+    /// port: tsc/internal/module/resolver.go:NewResolverWithOptions
+    pub fn with_options(
+        host: Arc<dyn FileSystem>,
+        options: Arc<CompilerOptions>,
+        cwd: &[u8],
+        settings: ResolverOptions,
+    ) -> Result<Self, Error> {
+        if host.snapshot_id().is_none() && !settings.allow_live_host {
             return Err(Error::MutableHost);
         }
+        let packages = settings.package_json_cache.unwrap_or_else(|| {
+            Arc::new(crate::InfoCache::new(
+                cwd,
+                host.use_case_sensitive_file_names(),
+            ))
+        });
+        let trace_resolution = options.trace_resolution.is_true();
         Ok(Self {
             config_lookup: false,
             package_directory_only: false,
             host,
             options,
+            operation_base_options: None,
+            typings_location: settings.typings_location,
+            project_name: settings.project_name,
+            extra_extensions: settings.extra_extensions,
             cwd: JsString::from_bytes(cwd),
             cache: BTreeMap::new(),
-            packages: BTreeMap::new(),
+            option_patterns: std::sync::OnceLock::new(),
+            packages,
+            trace_resolution,
+            last_resolution: None,
             tracer: crate::trace::Tracer::default(),
             probes: Vec::new(),
             type_cache: BTreeMap::new(),
@@ -136,67 +202,76 @@ impl Resolver {
     pub fn host(&self) -> &dyn FileSystem {
         self.host.as_ref()
     }
+    /// Toggle tracing without mutating shared compiler options or discarding
+    /// caches. Traced calls bypass reads but preserve native cache write rules.
+    pub fn set_trace_resolution(&mut self, enabled: bool) {
+        self.trace_resolution = enabled;
+    }
+    /// port: tsc/internal/module/resolver.go:Resolver.PackageJsonCacheEntries
+    pub fn package_json_cache_entries(
+        &self,
+        visit: impl FnMut(&JsString, &Arc<crate::InfoCacheEntry>) -> bool,
+    ) {
+        self.packages.range(visit);
+    }
+    /// port: tsc/internal/module/resolver.go:resolutionState.getPackageJsonInfo
     pub fn package_json(
         &mut self,
         directory: &[u8],
     ) -> Result<Option<Arc<PackageJson>>, tsr_vfs::Error> {
         let file = path::combine(directory, &[b"package.json"]);
-        let key = path::to_path(
-            &file,
-            self.cwd.as_bytes(),
-            self.host.use_case_sensitive_file_names(),
-        );
-        if let Some((exists, cached)) = self.packages.get(&key) {
-            if cached.is_some() {
+        if let Some(cached) = self.packages.get(&file) {
+            if cached.exists() {
                 trace!(
                     self,
                     diagnostics::File_0_exists_according_to_earlier_cached_lookups,
                     &file
                 );
-            } else if *exists {
+            } else if cached.directory_exists {
                 trace!(
                     self,
                     diagnostics::File_0_does_not_exist_according_to_earlier_cached_lookups,
                     &file
                 );
             }
-            return Ok(cached.as_ref().map(|cached| {
-                if cached.directory.as_bytes() == directory {
-                    cached.clone()
-                } else {
-                    Arc::new(PackageJson {
-                        directory: JsString::from_bytes(directory),
-                        shared: Arc::clone(&cached.shared),
-                    })
-                }
-            }));
+            return Ok(cached
+                .contents
+                .as_ref()
+                .map(|contents| contents.with_directory(directory)));
         }
         let directory_exists = self.host.directory_exists(directory)?;
-        let result = if directory_exists && self.host.file_exists(&file)? {
+        let contents = if directory_exists && self.host.file_exists(&file)? {
             let content = self.host.read_file(&file)?;
-            let parsed = crate::package_json::parse(
+            trace!(self, diagnostics::Found_package_json_at_0, &file);
+            Some(Arc::new(PackageJson::parse(
+                directory,
                 content
                     .as_ref()
                     .map_or(b"".as_slice(), |file| file.text.as_bytes()),
-            );
-            trace!(self, diagnostics::Found_package_json_at_0, &file);
-            Some(Arc::new(PackageJson {
-                directory: JsString::from_bytes(directory),
-                shared: Arc::new(PackageContents {
-                    contents: parsed.fields,
-                    parseable: parsed.parseable,
-                    version_paths: std::sync::OnceLock::new(),
-                }),
-            }))
+            )))
         } else {
             if directory_exists {
                 trace!(self, diagnostics::File_0_does_not_exist, &file);
             }
             None
         };
-        self.packages
-            .insert(key, (directory_exists, result.clone()));
-        Ok(result)
+        let present = contents.is_some();
+        let winner = self.packages.set(
+            &file,
+            Arc::new(crate::InfoCacheEntry {
+                package_directory: JsString::from_bytes(directory),
+                directory_exists,
+                contents,
+            }),
+        );
+        Ok(if present {
+            winner
+                .contents
+                .as_ref()
+                .map(|contents| contents.with_directory(directory))
+        } else {
+            None
+        })
     }
 
     pub fn package_scope(
@@ -206,6 +281,9 @@ impl Resolver {
         for dir in path::ancestors(directory) {
             if let Some(info) = self.package_json(&dir)? {
                 return Ok(Some(info));
+            }
+            if dir == self.typings_location.as_bytes() {
+                break;
             }
         }
         Ok(None)
@@ -228,15 +306,40 @@ impl Resolver {
         containing_file: &[u8],
         mode: ModuleKind,
     ) -> Result<&ResolvedModule, Error> {
-        self.tracer.begin(self.options.trace_resolution.is_true());
-        let directory = path::directory(&path::absolute(containing_file, self.cwd.as_bytes()));
+        self.resolve_with_redirect(name, containing_file, mode, None)
+    }
+    pub fn resolve_with_redirect(
+        &mut self,
+        name: &[u8],
+        containing_file: &[u8],
+        mode: ModuleKind,
+        reference: Option<crate::ResolvedProjectReference<'_>>,
+    ) -> Result<&ResolvedModule, Error> {
+        let slot = self.with_redirect(reference, |resolver| {
+            resolver.resolve_in_context(name, containing_file, mode, reference)
+        })?;
+        Ok(match slot {
+            ResolutionSlot::Cached(key) => &self.cache[&key],
+            ResolutionSlot::Fresh => self.last_resolution.as_ref().expect("fresh resolution"),
+        })
+    }
+    fn resolve_in_context(
+        &mut self,
+        name: &[u8],
+        containing_file: &[u8],
+        mode: ModuleKind,
+        reference: Option<crate::ResolvedProjectReference<'_>>,
+    ) -> Result<ResolutionSlot, Error> {
+        self.tracer.begin(self.trace_resolution);
+        let directory = path::directory(containing_file);
         let key = Key {
             directory: JsString::from_bytes(directory.as_slice()),
             name: JsString::from_bytes(name),
             mode,
+            redirect: JsString::from_bytes(reference.map_or(b"".as_slice(), |r| r.config_name)),
         };
-        if !self.options.trace_resolution.is_true() && self.cache.contains_key(&key) {
-            return Ok(&self.cache[&key]);
+        if !self.trace_resolution && self.cache.contains_key(&key) {
+            return Ok(ResolutionSlot::Cached(key));
         }
         let result = self.trace_operation(|resolver| {
             trace!(
@@ -245,6 +348,7 @@ impl Resolver {
                 name,
                 containing_file
             );
+            resolver.trace_redirect(reference);
             let resolution = resolver.options.module_resolution_kind();
             let resolution_name = match resolution {
                 ModuleResolutionKind::NODE16 => b"Node16".as_slice(),
@@ -293,10 +397,71 @@ impl Resolver {
                     );
                 }
             }
-            outcome
+            outcome.and_then(|original| resolver.try_typings_location(name, original))
         })?;
-        self.cache.insert(key.clone(), result);
-        Ok(&self.cache[&key])
+        if self.cache.contains_key(&key) {
+            // LoadOrStore retains the first entry, but a traced caller receives
+            // its fresh result rather than the cached winner.
+            self.last_resolution = Some(result);
+            Ok(ResolutionSlot::Fresh)
+        } else {
+            self.cache.insert(key.clone(), result);
+            Ok(ResolutionSlot::Cached(key))
+        }
+    }
+    /// port: tsc/internal/module/resolver.go:Resolver.tryResolveFromTypingsLocation
+    fn try_typings_location(
+        &mut self,
+        name: &[u8],
+        original: ResolvedModule,
+    ) -> Result<ResolvedModule, Error> {
+        if self.typings_location.is_empty()
+            || is_relative(name)
+            || original.is_resolved()
+                && matches!(
+                    original.extension.as_bytes(),
+                    b".ts"
+                        | b".tsx"
+                        | b".mts"
+                        | b".cts"
+                        | b".d.ts"
+                        | b".d.mts"
+                        | b".d.cts"
+                        | b".json"
+                )
+        {
+            return Ok(original);
+        }
+        let base = self
+            .operation_base_options
+            .as_ref()
+            .unwrap_or(&self.options)
+            .clone();
+        let location = self.typings_location.clone();
+        trace!(self, diagnostics::Auto_discovery_for_typings_is_enabled_in_project_0_Running_extra_resolution_pass_for_module_1_using_cache_location_2,
+            &self.project_name.clone(), name, &location);
+        // The fallback uses the base compiler options and no project redirect.
+        self.with_redirect(
+            Some(crate::ResolvedProjectReference {
+                config_name: b"",
+                compiler_options: Some(&base),
+            }),
+            |resolver| {
+                let context =
+                    crate::package_maps::Context::new(&resolver.options, ModuleKind::NONE);
+                let Some(mut result) =
+                    resolver.immediate_node_modules(name, location.as_bytes(), DTS, &context)?
+                else {
+                    return Ok(original);
+                };
+                // createResolvedModule, without symlink canonicalization on this path.
+                result.is_external_library_import = true;
+                let mut diagnostics = original.resolution_diagnostics;
+                diagnostics.append(&mut result.resolution_diagnostics);
+                result.resolution_diagnostics = diagnostics;
+                Ok(result)
+            },
+        )
     }
     pub(super) fn resolve_worker(
         &mut self,
@@ -311,7 +476,7 @@ impl Resolver {
                 | ModuleResolutionKind::NODE_NEXT
                 | ModuleResolutionKind::BUNDLER
         ) {
-            return Err(Error::Unsupported("module resolution kind"));
+            panic!("Unexpected moduleResolution: {}", resolution.0);
         }
         let esm = context.esm;
         let extensions = context.extensions;
@@ -319,10 +484,7 @@ impl Resolver {
             return self.finish_external(result);
         }
         if is_relative(name) {
-            let mut candidate = path::resolve(directory, &[name]);
-            if matches!(path::base_name(name), b"." | b"..") && !candidate.ends_with(b"/") {
-                candidate.push(b'/');
-            }
+            let candidate = normalize_cjs_path(directory, name);
             return Ok(self
                 .relative(extensions, &candidate, esm, true, false)?
                 .map_or_else(ResolvedModule::default, |mut r| {
@@ -463,7 +625,7 @@ impl Resolver {
         } else {
             candidate
         };
-        let version_paths = package.and_then(|info| self.version_paths(info));
+        let version_paths = package.map(|info| self.version_paths(info));
         let mut package_file = None;
         if let Some(info) = package.filter(|info| {
             path::to_path(
@@ -487,7 +649,10 @@ impl Resolver {
                 package_file = self.package_json_path_field(info, "main");
             }
         }
-        if let Some((version, paths)) = version_paths {
+        if let Some((version, paths)) = version_paths
+            .as_ref()
+            .and_then(|v| Some((v.version, v.paths()?)))
+        {
             let selected = package_file.as_deref().unwrap_or_default();
             if selected.is_empty()
                 || selected
@@ -571,10 +736,17 @@ impl Resolver {
         if path::base_name(candidate).contains(&b'.') {
             let stripped = path::remove_file_extension(candidate);
             let stripped = if stripped.len() == candidate.len() {
-                &candidate[..candidate
-                    .iter()
-                    .rposition(|&c| c == b'.')
-                    .expect("basename contains dot")]
+                let extension =
+                    path::longest_extension_from_path(candidate, &self.extra_extensions, false);
+                let end = if extension.is_empty() {
+                    candidate
+                        .iter()
+                        .rposition(|&c| c == b'.')
+                        .expect("basename contains dot")
+                } else {
+                    candidate.len() - extension.len()
+                };
+                &candidate[..end]
             } else {
                 stripped
             };
@@ -644,6 +816,17 @@ impl Resolver {
         }
         if self.config_lookup && matches!(original, b".ts" | b".d.ts" | b".js" | b"") {
             if let Some(result) = self.try_extension(base, b".json", false)? {
+                return Ok(Some(result));
+            }
+        }
+        if candidates.is_empty()
+            && self
+                .extra_extensions
+                .iter()
+                .any(|value| value.as_bytes() == original)
+        {
+            if let Some(mut result) = self.try_extension(base, original, false)? {
+                result.resolved_using_extra_extensions = true;
                 return Ok(Some(result));
             }
         }
@@ -781,6 +964,25 @@ impl Resolver {
         containing_file: &[u8],
         mode: ModuleKind,
     ) -> Result<Option<ResolvedModule>, Error> {
+        self.resolve_package_directory_with_redirect(name, containing_file, mode, None)
+    }
+    pub fn resolve_package_directory_with_redirect(
+        &mut self,
+        name: &[u8],
+        containing_file: &[u8],
+        mode: ModuleKind,
+        reference: Option<crate::ResolvedProjectReference<'_>>,
+    ) -> Result<Option<ResolvedModule>, Error> {
+        self.with_redirect(reference, |resolver| {
+            resolver.package_directory_in_context(name, containing_file, mode)
+        })
+    }
+    fn package_directory_in_context(
+        &mut self,
+        name: &[u8],
+        containing_file: &[u8],
+        mode: ModuleKind,
+    ) -> Result<Option<ResolvedModule>, Error> {
         let context = crate::package_maps::Context::new(&self.options, mode);
         let previous = self.package_directory_only;
         let previous_trace = self.tracer.active;
@@ -890,4 +1092,14 @@ pub fn get_conditions(options: &CompilerOptions, mut mode: ModuleKind) -> Vec<Js
     }
     result.extend(options.custom_conditions.iter().flatten().cloned());
     result
+}
+
+/// port: tsc/internal/module/resolver.go:normalizePathForCJSResolution
+pub(super) fn normalize_cjs_path(directory: &[u8], name: &[u8]) -> Vec<u8> {
+    let combined = path::combine(directory, &[name]);
+    let mut candidate = path::normalize(&combined).into_owned();
+    if matches!(path::base_name(&combined), b"." | b"..") && !candidate.ends_with(b"/") {
+        candidate.push(b'/');
+    }
+    candidate
 }

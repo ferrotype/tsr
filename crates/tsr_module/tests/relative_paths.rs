@@ -92,3 +92,85 @@ fn paths_keep_source_order_on_equal_prefixes_but_exact_matches_win() {
         b"/exact.ts"
     );
 }
+
+#[test]
+fn redirect_restores_options_and_patterns_after_panic_and_isolates_cache_keys() {
+    use tsr_core::ModuleResolutionKind;
+    use tsr_module::ResolvedProjectReference;
+    let mut host = MemoryBuilder::new(b"/", true);
+    for file in [b"/base.ts".as_slice(), b"/other.ts"] {
+        host.insert_loaded(file, b"export {};".as_slice());
+    }
+    let mapped = |target: &[u8]| CompilerOptions {
+        paths: Some(
+            [(
+                JsString::from_bytes(b"x".as_slice()),
+                Some(vec![JsString::from_bytes(target)]),
+            )]
+            .into_iter()
+            .collect(),
+        ),
+        ..Default::default()
+    };
+    let base = Arc::new(mapped(b"/base.ts"));
+    let mut resolver = Resolver::new(Arc::new(host.finish()), base.clone(), b"/").unwrap();
+    assert_eq!(
+        resolver
+            .resolve(b"x", b"/main.ts", ModuleKind::NONE)
+            .unwrap()
+            .resolved_file_name
+            .as_bytes(),
+        b"/base.ts"
+    );
+    let invalid = CompilerOptions {
+        module_resolution: ModuleResolutionKind(5),
+        ..Default::default()
+    };
+    let reference = |compiler_options| {
+        Some(ResolvedProjectReference {
+            config_name: b"/other.json",
+            compiler_options,
+        })
+    };
+    assert!(std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+        resolver
+            .resolve_with_redirect(
+                b"new",
+                b"/main.ts",
+                ModuleKind::NONE,
+                reference(Some(&invalid)),
+            )
+            .unwrap();
+    }))
+    .is_err());
+    // This uses a new directory key, so the restored pattern cache is exercised.
+    assert_eq!(
+        resolver
+            .resolve(b"x", b"/sub/main.ts", ModuleKind::NONE)
+            .unwrap()
+            .resolved_file_name
+            .as_bytes(),
+        b"/base.ts"
+    );
+    let other = mapped(b"/other.ts");
+    assert_eq!(
+        resolver
+            .resolve_with_redirect(b"x", b"/main.ts", ModuleKind::NONE, reference(Some(&other)))
+            .unwrap()
+            .resolved_file_name
+            .as_bytes(),
+        b"/other.ts"
+    );
+    assert_eq!(
+        resolver
+            .resolve(b"x", b"/main.ts", ModuleKind::NONE)
+            .unwrap()
+            .resolved_file_name
+            .as_bytes(),
+        b"/base.ts"
+    );
+    assert!(std::ptr::eq(
+        tsr_module::compiler_options_with_redirect(&base, reference(None)),
+        base.as_ref()
+    ));
+}

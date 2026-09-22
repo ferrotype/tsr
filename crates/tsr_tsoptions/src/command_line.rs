@@ -24,11 +24,12 @@ pub struct ParsedBuildCommandLine {
     pub current_directory: JsString,
     pub case_sensitive: bool,
     locale: std::sync::OnceLock<tsr_locale::Locale>,
+    resolved_project_paths: std::sync::OnceLock<Vec<JsString>>,
 }
 
 /// port: tsc/internal/tsoptions/commandlineparser.go:ParseCommandLine
 pub fn parse_command_line(args: &[JsString], host: &dyn ParseConfigHost) -> ParsedCommandLine {
-    let parsed = worker::parse(args, host, worker::Mode::Compiler);
+    let parsed = worker::parse(args, host, worker::Mode::Compiler(COMPILER_OPTIONS));
     let mut result = ParsedCommandLine::new(CompilerOptions::default(), parsed.files);
     let mut watch = WatchOptions::default();
     for (key, value) in &parsed.options {
@@ -47,31 +48,8 @@ pub fn parse_command_line(args: &[JsString], host: &dyn ParseConfigHost) -> Pars
 }
 
 fn absolute_value<'a>(key: &[u8], value: &'a V, cwd: &[u8]) -> std::borrow::Cow<'a, V> {
-    use std::borrow::Cow;
-    let Some(option) = find_declaration(COMPILER_OPTIONS, key, false) else {
-        return Cow::Borrowed(value);
-    };
-    let absolute = |name: &JsString| {
-        V::String(JsString::from_bytes(tsr_tspath::absolute(
-            name.as_bytes(),
-            cwd,
-        )))
-    };
-    if option.element.is_some_and(|element| element.is_file_path) {
-        if let V::Array(values) = value {
-            return Cow::Owned(V::Array(values.as_ref().map(|values| {
-                values
-                    .iter()
-                    .map(|value| value.as_string().map_or_else(|| value.clone(), absolute))
-                    .collect()
-            })));
-        }
-    } else if option.is_file_path {
-        if let V::String(name) = value {
-            return Cow::Owned(absolute(name));
-        }
-    }
-    Cow::Borrowed(value)
+    crate::convert_option_to_absolute_path(key, value, crate::compiler_option_name_map(), cwd)
+        .map_or(std::borrow::Cow::Borrowed(value), std::borrow::Cow::Owned)
 }
 
 /// port: tsc/internal/tsoptions/commandlineparser.go:ParseBuildCommandLine
@@ -90,6 +68,7 @@ pub fn parse_build_command_line(
         current_directory: JsString::from_bytes(host.current_directory()),
         case_sensitive: host.fs().use_case_sensitive_file_names(),
         locale: std::sync::OnceLock::new(),
+        resolved_project_paths: std::sync::OnceLock::new(),
     };
     for (key, value) in result.raw.as_object().expect("worker raw object") {
         // At the pin BuildOpts = commonOptionsWithBuild + OptionsForBuild;
@@ -136,6 +115,24 @@ pub fn parse_build_command_line(
 }
 
 impl ParsedBuildCommandLine {
+    /// Resolve lazily, retaining the first result just like the pinned once
+    /// cache. Later edits to `projects` or `current_directory` do not reset it.
+    /// port: tsc/internal/tsoptions/parsedbuildcommandline.go:ParsedBuildCommandLine.ResolvedProjectPaths
+    pub fn resolved_project_paths(&self) -> &[JsString] {
+        self.resolved_project_paths.get_or_init(|| {
+            self.projects
+                .iter()
+                .map(|project| {
+                    let path = tsr_tspath::resolve(
+                        self.current_directory.as_bytes(),
+                        &[project.as_bytes()],
+                    );
+                    crate::resolve_config_file_name_of_project_reference(&path)
+                })
+                .collect()
+        })
+    }
+
     /// As in Go, the first locale lookup freezes the value for this parse
     /// result. Updating options afterwards does not reset that result cache.
     /// port: tsc/internal/tsoptions/parsedbuildcommandline.go:ParsedBuildCommandLine.Locale
@@ -149,4 +146,16 @@ impl ParsedBuildCommandLine {
             .0
         })
     }
+}
+
+/// Test-only counterpart of the pinned export_test.go worker. Uses the same
+/// parser body; declarations and expected results are supplied independently.
+#[cfg(feature = "harness")]
+pub fn parse_command_line_test_worker(
+    args: &[JsString],
+    host: &dyn ParseConfigHost,
+    declarations: &'static [crate::OptionDeclaration],
+) -> (V, Vec<JsString>, Vec<Diagnostic>) {
+    let parsed = worker::parse(args, host, worker::Mode::Compiler(declarations));
+    (V::Object(parsed.options), parsed.files, parsed.errors)
 }

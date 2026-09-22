@@ -2,10 +2,8 @@
 //! `parsinghelpers.go` and `wildcarddirectories.go`.
 //!
 //! Both source-file and raw-JSON entry points, including wildcard directory
-//! calculation, execute the production `tsr_tsoptions` port. Remaining gaps
-//! (extended-config caching, watch/build options and private helper entry
-//! points) are reported at the handler that encounters them; this driver
-//! never implements a missing compiler operation.
+//! calculation and shared extended-config caching, execute the production port.
+//! This driver only assembles hosts and translates the declared probe values.
 
 use crate::api::{subject, Outcome};
 use serde_json::{json, Map, Value};
@@ -27,9 +25,9 @@ use tsr_vfs::{Error, FileSystem, MemoryBuilder};
 /// `tools/s07/config/host.rs:27` is the existing one. The pinned
 /// `tsoptionstest` factory that does this in Go has no Rust counterpart, which
 /// `tools/phase1/config/src/parseconfighost.rs` already records as its own gap.
-struct Host {
-    fs: Arc<dyn FileSystem>,
-    cwd: JsString,
+pub(super) struct Host {
+    pub(super) fs: Arc<dyn FileSystem>,
+    pub(super) cwd: JsString,
 }
 #[allow(
     clippy::needless_pass_by_value,
@@ -115,7 +113,7 @@ fn wants(request: &Value, section: &str) -> bool {
         Some(sections) => sections.iter().any(|name| name.as_str() == Some(section)),
     }
 }
-fn build_host(request: &Value) -> Host {
+pub(super) fn build_host(request: &Value) -> Host {
     let cwd = text_of(request, "currentDirectory").as_bytes().to_vec();
     let case_sensitive = flag(request, "caseSensitive");
     let mut builder = MemoryBuilder::new(&cwd, case_sensitive);
@@ -181,21 +179,29 @@ fn decode_value(value: &Value) -> Result<ConfigValue, String> {
             }
             Ok(ConfigValue::Object(entries))
         }
-        // `strings` and `map` name Go's []string and map[string]any. They exist
-        // in the encoding because which concrete Go type an `any` holds is part
-        // of the pinned contract, and ConfigValue can express neither: it has
-        // no untyped string slice and no UNORDERED map. That is not an
-        // oversight in the encoding, it is the subject of
-        // `tsconfigparsing.go:normalizeJsonValue` (:882-901), whose whole job
-        // is to turn a Go `map[string]any` into a key-sorted OrderedMap. The
-        // port has nothing to normalize, because its config values are ordered
-        // the moment they are parsed.
-        //
-        // So a request carrying one of these tags is a GAP, not a harness
-        // failure: the caller turns this error into Outcome::missing naming the
-        // pinned operation. An earlier revision of this comment claimed no case
-        // reaches here, and one does.
-        other => Err(format!("{GO_ONLY_VALUE}: {other:?}")),
+        "strings" => Ok(ConfigValue::StringArray(Some(
+            payload
+                .and_then(Value::as_array)
+                .ok_or("strings payload")?
+                .iter()
+                .map(|s| {
+                    s.as_str()
+                        .map(|s| JsString::from_bytes(s.as_bytes()))
+                        .ok_or_else(|| "string element".to_owned())
+                })
+                .collect::<Result<Vec<_>, _>>()?,
+        ))),
+        "map" => {
+            let mut entries = std::collections::HashMap::new();
+            for pair in payload.and_then(Value::as_array).ok_or("map payload")? {
+                entries.insert(
+                    JsString::from_bytes(pair[0].as_str().ok_or("map key")?.as_bytes()),
+                    decode_value(&pair[1])?,
+                );
+            }
+            Ok(ConfigValue::UnorderedObject(entries))
+        }
+        other => Err(format!("unknown config value tag: {other:?}")),
     }
 }
 
@@ -214,6 +220,10 @@ fn text(value: &[u8]) -> String {
 }
 fn render_value(value: &ConfigValue) -> Value {
     match value {
+        ConfigValue::StringArray(values) => render_strings(values.as_ref()),
+        ConfigValue::UnorderedObject(_) => {
+            panic!("unordered values must be normalized before rendering")
+        }
         ConfigValue::Null => json!(["null"]),
         ConfigValue::EmptyStruct => json!(["emptyStruct"]),
         ConfigValue::Boolean(value) => json!(["bool", value]),
@@ -506,11 +516,12 @@ fn describe_parsed(
     Ok(observation)
 }
 
-fn parse_source(
+pub(super) fn parse_source(
     request: &Value,
     host: &Host,
     name: &[u8],
     source_text: &[u8],
+    cache: Option<&tsr_tsoptions::ExtendedConfigCache<'_>>,
 ) -> Result<ParsedCommandLine, Error> {
     let path = tsr_tspath::to_path(
         name,
@@ -522,6 +533,15 @@ fn parse_source(
         path,
         SourceText::from_loaded_bytes(source_text.to_vec()),
     );
+    if let Some(cache) = cache {
+        return cache.parse_source_file(
+            source,
+            &base_of(request),
+            &CompilerOptions::default(),
+            &ConfigValue::Null,
+            name,
+        );
+    }
     parse_json_source_file_config_file_content(
         source,
         host,
@@ -532,210 +552,12 @@ fn parse_source(
     )
 }
 
-// --- the reviewed gap records -------------------------------------------------
-
-type Gap = (&'static str, &'static str, &'static str, &'static str);
-
-const CONVERT_TO_OBJECT: Gap = (
-    "tsc/internal/tsoptions/tsconfigparsing.go:convertToObject",
-    "tsc/internal/tsoptions/tsconfigparsing.go:918-925, the circularity branch's converter: unlike \
-     convertConfigFileToObject it calls convertToJson directly and so does NOT report \
-     The_root_value_of_a_0_file_must_be_an_object for a non-object root",
-    "pub fn convert_to_object(config: &TsConfigSourceFile) -> (ConfigValue, Vec<Diagnostic>)",
-    "crates/tsr_tsoptions/src/config_text.rs, which exports convert_config_file_to_object (:98) \
-     -- the root-checking variant -- and nothing that skips the check (absent)",
-);
-const NORMALIZE_JSON_VALUE: Gap = (
-    "tsc/internal/tsoptions/tsconfigparsing.go:normalizeJsonValue",
-    "tsc/internal/tsoptions/tsconfigparsing.go:882-916, which turns a map[string]any into a \
-     key-SORTED OrderedMap, leaves an existing OrderedMap's order alone, rewrites any slice or \
-     array through reflection and maps a nil slice to nil",
-    "pub fn normalize_json_value(value: &ConfigValue) -> ConfigValue",
-    "no Rust home: ConfigValue (crates/tsr_tsoptions/src/config_value.rs:6) has no unordered-map \
-     or typed-slice variant to normalize, because the value-mode API that needs one is absent",
-);
-const EXTENDED_CONFIG: Gap = (
-    "tsc/internal/tsoptions/tsconfigparsing.go:ParseExtendedConfig",
-    "tsc/internal/tsoptions/tsconfigparsing.go:1052-1078, which reads the extended config through \
-     readJsonConfigFile, returns an ExtendedConfigCacheEntry carrying the source file, the parsed \
-     config and the errors, and stops at the first of read errors or parse diagnostics",
-    "pub fn parse_extended_config(name: &[u8], path: JsString, stack: &[JsString], \
-     host: &dyn ParseConfigHost, cache: Option<&dyn ExtendedConfigCache>) \
-     -> Result<ExtendedConfigCacheEntry, Error>",
-    "crates/tsr_tsoptions/src/config_parse.rs:440-509, which reads, parses and merges each \
-     extended config INLINE inside parse_config; there is no separable entry point, no cache \
-     entry type and no ExtendedConfigCache trait anywhere in crates/",
-);
-const GET_EXTENDED_CONFIG: Gap = (
-    "tsc/internal/tsoptions/tsconfigparsing.go:getExtendedConfig",
-    "tsc/internal/tsoptions/tsconfigparsing.go:1015-1050, which consults the supplied \
-     ExtendedConfigCache -- bypassing it on a resolution-stack cycle -- and re-emits the cached \
-     entry's errors on every hit, so a second parse of the same base still reports them",
-    "pub fn get_extended_config(config: Option<&TsConfigSourceFile>, name: &[u8], \
-     host: &dyn ParseConfigHost, stack: &[JsString], cache: Option<&dyn ExtendedConfigCache>) \
-     -> Result<(Option<Parsed>, Vec<Diagnostic>), Error>",
-    "crates/tsr_tsoptions/src/config_parse.rs:440-509: the extended read is inline and there is \
-     no cache, so a case that supplies one has nothing to supply it to (absent)",
-);
-
-const CONVERT_OPTION_TO_ABSOLUTE_PATH: Gap = (
-    "tsc/internal/tsoptions/parsinghelpers.go:ConvertOptionToAbsolutePath",
-    "tsc/internal/tsoptions/parsinghelpers.go:711-738, which resolves the option declaration, \
-     absolutizes a list option's elements when the ELEMENT is a file path and a scalar option's \
-     value when the option itself is, and reports whether it converted anything",
-    "pub fn convert_option_to_absolute_path(name: &[u8], value: &ConfigValue, cwd: &[u8]) \
-     -> Option<ConfigValue>",
-    "crates/tsr_tsoptions/src/convert_options.rs:161-177 absolutizes a file-path option DURING \
-     conversion from JSON, against the config's base path; the pinned post-hoc conversion of an \
-     already-parsed option map against an arbitrary cwd has no entry point (absent)",
-);
-const CONVERT_TO_OPTIONS_WITH_ABSOLUTE_PATHS: Gap = (
-    "tsc/internal/tsoptions/parsinghelpers.go:convertToOptionsWithAbsolutePaths",
-    "tsc/internal/tsoptions/parsinghelpers.go:696-709, which walks an option map in place and \
-     replaces every entry ConvertOptionToAbsolutePath converted",
-    "pub fn convert_to_options_with_absolute_paths(options: &mut ConfigValue, cwd: &[u8])",
-    "crates/tsr_tsoptions/src/convert_options.rs (absent); its single caller in the pin is \
-     commandlineparser.go:51, and the port has no argument-vector parser either",
-);
-const COMMAND_LINE_OPTIONS_TO_MAP: Gap = (
-    "tsc/internal/tsoptions/tsconfigparsing.go:commandLineOptionsToMap",
-    "tsc/internal/tsoptions/tsconfigparsing.go:615-622, which stores EVERY declaration twice, \
-     under its exact name and under its lowercased name, which is what makes \
-     CommandLineOptionNameMap.Get's two-step lookup work",
-    "pub fn option_name_map(options: &[OptionDeclaration]) -> BTreeMap<Vec<u8>, &OptionDeclaration>",
-    "crates/tsr_tsoptions/src/option_declarations.rs:83-104 replaces the doubled map with a \
-     case-insensitive linear scan over the declaration slice, so no map is built and the \
-     operation has no counterpart to observe (fused into find_declaration)",
-);
-const GET_SPELLING_SUGGESTION: Gap = (
-    "tsc/internal/tsoptions/tsconfigparsing.go:CommandLineOptionNameMap.GetSpellingSuggestion",
-    "tsc/internal/tsoptions/tsconfigparsing.go:606-613, core.GetSpellingSuggestion over the \
-     declarations, tie-broken by option name",
-    "pub fn spelling_suggestion(name: &[u8]) -> Option<&'static OptionDeclaration>",
-    "IMPLEMENTED BUT UNREACHABLE: crates/tsr_tsoptions/src/config_parse.rs:158-165 and \
-     convert_options.rs:304-319 both run tsr_scanner::get_spelling_suggestion_for_strings over \
-     COMPILER_OPTIONS, but neither `unknown` nor `unknown_option` is exported from the crate \
-     (lib.rs:273-276 re-exports neither), so no caller outside tsr_tsoptions can reach it",
-);
-const HAS_FILE_WITH_HIGHER_PRIORITY_EXTENSION: Gap = (
-    "tsc/internal/tsoptions/tsconfigparsing.go:hasFileWithHigherPriorityExtension",
-    "tsc/internal/tsoptions/tsconfigparsing.go:1875-1903, the extension-priority test, including \
-     the legacy exemption that lets a .d.ts sit beside its .js or .jsx counterpart",
-    "pub fn has_file_with_higher_priority_extension(file: &[u8], extensions: &[Vec<JsString>], \
-     has_file: &dyn Fn(&[u8]) -> bool) -> bool",
-    "IMPLEMENTED BUT UNREACHABLE: crates/tsr_tsoptions/src/config_files.rs:39 is the port, and it \
-     is a private fn in a private module; lib.rs:286-287 re-exports only file_names_from_specs, \
-     so the operation can only be observed through the whole expansion",
-);
-const PROP_ARRAY_ELEMENT: Gap = (
-    "tsc/internal/tsoptions/tsconfigparsing.go:GetTsConfigPropArrayElementValue",
-    "tsc/internal/tsoptions/tsconfigparsing.go:1613-1621, which finds the string literal with the \
-     given text inside the named top-level array property, and is what attaches a spec diagnostic \
-     to the exact element",
-    "pub fn prop_array_element(config: &TsConfigSourceFile, key: &[u8], value: &[u8]) \
-     -> Option<NodeId>",
-    "IMPLEMENTED BUT UNREACHABLE: crates/tsr_tsoptions/src/config_parse.rs:105-143 (`array_string`) \
-     is the port and is a private fn; lib.rs re-exports find_property and \
-     find_property_in_object but not this one, so a caller can find the PROPERTY and not the \
-     element",
-);
-const OPTIONS_SYNTAX_BY_ARRAY_ELEMENT_VALUE: Gap = (
-    "tsc/internal/tsoptions/tsconfigparsing.go:GetOptionsSyntaxByArrayElementValue",
-    "tsc/internal/tsoptions/tsconfigparsing.go:1674-1676, the same element search over an \
-     ARBITRARY object literal rather than the config root, which is how the program attributes a \
-     types or lib diagnostic",
-    "pub fn options_syntax_by_array_element_value(config: &TsConfigSourceFile, object: NodeId, \
-     key: &[u8], value: &[u8]) -> Option<NodeId>",
-    "crates/tsr_tsoptions/src/config_parse.rs:105-143 searches only from the config ROOT object \
-     and is private; nothing in crates/ takes an arbitrary object literal (absent)",
-);
-const IS_DOUBLE_QUOTED_STRING: Gap = (
-    "tsc/internal/tsoptions/tsconfigparsing.go:isDoubleQuotedString",
-    "tsc/internal/tsoptions/tsconfigparsing.go:814-816, ast.IsStringLiteral under another name; \
-     its only caller is the KindStringLiteral arm of convertPropertyValueToJson (:827-831), where \
-     it is therefore always true and the guarded diagnostic unreachable",
-    "pub fn is_double_quoted_string(config: &TsConfigSourceFile, node: NodeId) -> bool",
-    "crates/tsr_tsoptions/src/config_text.rs:165-170 omits the predicate and the unreachable \
-     diagnostic with it; there is no entry point to call (absent, deliberately)",
-);
-const PARSE_PROJECT_REFERENCE: Gap = (
-    "tsc/internal/tsoptions/parsinghelpers.go:parseProjectReference",
-    "tsc/internal/tsoptions/parsinghelpers.go:83-103, which reports separately whether `path` and \
-     `circular` were PRESENT and whether each was of the right type, so the caller can tell a \
-     missing property from a wrongly typed one",
-    "pub fn parse_project_reference(value: &ConfigValue) -> Option<ProjectReferenceParse>",
-    "crates/tsr_tsoptions/src/config_parse.rs:629-687 (`references`) fuses the parse into the \
-     validation loop and never materialises the four present/valid flags; nothing in crates/ \
-     parses one reference object on its own (fused)",
-);
-const IS_STRING_VALUE: Gap = (
-    "tsc/internal/tsoptions/tsconfigparsing.go:isStringValue",
-    "tsc/internal/tsoptions/tsconfigparsing.go:1226-1229, the element validator \
-     parseJsonConfigFileContentWorker passes to getPropFromRaw for files, include and exclude",
-    "pub fn is_string_value(value: &ConfigValue) -> bool",
-    "crates/tsr_tsoptions/src/config_parse.rs:577-598 filters spec arrays with \
-     ConfigValue::as_string inline and never names the predicate; the pinned per-element \
-     validation callback has no counterpart (fused)",
-);
-const SUBSTITUTED_STRING_ARRAY: Gap = (
-    "tsc/internal/tsoptions/tsconfigparsing.go:getSubstitutedStringArrayWithConfigDirTemplate",
-    "tsc/internal/tsoptions/tsconfigparsing.go:1807-1821, which clones the list ONLY when some \
-     element starts with the template and returns nil otherwise, so a caller can tell \
-     'nothing to substitute' from 'substituted to the same text'",
-    "pub fn substitute_string_array(values: &[JsString], base: &[u8]) -> Option<Vec<JsString>>",
-    "IMPLEMENTED BUT UNREACHABLE: crates/tsr_tsoptions/src/config_substitution.rs:21-27 \
-     (`substitute_strings`) is the port -- in place, with no nil signal -- and lib.rs:288-289 \
-     re-exports only starts_with_config_dir, substitute_options and substitute_path, so no caller \
-     outside the crate can reach it",
-);
-const CREATE_DIAGNOSTIC_AT_REFERENCE_SYNTAX: Gap = (
-    "tsc/internal/tsoptions/tsconfigparsing.go:CreateDiagnosticAtReferenceSyntax",
-    "tsc/internal/tsoptions/tsconfigparsing.go:1630-1640, which attributes a diagnostic to the \
-     index-th element of the config's `references` array, or returns nil when the config has no \
-     such element",
-    "pub fn diagnostic_at_reference_syntax(config: &ParsedCommandLine, index: usize, \
-     message: &'static Message, args: Vec<JsString>) -> Option<Diagnostic>",
-    "crates/tsr_tsoptions/src/config_parse.rs:96-104 (`array_element`) can reach the element and \
-     is private; no public function builds a diagnostic at a project reference (absent). Its \
-     pinned caller is compiler/program.go:1368",
-);
-
-fn missing(gap: Gap) -> Outcome {
-    let (operation, authority, signature, home) = gap;
-    Outcome::missing(operation, authority, signature, home)
-}
-
-// --- the group ---------------------------------------------------------------
-
-#[allow(clippy::too_many_lines, reason = "one arm per reviewed pinned action")]
 pub fn observe(request: &Value) -> Option<Outcome> {
     if subject(request) != "configParse" {
         return None;
     }
-    Some(answer(request).unwrap_or_else(|error| {
-        if error.starts_with(GO_ONLY_VALUE) {
-            // The pinned value has a Go type the port's ConfigValue cannot
-            // hold, which is exactly what the pinned operation exists to
-            // normalize away. Record the gap; do not fail the capture.
-            return Outcome::missing(
-                "tsc/internal/tsoptions/tsconfigparsing.go:normalizeJsonValue",
-                "tsc/internal/tsoptions/tsconfigparsing.go:normalizeJsonValue (:882-901), which \
-                 turns a Go map[string]any into a key-sorted OrderedMap, walks an existing \
-                 OrderedMap in place, rewrites a typed slice through reflection and maps a nil \
-                 slice to nil",
-                "pub fn normalize_json_value(value: ConfigValue) -> ConfigValue -- absent, and \
-                 absent for a reason: ConfigValue has no unordered map and no untyped string \
-                 slice, so there is no unordered input for it to sort. Closing this gap means \
-                 deciding whether the port needs that shape at all, not writing the function",
-                "crates/tsr_tsoptions/src/config_value.rs (no unordered map variant exists)",
-            );
-        }
-        Outcome::Failed(error)
-    }))
+    Some(answer(request).unwrap_or_else(Outcome::Failed))
 }
-
-/// Marks the one failure that is a recorded gap rather than a broken harness.
-const GO_ONLY_VALUE: &str = "go-only config value";
 
 fn failed<T>(result: Result<T, Error>) -> Result<T, String> {
     result.map_err(|error| format!("filesystem: {error}"))
@@ -748,13 +570,9 @@ fn answer(request: &Value) -> Result<Outcome, String> {
     let target = text_of(request, "target");
     match action {
         "parse_source_file" => {
-            if flag(request, "useCache") {
-                // The request asks for a shared ExtendedConfigCache. The Rust
-                // parse has nothing to give one to, so the honest answer is the
-                // gap, not a cacheless run dressed up as agreement.
-                return Ok(missing(GET_EXTENDED_CONFIG));
-            }
             let host = build_host(request);
+            let cache =
+                flag(request, "useCache").then(|| tsr_tsoptions::ExtendedConfigCache::new(&host));
             let name = text_of(request, "configFileName").as_bytes().to_vec();
             let also = text_of(request, "parseAlso");
             if !also.is_empty() {
@@ -766,37 +584,50 @@ fn answer(request: &Value) -> Result<Outcome, String> {
                     &host,
                     also.as_bytes(),
                     content.raw.as_ref(),
+                    cache.as_ref(),
                 ))?;
             }
             let source_text = text_of(request, "jsonText").as_bytes().to_vec();
-            let mut parsed = failed(parse_source(request, &host, &name, &source_text))?;
+            let mut parsed = failed(parse_source(
+                request,
+                &host,
+                &name,
+                &source_text,
+                cache.as_ref(),
+            ))?;
             if flag(request, "parseTwice") {
-                parsed = failed(parse_source(request, &host, &name, &source_text))?;
+                parsed = failed(parse_source(
+                    request,
+                    &host,
+                    &name,
+                    &source_text,
+                    cache.as_ref(),
+                ))?;
             }
             Ok(Outcome::Observed(Value::Object(describe_parsed(
                 request, &parsed,
             )?)))
         }
         "read_config_file" => {
-            if flag(request, "useCache") {
-                return Ok(missing(GET_EXTENDED_CONFIG));
-            }
             let host = build_host(request);
-            let also = text_of(request, "parseAlso");
-            if !also.is_empty() {
-                failed(get_parsed_command_line_of_config_file(
-                    also.as_bytes(),
+            let cache =
+                flag(request, "useCache").then(|| tsr_tsoptions::ExtendedConfigCache::new(&host));
+            let read = |name: &[u8]| match &cache {
+                Some(cache) => {
+                    cache.read_config_file(name, &CompilerOptions::default(), &ConfigValue::Null)
+                }
+                None => get_parsed_command_line_of_config_file(
+                    name,
                     &CompilerOptions::default(),
                     &ConfigValue::Null,
                     &host,
-                ))?;
+                ),
+            };
+            let also = text_of(request, "parseAlso");
+            if !also.is_empty() {
+                failed(read(also.as_bytes()))?;
             }
-            let result = failed(get_parsed_command_line_of_config_file(
-                text_of(request, "configFileName").as_bytes(),
-                &CompilerOptions::default(),
-                &ConfigValue::Null,
-                &host,
-            ))?;
+            let result = failed(read(text_of(request, "configFileName").as_bytes()))?;
             let Some(parsed) = result.command_line else {
                 return Ok(Outcome::Observed(json!({
                     "read_failed": true,
@@ -808,15 +639,32 @@ fn answer(request: &Value) -> Result<Outcome, String> {
             Ok(Outcome::Observed(Value::Object(observation)))
         }
         "parse_json_api" | "parse_json_api_value" => {
-            let host=build_host(request);
-            let name=text_of(request,"configFileName").as_bytes();
-            let raw=if action=="parse_json_api_value" { decode_value(&request["value"])? } else {
-                let path=tsr_tspath::to_path(name,&base_of(request),flag(request,"caseSensitive"));
-                parse_config_file_text_to_json(JsString::from_bytes(name),path,SourceText::from_loaded_bytes(text_of(request,"jsonText").as_bytes().to_vec())).value
+            let host = build_host(request);
+            let name = text_of(request, "configFileName").as_bytes();
+            let raw = if action == "parse_json_api_value" {
+                decode_value(&request["value"])?
+            } else {
+                let path =
+                    tsr_tspath::to_path(name, &base_of(request), flag(request, "caseSensitive"));
+                parse_config_file_text_to_json(
+                    JsString::from_bytes(name),
+                    path,
+                    SourceText::from_loaded_bytes(text_of(request, "jsonText").as_bytes().to_vec()),
+                )
+                .value
             };
-            let parsed=failed(tsr_tsoptions::parse_json_config_file_content(raw,&host,&base_of(request),&CompilerOptions::default(),name,&[]))?;
-            Ok(Outcome::Observed(Value::Object(describe_parsed(request,&parsed)?)))
-        },
+            let parsed = failed(tsr_tsoptions::parse_json_config_file_content(
+                raw,
+                &host,
+                &base_of(request),
+                &CompilerOptions::default(),
+                name,
+                &[],
+            ))?;
+            Ok(Outcome::Observed(Value::Object(describe_parsed(
+                request, &parsed,
+            )?)))
+        }
         "parse_config_text" => {
             let name = text_of(request, "configFileName").as_bytes().to_vec();
             let path =
@@ -831,8 +679,26 @@ fn answer(request: &Value) -> Result<Outcome, String> {
                 "errors": render_diagnostics(&parsed.diagnostics),
             })))
         }
-        "convert_to_object" => Ok(missing(CONVERT_TO_OBJECT)),
-        "extended_config" => Ok(missing(EXTENDED_CONFIG)),
+        "convert_to_object" => {
+            let source = source_from_request(request);
+            let (raw, errors) = tsr_tsoptions::convert_to_object(&source);
+            Ok(Outcome::Observed(
+                json!({"value":render_value(&raw),"errors":render_diagnostics(&errors)}),
+            ))
+        }
+        "extended_config" => {
+            let host = build_host(request);
+            let name = text_of(request, "configFileName").as_bytes();
+            let path = tsr_tspath::to_path(
+                name,
+                host.current_directory(),
+                host.fs().use_case_sensitive_file_names(),
+            );
+            let entry = failed(tsr_tsoptions::parse_extended_config(name, path, &[], &host))?;
+            Ok(Outcome::Observed(
+                json!({"has_entry":true,"extended_file_names":entry.extended_file_names().iter().map(|s|text(s.as_bytes())).collect::<Vec<_>>()}),
+            ))
+        }
         "spec_diagnostic" => {
             let message = spec_diagnostic(
                 text_of(request, "spec").as_bytes(),
@@ -858,7 +724,27 @@ fn answer(request: &Value) -> Result<Outcome, String> {
                     .collect();
                 Ok(Outcome::Observed(json!({ "per_value": per_value })))
             }
-            "array" => Ok(missing(SUBSTITUTED_STRING_ARRAY)),
+            "array" => {
+                let values = tsr_tsoptions::substituted_strings(
+                    &strings_of(request, "specs"),
+                    &base_of(request),
+                );
+                let rendered = values.as_ref().map_or_else(
+                    || json!(["nilarray"]),
+                    |values| {
+                        json!([
+                            "strings",
+                            values
+                                .iter()
+                                .map(|value| text(value.as_bytes()))
+                                .collect::<Vec<_>>()
+                        ])
+                    },
+                );
+                Ok(Outcome::Observed(
+                    json!({"substituted":values.is_some(),"array":rendered}),
+                ))
+            }
             other => Err(format!("unknown config_dir helper {other:?}")),
         },
         "supported_extensions" => {
@@ -887,59 +773,78 @@ fn answer(request: &Value) -> Result<Outcome, String> {
                 "with_json": render(tsr_tsoptions::supported_extensions_with_json(&options, &extra)),
             })))
         }
-        // The four unexported option parsers and the generic that dispatches
-        // through them. `tsr_tsoptions` has no parser INTERFACE: it has one
-        // `parse_compiler_options(key, value, &mut options)` free function
-        // (parse_options.rs:57) and nothing at all for watch, type-acquisition
-        // or build options, so there is no per-kind dispatch to compare and no
-        // per-kind unknown-option message to read back.
         "parser_diagnostics" | "option_parser_parse_option" => {
             let kind = text_of(request, "parserKind");
-            let parser = match kind {
-                "compiler" => "compilerOptionsParser",
-                "watch" => "watchOptionsParser",
-                "typeAcquisition" => "typeAcquisitionParser",
-                "build" => "buildOptionsParser",
-                other => return Err(format!("no pinned parser named {other:?}")),
+            let mut parser: Box<dyn tsr_tsoptions::OptionParser> = match kind {
+                "compiler" => Box::new(CompilerOptions::default()),
+                "watch" => Box::new(tsr_core::WatchOptions::default()),
+                "build" => Box::new(tsr_core::BuildOptions::default()),
+                "typeAcquisition" => Box::new(tsr_tsoptions::TypeAcquisition::default()),
+                _ => return Err(format!("no pinned parser named {kind:?}")),
             };
-            // The identity must be one the CASE claims, not just one on the
-            // same interface: `record` refuses an unclaimed identity, and it is
-            // right to -- a gap record naming a neighbour would attribute the
-            // absence to the wrong operation. The two actions ask about
-            // different methods of the same parser, so they name different ones.
-            let method = if action == "parser_diagnostics" {
-                "UnknownOptionDiagnostic"
+            if action == "parser_diagnostics" {
+                Ok(Outcome::Observed(
+                    json!({"kind":kind,"unknown_option_code":parser.unknown_option().code,"unknown_did_you_mean_code":parser.unknown_did_you_mean().code}),
+                ))
             } else {
-                "ParseOption"
-            };
-            Ok(Outcome::missing(
-                format!("tsc/internal/tsoptions/parsinghelpers.go:{parser}.{method}"),
-                "tsc/internal/tsoptions/parsinghelpers.go:198-266, the optionParser interface and \
-                 its four implementations, each answering ParseOption plus its own \
-                 UnknownOptionDiagnostic and UnknownDidYouMeanDiagnostic",
-                "a per-kind option parser -- pub trait OptionParser { fn parse_option(&mut self, \
-                 key: &[u8], value: &ConfigValue) -> Vec<Diagnostic>; fn unknown_option(&self) -> \
-                 &'static Message; fn unknown_did_you_mean(&self) -> &'static Message } with an \
-                 implementation for each of compiler, watch, type-acquisition and build options",
-                "crates/tsr_tsoptions/src/parse_options.rs has one free                  parse_compiler_options(key, value, &mut options) at :57 and no watch,                  type-acquisition or build parser at all",
+                let mut codes = Vec::new();
+                for (key, value) in parser_entries(request)? {
+                    codes.extend(
+                        parser
+                            .parse_option(key.as_bytes(), &value)
+                            .iter()
+                            .map(|d| d.code),
+                    );
+                }
+                Ok(Outcome::Observed(
+                    json!({"kind":kind,"diagnostic_codes":codes}),
+                ))
+            }
+        }
+        "convert_map_to_options" => {
+            let mut options = CompilerOptions::default();
+            tsr_tsoptions::convert_map_to_options(&parser_entries(request)?, &mut options);
+            Ok(Outcome::Observed(
+                json!({"options":render_options(&options,&list_of(request,"optionNames"))?}),
             ))
         }
-        "convert_map_to_options" => Ok(Outcome::missing(
-            "tsc/internal/tsoptions/tsconfigparsing.go:convertMapToOptions",
-            "tsc/internal/tsoptions/tsconfigparsing.go:626-632, the generic that walks an \
-             OrderedMap in order and dispatches each entry through optionParser.ParseOption",
-            "pub fn convert_map_to_options<P: OptionParser>(entries: &[(JsString, ConfigValue)], \
-             parser: &mut P) -- needs the parser trait above before it can exist",
-            "crates/tsr_tsoptions/src/convert_options.rs (no interface-dispatching walk exists)",
-        )),
-        "content_mapper_diagnostic_location" => Ok(Outcome::missing(
-            "tsc/internal/tsoptions/tsconfigparsing.go:GetContentMapperOptionDiagnosticLocation",
-            "tsc/internal/tsoptions/tsconfigparsing.go:1706-1740, which locates the syntax node \
-             for a content mapper's option path so a diagnostic can point at it",
-            "pub fn content_mapper_option_diagnostic_location(config: &ParsedCommandLine, mapper: \
-             &ContentMapper, path: &[OptionPathSegment]) -> Option<(AstFile, TextRange)>",
-            "crates/tsr_tsoptions/src/config_mappers.rs carries mapper validation but no              option-path syntax lookup",
-        )),
+        "content_mapper_diagnostic_location" => {
+            let host = build_host(request);
+            let name = tsr_tspath::combine(
+                &base_of(request),
+                &[text_of(request, "configFileName").as_bytes()],
+            );
+            let parsed = failed(parse_source(
+                request,
+                &host,
+                &name,
+                text_of(request, "jsonText").as_bytes(),
+                None,
+            ))?;
+            let mappers = parsed.content_mappers.as_deref().unwrap_or_default();
+            let path = request["optionPath"]
+                .as_array()
+                .ok_or("optionPath")?
+                .iter()
+                .map(|segment| {
+                    if flag(segment, "isIndex") {
+                        config_mappers::OptionPathSegment::Index(
+                            segment["index"].as_i64().unwrap_or_default() as isize,
+                        )
+                    } else {
+                        config_mappers::OptionPathSegment::Property(JsString::from_bytes(
+                            text_of(segment, "name").as_bytes(),
+                        ))
+                    }
+                })
+                .collect::<Vec<_>>();
+            let location = mappers.first().and_then(|mapper| {
+                config_mappers::option_diagnostic_location(&parsed, mapper, &path)
+            });
+            Ok(Outcome::Observed(
+                json!({"mappers":mappers.len(),"has_file":location.is_some(),"pos":location.map_or(-1,|(_,loc)|loc.pos()),"end":location.map_or(-1,|(_,loc)|loc.end())}),
+            ))
+        }
         "parse_value" => {
             let value = decode_value(request.get("value").ok_or("request has no value")?)?;
             match helper {
@@ -998,9 +903,18 @@ fn answer(request: &Value) -> Result<Outcome, String> {
                         "errors": render_diagnostics(&errors),
                     })))
                 }
-                "project_reference" => Ok(missing(PARSE_PROJECT_REFERENCE)),
-                "is_string_value" => Ok(missing(IS_STRING_VALUE)),
-                "normalize_json_value" => Ok(missing(NORMALIZE_JSON_VALUE)),
+                "project_reference" => {
+                    let result = tsr_tsoptions::parse_project_reference(&value);
+                    Ok(Outcome::Observed(
+                        json!({"present":result.is_some(),"path":result.as_ref().map_or_else(String::new,|r|text(r.reference.path.as_bytes())),"circular":result.as_ref().is_some_and(|r|r.reference.circular),"has_path":result.as_ref().is_some_and(|r|r.has_path),"path_valid":result.as_ref().is_some_and(|r|r.path_valid),"has_circular":result.as_ref().is_some_and(|r|r.has_circular),"circular_valid":result.as_ref().is_some_and(|r|r.circular_valid)}),
+                    ))
+                }
+                "is_string_value" => Ok(Outcome::Observed(
+                    json!({"result": value.as_string().is_some()}),
+                )),
+                "normalize_json_value" => Ok(Outcome::Observed(
+                    json!({"result": render_value(&tsr_tsoptions::normalize_json_value(value))}),
+                )),
                 other => Err(format!("unknown parse_value helper {other:?}")),
             }
         }
@@ -1023,11 +937,9 @@ fn answer(request: &Value) -> Result<Outcome, String> {
             }
             "type_acquisition" => {
                 let value = decode_value(request.get("value").ok_or("request has no value")?)?;
-                // TypeAcquisition::for_config is private, so the jsconfig.json
-                // default cannot be requested here; a case that needs it uses a
-                // whole parse instead. Default::default() is the tsconfig.json
-                // default, which is what these cases ask for.
-                let mut types = tsr_tsoptions::TypeAcquisition::default();
+                let mut types = tsr_tsoptions::TypeAcquisition::for_config(
+                    text_of(request, "configFileName").as_bytes(),
+                );
                 types.parse_option(text_of(request, "key").as_bytes(), &value);
                 Ok(Outcome::Observed(json!({
                     "type_acquisition": render_type_acquisition(Some(&types)),
@@ -1037,7 +949,11 @@ fn answer(request: &Value) -> Result<Outcome, String> {
             "watch" => {
                 let value = decode_value(request.get("value").ok_or("request has no value")?)?;
                 let mut options = tsr_core::WatchOptions::default();
-                tsr_tsoptions::parse_watch_options(text_of(request, "key").as_bytes(), &value, &mut options);
+                tsr_tsoptions::parse_watch_options(
+                    text_of(request, "key").as_bytes(),
+                    &value,
+                    &mut options,
+                );
                 Ok(Outcome::Observed(json!({
                     "watch": [
                         ["watchInterval", options.interval.map_or_else(|| json!(["null"]), |v| json!(["int",v]))],
@@ -1053,7 +969,11 @@ fn answer(request: &Value) -> Result<Outcome, String> {
             "build" => {
                 let value = decode_value(request.get("value").ok_or("request has no value")?)?;
                 let mut options = tsr_core::BuildOptions::default();
-                tsr_tsoptions::parse_build_options(text_of(request, "key").as_bytes(), &value, &mut options);
+                tsr_tsoptions::parse_build_options(
+                    text_of(request, "key").as_bytes(),
+                    &value,
+                    &mut options,
+                );
                 Ok(Outcome::Observed(json!({
                     "build": [
                         ["clean", ["tristate", options.clean.0]],
@@ -1068,52 +988,121 @@ fn answer(request: &Value) -> Result<Outcome, String> {
             other => Err(format!("unknown parse_option target {other:?}")),
         },
         "default_options" => {
-            if wants(request, "type_acquisition") {
-                return Ok(missing((
-                    "tsc/internal/tsoptions/tsconfigparsing.go:getDefaultTypeAcquisition",
-                    "tsc/internal/tsoptions/tsconfigparsing.go:941-947, which enables type \
-                     acquisition when and only when the config's base name is jsconfig.json",
-                    "pub fn default_type_acquisition(config_file_name: &[u8]) -> TypeAcquisition",
-                    "IMPLEMENTED BUT UNREACHABLE: crates/tsr_tsoptions/src/config_parse.rs:39-48 \
-                     (`TypeAcquisition::for_config`) is the port and is a private associated \
-                     function; lib.rs:295-297 exports the type but not the constructor, so it can \
-                     only be observed through a whole config parse",
-                )));
+            let mut result = Map::new();
+            let name = text_of(request, "configFileName").as_bytes();
+            if wants(request, "options") {
+                result.insert(
+                    "options".into(),
+                    render_options(
+                        &tsr_tsoptions::default_compiler_options(name),
+                        &list_of(request, "optionNames"),
+                    )?,
+                );
             }
-            let options = tsr_tsoptions::default_compiler_options(
-                text_of(request, "configFileName").as_bytes(),
-            );
-            Ok(Outcome::Observed(json!({
-                "options": render_options(&options, &list_of(request, "optionNames"))?,
-            })))
+            if wants(request, "type_acquisition") {
+                result.insert(
+                    "type_acquisition".into(),
+                    render_type_acquisition(Some(&tsr_tsoptions::TypeAcquisition::for_config(
+                        name,
+                    ))),
+                );
+            }
+            Ok(Outcome::Observed(Value::Object(result)))
         }
         "option_absolute_path" => match helper {
-            "one" => Ok(missing(CONVERT_OPTION_TO_ABSOLUTE_PATH)),
-            "all" => Ok(missing(CONVERT_TO_OPTIONS_WITH_ABSOLUTE_PATHS)),
+            "one" => {
+                let value = decode_value(&request["value"])?;
+                let converted = tsr_tsoptions::convert_option_to_absolute_path(
+                    text_of(request, "name").as_bytes(),
+                    &value,
+                    tsr_tsoptions::compiler_option_name_map(),
+                    text_of(request, "currentDirectory").as_bytes(),
+                );
+                Ok(Outcome::Observed(
+                    json!({"converted":converted.is_some(),"result":render_value(converted.as_ref().unwrap_or(&ConfigValue::Null))}),
+                ))
+            }
+            "all" => {
+                let mut values = option_entries(request)?
+                    .into_iter()
+                    .map(|(key, value)| (JsString::from_bytes(key), value))
+                    .collect();
+                tsr_tsoptions::convert_options_with_absolute_paths(
+                    &mut values,
+                    tsr_tsoptions::compiler_option_name_map(),
+                    text_of(request, "currentDirectory").as_bytes(),
+                );
+                Ok(Outcome::Observed(
+                    json!({"result":render_value(&ConfigValue::Object(values))}),
+                ))
+            }
             other => Err(format!("unknown option_absolute_path helper {other:?}")),
         },
-        "option_name_map" => match helper {
-            "get" => {
-                let rows: Vec<Value> = list_of(request, "query")
-                    .into_iter()
-                    .map(|name| {
-                        let found = option_declaration(&name, false)
-                            .map_or_else(String::new, |option| option.name.to_owned());
-                        json!([text(&name), found])
-                    })
-                    .collect();
-                Ok(Outcome::Observed(json!({ "resolved": rows })))
+        "option_name_map" => {
+            let map = tsr_tsoptions::compiler_option_name_map();
+            match helper {
+                "get" | "spelling" => {
+                    let rows = list_of(request, "query")
+                        .iter()
+                        .map(|name| {
+                            let found = if helper == "get" {
+                                map.get(name)
+                            } else {
+                                map.spelling_suggestion(name)
+                            };
+                            json!([text(name), found.map_or("", |option| option.name)])
+                        })
+                        .collect::<Vec<_>>();
+                    let key = if helper == "get" {
+                        "resolved"
+                    } else {
+                        "suggested"
+                    };
+                    Ok(Outcome::Observed(json!({key:rows})))
+                }
+                "build_map" => {
+                    let declarations = list_of(request, "query")
+                        .iter()
+                        .map(|name| {
+                            crate::commandlineops::worker_declaration(
+                                &json!({"name":text(name),"kind":"string"}),
+                            )
+                        })
+                        .collect::<Result<Vec<_>, _>>()
+                        .map_err(|_| "bad name-map declaration".to_owned())?;
+                    let map = tsr_tsoptions::CommandLineOptionNameMap::new(&declarations);
+                    Ok(Outcome::Observed(
+                        json!({"keys":map.keys().map(text).collect::<Vec<_>>()}),
+                    ))
+                }
+                other => Err(format!("unknown option_name_map helper {other:?}")),
             }
-            "spelling" => Ok(missing(GET_SPELLING_SUGGESTION)),
-            "build_map" => Ok(missing(COMMAND_LINE_OPTIONS_TO_MAP)),
-            other => Err(format!("unknown option_name_map helper {other:?}")),
-        },
+        }
         "wildcard_directories" => {
-            let include=list_of(request,"include").into_iter().map(JsString::from_bytes).collect::<Vec<_>>();let exclude=list_of(request,"exclude").into_iter().map(JsString::from_bytes).collect::<Vec<_>>();
-            let directories=tsr_tsoptions::wildcard_directories(&include,&exclude,text_of(request,"currentDirectory").as_bytes(),flag(request,"caseSensitive"));
-            let mut rows=directories.as_ref().map_or(Vec::new(),|m|m.iter().map(|(p,r)| (text(p.as_bytes()),*r)).collect::<Vec<_>>());rows.sort_by(|a,b|a.0.cmp(&b.0));
-            Ok(Outcome::Observed(json!({"directories":rows,"nil_result":directories.is_none()})))
-        },
+            let include = list_of(request, "include")
+                .into_iter()
+                .map(JsString::from_bytes)
+                .collect::<Vec<_>>();
+            let exclude = list_of(request, "exclude")
+                .into_iter()
+                .map(JsString::from_bytes)
+                .collect::<Vec<_>>();
+            let directories = tsr_tsoptions::wildcard_directories(
+                &include,
+                &exclude,
+                text_of(request, "currentDirectory").as_bytes(),
+                flag(request, "caseSensitive"),
+            );
+            let mut rows = directories.as_ref().map_or(Vec::new(), |m| {
+                m.iter()
+                    .map(|(p, r)| (text(p.as_bytes()), *r))
+                    .collect::<Vec<_>>()
+            });
+            rows.sort_by(|a, b| a.0.cmp(&b.0));
+            Ok(Outcome::Observed(
+                json!({"directories":rows,"nil_result":directories.is_none()}),
+            ))
+        }
         "config_specs" => {
             let specs = config_specs(request);
             match helper {
@@ -1154,17 +1143,106 @@ fn answer(request: &Value) -> Result<Outcome, String> {
                         .collect();
                     Ok(Outcome::Observed(json!({ "matches": rows })))
                 }
-                "extension_priority" => Ok(missing(HAS_FILE_WITH_HIGHER_PRIORITY_EXTENSION)),
+                "extension_priority" => {
+                    let groups = request["extensions"]
+                        .as_array()
+                        .ok_or("extension groups")?
+                        .iter()
+                        .map(|row| {
+                            row.as_array()
+                                .ok_or("extension group")?
+                                .iter()
+                                .map(|ext| {
+                                    ext.as_str()
+                                        .map(|s| JsString::from_bytes(s.as_bytes()))
+                                        .ok_or("extension")
+                                })
+                                .collect::<Result<Vec<_>, _>>()
+                        })
+                        .collect::<Result<Vec<_>, _>>()?;
+                    let mut present: tsr_core::collections::OrderedMap<_, _> =
+                        strings_of(request, "present")
+                            .into_iter()
+                            .map(|s| (s.clone(), s))
+                            .collect();
+                    let spec = text_of(request, "spec").as_bytes();
+                    let higher = tsr_tsoptions::has_file_with_higher_priority_extension(
+                        spec,
+                        &groups,
+                        |key| present.get(key).is_some(),
+                    );
+                    tsr_tsoptions::remove_wildcard_files_with_lower_priority_extension(
+                        spec,
+                        &mut present,
+                        &groups,
+                        true,
+                    );
+                    Ok(Outcome::Observed(
+                        json!({"higher_priority":higher,"survivors":render_strings(Some(&present.into_iter().map(|(_,v)|v).collect()))}),
+                    ))
+                }
                 other => Err(format!("unknown config_specs helper {other:?}")),
             }
         }
-        "syntax_element" => match helper {
-            "prop_array_element" => Ok(missing(PROP_ARRAY_ELEMENT)),
-            "options_syntax" => Ok(missing(OPTIONS_SYNTAX_BY_ARRAY_ELEMENT_VALUE)),
-            "double_quoted" => Ok(missing(IS_DOUBLE_QUOTED_STRING)),
-            other => Err(format!("unknown syntax_element helper {other:?}")),
-        },
-        "reference_syntax" => Ok(missing(CREATE_DIAGNOSTIC_AT_REFERENCE_SYNTAX)),
+        "syntax_element" => {
+            let name = text_of(request, "configFileName").as_bytes();
+            let config = TsConfigSourceFile::parse(
+                JsString::from_bytes(name),
+                tsr_tspath::to_path(name, &base_of(request), flag(request, "caseSensitive")),
+                SourceText::from_loaded_bytes(text_of(request, "jsonText").as_bytes().to_vec()),
+            );
+            let key = text_of(request, "key").as_bytes();
+            let value = text_of(request, "spec").as_bytes();
+            let describe = |node: Option<tsr_ast::NodeId>| {
+                node.map_or(Value::Null, |node| {
+                    let read = config.file.view().node(node).expect("config node");
+                    json!([read.kind().raw(), read.pos(), read.end()])
+                })
+            };
+            match helper {
+                "prop_array_element" | "double_quoted" => {
+                    let node = tsr_tsoptions::config_prop_array_element_value(&config, key, value);
+                    if helper == "double_quoted" {
+                        Ok(Outcome::Observed(node.map_or_else(||json!({"found":false}),|node|json!({"found":true,"double_quoted":tsr_tsoptions::is_double_quoted_string(&config,node)}))))
+                    } else {
+                        Ok(Outcome::Observed(node.map_or_else(||json!({"node":null}),|node|json!({"node":describe(Some(node)),"text":text(config.file.view().node_text(node).expect("config text").as_bytes())}))))
+                    }
+                }
+                "options_syntax" => {
+                    let object = config.object();
+                    let node = object.and_then(|object| {
+                        tsr_tsoptions::options_syntax_by_array_element_value(
+                            &config, object, key, value,
+                        )
+                    });
+                    Ok(Outcome::Observed(
+                        json!({"node":describe(node),"has_object":object.is_some()}),
+                    ))
+                }
+                other => Err(format!("unknown syntax_element helper {other:?}")),
+            }
+        }
+        "reference_syntax" => {
+            let host = build_host(request);
+            let parsed = failed(parse_source(
+                request,
+                &host,
+                text_of(request, "configFileName").as_bytes(),
+                text_of(request, "jsonText").as_bytes(),
+                None,
+            ))?;
+            let index = request["index"].as_i64().ok_or("missing index")?;
+            let diagnostic = tsr_tsoptions::diagnostic_at_reference_syntax(
+                &parsed,
+                isize::try_from(index).map_err(|_| "invalid index")?,
+                tsr_diagnostics::Compiler_option_0_cannot_be_given_an_empty_string,
+                vec![JsString::from_bytes(b"reference.path".as_slice())],
+            );
+            Ok(Outcome::Observed(diagnostic.as_ref().map_or_else(
+                || json!({"reported":false}),
+                |diagnostic| json!({"reported":true,"diagnostic":render_diagnostic(diagnostic)}),
+            )))
+        }
         other => Err(format!("unknown configParse action {other:?}")),
     }
 }
@@ -1213,6 +1291,31 @@ fn config_specs(request: &Value) -> ConfigFileSpecs {
         includes_before_substitution: strings_of(request, "includesBefore"),
         is_default_include: flag(request, "isDefaultInclude"),
     }
+}
+
+fn parser_entries(
+    request: &Value,
+) -> Result<tsr_core::collections::OrderedMap<JsString, ConfigValue>, String> {
+    request["parserEntries"]
+        .as_array()
+        .ok_or("parserEntries must be an array")?
+        .iter()
+        .map(|entry| {
+            Ok((
+                JsString::from_bytes(entry["key"].as_str().ok_or("parser key")?.as_bytes()),
+                decode_value(&entry["value"])?,
+            ))
+        })
+        .collect()
+}
+
+fn source_from_request(request: &Value) -> TsConfigSourceFile {
+    let name = text_of(request, "configFileName").as_bytes();
+    TsConfigSourceFile::parse(
+        JsString::from_bytes(name),
+        tsr_tspath::to_path(name, &base_of(request), flag(request, "caseSensitive")),
+        SourceText::from_loaded_bytes(text_of(request, "jsonText").as_bytes().to_vec()),
+    )
 }
 
 #[cfg(test)]

@@ -27,6 +27,16 @@ impl Encode for ConfigValue {
             Self::String(value) => value.encode(out),
             Self::Array(values) => out.array(values.iter().flatten()),
             Self::Object(values) => values.encode(out),
+            Self::StringArray(values) => out.array(values.iter().flatten()),
+            Self::UnorderedObject(values) => {
+                let mut entries: Vec<_> = values.iter().collect();
+                entries.sort_by(|a, b| a.0.as_bytes().cmp(b.0.as_bytes()));
+                out.object(
+                    entries
+                        .into_iter()
+                        .map(|(key, value)| (key.as_bytes(), value)),
+                )
+            }
         }
     }
 }

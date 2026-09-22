@@ -1,6 +1,6 @@
 //! Direct native action traces for command-line parsing and parsed config.
-//! Missing result accessors remain individually identified; argv operations
-//! now call the production parser, including response files and build mode.
+//! Operations call production parsers, result accessors and diagnostic policies,
+//! including response files and build mode.
 
 use crate::api::{action_op, action_str, actions, ordered, subject, Outcome};
 use serde_json::{json, Map, Value};
@@ -14,241 +14,6 @@ use tsr_tsoptions::{
     COMPILER_OPTIONS, ROOT_OPTIONS, WATCH_OPTIONS,
 };
 use tsr_vfs::{FileSystem, MemoryBuilder};
-
-// ---------------------------------------------------------------------------
-// The gaps, one reviewed record each.
-// ---------------------------------------------------------------------------
-
-/// Shared by the `ParsedCommandLine` accessors the port does not carry.
-const NO_ACCESSOR: &str = "crates/tsr_tsoptions/src/lib.rs:196-212 declares ParsedCommandLine and \
-     crates/tsr_tsoptions/src/config_specs.rs:70-117 carries its only accessor block; neither \
-     defines this operation (absent)";
-
-/// `(operation, go_authority, intended_signature, production_home)`.
-type Gap = (&'static str, &'static str, &'static str, &'static str);
-
-const INVALID_ENUM_TYPE_DIAGNOSTIC: Gap = (
-    "tsc/internal/tsoptions/errors.go:createDiagnosticForInvalidEnumType",
-    "tsc/internal/tsoptions/errors.go:14, which collects the option's enum keys, formats them \
-     through formatEnumTypeKeys (:21) and builds Argument_for_0_option_must_be_Colon_1",
-    "pub fn invalid_enum_type_diagnostic(option: &OptionDeclaration, syntax: OptionSyntax<'_>) -> \
-     Diagnostic",
-    "crates/tsr_tsoptions/src/option_declarations.rs:62 has enum_names, the string this \
-     diagnostic carries, and crates/tsr_tsoptions/src/fixture_options.rs:57 builds the same \
-     message for the fixture bridge; neither is a shared operation the config path can call, \
-     and fixture_options::enum_error is private to that module (absent as a named operation)",
-);
-
-const EXTRA_KEY_DIAGNOSTICS: Gap = (
-    "tsc/internal/tsoptions/errors.go:extraKeyDiagnostics",
-    "tsc/internal/tsoptions/errors.go:103 and its did-you-mean sibling at :118, which map a \
-     parent option name -- compilerOptions, watchOptions, typeAcquisition, buildOptions -- to \
-     the unknown-key message pair, and answer nil for anything else",
-    "pub fn extra_key_diagnostics(parent: &[u8]) -> Option<(&'static Message, &'static Message)>",
-    "crates/tsr_tsoptions/src/config_parse.rs:144-156 inlines the same choice inside `unknown`, \
-     for compilerOptions and typeAcquisition only, with no watchOptions or buildOptions arm and \
-     no nil answer for an unrecognised parent (absent as an operation, and partial where it is \
-     inlined)",
-);
-
-const WORKER_DIAGNOSTICS: Gap = (
-    "tsc/internal/tsoptions/diagnostics.go:getParseCommandLineWorkerDiagnostics",
-    "tsc/internal/tsoptions/diagnostics.go:30, which builds the compiler-mode \
-     ParseCommandLineWorkerDiagnostics -- the alternate mode pointing at BuildNameMap, the \
-     unknown and did-you-mean messages, and the option-type mismatch message -- over a \
-     caller-supplied declaration list",
-    "pub fn parse_command_line_worker_diagnostics(declarations: &'static [OptionDeclaration]) -> \
-     ParseCommandLineWorkerDiagnostics",
-    "no Rust home: crates/tsr_tsoptions has no worker-diagnostics value at all; \
-     fixture_options.rs:276-302 hard-codes the compiler-mode choices inline instead (absent)",
-);
-
-const TO_CANONICAL_KEY: Gap = (
-    "tsc/internal/tsoptions/wildcarddirectories.go:toCanonicalKey",
-    "tsc/internal/tsoptions/wildcarddirectories.go:85, the case-folding a wildcard directory key \
-     is stored under",
-    "pub fn to_canonical_key(path: &[u8], use_case_sensitive_file_names: bool) -> Cow<'_, [u8]>",
-    "no Rust home: a grep for `wildcard` over crates/ finds only diagnostic message names, \
-     tsr_module type references and semver helpers; crates/tsr_tsoptions has no \
-     wildcard-directory file (absent)",
-);
-
-const WILDCARD_DIRECTORY_FROM_SPEC: Gap = (
-    "tsc/internal/tsoptions/wildcarddirectories.go:getWildcardDirectoryFromSpec",
-    "tsc/internal/tsoptions/wildcarddirectories.go:99, which decides from one include spec which \
-     directory is watched and whether it is watched recursively",
-    "pub fn wildcard_directory_from_spec(spec: &[u8], use_case_sensitive_file_names: bool) -> \
-     Option<WildcardDirectoryMatch>",
-    "no Rust home: crates/tsr_tsoptions has no wildcard-directory file (absent)",
-);
-
-const WILDCARD_DIRECTORIES: Gap = (
-    "tsc/internal/tsoptions/wildcarddirectories.go:getWildcardDirectories",
-    "tsc/internal/tsoptions/wildcarddirectories.go:10, the whole calculation: exclude matching, \
-     per-spec directory selection, canonical-key collision handling and the removal of subpaths \
-     under an already recursive watch",
-    "pub fn wildcard_directories(include: &[JsString], exclude: &[JsString], base: &[u8], \
-     use_case_sensitive_file_names: bool) -> Vec<(JsString, bool)>, carrying the include-order \
-     insertion sequence the TypeScript object had",
-    "no Rust home: crates/tsr_tsoptions has no wildcard-directory file, and \
-     crates/tsr_tsoptions/src/config_specs.rs carries only the spec matchers (absent)",
-);
-
-/// The `ParsedCommandLine` accessors with no Rust counterpart, by probe name.
-const ACCESSOR_GAPS: &[(&str, Gap)] = &[
-    (
-        "file_names_by_path",
-        (
-            "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.FileNamesByPath",
-            "tsc/internal/tsoptions/parsedcommandline.go:334, the once-built path -> file-name \
-             index over the parse's own file names",
-            "pub fn file_names_by_path(&self) -> &BTreeMap<Path, JsString>",
-            NO_ACCESSOR,
-        ),
-    ),
-    (
-        "current_directory",
-        (
-            "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.GetCurrentDirectory",
-            "tsc/internal/tsoptions/parsedcommandline.go:189, which reads the comparePathsOptions \
-             the result was built with, and :193 for the case-sensitivity flag beside it",
-            "pub fn current_directory(&self) -> &[u8]",
-            "crates/tsr_tsoptions/src/lib.rs:205-206 carries config_base_path and \
-             config_case_sensitive as public fields, but the pinned pair is comparePathsOptions, \
-             which a command-line parse fills from the host rather than from a config's base \
-             path; no accessor of that name exists (absent)",
-        ),
-    ),
-    (
-        "wildcard_directories",
-        (
-            "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.WildcardDirectories",
-            "tsc/internal/tsoptions/parsedcommandline.go:258, the once-only accessor that is the \
-             only pinned caller of getWildcardDirectories (wildcarddirectories.go:10)",
-            "pub fn wildcard_directories(&self) -> &[(JsString, bool)]",
-            NO_ACCESSOR,
-        ),
-    ),
-    (
-        "wildcard_directory_globs",
-        (
-            "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.fileGlobPatterns",
-            "tsc/internal/tsoptions/parsedcommandline.go:31, which augments the built-in include \
-             glob with the extensions the config's content mappers registered; its only caller is \
-             WildcardDirectoryGlobs (:284)",
-            "fn file_glob_patterns(&self) -> (Vec<u8>, Vec<u8>)",
-            NO_ACCESSOR,
-        ),
-    ),
-    (
-        "extended_source_files",
-        (
-            "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.ExtendedSourceFiles",
-            "tsc/internal/tsoptions/parsedcommandline.go:386, which reads the extends chain the \
-             parse recorded on the config source file, and answers nil when there is no config",
-            "pub fn extended_source_files(&self) -> &[JsString]",
-            "crates/tsr_tsoptions/src/config_syntax.rs:11 carries extended_source_files on \
-             TsConfigSourceFile, so the state exists; no accessor on ParsedCommandLine reaches \
-             it, and the nil-when-no-config contract has no home (absent)",
-        ),
-    ),
-    (
-        "project_references",
-        (
-            "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.ResolvedProjectReferencePaths",
-            "tsc/internal/tsoptions/parsedcommandline.go:379, the once-only resolution of every \
-             project reference path, over ProjectReferences (:345)",
-            "pub fn resolved_project_reference_paths(&self) -> &[JsString]",
-            "crates/tsr_tsoptions/src/lib.rs:209 carries project_references as a public field, so \
-             the references themselves exist; core.ResolveProjectReferencePath has no Rust \
-             counterpart reachable from ParsedCommandLine (absent)",
-        ),
-    ),
-    (
-        "common_source_directory",
-        (
-            "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.CommonSourceDirectory",
-            "tsc/internal/tsoptions/parsedcommandline.go:157, which filters the file names and \
-             hands outputpaths.GetCommonSourceDirectory the checkSourceFilesBelongToPath callback \
-             at :176 -- the callback that appends File_0_is_not_under_rootDir_1 to Errors",
-            "pub fn common_source_directory(&mut self) -> &[u8]",
-            NO_ACCESSOR,
-        ),
-    ),
-    (
-        "build_info_file_name",
-        (
-            "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.GetBuildInfoFileName",
-            "tsc/internal/tsoptions/parsedcommandline.go:253, which forwards the compiler options \
-             and comparePathsOptions to outputpaths.GetBuildInfoFileName",
-            "pub fn build_info_file_name(&self) -> JsString",
-            NO_ACCESSOR,
-        ),
-    ),
-    (
-        "input_output_names",
-        (
-            "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.ParseInputOutputNames",
-            "tsc/internal/tsoptions/parsedcommandline.go:135, which walks \
-             getOutputDeclarationAndSourceFileNames (:197) once and fills both \
-             SourceToProjectReference (:127) and OutputDtsToProjectReference (:131)",
-            "pub fn parse_input_output_names(&mut self), plus the two path-keyed maps it fills",
-            NO_ACCESSOR,
-        ),
-    ),
-    (
-        "content_mappers",
-        (
-            "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.GetContentMapperForFileName",
-            "tsc/internal/tsoptions/parsedcommandline.go:366, which picks the configured mapper \
-             whose extensions match a file name, over ContentMapperExtensions (:358) and \
-             ContentMappers (:349)",
-            "pub fn content_mapper_for_file_name(&self, file_name: &[u8]) -> \
-             Option<&ContentMapper>",
-            "crates/tsr_tsoptions/src/lib.rs:211 carries content_mappers as a public field and \
-             crates/tsr_tsoptions/src/config_mappers.rs validates them, but no accessor selects a \
-             mapper by file name and nothing flattens the extension list (absent)",
-        ),
-    ),
-    (
-        "type_acquisition",
-        (
-            "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.SetTypeAcquisition",
-            "tsc/internal/tsoptions/parsedcommandline.go:321, and the accessor at :325 that reads \
-             back what it set",
-            "pub fn set_type_acquisition(&mut self, acquisition: TypeAcquisition)",
-            "crates/tsr_tsoptions/src/lib.rs:208 carries type_acquisition as a public field, so \
-             the state is reachable; no named operation sets or reads it, and writing the field \
-             from this harness would be the harness doing the port's job (absent)",
-        ),
-    ),
-    (
-        "set_compiler_options",
-        (
-            "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.SetCompilerOptions",
-            "tsc/internal/tsoptions/parsedcommandline.go:310, which replaces the compiler options \
-             without disturbing the rest of ParsedConfig, and Locale (:489), the once-only \
-             locale.Parse over whatever options are in place when it is first asked",
-            "pub fn set_compiler_options(&mut self, options: CompilerOptions) and pub fn \
-             locale(&self) -> Locale",
-            "crates/tsr_tsoptions/src/lib.rs:198 carries options as a public field; there is no \
-             setter operation, and no locale parsing anywhere in crates/tsr_tsoptions (absent)",
-        ),
-    ),
-    (
-        "set_parsed_options",
-        (
-            "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.SetParsedOptions",
-            "tsc/internal/tsoptions/parsedcommandline.go:306, which replaces the whole \
-             ParsedOptions block -- compiler options, watch options, type acquisition, file \
-             names, project references and content mappers -- in one call",
-            "pub fn set_parsed_options(&mut self, parsed: ParsedOptions)",
-            "crates/tsr_tsoptions/src/lib.rs:196-212 flattens ParsedOptions into \
-             ParsedCommandLine's own fields, so there is no block to replace and no setter \
-             (absent)",
-        ),
-    ),
-];
 
 // ---------------------------------------------------------------------------
 // Rendering.
@@ -291,6 +56,10 @@ macro_rules! diagnostic_rows {
 fn config_value(value: &ConfigValue) -> Value {
     match value {
         ConfigValue::Null => Value::Null,
+        ConfigValue::StringArray(values) => strings(values.as_deref().unwrap_or_default()),
+        ConfigValue::UnorderedObject(_) => {
+            config_value(&tsr_tsoptions::normalize_json_value(value.clone()))
+        }
         ConfigValue::EmptyStruct => Value::String("empty-struct".into()),
         ConfigValue::Boolean(value) => json!(value),
         ConfigValue::Number(value) => json!(value),
@@ -447,6 +216,40 @@ fn config_parse(request: &Value) -> Result<ParsedCommandLine, String> {
 // ---------------------------------------------------------------------------
 // Actions.
 // ---------------------------------------------------------------------------
+
+// Production declarations have static metadata. This short-lived probe process
+// retains request-owned synthetic names for that lifetime; no production parser
+// or compiler options acquire a leaking dynamic-declaration API.
+pub(super) fn worker_declaration(value: &Value) -> Result<OptionDeclaration, Outcome> {
+    use tsr_tsoptions::OptionKind;
+    let kind = match action_str(value, "kind") {
+        "string" => OptionKind::String,
+        "boolean" => OptionKind::Boolean,
+        "number" => OptionKind::Number,
+        "object" => OptionKind::Object,
+        "enum" => OptionKind::Enum,
+        other => {
+            return Err(Outcome::Failed(format!(
+                "unsupported synthetic declaration kind {other:?}"
+            )))
+        }
+    };
+    Ok(OptionDeclaration {
+        name: Box::leak(action_str(value, "name").to_owned().into_boxed_str()),
+        short_name: Box::leak(action_str(value, "shortName").to_owned().into_boxed_str()),
+        kind,
+        is_file_path: value["isFilePath"].as_bool().unwrap_or(false),
+        is_tsconfig_only: value["isTSConfigOnly"].as_bool().unwrap_or(false),
+        is_command_line_only: value["isCommandLineOnly"].as_bool().unwrap_or(false),
+        enum_values: &[],
+        deprecated_keys: &[],
+        element: None,
+        extra_validation: "",
+        min_value: 0,
+        allow_config_dir_template: false,
+        preserve_falsy: false,
+    })
+}
 
 /// Answer one action, or report which pinned operation the port is missing.
 #[allow(clippy::too_many_lines)]
@@ -634,18 +437,19 @@ fn run(
             let (options, raw, errors) = if action_op(action) == "parse_command_line" {
                 let parsed = tsr_tsoptions::parse_command_line(&args, &host);
                 row.insert("file_names".into(), strings(&parsed.root_file_names));
-                row.insert(
-                    "current_directory".into(),
-                    text(parsed.config_base_path.as_bytes()),
-                );
+                row.insert("current_directory".into(), text(parsed.current_directory()));
                 row.insert(
                     "use_case_sensitive_file_names".into(),
-                    json!(parsed.config_case_sensitive),
+                    json!(parsed.use_case_sensitive_file_names()),
                 );
                 (parsed.options, parsed.raw, parsed.errors)
             } else {
                 let parsed = tsr_tsoptions::parse_build_command_line(&args, &host);
                 row.insert("projects".into(), strings(&parsed.projects));
+                row.insert(
+                    "resolvedProjects".into(),
+                    strings(parsed.resolved_project_paths()),
+                );
                 row.insert(
                     "locale_is_default".into(),
                     json!(parsed.locale().is_default()),
@@ -678,12 +482,118 @@ fn run(
                 text(tsr_tsoptions::input_option_name(input.as_bytes())),
             );
         }
-        "invalid_enum_type_diagnostic" => return Err(gap(INVALID_ENUM_TYPE_DIAGNOSTIC)),
-        "extra_key_diagnostics" => return Err(gap(EXTRA_KEY_DIAGNOSTICS)),
-        "worker_diagnostics" => return Err(gap(WORKER_DIAGNOSTICS)),
-        "canonical_key" => return Err(gap(TO_CANONICAL_KEY)),
-        "wildcard_directory_from_spec" => return Err(gap(WILDCARD_DIRECTORY_FROM_SPEC)),
-        "wildcard_directories" => return Err(gap(WILDCARD_DIRECTORIES)),
+        "invalid_enum_type_diagnostic" => {
+            let option = declaration(action).map_err(Outcome::Failed)?;
+            let diagnostic = tsr_tsoptions::invalid_enum_type_diagnostic(
+                option,
+                tsr_tsoptions::OptionSyntax::default(),
+            );
+            row.insert("name".into(), json!(option.name));
+            row.insert(
+                "diagnostic".into(),
+                diagnostic_rows!([diagnostic])[0].clone(),
+            );
+        }
+        "extra_key_diagnostics" => {
+            let parent = action_str(action, "value");
+            let messages = tsr_tsoptions::extra_key_diagnostics(parent.as_bytes());
+            row.insert("parent".into(), json!(parent));
+            row.insert(
+                "unknown_code".into(),
+                messages.map_or(Value::Null, |messages| json!(messages.0.code)),
+            );
+            row.insert(
+                "did_you_mean_code".into(),
+                messages.map_or(Value::Null, |messages| json!(messages.1.code)),
+            );
+        }
+        "worker_diagnostics" => {
+            let declarations = action
+                .get("declarations")
+                .and_then(Value::as_array)
+                .ok_or_else(|| Outcome::Failed("missing declarations".into()))?
+                .iter()
+                .map(worker_declaration)
+                .collect::<Result<Vec<_>, _>>()?;
+            let policy = tsr_tsoptions::parse_command_line_worker_diagnostics(&declarations);
+            row.insert(
+                "option_type_mismatch_code".into(),
+                json!(policy.mismatch.code),
+            );
+            row.insert("unknown_option_code".into(), json!(policy.unknown.code));
+            row.insert(
+                "unknown_did_you_mean_code".into(),
+                json!(policy.did_you_mean.code),
+            );
+            row.insert(
+                "alternate_mode_code".into(),
+                policy
+                    .alternate
+                    .map_or(Value::Null, |alternate| json!(alternate.diagnostic.code)),
+            );
+            row.insert(
+                "alternate_mode_has_name_map".into(),
+                json!(policy.alternate.is_some()),
+            );
+            row.insert("declaration_count".into(), json!(policy.declarations.len()));
+        }
+        "canonical_key" => {
+            let input = action_str(action, "value");
+            row.insert("input".into(), json!(input));
+            row.insert(
+                "key".into(),
+                text(
+                    tsr_tsoptions::canonical_key(
+                        input.as_bytes(),
+                        request["caseSensitive"].as_bool().unwrap_or(false),
+                    )
+                    .as_bytes(),
+                ),
+            );
+        }
+        "wildcard_directory_from_spec" => {
+            let spec = action_str(action, "value");
+            let found = tsr_tsoptions::wildcard_directory_from_spec(
+                spec.as_bytes(),
+                request["caseSensitive"].as_bool().unwrap_or(false),
+            );
+            row.insert("spec".into(), json!(spec));
+            row.insert("matched".into(), json!(found.is_some()));
+            row.insert(
+                "key".into(),
+                text(found.as_ref().map_or(b"", |v| v.key.as_bytes())),
+            );
+            row.insert(
+                "path".into(),
+                text(found.as_ref().map_or(b"", |v| v.path.as_bytes())),
+            );
+            row.insert(
+                "recursive".into(),
+                json!(found.is_some_and(|v| v.recursive)),
+            );
+        }
+        "wildcard_directories" => {
+            let list = |key: &str| {
+                action[key]
+                    .as_array()
+                    .into_iter()
+                    .flatten()
+                    .map(|v| JsString::from_bytes(v.as_str().expect("spec string").as_bytes()))
+                    .collect::<Vec<_>>()
+            };
+            let include = list("include");
+            let exclude = list("exclude");
+            let directories = tsr_tsoptions::wildcard_directories(
+                &include,
+                &exclude,
+                action_str(request, "currentDirectory").as_bytes(),
+                request["caseSensitive"].as_bool().unwrap_or(false),
+            );
+            row.insert("include".into(), strings(&include));
+            row.insert("exclude".into(), strings(&exclude));
+            row.insert("is_nil".into(), json!(directories.is_none()));
+            row.insert("directories".into(), directory_rows(directories.as_ref()));
+        }
 
         other => {
             return Err(Outcome::Failed(format!(
@@ -694,8 +604,18 @@ fn run(
     Ok(Value::Object(row))
 }
 
-fn gap((operation, authority, signature, home): Gap) -> Outcome {
-    Outcome::missing(operation, authority, signature, home)
+fn directory_rows(
+    directories: Option<&tsr_core::collections::OrderedMap<JsString, bool>>,
+) -> Value {
+    let mut entries = directories
+        .into_iter()
+        .flat_map(|m| m.iter())
+        .collect::<Vec<_>>();
+    entries.sort_by(|a, b| a.0.cmp(b.0));
+    json!(entries
+        .into_iter()
+        .map(|(p, r)| json!([text(p.as_bytes()), r]))
+        .collect::<Vec<_>>())
 }
 
 /// Drive one `ParsedCommandLine` accessor, or report it missing.
@@ -706,17 +626,173 @@ fn config_probe(
 ) -> Result<Value, Outcome> {
     let requested = action_str(action, "probe");
     let (probe, argument) = requested.split_once(':').unwrap_or((requested, ""));
-    if let Some((_, record)) = ACCESSOR_GAPS.iter().find(|(name, _)| *name == probe) {
-        return Err(gap(*record));
-    }
     if parsed.is_none() {
         *parsed = Some(config_parse(request).map_err(Outcome::Failed)?);
     }
-    let parsed = parsed.as_ref().expect("config parse");
+    let parsed = parsed.as_mut().expect("config parse");
     let mut row = Map::new();
     row.insert("op".into(), Value::String("parsed_config".into()));
     row.insert("probe".into(), Value::String(requested.to_owned()));
     match probe {
+        "common_source_directory" => {
+            let before = parsed.errors.len();
+            row.insert(
+                "common_source_directory".into(),
+                text(parsed.common_source_directory()),
+            );
+            row.insert("errors_added".into(), json!(parsed.errors.len() - before));
+            row.insert("errors".into(), diagnostic_rows!(&parsed.errors[before..]));
+        }
+        "build_info_file_name" => {
+            row.insert(
+                "build_info_file_name".into(),
+                text(parsed.build_info_file_name().as_bytes()),
+            );
+        }
+        "input_output_names" => {
+            parsed.parse_input_output_names();
+            row.insert(
+                "source_to_project_reference".into(),
+                json!(parsed
+                    .source_to_project_reference()
+                    .map(|(key, entry)| json!([
+                        text(key.as_bytes()),
+                        text(entry.names.source.as_bytes()),
+                        text(entry.names.output_dts.as_bytes())
+                    ]))
+                    .collect::<Vec<_>>()),
+            );
+            row.insert(
+                "output_dts_to_project_reference".into(),
+                json!(parsed
+                    .output_dts_to_project_reference()
+                    .map(|(key, entry)| json!([
+                        text(key.as_bytes()),
+                        text(entry.names.source.as_bytes()),
+                        text(entry.names.output_dts.as_bytes())
+                    ]))
+                    .collect::<Vec<_>>()),
+            );
+        }
+        "file_names_by_path" => {
+            row.insert(
+                "file_names_by_path".into(),
+                json!(parsed
+                    .file_names_by_path()
+                    .iter()
+                    .map(|(key, value)| [text(key.as_bytes()), text(value.as_bytes())])
+                    .collect::<Vec<_>>()),
+            );
+        }
+        "wildcard_directory_globs" => {
+            let mut patterns = parsed
+                .wildcard_directory_globs()
+                .unwrap_or_default()
+                .iter()
+                .map(tsr_glob::Glob::to_bytes)
+                .collect::<Vec<_>>();
+            patterns.sort();
+            row.insert("glob_count".into(), json!(patterns.len()));
+            row.insert(
+                "patterns".into(),
+                json!(patterns
+                    .iter()
+                    .map(|pattern| text(pattern))
+                    .collect::<Vec<_>>()),
+            );
+        }
+        "extended_source_files" => {
+            row.insert(
+                "extended_source_files".into(),
+                strings(parsed.extended_source_files()),
+            );
+        }
+        "project_references" => {
+            row.insert(
+                "project_references".into(),
+                json!(parsed
+                    .project_references
+                    .iter()
+                    .flatten()
+                    .map(|reference| json!([
+                        text(reference.path.as_bytes()),
+                        text(reference.original_path.as_bytes()),
+                        reference.circular
+                    ]))
+                    .collect::<Vec<_>>()),
+            );
+            row.insert(
+                "resolved_paths".into(),
+                strings(parsed.resolved_project_reference_paths()),
+            );
+        }
+        "content_mappers" => {
+            row.insert(
+                "mapper_count".into(),
+                json!(parsed.content_mappers.as_ref().map_or(0, Vec::len)),
+            );
+            row.insert(
+                "extensions".into(),
+                strings(&parsed.content_mapper_extensions()),
+            );
+            row.insert("mapper_for_file".into(), json!(argument));
+            row.insert(
+                "has_mapper_for_file".into(),
+                json!(
+                    !argument.is_empty()
+                        && parsed
+                            .content_mapper_for_file_name(argument.as_bytes())
+                            .is_some()
+                ),
+            );
+        }
+        "type_acquisition" => {
+            parsed.set_type_acquisition(Some(tsr_tsoptions::TypeAcquisition {
+                enable: tsr_core::Tristate::TRUE,
+                ..Default::default()
+            }));
+            row.insert(
+                "set_then_read_enable".into(),
+                json!(parsed
+                    .type_acquisition
+                    .as_ref()
+                    .is_some_and(|value| value.enable.is_true())),
+            );
+        }
+        "set_compiler_options" => {
+            parsed.set_compiler_options(CompilerOptions {
+                locale: JsString::from_bytes(argument.as_bytes()),
+                ..Default::default()
+            });
+            row.insert("locale_input".into(), json!(argument));
+            row.insert(
+                "locale_is_default".into(),
+                json!(parsed.locale().is_default()),
+            );
+            row.insert(
+                "file_names_survived".into(),
+                json!(parsed.root_file_names.len()),
+            );
+        }
+        "set_parsed_options" => {
+            parsed.set_parsed_options(tsr_tsoptions::ParsedOptions {
+                file_names: vec![JsString::from_bytes(argument.as_bytes())],
+                ..Default::default()
+            });
+            row.insert("file_names".into(), strings(&parsed.root_file_names));
+        }
+        "current_directory" => {
+            row.insert("current_directory".into(), text(parsed.current_directory()));
+            row.insert(
+                "use_case_sensitive_file_names".into(),
+                json!(parsed.use_case_sensitive_file_names()),
+            );
+        }
+        "wildcard_directories" => {
+            let directories = parsed.wildcard_directories();
+            row.insert("is_nil".into(), json!(directories.is_none()));
+            row.insert("directories".into(), directory_rows(directories));
+        }
         "config_name" => {
             row.insert("config_name".into(), text(parsed.config_name().as_bytes()));
         }

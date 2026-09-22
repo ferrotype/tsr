@@ -993,6 +993,31 @@ executor or mapper process is implemented to finish this preparation step.
 cache tests pass, and loader closure/diagnostics agree. No unsupported required
 operation is disguised as an empty successful parse or an unresolved module.
 
+##### Follow-up before concurrent resolution on one resolver
+
+F3b's `Resolver::with_redirect` temporarily replaces the resolver's options
+handle, base-options handle and parsed-path-pattern cache. `OptionsScope::drop`
+restores them on return or panic unwinding. The option values themselves remain
+immutable, and `&mut Resolver` prevents overlapping calls. This is a serial
+per-resolver contract, not evidence of concurrent resolution support.
+
+The pin keeps redirected compiler options and request state in
+`internal/module/resolver.go:resolutionState`, with per-call traces and
+synchronized shared caches in `internal/module/cache.go`. Before Phase 2/3
+consumers introduce concurrent calls on a shared Rust resolver, move effective
+and base options, request flags, traces, probes and scratch results into
+per-call state. Define synchronization and result ownership for the module,
+type-reference and parsed-pattern caches as part of that change; moving only
+the redirected options is insufficient. Preserve redirect/mode cache separation
+and the pin's distinction between base and effective options.
+
+Validate overlapping calls using different redirects and resolution modes,
+including hits, misses, negative entries and one failing request. Compare each
+result and ordered trace with its serial native counterpart, and verify that
+failure or unwinding cannot affect another call's options or results. This
+follow-up is required before adding shared-resolver concurrency; it does not
+reopen the completed serial F3b scope.
+
 ### F4 — complete syntax, binding and reusable syntax services
 
 Reuse the direct parser and binder corpus, including every virtual unit and

@@ -18,6 +18,18 @@ pub fn substitute_path(value: &[u8], base: &[u8]) -> JsString {
     }
     JsString::from_bytes(tsr_tspath::absolute(&result, base))
 }
+/// Returns None when no element matches, preserving the caller's original list.
+/// port: tsc/internal/tsoptions/tsconfigparsing.go:getSubstitutedStringArrayWithConfigDirTemplate
+pub fn substituted_strings(values: &[JsString], base: &[u8]) -> Option<Vec<JsString>> {
+    let mut result = None;
+    for (index, value) in values.iter().enumerate() {
+        if starts_with_config_dir(value.as_bytes()) {
+            result.get_or_insert_with(|| values.to_vec())[index] =
+                substitute_path(value.as_bytes(), base);
+        }
+    }
+    result
+}
 pub fn substitute_strings(values: &mut [JsString], base: &[u8]) {
     for value in values {
         if starts_with_config_dir(value.as_bytes()) {

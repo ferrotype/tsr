@@ -19,8 +19,9 @@ moved pin invalidates it.
 
 `python3 scripts/phase1.py inventory --check` computes this: it reports
 `f0_complete: false` with the outstanding items, separately from whether the
-manifests are internally consistent. Stage A preparation is not Phase 1
-implementation; no production behavior has been added or changed.
+manifests are internally consistent. This table tracks preparation; the later
+sections record production implementation separately. **F3b is complete** under
+the approved immutable-`Parseable` exception; see the completion record below.
 
 ## F1a — foundation leaf preparation
 
@@ -2072,3 +2073,347 @@ Clippy with warnings denied, Rust 1.96 checks for both changed consumers,
 formatting, publication policy and the 164 Phase 1 Python tests (20 subtests)
 pass. Inventory validation has no problems; pending Linux observations remain
 explicit.
+
+### F3b continuation: build paths and the shared CLI renderer
+
+`ParsedBuildCommandLine::resolved_project_paths` now mirrors the pinned lazy
+once cache, including JSON suffix rules, input order and repeated projects.
+Its seven direct Go build traces match; the focused tests also cover normalized
+paths and cache/clone behavior.
+
+The 53 ordinary and 27 build command-line baseline cases now execute the Rust
+production parser and diagnostic writer. The default-off `harness` feature
+exposes the same parser worker to the pinned synthetic declaration fixture.
+The argument vectors are frozen inputs and checked against the native input
+sections; neither Rust nor the renderer reads expected result sections.
+
+The Go bridge calls the original `formatNewBaseline`/`formatNewBaselineBuild`.
+It converts a complete typed option record to the native structs for their
+JSON encoding, rejecting unknown or missing fields and invalid types. Byte
+strings use hex; nil slices, empty slices, ordered maps, raw enum values and
+all three tristates stay distinct. Diagnostic arguments are an ordered
+sequence (nil and zero arguments both mean an empty sequence); this does not
+normalize any option container. Rust supplies its own formatted error bytes.
+Native witnesses passed through the same bridge reproduce all 80 frozen files.
+
+The scoped capture `target/phase1/f3b-cli-bridge` compares **80/80** byte and
+typed observations, with no missing or differing selected row. It retains the
+raw Rust output and renderer input/output with authenticated hashes; replay
+checks the renderer did not change a Rust value or outcome and starts no
+children. Renderer controls reject missing/unknown/wrong-type fields and
+repeated map keys, preserve nil/empty/order, and expose changed options or file
+order. Focused Rust checks and 167 Phase 1 Python tests plus 20 subtests pass;
+the committed-scope comparison is intentionally stale until the final F3b
+inventory refresh. This step does not claim the remaining config, cache and
+module-resolution gaps complete.
+
+### F3b continuation: config baseline bridge
+
+The same bridge now covers the 40 raw-JSON, 40 JSON-source and seven JSON-text
+config baselines. The inputs are frozen from the actual pinned test tables
+(and the already-reviewed input-only recovery for acquisition cases); the
+native producer refuses drift. Rust calls the production config APIs and pretty
+diagnostic writer. All option fields, raw values, acquisition values, file
+order, diagnostic positions/arguments/chains and formatted bytes are compared.
+The carried inline envelope assembly consumes supplied results only.
+
+All **87/87** config baselines reproduce the native bytes and canonical typed
+observations (`target/phase1/f3b-config-native-02` and
+`target/phase1/f3b-config-render-rust-02`). Floating-point transport uses IEEE-754
+bits: JSON's `1` versus `1.0` otherwise creates artificial canonical differences
+in four raw-value observations despite identical types and rendered bytes.
+The full intermediate family capture found the same seven existing differences
+and 96 remaining direct-operation gaps; its four additional raw-number transport
+differences were resolved by that lossless encoding. No earlier matching
+production case regressed. Focused clippy and the Phase 1 Python checks pass;
+tracker/inventory recording remains deferred to F3b completion.
+
+### F3b continuation: wildcard cache and matching context
+
+Wildcard discovery now uses `OnceLock` and returns a borrowed result. Its three
+inputs (validated specs, base directory and case sensitivity) are private and
+read-only between explicit `set_config_specs` calls. That setter requires
+`&mut self` and clears the cache. A program snapshot therefore cannot mutate
+another reader's inputs, and repeated lookups do no spec copying, hashing or
+recalculation. Cloning still owns independent specs and a separate cached map.
+This supplies the mutation/invalidation boundary requested in F3b item 2.
+
+The regression covers concurrent first reads, replacement before and after
+initialization, changes to base/excludes/casing, nil results and clone isolation.
+The production wildcard/canonical helpers and parsed-context getters also now
+serve their direct harness cases. All 55 implemented command-line action
+traces match Go (15 other traces remain pending), all 142 matchFiles envelopes
+are unchanged, and the compiler's two include-reason tests pass. Focused
+clippy with warnings denied passes. Tracker refresh remains at the final step.
+
+### F3b continuation: package selection and resolver fidelity
+
+Package version selection and its trace list remain initialized once per source
+package, including directory aliases. Each retrieval now owns a separate lazy
+mapping table, as Go's returned-by-value `VersionPaths` does; repeated reads of
+one retrieval share that table. The resolver and checker consume that same API.
+A public traced retrieval makes recorded diagnostics observable on every call.
+The previous snapshot/options clone decisions do not cover this distinct cache
+contract, so the native behavior is preserved rather than silently excepted.
+
+Exports now use the existing package object classification (including hash-key
+and mixed objects), and relative type references use the same trailing-directory
+normalization as ordinary module references. All three corrected native traces
+and the newly implemented version-trace case match; all five module unit tests
+and focused clippy pass. The remaining resolver differences involve native
+failure behavior, not these successful-resolution paths. Inventory recording
+remains deferred to the final F3b batch.
+
+### F3b continuation: shared resolver helpers
+
+Package-name unmangling, node_modules path extraction and byte-preserving package
+identity rendering now have shared production homes; the checker and compiler
+reuse them. Compiler `paths` patterns are parsed lazily once for the resolver's
+immutable options and preserve exact-match precedence and insertion-order ties.
+The direct helper traces now run through those APIs. The native trailer-pattern
+case includes overlapping ends that panic during slicing; the Rust branch now
+preserves that bounds failure rather than silently returning unresolved. The
+adapter records the same distinct index/slice bounds classes per action and
+rejects unrelated panics. All 49 implemented module traces match; eight remain
+unimplemented and two retain visible failure-contract differences. Both path
+mapping regressions and focused clippy pass.
+
+### F3b continuation: real resolver cache ownership
+
+`InfoCache` now owns canonical package entries, including negative observations,
+with first-writer-wins publication and callback-safe enumeration. Resolvers can
+share it explicitly. Standalone tools can opt into a live host; the default
+constructor still refuses one, preserving the program snapshot boundary. Trace
+toggling is an exclusive resolver operation and never mutates shared options.
+Module results retain the first cached value but return a fresh traced result;
+type-reference results retain the latest value, matching their different Go
+stores. Concurrent cache publication and callback reentry have focused tests.
+
+The module adapter now uses the already-ported vfstest/iovfs host rather than
+MemorySnapshot, so live updates and absolute-path refusal exercise real host
+operations. Module resolution preserves the containing-file spelling and the
+pin's explicit invalid-resolution-kind failure. All **55 implemented module
+traces match**, including injected negative caches and both write policies;
+four other traces remain pending. Nine module tests, the compiler refusal
+regression and focused clippy pass. No benchmark or full corpus was run.
+
+### F3b continuation: reverse package entrypoints
+
+The resolver now discovers package entrypoints from exact/wildcard export maps
+and from directory fallback. Results retain symlink and real paths, rewriteable
+ending categories and required/excluded conditions. An explicit work stack
+preserves native depth-first order through nested arrays and condition objects.
+The checker reuses the shared JS-extension conversion instead of its duplicate.
+
+The native fixture was expanded without dropping its original symlink/pattern
+observations: it now covers nested condition exclusions, `types` short-circuiting,
+invalid/null targets, array alternatives, directory-search enablement and nested
+node_modules exclusion. Both adapters expose condition sets with nilness and
+sorted members. All four discovery calls match Go (5, 5, 2 and 1 entrypoints),
+including every field and condition set, in the focused native capture at
+`target/phase1/f3b-entrypoints-native-03`. The original module schedule now has
+56 implemented matching cases, with three remaining production gaps. Focused
+clippy passes; final inventory/evidence regeneration will include the expansion.
+
+### F3b continuation: project-reference resolution
+
+Module, type-reference and package-directory resolution now accept a borrowed
+project-reference view. Redirect names partition both resolution caches even
+when the reference has no compiler options. An exclusive options scope restores
+base options and their lazy path-pattern cache on success, error or panic;
+caller options and other resolvers remain unchanged. Trace enablement continues
+to come from the base resolver, as in Go.
+
+Both frozen redirect cases match native, bringing the original module schedule
+to 58 implemented cases (the expanded entrypoint case is compared separately).
+A focused regression checks panic restoration, pattern-cache restoration, cache
+key isolation and nil-option fallback. Three relative-path tests and focused
+clippy pass. The remaining module fixture is global typings fallback.
+
+### F3b continuation: complete direct module-resolution schedule
+
+Resolver settings now carry the global typings location, project name and extra
+extensions. The fallback shares immediate node_modules lookup with ordinary
+resolution, runs after its completion trace, uses base options rather than a
+project redirect and preserves the original diagnostics before its own. Package
+scope stops at the global-cache boundary. Registered compound extensions use the
+longest match and retain the resolved-using-extra-extensions bit.
+
+All **59/59 module cases** now match the newly executed native schedule at
+`target/phase1/f3b-module-native-complete`, including the expanded entrypoint
+condition data and a compound-extra-extension witness. No module case remains
+`not_implemented`. All 13 module tests and focused clippy pass. These development
+comparisons will be folded into final authenticated F3b evidence together.
+
+### F3b continuation: parsed-config result accessors
+
+Parsed results now expose canonical file-name indexes, wildcard globs (including
+mapper extensions), extended sources, resolved project references, mapper
+selection, locale and explicit option/type-acquisition replacement. Initialized
+result caches survive those replacements as Go's once caches do. Config-spec
+replacement invalidates both directory and glob caches through the existing
+exclusive setter.
+
+Common-source-directory diagnostics are emitted only on first use. Source/output
+indexes share name records and supply the owning parsed result through borrowed
+views, avoiding self pointers and ownership cycles. Build-info and declaration
+output helpers were moved from the compiler to tsoptions and reused by both;
+this adds no emitter or scheduler.
+
+All 12 previously missing accessor cases match native, taking the command-line
+action schedule to **67/70** (three diagnostic-helper cases remain). Focused
+regressions cover cache lifetime across replacement/clone, once-only diagnostics,
+shared map records and lazy output-directory discovery. Focused clippy and the
+package asset/publication policy check pass.
+
+### F3b continuation: shared option diagnostic policies
+
+Invalid enum diagnostics, unknown-key message pairs and compiler/build/watch
+worker policies now have shared production definitions. Both config conversion
+and command-line parsing call them; direct probes no longer duplicate message
+selection or report these operations absent. All **70/70 command-line action
+cases** match Go, including custom worker declaration lists, and all nine parser
+regressions pass. Focused clippy passes.
+
+### F3b continuation: config option and syntax helpers
+
+Absolute option conversion now shares one production implementation between the
+CLI and direct config API. The declaration-name map preserves original/lowercase
+keys and native spelling tie-breaking. Type-acquisition defaults and conditional
+config-directory array substitution are exposed without changing their existing
+callers' contracts.
+
+Direct config syntax queries now use the production property search and source
+ranges. This exposed and fixed an older duplicate-key bug: an absent array value
+in the first matching property must not resume searching later duplicate keys.
+Reference diagnostics and the deliberately kind-only `isDoubleQuotedString`
+predicate follow the pin. Config helper comparisons are **127/145 exact**, with
+18 explicitly missing cases and no differing results. Three syntax unit tests
+and focused clippy pass.
+
+The owner separately approved immutable published `Parseable` on 2026-09-22;
+the pinned caller audit and narrowly scoped alias-mutation exception are recorded
+in `PHASE1-aliasing-audit.md`. Final package evidence must preserve this difference.
+
+### F3b continuation: remaining config helper contracts
+
+The four option-parser policies now delegate to the production assignments;
+ordered-map assignment, project-reference validation, extension priority and
+mapper option-path diagnostics are available at the same boundary. Raw JSON
+normalization sorts foreign maps while preserving ordered objects and typed
+slice distinctions. The raw and object-root-checked syntax converters remain
+separate. All **141/145 config cases** that now execute match native; the four
+remaining gaps concern extended-config cache entries and reuse. All 17
+tsoptions tests pass, and focused clippy passes.
+
+### F3b continuation: extended-config cache ownership
+
+All **145/145 config cases** now match native. Extended-config entries preserve
+parsed options before caller-specific substitution, cached diagnostics and their
+syntax owners. The cache is bound to one host, parses outside its map lock and
+publishes a first winner. Callers replace or clear it when the host changes.
+Resolution-stack cycles bypass lookup; extended filenames are sorted and unique,
+as in Go. Focused tests cover cache reuse across two config directories, source
+retention after cache disposal, and a cyclic diamond. Both tests and focused
+clippy pass.
+
+### F3b continuation: package fields and test-host composition
+
+Package declarations now expose expected-type metadata independently of decoded
+JSON; resolver diagnostics consume that same metadata. Borrowed JSON views keep
+absence distinct from null and reject off-type string reads. Dependency queries
+cover all four fields with native field order and early termination. The package
+probes also exercise the already-implemented first-writer info cache and shared
+contents. **15/16 package cases match**; the remaining case reports immutable
+`Parseable` explicitly (`mutation_performed: false`) under the owner's recorded
+exception, while preserving shared identity.
+
+The tsoptionstest helpers remain private harness composition. Host observation
+now uses the actual TestFs adapter, including its relative-path refusal, and the
+one-shot helper calls production config parsing. **11/11 host cases match.**
+Focused module tests and clippy pass.
+
+### F3b continuation: diagnostic display and forward source maps
+
+All **18/18 diagnostic-writer action cases match** pinned Go. The production
+writer now resolves original versus virtual ranges, retains canonical file
+names, appends the synthesized-code note without mutating diagnostics, and
+serves wrapper identity, related information, comparison, status, clear-screen
+and tabular display operations. Full plain/pretty formatting uses those same
+resolved locations. The raw chain helper remains available for callers that
+have no file context; it no longer claims the complete file-aware port.
+
+The required forward span-mapping slice lives with the AST span segments and is
+recorded as a partial Phase 5 prerequisite in PORTS.toml. Reverse lookups,
+feature filtering, mapper transport and validation are not claimed. Tests port
+native span/boundary expectations and exercise mapped plain/pretty output,
+external diagnostics, synthesized notes, foreign-source rejection and retained
+file text after its AST owner drops. The existing native diagnostic byte suite,
+config source parity and config diagnostic integration tests pass. Focused
+all-target clippy passes with warnings denied. The S07 config observer also
+handles the newly explicit foreign JSON input variants through normalization.
+
+
+## F3b completion (2026-09-22)
+
+The remaining config, package and resolution implementation is complete under
+the owner-approved immutable-`Parseable` decision. The 80 command-line
+and 87 config outputs pass through the shared pinned Go test renderer; the 142
+matchFiles outputs also match the observed native renderer byte for byte.
+The existing 74 exceptions concerning historical matchFiles reference files
+remain separate and unchanged. No renderer copies expected output sections.
+
+| Family | Final raw comparison |
+| --- | --- |
+| Config, command-line, resolution and display (486) | 485 match; 1 approved `Parseable` alias-mutation difference |
+| Filesystem controls (359) | 355 match; 3 previously recorded differences; 1 Linux-only native unavailable |
+| Leaf controls (230) | 229 match; 1 previously approved options-clone difference |
+
+Every F3b case executes; none is missing or a harness failure. Package contents
+remain shared by identity; `Parseable` remains immutable after publication.
+Version selection and traces retain shared memoization, while path tables are
+memoized per retrieval, as in Go. The exact rejected `Parseable` mutation and
+its raw observation remain visible in the capture and
+[ownership audit](PHASE1-aliasing-audit.md).
+This approval does not suppress unrelated future differences.
+
+Resolution remains exclusive per `Resolver`: redirect scopes temporarily swap
+option handles and restore them on return or unwinding. The implementation plan
+records the [per-call state and cache work required before concurrent resolution](PHASE1-implementation-plan.md#follow-up-before-concurrent-resolution-on-one-resolver).
+F3b's serial comparisons do not certify overlapping calls on one resolver.
+
+The final family captures are retained in
+`data/phase1/captures/f3b-complete.tar.gz` (3,723,174 bytes, SHA-256
+`d60a5741831573dfc88ccda94a46e5ed3de79d0cdbe7c675195687c6c3d432d2`).
+An extracted copy was authenticated and replayed without compiling or running
+children. Family provenance SHA-256 values:
+
+- config: `4bb0b895786e49b197c4a68303fbccbc1f53d320dec64ab36283c3fd517d4ae1`
+- filesystem: `9162d70f33e96fd82553db69028fead58c0cb9720649dd12bd2accfc5d7ad1ed`
+- leaves: `89836a22c0a917916bf890756ef4d95fd295898bce73a5a45e3deb9191cded42`
+
+Program integration checks retain the 48 native ordered-loader fixtures, 25
+native config observations and config diagnostic/source-owner tests. The bounded
+E2 recheck selects all 232 frozen variants naming the changed loading/resolution
+surfaces plus 50 deterministic controls: **214 acceptance matches, 67
+informational matches and one informational native-unavailable case**. There
+are no execution failures or comparison regressions in any checked domain.
+The selection and scoped report are committed as
+`data/phase1/f3b-program-{selection,results}.json`; the full local capture is
+`target/phase1/f3b-program-recheck`. This does not replace full E2 evidence or
+claim new checker performance measurements.
+
+The S07 graph and selection review were refreshed after 71 Rust mapping changes.
+All non-mapping graph fields, subset bytes and checker obligations are unchanged.
+Correcting the forward span-map crate home required new upstream-manifest
+provenance; regenerated native syntax/config observations are byte-identical.
+The glob dependency now participates in the relevant producer fingerprints and
+the external embedding consumer lockfile.
+
+Validation: workspace all-target/all-feature clippy with warnings denied; 692
+Python tests and 1,297 subtests (one platform skip); config/module package and
+compiler integration tests; native plain/pretty diagnostic fixtures and mapped
+source ownership checks; formatting, package policy, tracker and inventory
+validation, and Rust 1.96 checks for the changed consumers. No benchmark was
+run. The older F2b foreign dynamic element/map differences, Linux-only
+observations and F4a/F5a preparation remain outside this F3b closure.

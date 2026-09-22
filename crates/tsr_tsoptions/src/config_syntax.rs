@@ -163,6 +163,19 @@ pub fn diagnostic_for_node(
     )
 }
 
+/// The pinned predicate only checks the syntax kind, including single-quoted
+/// recovery literals. The name does not imply a source-quote inspection.
+/// port: tsc/internal/tsoptions/tsconfigparsing.go:isDoubleQuotedString
+pub fn is_double_quoted_string(config: &TsConfigSourceFile, node: NodeId) -> bool {
+    config
+        .file
+        .view()
+        .node(node)
+        .expect("config syntax owner")
+        .kind()
+        == K::StringLiteral
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -204,5 +217,17 @@ mod tests {
         );
         assert_eq!(diagnostic.loc.end(), i64::from(node.end()));
         assert_eq!(diagnostic.file, Some(config.root));
+    }
+    #[test]
+    fn a_missing_element_in_the_first_property_does_not_search_duplicate_keys() {
+        let config = TsConfigSourceFile::parse(
+            JsString::from_bytes(b"/tsconfig.json".as_slice()),
+            JsString::from_bytes(b"/tsconfig.json".as_slice()),
+            SourceText::from_loaded_bytes(
+                br#"{"files":["first.ts"],"files":["second.ts"]}"#.as_slice(),
+            ),
+        );
+        assert!(crate::config_prop_array_element_value(&config, b"files", b"first.ts").is_some());
+        assert!(crate::config_prop_array_element_value(&config, b"files", b"second.ts").is_none());
     }
 }

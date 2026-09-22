@@ -5235,11 +5235,11 @@ loc = 29
 [[file]]
 go = "tsc/internal/spanmap/spanmap.go"
 package = "internal/spanmap"
-crate = "tsr_spanmap"
+crate = "tsr_ast"
 phase = 5
 kind = "source"
-status = "planned"
-rust = []
+status = "in-progress"
+rust = ["crates/tsr_ast/src/span_map.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "8b7477cf013d658bc81c782338e7ff95a0858904976816ab1021fe1b82453e12"

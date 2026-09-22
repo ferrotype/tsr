@@ -1,6 +1,10 @@
 //! The output-name calculation needed by option diagnostics. No files are emitted.
 use crate::{Error, Program, ProgramFile};
-use tsr_core::{CompilerOptions, JsxEmit, ScriptKind};
+use tsr_core::{JsxEmit, ScriptKind};
+pub(crate) use tsr_tsoptions::output_paths::{build_info_file, computed_common};
+fn declaration_extension(file: &[u8]) -> Vec<u8> {
+    tsr_tsoptions::output_paths::declaration_extension(file, &[])
+}
 use tsr_jsstring::JsString;
 use tsr_tspath as path;
 
@@ -9,35 +13,6 @@ fn separator(mut directory: Vec<u8>) -> Vec<u8> {
         directory.push(b'/');
     }
     directory
-}
-/// port: tsc/internal/outputpaths/commonsourcedirectory.go:computeCommonSourceDirectoryOfFilenames
-pub(crate) fn computed_common(files: &[JsString], cwd: &[u8], case_sensitive: bool) -> Vec<u8> {
-    let mut common: Option<Vec<Vec<u8>>> = None;
-    for file in files {
-        let mut components = path::normalized_components(file.as_bytes(), cwd);
-        components.pop();
-        if let Some(common) = &mut common {
-            let length = common
-                .iter()
-                .zip(&components)
-                .take_while(|(a, b)| {
-                    path::canonical(a, case_sensitive) == path::canonical(b, case_sensitive)
-                })
-                .count();
-            if length == 0 {
-                return Vec::new();
-            }
-            common.truncate(length);
-        } else {
-            common = Some(components);
-        }
-    }
-    let common = common.unwrap_or_default();
-    if common.is_empty() {
-        cwd.to_vec()
-    } else {
-        path::path_from_components(&common)
-    }
 }
 /// port: tsc/internal/outputpaths/commonsourcedirectory.go:GetComputedCommonSourceDirectory
 pub(crate) fn computed_common_directory(files: &[JsString], program: &Program) -> Vec<u8> {
@@ -151,34 +126,6 @@ fn output_extension(file: &[u8], jsx: JsxEmit) -> &'static [u8] {
         b".js"
     }
 }
-/// Declaration names for the S07 mapper-free operation closure.
-/// port: tsc/internal/outputpaths/outputpaths.go:ChangeToDeclarationExtension
-fn declaration_extension(file: &[u8]) -> Vec<u8> {
-    let mut base = path::remove_file_extension(file);
-    if base == file {
-        let filename = path::base_name(file);
-        if let Some(index) = filename.iter().rposition(|&byte| byte == b'.') {
-            base = &file[..file.len() - filename.len() + index];
-        }
-    }
-    let extension = if extension_is(file, b".mts") || extension_is(file, b".mjs") {
-        b".d.mts".to_vec()
-    } else if extension_is(file, b".cts") || extension_is(file, b".cjs") {
-        b".d.cts".to_vec()
-    } else if [b".ts".as_slice(), b".tsx", b".js", b".jsx"]
-        .iter()
-        .any(|extension| extension_is(file, extension))
-    {
-        b".d.ts".to_vec()
-    } else {
-        let filename = path::base_name(file);
-        filename.iter().rposition(|&byte| byte == b'.').map_or_else(
-            || b".d.ts".to_vec(),
-            |index| [b".d".as_slice(), &filename[index..], b".ts"].concat(),
-        )
-    };
-    [base, &extension].concat()
-}
 /// port: tsc/internal/outputpaths/outputpaths.go:GetOutputPathsFor
 pub(crate) fn output_names(
     file: &ProgramFile,
@@ -233,55 +180,26 @@ pub(crate) fn output_names(
     }
     Ok(result)
 }
-/// port: tsc/internal/outputpaths/outputpaths.go:GetBuildInfoFileName
-pub(crate) fn build_info_file(
-    options: &CompilerOptions,
-    cwd: &[u8],
-    case_sensitive: bool,
-) -> Vec<u8> {
-    if !options.is_incremental() && !options.build.is_true() {
-        return Vec::new();
-    }
-    if !options.ts_build_info_file.is_empty() {
-        return options.ts_build_info_file.as_bytes().to_vec();
-    }
-    if options.config_file_path.is_empty() {
-        return Vec::new();
-    }
-    let config = path::remove_file_extension(options.config_file_path.as_bytes());
-    let base = if options.out_dir.is_empty() {
-        config.to_vec()
-    } else if !options.root_dir.is_empty() {
-        path::resolve(
-            options.out_dir.as_bytes(),
-            &[&path::relative_from_directory(
-                options.root_dir.as_bytes(),
-                config,
-                cwd,
-                case_sensitive,
-            )],
-        )
-    } else {
-        path::combine(options.out_dir.as_bytes(), &[path::base_name(config)])
-    };
-    [base.as_slice(), b".tsbuildinfo"].concat()
-}
-
 /// Unconditional workers used by import-map inversion, regardless of emit flags.
 // port: tsc/internal/outputpaths/outputpaths.go:GetOutputJSFileNameWorker
-// port: tsc/internal/outputpaths/outputpaths.go:GetOutputDeclarationFileNameWorker
 pub(crate) fn module_specifier_output_name(
     file: &[u8],
     program: &Program,
     common: &[u8],
     declaration: bool,
 ) -> Vec<u8> {
+    if declaration {
+        return tsr_tsoptions::output_paths::output_declaration_file_name(
+            file,
+            program.options(),
+            common,
+            program.current_directory(),
+            program.host().use_case_sensitive_file_names(),
+            &[],
+        );
+    }
     let options = program.options();
-    let directory = if declaration && !options.declaration_dir.is_empty() {
-        &options.declaration_dir
-    } else {
-        &options.out_dir
-    };
+    let directory = &options.out_dir;
     let output = if directory.is_empty() {
         file.to_vec()
     } else {
@@ -295,13 +213,9 @@ pub(crate) fn module_specifier_output_name(
             )],
         )
     };
-    if declaration {
-        declaration_extension(&output)
-    } else {
-        [
-            path::remove_file_extension(&output),
-            output_extension(file, options.jsx),
-        ]
-        .concat()
-    }
+    [
+        path::remove_file_extension(&output),
+        output_extension(file, options.jsx),
+    ]
+    .concat()
 }

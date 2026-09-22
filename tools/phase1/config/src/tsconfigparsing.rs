@@ -1,102 +1,177 @@
-//! The `config/tsconfigParsing` baseline group: 87 outputs across three pinned
-//! entry points.
-//!
-//! All 87 are recorded gaps, but not the same gap, and the distinction is the
-//! useful part of the record. There are two independent reasons, read off the
-//! crate rather than off the ledger:
-//!
-//! 1. **The envelope has no Rust producer, for any of the 87.** The
-//!    `Errors::` section is the pinned
-//!    `diagnosticwriter.FormatDiagnosticsWithColorAndContext`; the only Rust
-//!    counterpart is `tsr_compiler::diagnostic_writer::DiagnosticWriter`,
-//!    whose constructor is `new(program: &Program, options: FormattingOptions)`
-//!    (crates/tsr_compiler/src/diagnostic_writer/mod.rs:75). A config parse
-//!    produces no `Program`, so that writer cannot render a config diagnostic
-//!    standing alone, and `tsr_diagnostics` is message data only. The plan
-//!    settles what that means for a byte case: "In Phase A, an absent Rust
-//!    writer keeps that case `not_implemented` even if structural parity
-//!    holds" (docs/PHASE1-implementation-plan.md:750-751).
-//!
-//! 2. **One of the three entry points is itself absent.** The 40 `json` API
-//!    outputs go through the pinned `ParseJsonConfigFileContent`
-//!    (tsconfigparsing.go:872), the raw-`any` entry point, which has no Rust
-//!    counterpart at all: `crates/tsr_tsoptions` exposes
-//!    `parse_json_source_file_config_file_content` (config_parse.rs:691) and
-//!    `parse_config_file_text_to_json` (config_text.rs:20), and nothing that
-//!    takes a parsed-JSON value. The 40 `jsonSourceFile` and 7 `jsonParse`
-//!    outputs do have their parse in Rust; for those, reason 1 is the only one
-//!    standing, and F3b closes a strictly smaller gap.
-//!
-//! Recording that split is the point. A single undifferentiated
-//! `not_implemented` across all 87 would say the port is equally far from all
-//! three, which is false.
-//!
-//! Preparation records the gap; it never emulates a renderer or a parse to
-//! make a comparison run, and it never reads the frozen bytes.
-
-use crate::api::Outcome;
-use serde_json::Value;
-
-/// Shared by all three: the envelope itself, which no Rust code renders.
-const ENVELOPE_HOME: &str = "no Rust home: the `Fs::`/`configFileName::`/`CompilerOptions::`/\
-     `TypeAcquisition::`/`FileNames::`/`Errors::` envelope has no counterpart, and the \
-     `Errors::` section needs a diagnostic writer that does not require a Program \
-     (crates/tsr_compiler/src/diagnostic_writer/mod.rs:75 takes one)";
-
-const JSON_API: (&str, &str, &str) = (
-    "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonConfigFileContent, whose result the \
-     pinned baselineParseConfigWith (tsc/internal/tsoptions/tsconfigparsing_test.go:1503) \
-     renders through getParsedWithJsonApi (:952)",
-    "pub fn parse_json_config_file_content(json: &ConfigValue, host: &dyn ParseConfigHost, \
-     base_path: &JsString, existing_options: Option<&CompilerOptions>, config_file_name: \
-     &JsString, resolution_stack: &[Path], extended_cache: Option<&mut ExtendedConfigCache>) \
-     -> ParsedCommandLine -- the raw-JSON entry point, absent; only the source-file one exists",
-    "crates/tsr_tsoptions/src/config_parse.rs (the raw-JSON entry point is absent)",
-);
-
-const JSON_SOURCE_FILE_API: (&str, &str, &str) = (
-    "tsc/internal/tsoptions/tsconfigparsing.go:ParseJsonSourceFileConfigFileContent, whose \
-     result the pinned baselineParseConfigWith renders through \
-     getParsedWithJsonSourceFileApi (tsc/internal/tsoptions/tsconfigparsing_test.go:1481)",
-    "the parse exists as tsr_tsoptions::parse_json_source_file_config_file_content \
-     (crates/tsr_tsoptions/src/config_parse.rs:691); what is missing is the baseline envelope \
-     over its result, pub fn render_tsconfig_parsing_baseline(parsed: &ParsedCommandLine, \
-     host: &dyn ParseConfigHost, config_file_name: &JsString) -> String",
-    ENVELOPE_HOME,
-);
-
-const JSON_PARSE_API: (&str, &str, &str) = (
-    "tsc/internal/tsoptions/tsconfigparsing.go:ParseConfigFileTextToJson, rendered inline by \
-     the pinned TestParseConfigFileTextToJson (tsc/internal/tsoptions/tsconfigparsing_test.go:130)",
-    "the parse exists as tsr_tsoptions::parse_config_file_text_to_json \
-     (crates/tsr_tsoptions/src/config_text.rs:20); what is missing is the \
-     `Input::`/`Config::`/`Errors::` envelope over its result, which needs the readable-JSON \
-     writer the pinned writeJsonReadableText supplies and a config-scope diagnostic writer",
-    ENVELOPE_HOME,
-);
-
-pub fn observe(request: &Value) -> Option<Outcome> {
-    if crate::api::subject(request) != "tsconfigParsingBaseline" {
-        return None;
-    }
-    let api = request
-        .get("api")
+//! Calls the production config APIs and writer; the shared Go bridge only
+//! serializes their complete typed observations and assembles test headings.
+use crate::{
+    api::Outcome,
+    configparse::Host,
+    options_wire::{self, Wire},
+};
+use serde_json::{json, Value};
+use std::sync::Arc;
+use tsr_ast::Diagnostic;
+use tsr_compiler::diagnostic_writer::{DiagnosticWriter, FormattingOptions};
+use tsr_core::CompilerOptions;
+use tsr_jsstring::{JsString, SourceText};
+use tsr_tsoptions::{
+    self as o, ConfigValue, ParseConfigHost, ParsedCommandLine, TsConfigSourceFile,
+};
+use tsr_vfs::MemoryBuilder;
+fn text<'a>(v: &'a Value, key: &str) -> Result<&'a str, String> {
+    v.get(key)
         .and_then(Value::as_str)
-        .unwrap_or_default();
-    let (authority, signature, home) = match api {
-        "json" => JSON_API,
-        "jsonSourceFile" => JSON_SOURCE_FILE_API,
-        "jsonParse" => JSON_PARSE_API,
-        other => {
-            return Some(Outcome::Failed(format!(
-                "no reviewed missing operation for tsconfigParsing api {other:?}"
-            )))
+        .ok_or_else(|| format!("missing input {key}"))
+}
+fn js(v: &[u8]) -> JsString {
+    JsString::from_bytes(v)
+}
+fn diagnostics(writer: &DiagnosticWriter<'_>, errors: &[Diagnostic]) -> Result<Value, String> {
+    fn one(writer: &DiagnosticWriter<'_>, d: &Diagnostic) -> Result<Value, String> {
+        let file = d
+            .file
+            .map(|id| {
+                writer
+                    .source(id)
+                    .map(|s| options_wire::hex(s.file_name()))
+                    .map_err(|e| format!("diagnostic source: {e:?}"))
+            })
+            .transpose()?;
+        Ok(
+            json!({"code":d.code,"pos":d.loc.pos(),"end":d.loc.end(),"category":d.category,"file":file,"args":d.message_args.wire(),
+            "chain":d.message_chain.iter().map(|d|one(writer,d)).collect::<Result<Vec<_>,_>>()?,
+            "related":d.related_information.iter().map(|d|one(writer,d)).collect::<Result<Vec<_>,_>>()?}),
+        )
+    }
+    Ok(json!(errors
+        .iter()
+        .map(|d| one(writer, d))
+        .collect::<Result<Vec<_>, _>>()?))
+}
+fn acquisition(value: &o::TypeAcquisition) -> Value {
+    json!(["struct",{
+        "Enable":["int",value.enable.0],
+        "Include":value.include.as_ref().map_or_else(||json!(["slice",null]),Wire::wire),
+        "Exclude":value.exclude.as_ref().map_or_else(||json!(["slice",null]),Wire::wire),
+        "DisableFilenameBasedTypeAcquisition":["int",value.disable_filename_based_type_acquisition.0],
+    }])
+}
+fn row(input: &Value, api: &str) -> Result<Value, String> {
+    let content = text(input, "json_text")?;
+    let (parsed, errors, format) = if api == "jsonParse" {
+        let result = o::parse_config_file_text_to_json(
+            js(b"/apath/tsconfig.json"),
+            js(b"/apath"),
+            SourceText::from_bytes(content.as_bytes()),
+        );
+        let mut parsed = ParsedCommandLine::new(CompilerOptions::default(), vec![]);
+        parsed.config_file = Some(result.source);
+        parsed.raw = result.value;
+        (
+            parsed,
+            result.diagnostics,
+            FormattingOptions {
+                new_line: b"\n".to_vec(),
+                current_directory: b"/".to_vec(),
+                case_sensitive: true,
+            },
+        )
+    } else {
+        let name = text(input, "config_file_name")?.as_bytes();
+        let cwd = text(input, "base_path")?.as_bytes();
+        let base = if cwd.is_empty() {
+            tsr_tspath::absolute(&tsr_tspath::directory(name), b"")
+        } else {
+            cwd.to_vec()
+        };
+        let absolute = tsr_tspath::absolute(name, &base);
+        let mut builder = MemoryBuilder::new(if cwd.is_empty() { b"/" } else { cwd }, true);
+        if let Some(files) = input["all_file_list"].as_object() {
+            for (name, content) in files {
+                builder.insert_physical(
+                    name.as_bytes(),
+                    content
+                        .as_str()
+                        .ok_or("non-string file content")?
+                        .as_bytes()
+                        .to_vec(),
+                );
+            }
         }
+        builder.insert_physical(
+            &tsr_tspath::combine(&base, &[name]),
+            content.as_bytes().to_vec(),
+        );
+        let host = Host {
+            fs: Arc::new(builder.finish()),
+            cwd: js(cwd),
+        };
+        let path = tsr_tspath::to_path(name, &base, true);
+        let parsed = match api {
+            "json" => {
+                let raw = o::parse_config_file_text_to_json(
+                    js(&absolute),
+                    path,
+                    SourceText::from_bytes(content.as_bytes()),
+                );
+                o::parse_json_config_file_content(
+                    raw.value,
+                    &host,
+                    &base,
+                    &CompilerOptions::default(),
+                    &absolute,
+                    &[],
+                )
+            }
+            "jsonSourceFile" => o::parse_json_source_file_config_file_content(
+                TsConfigSourceFile::parse(
+                    js(&absolute),
+                    path,
+                    SourceText::from_bytes(content.as_bytes()),
+                ),
+                &host,
+                host.current_directory(),
+                &CompilerOptions::default(),
+                &ConfigValue::Null,
+                &absolute,
+            ),
+            _ => return Err(format!("unknown config API {api}")),
+        }
+        .map_err(|e| format!("config parse: {e:?}"))?;
+        let errors = parsed.errors.clone();
+        (
+            parsed,
+            errors,
+            FormattingOptions {
+                new_line: b"\r\n".to_vec(),
+                current_directory: base,
+                case_sensitive: true,
+            },
+        )
     };
-    Some(Outcome::missing(
-        "tsoptions.tsconfigParsingBaseline",
-        authority,
-        signature,
-        home,
-    ))
+    let mut writer = DiagnosticWriter::from_sources(&parsed, format);
+    let diagnostic_rows = diagnostics(&writer, &errors)?;
+    let error_text = writer
+        .format(&errors.iter().collect::<Vec<_>>(), true)
+        .map_err(|e| format!("config diagnostics: {e:?}"))?;
+    let mut row = json!({"raw":parsed.raw.wire(),"errors":options_wire::hex(&error_text),"diagnostics":diagnostic_rows});
+    if api != "jsonParse" {
+        row["compiler"] = options_wire::compiler(&parsed.options);
+        row["acquisition"] = parsed
+            .type_acquisition
+            .as_ref()
+            .map_or_else(|| json!(["nil"]), acquisition);
+        row["files"] = parsed.root_file_names.wire();
+    }
+    Ok(row)
+}
+fn run(request: &Value) -> Result<Value, String> {
+    let api = text(request, "api")?;
+    let inputs = request["inputs"]
+        .as_array()
+        .ok_or("missing frozen config inputs")?;
+    Ok(json!({"rows":inputs.iter().map(|input|row(input,api)).collect::<Result<Vec<_>,_>>()?}))
+}
+pub fn observe(request: &Value) -> Option<Outcome> {
+    (crate::api::subject(request) == "tsconfigParsingBaseline").then(|| match run(request) {
+        Ok(v) => Outcome::Observed(v),
+        Err(e) => Outcome::Failed(e),
+    })
 }

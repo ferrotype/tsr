@@ -3850,10 +3850,112 @@
           "enable_directory_search": true,
           "op": "entrypoints",
           "package_name": "pkg"
+        },
+        {
+          "op": "new_resolver",
+          "cwd": "/p",
+          "case_sensitive": true,
+          "typings_location": "",
+          "project_name": "",
+          "extra_extensions": [],
+          "options": {
+            "module": 199,
+            "moduleResolution": 99,
+            "traceResolution": true
+          },
+          "files": [
+            {
+              "kind": "file",
+              "path": "/p/pkg/package.json",
+              "content": "{\"exports\":{\".\":{\"browser\":{\"import\":\"./one.js\",\"require\":\"./two.js\"},\"node\":\"./three.js\",\"types\":\"./fallback.d.ts\",\"default\":\"./never.d.ts\"},\"./null\":null,\"./bad\":\"../escape.d.ts\",\"./bad-segment\":\"./a/../escape.d.ts\",\"./array\":[\"invalid\",\"./fallback.d.ts\"]}}"
+            },
+            {
+              "kind": "file",
+              "path": "/p/pkg/one.d.ts",
+              "content": ""
+            },
+            {
+              "kind": "file",
+              "path": "/p/pkg/two.d.ts",
+              "content": ""
+            },
+            {
+              "kind": "file",
+              "path": "/p/pkg/three.d.ts",
+              "content": ""
+            },
+            {
+              "kind": "file",
+              "path": "/p/pkg/fallback.d.ts",
+              "content": ""
+            },
+            {
+              "kind": "file",
+              "path": "/p/pkg/never.d.ts",
+              "content": ""
+            }
+          ]
+        },
+        {
+          "op": "entrypoints",
+          "directory": "/p/pkg",
+          "package_name": "pkg",
+          "enable_directory_search": true
+        },
+        {
+          "op": "new_resolver",
+          "cwd": "/p",
+          "case_sensitive": false,
+          "typings_location": "",
+          "project_name": "",
+          "extra_extensions": [],
+          "options": {
+            "module": 199,
+            "moduleResolution": 99
+          },
+          "files": [
+            {
+              "kind": "file",
+              "path": "/p/pkg/package.json",
+              "content": "{\"types\":\"./index.d.ts\"}"
+            },
+            {
+              "kind": "file",
+              "path": "/p/pkg/index.d.ts",
+              "content": ""
+            },
+            {
+              "kind": "file",
+              "path": "/p/pkg/sub/extra.ts",
+              "content": ""
+            },
+            {
+              "kind": "file",
+              "path": "/p/pkg/sub/extra.js",
+              "content": ""
+            },
+            {
+              "kind": "file",
+              "path": "/p/pkg/node_modules/nested/index.d.ts",
+              "content": ""
+            }
+          ]
+        },
+        {
+          "op": "entrypoints",
+          "directory": "/p/pkg",
+          "package_name": "pkg",
+          "enable_directory_search": true
+        },
+        {
+          "op": "entrypoints",
+          "directory": "/p/pkg",
+          "package_name": "pkg",
+          "enable_directory_search": false
         }
       ],
       "case": "config/module/entrypoints/export-map-entrypoints",
-      "discriminates": "entrypoint discovery is the reverse direction of resolution: it walks the whole exports map and reports every file it can reach, each with the module specifier that reaches it and an Ending that says how much of that specifier may be rewritten (resolver.go:2133-2159, :2168-2225, :2244-2357). SymlinkOrRealpath prefers the symlinked spelling and falls back to the real one (:2161-2166). A port that reuses the forward resolver for this answers only the `.` entry, and a port that reports one path per entrypoint loses the symlink distinction.",
+      "discriminates": "entrypoint discovery is the reverse direction of resolution: it walks the whole exports map and reports every file it can reach, each with the module specifier that reaches it and an Ending that says how much of that specifier may be rewritten (resolver.go:2133-2159, :2168-2225, :2244-2357). SymlinkOrRealpath prefers the symlinked spelling and falls back to the real one (:2161-2166). A port that reuses the forward resolver for this answers only the `.` entry, and a port that reports one path per entrypoint loses the symlink distinction. F3b expands the trace with nested ordered conditions, always-matching types fallback, null/invalid targets, array alternatives, directory discovery excluding nested node_modules and the directory-search switch. Include/exclude condition sets are sorted for comparison while retaining nilness.",
       "host_applicability": "any",
       "operation": "tsc/internal/module/resolver.go:Resolver.GetEntrypointsFromPackageJsonInfo",
       "order_sensitive": true,
@@ -3864,7 +3966,10 @@
         {
           "case_sensitive": true,
           "cwd": "/p",
-          "extra_extensions": [],
+          "extra_extensions": [
+            ".view",
+            ".special.view"
+          ],
           "files": [
             {
               "content": "",
@@ -3895,6 +4000,16 @@
               "content": "{\"name\":\"typed\",\"version\":\"2.0.0\",\"types\":\"./index.d.ts\"}",
               "kind": "file",
               "path": "/p/node_modules/typed/package.json"
+            },
+            {
+              "kind": "file",
+              "path": "/p/src/widget.special.view",
+              "content": ""
+            },
+            {
+              "kind": "file",
+              "path": "/global/package.json",
+              "content": "{\"name\":\"outside-cache\"}"
             }
           ],
           "op": "new_resolver",
@@ -3924,6 +4039,12 @@
           "mode": 99,
           "name": "./missing",
           "op": "resolve"
+        },
+        {
+          "op": "resolve",
+          "file": "/p/src/index.ts",
+          "mode": 99,
+          "name": "./widget.special.view"
         }
       ],
       "case": "config/module/typings/typings-location-fallback",

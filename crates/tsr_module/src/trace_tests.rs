@@ -117,13 +117,20 @@ fn trace_scope_retires_after_error_and_native_unwind() {
         ..Default::default()
     };
     let mut resolver = Resolver::new(Arc::new(files), Arc::new(options), b"/repo").unwrap();
-    assert!(resolver
-        .resolve(
+    let outcome = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+        let _ = resolver.resolve(
             b"missing",
             b"/repo/main.ts",
-            tsr_core::ModuleKind::COMMON_JS
-        )
-        .is_err());
+            tsr_core::ModuleKind::COMMON_JS,
+        );
+    }));
+    assert_eq!(
+        outcome
+            .unwrap_err()
+            .downcast_ref::<String>()
+            .map(String::as_str),
+        Some("Unexpected moduleResolution: 999")
+    );
     assert!(!resolver.tracer.active);
     resolver.take_trace();
     resolver.package_scope(b"/repo").unwrap();
@@ -166,10 +173,21 @@ fn directory_alias_preserves_uncomputed_and_initialized_version_cache_identity()
     assert!(!Arc::ptr_eq(&first, &alias));
     assert!(Arc::ptr_eq(&first.shared, &alias.shared));
     assert!(alias.version_paths.get().is_none());
-    let (_, paths) = resolver.version_paths(&first).unwrap();
-    let original = std::ptr::from_ref(paths);
-    let (_, paths) = resolver.version_paths(&alias).unwrap();
-    assert!(std::ptr::eq(original, paths));
+    let original = resolver.version_paths(&first);
+    let alias_paths = resolver.version_paths(&alias);
+    assert!(std::ptr::eq(
+        first.version_paths.get().unwrap(),
+        alias.version_paths.get().unwrap()
+    ));
+    assert!(std::ptr::eq(
+        original.paths().unwrap(),
+        original.paths().unwrap()
+    ));
+    assert!(!std::ptr::eq(
+        original.paths().unwrap(),
+        alias_paths.paths().unwrap()
+    ));
+    assert_eq!(original.paths(), alias_paths.paths());
     let repeated = resolver
         .package_json(b"/repo/node_modules/pkg")
         .unwrap()

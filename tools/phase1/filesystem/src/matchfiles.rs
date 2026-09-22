@@ -190,8 +190,8 @@ fn result(parsed: &ParsedCommandLine) -> V {
     let watches = V::Object(
         parsed
             .wildcard_directories()
-            .unwrap_or_default()
-            .iter()
+            .into_iter()
+            .flat_map(|map| map.iter())
             .map(|(path, recursive)| {
                 (
                     path.clone(),

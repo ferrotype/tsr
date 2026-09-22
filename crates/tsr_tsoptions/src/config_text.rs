@@ -100,18 +100,7 @@ pub fn convert_config_file_to_object(
     mut notifier: Option<&mut PropertyNotifier<'_>>,
 ) -> (ConfigValue, Vec<Diagnostic>) {
     let view = config.file.view();
-    let root = view.node(config.root).expect("JSON source root");
-    let NodeDataRead::SourceFile(data) = root.data() else {
-        panic!("config root must be a source file")
-    };
-    let expression = data.statements().and_then(|list| {
-        let list = view.list(list).expect("JSON statements");
-        let nodes = view.node_slice(list.nodes()).expect("JSON statement slice");
-        nodes
-            .first()
-            .flatten()
-            .and_then(|node| view.node(node).expect("JSON statement").expression())
-    });
+    let expression = root_expression(config);
     let Some(mut expression) = expression else {
         return (ConfigValue::EmptyStruct, vec![]);
     };
@@ -309,4 +298,28 @@ fn convert_object(
         }
     }
     (result, errors)
+}
+
+fn root_expression(config: &TsConfigSourceFile) -> Option<NodeId> {
+    let view = config.file.view();
+    let root = view.node(config.root).expect("JSON source root");
+    let NodeDataRead::SourceFile(data) = root.data() else {
+        panic!("config root must be a source file")
+    };
+    data.statements().and_then(|list| {
+        let list = view.list(list).expect("JSON statements");
+        let nodes = view.node_slice(list.nodes()).expect("JSON statement slice");
+        nodes
+            .first()
+            .flatten()
+            .and_then(|node| view.node(node).expect("JSON statement").expression())
+    })
+}
+/// Convert a JSON syntax value without enforcing the tsconfig object root.
+/// port: tsc/internal/tsoptions/tsconfigparsing.go:convertToObject
+pub fn convert_to_object(config: &TsConfigSourceFile) -> (ConfigValue, Vec<Diagnostic>) {
+    root_expression(config).map_or_else(
+        || (ConfigValue::EmptyStruct, Vec::new()),
+        |node| convert_value(config, node, None, &mut None),
+    )
 }

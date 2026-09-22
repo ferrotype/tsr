@@ -283,3 +283,59 @@ pub fn set_diagnostic_location(
     }
     diagnostic
 }
+
+#[derive(Clone, Debug)]
+pub enum OptionPathSegment {
+    Property(JsString),
+    Index(isize),
+}
+/// Retain the last resolved node when a path segment cannot be followed.
+/// The mapper must be borrowed from this parsed configuration; a foreign mapper
+/// follows the pin's index=-1 fallback to the whole contentMappers property.
+/// port: tsc/internal/tsoptions/tsconfigparsing.go:GetContentMapperOptionDiagnosticLocation
+pub fn option_diagnostic_location<'a>(
+    config: &'a crate::ParsedCommandLine,
+    mapper: &ContentMapper,
+    path: &[OptionPathSegment],
+) -> Option<(&'a TsConfigSourceFile, tsr_core::TextRange)> {
+    let source = config.config_file.as_deref()?;
+    let index = config
+        .content_mappers
+        .as_deref()
+        .unwrap_or_default()
+        .iter()
+        .position(|m| std::ptr::eq(m, mapper))
+        .map_or(-1, |index| index as isize);
+    let mut node =
+        mapper_syntax(source, index, b"options").or_else(|| mapper_syntax(source, index, b""))?;
+    let view = source.file.view();
+    for segment in path {
+        let read = view.node(node).expect("mapper option node");
+        let next = match segment {
+            OptionPathSegment::Index(index) if read.kind() == K::ArrayLiteralExpression => {
+                let elements = crate::config_parse::array_elements(source, node);
+                if *index < elements.len() as isize {
+                    Some(elements[*index as usize])
+                } else {
+                    None
+                }
+            }
+            OptionPathSegment::Property(name) if read.kind() == K::ObjectLiteralExpression => {
+                crate::find_property_in_object(source, node, &[name.as_bytes()])
+                    .and_then(|property| crate::config_parse::initializer(source, property))
+            }
+            _ => None,
+        };
+        let Some(next) = next else { break };
+        node = next;
+    }
+    let read = view.node(node).expect("mapper diagnostic node");
+    let text = view.source_file(source.root).expect("mapper source");
+    Some((
+        source,
+        tsr_core::TextRange::new(
+            tsr_scanner::skip_trivia(text.text().as_bytes(), i64::from(read.pos())),
+            i64::from(read.end()),
+        ),
+    ))
+}

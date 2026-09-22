@@ -1,6 +1,6 @@
 //! Local paths and extension preferences from modulespecifiers/{preferences,specifiers}.go.
 use super::{Error, Generation, Import};
-use tsr_core::{CompilerOptions, JsxEmit, ModuleResolutionKind as MR, ResolutionMode as Mode};
+use tsr_core::{CompilerOptions, ModuleResolutionKind as MR, ResolutionMode as Mode};
 use tsr_tspath as path;
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -98,27 +98,10 @@ pub(super) fn allowed_endings(
     }
 }
 
-// port: tsc/internal/module/util.go:TryGetJSExtensionForFile
+// Optional view of the shared, byte-preserving resolver operation.
 pub(super) fn js_extension(file: &[u8], options: &CompilerOptions) -> Option<&'static [u8]> {
-    if has_extension(file, &[b".json"]) {
-        Some(b".json")
-    } else if has_extension(file, &[b".mts", b".mjs"]) {
-        Some(b".mjs")
-    } else if has_extension(file, &[b".cts", b".cjs"]) {
-        Some(b".cjs")
-    } else if has_extension(file, &[b".jsx"]) {
-        Some(b".jsx")
-    } else if has_extension(file, &[b".tsx"]) {
-        Some(if options.jsx == JsxEmit::PRESERVE {
-            b".jsx"
-        } else {
-            b".js"
-        })
-    } else if has_extension(file, &[b".ts", b".js"]) {
-        Some(b".js")
-    } else {
-        None
-    }
+    let extension = tsr_module::js_extension_for_file(file, options);
+    (!extension.is_empty()).then_some(extension)
 }
 
 pub(super) fn ensure_non_module(path: Vec<u8>) -> Vec<u8> {

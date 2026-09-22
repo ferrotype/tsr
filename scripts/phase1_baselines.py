@@ -475,7 +475,11 @@ def output_preparation(cases: dict, step: str) -> dict:
         observation = row.get("observation", {})
         # Older probes keep provenance beside rendered; newer ones separate
         # it from the compiler observation in authenticated row metadata.
-        metadata = row.get("metadata", observation)
+        extra = row.get("metadata", {})
+        if any(observation[key] != extra[key] for key in observation.keys() & extra.keys()):
+            problems.append(f"{name}: conflicting observation and metadata fields")
+            continue
+        metadata = {**observation, **extra}
         if row.get("result") != "observed" or metadata.get("baseline") != name:
             problems.append(f"{name}: no corresponding native observation")
             continue

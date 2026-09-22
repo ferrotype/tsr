@@ -16,24 +16,16 @@
 //! on both sides, because a path is not required to be valid UTF-8 and
 //! `JsString` carries bytes.
 //!
-//! Three whole classes of action have no Rust counterpart, and each is
-//! recorded rather than worked around:
-//!
-//!   * A filesystem whose answers change. `Resolver::new` refuses a host with
-//!     no snapshot identity (crates/tsr_module/src/resolver.rs:111-113), so
-//!     the `mutate` action cannot be expressed at all.
-//!   * Changing `traceResolution` between two requests on one resolver. The
-//!     options are an `Arc<CompilerOptions>` fixed at construction
-//!     (resolver.rs:106-125), where the pin re-reads the field from the
-//!     caller's struct on every request (resolver.go:201-206). This is the only
-//!     way to reach a cache WRITE twice for one key, so the two cache-write
-//!     cases are unreachable here.
-//!   * Project reference redirects, entrypoint discovery, the typings
-//!     location and an injected package.json cache, none of which exist in
-//!     `tsr_module` at all.
+//! Standalone resolver traces explicitly use a live native-style test host.
+//! The production default constructor still requires an immutable snapshot.
+//! Redirects, entrypoint discovery, typings fallback, cache mutations and trace
+//! toggling call production APIs.
 
 use std::sync::atomic::{AtomicUsize, Ordering};
-use std::sync::Arc;
+use std::{
+    collections::BTreeMap,
+    sync::{Arc, RwLock},
+};
 
 use serde_json::{json, Map, Value};
 use tsr_core::{CompilerOptions, ModuleKind};
@@ -43,10 +35,7 @@ use tsr_module::{
     mangle_scoped_package_name, resolution_diagnostic, PackageId, ResolvedModule,
     ResolvedTypeReferenceDirective, Resolver, TraceArg,
 };
-use tsr_vfs::{
-    Entries, Error as VfsError, FileContent, FileInfo, FileSystem, MemoryBuilder, MemorySnapshot,
-    SnapshotId,
-};
+use tsr_vfs::{Entries, Error as VfsError, FileContent, FileInfo, FileSystem, SnapshotId};
 
 use crate::api::{self, Outcome};
 
@@ -54,203 +43,6 @@ use crate::api::{self, Outcome};
 /// config group and a subject string could collide with a neighbour's, so
 /// ownership is keyed on the case id this group was assigned.
 const CASE_PREFIX: &str = "config/module/";
-
-/// Every operation a case in this group names when the port cannot run it,
-/// with the pinned body that is its authority, the signature the port would
-/// need and the Rust home that does not have it.
-/// Keyed by the request's own operation id, so a recorded gap names the
-/// operation the case was written for rather than the subject it shares.
-///
-/// Each row was read against `crates/tsr_module` in this session; a row that
-/// says "present but not a counterpart" names the Rust function that was read
-/// and rejected, so the record cannot be mistaken for "nobody looked".
-const MISSING: &[(&str, &str, &str, &str)] = &[
-    (
-        "tsc/internal/module/util.go:UnmangleScopedPackageName",
-        "tsc/internal/module/util.go:69-75, the inverse of MangleScopedPackageName; its only pinned \
-         caller is GetPackageNameFromTypesPackageName (util.go:81-87)",
-        "pub fn unmangle_scoped_package_name(name: &[u8]) -> Vec<u8>, cutting at the FIRST `__` \
-         and re-adding `@` and `/` unconditionally. The only Rust code that performs the \
-         operation is three inlined lines inside \
-         crates/tsr_checker/src/module_specifiers_packages.rs:80-84, which is not callable as an \
-         operation and is not in tsr_module",
-        "crates/tsr_module/src/resolver.rs (absent; mangle_scoped_package_name at :860 has no \
-         inverse, and scope.json's rust_home for this row points at tsr_module, which is wrong)",
-    ),
-    (
-        "tsc/internal/module/util.go:ParseNodeModuleFromPath",
-        "tsc/internal/module/util.go:28-41, whose nine-row contract the pinned \
-         TestParseNodeModuleFromPath (resolver_test.go:301-330) fixes",
-        "pub fn parse_node_module_from_path(resolved: &[u8], is_folder: bool) -> Vec<u8>, \
-         normalizing first, cutting at the LAST `/node_modules/`, and advancing past the package \
-         name with the pin's moveToNextDirectorySeparatorIfAvailable, which for is_folder=false \
-         and no following separator returns the PREVIOUS separator index \
-         (resolver.go:1971-1984). crates/tsr_module/src/type_references.rs:467-472 \
-         (`node_module_directory`) was read and rejected: it is private, it has no is_folder \
-         parameter at all, and it uses parse_package_name so it always INCLUDES the package name",
-        "crates/tsr_module/src/type_references.rs:467 (present but not a counterpart and not \
-         callable)",
-    ),
-    (
-        "tsc/internal/module/types.go:PackageId.String",
-        "tsc/internal/module/types.go:54-56 with PackageName at :58-63, rendered into the \
-         Module_name_0_was_successfully_resolved_to_1_with_Package_ID_2 argument at \
-         resolver.go:313",
-        "impl Display for PackageId, or a public package_id(id: &PackageId) -> Vec<u8>, rendering \
-         `name[/subModuleName]@version` with the peerDependencies suffix appended raw. \
-         crates/tsr_module/src/trace.rs:134-144 is a correct transcription but is pub(super), so \
-         the rendering is reachable only as a trace argument; \
-         crates/tsr_compiler/src/include_reason.rs carries a second, independent copy, which is \
-         itself a divergence risk",
-        "crates/tsr_module/src/resolver.rs:29 (PackageId has no Display and no public renderer)",
-    ),
-    (
-        "tsc/internal/module/resolver.go:TryParsePatterns",
-        "tsc/internal/module/resolver.go:1995-2032 with MatchPatternOrExact at :2034-2045 and the \
-         ParsedPatterns type at :1986-1989",
-        "pub struct ParsedPatterns { matchable: HashSet<JsString>, patterns: Vec<Pattern> } with \
-         pub fn try_parse_patterns(mappings: &PathMappings) -> ParsedPatterns and pub fn \
-         match_pattern_or_exact(patterns: &ParsedPatterns, candidate: &[u8]) -> Pattern, so an \
-         exact key answers with StarIndex -1 and an empty MatchedText without consulting the \
-         pattern list. crates/tsr_module/src/paths.rs:75-88 was read and rejected: it re-parses \
-         every key on every call and selects inline, so there is no ParsedPatterns value to ask, \
-         and the pin's parsedPatternsCache (cache.go:50-60) has nothing to key on",
-        "crates/tsr_module/src/paths.rs:75 (behaviour inlined; no type, no entry point, no cache)",
-    ),
-    (
-        "tsc/internal/module/resolver.go:resolutionState.getPackageJsonInfo",
-        "tsc/internal/module/resolver.go:1764-1809, whose negative entry is written at :1804-1808 \
-         and short-circuited at :1766-1779",
-        "the operation itself is present at crates/tsr_module/src/resolver.rs:139-199 and caches \
-         the negative answer as (exists, None) the same way. What is missing is the ability to \
-         OBSERVE the pinned contract: the case needs the host to gain a package.json between two \
-         requests, and Resolver::new returns Err(Error::MutableHost) for any host without a \
-         snapshot identity (resolver.rs:111-113), so a resolver can never see a second state of \
-         the filesystem. A port would need a resolver that accepts a live host, or an explicit \
-         invalidation entry point",
-        "crates/tsr_module/src/resolver.rs:111 (present but unreachable: no live host, no \
-         invalidation)",
-    ),
-    (
-        "tsc/internal/module/cache.go:moduleResolutionCache.Set",
-        "tsc/internal/module/cache.go:26-28 (LoadOrStore), written from resolver.go:325 after the \
-         read that skips it at :278-283",
-        "a resolution cache whose write is first-writer-wins, like the pin's LoadOrStore \
-         (cache.go:26-28). crates/tsr_module/src/resolver.rs:298 was read and rejected: it is a \
-         plain BTreeMap insert, which is LAST-writer-wins. Observing either semantics also needs \
-         the trace mode to change between two requests on one resolver, and the options are an \
-         Arc fixed at construction (resolver.rs:106-125) where the pin re-reads \
-         TraceResolution per request (resolver.go:201-206)",
-        "crates/tsr_module/src/resolver.rs:298 (wrong write semantics, and unobservable: options \
-         and host are both fixed for the resolver's lifetime)",
-    ),
-    (
-        "tsc/internal/module/cache.go:typeRefDirectiveResolutionCache.Set",
-        "tsc/internal/module/cache.go:46-48 (Store), written from resolver.go:262 after the read \
-         that skips it at :241-245",
-        "a type-reference cache whose write is last-writer-wins, like the pin's Store \
-         (cache.go:46-48). crates/tsr_module/src/type_references.rs:155 is a BTreeMap insert and \
-         its semantics DO match, but the case cannot run for the same two reasons as its module \
-         companion: no live host and no per-request trace mode",
-        "crates/tsr_module/src/type_references.rs:155 (matching semantics, unobservable)",
-    ),
-    (
-        "tsc/internal/module/resolver.go:NewResolverWithOptions",
-        "tsc/internal/module/resolver.go:180-199 with ResolverOptions at :159-161 and \
-         packagejson.InfoCache.Set at packagejson/cache.go:190-194",
-        "pub fn Resolver::with_options(host, options, typings_location, project_name, opts: \
-         ResolverOptions) taking an external package.json info cache, plus a public InfoCache \
-         type whose Set is a LoadOrStore that RETURNS the winning entry \
-         (packagejson/cache.go:190-194) and whose entries carry the three-state \
-         absent / present-with-nil-contents / present-with-contents. \
-         crates/tsr_module/src/resolver.rs:99 was read and rejected: the cache is a private \
-         BTreeMap field of Resolver, it is not injectable, its write is a plain insert, and its \
-         value tuple cannot represent a present entry with no contents",
-        "crates/tsr_module/src/resolver.rs:99 (private field; no injectable cache type)",
-    ),
-    (
-        "tsc/internal/module/resolver.go:Resolver.PackageJsonCacheEntries",
-        "tsc/internal/module/resolver.go:212-214, forwarding to packagejson.InfoCache.Range \
-         (packagejson/cache.go:196-198)",
-        "pub fn package_json_cache_entries(&self) -> impl Iterator<Item = (&JsString, &Entry)>, \
-         reporting the canonical key, the stored package directory and whether contents were \
-         read. The cache is the private BTreeMap at crates/tsr_module/src/resolver.rs:99 and \
-         nothing exposes it",
-        "crates/tsr_module/src/resolver.rs:99 (no accessor)",
-    ),
-    (
-        "tsc/internal/module/resolver.go:GetCompilerOptionsWithRedirect",
-        "tsc/internal/module/resolver.go:139-147, called from newResolutionState (:103), \
-         ResolveModuleName (:284) and ResolveTypeReferenceDirective (:246)",
-        "pub fn compiler_options_with_redirect<'a>(options: &'a CompilerOptions, redirect: \
-         Option<&'a dyn ResolvedProjectReference>) -> &'a CompilerOptions, returning the \
-         caller's own options both when there is no reference AND when the reference's options \
-         are absent. There is no ResolvedProjectReference trait anywhere in the workspace: \
-         `grep -rn \"ResolvedProjectReference\" crates --include=*.rs` is empty",
-        "crates/tsr_module/src/resolver.rs (absent; project reference redirects are not modelled)",
-    ),
-    (
-        "tsc/internal/module/resolver.go:tracer.traceResolutionUsingProjectReference",
-        "tsc/internal/module/resolver.go:216-220, with getRedirectConfigName at cache.go:84-89 \
-         feeding both cache keys (cache.go:11-16, :30-36)",
-        "the redirect trace line plus the redirect's config name as the fourth component of both \
-         cache keys (cache.go:11-16, :30-36, :84-89). tsr_module's keys are \
-         {directory, name, mode} (resolver.rs:81-86) and {directory, name, mode, inferred} \
-         (type_references.rs:24-30); neither carries a redirect, so two resolutions the pin \
-         keeps separate would collide. The message constant exists \
-         (tsr_diagnostics::Using_compiler_options_of_project_reference_redirect_0) and has no \
-         writer in tsr_module",
-        "crates/tsr_module/src/trace.rs (absent) and resolver.rs:81 (cache key omits the redirect)",
-    ),
-    (
-        "tsc/internal/module/resolver.go:Resolver.GetEntrypointsFromPackageJsonInfo",
-        "tsc/internal/module/resolver.go:2168-2225 with loadEntrypointsFromExportMap at :2244-2357, \
-         createResolvedEntrypointHandlingSymlink at :2227-2242 and ResolvedEntrypoint at \
-         :2147-2166",
-        "pub fn entrypoints(&mut self, package: &PackageJson, package_name: &[u8], \
-         directory_search: bool) -> Vec<ResolvedEntrypoint>, where ResolvedEntrypoint carries \
-         the real path, the symlinked path, the module specifier that reaches it, an Ending and \
-         the include/exclude condition sets (resolver.go:2133-2159). The whole reverse direction \
-         is absent: loadEntrypointsFromExportMap, createResolvedEntrypointHandlingSymlink, \
-         getMatchedStarForPatternEntrypoint and extensions.Array have no Rust counterpart. \
-         tsr_checker has an unrelated `Ending` from modulespecifiers/preferences.go and a \
-         tryGetModuleNameFromExports, which computes the opposite direction",
-        "crates/tsr_module/src/package_maps.rs (absent; the crate only resolves forwards)",
-    ),
-    (
-        "tsc/internal/module/resolver.go:Resolver.tryResolveFromTypingsLocation",
-        "tsc/internal/module/resolver.go:339-366, called unconditionally from ResolveModuleName \
-         at :324",
-        "Resolver::new taking a typings location, a project name and extra extensions, plus the \
-         extra resolution pass that runs after an ordinary resolution failed to land on a \
-         TypeScript or JSON extension and that announces itself with the project name \
-         (resolver.go:339-366). crates/tsr_module/src/resolver.rs:90-104 has no such fields, so \
-         the pass never runs, the Auto_discovery_for_typings line is never written, and \
-         getPackageScopeForPath walks to the filesystem root where the pin stops at the global \
-         cache (resolver.go:495-504 vs resolver.rs:206-210)",
-        "crates/tsr_module/src/resolver.rs:90 (no typings location, project name or extra \
-         extensions on the resolver)",
-    ),
-];
-
-fn gap(request: &Value) -> Outcome {
-    let requested = request
-        .get("operation")
-        .and_then(Value::as_str)
-        .unwrap_or_default();
-    match MISSING
-        .iter()
-        .find(|(identity, _, _, _)| *identity == requested)
-    {
-        Some((identity, authority, signature, home)) => {
-            Outcome::missing(*identity, authority, signature, home)
-        }
-        None => Outcome::Failed(format!(
-            "the module group cannot run case operation {requested:?} and has no reviewed \
-             missing-operation record for it"
-        )),
-    }
-}
 
 fn hex(bytes: &[u8]) -> String {
     use std::fmt::Write;
@@ -267,7 +59,8 @@ fn hex(bytes: &[u8]) -> String {
 /// directory_exists through its own `stat`, which is below this wrapper and is
 /// therefore not counted twice.
 struct Counting {
-    inner: MemorySnapshot,
+    inner: RwLock<Arc<dyn FileSystem>>,
+    files: RwLock<BTreeMap<Vec<u8>, tsr_vfs::vfstest::InputFile>>,
     calls: AtomicUsize,
 }
 
@@ -282,34 +75,46 @@ impl Counting {
 
 impl FileSystem for Counting {
     fn use_case_sensitive_file_names(&self) -> bool {
-        self.inner.use_case_sensitive_file_names()
+        self.inner
+            .read()
+            .expect("fixture host lock")
+            .use_case_sensitive_file_names()
     }
     fn snapshot_id(&self) -> Option<SnapshotId> {
-        self.inner.snapshot_id()
+        None
     }
     fn read_file(&self, path: &[u8]) -> Result<Option<FileContent>, VfsError> {
         self.hit();
-        self.inner.read_file(path)
+        self.inner
+            .read()
+            .expect("fixture host lock")
+            .read_file(path)
     }
     fn stat(&self, path: &[u8]) -> Result<Option<FileInfo>, VfsError> {
         self.hit();
-        self.inner.stat(path)
+        self.inner.read().expect("fixture host lock").stat(path)
     }
     fn entries(&self, path: &[u8]) -> Result<Entries, VfsError> {
         self.hit();
-        self.inner.entries(path)
+        self.inner.read().expect("fixture host lock").entries(path)
     }
     fn realpath(&self, path: &[u8]) -> Result<JsString, VfsError> {
         self.hit();
-        self.inner.realpath(path)
+        self.inner.read().expect("fixture host lock").realpath(path)
     }
     fn file_exists(&self, path: &[u8]) -> Result<bool, VfsError> {
         self.hit();
-        self.inner.file_exists(path)
+        self.inner
+            .read()
+            .expect("fixture host lock")
+            .file_exists(path)
     }
     fn directory_exists(&self, path: &[u8]) -> Result<bool, VfsError> {
         self.hit();
-        self.inner.directory_exists(path)
+        self.inner
+            .read()
+            .expect("fixture host lock")
+            .directory_exists(path)
     }
 }
 
@@ -478,90 +283,258 @@ fn type_reference_rows(resolved: &ResolvedTypeReferenceDirective) -> Value {
     Value::Array(rows)
 }
 
-/// What an action did. `Unreachable` is the port having no entry point for it;
-/// it is turned into the case's reviewed gap record by the caller.
+/// A completed action; malformed actions remain harness errors.
 enum Step {
     Done,
-    Unreachable,
 }
 
-fn build_host(action: &Value) -> Result<Arc<Counting>, Bad> {
-    let cwd = text(action, "cwd")?.as_bytes().to_vec();
-    let case_sensitive = flag(action, "case_sensitive")?;
-    let mut builder = MemoryBuilder::new(&cwd, case_sensitive);
-    for entry in list(action, "files")? {
+fn apply_files(
+    files: &mut BTreeMap<Vec<u8>, tsr_vfs::vfstest::InputFile>,
+    entries: &[Value],
+) -> Result<(), Bad> {
+    use tsr_vfs::{
+        iofs::{FileMode, MapFile},
+        vfstest::InputFile,
+    };
+    for entry in entries {
         let path = text(entry, "path")?.as_bytes().to_vec();
-        match text(entry, "kind")? {
-            "file" => builder.insert_loaded(&path, text(entry, "content")?.as_bytes().to_vec()),
-            "symlink" => builder.insert_symlink(&path, text(entry, "target")?.as_bytes()),
-            "directory" => builder.insert_directory(&path),
+        let file = match text(entry, "kind")? {
+            "file" => InputFile::Text(text(entry, "content")?.as_bytes().to_vec()),
+            "symlink" => {
+                InputFile::File(tsr_vfs::vfstest::symlink(text(entry, "target")?.as_bytes()))
+            }
+            "directory" => InputFile::File(MapFile {
+                mode: FileMode::DIR,
+                ..MapFile::default()
+            }),
             other => return Err(format!("unknown fixture entry kind {other:?}")),
-        }
+        };
+        files.insert(path, file);
     }
+    Ok(())
+}
+fn build_host(action: &Value) -> Result<Arc<Counting>, Bad> {
+    let mut files = BTreeMap::new();
+    apply_files(&mut files, list(action, "files")?)?;
+    let fs = tsr_vfs::vfstest::from_map(&files, flag(action, "case_sensitive")?).into_vfs();
     Ok(Arc::new(Counting {
-        inner: builder.finish(),
+        inner: RwLock::new(Arc::new(fs)),
+        files: RwLock::new(files),
         calls: AtomicUsize::new(0),
     }))
+}
+
+fn redirect_options(action: &Value) -> Result<(Option<&str>, Option<CompilerOptions>), Bad> {
+    let Some(reference) = action.get("redirect").filter(|value| !value.is_null()) else {
+        return Ok((None, None));
+    };
+    let options = reference
+        .get("options")
+        .filter(|value| !value.is_null())
+        .map(options)
+        .transpose()?;
+    Ok((Some(text(reference, "config_name")?), options))
 }
 
 #[allow(clippy::too_many_lines)]
 fn apply(state: &mut State, action: &Value, row: &mut Map<String, Value>) -> Result<Step, Bad> {
     let op = api::action_op(action);
     match op {
-        "new_resolver" => {
-            // The pin's resolver carries a typings location, a project name
-            // and extra extensions; tsr_module's does not. A case that leaves
-            // all three empty is unaffected, so only a case that uses them is
-            // recorded as a gap.
-            if !text(action, "typings_location")?.is_empty()
-                || !text(action, "project_name")?.is_empty()
-                || !list(action, "extra_extensions")?.is_empty()
-            {
-                return Ok(Step::Unreachable);
-            }
+        "new_resolver" | "new_resolver_with_options" => {
             let cwd = text(action, "cwd")?.as_bytes().to_vec();
             let host = build_host(action)?;
             let compiler_options = Arc::new(options(field(action, "options")?)?);
             let dynamic: Arc<dyn FileSystem> = host.clone();
-            let resolver = Resolver::new(dynamic, compiler_options, &cwd)
+            let mut settings = tsr_module::ResolverOptions {
+                allow_live_host: true,
+                typings_location: JsString::from_bytes(
+                    text(action, "typings_location")?.as_bytes(),
+                ),
+                project_name: JsString::from_bytes(text(action, "project_name")?.as_bytes()),
+                extra_extensions: action
+                    .get("extra_extensions")
+                    .and_then(Value::as_array)
+                    .map(|values| {
+                        values
+                            .iter()
+                            .map(|value| {
+                                value
+                                    .as_str()
+                                    .map(|value| JsString::from_bytes(value.as_bytes()))
+                                    .ok_or_else(|| "invalid extra extension".to_owned())
+                            })
+                            .collect()
+                    })
+                    .transpose()?
+                    .unwrap_or_default(),
+                ..Default::default()
+            };
+            if op == "new_resolver_with_options" {
+                let cache = Arc::new(tsr_module::InfoCache::new(
+                    &cwd,
+                    flag(action, "case_sensitive")?,
+                ));
+                let mut seeds = Vec::new();
+                for seed in list(action, "package_json_cache")? {
+                    let path = text(seed, "package_json_path")?.as_bytes();
+                    let directory = tsr_tspath::directory(path);
+                    let contents = match seed.get("contents") {
+                        None | Some(Value::Null) => None,
+                        Some(Value::String(source)) => Some(Arc::new(
+                            tsr_module::PackageJson::parse(&directory, source.as_bytes()),
+                        )),
+                        _ => return Err("cache contents must be a string or null".into()),
+                    };
+                    let entry = Arc::new(tsr_module::InfoCacheEntry {
+                        package_directory: JsString::from_bytes(directory.as_slice()),
+                        directory_exists: flag(seed, "directory_exists")?,
+                        contents,
+                    });
+                    let actual = cache.set(path, entry.clone());
+                    seeds.push(json!([
+                        hex(path),
+                        Arc::ptr_eq(&actual, &entry),
+                        hex(actual.package_directory.as_bytes()),
+                        actual.exists()
+                    ]));
+                }
+                row.insert("cache_seeds".into(), json!(seeds));
+                settings.package_json_cache = Some(cache);
+            }
+            let resolver = Resolver::with_options(dynamic, compiler_options, &cwd, settings)
                 .map_err(|error| format!("Resolver::new refused the fixture host: {error:?}"))?;
             state.host = Some(host);
             state.resolver = Some(resolver);
             row.insert("created".into(), Value::Bool(true));
             Ok(Step::Done)
         }
-        // Nothing in `tsr_module` can run these, and each one's reason is the
-        // MISSING row of the case's own operation:
-        //   * an injected package.json cache, a filesystem whose answers
-        //     change and a per-request trace mode are structural gaps;
-        //   * project reference redirects, entrypoint discovery and the cache
-        //     accessor do not exist at all;
-        //   * the five pure helpers exist only as private or foreign-crate
-        //     code, so there is no entry point to call.
-        "new_resolver_with_options"
-        | "mutate"
-        | "set_trace"
-        | "resolve_with_redirect"
-        | "compiler_options_with_redirect"
-        | "entrypoints"
-        | "package_json_cache_entries"
-        | "unmangle_scoped"
-        | "package_name_from_types_package_name"
-        | "parse_node_module_from_path"
-        | "package_id_string"
-        | "parsed_patterns" => Ok(Step::Unreachable),
+        // Remaining production gaps are recorded before partial results escape.
+        "compiler_options_with_redirect" => {
+            let base = options(field(action, "options")?)?;
+            let (name, redirected) = redirect_options(action)?;
+            let reference = name.map(|name| tsr_module::ResolvedProjectReference {
+                config_name: name.as_bytes(),
+                compiler_options: redirected.as_ref(),
+            });
+            let effective = tsr_module::compiler_options_with_redirect(&base, reference);
+            row.insert(
+                "same_pointer_as_base".into(),
+                json!(std::ptr::eq(effective, &raw const base)),
+            );
+            row.insert(
+                "module_resolution".into(),
+                json!(effective.module_resolution_kind().0),
+            );
+            row.insert(
+                "trace_resolution".into(),
+                json!(effective.trace_resolution.is_true()),
+            );
+            Ok(Step::Done)
+        }
 
-        "resolve" => {
+        "mutate" => {
+            let host = state.host.as_ref().ok_or("mutate before resolver")?;
+            let sensitive = host.use_case_sensitive_file_names();
+            let mut files = host.files.write().expect("fixture files lock");
+            apply_files(&mut files, list(action, "add")?)?;
+            for path in strings(action, "remove")? {
+                files.remove(&path);
+            }
+            let fs = tsr_vfs::vfstest::from_map(&files, sensitive).into_vfs();
+            *host.inner.write().expect("fixture host lock") = Arc::new(fs);
+            row.insert("file_count".into(), json!(files.len()));
+            Ok(Step::Done)
+        }
+        "set_trace" => {
+            let enabled = flag(action, "enabled")?;
+            state
+                .resolver
+                .as_mut()
+                .ok_or("set_trace before resolver")?
+                .set_trace_resolution(enabled);
+            row.insert("trace_resolution".into(), json!(enabled));
+            Ok(Step::Done)
+        }
+        "entrypoints" => {
+            let resolver = state
+                .resolver
+                .as_mut()
+                .ok_or("entrypoints before resolver")?;
+            let package = resolver
+                .package_scope(text(action, "directory")?.as_bytes())
+                .map_err(|e| e.to_string())?
+                .ok_or("entrypoints without package scope")?;
+            let entries = resolver
+                .entrypoints(
+                    &package,
+                    text(action, "package_name")?.as_bytes(),
+                    flag(action, "enable_directory_search")?,
+                )
+                .map_err(|e| e.to_string())?;
+            row.insert(
+                "entrypoints".into(),
+                json!(entries
+                    .iter()
+                    .map(|entry| json!([
+                        hex(entry.resolved_file_name.as_bytes()),
+                        hex(entry.original_file_name.as_bytes()),
+                        hex(entry.symlink_or_realpath()),
+                        hex(entry.module_specifier.as_bytes()),
+                        entry.ending as u8,
+                        entry.include_conditions.as_ref().map(|values| values
+                            .iter()
+                            .map(|value| hex(value.as_bytes()))
+                            .collect::<Vec<_>>()),
+                        entry.exclude_conditions.as_ref().map(|values| values
+                            .iter()
+                            .map(|value| hex(value.as_bytes()))
+                            .collect::<Vec<_>>()),
+                    ]))
+                    .collect::<Vec<_>>()),
+            );
+            Ok(Step::Done)
+        }
+        "package_json_cache_entries" => {
+            let mut entries = Vec::new();
+            state
+                .resolver
+                .as_ref()
+                .ok_or("cache entries before resolver")?
+                .package_json_cache_entries(|key, entry| {
+                    entries.push((key.clone(), entry.clone()));
+                    true
+                });
+            entries.sort_by(|a, b| a.0.cmp(&b.0));
+            row.insert(
+                "entries".into(),
+                json!(entries
+                    .iter()
+                    .map(|(key, entry)| json!([
+                        hex(key.as_bytes()),
+                        hex(entry.package_directory.as_bytes()),
+                        entry.exists()
+                    ]))
+                    .collect::<Vec<_>>()),
+            );
+            Ok(Step::Done)
+        }
+        "resolve" | "resolve_with_redirect" => {
             let resolver = state
                 .resolver
                 .as_mut()
                 .ok_or("action needs a resolver, but the case never built one")?;
             let host = state.host.as_ref().ok_or("no fixture host")?;
             let before = host.calls();
-            let outcome = resolver.resolve(
+            let (name, redirected) = redirect_options(action)?;
+            let reference = name.map(|name| tsr_module::ResolvedProjectReference {
+                config_name: name.as_bytes(),
+                compiler_options: redirected.as_ref(),
+            });
+            let outcome = resolver.resolve_with_redirect(
                 text(action, "name")?.as_bytes(),
                 text(action, "file")?.as_bytes(),
                 mode(action)?,
+                reference,
             );
             match outcome {
                 Ok(resolved) => {
@@ -668,6 +641,88 @@ fn apply(state: &mut State, action: &Value, row: &mut Map<String, Value>) -> Res
                         .collect(),
                 ),
             );
+            Ok(Step::Done)
+        }
+        "unmangle_scoped" | "package_name_from_types_package_name" => {
+            let convert = if api::action_op(action) == "unmangle_scoped" {
+                tsr_module::unmangle_scoped_package_name
+            } else {
+                tsr_module::package_name_from_types_package_name
+            };
+            row.insert(
+                "names".into(),
+                json!(strings(action, "names")?
+                    .iter()
+                    .map(|name| json!([hex(name), hex(&convert(name))]))
+                    .collect::<Vec<_>>()),
+            );
+            Ok(Step::Done)
+        }
+        "parse_node_module_from_path" => {
+            let values = list(action, "inputs")?
+                .iter()
+                .map(|input| {
+                    let path = text(input, "path")?;
+                    let folder = flag(input, "is_folder")?;
+                    Ok(json!([
+                        hex(path.as_bytes()),
+                        folder,
+                        hex(&tsr_module::parse_node_module_from_path(
+                            path.as_bytes(),
+                            folder
+                        ))
+                    ]))
+                })
+                .collect::<Result<Vec<_>, Bad>>()?;
+            row.insert("inputs".into(), json!(values));
+            Ok(Step::Done)
+        }
+        "package_id_string" => {
+            let values = list(action, "package_ids")?
+                .iter()
+                .map(|spec| {
+                    let id = PackageId {
+                        name: JsString::from_bytes(text(spec, "name")?.as_bytes()),
+                        sub_module_name: JsString::from_bytes(
+                            text(spec, "sub_module_name")?.as_bytes(),
+                        ),
+                        version: JsString::from_bytes(text(spec, "version")?.as_bytes()),
+                        peer_dependencies: JsString::from_bytes(
+                            text(spec, "peer_dependencies")?.as_bytes(),
+                        ),
+                    };
+                    Ok(json!([
+                        hex(id.package_name().as_bytes()),
+                        hex(id.text().as_bytes())
+                    ]))
+                })
+                .collect::<Result<Vec<_>, Bad>>()?;
+            row.insert("package_ids".into(), json!(values));
+            Ok(Step::Done)
+        }
+        "parsed_patterns" => {
+            let input = json!({"paths":field(action, "paths")?});
+            let mappings = options(&input)?.paths.unwrap_or_default();
+            let patterns = tsr_module::ParsedPatterns::new(&mappings);
+            let values: Vec<_> = strings(action, "candidates")?
+                .iter()
+                .map(|candidate| {
+                    let matched = patterns.match_pattern_or_exact(candidate);
+                    let inner = if matched.is_valid() {
+                        matched.matched_text(candidate)
+                    } else {
+                        b""
+                    };
+                    json!([
+                        hex(candidate),
+                        matched.is_valid(),
+                        hex(&matched.text),
+                        matched.star_index,
+                        hex(inner)
+                    ])
+                })
+                .collect();
+            row.insert("candidates".into(), json!(values));
             Ok(Step::Done)
         }
         "mangle_scoped" => {
@@ -789,12 +844,45 @@ pub fn observe(request: &Value) -> Option<Outcome> {
             "op".into(),
             Value::String(api::action_op(action).to_owned()),
         );
-        match apply(&mut state, action, &mut row) {
+        // Match native per-action recovery. Only known runtime bounds classes
+        // are canonicalized; unrelated panics remain harness failures.
+        let applied = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+            apply(&mut state, action, &mut row)
+        }));
+        let applied = match applied {
+            Ok(result) => result,
+            Err(payload) => {
+                let message = payload
+                    .downcast_ref::<String>()
+                    .map(String::as_str)
+                    .or_else(|| payload.downcast_ref::<&str>().copied())
+                    .unwrap_or("non-string panic");
+                let class = if message.starts_with("index out of bounds:") {
+                    "runtime: index out of range"
+                } else if message.starts_with("slice index starts at ")
+                    || message.starts_with("range start index ")
+                    || message.starts_with("range end index ")
+                {
+                    "runtime: slice bounds out of range"
+                } else if message.starts_with("Unexpected moduleResolution: ")
+                    || message.starts_with("vfs: path ")
+                {
+                    message
+                } else {
+                    return Some(Outcome::Failed(format!("unexpected panic: {message}")));
+                };
+                row = Map::from_iter([
+                    ("op".into(), json!(api::action_op(action))),
+                    ("panic".into(), json!(class)),
+                ]);
+                Ok(Step::Done)
+            }
+        };
+        match applied {
             Ok(Step::Done) => rows.push(Value::Object(row)),
             // The first action the port cannot run decides the whole case: a
             // partial trace would be a comparison against a shorter run, not a
             // result. The gap names the operation the case was written for.
-            Ok(Step::Unreachable) => return Some(gap(request)),
             Err(error) => {
                 return Some(Outcome::Failed(format!(
                     "case {identifier}, action {:?}: {error}",

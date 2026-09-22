@@ -4927,7 +4927,10 @@
             "projects": [
               "."
             ],
-            "raw": []
+            "raw": [],
+            "resolvedProjects": [
+              "/project/tsconfig.json"
+            ]
           },
           {
             "args": [
@@ -4940,7 +4943,10 @@
             "projects": [
               "p1"
             ],
-            "raw": []
+            "raw": [],
+            "resolvedProjects": [
+              "/project/p1/tsconfig.json"
+            ]
           },
           {
             "args": [
@@ -4955,7 +4961,11 @@
               "p1",
               "p2"
             ],
-            "raw": []
+            "raw": [],
+            "resolvedProjects": [
+              "/project/p1/tsconfig.json",
+              "/project/p2/tsconfig.json"
+            ]
           },
           {
             "args": [
@@ -4973,6 +4983,9 @@
                 "verbose",
                 true
               ]
+            ],
+            "resolvedProjects": [
+              "/project/tsconfig.json"
             ]
           },
           {
@@ -4992,6 +5005,9 @@
                 "verbose",
                 true
               ]
+            ],
+            "resolvedProjects": [
+              "/project/p1/tsconfig.json"
             ]
           }
         ]
@@ -5032,6 +5048,9 @@
                 "force",
                 true
               ]
+            ],
+            "resolvedProjects": [
+              "/project/tsconfig.json"
             ]
           },
           {
@@ -5063,6 +5082,9 @@
                 "verbose",
                 true
               ]
+            ],
+            "resolvedProjects": [
+              "/project/tsconfig.json"
             ]
           },
           {
@@ -5094,6 +5116,9 @@
                 "watch",
                 true
               ]
+            ],
+            "resolvedProjects": [
+              "/project/tsconfig.json"
             ]
           },
           {
@@ -5125,6 +5150,9 @@
                 "dry",
                 true
               ]
+            ],
+            "resolvedProjects": [
+              "/project/tsconfig.json"
             ]
           },
           {
@@ -5168,6 +5196,9 @@
                 "verbose",
                 true
               ]
+            ],
+            "resolvedProjects": [
+              "/project/tsconfig.json"
             ]
           },
           {
@@ -5191,6 +5222,9 @@
                 "verbose",
                 true
               ]
+            ],
+            "resolvedProjects": [
+              "/project/tsconfig.json"
             ]
           }
         ]
@@ -5218,6 +5252,9 @@
                 "build",
                 true
               ]
+            ],
+            "resolvedProjects": [
+              "/project/tsconfig.json"
             ]
           },
           {
@@ -5246,6 +5283,9 @@
                 "force",
                 true
               ]
+            ],
+            "resolvedProjects": [
+              "/project/tsconfig.json"
             ]
           },
           {
@@ -5270,6 +5310,9 @@
                 "verbose",
                 true
               ]
+            ],
+            "resolvedProjects": [
+              "/project/p1/tsconfig.json"
             ]
           },
           {
@@ -5288,6 +5331,9 @@
                 "quiet",
                 true
               ]
+            ],
+            "resolvedProjects": [
+              "/project/tsconfig.json"
             ]
           }
         ]
@@ -5318,7 +5364,10 @@
             "projects": [
               "p1"
             ],
-            "raw": []
+            "raw": [],
+            "resolvedProjects": [
+              "/project/p1/tsconfig.json"
+            ]
           },
           {
             "args": [
@@ -5339,7 +5388,10 @@
             "projects": [
               "dist"
             ],
-            "raw": []
+            "raw": [],
+            "resolvedProjects": [
+              "/project/dist/tsconfig.json"
+            ]
           },
           {
             "args": [
@@ -5360,7 +5412,10 @@
             "projects": [
               "react"
             ],
-            "raw": []
+            "raw": [],
+            "resolvedProjects": [
+              "/project/react/tsconfig.json"
+            ]
           }
         ]
       },
@@ -5389,7 +5444,10 @@
             "projects": [
               "."
             ],
-            "raw": []
+            "raw": [],
+            "resolvedProjects": [
+              "/project/tsconfig.json"
+            ]
           },
           {
             "args": [
@@ -5410,7 +5468,10 @@
             "projects": [
               "."
             ],
-            "raw": []
+            "raw": [],
+            "resolvedProjects": [
+              "/project/tsconfig.json"
+            ]
           },
           {
             "args": [
@@ -5431,7 +5492,10 @@
             "projects": [
               "."
             ],
-            "raw": []
+            "raw": [],
+            "resolvedProjects": [
+              "/project/tsconfig.json"
+            ]
           },
           {
             "args": [
@@ -5452,7 +5516,10 @@
             "projects": [
               "."
             ],
-            "raw": []
+            "raw": [],
+            "resolvedProjects": [
+              "/project/tsconfig.json"
+            ]
           }
         ]
       },
@@ -5500,6 +5567,9 @@
                 "incremental",
                 true
               ]
+            ],
+            "resolvedProjects": [
+              "/project/tsconfig.json"
             ]
           },
           {
@@ -5542,7 +5612,10 @@
             "projects": [
               "x.tsbuildinfo"
             ],
-            "raw": []
+            "raw": [],
+            "resolvedProjects": [
+              "/project/x.tsbuildinfo/tsconfig.json"
+            ]
           },
           {
             "args": [
@@ -5582,6 +5655,9 @@
                 "locale",
                 "ja-jp"
               ]
+            ],
+            "resolvedProjects": [
+              "/project/tsconfig.json"
             ]
           },
           {
@@ -5621,6 +5697,9 @@
                 "verbose",
                 true
               ]
+            ],
+            "resolvedProjects": [
+              "/project/tsconfig.json"
             ]
           },
           {
@@ -5660,6 +5739,9 @@
                 "watch",
                 true
               ]
+            ],
+            "resolvedProjects": [
+              "/project/tsconfig.json"
             ]
           },
           {
@@ -5692,7 +5774,10 @@
             "projects": [
               "."
             ],
-            "raw": []
+            "raw": [],
+            "resolvedProjects": [
+              "/project/tsconfig.json"
+            ]
           },
           {
             "args": [
@@ -5732,6 +5817,9 @@
                 "locale",
                 "en"
               ]
+            ],
+            "resolvedProjects": [
+              "/project/tsconfig.json"
             ]
           },
           {
@@ -5775,7 +5863,10 @@
             "projects": [
               "."
             ],
-            "raw": []
+            "raw": [],
+            "resolvedProjects": [
+              "/project/tsconfig.json"
+            ]
           }
         ]
       },
@@ -5803,6 +5894,9 @@
                 "builders",
                 4
               ]
+            ],
+            "resolvedProjects": [
+              "/project/tsconfig.json"
             ]
           },
           {
@@ -5825,7 +5919,10 @@
             "projects": [
               "."
             ],
-            "raw": []
+            "raw": [],
+            "resolvedProjects": [
+              "/project/tsconfig.json"
+            ]
           },
           {
             "args": [
@@ -5844,6 +5941,9 @@
                 "builders",
                 1
               ]
+            ],
+            "resolvedProjects": [
+              "/project/tsconfig.json"
             ]
           },
           {
@@ -5866,7 +5966,10 @@
             "projects": [
               "."
             ],
-            "raw": []
+            "raw": [],
+            "resolvedProjects": [
+              "/project/tsconfig.json"
+            ]
           }
         ]
       },
@@ -8324,6 +8427,6 @@
       "result": "native_unavailable"
     }
   ],
-  "request_sha256": "addc8ee3b7be0629eb17e770ce758d992485be126db26a724cf14c9f1431cdde",
+  "request_sha256": "346b193393d1c6c013e9c0a9b3c7fa6236166c70a24d0182bf4906fdc20edb11",
   "version": 1
 }

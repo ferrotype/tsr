@@ -1511,11 +1511,12 @@ class PortAnnotationTests(unittest.TestCase):
         # function: internal/parser's tests the single-quote token flag,
         # internal/tsoptions' does not. The Rust port declares itself the port
         # of the parser's, and the by-name rule attributed it to tsoptions'.
-        ports = scope.declared_ports()
-        self.assertEqual(
-            ports.get("is_double_quoted_string"),
-            {"tsc/internal/parser/parser.go:isDoubleQuotedString"},
-        )
+        # Freeze this negative witness: F3b now also ports the tsoptions
+        # helper, so inspecting the live union of annotations tests absence
+        # of implementation instead of the classifier's refusal to infer it.
+        ports = {"is_double_quoted_string": {
+            "tsc/internal/parser/parser.go:isDoubleQuotedString"
+        }}
         index = {"is_double_quoted_string": ["crates/tsr_parser/src/json.rs"]}
         disposition, basis = scope.classify(
             {}, "isDoubleQuotedString", False, index, [], ports,
@@ -1531,10 +1532,10 @@ class PortAnnotationTests(unittest.TestCase):
             "tsc/internal/parser/parser.go:isDoubleQuotedString")
         self.assertEqual(disposition, "implemented_untested")
 
-    def test_the_committed_scope_carries_the_correction(self):
+    def test_the_committed_scope_names_the_new_tsoptions_port(self):
         row = next(r for r in json.loads((ROOT / "data/phase1/scope.json").read_text())["operations"]
                    if r["id"] == "tsc/internal/tsoptions/tsconfigparsing.go:isDoubleQuotedString")
-        self.assertEqual(row["disposition"], "missing")
+        self.assertIn("crates/tsr_tsoptions/src/config_syntax.rs", row["annotated_home"])
 
 
     def test_an_annotated_home_is_recorded_beside_the_ledger_claim(self):

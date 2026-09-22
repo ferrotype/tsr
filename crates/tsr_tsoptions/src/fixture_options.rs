@@ -55,14 +55,9 @@ pub(crate) fn enum_value(option: &OptionDeclaration, value: &[u8]) -> Option<V> 
     })
 }
 pub(crate) fn enum_error(option: &OptionDeclaration) -> Diagnostic {
-    Diagnostic::compiler(
-        d::Argument_for_0_option_must_be_Colon_1,
-        vec![
-            text(format!("--{}", option.name).as_bytes()),
-            text(option.enum_names().as_bytes()),
-        ],
-    )
+    crate::invalid_enum_type_diagnostic(option, crate::OptionSyntax::default())
 }
+
 /// port: tsc/internal/tsoptions/commandlineparser.go:ParseListTypeOption
 pub fn parse_list_type_option(
     option: &'static OptionDeclaration,

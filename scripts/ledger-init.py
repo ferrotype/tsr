@@ -74,7 +74,7 @@ CRATES = {
     "internal/scanner": ("tsr_scanner", 0),
     "internal/semver": ("tsr_semver", 1),
     "internal/sourcemap": ("tsr_sourcemap", 3),
-    "internal/spanmap": ("tsr_spanmap", 5),
+    "internal/spanmap": ("tsr_ast", 5),
     "internal/stringutil": ("tsr_stringutil", 1),
     "internal/symlinks": ("tsr_module", 1),
     "internal/testrunner": ("tsr_testrunner", 1),

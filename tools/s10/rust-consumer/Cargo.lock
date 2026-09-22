@@ -485,6 +485,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "tsr_glob"
+version = "0.1.0"
+dependencies = [
+ "tsr_jsstring",
+]
+
+[[package]]
 name = "tsr_jsnum"
 version = "0.1.0"
 dependencies = [
@@ -618,9 +625,11 @@ dependencies = [
  "tsr_bundled",
  "tsr_core",
  "tsr_diagnostics",
+ "tsr_glob",
  "tsr_jsnum",
  "tsr_json",
  "tsr_jsstring",
+ "tsr_locale",
  "tsr_parser",
  "tsr_scanner",
  "tsr_tspath",

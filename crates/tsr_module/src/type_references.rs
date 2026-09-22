@@ -27,6 +27,7 @@ pub(super) struct TypeKey {
     name: JsString,
     mode: ModuleKind,
     inferred: bool,
+    redirect: JsString,
 }
 /// port: tsc/internal/core/compileroptions.go:CompilerOptions.GetEffectiveTypeRoots
 pub fn effective_type_roots(options: &CompilerOptions, cwd: &[u8]) -> (Vec<JsString>, bool) {
@@ -71,34 +72,44 @@ impl Resolver {
                 if path::base_name(&dir) == b"node_modules" {
                     continue;
                 }
-                let node_modules = path::combine(&dir, &[b"node_modules"]);
-                if !self.host.directory_exists(&node_modules)? {
-                    trace!(
-                        self,
-                        diagnostics::Directory_0_does_not_exist_skipping_all_lookups_in_it,
-                        &node_modules
-                    );
-                    continue;
-                }
-                if let Some(r) = self.package(ext, name, &node_modules, context)? {
-                    return Ok(Some(r));
-                }
-                if ext & DTS != 0 {
-                    let types = path::combine(&node_modules, &[b"@types"]);
-                    if self.host.directory_exists(&types)? {
-                        let mangled = self.trace_mangle_scoped(name);
-                        if let Some(r) = self.package(DTS, &mangled, &types, context)? {
-                            return Ok(Some(r));
-                        }
-                    } else {
-                        trace!(
-                            self,
-                            diagnostics::Directory_0_does_not_exist_skipping_all_lookups_in_it,
-                            &types
-                        );
-                    }
+                if let Some(result) = self.immediate_node_modules(name, &dir, ext, context)? {
+                    return Ok(Some(result));
                 }
             }
+        }
+        Ok(None)
+    }
+    /// port: tsc/internal/module/resolver.go:resolutionState.loadModuleFromImmediateNodeModulesDirectory
+    pub(super) fn immediate_node_modules(
+        &mut self,
+        name: &[u8],
+        directory: &[u8],
+        extensions: u8,
+        context: &crate::package_maps::Context,
+    ) -> Result<Option<ResolvedModule>, Error> {
+        let node_modules = path::combine(directory, &[b"node_modules"]);
+        if !self.host.directory_exists(&node_modules)? {
+            trace!(
+                self,
+                diagnostics::Directory_0_does_not_exist_skipping_all_lookups_in_it,
+                &node_modules
+            );
+            return Ok(None);
+        }
+        if let Some(result) = self.package(extensions, name, &node_modules, context)? {
+            return Ok(Some(result));
+        }
+        if extensions & DTS != 0 {
+            let types = path::combine(&node_modules, &[b"@types"]);
+            if self.host.directory_exists(&types)? {
+                let mangled = self.trace_mangle_scoped(name);
+                return self.package(DTS, &mangled, &types, context);
+            }
+            trace!(
+                self,
+                diagnostics::Directory_0_does_not_exist_skipping_all_lookups_in_it,
+                &types
+            );
         }
         Ok(None)
     }
@@ -108,7 +119,28 @@ impl Resolver {
         containing_file: &[u8],
         mode: ModuleKind,
     ) -> Result<&ResolvedTypeReferenceDirective, Error> {
-        self.tracer.begin(self.options.trace_resolution.is_true());
+        self.resolve_type_reference_with_redirect(name, containing_file, mode, None)
+    }
+    pub fn resolve_type_reference_with_redirect(
+        &mut self,
+        name: &[u8],
+        containing_file: &[u8],
+        mode: ModuleKind,
+        reference: Option<crate::ResolvedProjectReference<'_>>,
+    ) -> Result<&ResolvedTypeReferenceDirective, Error> {
+        let key = self.with_redirect(reference, |resolver| {
+            resolver.type_reference_in_context(name, containing_file, mode, reference)
+        })?;
+        Ok(&self.type_cache[&key])
+    }
+    fn type_reference_in_context(
+        &mut self,
+        name: &[u8],
+        containing_file: &[u8],
+        mode: ModuleKind,
+        reference: Option<crate::ResolvedProjectReference<'_>>,
+    ) -> Result<TypeKey, Error> {
+        self.tracer.begin(self.trace_resolution);
         let directory = path::directory(containing_file);
         let inferred = containing_file.ends_with(INFERRED_TYPES_CONTAINING_FILE);
         let key = TypeKey {
@@ -116,9 +148,10 @@ impl Resolver {
             name: JsString::from_bytes(name),
             mode,
             inferred,
+            redirect: JsString::from_bytes(reference.map_or(b"".as_slice(), |r| r.config_name)),
         };
-        if !self.options.trace_resolution.is_true() && self.type_cache.contains_key(&key) {
-            return Ok(&self.type_cache[&key]);
+        if !self.trace_resolution && self.type_cache.contains_key(&key) {
+            return Ok(key);
         }
         let result = self.trace_operation(|resolver| {
         let (roots, from_config) = effective_type_roots(&resolver.options, resolver.cwd.as_bytes());
@@ -129,6 +162,7 @@ impl Resolver {
             containing_file,
             joined(&roots, b",")
         );
+        resolver.trace_redirect(reference);
         let outcome = resolver.resolve_type_reference_worker(
             name,
             &directory,
@@ -153,7 +187,7 @@ impl Resolver {
             outcome
         })?;
         self.type_cache.insert(key.clone(), result);
-        Ok(&self.type_cache[&key])
+        Ok(key)
     }
     fn resolve_type_reference_worker(
         &mut self,
@@ -212,7 +246,7 @@ impl Resolver {
                 directory
             );
             resolved = if is_relative(name) {
-                let candidate = path::resolve(directory, &[name]);
+                let candidate = crate::resolver::normalize_cjs_path(directory, name);
                 self.relative(DTS, &candidate, esm, true, false)?
             } else {
                 self.nearest_node_modules(
@@ -322,7 +356,7 @@ impl Resolver {
             return Ok(PackageId::default());
         };
         let mut peers = Vec::new();
-        let peers_valid = self.validate_package_field(package, "peerDependencies", "object");
+        let peers_valid = self.validate_package_field(package, "peerDependencies");
         if let Some(values) = package
             .contents
             .get("peerDependencies")
@@ -471,8 +505,6 @@ impl Resolver {
 }
 
 fn node_module_directory(file: &[u8]) -> Option<Vec<u8>> {
-    let start = file.windows(14).rposition(|w| w == b"/node_modules/")? + 14;
-    let rest = &file[start..];
-    let (package, _) = crate::resolver::parse_package_name(rest);
-    Some(file[..start + package.len()].to_vec())
+    let directory = crate::parse_node_module_from_path(file, false);
+    (!directory.is_empty()).then_some(directory)
 }

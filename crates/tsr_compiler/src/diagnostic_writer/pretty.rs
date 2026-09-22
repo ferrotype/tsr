@@ -1,6 +1,5 @@
 use super::{
-    category, color, flattened, styled, Diagnostic, DiagnosticWriter, Error, File, Result, CYAN,
-    GREY, RESET,
+    category, color, styled, Diagnostic, DiagnosticWriter, Error, File, Result, CYAN, GREY, RESET,
 };
 use std::sync::Arc;
 const GUTTER: &[u8] = b"\x1b[7m";
@@ -25,9 +24,10 @@ fn trim_line(bytes: &[u8]) -> Vec<u8> {
 impl DiagnosticWriter<'_> {
     /// port: tsc/internal/diagnosticwriter/diagnosticwriter.go:FormatDiagnosticWithColorAndContext
     pub(super) fn pretty(&mut self, out: &mut Vec<u8>, d: &Diagnostic) -> Result<()> {
+        let location = self.resolved_location(d)?.loc;
         let file = self.file(d)?;
         if let Some(file) = &file {
-            out.extend_from_slice(&self.location(file, d.loc.pos(), true)?);
+            out.extend_from_slice(&self.location(file, location.pos(), true)?);
             out.extend_from_slice(b" - ");
         }
         styled(out, category(d.category)?, color(d.category)?, true);
@@ -36,7 +36,7 @@ impl DiagnosticWriter<'_> {
         out.extend_from_slice(super::prefix(d));
         out.extend_from_slice(format!("{}: ", d.code).as_bytes());
         out.extend_from_slice(RESET);
-        out.extend_from_slice(&flattened(d, &self.options.new_line)?);
+        out.extend_from_slice(&self.flatten(d, &self.options.new_line)?);
         if let Some(file) =
             file.filter(|_| d.code != tsr_diagnostics::File_appears_to_be_binary.code)
         {
@@ -44,25 +44,26 @@ impl DiagnosticWriter<'_> {
             self.snippet(
                 out,
                 &file,
-                d.loc.pos(),
-                d.loc.end(),
+                location.pos(),
+                location.end(),
                 color(d.category)?,
                 b"",
             )?;
             out.extend_from_slice(&self.options.new_line);
         }
         for related in &d.related_information {
+            let related_location = self.resolved_location(related)?.loc;
             if let Some(file) = self.file(related)? {
                 out.extend_from_slice(&self.options.new_line);
                 out.extend_from_slice(b"  ");
-                out.extend_from_slice(&self.location(&file, related.loc.pos(), true)?);
+                out.extend_from_slice(&self.location(&file, related_location.pos(), true)?);
                 out.extend_from_slice(b" - ");
-                out.extend_from_slice(&flattened(related, &self.options.new_line)?);
+                out.extend_from_slice(&self.flatten(related, &self.options.new_line)?);
                 self.snippet(
                     out,
                     &file,
-                    related.loc.pos(),
-                    related.loc.end(),
+                    related_location.pos(),
+                    related_location.end(),
                     CYAN,
                     b"    ",
                 )?;
@@ -146,8 +147,19 @@ impl DiagnosticWriter<'_> {
         }
         Ok(())
     }
-    fn pretty_path(&self, file: &File, first: &Diagnostic) -> Result<Vec<u8>> {
-        let (line, _) = file.line_and_character(first.loc.pos())?;
+    /// port: tsc/internal/diagnosticwriter/diagnosticwriter.go:prettyPathForFileError
+    pub fn pretty_path_for_errors(
+        &self,
+        file: Option<&File>,
+        diagnostics: &[&Diagnostic],
+    ) -> Result<Vec<u8>> {
+        match (file, diagnostics.first()) {
+            (Some(file), Some(first)) => self.pretty_path(file, first),
+            _ => Ok(Vec::new()),
+        }
+    }
+    pub fn pretty_path(&self, file: &File, first: &Diagnostic) -> Result<Vec<u8>> {
+        let (line, _) = file.line_and_character(self.resolved_location(first)?.loc.pos())?;
         let mut path = if tsr_tspath::root_length(file.name.as_bytes()) > 0
             && tsr_tspath::root_length(&self.options.current_directory) > 0
         {
@@ -222,21 +234,32 @@ impl DiagnosticWriter<'_> {
         out.extend_from_slice(&self.options.new_line);
         out.extend_from_slice(&self.options.new_line);
         if groups.len() > 1 {
-            let digits = groups
-                .iter()
-                .map(|(_, ds)| ds.len())
-                .max()
-                .unwrap()
-                .to_string()
-                .len();
-            let width = 6.max(digits);
-            repeat(&mut out, b' ', digits.saturating_sub(6));
-            out.extend_from_slice(b"Errors  Files");
+            out.extend_from_slice(&self.tabular_errors(&groups)?);
             out.extend_from_slice(&self.options.new_line);
-            for (file, diags) in groups {
-                out.extend_from_slice(format!("{:>width$}  ", diags.len()).as_bytes());
-                out.extend_from_slice(&self.pretty_path(&file, diags[0])?);
-                out.extend_from_slice(&self.options.new_line);
+        }
+        Ok(out)
+    }
+
+    /// The caller supplies file order and grouping. Each group must contain a
+    /// first diagnostic, just as native prettyPathForFileError requires.
+    /// port: tsc/internal/diagnosticwriter/diagnosticwriter.go:writeTabularErrorsDisplay
+    pub fn tabular_errors(&self, groups: &[(Arc<File>, Vec<&Diagnostic>)]) -> Result<Vec<u8>> {
+        let mut out = Vec::new();
+        let digits = groups
+            .iter()
+            .map(|(_, ds)| ds.len())
+            .max()
+            .unwrap_or(0)
+            .to_string()
+            .len();
+        let width = 6.max(digits);
+        repeat(&mut out, b' ', digits.saturating_sub(6));
+        out.extend_from_slice(b"Errors  Files");
+        out.extend_from_slice(&self.options.new_line);
+        for (file, diags) in groups {
+            out.extend_from_slice(format!("{:>width$}  ", diags.len()).as_bytes());
+            if let Some(first) = diags.first() {
+                out.extend_from_slice(&self.pretty_path(file, first)?);
             }
             out.extend_from_slice(&self.options.new_line);
         }

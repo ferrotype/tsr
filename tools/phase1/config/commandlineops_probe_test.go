@@ -567,6 +567,7 @@ func commandLineOpsRun(t *testing.T, session *commandLineOpsSession, action comm
 		parsed := tsoptions.ParseBuildCommandLine(action.Args, session.host())
 		row["args"] = commandLineOpsStrings(action.Args)
 		row["projects"] = commandLineOpsStrings(parsed.Projects)
+		row["resolvedProjects"] = commandLineOpsStrings(parsed.ResolvedProjectPaths())
 		row["errors"] = commandLineOpsDiagnostics(parsed.Errors)
 		raw, ok := parsed.Raw.(*collections.OrderedMap[string, any])
 		if !ok {

@@ -627,6 +627,8 @@ func p1apply(state *p1State, action p1Action, row map[string]any) {
 				p1hex(entrypoint.SymlinkOrRealpath()),
 				p1hex(entrypoint.ModuleSpecifier),
 				int64(entrypoint.Ending),
+				p1conditions(entrypoint.IncludeConditions),
+				p1conditions(entrypoint.ExcludeConditions),
 			})
 		}
 		row["entrypoints"] = encoded
@@ -843,4 +845,21 @@ func TestPhase1ConfigModule(t *testing.T) {
 	if err := os.WriteFile(os.Getenv("S08_OUTPUT"), append(data, '\n'), 0o644); err != nil {
 		t.Fatal(err)
 	}
+}
+
+// Condition sets are unordered; preserve nil while sorting present members.
+func p1conditions(values *collections.Set[string]) any {
+	if values == nil {
+		return nil
+	}
+	names := []string{}
+	for name := range values.Keys() {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+	result := []any{}
+	for _, name := range names {
+		result = append(result, p1hex(name))
+	}
+	return result
 }

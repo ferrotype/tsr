@@ -1,66 +1,10 @@
 package tsoptions_test
 
-// Phase 1 F3a, access only: the 87 `config/tsconfigParsing` reference outputs.
-//
-// Like the command-line group and unlike F2a's carried `config/matchFiles`
-// envelope, these have a real pinned producer. Unlike the command-line group,
-// its assembly is not a reusable function: `baselineParseConfigWith`
-// (tsconfigparsing_test.go:1503) ends in `baseline.Run` (:1554), and
-// `TestParseConfigFileTextToJson` (:130) assembles its sections inline in the
-// test body. Calling either as-is is not an option:
-//
-//   * `baseline.Run` -> `writeComparison` (baseline.go:41-80) writes under
-//     `repo.TestDataPath()/baselines/local`, which is inside the pinned
-//     submodule, and calls `t.Errorf` on any difference (:79). A Rust-fed
-//     render that diverged would make `go test` exit non-zero and abort the
-//     whole capture instead of recording a `different` row -- the comparison
-//     would destroy the evidence it exists to produce.
-//
-// So this file carries the two assemblies, which the plan authorises for
-// exactly this case: "Where assembly is inline, carry a minimal reviewed
-// test-source patch exposing the same assembly over supplied observations"
-// (docs/PHASE1-implementation-plan.md:739-741). What is carried is the section
-// *sequencing* and nothing else. Every value in it comes from a pinned call:
-//
-//   * `Fs::`               -- the pinned `printFS` (:1657), called directly
-//   * `configFileName::`   -- the config's own raw file name
-//   * `CompilerOptions::`  -- the pinned `internal/json.MarshalIndentWrite`
-//   * `TypeAcquisition::`  -- the same, under the pinned nil gate (:1531)
-//   * `FileNames::`        -- `strings.Join` of the parse's own file names
-//   * `Errors::`           -- the pinned
-//                             `diagnosticwriter.FormatDiagnosticsWithColorAndContext`
-//   * `Input::`/`Config::` -- the pinned `ParseConfigFileTextToJson` and
-//                             `writeJsonReadableText` (:1557)
-//
-// and the host is the pinned `tsoptionstest.NewVFSParseConfigHost`. The two
-// entry points are the pinned `getParsedWithJsonApi` (:952) and
-// `getParsedWithJsonSourceFileApi` (:1481), called rather than reimplemented,
-// which is why this file compiles into `tsoptions_test`.
-//
-// The carried sequencing is held to the only standard that makes carrying it
-// safe: it must reproduce the untouched pinned bytes. Each row reports
-// `rendered_sha256` against the frozen file's `expected_sha256`, and all 87
-// are required to be exact -- these outputs are `rendering_verified: true` in
-// data/phase1/config-baselines.json, so `exception_problems` refuses an
-// exception on any of them.
-//
-// WHERE THE INPUTS COME FROM. 71 of the 87 read the pinned tables directly:
-// `parseJsonConfigFileTests` (:168) and `parseConfigFileTextToJsonTests` (:40)
-// are package-level vars in `tsoptions_test`, so the overlay reads the pinned
-// data itself and nothing is transcribed. The other 16 cannot be read that
-// way: `TestParseTypeAcquisition`'s table is a function-local (:1563), so the
-// overlay recovers each one's config text from the baseline's own `Fs::` and
-// `configFileName::` sections -- both INPUT sections -- and takes the rest of
-// that test's input shape from the pinned literal at :1634-1644, which is
-// constant across all eight: base path `/apath`, `allFileList` of
-// `/apath/a.ts` and `/apath/b.ts`, one input, `includeCompilerOptions` true.
-// A wrong recovery cannot pass silently, because `Fs::` is rendered back out
-// of the reconstructed host and compared with the rest of the bytes.
-//
-// The probe never reads `CompilerOptions::`, `TypeAcquisition::`,
-// `FileNames::`, `Config::` or `Errors::` -- the result sections -- to build a
-// request, and it never edits, repairs or special-cases a baseline.
-
+// Test-only bridge for the 87 pinned config baselines. Inputs are exported
+// directly from the native tables, except the 16 function-local acquisition
+// cases whose input-only Fs prefix is recovered as in F3a. Native witnesses
+// authenticate those inputs and the exact envelope bytes. Rust supplies every
+// result field and diagnostic byte to the same pure envelope function.
 import (
 	"crypto/sha256"
 	"encoding/hex"
@@ -69,10 +13,13 @@ import (
 	"maps"
 	"os"
 	"path/filepath"
+	"reflect"
 	"runtime"
 	"strings"
 	"testing"
 
+	"github.com/microsoft/TypeScript/tsc/internal/ast"
+	"github.com/microsoft/TypeScript/tsc/internal/core"
 	"github.com/microsoft/TypeScript/tsc/internal/diagnosticwriter"
 	"github.com/microsoft/TypeScript/tsc/internal/json"
 	"github.com/microsoft/TypeScript/tsc/internal/repo"
@@ -86,124 +33,305 @@ const (
 	tsconfigFsHead           = "Fs::\n"
 	tsconfigNameHead         = "\nconfigFileName:: "
 	tsconfigEntryMark        = "//// ["
-	// TestParseTypeAcquisition's function-local input shape
-	// (tsconfigparsing_test.go:1634-1644), constant across all eight cases.
-	typeAcquisitionBasePath = "/apath"
+	typeAcquisitionBasePath  = "/apath"
 )
 
+type configInput struct {
+	ConfigFileName string            `json:"config_file_name"`
+	BasePath       string            `json:"base_path"`
+	JSONText       string            `json:"json_text"`
+	AllFileList    map[string]string `json:"all_file_list"`
+}
 type tsconfigParsingRequest struct {
-	Case      string `json:"case"`
-	Operation string `json:"operation"`
-	Baseline  string `json:"baseline"`
-	// "json", "jsonSourceFile" or "jsonParse": which pinned entry point the
-	// output is written from.
-	API string `json:"api"`
-	// "table" when the input is read from a pinned package-level table,
-	// "recovered" when it is rebuilt from the baseline's own input sections.
-	Source string `json:"source"`
-	// The pinned test title, which is the table key and the output-name stem.
-	Title string `json:"title"`
+	Case                   string        `json:"case"`
+	Operation              string        `json:"operation"`
+	Baseline               string        `json:"baseline"`
+	API                    string        `json:"api"`
+	Source                 string        `json:"source"`
+	Title                  string        `json:"title"`
+	IncludeCompilerOptions bool          `json:"include_compiler_options"`
+	Inputs                 []configInput `json:"inputs"`
 }
 
-// phase1RenderParseConfig is `baselineParseConfigWith`
-// (tsconfigparsing_test.go:1503-1555) with its final `baseline.Run` removed and
-// the assembled bytes returned instead. Nothing else is changed: the loop, the
-// host construction, the section order, the two `WriteString("\n")` separators,
-// the `TypeAcquisition` nil gate and both newline settings are the pinned
-// ones, and every value is produced by the pinned call named in the file
-// comment above.
-func phase1RenderParseConfig(
-	includeCompilerOptions bool,
-	input []testConfig,
-	getParsed func(config testConfig, host tsoptions.ParseConfigHost, basePath string) *tsoptions.ParsedCommandLine,
-) (string, error) {
-	var baselineContent strings.Builder
-	for i, config := range input {
-		basePath := config.basePath
-		if basePath == "" {
-			basePath = tspath.GetNormalizedAbsolutePath(tspath.GetDirectoryPath(config.configFileName), "")
+func configInputs(request tsconfigParsingRequest, expected string) (bool, []configInput, error) {
+	if request.API == "jsonParse" {
+		texts, ok := parseConfigFileTextToJsonInputs(request.Title)
+		if !ok {
+			return false, nil, fmt.Errorf("missing pinned title %s", request.Title)
 		}
-		configFileName := tspath.CombinePaths(basePath, config.configFileName)
-		allFileLists := make(map[string]string, len(config.allFileList)+1)
-		maps.Copy(allFileLists, config.allFileList)
-		allFileLists[configFileName] = config.jsonText
-		host := tsoptionstest.NewVFSParseConfigHost(allFileLists, config.basePath, true /*useCaseSensitiveFileNames*/)
-		parsedConfigFileContent := getParsed(config, host, basePath)
-
-		baselineContent.WriteString("Fs::\n")
-		if err := printFS(&baselineContent, host.FS(), "/"); err != nil {
-			return "", err
+		result := []configInput{}
+		for _, text := range texts {
+			result = append(result, configInput{JSONText: text})
 		}
-		baselineContent.WriteString("\n")
-		baselineContent.WriteString("configFileName:: ")
-		baselineContent.WriteString(config.configFileName)
-		baselineContent.WriteString("\n")
-		if includeCompilerOptions {
-			baselineContent.WriteString("CompilerOptions::\n")
-			if err := json.MarshalIndentWrite(&baselineContent, parsedConfigFileContent.ParsedConfig.CompilerOptions, "", "  "); err != nil {
-				return "", err
-			}
-			baselineContent.WriteString("\n")
-			baselineContent.WriteString("\n")
-
-			if parsedConfigFileContent.ParsedConfig.TypeAcquisition != nil {
-				baselineContent.WriteString("TypeAcquisition::\n")
-				if err := json.MarshalIndentWrite(&baselineContent, parsedConfigFileContent.ParsedConfig.TypeAcquisition, "", "  "); err != nil {
-					return "", err
-				}
-				baselineContent.WriteString("\n")
-				baselineContent.WriteString("\n")
-			}
+		return false, result, nil
+	}
+	var configs []testConfig
+	var include bool
+	switch request.Source {
+	case "table":
+		entry, ok := tsconfigParsingEntry(request.Title)
+		if !ok {
+			return false, nil, fmt.Errorf("missing pinned title %s", request.Title)
 		}
-		baselineContent.WriteString("FileNames::\n")
-		baselineContent.WriteString(strings.Join(parsedConfigFileContent.ParsedConfig.FileNames, ","))
-		baselineContent.WriteString("\n")
-		baselineContent.WriteString("Errors::\n")
-		diagnosticwriter.FormatDiagnosticsWithColorAndContext(&baselineContent, diagnosticwriter.FromASTDiagnostics(parsedConfigFileContent.Errors), &diagnosticwriter.FormattingOptions{
-			NewLine: "\r\n",
-			ComparePathsOptions: tspath.ComparePathsOptions{
-				CurrentDirectory:          basePath,
-				UseCaseSensitiveFileNames: true,
-			},
+		configs = entry.input
+		include = entry.includeCompilerOptions
+	case "recovered":
+		config, err := recoverTypeAcquisitionInput(expected)
+		if err != nil {
+			return false, nil, err
+		}
+		configs = []testConfig{config}
+		include = true
+	default:
+		return false, nil, fmt.Errorf("unknown input source")
+	}
+	result := []configInput{}
+	for _, c := range configs {
+		// None of these 87 frozen inputs passes existing options. Refuse a
+		// pin change rather than silently eliding a new input.
+		if c.existingOptions != nil {
+			return false, nil, fmt.Errorf("new existingOptions input needs transport")
+		}
+		result = append(result, configInput{c.configFileName, c.basePath, c.jsonText, c.allFileList})
+	}
+	return include, result, nil
+}
+func configHost(input configInput) (string, tsoptions.ParseConfigHost) {
+	base := input.BasePath
+	if base == "" {
+		base = tspath.GetNormalizedAbsolutePath(tspath.GetDirectoryPath(input.ConfigFileName), "")
+	}
+	files := map[string]string{}
+	maps.Copy(files, input.AllFileList)
+	files[tspath.CombinePaths(base, input.ConfigFileName)] = input.JSONText
+	return base, tsoptionstest.NewVFSParseConfigHost(files, input.BasePath, true)
+}
+func configDiagnostics(errors []*ast.Diagnostic) []any {
+	result := []any{}
+	for _, d := range errors {
+		var file any
+		if d.File() != nil {
+			file = hex.EncodeToString([]byte(d.File().FileName()))
+		}
+		result = append(result, map[string]any{
+			"code": d.Code(), "pos": d.Pos(), "end": d.End(), "category": d.Category(), "file": file,
+			"args":  bridgeWire(append([]string{}, d.MessageArgs()...)),
+			"chain": configDiagnostics(d.MessageChain()), "related": configDiagnostics(d.RelatedInformation()),
 		})
-		baselineContent.WriteString("\n")
-		if i != len(input)-1 {
-			baselineContent.WriteString("\n")
+	}
+	return result
+}
+func configObserve(request tsconfigParsingRequest) []map[string]any {
+	result := []map[string]any{}
+	for _, input := range request.Inputs {
+		var errors []*ast.Diagnostic
+		row := map[string]any{}
+		format := &diagnosticwriter.FormattingOptions{NewLine: "\n", ComparePathsOptions: tspath.ComparePathsOptions{CurrentDirectory: "/", UseCaseSensitiveFileNames: true}}
+		if request.API == "jsonParse" {
+			var value any
+			value, errors = tsoptions.ParseConfigFileTextToJson("/apath/tsconfig.json", "/apath", input.JSONText)
+			row["raw"] = bridgeWire(value)
+		} else {
+			base, host := configHost(input)
+			config := testConfig{configFileName: input.ConfigFileName, basePath: input.BasePath, jsonText: input.JSONText, allFileList: input.AllFileList}
+			var parsed *tsoptions.ParsedCommandLine
+			switch request.API {
+			case "json":
+				parsed = getParsedWithJsonApi(config, host, base)
+			case "jsonSourceFile":
+				parsed = getParsedWithJsonSourceFileApi(config, host, base)
+			default:
+				panic("unknown config API")
+			}
+			row["compiler"] = bridgeWire(parsed.ParsedConfig.CompilerOptions)
+			row["acquisition"] = bridgeWire(parsed.ParsedConfig.TypeAcquisition)
+			// A filename result is a sequence, unlike option values whose
+			// nil/empty presence states affect serialization.
+			row["files"] = bridgeWire(append([]string{}, parsed.ParsedConfig.FileNames...))
+			row["raw"] = bridgeWire(parsed.Raw)
+			errors = parsed.Errors
+			format.NewLine = "\r\n"
+			format.CurrentDirectory = base
+		}
+		var text strings.Builder
+		diagnosticwriter.FormatDiagnosticsWithColorAndContext(&text, diagnosticwriter.FromASTDiagnostics(errors), format)
+		row["errors"] = hex.EncodeToString([]byte(text.String()))
+		row["diagnostics"] = configDiagnostics(errors)
+		result = append(result, row)
+	}
+	return result
+}
+
+// The section sequence is the pinned baselineParseConfigWith and the inline
+// TestParseConfigFileTextToJson assembly. Only result acquisition is separated:
+// no call below parses a config or formats a diagnostic.
+func configRender(request tsconfigParsingRequest, typed map[string]any) map[string]any {
+	if len(typed) != 1 {
+		panic("unknown config renderer fields")
+	}
+	rows, ok := typed["rows"].([]any)
+	if !ok || len(rows) != len(request.Inputs) {
+		panic("config renderer schedule")
+	}
+	var b strings.Builder
+	for i, input := range request.Inputs {
+		row, ok := rows[i].(map[string]any)
+		if !ok {
+			panic("invalid config result")
+		}
+		keys := []string{"raw", "errors", "diagnostics"}
+		if request.API != "jsonParse" {
+			keys = append(keys, "compiler", "acquisition", "files")
+		}
+		if len(row) != len(keys) {
+			panic("wrong config renderer field count")
+		}
+		for _, k := range keys {
+			if _, ok := row[k]; !ok {
+				panic("missing config renderer field " + k)
+			}
+		}
+		if request.API == "jsonParse" {
+			b.WriteString("Input::\n")
+			b.WriteString(input.JSONText)
+			b.WriteString("\nConfig::\n")
+			if err := writeJsonReadableText(&b, bridgeDecode(row["raw"])); err != nil {
+				panic(err)
+			}
+			b.WriteString("\n")
+		} else {
+			_, host := configHost(input)
+			b.WriteString("Fs::\n")
+			if err := printFS(&b, host.FS(), "/"); err != nil {
+				panic(err)
+			}
+			b.WriteString("\nconfigFileName:: ")
+			b.WriteString(input.ConfigFileName)
+			b.WriteString("\n")
+			var options core.CompilerOptions
+			bridgeAssign(reflect.ValueOf(&options).Elem(), bridgeDecode(row["compiler"]))
+			var acquisition *core.TypeAcquisition
+			bridgeAssign(reflect.ValueOf(&acquisition).Elem(), bridgeDecode(row["acquisition"]))
+			if request.IncludeCompilerOptions {
+				b.WriteString("CompilerOptions::\n")
+				if err := json.MarshalIndentWrite(&b, &options, "", "  "); err != nil {
+					panic(err)
+				}
+				b.WriteString("\n\n")
+				if acquisition != nil {
+					b.WriteString("TypeAcquisition::\n")
+					if err := json.MarshalIndentWrite(&b, acquisition, "", "  "); err != nil {
+						panic(err)
+					}
+					b.WriteString("\n\n")
+				}
+			}
+			var files []string
+			bridgeAssign(reflect.ValueOf(&files).Elem(), bridgeDecode(row["files"]))
+			b.WriteString("FileNames::\n")
+			b.WriteString(strings.Join(files, ","))
+			b.WriteString("\n")
+		}
+		b.WriteString("Errors::\n")
+		b.Write(bridgeBytes(row["errors"]))
+		b.WriteString("\n")
+		if i != len(rows)-1 {
+			b.WriteString("\n")
 		}
 	}
-	return baselineContent.String(), nil
+	rendered := b.String()
+	sum := sha256.Sum256([]byte(rendered))
+	return map[string]any{"baseline": request.Baseline, "typed": typed, "rendered": rendered, "rendered_sha256": hex.EncodeToString(sum[:])}
 }
-
-// phase1RenderParseConfigText is the inline assembly of
-// `TestParseConfigFileTextToJson` (tsconfigparsing_test.go:130-160), lifted out
-// of the test body unchanged. Note its `NewLine` is "\n", not the "\r\n" the
-// other renderer uses -- a real difference between the two, preserved here.
-func phase1RenderParseConfigText(inputs []string) string {
-	var baselineContent strings.Builder
-	for i, jsonText := range inputs {
-		baselineContent.WriteString("Input::\n")
-		baselineContent.WriteString(jsonText)
-		baselineContent.WriteString("\n")
-		parsed, errors := tsoptions.ParseConfigFileTextToJson("/apath/tsconfig.json", "/apath", jsonText)
-		baselineContent.WriteString("Config::\n")
-		if err := writeJsonReadableText(&baselineContent, parsed); err != nil {
+func init() {
+	bridgeRenderers[tsconfigParsingOperation] = func(raw stdjson.RawMessage, typed map[string]any) map[string]any {
+		var r tsconfigParsingRequest
+		if err := stdjson.Unmarshal(raw, &r); err != nil {
 			panic(err)
 		}
-		baselineContent.WriteString("\n")
-		baselineContent.WriteString("Errors::\n")
-		diagnosticwriter.FormatDiagnosticsWithColorAndContext(&baselineContent, diagnosticwriter.FromASTDiagnostics(errors), &diagnosticwriter.FormattingOptions{
-			NewLine: "\n",
-			ComparePathsOptions: tspath.ComparePathsOptions{
-				CurrentDirectory:          "/",
-				UseCaseSensitiveFileNames: true,
-			},
-		})
-		baselineContent.WriteString("\n")
-		if i != len(inputs)-1 {
-			baselineContent.WriteString("\n")
-		}
+		return configRender(r, typed)
 	}
-	return baselineContent.String()
+}
+
+func configDocument(t *testing.T) ([]byte, []tsconfigParsingRequest) {
+	t.Helper()
+	input, err := os.ReadFile(os.Getenv("S08_REQUESTS"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var d struct {
+		Requests []tsconfigParsingRequest `json:"requests"`
+	}
+	if err := stdjson.Unmarshal(input, &d); err != nil {
+		t.Fatal(err)
+	}
+	return input, d.Requests
+}
+func configExpected(t *testing.T, r tsconfigParsingRequest) []byte {
+	t.Helper()
+	b, err := os.ReadFile(filepath.Join(repo.TestDataPath(), "baselines", "reference", filepath.FromSlash(r.Baseline)))
+	if err != nil {
+		t.Fatal(err)
+	}
+	return b
+}
+func TestPhase1ConfigInputs(t *testing.T) {
+	input, requests := configDocument(t)
+	for i, r := range requests {
+		include, inputs, err := configInputs(r, string(configExpected(t, r)))
+		if err != nil {
+			t.Fatal(err)
+		}
+		requests[i].Inputs = inputs
+		requests[i].IncludeCompilerOptions = include
+	}
+	sum := sha256.Sum256(input)
+	b, err := stdjson.MarshalIndent(map[string]any{"requests": requests, "request_sha256": hex.EncodeToString(sum[:]), "go": runtime.Version(), "goos": runtime.GOOS, "goarch": runtime.GOARCH}, "", "  ")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(os.Getenv("S08_OUTPUT"), b, 0600); err != nil {
+		t.Fatal(err)
+	}
+}
+func TestPhase1ConfigTsconfigParsing(t *testing.T) {
+	input, requests := configDocument(t)
+	rows := []map[string]any{}
+	for _, r := range requests {
+		row := map[string]any{"case": r.Case, "operation": r.Operation}
+		if r.Operation != tsconfigParsingOperation {
+			row["result"] = "native_unavailable"
+			row["reason"] = "operation is not served by the tsconfigParsing baseline probe"
+			rows = append(rows, row)
+			continue
+		}
+		expected := configExpected(t, r)
+		include, inputs, err := configInputs(r, string(expected))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if include != r.IncludeCompilerOptions || !reflect.DeepEqual(inputs, r.Inputs) {
+			t.Fatalf("%s: frozen inputs differ from pinned test", r.Case)
+		}
+		typed := bridgeRoundtrip(map[string]any{"rows": configObserve(r)}).(map[string]any)
+		observation := configRender(r, typed)
+		if observation["rendered"] != string(expected) {
+			t.Fatalf("%s: native renderer changed frozen bytes", r.Case)
+		}
+		sum := sha256.Sum256(expected)
+		row["result"] = "observed"
+		row["observation"] = observation
+		row["metadata"] = map[string]any{"expected_sha256": hex.EncodeToString(sum[:])}
+		rows = append(rows, row)
+	}
+	sum := sha256.Sum256(input)
+	b, err := stdjson.MarshalIndent(map[string]any{"version": 1, "request_sha256": hex.EncodeToString(sum[:]), "go": runtime.Version(), "goos": runtime.GOOS, "goarch": runtime.GOARCH, "observations": rows}, "", "  ")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(os.Getenv("S08_OUTPUT"), b, 0600); err != nil {
+		t.Fatal(err)
+	}
 }
 
 // recoverTypeAcquisitionInput rebuilds one `TestParseTypeAcquisition` input
@@ -251,127 +379,6 @@ func tsconfigParsingEntry(title string) (parseJsonConfigTestCase, bool) {
 		}
 	}
 	return parseJsonConfigTestCase{}, false
-}
-
-func TestPhase1ConfigTsconfigParsing(t *testing.T) {
-	input, err := os.ReadFile(os.Getenv("S08_REQUESTS"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	var document struct {
-		Requests []tsconfigParsingRequest `json:"requests"`
-	}
-	if err := stdjson.Unmarshal(input, &document); err != nil {
-		t.Fatal(err)
-	}
-
-	observations := make([]map[string]any, 0, len(document.Requests))
-	for _, request := range document.Requests {
-		row := map[string]any{"case": request.Case, "operation": request.Operation}
-		if request.Operation != tsconfigParsingOperation {
-			row["result"] = "native_unavailable"
-			row["reason"] = "operation is not served by the tsconfigParsing baseline probe"
-			observations = append(observations, row)
-			continue
-		}
-		path := filepath.Join(repo.TestDataPath(), "baselines", "reference", filepath.FromSlash(request.Baseline))
-		expected, readErr := os.ReadFile(path)
-		if readErr != nil {
-			t.Fatalf("%s: %v", request.Case, readErr)
-		}
-		rendered, inputs, renderErr := renderTsconfigParsing(request, string(expected))
-		if renderErr != nil {
-			row["result"] = "harness_failed"
-			row["error"] = fmt.Sprintf("cannot render %s: %v", request.Baseline, renderErr)
-			observations = append(observations, row)
-			continue
-		}
-		renderedSum := sha256.Sum256([]byte(rendered))
-		expectedSum := sha256.Sum256(expected)
-		row["result"] = "observed"
-		row["observation"] = map[string]any{
-			"baseline":        request.Baseline,
-			"api":             request.API,
-			"input_source":    request.Source,
-			"inputs":          inputs,
-			"rendered":        rendered,
-			"rendered_sha256": hex.EncodeToString(renderedSum[:]),
-			"expected_sha256": hex.EncodeToString(expectedSum[:]),
-		}
-		observations = append(observations, row)
-	}
-
-	hash := sha256.Sum256(input)
-	output := map[string]any{
-		"request_sha256": hex.EncodeToString(hash[:]),
-		"go":             runtime.Version(),
-		"goos":           runtime.GOOS,
-		"goarch":         runtime.GOARCH,
-		"version":        1,
-		"observations":   observations,
-	}
-	encoded, err := stdjson.MarshalIndent(output, "", "  ")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(os.Getenv("S08_OUTPUT"), append(encoded, '\n'), 0o644); err != nil {
-		t.Fatal(err)
-	}
-}
-
-// renderTsconfigParsing resolves one request's inputs and renders it, returning
-// the bytes and the inputs it used so a differing row records both.
-func renderTsconfigParsing(request tsconfigParsingRequest, expected string) (string, []map[string]any, error) {
-	describe := func(input []testConfig) []map[string]any {
-		rows := make([]map[string]any, 0, len(input))
-		for _, config := range input {
-			rows = append(rows, map[string]any{
-				"config_file_name": config.configFileName,
-				"base_path":        config.basePath,
-				"json_text":        config.jsonText,
-				"all_file_list":    config.allFileList,
-			})
-		}
-		return rows
-	}
-	switch request.API {
-	case "jsonParse":
-		inputs, found := parseConfigFileTextToJsonInputs(request.Title)
-		if !found {
-			return "", nil, fmt.Errorf("no pinned parseConfigFileTextToJsonTests entry titled %q", request.Title)
-		}
-		texts := make([]map[string]any, 0, len(inputs))
-		for _, text := range inputs {
-			texts = append(texts, map[string]any{"json_text": text})
-		}
-		return phase1RenderParseConfigText(inputs), texts, nil
-	case "json", "jsonSourceFile":
-		getParsed := getParsedWithJsonApi
-		if request.API == "jsonSourceFile" {
-			getParsed = getParsedWithJsonSourceFileApi
-		}
-		switch request.Source {
-		case "table":
-			rec, found := tsconfigParsingEntry(request.Title)
-			if !found {
-				return "", nil, fmt.Errorf("no pinned parseJsonConfigFileTests entry titled %q", request.Title)
-			}
-			rendered, err := phase1RenderParseConfig(rec.includeCompilerOptions, rec.input, getParsed)
-			return rendered, describe(rec.input), err
-		case "recovered":
-			config, err := recoverTypeAcquisitionInput(expected)
-			if err != nil {
-				return "", nil, err
-			}
-			input := []testConfig{config}
-			rendered, err := phase1RenderParseConfig(true, input, getParsed)
-			return rendered, describe(input), err
-		default:
-			return "", nil, fmt.Errorf("unknown input source %q", request.Source)
-		}
-	default:
-		return "", nil, fmt.Errorf("unknown tsconfigParsing api %q", request.API)
-	}
 }
 
 // parseConfigFileTextToJsonInputs reads the pinned package-level

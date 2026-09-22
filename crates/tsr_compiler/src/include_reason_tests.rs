@@ -54,16 +54,18 @@ fn load(request: &Value) -> Program {
             )),
         )));
         let specs = &request["specs"];
-        config.config_specs = Some(ConfigFileSpecs {
-            validated_files: strings(&specs["Files"]),
-            files_before_substitution: strings(&specs["BeforeFiles"]),
-            validated_includes: strings(&specs["Includes"]),
-            includes_before_substitution: strings(&specs["BeforeIncludes"]),
-            is_default_include: specs["Default"].as_bool().unwrap_or(false),
-            ..ConfigFileSpecs::default()
-        });
-        config.config_base_path = JsString::from_bytes(cwd);
-        config.config_case_sensitive = case_sensitive;
+        config.set_config_specs(
+            Some(ConfigFileSpecs {
+                validated_files: strings(&specs["Files"]),
+                files_before_substitution: strings(&specs["BeforeFiles"]),
+                validated_includes: strings(&specs["Includes"]),
+                includes_before_substitution: strings(&specs["BeforeIncludes"]),
+                is_default_include: specs["Default"].as_bool().unwrap_or(false),
+                ..ConfigFileSpecs::default()
+            }),
+            JsString::from_bytes(cwd),
+            case_sensitive,
+        );
     }
     Program::load(
         ProgramOptions {

@@ -12,6 +12,8 @@ description = "Phase 1 F3a: answers the config, command-line, package and module
 # touches, and no published crate has that set, so it lives here rather than as
 # an example on a shipped crate.
 [dependencies]
+tsr_diagnostics = { path = "../../../crates/tsr_diagnostics" }
+tsr_glob = { path = "../../../crates/tsr_glob" }
 phase1_harness = { version = "0.1.0", path = "../harness" }
 serde_json = { version = "1", features = ["preserve_order"] }
 tsr_ast = { version = "0.1.0", path = "../../../crates/tsr_ast" }
@@ -21,9 +23,11 @@ tsr_compiler = { version = "0.1.0", path = "../../../crates/tsr_compiler" }
 tsr_core = { version = "0.1.0", path = "../../../crates/tsr_core" }
 tsr_jsstring = { version = "0.1.0", path = "../../../crates/tsr_jsstring" }
 tsr_module = { version = "0.1.0", path = "../../../crates/tsr_module" }
-tsr_tsoptions = { version = "0.1.0", path = "../../../crates/tsr_tsoptions" }
+tsr_tsoptions = { version = "0.1.0", path = "../../../crates/tsr_tsoptions", features = ["harness"] }
 tsr_tspath = { version = "0.1.0", path = "../../../crates/tsr_tspath" }
 tsr_vfs = { version = "0.1.0", path = "../../../crates/tsr_vfs" }
+
+tsr_parser = { version = "0.1.0", path = "../../../crates/tsr_parser" }
 
 [lints]
 workspace = true

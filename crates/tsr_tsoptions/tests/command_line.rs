@@ -249,3 +249,30 @@ fn build_locale_is_lazy_and_stays_at_the_first_observed_value() {
     result.compiler_options.locale = JsString::from_bytes(b"en".as_slice());
     assert_eq!(result.locale().tag_string(), "ja");
 }
+
+#[test]
+fn resolved_build_projects_normalize_in_order_and_cache_the_first_result() {
+    let mut parsed = parse_build_command_line(
+        &argv(&["../a", "sub/../tsconfig.dev.json", "/x/custom.JSON", "../a"]),
+        &host(&[]),
+    );
+    let expected = argv(&[
+        "/a/tsconfig.json",
+        "/project/tsconfig.dev.json",
+        "/x/custom.JSON/tsconfig.json",
+        "/a/tsconfig.json",
+    ]);
+    // A pre-observation clone has its own lazy cache, following the owned
+    // parse-result policy. Initializing it cannot populate the original.
+    let mut clone = parsed.clone();
+    clone.projects = argv(&["other"]);
+    assert_eq!(
+        clone.resolved_project_paths(),
+        argv(&["/project/other/tsconfig.json"])
+    );
+    assert_eq!(parsed.resolved_project_paths(), expected);
+    parsed.projects.clear();
+    parsed.current_directory = JsString::from_bytes(b"/changed".as_slice());
+    assert_eq!(parsed.resolved_project_paths(), expected);
+    assert_eq!(parsed.clone().resolved_project_paths(), expected);
+}

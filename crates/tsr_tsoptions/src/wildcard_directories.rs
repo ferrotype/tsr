@@ -6,7 +6,8 @@ use crate::{
 use tsr_core::collections::OrderedMap;
 use tsr_jsstring::{helpers::to_lower_go, JsString};
 use tsr_tspath as path;
-fn canonical(value: &[u8], sensitive: bool) -> JsString {
+/// port: tsc/internal/tsoptions/wildcarddirectories.go:toCanonicalKey
+pub fn canonical_key(value: &[u8], sensitive: bool) -> JsString {
     JsString::from_bytes(if sensitive {
         value.to_vec()
     } else {
@@ -25,7 +26,7 @@ pub fn wildcard_directory_from_spec(spec: &[u8], sensitive: bool) -> Option<Wild
         if let Some(last) = spec[..first].iter().rposition(|b| *b == b'/') {
             let directory = &spec[..last];
             return Some(WildcardDirectory {
-                key: canonical(directory, sensitive),
+                key: canonical_key(directory, sensitive),
                 path: JsString::from_bytes(directory),
                 recursive: first < spec.iter().rposition(|b| *b == b'/').expect("separator"),
             });
@@ -35,7 +36,7 @@ pub fn wildcard_directory_from_spec(spec: &[u8], sensitive: bool) -> Option<Wild
         if crate::glob::is_implicit_glob(&spec[last + 1..]) {
             let directory = path::remove_trailing_directory_separator(spec);
             return Some(WildcardDirectory {
-                key: canonical(directory, sensitive),
+                key: canonical_key(directory, sensitive),
                 path: JsString::from_bytes(directory),
                 recursive: true,
             });
@@ -86,7 +87,7 @@ pub fn wildcard_directories(
         let remove: Vec<_> = directories
             .iter()
             .filter_map(|(p, _)| {
-                let key = canonical(p.as_bytes(), sensitive);
+                let key = canonical_key(p.as_bytes(), sensitive);
                 recursive
                     .iter()
                     .any(|r| {
@@ -103,16 +104,47 @@ pub fn wildcard_directories(
     Some(directories)
 }
 impl ParsedCommandLine {
+    /// Validated specifications are immutable between explicit replacements.
+    pub fn config_specs(&self) -> Option<&crate::ConfigFileSpecs> {
+        self.config_specs.as_ref()
+    }
+    /// Replace the complete matching context before publishing a snapshot.
+    /// Exclusive access prevents a reader retaining a stale cache reference.
+    pub fn set_config_specs(
+        &mut self,
+        specs: Option<crate::ConfigFileSpecs>,
+        base: JsString,
+        case_sensitive: bool,
+    ) {
+        self.config_specs = specs;
+        self.config_base_path = base;
+        self.config_case_sensitive = case_sensitive;
+        self.wildcard_directories_cache.take();
+        self.caches.globs.take();
+    }
+    /// port: tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.GetCurrentDirectory
+    pub fn current_directory(&self) -> &[u8] {
+        self.config_base_path.as_bytes()
+    }
+    /// port: tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.UseCaseSensitiveFileNames
+    pub fn use_case_sensitive_file_names(&self) -> bool {
+        self.config_case_sensitive
+    }
+    /// Cached once per immutable matching context. Clone owns its own cache;
+    /// changing a clone's specs cannot change another published result.
     /// port: tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.WildcardDirectories
-    pub fn wildcard_directories(&self) -> Option<OrderedMap<JsString, bool>> {
-        // The raw-value entry point also retains validated specs, so it does
-        // not require the native test hook that recovers them without syntax.
-        let specs = self.config_specs.as_ref()?;
-        wildcard_directories(
-            &specs.validated_includes,
-            &specs.validated_excludes,
-            self.config_base_path.as_bytes(),
-            self.config_case_sensitive,
-        )
+    pub fn wildcard_directories(&self) -> Option<&OrderedMap<JsString, bool>> {
+        self.wildcard_directories_cache
+            .get_or_init(|| {
+                // Raw JSON also retains validated specs and needs no syntax hook.
+                let specs = self.config_specs.as_ref()?;
+                wildcard_directories(
+                    &specs.validated_includes,
+                    &specs.validated_excludes,
+                    self.config_base_path.as_bytes(),
+                    self.config_case_sensitive,
+                )
+            })
+            .as_ref()
     }
 }

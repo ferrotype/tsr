@@ -275,6 +275,10 @@ FAMILIES = {
             "data/phase1/requests/config-packagejson.json",
             "data/phase1/requests/config-diagwriter.json",
         ],
+        "renderer": {"package": "tsoptions", "test": "TestPhase1ConfigRender",
+                     "probe": "tools/phase1/config/commandline_probe_test.go",
+                     "helper": "tools/phase1/config/renderer_test.go", "trimpath": False,
+                     "extra_sources": {"phase1_config_test.go": "tools/phase1/config/tsconfigparsing_probe_test.go"}},
         "native_probes": [
             # The 53 + 27 `tsoptions/commandLineParsing` outputs. It compiles
             # into the pinned `tsoptions_test` package so it can call that
@@ -287,6 +291,7 @@ FAMILIES = {
             # it is for the F0 pilot's command-line probe.
             {"name": "commandline", "package": "tsoptions",
              "probe": "tools/phase1/config/commandline_probe_test.go",
+             "helper": "tools/phase1/config/renderer_test.go",
              "test": "TestPhase1ConfigCommandLine",
              "trimpath": False},
             # The 87 `config/tsconfigParsing` outputs. Same package and the
@@ -296,6 +301,8 @@ FAMILIES = {
             # any difference -- and the secondary one is inline in a test body.
             {"name": "tsconfigparsing", "package": "tsoptions",
              "probe": "tools/phase1/config/tsconfigparsing_probe_test.go",
+             "helper": "tools/phase1/config/renderer_test.go",
+             "extra_sources": {"phase1_commandline_test.go": "tools/phase1/config/commandline_probe_test.go"},
              "test": "TestPhase1ConfigTsconfigParsing",
              "trimpath": False},
             # The pinned parse-config host factory. Its own package, so its own
@@ -533,7 +540,8 @@ def build_rust(family: str) -> Path:
 
 
 def run_probe(directory: Path, package: str, source: str, request: dict, test: str,
-              trimpath: bool = True, helper: str | None = None) -> dict:
+              trimpath: bool = True, helper: str | None = None,
+              extra_sources: dict[str, str] | None = None) -> dict:
     """Run one access-only Go probe under an overlay and authenticate its output.
 
     This mirrors `s08_oracle.run_overlay`, which is reused wherever it fits. It
@@ -574,6 +582,15 @@ def run_probe(directory: Path, package: str, source: str, request: dict, test: s
         if helper_virtual.exists():
             raise ValueError(f"overlay would replace a source file: {helper_virtual}")
         replace[str(helper_virtual)] = str(helper_path)
+    for name, text in (extra_sources or {}).items():
+        if Path(name).name != name or not name.endswith("_test.go"):
+            raise ValueError("invalid extra overlay source name")
+        target = upstream / "tsc/internal" / package / name
+        if target.exists() or str(target) in replace:
+            raise ValueError(f"overlay would replace an existing source: {target}")
+        local = directory / name
+        local.write_text(text)
+        replace[str(target)] = str(local)
     overlay = directory / "overlay.json"
     overlay.write_bytes(canonical({"Replace": replace}))
     env.update(S08_REQUESTS=str(request_path), S08_OUTPUT=str(output))
@@ -592,6 +609,7 @@ def run_probe(directory: Path, package: str, source: str, request: dict, test: s
         "pin": pin(), "package": package, "test": test, "trimpath": trimpath,
         "source_sha256": digest(source.encode()),
         "helper_sha256": digest(helper.encode()) if helper is not None else None,
+        "extra_sources_sha256": {name:digest(source.encode()) for name, source in (extra_sources or {}).items()},
         "request_sha256": digest(request_bytes),
         "output_sha256": digest(output.read_bytes()),
         "go": report["go"], "goos": report["goos"], "goarch": report["goarch"],
@@ -723,6 +741,34 @@ def validate_response(document: object, requests: list[dict], side: str) -> list
     return rows
 
 
+def validate_renderer(directory: Path, requests: dict, rendered: dict) -> None:
+    """Child-free check that rendering retained every Rust result unchanged."""
+    raw = strict_json_loads((directory / "rust-raw-observations.json").read_bytes())
+    before = validate_response(raw, requests["requests"], "rust")
+    after = validate_response(rendered, requests["requests"], "rust")
+    bridge_input = strict_json_loads((directory / "renderer/requests.json").read_bytes())
+    if bridge_input != {**requests, "observations": before}:
+        raise ValueError("renderer input does not carry the captured Rust results")
+    bridge_output = strict_json_loads((directory / "renderer/observations.json").read_bytes())
+    if bridge_output != rendered:
+        raise ValueError("Rust observations differ from the renderer output")
+    for request, original, final in zip(requests["requests"], before, after):
+        if request.get("subject") in ("commandLineBaseline", "tsconfigParsingBaseline") and original["result"] == "observed":
+            observation = final.get("observation", {})
+            expected_keys = {"baseline", "typed", "rendered", "rendered_sha256"}
+            if set(observation) != expected_keys or observation["typed"] != original["observation"]:
+                raise ValueError("renderer changed or omitted a typed Rust result")
+            text = observation["rendered"]
+            if not isinstance(text, str) or digest(text.encode()) != observation["rendered_sha256"]:
+                raise ValueError("renderer byte digest does not match")
+            if observation["baseline"] != request["baseline"]:
+                raise ValueError("renderer substituted a baseline identity")
+            if {k:v for k,v in original.items() if k != "observation"} != {k:v for k,v in final.items() if k != "observation"}:
+                raise ValueError("renderer changed the Rust outcome")
+        elif original != final:
+            raise ValueError("renderer changed an unrelated Rust row")
+
+
 def capture(family: str, output: Path, cases: list[str] | None = None) -> dict:
     if family not in FAMILIES:
         raise ValueError(
@@ -776,6 +822,7 @@ def capture(family: str, output: Path, cases: list[str] | None = None) -> dict:
             probe["test"],
             probe.get("trimpath", True),
             (ROOT / probe["helper"]).read_text() if probe.get("helper") else None,
+            {name: (ROOT / path).read_text() for name, path in probe.get("extra_sources", {}).items()},
         )
         validate_response(report, selected, "native")
         native_reports[name] = {
@@ -792,7 +839,29 @@ def capture(family: str, output: Path, cases: list[str] | None = None) -> dict:
     executable = build_rust(family)
     rust_path = output / "rust-observations.json"
     command([str(executable), str(request_path), str(rust_path)], cwd=ROOT)
-    validate_response(strict_json_loads(rust_path.read_bytes()), selected, "rust")
+    raw_document = strict_json_loads(rust_path.read_bytes())
+    validate_response(raw_document, selected, "rust")
+    renderer_record = None
+    if renderer := spec.get("renderer"):
+        # Preserve exactly what the Rust executable emitted. Only the pinned
+        # test envelope and serialization run in this second Go invocation.
+        raw_path = output / "rust-raw-observations.json"
+        raw_path.write_bytes(rust_path.read_bytes())
+        rendered = run_probe(
+            output / "renderer", renderer["package"],
+            (ROOT / renderer["probe"]).read_text(),
+            {**request_document, "observations": raw_document["observations"]},
+            renderer["test"], renderer.get("trimpath", True),
+            (ROOT / renderer["helper"]).read_text(),
+            {name: (ROOT / path).read_text() for name, path in renderer.get("extra_sources", {}).items()},
+        )
+        validate_response(rendered, selected, "rust")
+        rust_path.write_bytes(canonical(rendered) + b"\n")
+        renderer_record = {name: sha_file(output / name) for name in (
+            "rust-raw-observations.json", "renderer/requests.json",
+            "renderer/observations.json", "renderer/provenance.json",
+        )}
+        validate_renderer(output, request_document, rendered)
 
     after = source_closure(family)
     if before != after:
@@ -816,6 +885,7 @@ def capture(family: str, output: Path, cases: list[str] | None = None) -> dict:
         "native_probes": native_reports,
         "rust_observations_sha256": sha_file(rust_path),
         "rust_binary_sha256": sha_file(executable),
+        "renderer_artifacts": renderer_record,
         "workspace_packages": workspace_package_paths(spec["rust_package"]),
         "source_closure": before,
         "source_closure_size": len(before),
@@ -848,6 +918,8 @@ def _authenticate(directory: Path) -> dict:
         "requests.json": provenance["requests_sha256"],
         "rust-observations.json": provenance["rust_observations_sha256"],
     }
+    if renderer_artifacts := provenance.get("renderer_artifacts"):
+        checks.update(renderer_artifacts)
     for probe in provenance["native_probes"].values():
         checks[f"{probe['directory']}/observations.json"] = probe["observations_sha256"]
     for name, expected in checks.items():
@@ -953,6 +1025,11 @@ def validate_capture(directory: Path) -> tuple[dict, list[dict], dict[str, dict]
     requests = strict_json_loads((directory / "requests.json").read_bytes())["requests"]
     # _merge_native raises on any native harness failure, across every probe.
     native_rows = _merge_native(directory, provenance, requests)
+    if FAMILIES[provenance["family"]].get("renderer"):
+        if not provenance.get("renderer_artifacts"):
+            raise ValueError("capture omitted the shared renderer provenance")
+        validate_renderer(directory, strict_json_loads((directory / "requests.json").read_bytes()),
+                          strict_json_loads((directory / "rust-observations.json").read_bytes()))
     rust_list = validate_response(
         strict_json_loads((directory / "rust-observations.json").read_bytes()), requests, "rust"
     )
