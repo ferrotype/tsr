@@ -57,17 +57,18 @@ pub(super) fn program_options(
     if let Some(parsed) = parsed_config {
         // CompileFilesEx carries config diagnostics and their syntax owners
         // beside the already finalized fixture options and source-file list.
+        let specs = parsed.config_specs().cloned();
         config.config_file = parsed.config_file;
         config.config_dependencies = parsed.config_dependencies;
         config.errors = parsed.errors;
         config.content_mappers = parsed.content_mappers;
         // Go stores these include/exclude specifications on TsConfigSourceFile.
         // Rust keeps them beside that source in ParsedCommandLine.
-        config.config_specs = parsed.config_specs;
+
         // CompileFilesEx constructs a fresh ParsedCommandLine without copying
         // comparePathsOptions. Preserve its zero-valued matching context even
         // though the earlier config parse had an explicit directory and casing.
-        config.config_case_sensitive = false;
+        config.set_config_specs(specs, JsString::default(), false);
     } else if let Some(name) = request["config_name"].as_str() {
         let text = bytes(request["config_text"].as_str().expect("config text hex"));
         config.config_file = Some(Arc::new(tsr_tsoptions::TsConfigSourceFile::parse(

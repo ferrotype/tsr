@@ -63,37 +63,6 @@ const WORKER_DIAGNOSTICS: Gap = (
      fixture_options.rs:276-302 hard-codes the compiler-mode choices inline instead (absent)",
 );
 
-const TO_CANONICAL_KEY: Gap = (
-    "tsc/internal/tsoptions/wildcarddirectories.go:toCanonicalKey",
-    "tsc/internal/tsoptions/wildcarddirectories.go:85, the case-folding a wildcard directory key \
-     is stored under",
-    "pub fn to_canonical_key(path: &[u8], use_case_sensitive_file_names: bool) -> Cow<'_, [u8]>",
-    "no Rust home: a grep for `wildcard` over crates/ finds only diagnostic message names, \
-     tsr_module type references and semver helpers; crates/tsr_tsoptions has no \
-     wildcard-directory file (absent)",
-);
-
-const WILDCARD_DIRECTORY_FROM_SPEC: Gap = (
-    "tsc/internal/tsoptions/wildcarddirectories.go:getWildcardDirectoryFromSpec",
-    "tsc/internal/tsoptions/wildcarddirectories.go:99, which decides from one include spec which \
-     directory is watched and whether it is watched recursively",
-    "pub fn wildcard_directory_from_spec(spec: &[u8], use_case_sensitive_file_names: bool) -> \
-     Option<WildcardDirectoryMatch>",
-    "no Rust home: crates/tsr_tsoptions has no wildcard-directory file (absent)",
-);
-
-const WILDCARD_DIRECTORIES: Gap = (
-    "tsc/internal/tsoptions/wildcarddirectories.go:getWildcardDirectories",
-    "tsc/internal/tsoptions/wildcarddirectories.go:10, the whole calculation: exclude matching, \
-     per-spec directory selection, canonical-key collision handling and the removal of subpaths \
-     under an already recursive watch",
-    "pub fn wildcard_directories(include: &[JsString], exclude: &[JsString], base: &[u8], \
-     use_case_sensitive_file_names: bool) -> Vec<(JsString, bool)>, carrying the include-order \
-     insertion sequence the TypeScript object had",
-    "no Rust home: crates/tsr_tsoptions has no wildcard-directory file, and \
-     crates/tsr_tsoptions/src/config_specs.rs carries only the spec matchers (absent)",
-);
-
 /// The `ParsedCommandLine` accessors with no Rust counterpart, by probe name.
 const ACCESSOR_GAPS: &[(&str, Gap)] = &[
     (
@@ -106,29 +75,8 @@ const ACCESSOR_GAPS: &[(&str, Gap)] = &[
             NO_ACCESSOR,
         ),
     ),
-    (
-        "current_directory",
-        (
-            "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.GetCurrentDirectory",
-            "tsc/internal/tsoptions/parsedcommandline.go:189, which reads the comparePathsOptions \
-             the result was built with, and :193 for the case-sensitivity flag beside it",
-            "pub fn current_directory(&self) -> &[u8]",
-            "crates/tsr_tsoptions/src/lib.rs:205-206 carries config_base_path and \
-             config_case_sensitive as public fields, but the pinned pair is comparePathsOptions, \
-             which a command-line parse fills from the host rather than from a config's base \
-             path; no accessor of that name exists (absent)",
-        ),
-    ),
-    (
-        "wildcard_directories",
-        (
-            "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.WildcardDirectories",
-            "tsc/internal/tsoptions/parsedcommandline.go:258, the once-only accessor that is the \
-             only pinned caller of getWildcardDirectories (wildcarddirectories.go:10)",
-            "pub fn wildcard_directories(&self) -> &[(JsString, bool)]",
-            NO_ACCESSOR,
-        ),
-    ),
+
+
     (
         "wildcard_directory_globs",
         (
@@ -634,13 +582,10 @@ fn run(
             let (options, raw, errors) = if action_op(action) == "parse_command_line" {
                 let parsed = tsr_tsoptions::parse_command_line(&args, &host);
                 row.insert("file_names".into(), strings(&parsed.root_file_names));
-                row.insert(
-                    "current_directory".into(),
-                    text(parsed.config_base_path.as_bytes()),
-                );
+                row.insert("current_directory".into(), text(parsed.current_directory()));
                 row.insert(
                     "use_case_sensitive_file_names".into(),
-                    json!(parsed.config_case_sensitive),
+                    json!(parsed.use_case_sensitive_file_names()),
                 );
                 (parsed.options, parsed.raw, parsed.errors)
             } else {
@@ -685,9 +630,63 @@ fn run(
         "invalid_enum_type_diagnostic" => return Err(gap(INVALID_ENUM_TYPE_DIAGNOSTIC)),
         "extra_key_diagnostics" => return Err(gap(EXTRA_KEY_DIAGNOSTICS)),
         "worker_diagnostics" => return Err(gap(WORKER_DIAGNOSTICS)),
-        "canonical_key" => return Err(gap(TO_CANONICAL_KEY)),
-        "wildcard_directory_from_spec" => return Err(gap(WILDCARD_DIRECTORY_FROM_SPEC)),
-        "wildcard_directories" => return Err(gap(WILDCARD_DIRECTORIES)),
+        "canonical_key" => {
+            let input = action_str(action, "value");
+            row.insert("input".into(), json!(input));
+            row.insert(
+                "key".into(),
+                text(
+                    tsr_tsoptions::canonical_key(
+                        input.as_bytes(),
+                        request["caseSensitive"].as_bool().unwrap_or(false),
+                    )
+                    .as_bytes(),
+                ),
+            );
+        }
+        "wildcard_directory_from_spec" => {
+            let spec = action_str(action, "value");
+            let found = tsr_tsoptions::wildcard_directory_from_spec(
+                spec.as_bytes(),
+                request["caseSensitive"].as_bool().unwrap_or(false),
+            );
+            row.insert("spec".into(), json!(spec));
+            row.insert("matched".into(), json!(found.is_some()));
+            row.insert(
+                "key".into(),
+                text(found.as_ref().map_or(b"", |v| v.key.as_bytes())),
+            );
+            row.insert(
+                "path".into(),
+                text(found.as_ref().map_or(b"", |v| v.path.as_bytes())),
+            );
+            row.insert(
+                "recursive".into(),
+                json!(found.is_some_and(|v| v.recursive)),
+            );
+        }
+        "wildcard_directories" => {
+            let list = |key: &str| {
+                action[key]
+                    .as_array()
+                    .into_iter()
+                    .flatten()
+                    .map(|v| JsString::from_bytes(v.as_str().expect("spec string").as_bytes()))
+                    .collect::<Vec<_>>()
+            };
+            let include = list("include");
+            let exclude = list("exclude");
+            let directories = tsr_tsoptions::wildcard_directories(
+                &include,
+                &exclude,
+                action_str(request, "currentDirectory").as_bytes(),
+                request["caseSensitive"].as_bool().unwrap_or(false),
+            );
+            row.insert("include".into(), strings(&include));
+            row.insert("exclude".into(), strings(&exclude));
+            row.insert("is_nil".into(), json!(directories.is_none()));
+            row.insert("directories".into(), directory_rows(directories.as_ref()));
+        }
 
         other => {
             return Err(Outcome::Failed(format!(
@@ -696,6 +695,20 @@ fn run(
         }
     }
     Ok(Value::Object(row))
+}
+
+fn directory_rows(
+    directories: Option<&tsr_core::collections::OrderedMap<JsString, bool>>,
+) -> Value {
+    let mut entries = directories
+        .into_iter()
+        .flat_map(|m| m.iter())
+        .collect::<Vec<_>>();
+    entries.sort_by(|a, b| a.0.cmp(b.0));
+    json!(entries
+        .into_iter()
+        .map(|(p, r)| json!([text(p.as_bytes()), r]))
+        .collect::<Vec<_>>())
 }
 
 fn gap((operation, authority, signature, home): Gap) -> Outcome {
@@ -721,6 +734,18 @@ fn config_probe(
     row.insert("op".into(), Value::String("parsed_config".into()));
     row.insert("probe".into(), Value::String(requested.to_owned()));
     match probe {
+        "current_directory" => {
+            row.insert("current_directory".into(), text(parsed.current_directory()));
+            row.insert(
+                "use_case_sensitive_file_names".into(),
+                json!(parsed.use_case_sensitive_file_names()),
+            );
+        }
+        "wildcard_directories" => {
+            let directories = parsed.wildcard_directories();
+            row.insert("is_nil".into(), json!(directories.is_none()));
+            row.insert("directories".into(), directory_rows(directories));
+        }
         "config_name" => {
             row.insert("config_name".into(), text(parsed.config_name().as_bytes()));
         }

@@ -2126,3 +2126,21 @@ and 96 remaining direct-operation gaps; its four additional raw-number transport
 differences were resolved by that lossless encoding. No earlier matching
 production case regressed. Focused clippy and the Phase 1 Python checks pass;
 tracker/inventory recording remains deferred to F3b completion.
+
+### F3b continuation: wildcard cache and matching context
+
+Wildcard discovery now uses `OnceLock` and returns a borrowed result. Its three
+inputs (validated specs, base directory and case sensitivity) are private and
+read-only between explicit `set_config_specs` calls. That setter requires
+`&mut self` and clears the cache. A program snapshot therefore cannot mutate
+another reader's inputs, and repeated lookups do no spec copying, hashing or
+recalculation. Cloning still owns independent specs and a separate cached map.
+This supplies the mutation/invalidation boundary requested in F3b item 2.
+
+The regression covers concurrent first reads, replacement before and after
+initialization, changes to base/excludes/casing, nil results and clone isolation.
+The production wildcard/canonical helpers and parsed-context getters also now
+serve their direct harness cases. All 55 implemented command-line action
+traces match Go (15 other traces remain pending), all 142 matchFiles envelopes
+are unchanged, and the compiler's two include-reason tests pass. Focused
+clippy with warnings denied passes. Tracker refresh remains at the final step.

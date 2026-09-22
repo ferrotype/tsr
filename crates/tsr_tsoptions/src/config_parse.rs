@@ -800,6 +800,7 @@ fn finish_config(
         errors: parsed.errors,
         raw: parsed.raw,
         compile_on_save,
+        wildcard_directories_cache: std::sync::OnceLock::new(),
         config_specs: Some(config_specs),
         config_base_path: JsString::from_bytes(base_files),
         config_case_sensitive: host.fs().use_case_sensitive_file_names(),

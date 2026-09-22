@@ -202,9 +202,11 @@ pub struct ParsedCommandLine {
     pub errors: Vec<tsr_ast::Diagnostic>,
     pub raw: ConfigValue,
     pub compile_on_save: Option<bool>,
-    pub config_specs: Option<ConfigFileSpecs>,
-    pub config_base_path: JsString,
-    pub config_case_sensitive: bool,
+    config_specs: Option<ConfigFileSpecs>,
+    config_base_path: JsString,
+    config_case_sensitive: bool,
+    wildcard_directories_cache:
+        std::sync::OnceLock<Option<tsr_core::collections::OrderedMap<JsString, bool>>>,
     pub config_dependencies: Vec<std::sync::Arc<TsConfigSourceFile>>,
     pub type_acquisition: Option<TypeAcquisition>,
     pub project_references: Option<Vec<ProjectReference>>,
@@ -241,6 +243,7 @@ impl ParsedCommandLine {
             errors: Vec::new(),
             raw: ConfigValue::Null,
             compile_on_save: None,
+            wildcard_directories_cache: std::sync::OnceLock::new(),
             config_specs: None,
             config_base_path: JsString::default(),
             config_case_sensitive: true,
@@ -314,7 +317,7 @@ pub use config_read::{
 
 mod wildcard_directories;
 pub use wildcard_directories::{
-    wildcard_directories, wildcard_directory_from_spec, WildcardDirectory,
+    canonical_key, wildcard_directories, wildcard_directory_from_spec, WildcardDirectory,
 };
 
 pub use config_parse::{parse_json_config_file_content, type_acquisition_from_json};
