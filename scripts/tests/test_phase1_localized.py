@@ -1,12 +1,18 @@
 """Localized config integration requires all native envelopes and untouched Rust results."""
 import copy
+import contextlib
+import io
+import json
+import subprocess
 import sys
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'scripts'))
 import phase1_capture as capture
+import phase1_integration as integration
 import phase1_localized as localized
 
 
@@ -28,6 +34,31 @@ def fixture():
 
 
 class LocalizedTests(unittest.TestCase):
+    def test_integration_command_output_replays_the_exact_renderer_request(self):
+        observed = fixture()
+        leaf = {"id": "localized-config-diagnostics", "locale": "de-DE", "code": 5023,
+                "leaf_localized": 'Unbekannte Compileroption "notAnOption".',
+                "writer_localized": 'Unbekannte Compileroption "notAnOption".'}
+        output = io.StringIO()
+        with patch.object(sys, "argv", ["phase1_integration.py", "observe-localized-config"]), \
+                patch.object(integration.subprocess, "run", return_value=subprocess.CompletedProcess(
+                    args=[], returncode=0, stdout=json.dumps(leaf).encode())), \
+                patch.object(localized, "observe", return_value={"observation": observed}), \
+                contextlib.redirect_stdout(output):
+            self.assertEqual(integration.main(), 0)
+        recorded = json.loads(output.getvalue())
+        replayed = integration.localized_integration_result(
+            ROOT, recorded["leaf"]["observation"], recorded["envelopes"]["observation"])
+        self.assertEqual(recorded, replayed)
+        self.assertEqual(replayed["status"], "match")
+
+    def test_sorted_raw_renderer_request_is_rejected(self):
+        # Sorting named result fields is harmless to result comparison but is
+        # not the byte sequence the Go renderer's request digest authenticates.
+        observed = json.loads(json.dumps(fixture(), sort_keys=True))
+        with self.assertRaisesRegex(ValueError, "renderer observed a different Rust request"):
+            localized.compare(observed)
+
     def test_whole_native_envelope_is_compared(self):
         observed = fixture()
         self.assertEqual(localized.compare(observed)['status'], 'match')

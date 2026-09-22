@@ -302,6 +302,18 @@ class IntegrationEvaluationTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 integration.rust_witness_result(changed)
 
+    def test_binder_witness_uses_rust_module_identity_not_source_filename(self):
+        command, names = integration.RUST_WITNESS_TESTS["witness/binder-container-flags-source-contract"]
+        self.assertEqual(command, ["cargo", "test", "--locked", "-p", "tsr_binder", "--lib",
+                                  "container_classification::tests::", "--", "--test-threads=1"])
+        self.assertEqual(names, [
+            "container_classification::tests::fixed_container_rules_do_not_inspect_payload_or_parent",
+            "container_classification::tests::method_rules_read_only_the_selected_parent_kind",
+            "container_classification::tests::block_rules_include_signature_and_static_block_parents",
+            "container_classification::tests::property_rules_inspect_initializer_without_requiring_a_parent",
+            "container_classification::tests::local_dynamic_rules_preserve_checked_contract_failures",
+        ])
+
     def test_duplicate_unknown_and_changed_command_receipts_are_invalid(self):
         receipt = self.receipt("retained-program-snapshot", "test tests::live_filesystem_snapshots_preserve_retained_program_files ... ok\n")
         self.assertTrue(any("duplicate integration" in p for p in self.evaluate(receipts=[receipt, receipt])["problems"]))

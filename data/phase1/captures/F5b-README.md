@@ -11,6 +11,7 @@ root if a target directory is already present.
 | `f5b-reviewed-families.tar.gz` | 5,681,974 | `efc0988bbecab4efd4f2087ee6eb707b372fdb0bbab5ee299bdb19ae686e5afc` |
 | `f5b-reviewed-syntax-full.tar.gz` | 18,828,031 | `8a05f0a8f725ff52da4aac78575352b26ac7a1b3e8aed1c326b4c32e0d08b17b` |
 | `f5b-reviewed-integration.tar.gz` | 1,051,413 | `89554ca83ee749a518786ce601335fbcef5a447b9cd5b4af733b41dc7e755c31` |
+| `f5b-reviewed-integration-program-refresh.tar.gz` | 1,051,639 | `e5cc24fb78fbf01fcd1f37dc3d37f29609af147273d707ab35ae4b047e9e2060` |
 
 Replay after extraction (each family also supports `pilot`):
 
@@ -30,9 +31,13 @@ matches and four explicit missing driver paths and supplies no acceptance
 metric. Full program syntax is 15,152/15,152, with the separate 54 native
 selection boundaries retained in the committed syntax inventory.
 
-The integration archive retains all seven executed receipts and their stdout,
+The integration archives retain all seven executed receipts and their stdout,
 stderr, commands and source maps, plus the registry used by foundations replay.
-Replay it with `cargo xtask run foundations` after restoring the family captures
+The `program-refresh` archive is current after the S07 producer replay fix;
+the first archive preserves the preceding receipt set for diagnosis. That
+earlier set failed final receipt replay (localized request ordering and a
+binder test filter); it is not passing acceptance evidence. Use the registry in
+`program-refresh` when replaying current sources. Replay with `cargo xtask run foundations` after restoring the family captures
 and their `target/phase1-acceptance/{leaves,filesystem,config,syntax}` links.
 These seven receipts cover the required executable witnesses; the three
 case-based integration witnesses are evaluated from the family captures.

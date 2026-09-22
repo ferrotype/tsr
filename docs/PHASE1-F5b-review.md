@@ -31,7 +31,7 @@ inherit their acceptance.
 | I09 | Confirmed. Syntax replay now rejects a changed source closure with a typed stale-capture result instead of returning a passing comparison with a warning. |
 | I10 | Confirmed. A `later_step` preparation exemption does not remove an operation from Phase 1. Unresolved leaves/config transfers now appear in gap accounting; the current audit identifies 92 such entries. |
 | I13 | Confirmed. Config and syntax no longer depend on unrelated installed-package/transport integration health or recomputing live whole-workspace classification. Their consumed audit/runner inputs are included in the producer closure and ledger. The inventory audit remains a separate check. |
-| I14 | Confirmed. Rust-side witnesses now have explicit execution routes to metrics. The five contracts previously pointing only to `workspace` compilation get an exact named-test receipt, `rust-witnesses`; its execution is still required before that new metric can pass. |
+| I14 | Confirmed. Rust-side witnesses now have explicit execution routes to metrics. The five contracts previously pointing only to `workspace` compilation get an exact named-test receipt, `rust-witnesses`; its named tests passed in the reviewed receipt; compilation alone still cannot satisfy the metric. |
 | I15 | Confirmed. The 142 matchFiles observations contribute to both config baseline parity and filesystem completion. |
 | I16 | Confirmed. Ordinary in-crate Markdown is excluded from behavioral capture inputs. Literal embedded Markdown and packages with arbitrary build-script inputs remain conservative inputs; archive receipts deliberately include package README files. The regression uses actual temporary package files and changes both prose and an embedded asset. |
 | I18 | Extended. Reports now retain current request-bound results, historical raw outcomes, approved pairs, per-case cause classifications, expected contracts and missing-operation identities. Case reproduction selects the exact case; operation reproduction uses `phase1_coverage.py explain --operation ...`. A result classification is not a claim that every future semantic difference has already been diagnosed. |
@@ -52,12 +52,13 @@ inherit their acceptance.
   CI confirmation and accurate PR validation wording remain separate work.
 - **I38:** the reviewed family and full-syntax captures now have repository
   archives, listed below. They replace the earlier target-only archival gap.
-  This does not certify that all integration receipts or tracker producers
-  have finished refreshing.
+  Seven refreshed executable integration receipts are also archived.
+  None of these archives waives operation coverage or host requirements.
 - **I39:** port homes now include the EINTR helper and scanner binder helpers;
   syntax inventory references have been refreshed to the recorded E1/binder
-  artifacts. The program producer still needs a current run for its boundary
-  witness. P1A/P1B remain incomplete: the current report has 1,365 pending
+  artifacts as stale where appropriate. The program helper pass now executes
+  all 28 named tests, including the composed live-filesystem boundary witness.
+  P1A/P1B remain incomplete: the current report has 1,365 pending
   entries—947 missing witnesses, 303 unverified implementation mappings,
   92 unresolved later-step transfers and 23 ordinary loader/configuration
   operations. The original 1,250 count is a historical checkpoint.
@@ -109,8 +110,52 @@ Both captures are archived in the repository:
   (18 MB).
 
 All seven executable integration receipts passed on these inputs and are retained in
-[`f5b-reviewed-integration.tar.gz`](../data/phase1/captures/f5b-reviewed-integration.tar.gz)
-(about 1 MB), with their execution logs and registry. The program producer and
-grouped metric recording are the remaining evidence steps. The family matches do not discharge the 1,365 remaining
+[`f5b-reviewed-integration-program-refresh.tar.gz`](../data/phase1/captures/f5b-reviewed-integration-program-refresh.tar.gz)
+(about 1 MB), with their execution logs and registry. The preceding receipt
+archive is also retained. The `program`, `foundations`, `config` and `syntax` producers now have valid
+recorded results on these inputs. Foundations reports integration and Rust
+witnesses complete; config reports all direct cases complete. The family
+matches do not discharge the 1,365 remaining
 operation entries, the Linux-only observation, or ownership instrumentation.
 No performance benchmark is implied or required by these correctness captures.
+
+
+### Program producer recovery and a measured loader difference
+
+The refreshed program run completed 10,728 loader observations and 10,728
+option-verification observations before its helper stage rejected old native
+manifest metadata. Re-running the three native producers established identical
+semver, package JSON and config observation bytes; only their manifests changed.
+All 12 helper source checks and 28 named Rust helper tests then passed.
+
+Helpers now run before the costly capture stages. Complete stages may be reused
+only after authenticating their raw artifacts, exact ordered requests and pin,
+checking current source inputs, rebuilding the current probe executables and
+requiring identical binary hashes, then reconstructing every row and metric
+with the existing comparators. This extra build check covers assets and Cargo
+configuration absent from the older stage fingerprints. Missing/stale stages
+recapture; corrupted stages fail. Twenty-five focused tests and 36 subtests
+cover these boundaries, including preservation of genuinely failing results.
+
+The loader result is **10,727/10,728**, not a pass; option verification is
+**10,728/10,728**. The one loader difference is
+`conformance/declarationEmit/typesVersionsDeclarationEmit.multiFileBackReferenceToSelf.ts#configuration=0`.
+Its graph matches, but Rust omits two package-field resolution trace messages.
+`tsr_module::Resolver::directory` removes a candidate's trailing separator before
+comparing it with a cached package directory whose spelling retains it. The
+pinned resolver keeps the candidate spelling at that comparison. This is a
+pre-existing module-resolution defect, outside the reviewed production edits;
+it remains a named failure, not an approved difference.
+
+
+Aggregate replay also exposed two receipt-format defects after the child
+commands exited successfully. Localized integration output sorted the nested
+Rust renderer request, invalidating its exact byte digest on replay; both
+stdout and the saved comparison now preserve that order. The binder witness
+filtered on the source filename instead of Rust's module path and ran zero
+tests. Its corrected filter executes the five exact container tests; the
+complete Rust-witness receipt now observes 15 tests across five contracts.
+The six native localized envelopes pass both stdout and artifact round trips.
+The final receipt set is checked through the aggregate validator before metric
+recording; a successful child exit alone is not accepted. Earlier rejected
+receipts and failed producer records remain preserved for diagnosis.

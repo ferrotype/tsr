@@ -2949,3 +2949,40 @@ sprints in filename order, so P1A previously read S12's derived metric before
 it existed, even though the completed report showed S12 done. This removes that
 false unknown without reopening historical measurements or weakening any
 Phase 1 operation, integration or safety requirement.
+
+
+## F5b — review refresh, 2026-09-23
+
+The review of `019ec1c` found production duplication, overstated witnesses and
+evidence-binding gaps. Commit `ce3150c` corrects those claims and implementations;
+[the disposition](PHASE1-F5b-review.md) records each finding and its limits.
+The earlier F5b counts and current-evidence statements above describe that
+historical checkpoint, not the reviewed sources.
+
+Fresh reviewed family captures report 229 leaves matches, 355 filesystem
+matches, 498 config matches (including all 309 reference envelopes) and
+1,123 syntax-utility matches. Five existing approved differences remain raw
+differences, and the Linux-only filesystem observation remains unavailable
+on this macOS host. Full program syntax matches all 15,152 executable variants;
+the 54 native selection boundaries remain separate. Raw captures and receipts
+are preserved in `data/phase1/captures`, with hashes and replay instructions.
+
+The corrected operation audit has **1,365 pending entries**: 947 missing exact
+witnesses, 303 unverified implementation mappings, 92 unresolved later-step
+transfers and 23 ordinary reference-loading/configuration operations.
+[The destination audit](PHASE1-F5b-destinations.md) distinguishes the latter from
+build scheduling, and supports 205 actual later-phase destinations against
+the accepted plan and pinned callers. These remaining entries prevent P1A/P1B
+completion despite passing family observations.
+
+E1, binder and scanner records from the preceding checkpoint are retained as
+historical evidence after the reviewed production edits. No performance
+benchmark or threshold change was part of this review refresh.
+
+The reviewed `program`, `foundations`, `config` and `syntax` records are current.
+Integration and routed Rust witnesses report complete; all 309 config outputs
+and 15,152 syntax rows match. Program helpers and option verification pass, but
+loader parity remains 10,727/10,728 because of the named pre-existing
+`typesVersions` package-directory trace defect in the review disposition.
+The Linux-only observation and operation audit still prevent complete Phase 1
+acceptance.

@@ -120,27 +120,48 @@ def program():
     from s07_program_compare import check_subset, input_fingerprints, digest
     from s07_program_helpers import measure, preflight
     from s07_verify_compare import capture as capture_verification
+    from s07_program_replay import (StaleCapture, config_current, replay_loader,
+                                    replay_verification, verification_oracle_current)
     def production_inputs():
         values = input_fingerprints()
         for pattern in ("scripts/s06_utilities.py", "scripts/s07_program*.py", "scripts/s07_verify*.py", "scripts/s07_config*.py",
                         "scripts/s07_subset*.py", "scripts/s07_operations.py", "scripts/s07_operation_validation.py", "scripts/s07_producers.py",
-                        "tools/s07/program/*", "tools/s07/verify-options/*", "tools/s07/config/*"):
+                        "tools/s07/program/*", "tools/s07/verify-options/*", "tools/s07/config/*",
+                        ".cargo/**/*", "crates/tsr_bundled/**/*"):
             values.update((str(path.relative_to(ROOT)), digest(path)) for path in ROOT.glob(pattern) if path.is_file())
         return values
     before = production_inputs()
     directory = ROOT / "target/s07-program-reports"
     prepared_helpers = preflight(directory / "helpers")
+    helpers = measure(directory / "helpers", prepared_helpers)
     observations, loader, requests = prepare_subset(reuse=True)
     freeze(observations, loader, ROOT / "data/s07/subset-review.json", False)
     config = directory / "config-evidence.json"
-    command([sys.executable, "scripts/s07_config.py", "--loading-requests", str(requests),
-             "--output", str(config)], cwd=ROOT)
-    loader_report = check_subset(requests, loader, directory / "loader.json", config)
+    try:
+        loader_report = replay_loader(requests, loader, directory / "loader.json", config)
+    except (FileNotFoundError, StaleCapture) as error:
+        print(f"S07 loader stage needs capture: {error}", file=sys.stderr)
+        try:
+            config_current(config, requests)
+        except (FileNotFoundError, StaleCapture):
+            command([sys.executable, "scripts/s07_config.py", "--loading-requests", str(requests),
+                     "--output", str(config)], cwd=ROOT)
+        loader_report = check_subset(requests, loader, directory / "loader.json", config)
+    else:
+        print("S07 program: reused authenticated loader and config observations", file=sys.stderr)
     verify_oracle = directory / "verification-go.json"
-    command([sys.executable, "scripts/s07_verify_options.py", "--requests", str(requests),
-             "--output", str(verify_oracle)], cwd=ROOT)
-    verification = capture_verification(requests, verify_oracle, directory / "verification")
-    helpers = measure(directory / "helpers", prepared_helpers)
+    try:
+        verification = replay_verification(requests, verify_oracle, directory / "verification")
+    except (FileNotFoundError, StaleCapture) as error:
+        print(f"S07 option-verifier stage needs capture: {error}", file=sys.stderr)
+        try:
+            verification_oracle_current(requests, verify_oracle)
+        except (FileNotFoundError, StaleCapture):
+            command([sys.executable, "scripts/s07_verify_options.py", "--requests", str(requests),
+                     "--output", str(verify_oracle)], cwd=ROOT)
+        verification = capture_verification(requests, verify_oracle, directory / "verification")
+    else:
+        print("S07 program: reused authenticated option-verifier observations", file=sys.stderr)
     metrics = {"loader_parity": loader_report["loader_graph_parity"],
                "config_parity": loader_report["config_parity"],
                "option_verification": verification["metrics"]["option_verification"],

@@ -64,5 +64,7 @@ def observe(root=ROOT):
     observation = {"pin": capture.pin(), "requests_sha256": capture.digest(request_path.read_bytes()),
                    "native": native, "raw": raw, "rust": rust}
     result = {**compare(observation, root), "observation": observation}
-    (output / "comparison.json").write_bytes(capture.canonical(result) + b"\n")
+    # Raw Rust fields also form part of the ordered renderer request. Preserve
+    # their order so replay reconstructs the exact bytes the child consumed.
+    (output / "comparison.json").write_bytes(capture.request_bytes(result))
     return result

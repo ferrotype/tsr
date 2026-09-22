@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "run_id": "program",
+  "recorded_at": 1790112445,
+  "context": {
+    "revision": "019ec1c3dfbb0aedf6ee8e96c42d3eb876a0eac7",
+    "source_sha256": "e376a83d1ee615cdc8c85b70533f3a115b84c5d79625b76f7b90a83acf72c812",
+    "upstream_pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+    "environment": {
+      "CARGO_BUILD_TARGET": "",
+      "CARGO_ENCODED_RUSTFLAGS": "",
+      "CARGO_HOME": "/Users/cristian/.cargo",
+      "CGO_ENABLED": "",
+      "GOARCH": "",
+      "GOFLAGS": "",
+      "GOOS": "",
+      "RUSTC_WRAPPER": "",
+      "RUSTFLAGS": "",
+      "RUSTUP_HOME": "/Users/cristian/.rustup",
+      "RUSTUP_TOOLCHAIN": "1.97.1-aarch64-apple-darwin",
+      "S04_CACHE_HOME": "",
+      "S04_RUSTUP_HOME": ""
+    },
+    "host": "macos-aarch64",
+    "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n"
+  },
+  "spec_sha256": "b98ee336a483ab71f89031f0ab14745ab1280338002fe2f5ef32f860ae7284d4",
+  "inputs": {
+    ".gitmodules": "7f9e8e0a446a547c56d8444637b3ee73064ce52055bc3c983c05eb13f4331bdd",
+    "data/s04/toolchains.toml": "f7f747f45b0570c179771ba0e01e37a3fc3c1ca7e98dbf042b7eabf6d9f9c0be",
+    "data/s07/operations.json": "76bb62da6fe227c2b83dd012bd24e7eb9ca7b94b75b80cb06c187c9f9fd2971f",
+    "data/s07/subset-rule.json": "ebce88f7a090736eccc3fa664eecac1f2c96b7b008889895f6bfcdfb6e1f38d3",
+    "data/s07/subset.json": "8539ce8af2f0cd5245554114e8d257805fe266e46fcabbb4ac220d5bcd2c4f2a",
+    "data/upstream.json": "9f3a288befbb79b1dcd59c2fd0d87fd2cddf120563f8b4c129ce88e3c3957af9"
+  },
+  "command": [
+    "python3",
+    "scripts/s07_producers.py",
+    "program"
+  ],
+  "target": "host",
+  "config": "S07 complete frozen source-selected variants; independently observed config/options and original Go program loading; ordered file/library/module/type-reference closure, failures, diagnostics and traces; no checker semantics",
+  "host": "macos-aarch64",
+  "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n",
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "+ cargo test --locked --release --no-run --message-format=json --package tsr_compiler --test config_source_parity --lib --test verify_options\n+ cargo test --locked --release --no-run --message-format=json --package tsr_module --test config_mappers --test config_resolver --lib\n+ cargo test --locked --release --no-run --message-format=json --package tsr_semver --test source_parity\n+ cargo test --locked --release --no-run --message-format=json --package tsr_tspath --test go_observations\n+ /Users/cristian/git/ts-rust/target/release/deps/config_source_parity-feefd7ae614ea615 --list --format=terse\n+ /Users/cristian/git/ts-rust/target/release/deps/verify_options-39e6c14db6bf5e94 --list --format=terse\n+ /Users/cristian/git/ts-rust/target/release/deps/tsr_compiler-a1c640b88333eebc --list --format=terse\n+ /Users/cristian/git/ts-rust/target/release/deps/config_resolver-aed28d8aadf7c96e --list --format=terse\n+ /Users/cristian/git/ts-rust/target/release/deps/tsr_module-2d2add011b8b43a5 --list --format=terse\n+ /Users/cristian/git/ts-rust/target/release/deps/config_mappers-16e3930500464f59 --list --format=terse\n+ /Users/cristian/git/ts-rust/target/release/deps/source_parity-1252ba589baefad4 --list --format=terse\n+ /Users/cristian/git/ts-rust/target/release/deps/go_observations-75919a9e72c1b60b --list --format=terse\nS07 producer failed: AST utility named test inventory drift: tsr_compiler/lib/tests::\n",
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr_sha256": "9591dbc6fbb8ad1e102ba015eb227a7bbfb2e27f39ec1563124b5c82265ade45",
+  "valid_capture": false
+}

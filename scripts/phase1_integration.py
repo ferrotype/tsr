@@ -50,8 +50,8 @@ RUST_WITNESS_TESTS = {
          "concrete_entries_validate_in_field_order_before_node_allocation_and_hooks",
          "concrete_large_payload_keeps_all_fields_forged_kind_and_lazy_compatibility"]),
     "witness/binder-container-flags-source-contract": (
-        ["cargo", "test", "--locked", "-p", "tsr_binder", "--lib", "container_classification_tests::", "--", "--test-threads=1"],
-        ["container_classification_tests::" + name for name in (
+        ["cargo", "test", "--locked", "-p", "tsr_binder", "--lib", "container_classification::tests::", "--", "--test-threads=1"],
+        ["container_classification::tests::" + name for name in (
             "fixed_container_rules_do_not_inspect_payload_or_parent", "method_rules_read_only_the_selected_parent_kind",
             "block_rules_include_signature_and_static_block_parents", "property_rules_inspect_initializer_without_requiring_a_parent",
             "local_dynamic_rules_preserve_checked_contract_failures")]),
@@ -462,7 +462,10 @@ def main():
                                 cwd=ROOT, stdout=subprocess.PIPE, stderr=sys.stderr, check=True)
         envelopes = phase1_localized.observe()
         result = localized_integration_result(ROOT, strict_json_loads(output.stdout), envelopes["observation"])
-    print(json.dumps(result, indent=2, sort_keys=True))
+    # The localized observation retains the renderer's exact ordered request
+    # fields; sorting its nested raw result would invalidate that request hash
+    # when the receipt is replayed.
+    print(json.dumps(result, indent=2, sort_keys=args.operation != "observe-localized-config"))
     return int(isinstance(result, dict) and bool(result.get("problems")))
 
 
