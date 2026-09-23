@@ -419,7 +419,8 @@ class SyntaxReplayControls(unittest.TestCase):
     def test_an_omitted_source_input_is_not_current(self):
         self.provenance["rust_closure"] = {}
         self.write_capture()
-        self.assertFalse(syntax.replay(self.directory)["rust_sources_current"])
+        with self.assertRaisesRegex(ValueError, "syntax capture sources changed"):
+            syntax.replay(self.directory)
 
     def test_omitting_a_whole_parser_package_is_not_current(self):
         current = {"Cargo.toml": "workspace", "tools/phase1/syntax/Cargo.toml": "driver",
@@ -428,7 +429,8 @@ class SyntaxReplayControls(unittest.TestCase):
             name: digest for name, digest in current.items() if not name.startswith("crates/tsr_parser/")}
         self.write_capture()
         with patch.object(syntax, "rust_closure", return_value=current):
-            self.assertFalse(syntax.replay(self.directory)["rust_sources_current"])
+            with self.assertRaisesRegex(ValueError, "syntax capture sources changed"):
+                syntax.replay(self.directory)
 
     def test_rust_panic_cannot_produce_a_report(self):
         self.rust = [{"id": "case", "state": "panic", "panic": "boom"}]
@@ -520,6 +522,24 @@ class SyntaxSourceClosureControls(unittest.TestCase):
                 (root / "tools/phase1/syntax/new.rs").write_text("// new build input\n")
                 self.assertEqual(set(syntax.rust_closure()) - set(before), {"tools/phase1/syntax/new.rs"})
 
+    def test_finder_metadata_is_not_a_rust_source_input(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "Cargo.toml").write_text("[workspace]\n")
+            (root / ".cargo").mkdir()
+            (root / ".cargo/config.toml").write_text("[build]\n")
+            source = root / "tools/phase1/syntax/src/main.rs"
+            source.parent.mkdir(parents=True)
+            (root / "tools/phase1/syntax/Cargo.toml").write_text("[package]\n")
+            source.write_text("fn main() {}\n")
+            with patch.object(syntax, "ROOT", root), patch("s04_common.command", side_effect=AssertionError("child")):
+                before = syntax.rust_closure()
+                for parent in (root / ".cargo", root / "tools/phase1/syntax", source.parent):
+                    (parent / ".DS_Store").write_bytes(b"Finder view settings")
+                self.assertEqual(before, syntax.rust_closure())
+                source.write_text("fn main() { panic!() }\n")
+                self.assertNotEqual(before, syntax.rust_closure())
+
     def test_parser_dependency_is_found_without_any_recorded_package_list(self):
         with patch("s04_common.command", side_effect=AssertionError("child")):
             paths = syntax.rust_closure()
@@ -561,7 +581,7 @@ class SyntaxOperationCoverageControls(unittest.TestCase):
         self.review_signature()
 
     def review_signature(self):
-        self.case["request_sha256"] = self.capture.digest(self.capture.canonical(self.request) + b"\n")
+        self.case["request_sha256"] = self.capture.digest(self.capture.request_bytes(self.request))
 
     def problems(self):
         return self.capture.operation_coverage_problems([self.request], self.cases)

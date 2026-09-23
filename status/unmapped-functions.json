@@ -484,7 +484,6 @@
       "tsc/internal/ast/utilities.go:IsExternalModuleImportEqualsDeclaration",
       "tsc/internal/ast/utilities.go:IsExternalModuleIndicator",
       "tsc/internal/ast/utilities.go:IsIterationStatement",
-      "tsc/internal/ast/utilities.go:IsJSDocTypeAssertion",
       "tsc/internal/ast/utilities.go:IsJsxOpeningLikeElementTagName",
       "tsc/internal/ast/utilities.go:IsLet",
       "tsc/internal/ast/utilities.go:IsLiteralComputedPropertyDeclarationName",
@@ -492,7 +491,6 @@
       "tsc/internal/ast/utilities.go:IsModuleWithStringLiteralName",
       "tsc/internal/ast/utilities.go:IsNameOfHeritageClauseTypeReference",
       "tsc/internal/ast/utilities.go:IsNewExpressionTarget",
-      "tsc/internal/ast/utilities.go:IsOuterExpression",
       "tsc/internal/ast/utilities.go:IsParseTreeNode",
       "tsc/internal/ast/utilities.go:IsPrototypeAccess",
       "tsc/internal/ast/utilities.go:IsRequireVariableStatement",
@@ -2007,9 +2005,6 @@
       "tsc/internal/compiler/fileInclude.go:FileIncludeReason.asIndex",
       "tsc/internal/compiler/fileInclude.go:FileIncludeReason.asLibFileIndex",
       "tsc/internal/compiler/fileInclude.go:FileIncludeReason.asReferencedFileData",
-      "tsc/internal/compiler/fileInclude.go:FileIncludeReason.computeReferenceFileRelatedInfo",
-      "tsc/internal/compiler/fileInclude.go:FileIncludeReason.isReferencedFile",
-      "tsc/internal/compiler/fileInclude.go:referenceFileLocation.text",
       "tsc/internal/compiler/fileloader.go:ContentMapperInitializationDiagnostic",
       "tsc/internal/compiler/fileloader.go:ContentMapperProjectDiagnostic",
       "tsc/internal/compiler/fileloader.go:ContentMapperProjectErrorDiagnostic",
@@ -2024,9 +2019,7 @@
       "tsc/internal/compiler/fileloader.go:fileLoader.contentMapperUnavailable",
       "tsc/internal/compiler/fileloader.go:fileLoader.emptyContentMappedFile",
       "tsc/internal/compiler/fileloader.go:fileLoader.getContentMapperTransformIdentity",
-      "tsc/internal/compiler/fileloader.go:fileLoader.getDefaultLibFilePriority",
       "tsc/internal/compiler/fileloader.go:fileLoader.isSupportedExtension",
-      "tsc/internal/compiler/fileloader.go:fileLoader.loadSourceFileMetaData",
       "tsc/internal/compiler/fileloader.go:fileLoader.parseContentMappedFile",
       "tsc/internal/compiler/fileloader.go:fileLoader.parseSourceFile",
       "tsc/internal/compiler/fileloader.go:fileLoader.recordContentMapperFailure",
@@ -2112,9 +2105,7 @@
       "tsc/internal/compiler/program.go:Program.GetResolvedTypeReferenceDirectives",
       "tsc/internal/compiler/program.go:Program.GetSemanticDiagnostics",
       "tsc/internal/compiler/program.go:Program.GetSemanticDiagnosticsWithoutNoEmitFiltering",
-      "tsc/internal/compiler/program.go:Program.GetSourceFileByPath",
       "tsc/internal/compiler/program.go:Program.GetSourceFileFromReference",
-      "tsc/internal/compiler/program.go:Program.GetSourceFiles",
       "tsc/internal/compiler/program.go:Program.GetSourceOfProjectReferenceIfOutputIncluded",
       "tsc/internal/compiler/program.go:Program.GetSuggestionDiagnostics",
       "tsc/internal/compiler/program.go:Program.GetTypeChecker",
@@ -4851,9 +4842,6 @@
       "tsc/internal/modulespecifiers/util.go:replaceFirstStar",
       "tsc/internal/modulespecifiers/util.go:stringToRegex"
     ],
-    "internal/nativepath": [
-      "tsc/internal/nativepath/eintr_unix.go:ignoringEINTR"
-    ],
     "internal/osutil": [
       "tsc/internal/osutil/os_other.go:args",
       "tsc/internal/osutil/os_other.go:executable"
@@ -5886,8 +5874,7 @@
       "tsc/internal/pseudochecker/type.go:newPseudoType"
     ],
     "internal/scanner": [
-      "tsc/internal/scanner/scanner.go:GetECMALineStarts",
-      "tsc/internal/scanner/utilities.go:GetTextOfJSDocComment"
+      "tsc/internal/scanner/scanner.go:GetECMALineStarts"
     ],
     "internal/semver": [
       "tsc/internal/semver/version.go:MustParse",

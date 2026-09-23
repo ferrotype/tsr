@@ -79,6 +79,8 @@ impl IncludeReason {
         }
     }
 
+    /// The caller's `Option` handles Go's nil-reason arm.
+    /// port: tsc/internal/compiler/fileInclude.go:FileIncludeReason.isReferencedFile
     fn is_referenced(&self) -> bool {
         matches!(
             self.data,
@@ -98,6 +100,9 @@ impl IncludeReason {
     }
 
     /// port: tsc/internal/compiler/fileInclude.go:FileIncludeReason.getReferencedLocation
+    /// Reference text is retained when the location is resolved, rather than
+    /// reconstructed on each diagnostic read.
+    /// port: tsc/internal/compiler/fileInclude.go:referenceFileLocation.text
     fn compute_location(&self, program: &Program) -> Result<ReferenceLocation, AstError> {
         let (IncludeReasonData::Import {
             file: file_path, ..
@@ -358,6 +363,8 @@ impl IncludeReason {
     }
 
     /// port: tsc/internal/compiler/fileInclude.go:FileIncludeReason.toRelatedInfo
+    /// The referenced-file branch inlines the pin's separate related-info helper.
+    /// port: tsc/internal/compiler/fileInclude.go:FileIncludeReason.computeReferenceFileRelatedInfo
     fn compute_related_info(&self, program: &Program) -> Result<Option<Diagnostic>, AstError> {
         if self.is_referenced() {
             let location = self.reference_location(program)?;

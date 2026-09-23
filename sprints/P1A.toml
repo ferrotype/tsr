@@ -19,7 +19,10 @@ id = "P1A"
 title = "Phase 1 stage A: prepared tests and coverage"
 goal = "Every Phase 1 operation, the 309 config/options reference outputs and each family's comparisons are frozen, runnable and honestly classified, with missing Rust operations named rather than emulated."
 exit = [
-  "sprint.S12.done == 1",
+  # S12's dated acceptance condition, independent of current producer freshness.
+  # Sprint evaluation is filename-ordered; P1A precedes S12, so its derived
+  # sprint metric is not available here. S12's required items use this same ADR.
+  "adr.0020.status == Accepted",
   "run.foundations.inventory_complete == true",
   "run.foundations.harness_pass == true",
   "run.foundations.leaves_prepared == true",

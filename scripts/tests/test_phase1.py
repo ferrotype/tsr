@@ -29,6 +29,17 @@ def sha(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
+def bind_fixture_result(case, request=None):
+    """An explicit synthetic recorded outcome for contract tests only."""
+    if request is None:
+        request = next(r for r in capture.load_requests(capture.FAMILIES[case["family"]])["requests"]
+                       if r["case"] == case["id"])
+    case["result_evidence"] = {"request_sha256": capture.digest(capture.request_bytes(request)),
+                               "capture_sha256": "a" * 64, "claims_sha256": scope.case_claims_digest(case),
+                               "missing_operations": case.get("missing_operations", []),
+                               "result": case["last_result"]}
+
+
 class ManifestTests(unittest.TestCase):
     def test_committed_scope_has_no_unclassified_operation(self):
         document = json.loads((ROOT / "data/phase1/scope.json").read_text())
@@ -41,7 +52,7 @@ class ManifestTests(unittest.TestCase):
 
     def test_scope_rebuilds_to_the_committed_bytes(self):
         committed = json.loads((ROOT / "data/phase1/scope.json").read_text())
-        self.assertEqual(scope.build(), committed, "scope.json is stale against its inputs")
+        self.assertTrue(scope.build() == committed, "scope.json is stale against its inputs; run inventory --write")
 
     def test_equivalent_rust_cannot_be_rule_derived(self):
         document = json.loads((ROOT / "data/phase1/scope.json").read_text())
@@ -95,6 +106,18 @@ class BaselineIndexTests(unittest.TestCase):
         problems = baselines.verify(forged)
         self.assertTrue(any(dropped["name"] in p for p in problems))
 
+    def test_finder_metadata_is_not_a_reference_output(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            group = Path(temporary) / baselines.REFERENCE / baselines.GROUPS["matchFiles"][0]
+            (group / "nested").mkdir(parents=True)
+            (group / "a.js").write_text("baseline\n")
+            (group / "nested/b.js").write_text("baseline\n")
+            for parent in (group, group / "nested"):
+                (parent / ".DS_Store").write_bytes(b"Finder view settings")
+            with patch.object(baselines, "upstream", return_value=Path(temporary)):
+                self.assertEqual([p.relative_to(group) for p in baselines.outputs("matchFiles")],
+                                 [Path("a.js"), Path("nested/b.js")])
+
     def test_matching_group_authority_is_recorded_as_blocked(self):
         authority = self.index["groups"]["matchFiles"]["authority"]
         self.assertEqual(authority["status"], "blocked")
@@ -122,9 +145,10 @@ class SyntheticCapture:
         self.directory = directory
         probe_directory = directory / "native" / "vfsmatch"
         probe_directory.mkdir(parents=True)
+        inventory = {r["case"]: r for r in capture.load_requests(capture.FAMILIES["pilot"])["requests"]}
         requests = {"version": 1, "family": "pilot",
-                    "requests": [{"case": r["case"], "operation": "vfsmatch.readDirectory"} for r in rows]}
-        request_bytes = canonical(requests) + b"\n"
+                    "requests": [inventory.get(r["case"], {"case": r["case"], "operation": "vfsmatch.readDirectory"}) for r in rows]}
+        request_bytes = capture.request_bytes(requests)
         (directory / "requests.json").write_bytes(request_bytes)
 
         native = {"version": 1, "observations": native_rows if native_rows is not None else [
@@ -152,6 +176,7 @@ class SyntheticCapture:
             "upstream_gitlink": capture.gitlink(), "partial": partial,
             "selected_cases": selected if selected is not None else [r["case"] for r in rows],
             "requests_sha256": sha(request_bytes),
+            "case_claims": capture.case_claims(requests["requests"]),
             "native_probes": {
                 "vfsmatch": {
                     "package": "vfs/vfsmatch",
@@ -445,6 +470,23 @@ class SourceClosureTests(unittest.TestCase):
         closure = capture.source_closure("pilot")
         for probe in capture.FAMILIES["pilot"]["native_probes"]:
             self.assertIn(probe["probe"], closure, probe["probe"])
+
+    def test_finder_metadata_is_not_a_cross_platform_source_input(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / "crates/sample/src/lib.rs"
+            source.parent.mkdir(parents=True)
+            source.write_text("pub fn observed() {}\n")
+            with patch.object(capture, "ROOT", root):
+                before = capture.source_closure("filesystem", ["crates/sample"])
+                for parent in (source.parent, root / "tools/phase1/filesystem"):
+                    parent.mkdir(parents=True, exist_ok=True)
+                    (parent / ".DS_Store").write_bytes(b"Finder view settings")
+                    (parent / "__pycache__").mkdir()
+                    (parent / "__pycache__" / "generate.cpython-311.pyc").write_bytes(b"interpreter cache")
+                self.assertEqual(before, capture.source_closure("filesystem", ["crates/sample"]))
+                source.write_text("pub fn observed() { panic!() }\n")
+                self.assertNotEqual(before, capture.source_closure("filesystem", ["crates/sample"]))
 
     def test_closure_is_derived_from_the_dependency_graph(self):
         # tsr_tsoptions links these transitively; a hand-listed closure would
@@ -740,10 +782,15 @@ class CoverageLinkTests(unittest.TestCase):
             r for r in self.scope["operations"]
             if r.get("ledger_verification") and not r["cases"] and r["mapped_in_ledger"]
         ]
-        self.assertTrue(rows, "expected mapped operations carrying only file-level metrics")
         for row in rows:
             self.assertEqual(row["disposition"], "implemented_untested", row["id"])
-        self.assertGreater(len(rows), 1000, "the overclaim affected thousands of rows")
+        # Keep the negative control when exact witnesses eventually cover all
+        # live rows; the number of remaining gaps is not a correctness rule.
+        entry = {"status": "ported", "verify": ["run.e1.parity >= 0.999"]}
+        self.assertEqual(scope.classify(entry, "Parse", True, {}, [])[0],
+                         "implemented_untested")
+        self.assertEqual(scope.classify(entry, "Parse", True, {}, ["exact-case"])[0],
+                         "covered")
 
     def test_file_level_metrics_are_retained_for_context(self):
         rows = [r for r in self.scope["operations"] if r.get("ledger_verification")]
@@ -1423,11 +1470,16 @@ class RecordedResultTests(unittest.TestCase):
     def test_record_preserves_only_the_gap_identified_by_the_driver(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "cases.json"
-            path.write_text(json.dumps({"cases": [{"id": "a", "family": "filesystem",
-                "operations": ["present", "absent"], "last_result": "different"}]}))
-            report = {"family": "filesystem", "rows": [{"case": "a",
+            case = {"id": "a", "family": "filesystem",
+                    "operations": ["present", "absent"], "last_result": "different"}
+            path.write_text(json.dumps({"cases": [case]}))
+            request = {"case": "a", "operation": "absent"}
+            report = {"family": "filesystem", "capture_sha256": "a" * 64, "rows": [{"case": "a",
+                "request_sha256": capture.digest(capture.request_bytes(request)),
+                "claims_sha256": scope.case_claims_digest(case),
                 "result": "not_implemented", "missing_operation": {"operation": "absent"}}]}
             with patch.object(phase1, "CASES", path), \
+                    patch.object(capture, "load_requests", return_value={"requests": [request]}), \
                     patch.object(capture, "compare", return_value=report):
                 phase1.record_results(Path(tmp), True)
             self.assertEqual(json.loads(path.read_text())["cases"][0]["missing_operations"], ["absent"])
@@ -1442,8 +1494,14 @@ class RecordedResultTests(unittest.TestCase):
                     if c["last_result"] == "not_implemented" else {})} for c in leaves]
         rows[0] = {"case": leaves[0]["id"], "result": flipped}
 
+        requests = {r["case"]: r for r in capture.load_requests(capture.FAMILIES["leaves"])["requests"]}
+        declarations = {case["id"]: case for case in leaves}
+        for row in rows:
+            row["request_sha256"] = capture.digest(capture.request_bytes(requests[row["case"]]))
+            row["claims_sha256"] = scope.case_claims_digest(declarations[row["case"]])
+
         def fake_compare(directory, require):
-            return {"family": "leaves", "rows": rows}
+            return {"family": "leaves", "capture_sha256": "a" * 64, "rows": rows}
 
         original = phase1.capture_module.compare
         before = (ROOT / "data/phase1/cases.json").read_bytes()
@@ -1615,6 +1673,7 @@ class ConfigRosterTests(unittest.TestCase):
                     # Implementation can make every case pass. Exercise each
                     # preparation state explicitly rather than require live gaps.
                     case["last_result"] = result
+                    bind_fixture_result(case)
                     claimed = sorted(set(case["operations"]) & owned - witnessed)[0]
                     roster = scope.leaf_roster(step)
                     roster["exemptions"].append({
@@ -1877,6 +1936,13 @@ class RosterLedgerTests(unittest.TestCase):
             "last_result": "not_implemented", "operations": [operation],
             "missing_operations": [operation],
         })
+        request = {"case": "test/prepared-only", "operation": operation}
+        bind_fixture_result(self.cases["cases"][-1], request)
+        original_load = capture.load_requests
+        loader = patch.object(capture, "load_requests", side_effect=lambda spec: {
+            **original_load(spec), "requests": [*original_load(spec)["requests"], request]})
+        loader.start()
+        self.addCleanup(loader.stop)
         prepared = scope.prepared_links(self.cases)
         covering = scope.cases_by_operation()
         gap_only = sorted(set(prepared) - set(covering))
@@ -1936,10 +2002,11 @@ class ObservationMetadataTests(unittest.TestCase):
         def row(observation):
             return dict(request, result="observed", **observation)
         validated = ({"family": "pilot", "pin": "test", "partial": False,
-                      "requests_sha256": "test"}, [request],
+                      "requests_sha256": "test", "case_claims": capture.case_claims([request])}, [request],
                      {request["case"]: row(native)}, {request["case"]: row(rust)})
         with patch.object(capture, "validate_capture", return_value=validated), \
-                patch.object(capture, "load_requests", return_value={"requests": [request]}):
+                patch.object(capture, "load_requests", return_value={"requests": [request]}), \
+                patch.object(capture, "sha_file", return_value="a" * 64):
             return capture.compare(Path("unused"))["rows"][0]["result"]
 
     def test_metadata_is_separate_from_exact_rendered_observation(self):

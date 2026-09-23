@@ -299,22 +299,11 @@ impl CheckerState {
     }
 }
 
-/// `evaluator.AnyToString` for literal values.
-// port: tsc/internal/evaluator/evaluator.go:AnyToString
+/// Adapt checker literals to the shared evaluator's primitive conversion.
 pub(crate) fn literal_value_text(value: &LiteralValue) -> Result<Vec<u8>, Error> {
-    Ok(match value {
-        LiteralValue::String(text) => text.as_bytes().to_vec(),
-        LiteralValue::Number(number) => number.to_string().into_bytes(),
-        LiteralValue::Boolean(value) => {
-            if *value {
-                b"true".to_vec()
-            } else {
-                b"false".to_vec()
-            }
-        }
-        LiteralValue::BigInt(value) => value.to_text(),
-        LiteralValue::ComputedEnum => {
-            return Err(Error::Unsupported("AnyToString: computed enum value"))
-        }
-    })
+    Ok(value
+        .primitive()
+        .ok_or(Error::Unsupported("AnyToString: computed enum value"))?
+        .text_bytes()
+        .into_owned())
 }

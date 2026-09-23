@@ -27,15 +27,15 @@
   .chart { background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:12px; }
 </style>
 <div class="page">
-  <div class="eyebrow">Corsa in Rust &middot; generated 2026-09-22 &middot; upstream pin 1f70213d4922b434345f639b441681e470c7cfc1</div>
+  <div class="eyebrow">Corsa in Rust &middot; generated 2026-09-23 &middot; upstream pin 1f70213d4922b434345f639b441681e470c7cfc1</div>
   <h1>Status</h1>
   <p>Function mappings measure traceability. Baseline parity and required gates establish behavior. <a href="../STATUS.md">Detailed report</a> · <a href="TRACKING.md">Tracking contract</a> · <a href="../status/unmapped-functions.json">Unmapped-function worklist</a></p>
 
   <div class="tiles">
-    <div class="tile"><b>0.8%</b><span>lines verified, of 291999</span></div>
-    <div class="tile"><b>5 / 457</b><span>files verified</span></div>
-    <div class="tile"><b>39.9%</b><span>functions with a Rust counterpart, of 11506</span></div>
-    <div class="tile"><b>1 / 8</b><span>experiments passed</span></div>
+    <div class="tile"><b>0.0%</b><span>lines verified, of 291999</span></div>
+    <div class="tile"><b>0 / 457</b><span>files verified</span></div>
+    <div class="tile"><b>40.0%</b><span>functions with a Rust counterpart, of 11506</span></div>
+    <div class="tile"><b>0 / 8</b><span>experiments passed</span></div>
     <div class="tile"><b>22 / 22</b><span>decisions accepted</span></div>
   </div>
   <h2>Over time</h2>
@@ -49,7 +49,7 @@
 <div class="legend"><span class="acc">verified lines</span><span class="rust">mapped functions</span></div></div>
   <h2>By phase</h2>
   <table><thead><tr><th>Phase</th><th class="num">Files</th><th class="num">Lines</th><th>Verified</th><th class="num"></th></tr></thead><tbody>
-<tr><td>Phase 0</td><td class="num">36</td><td class="num">37883</td><td><div class="bar"><div style="width:5.8%"></div></div></td><td class="num">5.8%</td></tr>
+<tr><td>Phase 0</td><td class="num">36</td><td class="num">37883</td><td><div class="bar"><div style="width:0.0%"></div></div></td><td class="num">0.0%</td></tr>
 <tr><td>Phase 1</td><td class="num">106</td><td class="num">39128</td><td><div class="bar"><div style="width:0.0%"></div></div></td><td class="num">0.0%</td></tr>
 <tr><td>Phase 2</td><td class="num">31</td><td class="num">63068</td><td><div class="bar"><div style="width:0.0%"></div></div></td><td class="num">0.0%</td></tr>
 <tr><td>Phase 3</td><td class="num">71</td><td class="num">38906</td><td><div class="bar"><div style="width:0.0%"></div></div></td><td class="num">0.0%</td></tr>
@@ -59,24 +59,24 @@
 </tbody></table>
   <h2>Experiments</h2>
   <table><thead><tr><th></th><th>Title</th><th>Threshold</th><th>Measured</th><th>Result</th></tr></thead><tbody>
-<tr><td>E1</td><td>Parser parity</td><td>run.e1.parity &gt;= 0.999<br>run.e1.frozen_denominator == true</td><td>encoder_parity: 1<br>frozen_denominator: true</td><td><span class="chip ok">pass</span></td></tr>
+<tr><td>E1</td><td>Parser parity</td><td>run.e1.parity &gt;= 0.999<br>run.e1.frozen_denominator == true</td><td>encoder_parity: missing<br>frozen_denominator: missing</td><td><span class="chip warn">pending</span></td></tr>
 <tr><td>E2</td><td>Checker slice</td><td>run.e2.types_parity == 1<br>run.e2.errors_parity == 1<br>run.e2.comparators == true<br>run.e2.frozen_subset == true<br>run.e2.divergences_approved == true<br>run.checkerbench.throughput_ratio &gt; 0<br>run.checkerbench.allocated_bytes_ratio &gt;= 0<br>run.checkerbench.retained_bytes_ratio &gt;= 0<br>run.relater.parity == 1<br>run.relater.throughput_ratio &gt; 0<br>run.relater.allocated_bytes_ratio &gt;= 0<br>run.relater.retained_bytes_ratio &gt;= 0</td><td>types_parity: missing<br>errors_parity: missing<br>comparators: missing<br>frozen_subset: missing<br>divergences_approved: missing<br>checker_throughput: missing<br>checker_allocated_bytes: missing<br>checker_retained_bytes: missing<br>relater_prototype_parity: missing<br>relater_throughput: missing<br>relater_allocated_bytes: missing<br>relater_retained_bytes: missing</td><td><span class="chip warn">pending</span></td></tr>
 <tr><td>E3</td><td>Ownership</td><td>run.e3.shared_bound_file == true<br>run.e3.retained_snapshot_edit == true<br>run.e3.independent_checker_merges == true<br>run.e3.concurrent_lazy_storage == true<br>run.e3.mapper_bundle_disposal == true<br>run.e3.builder_cache_retention == true<br>run.e3.checker_result_retention == true<br>run.e3.checker_ast_retention == true<br>run.e3.api_scratch_disposal == true<br>run.e3.id_exhaustion == true<br>run.e3.wrong_owner_rejected == true<br>run.e3.stale_and_recycled_ids_rejected == true<br>run.e3.shared_pool_panic_retirement == true<br>run.e3.live_owner_delta == 0<br>run.e3.live_allocation_delta == 0<br>run.e3.miri == true<br>run.e3.address_sanitizer == true<br>run.e3.release_boundaries == true</td><td>shared_bound_file: missing<br>retained_snapshot_edit: missing<br>independent_checker_merges: missing<br>concurrent_lazy_storage: missing<br>mapper_bundle_disposal: missing<br>builder_cache_retention: missing<br>checker_result_retention: missing<br>checker_ast_retention: missing<br>api_scratch_disposal: missing<br>id_exhaustion: missing<br>wrong_owner_rejected: missing<br>stale_and_recycled_ids_rejected: missing<br>shared_pool_panic_retirement: missing<br>owners_return_to_baseline: missing<br>allocations_return_to_baseline: missing<br>miri: missing<br>address_sanitizer: missing<br>release_boundaries: missing</td><td><span class="chip warn">pending</span></td></tr>
-<tr><td>E4</td><td>Strings</td><td>run.e4.source_decoding == true<br>run.scanner.diagnostics == true<br>run.checkertext.token_literal_bytes == true<br>run.checkertext.helper_printer_semantics == true<br>run.e4.slice_validity == true<br>run.e4.utf8_positions == true<br>run.e4.utf16_positions == true<br>run.e1.encoder_success_error == true<br>run.e1.encoder_output_bytes == true<br>run.e4.helper_semantics == true<br>run.scanner.token_value_bytes == true</td><td>source_decoding: missing<br>diagnostics: missing<br>token_literal_bytes: missing<br>helper_printer_semantics: missing<br>slice_validity: missing<br>utf8_positions: missing<br>utf16_positions: missing<br>encoder_success_error: true<br>encoder_output_bytes: true<br>helper_semantics: missing<br>token_value_bytes: missing</td><td><span class="chip warn">pending</span></td></tr>
+<tr><td>E4</td><td>Strings</td><td>run.e4.source_decoding == true<br>run.scanner.diagnostics == true<br>run.checkertext.token_literal_bytes == true<br>run.checkertext.helper_printer_semantics == true<br>run.e4.slice_validity == true<br>run.e4.utf8_positions == true<br>run.e4.utf16_positions == true<br>run.e1.encoder_success_error == true<br>run.e1.encoder_output_bytes == true<br>run.e4.helper_semantics == true<br>run.scanner.token_value_bytes == true</td><td>source_decoding: missing<br>diagnostics: missing<br>token_literal_bytes: missing<br>helper_printer_semantics: missing<br>slice_validity: missing<br>utf8_positions: missing<br>utf16_positions: missing<br>encoder_success_error: missing<br>encoder_output_bytes: missing<br>helper_semantics: missing<br>token_value_bytes: missing</td><td><span class="chip warn">pending</span></td></tr>
 <tr><td>E5</td><td>Memory</td><td>run.e5.peak_rss_ratio &lt;= 0.85<br>run.e5.allocated_bytes_ratio &lt;= 0.85<br>run.e5.type_footprint_ratio &lt;= 0.85</td><td>peak_rss: missing<br>allocated_bytes: missing<br>type_footprint: missing</td><td><span class="chip warn">pending</span></td></tr>
 <tr><td>E6</td><td>CPU</td><td>run.e6.one_thread_wall_time_ratio &lt;= 1.25<br>run.e6.eight_threads_wall_time_ratio &lt;= 1.45</td><td>one_thread: missing<br>eight_threads: missing</td><td><span class="chip warn">pending</span></td></tr>
 <tr><td>E7</td><td>WebAssembly</td><td>run.e7.parser_artifact_size_ratio &lt;= 0.3<br>run.e7.parse_throughput_ratio &gt;= 1.5<br>run.e7.checker_parity == 1<br>run.e7.portable_host == true</td><td>parser_artifact_size: missing<br>parse_throughput: missing<br>checker_parity: missing<br>portable_host: missing</td><td><span class="chip warn">pending</span></td></tr>
 <tr><td>E8</td><td>Embedding</td><td>run.e8.node_parse_latency_ratio &lt;= 0.4<br>run.e8.rust_consumer_parity == 1<br>run.e8.lifetime_checks == true</td><td>node_parse_latency: missing<br>rust_consumer_parity: missing<br>lifetime_checks: missing</td><td><span class="chip warn">pending</span></td></tr>
 </tbody></table>
   <h2>Evidence</h2>
-  <table><thead><tr><th>Run</th><th>State</th><th>Artifact</th></tr></thead><tbody><tr><td>binder</td><td>current</td><td><a href="../status/evidence/27e07492557442eb4e5c304b2ebd3d5b438907197529ab47e01527674a55474b.json">result</a></td></tr>
+  <table><thead><tr><th>Run</th><th>State</th><th>Artifact</th></tr></thead><tbody><tr><td>binder</td><td>stale: source, pin, command or inputs changed</td><td><a href="../status/evidence/18e142d01ce38d551c88fc025f46a34934b17b820c9182e25f7997bf57993b39.json">result</a></td></tr>
 <tr><td>bindworkload</td><td>stale: source, pin, command or inputs changed</td><td><a href="../status/evidence/85a54b34aa18160150c0b7a723fb88013bb297dc05cf53d4fb665400d4ce15d9.json">result</a></td></tr>
 <tr><td>checkerbench</td><td>stale: source, pin, command or inputs changed</td><td><a href="../status/evidence/5c877c889f3630fa74103cc142b2b07234e3bb68d28fbc875789b74e9d507c97.json">result</a></td></tr>
 <tr><td>checkertext</td><td>stale: source, pin, command or inputs changed</td><td><a href="../status/evidence/e19d93b1b2e77cd0a2bda635f9e50aecd53ca78e5e4a4c27d45adc3e2ed2dc70.json">result</a></td></tr>
-<tr><td>clippy</td><td>stale: source, pin, command or inputs changed</td><td><a href="../status/evidence/2d09f23327466d969f3802fe696309740929a8d87f3cb4d2186d88f87cb1ba70.json">result</a></td></tr>
-<tr><td>config</td><td>missing</td><td>—</td></tr>
-<tr><td>deny</td><td>stale: source, pin, command or inputs changed</td><td><a href="../status/evidence/252fadf205f09448300c7aadc8187d41934e19bc7d9ba1bc618b302dfcb77140.json">result</a></td></tr>
-<tr><td>e1</td><td>current</td><td><a href="../status/evidence/66f3a46d3ddf483a8434e3efe95767f63d92014d08180810d329d1fbfceac2c4.json">result</a></td></tr>
+<tr><td>clippy</td><td>stale: source, pin, command or inputs changed</td><td><a href="../status/evidence/1139a58c2c3bd5afcdfbe91a672e1f5cff42f551afd819ea91888c0269c58ce5.json">result</a></td></tr>
+<tr><td>config</td><td>stale: source, pin, command or inputs changed</td><td><a href="../status/evidence/3d912e15f9adcf10e026ea555d1039cf5d2ddf4a2cb625805232acc9aa14a5f1.json">result</a></td></tr>
+<tr><td>deny</td><td>stale: source, pin, command or inputs changed</td><td><a href="../status/evidence/591ad73fa43511e46af99a450162caf7ec7638882f55a7f3176bdbd5ea64ff65.json">result</a></td></tr>
+<tr><td>e1</td><td>stale: source, pin, command or inputs changed</td><td><a href="../status/evidence/df8264588b903add090b14987510317a755eca2ca910c885b5669baf93cea6db.json">result</a></td></tr>
 <tr><td>e2</td><td>stale: source, pin, command or inputs changed</td><td><a href="../status/evidence/ea315699ea5079faf35a9d33257f266a4c20c5d8d7aebab5187cd5041b49e0b0.json">result</a></td></tr>
 <tr><td>e3</td><td>stale: source, pin, command or inputs changed</td><td><a href="../status/evidence/e360fcedd982cc66cf6b3e9bbd5eefc299699b4fe1cc50d064741d4f1ead151d.json">result</a></td></tr>
 <tr><td>e4</td><td>stale: source, pin, command or inputs changed</td><td><a href="../status/evidence/d3d8440cedd29da0a8ca8b103a9715a01e587f59d9d264cb3facc76d3014a0cf.json">result</a></td></tr>
@@ -84,28 +84,28 @@
 <tr><td>e6</td><td>stale: source, pin, command or inputs changed</td><td><a href="../status/evidence/66ab8b7c8e5067d93ee54f115b5f9f1aacc9c66645f50992a47ac5831c39e7eb.json">result</a></td></tr>
 <tr><td>e7</td><td>stale: source, pin, command or inputs changed</td><td><a href="../status/evidence/17a5f52a9809d5a6c148572c189148b42273c84e53005eccd24ab700dad8604b.json">result</a></td></tr>
 <tr><td>e8</td><td>stale: source, pin, command or inputs changed</td><td><a href="../status/evidence/556276951ed1b6a50a1a7a17946129a76c78ce6659f311d05e5050b1a54e9d67.json">result</a></td></tr>
-<tr><td>fmt</td><td>stale: source, pin, command or inputs changed</td><td><a href="../status/evidence/af9d3221d4a11c5c873b319aee931ee99cf374bda56af8e5f2a75898ded0075d.json">result</a></td></tr>
-<tr><td>foundations</td><td>current</td><td><a href="../status/evidence/abe314c6405ed0d00b7908ad3aca8c8d3e10e011bbc1a59c91aa524a01da464a.json">result</a></td></tr>
-<tr><td>gen</td><td>stale: source, pin, command or inputs changed</td><td><a href="../status/evidence/18df800a71b64b7255a58d25907b6ed0a29fad807c9886d7573099299d810af1.json">result</a></td></tr>
+<tr><td>fmt</td><td>stale: source, pin, command or inputs changed</td><td><a href="../status/evidence/dc47449558c50622bbab178a193f188aa62175a07b78e629065fd12cdc6a4d1a.json">result</a></td></tr>
+<tr><td>foundations</td><td>stale: source, pin, command or inputs changed</td><td><a href="../status/evidence/3f8fe43d2c0c7e57b58c1a005c647e1a97b40f22551424d05ee63ff11fe85b1f.json">result</a></td></tr>
+<tr><td>gen</td><td>stale: source, pin, command or inputs changed</td><td><a href="../status/evidence/acbeb3f87b196daef46e774ba1a2b611a80dadcb7f71b6a5dd3b50b6b2f22da3.json">result</a></td></tr>
 <tr><td>oracle</td><td>stale: source, pin, command or inputs changed</td><td><a href="../status/evidence/db9b5b2ec2719b6b57419acc4180632ba0a86b2ed29beb40ba799a720668ac7f.json">result</a></td></tr>
-<tr><td>program</td><td>stale: source, pin, command or inputs changed</td><td><a href="../status/evidence/561874e0c6df08b856dc4e595da900079fc4be78dde91ba0c27a3016ace9f10b.json">result</a></td></tr>
+<tr><td>program</td><td>stale: source, pin, command or inputs changed</td><td><a href="../status/evidence/fc2fbd0e18e6bbbad1ed50c2f6bca3b1c1173b0a81fa64a4d7dea84da69fcaf9.json">result</a></td></tr>
 <tr><td>relater</td><td>stale: source, pin, command or inputs changed</td><td><a href="../status/evidence/981fff12bacd54eab8b02804bdb78919731df5cccb1ad6a4c0890017a369c642.json">result</a></td></tr>
 <tr><td>scanner</td><td>stale: source, pin, command or inputs changed</td><td><a href="../status/evidence/a088df9f7c39827fc505dd973140afd89b8b19d7607a76be4497377fb2271394.json">result</a></td></tr>
-<tr><td>selftest</td><td>stale: source, pin, command or inputs changed</td><td><a href="../status/evidence/d6d5116f5f8058eae1f0be73e6cba00599e35e637e3a1777c1d3fb9f01c29b75.json">result</a></td></tr>
-<tr><td>syntax</td><td>missing</td><td>—</td></tr>
-<tr><td>testhost</td><td>stale: source, pin, command or inputs changed</td><td><a href="../status/evidence/add4c75d2d558f3e40130659376cfc364f6fdab3dd1dedea96de18ce910bba45.json">result</a></td></tr>
-<tr><td>workspace</td><td>stale: source, pin, command or inputs changed</td><td><a href="../status/evidence/0cf9cc95174085613ffed90cbfee4b7240359ce12fa3c6c9d7971ce66f92dd33.json">result</a></td></tr></tbody></table>
+<tr><td>selftest</td><td>stale: source, pin, command or inputs changed</td><td><a href="../status/evidence/34efc9d73aae1391aeaf72661c9fda3d0eb0518cb6e705ed6185bc113aa1cd4a.json">result</a></td></tr>
+<tr><td>syntax</td><td>stale: source, pin, command or inputs changed</td><td><a href="../status/evidence/1f9c350b09a4baf2a021b463eb45cc5640d429cf36b7f4374cd94865290f8ac3.json">result</a></td></tr>
+<tr><td>testhost</td><td>stale: source, pin, command or inputs changed</td><td><a href="../status/evidence/52d848dc16df91c05bbd3d66d32a6b52a61d35b237264fa7ebc9a6256629367a.json">result</a></td></tr>
+<tr><td>workspace</td><td>stale: source, pin, command or inputs changed</td><td><a href="../status/evidence/3e8b72258aae6ba4457d1ba29e8559bdb080daef946d262827b31eff6488db17.json">result</a></td></tr></tbody></table>
   <h2>Sprints</h2>
   <table><thead><tr><th>Sprint</th><th>Title</th><th class="num">Exit checks</th><th>State</th></tr></thead><tbody>
-<tr><td>P1A</td><td>Phase 1 stage A: prepared tests and coverage</td><td class="num">2 / 9</td><td><span class="chip warn">open</span></td></tr>
-<tr><td>P1B</td><td>Phase 1 stage B: foundational compiler services</td><td class="num">19 / 45</td><td><span class="chip warn">open</span></td></tr>
+<tr><td>P1A</td><td>Phase 1 stage A: prepared tests and coverage</td><td class="num">1 / 9</td><td><span class="chip warn">open</span></td></tr>
+<tr><td>P1B</td><td>Phase 1 stage B: foundational compiler services</td><td class="num">0 / 49</td><td><span class="chip warn">open</span></td></tr>
 <tr><td>S01</td><td>Contracts, workspace, oracle</td><td class="num">5 / 8</td><td><span class="chip warn">open</span></td></tr>
 <tr><td>S02</td><td>Toolchain, lints, dependency policy, CI</td><td class="num">0 / 6</td><td><span class="chip warn">open</span></td></tr>
 <tr><td>S03</td><td>Generators from the pinned schemas</td><td class="num">0 / 7</td><td><span class="chip warn">open</span></td></tr>
 <tr><td>S04</td><td>Contract leaves: tsr_jsstring and tsr_arena</td><td class="num">0 / 14</td><td><span class="chip warn">open</span></td></tr>
 <tr><td>S05</td><td>Scanner</td><td class="num">1 / 10</td><td><span class="chip warn">open</span></td></tr>
-<tr><td>S06</td><td>Parser, JSDoc, AST runtime and encoder</td><td class="num">12 / 16</td><td><span class="chip warn">open</span></td></tr>
-<tr><td>S07</td><td>Binder, resolution slice, program host, parse-and-bind benchmark</td><td class="num">9 / 20</td><td><span class="chip warn">open</span></td></tr>
+<tr><td>S06</td><td>Parser, JSDoc, AST runtime and encoder</td><td class="num">3 / 16</td><td><span class="chip warn">open</span></td></tr>
+<tr><td>S07</td><td>Binder, resolution slice, program host, parse-and-bind benchmark</td><td class="num">1 / 20</td><td><span class="chip warn">open</span></td></tr>
 <tr><td>S08</td><td>Checker slice, printer and node builder</td><td class="num">0 / 8</td><td><span class="chip warn">open</span></td></tr>
 <tr><td>S09</td><td>Ownership and registry harness</td><td class="num">0 / 3</td><td><span class="chip warn">open</span></td></tr>
 <tr><td>S10</td><td>WebAssembly and Rust embedding</td><td class="num">0 / 3</td><td><span class="chip warn">open</span></td></tr>

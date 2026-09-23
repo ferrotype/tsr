@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "family": "filesystem",
+  "requests": [
+    {
+      "case": "filesystem/composed/live-program-rebuild",
+      "operation": "tsc/internal/compiler/program.go:NewProgram",
+      "subject": "composed.ProgramRebuild",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "Runs in a disposable real OS directory on every supported host; root and realpath spellings are normalized. No watcher scheduling is exercised.",
+      "discriminates": "Cached metadata must be cleared after each build; a fresh cached/tracking compiler host discovers physical create/delete/edit mutations, reads changed source and syntax errors, reuses an unchanged file, retains the first bound file and records missing roots and explicitly seeded wildcard directories.",
+      "config": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"src/missing.ts\"],\"include\":[\"src/**/*.ts\"]}",
+      "initial_files": {
+        "package.json": "{\"type\":\"module\"}\n",
+        "src/main.ts": "export const oldName = 1;\n",
+        "src/deleted.ts": "export const deleted = 2;\n",
+        "src/unchanged.ts": "export const unchanged = 3;\n"
+      },
+      "mutations": [
+        {
+          "op": "write",
+          "path": "src/created.ts",
+          "text": "export const created = 4;\n"
+        },
+        {
+          "op": "remove",
+          "path": "src/deleted.ts"
+        },
+        {
+          "op": "write",
+          "path": "src/main.ts",
+          "text": "export const newName = ;\n"
+        }
+      ],
+      "retained_file": "src/main.ts",
+      "unchanged_file": "src/unchanged.ts",
+      "metadata_paths": [
+        "src/created.ts",
+        "src/deleted.ts",
+        "src/missing.ts"
+      ]
+    }
+  ]
+}

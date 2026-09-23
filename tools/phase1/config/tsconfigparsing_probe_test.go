@@ -41,6 +41,7 @@ type configInput struct {
 	BasePath       string            `json:"base_path"`
 	JSONText       string            `json:"json_text"`
 	AllFileList    map[string]string `json:"all_file_list"`
+	Locale         string            `json:"locale,omitempty"`
 }
 type tsconfigParsingRequest struct {
 	Case                   string        `json:"case"`
@@ -92,7 +93,7 @@ func configInputs(request tsconfigParsingRequest, expected string) (bool, []conf
 		if c.existingOptions != nil {
 			return false, nil, fmt.Errorf("new existingOptions input needs transport")
 		}
-		result = append(result, configInput{c.configFileName, c.basePath, c.jsonText, c.allFileList})
+		result = append(result, configInput{ConfigFileName: c.configFileName, BasePath: c.basePath, JSONText: c.jsonText, AllFileList: c.allFileList})
 	}
 	return include, result, nil
 }
@@ -134,6 +135,9 @@ func configObserve(request tsconfigParsingRequest) []map[string]any {
 		} else {
 			base, host := configHost(input)
 			config := testConfig{configFileName: input.ConfigFileName, basePath: input.BasePath, jsonText: input.JSONText, allFileList: input.AllFileList}
+			if input.Locale != "" {
+				config.existingOptions = &core.CompilerOptions{Locale: input.Locale}
+			}
 			var parsed *tsoptions.ParsedCommandLine
 			switch request.API {
 			case "json":
@@ -152,6 +156,9 @@ func configObserve(request tsconfigParsingRequest) []map[string]any {
 			errors = parsed.Errors
 			format.NewLine = "\r\n"
 			format.CurrentDirectory = base
+			if input.Locale != "" {
+				format.Locale = parsed.Locale()
+			}
 		}
 		var text strings.Builder
 		diagnosticwriter.FormatDiagnosticsWithColorAndContext(&text, diagnosticwriter.FromASTDiagnostics(errors), format)
@@ -391,4 +398,27 @@ func parseConfigFileTextToJsonInputs(title string) ([]string, bool) {
 		}
 	}
 	return nil, false
+}
+
+// F5b integration inputs are separate from the 309 frozen baseline outputs.
+// Both runtimes use configRender; all diagnostic bytes come from their own
+// production parser and writer. No expected file or translated catalog is read.
+func TestPhase1LocalizedConfig(t *testing.T) {
+	input, requests := configDocument(t)
+	rows := []map[string]any{}
+	for _, r := range requests {
+		if r.Operation != tsconfigParsingOperation || r.Source != "integration" || (r.API != "json" && r.API != "jsonSourceFile") || len(r.Inputs) != 1 || r.Inputs[0].Locale == "" {
+			t.Fatalf("invalid localized integration request %s", r.Case)
+		}
+		typed := bridgeRoundtrip(map[string]any{"rows": configObserve(r)}).(map[string]any)
+		rows = append(rows, map[string]any{"case": r.Case, "operation": r.Operation, "result": "observed", "observation": configRender(r, typed)})
+	}
+	sum := sha256.Sum256(input)
+	b, err := stdjson.MarshalIndent(map[string]any{"version": 1, "request_sha256": hex.EncodeToString(sum[:]), "go": runtime.Version(), "goos": runtime.GOOS, "goarch": runtime.GOARCH, "observations": rows}, "", "  ")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(os.Getenv("S08_OUTPUT"), b, 0600); err != nil {
+		t.Fatal(err)
+	}
 }

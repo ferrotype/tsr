@@ -251,5 +251,89 @@
         "mode": 1
       }
     ]
+  },
+  {
+    "id": "trailing-directory-types-versions-cold",
+    "cwd": "/repo",
+    "case_sensitive": true,
+    "options": {
+      "module": 1,
+      "moduleResolution": 2,
+      "traceResolution": true
+    },
+    "files": {
+      "/repo/node_modules/slash/package.json": "{\"name\": \"slash\", \"version\": \"1.0.0\", \"types\": \"entry\", \"typesVersions\": {\"*\": {\"*\": [\"types/*\"]}}}",
+      "/repo/node_modules/slash/entry.d.ts": "export interface Entry {}",
+      "/repo/node_modules/slash/index.d.ts": "export interface WrongIndex {}",
+      "/repo/node_modules/slash/types/entry.d.ts": "export interface Entry {}",
+      "/repo/node_modules/slash/types/index.d.ts": "export interface WrongIndex {}",
+      "/repo/node_modules/slash/types/file.d.ts": "export {}"
+    },
+    "operations": [
+      {
+        "kind": "module",
+        "name": "../",
+        "file": "/repo/node_modules/slash/types/file.d.ts",
+        "mode": 1
+      }
+    ]
+  },
+  {
+    "id": "trailing-directory-types-versions-warm",
+    "cwd": "/repo",
+    "case_sensitive": true,
+    "options": {
+      "module": 1,
+      "moduleResolution": 2,
+      "traceResolution": true
+    },
+    "files": {
+      "/repo/node_modules/slash/package.json": "{\"name\": \"slash\", \"version\": \"1.0.0\", \"types\": \"entry\", \"typesVersions\": {\"*\": {\"*\": [\"types/*\"]}}}",
+      "/repo/node_modules/slash/entry.d.ts": "export interface Entry {}",
+      "/repo/node_modules/slash/index.d.ts": "export interface WrongIndex {}",
+      "/repo/node_modules/slash/types/entry.d.ts": "export interface Entry {}",
+      "/repo/node_modules/slash/types/index.d.ts": "export interface WrongIndex {}",
+      "/repo/node_modules/slash/types/file.d.ts": "export {}"
+    },
+    "operations": [
+      {
+        "kind": "module",
+        "name": "slash",
+        "file": "/repo/main.ts",
+        "mode": 1
+      },
+      {
+        "kind": "module",
+        "name": "../",
+        "file": "/repo/node_modules/slash/types/file.d.ts",
+        "mode": 1
+      }
+    ]
+  },
+  {
+    "id": "trailing-directory-types-field",
+    "cwd": "/repo",
+    "case_sensitive": true,
+    "options": {
+      "module": 1,
+      "moduleResolution": 2,
+      "traceResolution": true
+    },
+    "files": {
+      "/repo/node_modules/slash/package.json": "{\"name\": \"slash\", \"version\": \"1.0.0\", \"types\": \"entry\"}",
+      "/repo/node_modules/slash/entry.d.ts": "export interface Entry {}",
+      "/repo/node_modules/slash/index.d.ts": "export interface WrongIndex {}",
+      "/repo/node_modules/slash/types/entry.d.ts": "export interface Entry {}",
+      "/repo/node_modules/slash/types/index.d.ts": "export interface WrongIndex {}",
+      "/repo/node_modules/slash/types/file.d.ts": "export {}"
+    },
+    "operations": [
+      {
+        "kind": "module",
+        "name": "../",
+        "file": "/repo/node_modules/slash/types/file.d.ts",
+        "mode": 1
+      }
+    ]
   }
 ]

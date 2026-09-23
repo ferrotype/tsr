@@ -18,6 +18,25 @@ def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def consumer_executable(build_log, manifest):
+    """Select the consumer Cargo actually built, including target overrides."""
+    executables = set()
+    for line in build_log.read_text().splitlines():
+        try:
+            message = json.loads(line)
+        except json.JSONDecodeError:
+            continue  # Cargo progress on stderr shares the retained build log.
+        if (isinstance(message, dict) and message.get('reason') == 'compiler-artifact'
+                and message.get('manifest_path') == str(manifest)
+                and message.get('target', {}).get('name') == 'package_consumer'
+                and message.get('target', {}).get('kind') == ['bin']
+                and message.get('executable')):
+            executables.add(message['executable'])
+    if len(executables) != 1:
+        raise ValueError('Cargo did not report exactly one package consumer executable')
+    return Path(executables.pop())
+
+
 def run(output):
     check_assets(True)
     rows = [r for r in publication_policy() if r['publish']]
@@ -81,8 +100,8 @@ def run(output):
     consumer = isolated / 'consumer'
     (consumer / 'src').mkdir(parents=True)
     shutil.copy2(ROOT / 'tools/packaging/consumer.rs', consumer / 'src/main.rs')
-    deps = ['tsr_arena', 'tsr_ast', 'tsr_core', 'tsr_embed', 'tsr_jsstring', 'tsr_bundled', 'tsr_vfs', 'tsr_tsoptions']
-    (consumer / 'Cargo.toml').write_text('[package]\nname = "package_consumer"\nversion = "0.0.0"\nedition = "2021"\npublish = false\n\n[dependencies]\n' + ''.join(f'{name} = "0.1.0"\n' for name in deps))
+    deps = ['tsr_arena', 'tsr_ast', 'tsr_core', 'tsr_embed', 'tsr_jsstring', 'tsr_bundled', 'tsr_vfs', 'tsr_tsoptions', 'tsr_compiler', 'tsr_locale', 'tsr_diagnostics']
+    (consumer / 'Cargo.toml').write_text('[package]\nname = "package_consumer"\nversion = "0.0.0"\nedition = "2021"\npublish = false\n\n[dependencies]\n' + ''.join(f'{name} = "0.1.0"\n' for name in deps) + 'serde_json = "1"\n')
     # All overrides point only to archive contents. No package source or config
     # is copied from the checkout; the root lock preserves external versions.
     metadata = json.loads(subprocess.check_output(['cargo', 'metadata', '--offline', '--format-version', '1'], cwd=isolated, env=env))
@@ -95,8 +114,11 @@ def run(output):
         if 'source' in p and (p['name'], p['version'], p['source'], p.get('checksum')) not in locked:
             raise ValueError('external dependency changed during packaging: ' + p['name'])
     target = output / 'build'
-    command(['cargo', 'build', '--locked', '--offline', '--workspace', '--all-features', '--target-dir', str(target)], isolated, 'native.log')
-    command([str(target / 'debug/package_consumer')], isolated, 'consumer.log')
+    command(['cargo', 'build', '--locked', '--offline', '--workspace', '--all-features', '--target-dir', str(target),
+             '--message-format=json'], isolated, 'native.log')
+    executable = consumer_executable(output / 'native.log', consumer / 'Cargo.toml')
+    command([str(executable)], isolated, 'consumer.log')
+    consumer_observation = json.loads((output / 'consumer.log').read_text())
     command(['cargo', 'build', '--locked', '--offline', '-p', 'tsr_embed', '--no-default-features', '--target-dir', str(target)], isolated, 'parser-only.log')
     pin = json.loads((ROOT / 'tools/s10/toolchains.json').read_text())
     env['CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_RUSTFLAGS'] = pin['wasm_rustflags']
@@ -107,7 +129,8 @@ def run(output):
         command(args, isolated, 'wasm-' + mode + '.log')
         shutil.copy2(target / pin['wasm_target'] / 'release/tsr_wasm.wasm', output / ('wasm-' + mode + '.wasm'))
     result = {'version': 1, 'state': 'pass', 'isolated_workspace': str(isolated), 'archives': archives,
-              'commands': commands, 'registry_publish_dry_run': 'pending: sibling 0.1.0 releases not published',
+              'commands': commands, 'consumer_observation': consumer_observation,
+              'registry_publish_dry_run': 'pending: sibling 0.1.0 releases not published',
               'archive_lockfiles': 'Cargo-generated; isolated workspace pins external dependencies from repository lockfile'}
     (output / 'verified.json').write_text(json.dumps(result, indent=2) + '\n')
     print(f'Verified {len(rows)} Cargo archives; report: {output / "verified.json"}')

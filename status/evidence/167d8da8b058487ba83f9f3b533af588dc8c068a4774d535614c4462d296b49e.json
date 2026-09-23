@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "run_id": "foundations",
+  "recorded_at": 1790114842,
+  "context": {
+    "revision": "ce3150c9199dc56a99ae315bd671b77af7a9c67c",
+    "source_sha256": "ca91ff01fede31b62ed208bd4d05e4dac2e7739de220e4367cdc0d5a47eb6f56",
+    "upstream_pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+    "environment": {
+      "CARGO_BUILD_TARGET": "",
+      "CARGO_ENCODED_RUSTFLAGS": "",
+      "CARGO_HOME": "/Users/cristian/.cargo",
+      "CGO_ENABLED": "",
+      "GOARCH": "",
+      "GOFLAGS": "",
+      "GOOS": "",
+      "RUSTC_WRAPPER": "",
+      "RUSTFLAGS": "",
+      "RUSTUP_HOME": "/Users/cristian/.rustup",
+      "RUSTUP_TOOLCHAIN": "1.97.1-aarch64-apple-darwin",
+      "S04_CACHE_HOME": "",
+      "S04_RUSTUP_HOME": ""
+    },
+    "host": "macos-aarch64",
+    "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n"
+  },
+  "spec_sha256": "39a89c1f1bbc7d4937eaebb1f2e714393f704bf3514c9e1e5ff6180c4eb8cf57",
+  "inputs": {
+    ".gitmodules": "7f9e8e0a446a547c56d8444637b3ee73064ce52055bc3c983c05eb13f4331bdd",
+    "data/s04/toolchains.toml": "f7f747f45b0570c179771ba0e01e37a3fc3c1ca7e98dbf042b7eabf6d9f9c0be",
+    "data/upstream.json": "9f3a288befbb79b1dcd59c2fd0d87fd2cddf120563f8b4c129ce88e3c3957af9"
+  },
+  "command": [
+    "python3",
+    "scripts/phase1_producers.py",
+    "foundations"
+  ],
+  "target": "host",
+  "config": "Phase 1 independently authenticated leaves, filesystem and syntax-utility families plus exact cross-family integration witnesses; grouped source closure; missing coverage and production failures remain separate from harness health; replay only, no implicit corpus or timing capture",
+  "host": "macos-aarch64",
+  "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n",
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "Phase 1 producer failed: invalid integration evidence: localized-config-diagnostics: localized renderer observed a different Rust request; rust-witnesses: Rust witness did not execute its exact tests: witness/binder-container-flags-source-contract\n",
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr_sha256": "c0f2a41b99d41c9ebab39c5d294f6f9ed3d2e99c9fd1ad19ddcc755d18de667a",
+  "valid_capture": false
+}

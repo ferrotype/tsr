@@ -1233,9 +1233,9 @@ remaining product behavior.
 9. Review all preparation exits and the report. State which future production
    PRs close each gap, which contracts already pass and which genuine decisions
    need the owner. Stop here for the agreed coverage review, with committed
-   runnable tests and reports before F2b–F5b. F1b is the explicit early-start
-   exception recorded above, and its delivered behavior participates in this
-   review.
+   runnable tests and reports before F5b. F1b–F4b's delivered behavior
+   participates in this review. The owner authorized F5b on top of #52;
+   remaining operation-attribution work stays visible until witnessed.
 
 **Deliver:** integration fixtures, complete producer/consumer mapping, tested
 fingerprints and failure aggregation, CI harness checks, and the finished Phase

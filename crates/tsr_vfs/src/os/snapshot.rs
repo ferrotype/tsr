@@ -1,5 +1,6 @@
 //! Explicit OS acquisition into a complete immutable directory snapshot.
 //! There is no implicit disk fallback from an in-memory program host.
+use super::native;
 use crate::{Error, MemoryBuilder, MemorySnapshot};
 use std::path::{Path, PathBuf};
 
@@ -28,7 +29,7 @@ impl ScopedOsFs {
     }
     fn capture(&self, path: &Path, builder: &mut MemoryBuilder) -> Result<(), Error> {
         let bytes = path_bytes(path)?;
-        let metadata = std::fs::symlink_metadata(path).map_err(|e| Error::Io(e.kind()))?;
+        let metadata = native::symlink_metadata(path).map_err(|e| Error::Io(e.kind()))?;
         if metadata.file_type().is_symlink() {
             let target = std::fs::canonicalize(path).map_err(|e| Error::Io(e.kind()))?;
             if !target.starts_with(&self.root) {

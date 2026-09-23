@@ -1,6 +1,6 @@
 //! Borrowed AST diagnostics retain their original identities. Resolution is a
 //! presentation operation; neither locations nor chains in the AST are mutated.
-use super::{localized, Diagnostic, DiagnosticWriter, File, Result};
+use super::{localized_with_locale, Diagnostic, DiagnosticWriter, File, Result};
 use std::{borrow::Cow, sync::Arc};
 use tsr_ast::SourceFileRead;
 use tsr_core::TextRange;
@@ -131,7 +131,7 @@ impl DiagnosticWriter<'_> {
     /// the stored chain or recursing on the native stack.
     /// port: tsc/internal/diagnosticwriter/diagnosticwriter.go:WriteFlattenedDiagnosticMessage
     pub fn flatten(&self, d: &Diagnostic, new_line: &[u8]) -> Result<Vec<u8>> {
-        let mut out = localized(d)?;
+        let mut out = localized_with_locale(d, &self.options.locale)?;
         enum Task<'a> {
             Node(&'a Diagnostic, usize),
             Note(Box<Diagnostic>, usize),
@@ -153,7 +153,7 @@ impl DiagnosticWriter<'_> {
             };
             out.extend_from_slice(new_line);
             out.extend(std::iter::repeat_n(b' ', level * 2));
-            out.extend_from_slice(&localized(value)?);
+            out.extend_from_slice(&localized_with_locale(value, &self.options.locale)?);
             if let Task::Node(value, _) = task {
                 enqueue(&mut pending, value, level + 1)?;
                 pending.extend(

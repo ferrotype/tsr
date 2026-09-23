@@ -257,14 +257,29 @@ fn bytes(action: &Value, key: &str) -> Result<Vec<u8>, String> {
         Ok(api::action_str(action, key).as_bytes().to_vec())
     }
 }
-fn options(action: &Value) -> FormattingOptions {
-    FormattingOptions {
+fn locale(action: &Value) -> Result<tsr_locale::Locale, String> {
+    match action.get("locale") {
+        None => Ok(tsr_locale::Locale::default()),
+        Some(value) => {
+            let value = value.as_str().ok_or("locale must be text")?;
+            let (locale, valid) = tsr_locale::Locale::parse(value);
+            if valid {
+                Ok(locale)
+            } else {
+                Err(format!("invalid locale {value:?}"))
+            }
+        }
+    }
+}
+fn options(action: &Value) -> Result<FormattingOptions, String> {
+    Ok(FormattingOptions {
+        locale: locale(action)?,
         new_line: api::action_str(action, "new_line").as_bytes().to_vec(),
         current_directory: api::action_str(action, "current_directory")
             .as_bytes()
             .to_vec(),
         case_sensitive: action["case_sensitive"].as_bool().unwrap_or_default(),
-    }
+    })
 }
 fn file_kind(file: &File) -> &'static str {
     match file.kind() {
@@ -309,7 +324,7 @@ fn replay(request: &Value) -> Result<Value, String> {
             built.insert(api::action_str(action, "target").into(), diagnostic);
             continue;
         }
-        let mut writer = DiagnosticWriter::from_sources(&files, options(action));
+        let mut writer = DiagnosticWriter::from_sources(&files, options(action)?);
         let mut row = json!({"op":op});
         let target = api::action_str(action, "target");
         let diag = || {
@@ -319,6 +334,12 @@ fn replay(request: &Value) -> Result<Value, String> {
         };
         let error = |e: tsr_compiler::Error| format!("display: {e:?}");
         match op {
+            "error_summary" => {
+                let diagnostics = selected(&built, action, "targets")?;
+                row["output_hex"] = json!(encode_hex(
+                    &writer.error_summary(&diagnostics).map_err(error)?
+                ));
+            }
             "flatten" | "write_flattened_ast" => {
                 row["text_hex"] = json!(encode_hex(
                     &writer
@@ -345,7 +366,7 @@ fn replay(request: &Value) -> Result<Value, String> {
                     .iter()
                     .map(|d| Ok(json!([
                         d.code,
-                        encode_hex(&dw::localized(d).map_err(error)?)
+                        encode_hex(&dw::localized_with_locale(d, &locale(action)?).map_err(error)?)
                     ])))
                     .collect::<Result<Vec<Value>, String>>()?);
             }

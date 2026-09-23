@@ -53,9 +53,10 @@ fn paths_keep_source_order_on_equal_prefixes_but_exact_matches_win() {
     }
     // Both wildcard patterns have a one-byte prefix. The suffix is not a
     // tie-breaker in the pin's FindBestPatternMatch; first insertion wins.
+    // Source order is deliberately the reverse of lexical key order.
     let paths = [
-        ("x*", "/first.ts"),
-        ("x*z", "/second.ts"),
+        ("x*z", "/first.ts"),
+        ("x*", "/second.ts"),
         ("xy", "/exact.ts"),
     ]
     .into_iter()

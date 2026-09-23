@@ -352,3 +352,19 @@ fn scanner_ecma_wrappers_count_bytes_and_partial_utf8_prefixes() {
     assert_eq!(get_ecma_position_of_line_and_byte_offset(text, 0, 1), 1);
     assert_eq!(get_ecma_line_of_position(text, 6), 1);
 }
+
+#[test]
+fn scanner_out_of_text_assertions_keep_the_go_debug_payload() {
+    use tsr_jsstring::scanner_positions::compute_position_of_line_and_utf16_character;
+    for character in [0, 1] {
+        let panic = std::panic::catch_unwind(|| {
+            compute_position_of_line_and_utf16_character(&[10], 0, character, b"", false)
+        })
+        .unwrap_err();
+        let message = panic
+            .downcast_ref::<String>()
+            .map(String::as_str)
+            .or_else(|| panic.downcast_ref::<&str>().copied());
+        assert_eq!(message, Some("Debug failure. False expression."));
+    }
+}

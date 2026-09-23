@@ -1,0 +1,86 @@
+[
+  {
+    "id": "skip-resolution-metadata",
+    "cwd": "/src",
+    "case_sensitive": true,
+    "files": {
+      "/src/package.json": "7b2274797065223a226d6f64756c65227d",
+      "/src/main.ts": "6578706f727420636f6e737420783d313b",
+      "/src/explicit.mts": "6578706f727420636f6e737420793d323b",
+      "/src/node_modules/pkg/package.json": "7b2274797065223a226d6f64756c65227d",
+      "/src/node_modules/pkg/index.ts": "6578706f727420636f6e7374207a3d333b"
+    },
+    "roots": [
+      "/src/main.ts",
+      "/src/explicit.mts",
+      "/src/node_modules/pkg/index.ts"
+    ],
+    "options": {
+      "module": 199,
+      "moduleResolution": 99,
+      "noLib": true,
+      "traceResolution": true
+    },
+    "skip_module_resolution": true
+  },
+  {
+    "id": "library-path-trailing-separator",
+    "cwd": "/src",
+    "case_sensitive": true,
+    "files": {
+      "/src/main.ts": "6c657420783d313b",
+      "/custom/lib.es5.d.ts": "696e74657266616365204f626a656374207b7d",
+      "/custom/lib.es2015.promise.d.ts": "696e746572666163652050726f6d6973653c543e207b7d"
+    },
+    "roots": [
+      "/src/main.ts"
+    ],
+    "options": {
+      "lib": [
+        "es2015.promise",
+        "es5"
+      ]
+    },
+    "default_library_path": "/custom/"
+  },
+  {
+    "id": "library-path-normalized-control",
+    "cwd": "/src",
+    "case_sensitive": true,
+    "files": {
+      "/src/main.ts": "6c657420783d313b",
+      "/custom/lib.es5.d.ts": "696e74657266616365204f626a656374207b7d",
+      "/custom/lib.es2015.promise.d.ts": "696e746572666163652050726f6d6973653c543e207b7d"
+    },
+    "roots": [
+      "/src/main.ts"
+    ],
+    "options": {
+      "lib": [
+        "es2015.promise",
+        "es5"
+      ]
+    },
+    "default_library_path": "/custom"
+  },
+  {
+    "id": "library-path-relative",
+    "cwd": "/src",
+    "case_sensitive": true,
+    "files": {
+      "/src/main.ts": "6c657420783d313b",
+      "/custom/lib.es5.d.ts": "696e74657266616365204f626a656374207b7d",
+      "/custom/lib.es2015.promise.d.ts": "696e746572666163652050726f6d6973653c543e207b7d"
+    },
+    "roots": [
+      "/src/main.ts"
+    ],
+    "options": {
+      "lib": [
+        "es2015.promise",
+        "es5"
+      ]
+    },
+    "default_library_path": "../custom/"
+  }
+]

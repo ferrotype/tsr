@@ -148,13 +148,20 @@ jobs:
             --profile minimal --component miri --component rust-src --no-self-update
       - name: Tracker self-tests
         if: ${{ !cancelled() && steps.validate.outcome == 'success' }}
-        run: cargo xtask run selftest
+        run: |
+          # Phase 1 tests inspect the full workspace through offline metadata.
+          # Building xtask alone does not fetch every workspace dependency.
+          cargo metadata --locked --format-version 1 > /dev/null
+          cargo xtask run selftest
       - name: Phase 1 manifest, harness and producer contracts
         if: ${{ !cancelled() && steps.validate.outcome == 'success' }}
         # Preparation health is independent of unfinished production parity.
         # This performs child-free contract validation; it does not capture
         # native corpora, run a benchmark, or require P1A/P1B to be complete.
-        run: python3 scripts/phase1_producers.py check
+        # Ordinary source changes stale their scoped captures; they do not
+        # invalidate the frozen operation-classification audit. Audit refresh
+        # remains phase1.py inventory --check, separate from harness contracts.
+        run: python3 scripts/phase1_producers.py check --structural
       - name: Workspace build
         if: ${{ !cancelled() && steps.validate.outcome == 'success' }}
         run: cargo xtask run workspace
@@ -179,6 +186,25 @@ jobs:
         run: |
           cargo test -p tsr_binder -p tsr_compiler -p tsr_tsoptions -p tsr_module -p tsr_semver -p tsr_tspath -p tsr_vfs -p tsr_bundled --all-targets --all-features --locked
           cargo test -p tsr_binder -p tsr_compiler -p tsr_tsoptions -p tsr_module -p tsr_semver -p tsr_tspath -p tsr_vfs -p tsr_bundled --all-targets --all-features --locked --release
+      - name: Filesystem observations applicable to this native host
+        if: ${{ !cancelled() && steps.validate.outcome == 'success' }}
+        # Each runner preserves its own complete applicable inventory. any and
+        # posix require Linux and Darwin evidence; host-exclusive rows run only
+        # on their declared target. Producer replay consumes separate archives.
+        run: |
+          python3 - <<'PY'
+          import json, sys
+          from pathlib import Path
+          sys.path.insert(0, "scripts")
+          import phase1_capture as capture
+          import phase1_producers as producers
+          goos = {"linux": "linux", "darwin": "darwin"}[sys.platform]
+          output = Path("target/phase1-platform") / goos
+          capture.capture("filesystem", output, producers.host_inventory(goos))
+          result = producers.platform_summary(output, output.parent / "records" / goos)
+          (output.parent / (goos + "-record.json")).write_text(json.dumps(result) + "\n")
+          sys.exit(result["state"] != "match")
+          PY
       - name: Checker ownership, constructor and type-display contracts
         if: ${{ !cancelled() && steps.validate.outcome == 'success' }}
         run: |
@@ -348,6 +374,7 @@ jobs:
             target/s06-reports/
             target/s07-binder-reports/
             target/s07-program-reports/
+            target/phase1-platform/
             target/s07-subset/review/review-payload.json
             target/s11-reports/
           if-no-files-found: error

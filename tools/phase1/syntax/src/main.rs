@@ -23,7 +23,10 @@ mod astnav;
 mod debug;
 mod diagnostics;
 mod evaluator;
+#[path = "../ast-generated/probe.rs"]
+mod generated_ast;
 mod parse_outputs;
+mod scanner_ast;
 mod schedule;
 
 // The corpus and embedding consumers share this host and config preparation.
@@ -48,6 +51,8 @@ type GroupHandler = fn(&Value) -> Option<Outcome>;
 
 /// Group modules, tried in order. The first to claim a request answers it.
 const GROUPS: &[(&str, GroupHandler)] = &[
+    ("generatedAst", generated_ast::observe),
+    ("scannerAst", scanner_ast::observe),
     ("diagnostics", diagnostics::observe),
     ("astnav", astnav::observe),
     ("evaluator", evaluator::observe),

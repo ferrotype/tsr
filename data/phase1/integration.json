@@ -4,19 +4,23 @@
   "witnesses": [
     {
       "id": "localized-config-diagnostics",
-      "claim": "A German config diagnostic reaches the compiler writer without reverting to English.",
+      "claim": "Localized config diagnostics retain their locale through the production writer and byte-equal shared Go envelopes (German, Japanese and unknown-locale fallback).",
       "kind": "driver",
       "references": [
         "crates/tsr_compiler/examples/phase1_integration.rs",
-        "upstream/tsc/internal/diagnostics/loc/de-DE.json.gz"
+        "upstream/tsc/internal/diagnostics/loc/de-DE.json.gz",
+        "tools/phase1/config/localized-requests.json",
+        "tools/phase1/config/tsconfigparsing_probe_test.go",
+        "tools/phase1/config/commandline_probe_test.go",
+        "tools/phase1/config/renderer_test.go",
+        "scripts/phase1_localized.py"
       ],
       "command": [
         "python3",
         "scripts/phase1_integration.py",
         "observe-localized-config"
       ],
-      "owner": "F5b",
-      "dependency": "Compiler diagnostic writer locale parameter and config-envelope propagation; the leaf translation is already present."
+      "owner": "F5b"
     },
     {
       "id": "ordered-package-resolution",
@@ -47,7 +51,8 @@
       "kind": "cases",
       "references": [
         "config/module/helpers/parsed-patterns-and-match",
-        "config/module/paths/substitution-and-ts-extension-suppression"
+        "config/module/paths/substitution-and-ts-extension-suppression",
+        "config/module/paths/source-order-beats-sorted-order"
       ],
       "command": [
         "python3",
@@ -60,7 +65,9 @@
         "--case",
         "config/module/helpers/parsed-patterns-and-match",
         "--case",
-        "config/module/paths/substitution-and-ts-extension-suppression"
+        "config/module/paths/substitution-and-ts-extension-suppression",
+        "--case",
+        "config/module/paths/source-order-beats-sorted-order"
       ],
       "owner": "F5b",
       "additional_tests": [
@@ -83,7 +90,7 @@
     },
     {
       "id": "retained-program-snapshot",
-      "claim": "An edited filesystem snapshot reloads changed text while retained bound files keep old text and symbols.",
+      "claim": "A physical edit is reacquired through ScopedOsFs into a new immutable program snapshot; changed files gain new text and symbols while an unchanged dependency is reused and a retained old bound file remains readable after both programs are dropped.",
       "kind": "test",
       "references": [
         "crates/tsr_compiler/src/tests.rs"
@@ -94,22 +101,20 @@
         "-p",
         "tsr_compiler",
         "--lib",
-        "tests::retained_snapshot_edit_reuses_only_equal_parse_inputs",
+        "tests::live_filesystem_snapshots_preserve_retained_program_files",
         "--",
         "--exact"
       ],
       "owner": "F5b",
-      "test": "retained_snapshot_edit_reuses_only_equal_parse_inputs",
-      "boundary": "The witness replaces an immutable MemorySnapshot; it does not prove polling a live OS filesystem or watch scheduling."
+      "test": "live_filesystem_snapshots_preserve_retained_program_files",
+      "boundary": "Exercises explicit live-directory acquisition into MemorySnapshot and retained program ownership. Watch scheduling is not claimed."
     },
     {
       "id": "live-cached-filesystem",
-      "claim": "Live mutations distinguish uncached reads from cached misses and deletions.",
+      "claim": "A real OS create/delete/edit sequence is rebuilt through fresh cached and tracking filesystems into compiler programs. Pinned Go and Rust observations compare discovered files, bound text and symbols, syntactic diagnostics, cache disable/clear behavior, unchanged file reuse, retained first-file ownership, and rebuild SeenFiles including missing roots and explicitly seeded wildcard directories.",
       "kind": "cases",
       "references": [
-        "filesystem/cachedvfs/readfile-is-never-cached",
-        "filesystem/cachedvfs/cached-miss-then-creation",
-        "filesystem/cachedvfs/cached-hit-then-deletion"
+        "filesystem/composed/live-program-rebuild"
       ],
       "command": [
         "python3",
@@ -118,20 +123,16 @@
         "--family",
         "filesystem",
         "--output",
-        "target/phase1-f5-live",
+        "target/phase1-f5-composed",
         "--case",
-        "filesystem/cachedvfs/readfile-is-never-cached",
-        "--case",
-        "filesystem/cachedvfs/cached-miss-then-creation",
-        "--case",
-        "filesystem/cachedvfs/cached-hit-then-deletion"
+        "filesystem/composed/live-program-rebuild"
       ],
       "owner": "F5b",
-      "boundary": "Composed with retained-program-snapshot for the Phase 1 contracts; no watch-mode connection or live filesystem freezing is claimed."
+      "boundary": "Uses the pinned watcher composition at watcher.go:431-490 and its actual watchCompilerHost through a same-package test overlay. This is a synchronous rebuild witness on each applicable host; watcher scheduling, incremental fast-path updates, emit, and semantic diagnostics are not exercised."
     },
     {
       "id": "installed-generated-assets",
-      "claim": "An isolated Cargo archive consumer loads all108 library assets and receives generated diagnostic code2322 through a checker.",
+      "claim": "An isolated Cargo archive consumer loads all 108 libraries, generated locale tables and German diagnostic messages, and retains checker ownership correctly.",
       "kind": "installed",
       "references": [
         "tools/packaging/consumer.rs",
@@ -145,7 +146,7 @@
         "target/phase1-f5-packages"
       ],
       "owner": "F5b",
-      "boundary": "Locale message rendering by an installed consumer remains pending until localized-config-diagnostics is implemented."
+      "boundary": "Archive-only execution; locale and diagnostic observations are compared with the pinned German catalog, independent of the generated Rust tables."
     },
     {
       "id": "compiler-syntax-diagnostics",

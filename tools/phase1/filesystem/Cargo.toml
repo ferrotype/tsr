@@ -11,6 +11,7 @@ description = "Phase 1 F2a: answers the filesystem, path and matching request sc
 # on every crate the filesystem surface touches, and no published crate has that
 # set, so it lives here rather than as an example on a shipped crate.
 [dependencies]
+tsr_arena = { version = "0.1.0", path = "../../../crates/tsr_arena" }
 tsr_compiler = { version = "0.1.0", path = "../../../crates/tsr_compiler" }
 tsr_diagnostics = { version = "0.1.0", path = "../../../crates/tsr_diagnostics" }
 phase1_harness = { version = "0.1.0", path = "../harness" }

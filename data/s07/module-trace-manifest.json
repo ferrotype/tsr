@@ -1,9 +1,9 @@
 {
   "adapter_sha256": "7e97b1c00f3313cb23e56180a7a4b995e6004e5819b2e6ade4ebe3a7462cecbe",
-  "callbacks": 292,
-  "observations_sha256": "46f3552b084fd5eee574ddc5c04d37a06bca8d7fa94cddc4e3207e16c806815a",
-  "operations": 25,
-  "requests_sha256": "d233befd65bd85157e3edffdd85f90fbbdede750cadc6d276820909bab2c24e0",
+  "callbacks": 361,
+  "observations_sha256": "5e3bb243c3ad2f9c229b97cb27d0fa22cd43730230d04aa1ba141501dee5f524",
+  "operations": 29,
+  "requests_sha256": "261c082359f10b10e5cd01a7eea238513ce1ab51df17b104ad74d2b01ad2c727",
   "sources": {
     "tsc/internal/module/resolver.go": "2327bd2509887f401591035516b643411a8a4a2ed046c928c521fcaa791cf629",
     "tsc/internal/packagejson/cache.go": "791379a5393c89351db510879e14d296a9ec37700268aabf6fff8dee2bc45172"

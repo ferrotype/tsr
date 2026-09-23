@@ -39,6 +39,10 @@
     [
       "scripts/s07_path_helpers.py",
       "--check"
+    ],
+    [
+      "scripts/s07_program_boundaries.py",
+      "--check"
     ]
   ],
   "groups": [
@@ -102,10 +106,12 @@
       "prefix": "tests::",
       "target": "lib",
       "tests": [
+        "tests::actual_go_loader_boundary_observations",
         "tests::actual_go_loader_observations",
+        "tests::invalid_resolution_kind_preserves_the_native_refusal",
+        "tests::live_filesystem_snapshots_preserve_retained_program_files",
         "tests::resolver_scope_routes_retained_files_and_rejects_foreign_generations",
-        "tests::retained_snapshot_edit_reuses_only_equal_parse_inputs",
-        "tests::unimplemented_resolution_does_not_become_unresolved_success"
+        "tests::retained_snapshot_edit_reuses_only_equal_parse_inputs"
       ]
     },
     {

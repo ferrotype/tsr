@@ -96,29 +96,14 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
         };
         Ok(self.unique_name(JsString::from_bytes(text)))
     }
-    // port: tsc/internal/ast/utilities.go:SkipOuterExpressions
     // OEKExpressionTypePassthrough retains assertions; only parentheses and
     // assignment/comma results preserve the expression's inferred type here.
-    fn assigned_expression(&self, mut node: NodeId) -> Result<NodeId, R::Error> {
-        loop {
-            if self.node(node).kind() == K::ParenthesizedExpression {
-                node = Self::required(self.node(node).expression())?;
-                continue;
-            }
-            if self.node(node).kind() == K::BinaryExpression {
-                let read = self.node(node);
-                let data = read.as_binary_expression().unwrap();
-                let operator = Self::required(data.operator_token())?;
-                if matches!(
-                    self.node(operator).kind().known(),
-                    Some(K::EqualsToken | K::CommaToken)
-                ) {
-                    node = Self::required(data.right())?;
-                    continue;
-                }
-            }
-            return Ok(node);
-        }
+    fn assigned_expression(&self, node: NodeId) -> Result<NodeId, R::Error> {
+        Ok(tsr_ast::utilities::skip_outer_expressions(
+            self.output.view(),
+            node,
+            tsr_ast::evaluator::outer_expression_kinds::EXPRESSION_TYPE_PASSTHROUGH,
+        )?)
     }
     // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.transformExportAssignment
     pub fn export_assignment(&mut self, node: NodeId) -> Result<NodeId, R::Error> {

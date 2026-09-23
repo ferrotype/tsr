@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "run_id": "clippy",
+  "recorded_at": 1790107881,
+  "context": {
+    "revision": "e96e2015bdc725b3051835cf2dc29d9d65c22d80",
+    "source_sha256": "863fb7228491c00bd2385fa3eda82e9fe849d6b873827c24820636c623293250",
+    "upstream_pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+    "environment": {
+      "CARGO_BUILD_TARGET": "",
+      "CARGO_ENCODED_RUSTFLAGS": "",
+      "CARGO_HOME": "/Users/cristian/.cargo",
+      "CGO_ENABLED": "",
+      "GOARCH": "",
+      "GOFLAGS": "",
+      "GOOS": "",
+      "RUSTC_WRAPPER": "",
+      "RUSTFLAGS": "",
+      "RUSTUP_HOME": "/Users/cristian/.rustup",
+      "RUSTUP_TOOLCHAIN": "1.97.1-aarch64-apple-darwin",
+      "S04_CACHE_HOME": "",
+      "S04_RUSTUP_HOME": ""
+    },
+    "host": "macos-aarch64",
+    "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n"
+  },
+  "spec_sha256": "9732e9b52e5b137977563a562737345d1615edcecfae6116d97c570d960b1103",
+  "inputs": {
+    "Cargo.lock": "2bc0cedc16f089b4a26bf5982c7da6f7dc9dc9af58fa8060ced0e425c7eea0e1",
+    "Cargo.toml": "68b6239ac8f732ef0276b75290ec00bb8dec76d0eef9fa1bdc288ab6b5178e18"
+  },
+  "command": [
+    "python3",
+    "scripts/checks.py",
+    "clippy"
+  ],
+  "target": "host",
+  "config": "debug; all targets and features; -D warnings",
+  "host": "macos-aarch64",
+  "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n",
+  "exit_code": 0,
+  "stdout": "{\"metrics\": {\"clean\": true}}\n",
+  "stderr": "clippy 0.1.97 (8bab26f4f6 2026-07-14)\n+ cargo clippy --workspace --all-targets --all-features --locked -- -D warnings\n    Checking tsr_compiler v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_compiler)\n    Finished `dev` profile [unoptimized + debuginfo] target(s) in 12.32s\n",
+  "stdout_sha256": "1cbfcf47216ecd3003591dc9b4f187162a15b6928eb7916ccdf71e348ae7bbb3",
+  "stderr_sha256": "ee35fc6051c31d97d08214798fd8401f5dbcc03edc93f30ac221f34edadd6671",
+  "valid_capture": true
+}

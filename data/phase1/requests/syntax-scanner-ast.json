@@ -1,0 +1,329 @@
+{
+  "family": "syntax",
+  "requests": [
+    {
+      "call": "comment",
+      "case": "syntax/scanner-ast/comment-nil",
+      "nodes": null,
+      "operation": "tsc/internal/scanner/utilities.go:GetTextOfJSDocComment",
+      "source_hex": "",
+      "subject": "scannerAst"
+    },
+    {
+      "call": "comment_nil_element",
+      "case": "syntax/scanner-ast/comment-nil-element",
+      "nodes": [
+        null
+      ],
+      "operation": "tsc/internal/scanner/utilities.go:GetTextOfJSDocComment",
+      "source_hex": "",
+      "subject": "scannerAst"
+    },
+    {
+      "call": "comment",
+      "case": "syntax/scanner-ast/comment-empty",
+      "nodes": [],
+      "operation": "tsc/internal/scanner/utilities.go:GetTextOfJSDocComment",
+      "source_hex": "",
+      "subject": "scannerAst"
+    },
+    {
+      "call": "comment",
+      "case": "syntax/scanner-ast/comment-source-links-unicode-space",
+      "nodes": [
+        {
+          "end": 0,
+          "kind": "JSDocText",
+          "pos": 0,
+          "text_hex": [
+            "70726566697820",
+            "ff20"
+          ]
+        },
+        {
+          "end": 11,
+          "kind": "JSDocLink",
+          "pos": 0,
+          "text_hex": [
+            "6e6f742074686520736f75726365207370656c6c696e67"
+          ]
+        },
+        {
+          "end": 27,
+          "kind": "JSDocLinkCode",
+          "pos": 12,
+          "text_hex": [
+            "6e6f742074686520736f75726365207370656c6c696e67"
+          ]
+        },
+        {
+          "end": 46,
+          "kind": "JSDocLinkPlain",
+          "pos": 28,
+          "text_hex": [
+            "6e6f742074686520736f75726365207370656c6c696e67"
+          ]
+        },
+        {
+          "end": 0,
+          "kind": "SemicolonToken",
+          "pos": 0,
+          "text_hex": []
+        },
+        {
+          "end": 0,
+          "kind": "JSDocText",
+          "pos": 0,
+          "text_hex": [
+            "090a0b0c0d",
+            "c285c2a0e19a80e28080e28081e28082e28083e28084e28085e28086e28087e28088e28089e2808ae280a8e280a9e280afe2819fe38080"
+          ]
+        }
+      ],
+      "operation": "tsc/internal/scanner/utilities.go:GetTextOfJSDocComment",
+      "source_hex": "7b406c696e6b204f6e657d207b406c696e6b636f64652054776f7d207b406c696e6b706c61696e2054687265657d",
+      "subject": "scannerAst"
+    },
+    {
+      "call": "comment",
+      "case": "syntax/scanner-ast/comment-nonspace-format-characters",
+      "nodes": [
+        {
+          "end": 0,
+          "kind": "JSDocText",
+          "pos": 0,
+          "text_hex": [
+            "206b656570e2808befbbbf20c285"
+          ]
+        }
+      ],
+      "operation": "tsc/internal/scanner/utilities.go:GetTextOfJSDocComment",
+      "source_hex": "",
+      "subject": "scannerAst"
+    },
+    {
+      "call": "comment",
+      "case": "syntax/scanner-ast/comment-malformed-final-byte",
+      "nodes": [
+        {
+          "end": 0,
+          "kind": "JSDocText",
+          "pos": 0,
+          "text_hex": [
+            "626f6479ff200a"
+          ]
+        }
+      ],
+      "operation": "tsc/internal/scanner/utilities.go:GetTextOfJSDocComment",
+      "source_hex": "",
+      "subject": "scannerAst"
+    },
+    {
+      "call": "comment",
+      "case": "syntax/scanner-ast/comment-only-unicode-space",
+      "nodes": [
+        {
+          "end": 0,
+          "kind": "JSDocText",
+          "pos": 0,
+          "text_hex": [
+            "c285e2808a"
+          ]
+        }
+      ],
+      "operation": "tsc/internal/scanner/utilities.go:GetTextOfJSDocComment",
+      "source_hex": "",
+      "subject": "scannerAst"
+    },
+    {
+      "call": "lines",
+      "case": "syntax/scanner-ast/source-line-wrappers",
+      "coordinates": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          0,
+          3
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          0
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          3,
+          0
+        ]
+      ],
+      "operation": "tsc/internal/scanner/scanner.go:GetECMALineStarts",
+      "positions": [
+        0,
+        1,
+        5,
+        6,
+        7,
+        8,
+        9,
+        12,
+        13,
+        14
+      ],
+      "source_hex": "61f09fa6800d0a2062e280a8630a",
+      "subject": "scannerAst"
+    },
+    {
+      "call": "lines",
+      "case": "syntax/scanner-ast/source-empty-line-cache",
+      "coordinates": [
+        [
+          0,
+          0
+        ]
+      ],
+      "operation": "tsc/internal/scanner/scanner.go:GetECMALineStarts",
+      "positions": [
+        0
+      ],
+      "source_hex": "",
+      "subject": "scannerAst"
+    },
+    {
+      "call": "token_position",
+      "case": "syntax/scanner-ast/token-positions",
+      "nodes": [
+        {
+          "end": 16,
+          "kind": "Identifier",
+          "pos": 0,
+          "text_hex": []
+        },
+        {
+          "end": 2,
+          "kind": "Identifier",
+          "pos": 2,
+          "text_hex": []
+        },
+        {
+          "end": 11,
+          "kind": "JSDocComment",
+          "pos": 0,
+          "text_hex": []
+        },
+        {
+          "end": 16,
+          "kind": "JsxText",
+          "pos": 0,
+          "text_hex": []
+        },
+        {
+          "doc": [
+            1,
+            11
+          ],
+          "end": 16,
+          "include_jsdoc": true,
+          "kind": "Identifier",
+          "pos": 0,
+          "text_hex": []
+        },
+        {
+          "doc": [
+            1,
+            11
+          ],
+          "end": 16,
+          "include_jsdoc": false,
+          "kind": "Identifier",
+          "pos": 0,
+          "text_hex": []
+        }
+      ],
+      "operation": "tsc/internal/scanner/scanner.go:GetTokenPosOfNode",
+      "source_hex": "202f2a2a20646f63202a2f206e616d65",
+      "subject": "scannerAst"
+    },
+    {
+      "call": "token_position",
+      "case": "syntax/scanner-ast/token-position-jsdoc-leading-star",
+      "nodes": [
+        {
+          "end": 8,
+          "in_jsdoc": true,
+          "kind": "Identifier",
+          "pos": 0,
+          "text_hex": []
+        }
+      ],
+      "operation": "tsc/internal/scanner/scanner.go:GetTokenPosOfNode",
+      "source_hex": "0a202a206e616d65",
+      "subject": "scannerAst"
+    },
+    {
+      "call": "scan_token",
+      "case": "syntax/scanner-ast/scan-token-at-position",
+      "operation": "tsc/internal/scanner/scanner.go:ScanTokenAtPosition",
+      "positions": [
+        0,
+        14,
+        15,
+        18,
+        19,
+        20,
+        21,
+        22,
+        25
+      ],
+      "source_hex": "202f2a20636f6d6d656e74202a2f206c657420783d313b",
+      "subject": "scannerAst"
+    },
+    {
+      "call": "keyword",
+      "case": "syntax/scanner-ast/identifier-keyword-kind",
+      "names_hex": [
+        "6173796e63",
+        "636f6e7374",
+        "666f6f",
+        "",
+        "466f72",
+        "ff"
+      ],
+      "operation": "tsc/internal/scanner/utilities.go:IdentifierToKeywordKind",
+      "source_hex": "",
+      "subject": "scannerAst"
+    },
+    {
+      "call": "default_state",
+      "case": "syntax/scanner-ast/default-state-before-configuration",
+      "operation": "tsc/internal/scanner/scanner.go:defaultScanner",
+      "subject": "scannerAst",
+      "source_hex": "202f2a20636f6d6d656e74202a2f206964656e746966696572",
+      "discriminates": "A new scanner is observed before any setters, then only SetText is called: default skipTrivia must skip the leading space/comment. Reset after disabling skipTrivia must restore the same defaults; snapshots include token, offsets, flags and bytes."
+    }
+  ],
+  "version": 1
+}

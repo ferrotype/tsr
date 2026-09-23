@@ -346,6 +346,7 @@ fn render(request: &Value) -> Result<String, String> {
             new_line: b"\r\n".to_vec(),
             current_directory: base,
             case_sensitive: input.sensitive,
+            ..tsr_compiler::diagnostic_writer::FormattingOptions::default()
         },
     );
     for diagnostic in &parsed.errors {

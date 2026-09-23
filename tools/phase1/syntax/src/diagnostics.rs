@@ -122,6 +122,7 @@ fn run(request: &Value) -> Result<Value, String> {
             new_line: b"\r\n".to_vec(),
             current_directory: spec["cwd"].as_str().unwrap_or_default().as_bytes().to_vec(),
             case_sensitive: spec["case_sensitive"].as_bool().unwrap_or_default(),
+            ..FormattingOptions::default()
         },
     );
     let refs: Vec<_> = diagnostics.iter().collect();

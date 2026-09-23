@@ -120,10 +120,13 @@
    ],
    "case": "filesystem/vfstest/from-map-rejects-malformed-maps",
    "discriminates": "a port that accepts a non-rooted, non-normalized or mixed-dialect map instead of rejecting it. tsr_vfs keys on tsr_tspath::to_path (crates/tsr_vfs/src/lib.rs:131,:137), which is canonical(absolute(..)): it silently turns `/string/../foo` into `/foo` and accepts `string` relative to the builder's cwd, where the pin panics `non-normalized path \"/string/../foo\"` and `non-rooted path \"string\"` before any entry is made. It also catches a port that checks only the map's keys: the pin runs the same checkPath over a symlink's target (vfstest.go:124), so a vfstest.Symlink with an unrooted target is rejected too, and a port whose insert_symlink takes the target verbatim (lib.rs:155) is not. Four of the five rejections are recorded with the pin's own sentence. The fifth, the unsupported file value, is recorded as the class `pinned:invalid file type`: the pin formats the offending value's dynamic Go type with %T (vfstest.go:118-119), so the full sentence ends in a Go type name that no port could reproduce except by hardcoding it, and a typed constructor parameter has no such case to reject at all.",
-   "host_applicability": "any",
    "operation": "tsc/internal/vfs/vfstest/vfstest.go:FromMap",
    "order_sensitive": true,
-   "subject": "MapFS"
+   "subject": "MapFS",
+   "hosts": [
+    "any"
+   ],
+   "host_note": "any"
   },
   {
    "actions": [
@@ -193,10 +196,13 @@
    ],
    "case": "filesystem/vfstest/entries-order-is-segment-order",
    "discriminates": "byte order versus segment order. comparePathsByParts(\"a/b\",\"a-x/c\") is -1 while strings.Compare is +1, because the segment compare sees \"a\" against \"a-x\" where the byte compare sees '/' (0x2F) against '-' (0x2D). tsr_vfs stores entries in a BTreeMap keyed by the canonical path (crates/tsr_vfs/src/lib.rs:175) and MemorySnapshot::entries sorts basenames with the derived Ord (lib.rs:279-280), so a port enumerates in byte order and reverses this pair. The three compare_paths rows at the end also pin the cycle a/b.ts < a-x/c.ts < a.b < a/b.ts, which is why no map in this group mixes a separator-free key with slashed siblings that straddle it.",
-   "host_applicability": "any",
    "operation": "tsc/internal/vfs/vfstest/vfstest.go:comparePathsByParts",
    "order_sensitive": true,
-   "subject": "MapFS"
+   "subject": "MapFS",
+   "hosts": [
+    "any"
+   ],
+   "host_note": "any"
   },
   {
    "actions": [
@@ -280,10 +286,13 @@
    ],
    "case": "filesystem/vfstest/symlink-creation-rooting-asymmetry",
    "discriminates": "the rooting asymmetry between the two ways to make a link. FromMap runs checkPath over the target and then strips its leading separator (vfstest.go:122-126), so a FromMap link stores an unrooted target; AddSymlink stores whatever it is handed (vfstest.go:507-510), so a rooted target produces a link that resolves to a key no entry has and dangles. GetTargetOfSymlink then re-prefixes unconditionally (vfstest.go:627), so the same call answers \"/home/a.ts\" for one and \"//home/a.ts\" for the other. tsr_vfs::MemoryBuilder::insert_symlink (lib.rs:155) takes one target convention for both and resolves it relative to the link's own directory (lib.rs:193), so a port cannot produce either asymmetry. AddSymlink also creates no parents, which leaves the parent directory reachable only as a synthesized one and therefore unopenable.",
-   "host_applicability": "any",
    "operation": "tsc/internal/vfs/vfstest/vfstest.go:MapFS.AddSymlink",
    "order_sensitive": true,
-   "subject": "MapFS"
+   "subject": "MapFS",
+   "hosts": [
+    "any"
+   ],
+   "host_note": "any"
   },
   {
    "actions": [
@@ -413,10 +422,13 @@
    ],
    "case": "filesystem/vfstest/broken-symlink-error-taxonomy",
    "discriminates": "that 'nothing is here' and 'a link pointed at nothing' are different errors, and that the pair the second names is the LAST hop rather than the request. A three-link chain onto a missing target reports `broken symlink \"c\" -> \"missing\"`, not `\"a\" -> \"b\"`, because the worker re-enters itself with a rewritten path (vfstest.go:267); a path under a dangling directory link reports the prefix link, not the requested path (vfstest.go:273); and the quoted spellings are canonical, so a request for \"/HOME/LINK\" is reported as \"home/link\". The distinction is load-bearing: WriteFile and AppendFile tolerate exactly this error and write through it (vfstest.go:530,:568). tsr_vfs has no broken-link variant at all (crates/tsr_vfs/src/lib.rs:13-19) and MemorySnapshot::resolve returns the unresolved name, so a port collapses both into one miss. The seeded resolve_worker rows separate the worker from its entry point: a port that folded the two would lose the seeded pair, and the third shows the seeds are overwritten by the first hop the worker takes itself.",
-   "host_applicability": "any",
    "operation": "tsc/internal/vfs/vfstest/vfstest.go:MapFS.getFollowingSymlinksWorker",
    "order_sensitive": true,
-   "subject": "MapFS"
+   "subject": "MapFS",
+   "hosts": [
+    "any"
+   ],
+   "host_note": "any"
   },
   {
    "actions": [
@@ -516,10 +528,13 @@
    ],
    "case": "filesystem/vfstest/write-through-a-broken-symlink-duplicates-a-name",
    "discriminates": "that a broken link is a writable condition rather than a failure, and what that leaves behind. isBrokenSymlinkError is the only reason AppendFile does not panic on it (vfstest.go:568), and the entry it then writes is keyed by the TARGET's canonical path but carries the LINK's realpath (vfstest.go:589), so Entries yields the same name twice. A dangling DIRECTORY link is the control: there the same error arrives from the parent check instead (vfstest.go:557) and is returned, not tolerated. A port with a single 'not found' either refuses the write or writes it under the link's own key; tsr_vfs has neither the error variant nor an append at all -- FileSystem::append_file is the default `Unsupported(\"immutable filesystem append\")` (crates/tsr_vfs/src/lib.rs:86-88). The mode rows also pin that append keeps an existing file's mode and only applies perm&^umask when there is none (vfstest.go:584-587).",
-   "host_applicability": "any",
    "operation": "tsc/internal/vfs/vfstest/vfstest.go:MapFS.AppendFile",
    "order_sensitive": true,
-   "subject": "MapFS"
+   "subject": "MapFS",
+   "hosts": [
+    "any"
+   ],
+   "host_note": "any"
   },
   {
    "actions": [
@@ -607,10 +622,13 @@
    ],
    "case": "filesystem/vfstest/write-file-parent-rules-across-dialects",
    "discriminates": "a posix/windows asymmetry no port reproduces by accident. MapFS keys have the leading separator stripped, so dirName(\"foo.ts\") is \"\" and WriteFile's parent check is skipped entirely (vfstest.go:517): a write to a top-level posix path on an empty filesystem succeeds. A windows path keeps its drive, so dirName(\"c:/foo.ts\") is \"c:\", the check runs, and the same write fails `write \"c:/foo.ts\": file does not exist`. tsr_tspath::directory is root-aware and answers \"c:/\" (crates/tsr_tspath/src/lib.rs:46-58), a different key again, and MemoryBuilder::insert creates every missing ancestor instead of refusing (crates/tsr_vfs/src/lib.rs:129-135), so a port has neither the skip nor the refusal. The remaining rows separate the three failure messages the pin distinguishes -- a missing parent, a parent that is not a directory, and a target that is not a regular file -- which a port with one error collapses.",
-   "host_applicability": "any",
    "operation": "tsc/internal/vfs/vfstest/vfstest.go:MapFS.WriteFile",
    "order_sensitive": true,
-   "subject": "MapFS"
+   "subject": "MapFS",
+   "hosts": [
+    "any"
+   ],
+   "host_note": "any"
   },
   {
    "actions": [
@@ -703,10 +721,13 @@
    ],
    "case": "filesystem/vfstest/mkdir-all-restarts-at-a-symlinked-parent",
    "discriminates": "the restart on a symlinked component. With link -> real, mkdirAll (\"link/deep/er\") rewrites the whole path to the link target's realpath and resets its cursor to zero (vfstest.go:353-359), so it creates real/deep and real/deep/er and leaves link a symlink. A port whose ancestor walk is leaf-first -- tsr_tspath::ancestors is the only one in the port and it walks that way (crates/tsr_tspath/src/lib.rs:147-159) -- cannot express the restart and materialises literal link/deep directories that shadow the link. The two case-varied rows separate the two places the same sentence is produced: the fast path quotes the caller's spelling (vfstest.go:333) and the loop quotes the canonical path it actually tripped over (vfstest.go:351). The failed walk then shows the two-pass structure: nothing is created until the whole path has been walked (vfstest.go:367), where MemoryBuilder::insert creates ancestors as it goes.",
-   "host_applicability": "any",
    "operation": "tsc/internal/vfs/vfstest/vfstest.go:MapFS.mkdirAll",
    "order_sensitive": true,
-   "subject": "MapFS"
+   "subject": "MapFS",
+   "hosts": [
+    "any"
+   ],
+   "host_note": "any"
   },
   {
    "actions": [
@@ -804,10 +825,13 @@
    ],
    "case": "filesystem/vfstest/chtimes-keeps-only-the-modification-time",
    "discriminates": "the plan's 'lost timestamp arguments' control, in both directions. The pin itself drops aTime: Chtimes takes two instants and assigns only mTime (vfstest.go:615), and fstest.MapFile has nowhere to put the other, so a port that stored an access time or refused the call for lacking one diverges from the pin rather than improving on it. Chtimes is also the one mutating method that does not strip a leading separator of its own, so `/f.ts` misses where `f.ts` hits -- GetFileInfo, GetModTime and GetTargetOfSymlink all strip, and the methods iovfs forwards have it stripped for them (iofs.go:47-90). It indexes m.m directly rather than resolving, so a chtimes on a link moves the link and leaves its target alone. tsr_vfs cannot receive either argument: FileSystem::change_times(&self, _path) takes no instants at all (crates/tsr_vfs/src/lib.rs:92-94) and returns Unsupported(\"immutable filesystem timestamps\").",
-   "host_applicability": "any",
    "operation": "tsc/internal/vfs/vfstest/vfstest.go:MapFS.Chtimes",
    "order_sensitive": true,
-   "subject": "MapFS"
+   "subject": "MapFS",
+   "hosts": [
+    "any"
+   ],
+   "host_note": "any"
   },
   {
    "actions": [
@@ -919,10 +943,13 @@
    ],
    "case": "filesystem/vfstest/injected-clock-orders-every-stamp",
    "discriminates": "a port that stamps a wall clock instead of honouring an injected one, and the four different stamping rules the pin applies. Files are stamped in FromMapWithClock's own sorted pass (vfstest.go:104-116) before convertMapFS runs, so every intermediate directory mkdirAll creates is stamped LATER than every file (vfstest.go:370), whatever their depth. WriteFile, AppendFile and MkdirAll each take a fresh reading; AddSymlink takes none at all (vfstest.go:507-510), so a link made that way keeps the zero instant while the identical link made through FromMap does not. tsr_vfs models no time anywhere: FileInfo is { directory, size } (crates/tsr_vfs/src/lib.rs:64-67) and there is no Clock to inject. The default-clock rows are deliberately non-strict: clockImpl.Now is time.Now (vfstest.go:46-48), and a probe run on this host saw two files created in sequence take the same truncated instant, so only 'not after' is a contract and a case asserting strictly increasing stamps would be wrong.",
-   "host_applicability": "any",
    "operation": "tsc/internal/vfs/vfstest/vfstest.go:FromMapWithClock",
    "order_sensitive": true,
-   "subject": "MapFS"
+   "subject": "MapFS",
+   "hosts": [
+    "any"
+   ],
+   "host_note": "any"
   },
   {
    "actions": [
@@ -1016,10 +1043,13 @@
    ],
    "case": "filesystem/vfstest/remove-is-recursive-and-prefix-guarded",
    "discriminates": "recursive directory removal and the sibling-prefix guard. remove appends the separator before scanning for the prefix (vfstest.go:226), so removing foo/bar deletes foo/bar/x.ts and leaves foo/barbar intact, where a bare string prefix would take both. It also purges the symlink registry for every key it deletes (vfstest.go:223,:230), so a link that lived inside the removed directory afterwards resolves to a plain miss rather than to a broken link -- the distinction WriteFile turns on. MemoryBuilder::remove drops exactly one key with no recursion, no prefix scan and no registry (crates/tsr_vfs/src/lib.rs:158-161), and the FileSystem trait's remove is the default `Unsupported(\"immutable filesystem remove\")` (lib.rs:89-91). The inner form is called directly so the algorithm is pinned apart from the lock its exported wrapper adds.",
-   "host_applicability": "any",
    "operation": "tsc/internal/vfs/vfstest/vfstest.go:MapFS.Remove",
    "order_sensitive": true,
-   "subject": "MapFS"
+   "subject": "MapFS",
+   "hosts": [
+    "any"
+   ],
+   "host_note": "any"
   },
   {
    "actions": [
@@ -1132,10 +1162,13 @@
    ],
    "case": "filesystem/vfstest/handle-names-come-from-the-realpath",
    "discriminates": "case preservation through a case-insensitive lookup, and the cursor the handle carries. fileInfo.Name splits fi.realpath, the recorded original spelling, never the canonical key (vfstest.go:383-385), so a filesystem holding Foo/Bar.TS read through foo/bar.ts still reports \"Bar.TS\" -- the pinned tests assert exactly this at vfstest_test.go:110 and :122. fileInfo.Sys hands back the caller's own value unwrapped (vfstest.go:387-389), which the pinned tests assert as 1234 at :44, :64, :107 and :119; a port that returned its own bookkeeping or nil fails. file.Stat and readDirFile.Stat are overrides, not delegations, so both substitutions survive the handle. ReadDir(1) three times then once more shows a stateful cursor rather than a snapshot list, and every entry is re-wrapped so it too reports the realpath spelling. tsr_vfs has no handle type, no Open and no name field on FileInfo at all (crates/tsr_vfs/src/lib.rs:64-67,:70-95).",
-   "host_applicability": "any",
    "operation": "tsc/internal/vfs/vfstest/vfstest.go:fileInfo.Name",
    "order_sensitive": true,
-   "subject": "MapFS"
+   "subject": "MapFS",
+   "hosts": [
+    "any"
+   ],
+   "host_note": "any"
   },
   {
    "actions": [
@@ -1228,10 +1261,13 @@
    ],
    "case": "filesystem/vfstest/synthesized-directories-and-the-dot-root",
    "discriminates": "the two branches nothing else reaches. convertMapFS pre-creates every intermediate directory so it can attach a realpath to it (vfstest.go:173-180); convertInfo's type assertion is then the only thing separating an entry vfstest made from one fstest.MapFS synthesized on the fly (vfstest.go:481-491), and its false return drives the `unexpected synthesized dir: %q` panic at :444 and :420. The two panics quote different things -- MapFS.Open quotes the name it was asked for, readDirFile.ReadDir quotes the basename of the entry it tripped over -- so a port with one message cannot satisfy both. Open(\".\") is the single exemption, and it is the one place the raw info.Sys() is used rather than an unwrapped original (vfstest.go:447-454). A port that synthesised parents lazily, which is the obvious way to build a map filesystem, reaches neither; tsr_vfs has no handle type at all, and MemoryBuilder::insert materialises ancestors eagerly but with no marker distinguishing them (crates/tsr_vfs/src/lib.rs:129-135).",
-   "host_applicability": "any",
    "operation": "tsc/internal/vfs/vfstest/vfstest.go:MapFS.Open",
    "order_sensitive": true,
-   "subject": "MapFS"
+   "subject": "MapFS",
+   "hosts": [
+    "any"
+   ],
+   "host_note": "any"
   },
   {
    "actions": [
@@ -1329,10 +1365,13 @@
    ],
    "case": "filesystem/vfstest/the-map-is-keyed-canonically-the-name-is-not",
    "discriminates": "that the map is keyed by the canonical path while the display name travels separately inside vfstest's own Sys wrapper (vfstest.go:288-297). Calling set/setEntry with a key that is not the canonical form of the stored realpath produces an entry Entries reports under one name and lookups find under another -- exactly the inconsistency a port collapses when it keys by the caller's spelling or stores only one name. tsr_vfs stores both, as NamedEntry { name, value } under to_path(name) (crates/tsr_vfs/src/lib.rs:102-106,:136-143), but derives the name FROM the key's own input, so the two can never disagree and this trace has no counterpart. setEntry is also the single registration point for a symlink (vfstest.go:299-304); overwriting the same canonical key with a regular file leaves the registry entry behind, and the last resolve shows the worker's first branch shadowing it. The final two rows show what `set` alone omits: an entry with no wrapper makes Entries itself fail, because it asserts the wrapper unconditionally (vfstest.go:654). And getCanonicalPath is case folding with no normalisation (vfstest.go:206), where the port's to_path is canonical(absolute(..)) (crates/tsr_tspath/src/lib.rs:112-113), so `a/../b` is a distinct key here and the same key as `b` there.",
-   "host_applicability": "any",
    "operation": "tsc/internal/vfs/vfstest/vfstest.go:MapFS.setEntry",
    "order_sensitive": true,
-   "subject": "MapFS"
+   "subject": "MapFS",
+   "hosts": [
+    "any"
+   ],
+   "host_note": "any"
   },
   {
    "actions": [
@@ -1427,10 +1466,13 @@
    ],
    "case": "filesystem/vfstest/path-helpers-at-the-drive-root-boundary",
    "discriminates": "the direction of the walk and the drive-root boundary. splitPath is root-first with a resumable offset (vfstest.go:307-313), which is what makes mkdirAll's symlink restart expressible at all; tsr_tspath::ancestors is the port's only path walker and it goes leaf-first (crates/tsr_tspath/src/lib.rs:147-159), so the restart cannot be written against it. dirName is path.Split with the trailing separator trimmed (vfstest.go:315-318) and is not root-aware: it answers \"c:\" where tsr_tspath::directory answers \"c:/\" (lib.rs:46-58), two different map keys, so a windows-dialect filesystem built by a port has a drive-root directory the pin does not and vice versa. Its \"\" for a top-level entry is what makes WriteFile skip its parent check. baseName splits the same way, so a trailing separator yields the empty basename rather than the last segment.",
-   "host_applicability": "any",
    "operation": "tsc/internal/vfs/vfstest/vfstest.go:splitPath",
    "order_sensitive": true,
-   "subject": "MapFS"
+   "subject": "MapFS",
+   "hosts": [
+    "any"
+   ],
+   "host_note": "any"
   },
   {
    "actions": [
@@ -1544,10 +1586,13 @@
    ],
    "case": "filesystem/vfstest/convert-map-fs-rejects-a-colliding-or-shadowed-map",
    "discriminates": "two guards a port drops for free. The duplicate-canonical-path panic fires only in case-insensitive mode and orders the two quoted names with min/max so the message is stable (vfstest.go:157-161); the pinned tests pass the same {foo, Foo} map twice and assert a panic for one mode and silence for the other (vfstest_test.go:160-190). A port keyed by a case-folded path would either collide silently, keeping whichever entry the map iteration yielded last, or reject both modes. The second guard is the intermediate-directory failure (vfstest.go:176-179): a map holding both foo and foo/oops is rejected outright, where MemoryBuilder::insert would create the ancestor over the file and keep going (crates/tsr_vfs/src/lib.rs:129-135). convertMapFS is called directly here rather than through FromMap, which is the only way to reach it with keys FromMap's checkPath would have refused.",
-   "host_applicability": "any",
    "operation": "tsc/internal/vfs/vfstest/vfstest.go:convertMapFS",
    "order_sensitive": true,
-   "subject": "MapFS"
+   "subject": "MapFS",
+   "hosts": [
+    "any"
+   ],
+   "host_note": "any"
   },
   {
    "actions": [
@@ -1643,10 +1688,13 @@
    ],
    "case": "filesystem/vfstest/realpath-reports-the-stored-spelling",
    "discriminates": "three separable behaviours. MapFS.Realpath returns an error on absence (vfstest.go:474-478), which is visible only at this level -- iovfs swallows it and returns the caller's own path (iofs.go:190-197) -- so the case calls MapFS directly. The value it returns is the STORED realpath spelling, so a case-insensitive lookup of FOO/BAR.TS answers Foo/Bar.TS. And it resolves through a link before reading that spelling, so a path under a symlinked directory answers with the target's spelling while a dangling link answers with the broken-link error rather than the miss. MemorySnapshot::realpath is the nearest port and diverges on all three: it falls back to the resolved path rather than erroring when nothing is there (crates/tsr_vfs/src/lib.rs:283-288), and its stored name is the caller's absolute spelling rather than a separately recorded original.",
-   "host_applicability": "any",
    "operation": "tsc/internal/vfs/vfstest/vfstest.go:MapFS.Realpath",
    "order_sensitive": true,
-   "subject": "MapFS"
+   "subject": "MapFS",
+   "hosts": [
+    "any"
+   ],
+   "host_note": "any"
   },
   {
    "actions": [
@@ -1747,10 +1795,13 @@
    ],
    "case": "filesystem/vfstest/get-file-info-answers-for-the-link-itself",
    "discriminates": "a port that answered GetFileInfo through its stat path. GetFileInfo indexes m.m directly (vfstest.go:665-672) and never resolves, so on a symlink it returns the LINK's entry -- mode carries fs.ModeSymlink and Data is the target string -- while Open of the same path resolves and returns the target's. MemorySnapshot::stat is the same-named port function and is not a counterpart: it goes through self.get -> self.resolve (crates/tsr_vfs/src/lib.rs:231,:208-213), so it always answers for the target, and its FileInfo has neither mode bits nor the stored realpath this one carries. The leading-separator rows pin that GetFileInfo strips one where Chtimes does not, and the last rows pin canonicalisation without absolutisation: `Foo/../Foo/Bar.TS` is simply a different key here, where a port keyed on to_path folds it onto the file.",
-   "host_applicability": "any",
    "operation": "tsc/internal/vfs/vfstest/vfstest.go:MapFS.GetFileInfo",
    "order_sensitive": true,
-   "subject": "MapFS"
+   "subject": "MapFS",
+   "hosts": [
+    "any"
+   ],
+   "host_note": "any"
   },
   {
    "actions": [
@@ -1822,10 +1873,13 @@
    ],
    "case": "filesystem/vfstest/snapshot-paired-publication-retains-bytes",
    "discriminates": "the plan's paired snapshot, in the one vocabulary both sides really have. MapFS has no snapshot operation and none is invented: its published view is the *fstest.MapFile GetFileInfo hands back (vfstest.go:671), which is the live entry. WriteFile replaces that entry with a freshly allocated MapFile rather than assigning into it (vfstest.go:540), so a view published before the write keeps its original bytes. The port is paired the same way rather than through a throwaway copy: publish hands the view the live MemorySnapshot itself, and the mutation replaces the whole filesystem through MemoryBuilder::from_snapshot + finish (crates/tsr_vfs/src/lib.rs:121-127,:162-169). A port whose from_snapshot aliased the entry map, or that otherwise let a later write reach an already published snapshot, reports different bytes at read_view and fails here. The mutation row itself is expected to diverge and is recorded as such: tsr_vfs has no write at all, FileSystem::write_file being the capability error Unsupported(\"immutable filesystem write\") (lib.rs:83-85), so the Rust row reports that answer and names MemoryBuilder::insert_physical as the substitution that advances the trace, instead of a bare success that would read as parity on MapFS.WriteFile. Its sibling record shows what the two do NOT agree on.",
-   "host_applicability": "any",
    "operation": "tsc/internal/vfs/vfstest/vfstest.go:MapFS.WriteFile",
    "order_sensitive": true,
-   "subject": "MapFSSnapshot"
+   "subject": "MapFSSnapshot",
+   "hosts": [
+    "any"
+   ],
+   "host_note": "any"
   },
   {
    "actions": [
@@ -1869,10 +1923,13 @@
    ],
    "case": "filesystem/vfstest/snapshot-mutation-leak-control",
    "discriminates": "the plan's 'mutation leaking into an old snapshot' comparator record, and the limit of what the port can answer about one. Chtimes is the one pinned mutation that assigns THROUGH the stored pointer instead of replacing the entry (vfstest.go:610-615), so a view published by GetFileInfo before it moves under its holder: view_unchanged reports false on the native side. It is also the one mutating method that strips no leading separator of its own, so this action carries the key spelling `a.ts` and BOTH sides forward it verbatim; a rooted `/a.ts` would miss with fs.ErrNotExist and the native side would observe no mutation at all. The port cannot answer in kind: FileSystem::change_times takes no instants and is the deliberate capability error Unsupported(\"immutable filesystem timestamps\") (crates/tsr_vfs/src/lib.rs:92-94), and a MemorySnapshot records no modification time for a mutation to move -- FileInfo is { directory, size } (lib.rs:64-67). The Rust view_unchanged therefore reports true, and no change to tsr_vfs short of the port growing a modification time could make it report otherwise. So this case records a CAPABILITY GAP: it pins that the pin's published view moves under a timestamp mutation and that the port refuses the call, and it does NOT pin that a Rust mutation cannot reach an already published snapshot. Its sibling carries that evidence, because there the published view is the live filesystem object itself and a leaked write is read back at read_view. The read_view and read_live rows deliberately agree, so the divergence is attributable rather than incidental.",
-   "host_applicability": "any",
    "operation": "tsc/internal/vfs/vfstest/vfstest.go:MapFS.Chtimes",
    "order_sensitive": true,
-   "subject": "MapFSSnapshot"
+   "subject": "MapFSSnapshot",
+   "hosts": [
+    "any"
+   ],
+   "host_note": "any"
   }
  ]
 }

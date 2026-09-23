@@ -215,3 +215,62 @@ fn deep_preceding_and_rightmost_searches_fit_a_small_caller_stack() {
         .join()
         .unwrap();
 }
+
+#[test]
+fn jsx_shift_rescan_matches_the_pinned_private_operation() {
+    // Direct Go observations and access-only overlay are retained under
+    // tools/phase1/syntax/astnav-rescan. Parsed JSX alone does not establish
+    // the containing-node kind; this tests both values of that predicate.
+    for line in include_str!("testdata/navigation-rescan.tsv")
+        .lines()
+        .filter(|line| !line.starts_with('#'))
+    {
+        let fields: Vec<_> = line.split('\t').collect();
+        assert_eq!(fields.len(), 7);
+        let text: Vec<u8> = fields[0]
+            .as_bytes()
+            .chunks_exact(2)
+            .map(|pair| u8::from_str_radix(std::str::from_utf8(pair).unwrap(), 16).unwrap())
+            .collect();
+        let expected: Vec<i64> = fields[2..]
+            .iter()
+            .map(|value| value.parse().unwrap())
+            .collect();
+        let mut scanner = tsr_scanner::Scanner::new();
+        scanner.set_text(&text);
+        scanner.scan();
+        let before = i64::from(scanner.token() as u16);
+        // Build the containing node, then execute the same classification as
+        // both production navigation paths. Passing the fixture boolean here
+        // would miss a broken is_jsx_child implementation entirely.
+        use tsr_ast::{AstBuilder, FactoryMethods};
+        let mut builder = AstBuilder::new(SourceText::default(), &tsr_arena::Counters::new());
+        let containing = if fields[1] == "true" {
+            builder.new_jsx_expression(None, None)
+        } else {
+            builder.new_source_file(
+                SourceFileParseOptions {
+                    file_name: tsr_ast::JsString::from_bytes(b"/rescan.ts".as_slice()),
+                    ..Default::default()
+                },
+                SourceText::default(),
+                None,
+                None,
+            )
+        };
+        let jsx_child = tsr_ast::utilities::is_jsx_child(&builder.view().node(containing).unwrap());
+        assert_eq!(jsx_child, fields[1] == "true");
+        let after = super::scan_navigation_token(&mut scanner, jsx_child);
+        assert_eq!(
+            [
+                before,
+                i64::from(after as u16),
+                scanner.token_start(),
+                scanner.token_end(),
+                i64::from(scanner.token_flags())
+            ],
+            expected.as_slice(),
+            "native navigation rescan row {line}"
+        );
+    }
+}

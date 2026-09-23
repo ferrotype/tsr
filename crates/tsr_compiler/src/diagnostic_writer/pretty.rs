@@ -210,27 +210,33 @@ impl DiagnosticWriter<'_> {
             Vec::new()
         };
         out.extend_from_slice(&self.options.new_line);
-        if total == 1 {
+        let total_text = total.to_string();
+        let files_text = groups.len().to_string();
+        let (message, args): (_, Vec<&[u8]>) = if total == 1 {
             if globals > 0 || first_path.is_empty() {
-                out.extend_from_slice(b"Found 1 error.");
+                (tsr_diagnostics::Found_1_error, vec![])
             } else {
-                out.extend_from_slice(b"Found 1 error in ");
-                out.extend_from_slice(&first_path);
+                (tsr_diagnostics::Found_1_error_in_0, vec![&first_path])
             }
         } else {
             match groups.len() {
-                0 => out.extend_from_slice(format!("Found {total} errors.").as_bytes()),
-                1 => {
-                    out.extend_from_slice(
-                        format!("Found {total} errors in the same file, starting at: ").as_bytes(),
-                    );
-                    out.extend_from_slice(&first_path);
-                }
-                n => {
-                    out.extend_from_slice(format!("Found {total} errors in {n} files.").as_bytes());
-                }
+                0 => (tsr_diagnostics::Found_0_errors, vec![total_text.as_bytes()]),
+                1 => (
+                    tsr_diagnostics::Found_0_errors_in_the_same_file_starting_at_Colon_1,
+                    vec![total_text.as_bytes(), &first_path],
+                ),
+                _ => (
+                    tsr_diagnostics::Found_0_errors_in_1_files,
+                    vec![total_text.as_bytes(), files_text.as_bytes()],
+                ),
             }
-        }
+        };
+        out.extend_from_slice(&tsr_diagnostics::localize(
+            &self.options.locale,
+            Some(message),
+            b"",
+            &args,
+        ));
         out.extend_from_slice(&self.options.new_line);
         out.extend_from_slice(&self.options.new_line);
         if groups.len() > 1 {
@@ -252,9 +258,21 @@ impl DiagnosticWriter<'_> {
             .unwrap_or(0)
             .to_string()
             .len();
-        let width = 6.max(digits);
-        repeat(&mut out, b' ', digits.saturating_sub(6));
-        out.extend_from_slice(b"Errors  Files");
+        let heading = tsr_diagnostics::localize(
+            &self.options.locale,
+            Some(tsr_diagnostics::Errors_Files),
+            b"",
+            &[],
+        );
+        // Go pads by UTF-8 byte length, not terminal display width.
+        let left_heading = heading
+            .split(|&byte| byte == b' ')
+            .next()
+            .unwrap_or_default()
+            .len();
+        let width = left_heading.max(digits);
+        repeat(&mut out, b' ', digits.saturating_sub(left_heading));
+        out.extend_from_slice(&heading);
         out.extend_from_slice(&self.options.new_line);
         for (file, diags) in groups {
             out.extend_from_slice(format!("{:>width$}  ", diags.len()).as_bytes());

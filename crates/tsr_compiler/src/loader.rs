@@ -109,7 +109,20 @@ impl Program {
         cache: &mut FileCache,
         counters: &Counters,
     ) -> Result<Self, Error> {
-        Loader::new(options, cache, counters)?.run()
+        Loader::new(options, cache, counters, false)?.run()
+    }
+    /// Load one program from a live host, with fresh resolution caches.
+    ///
+    /// The caller must keep the filesystem stable for the duration of the load
+    /// and create a new program after mutations. Loaded source files remain
+    /// owned and immutable, but subsequent host-dependent operations may observe
+    /// the live filesystem. `load` retains its immutable-host requirement.
+    pub fn load_live(
+        options: ProgramOptions,
+        cache: &mut FileCache,
+        counters: &Counters,
+    ) -> Result<Self, Error> {
+        Loader::new(options, cache, counters, true)?.run()
     }
     pub fn config(&self) -> &tsr_tsoptions::ParsedCommandLine {
         &self.config
@@ -120,6 +133,7 @@ impl Program {
     pub fn is_external_library(&self, path: &[u8]) -> bool {
         self.external_paths.contains(path)
     }
+    /// port: tsc/internal/compiler/program.go:Program.GetSourceFiles
     pub fn files(&self) -> &[Arc<ProgramFile>] {
         &self.files
     }
@@ -129,6 +143,7 @@ impl Program {
     pub fn host(&self) -> &dyn FileSystem {
         self.host.as_ref()
     }
+    /// port: tsc/internal/compiler/program.go:Program.GetSourceFileByPath
     pub fn file(&self, path: &[u8]) -> Option<&ProgramFile> {
         self.by_path.get(path).map(|&i| self.files[i].as_ref())
     }
@@ -194,6 +209,7 @@ impl<'a> Loader<'a> {
         input: ProgramOptions,
         cache: &'a mut FileCache,
         counters: &'a Counters,
+        allow_live_host: bool,
     ) -> Result<Self, Error> {
         if input
             .config
@@ -212,11 +228,19 @@ impl<'a> Loader<'a> {
             return Err(Error::Unsupported("content-mapper execution"));
         }
         let options = Arc::new(input.config.options.clone());
-        let resolver = Resolver::new(
+        let resolver = Resolver::with_options(
             input.host.clone(),
             options.clone(),
             input.current_directory.as_bytes(),
+            tsr_module::ResolverOptions {
+                allow_live_host,
+                ..Default::default()
+            },
         )?;
+        let lib_path = JsString::from_bytes(path::absolute(
+            input.default_library_path.as_bytes(),
+            input.current_directory.as_bytes(),
+        ));
         Ok(Self {
             config: input.config,
             pending: Vec::new(),
@@ -228,7 +252,7 @@ impl<'a> Loader<'a> {
             options,
             host: input.host,
             cwd: input.current_directory,
-            lib_path: input.default_library_path,
+            lib_path,
             lib_files: BTreeMap::new(),
             skip_resolution: input.skip_module_resolution,
             resolver,
@@ -799,7 +823,13 @@ impl<'a> Loader<'a> {
                 ));
             }
         }
-        let meta = metadata::load(&mut self.resolver, &name, &self.options, is_lib)?;
+        let meta = metadata::load(
+            &mut self.resolver,
+            &name,
+            &self.options,
+            is_lib,
+            self.skip_resolution,
+        )?;
         let Some(content) = self.host.read_file(&name)? else {
             self.missing.push(JsString::from_bytes(name.as_slice()));
             if is_root {
@@ -1074,7 +1104,9 @@ impl<'a> Loader<'a> {
         Ok(())
     }
 }
+/// port: tsc/internal/compiler/fileloader.go:fileLoader.getDefaultLibFilePriority
 fn lib_priority(name: &[u8], library_path: &[u8]) -> usize {
+    let library_path = path::remove_trailing_directory_separator(library_path);
     if !name
         .strip_prefix(library_path)
         .is_some_and(|suffix| suffix.starts_with(b"/"))

@@ -12,6 +12,7 @@ description = "Phase 1 F3a: answers the config, command-line, package and module
 # touches, and no published crate has that set, so it lives here rather than as
 # an example on a shipped crate.
 [dependencies]
+tsr_locale = { version = "0.1.0", path = "../../../crates/tsr_locale" }
 tsr_diagnostics = { path = "../../../crates/tsr_diagnostics" }
 tsr_glob = { path = "../../../crates/tsr_glob" }
 phase1_harness = { version = "0.1.0", path = "../harness" }

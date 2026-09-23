@@ -144,6 +144,19 @@ pub enum LiteralValue {
     ComputedEnum,
 }
 
+impl LiteralValue {
+    pub(crate) fn primitive(&self) -> Option<tsr_ast::evaluator::PrimitiveValue<'_>> {
+        use tsr_ast::evaluator::PrimitiveValue as V;
+        Some(match self {
+            Self::String(value) => V::String(value),
+            Self::Number(value) => V::Number(*value),
+            Self::Boolean(value) => V::Bool(*value),
+            Self::BigInt(value) => V::BigInt(value),
+            Self::ComputedEnum => return None,
+        })
+    }
+}
+
 #[derive(Debug)]
 pub struct IntrinsicData {
     pub name: JsString,

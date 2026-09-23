@@ -2813,3 +2813,208 @@ and tracker validation pass. The actual generator wrapper reproduces all managed
 outputs, untouched-client output and locale tables. The focused utility capture
 has 83/83 matches. Full correctness/benchmark histories were preserved and not
 rerun solely to refresh their timestamps.
+
+
+## F5b — integration fixes and exact-operation witnesses
+
+This increment is on `codex/phase1-f5b`, based on #52. It implements the
+integration fixes exposed by F5a and expands exact operation evidence. It does
+not close Phase 1: the regenerated coverage report still has 1,250 pending
+operation entries (1,249 syntax/helper entries and the Linux-only Realpath
+observation). Those are evidence or implementation-review obligations, not a
+claim that 1,250 production functions are absent. No threshold changed.
+
+Production changes:
+
+- `DiagnosticWriter` now carries the selected locale through messages, related
+  information, plain/pretty output, status messages and error summaries. Six
+  native config-plus-renderer comparisons cover German, Japanese and fallback;
+  packaged consumption also checks the German TS2322 generated asset.
+- `GetTextOfJSDocComment` now concatenates stored text and the source spelling of
+  links, preserves malformed bytes, and trims Go Unicode White_Space. Thirteen
+  direct native/Rust requests cover all 25 whitespace characters, ignored node
+  kinds, source/line helpers and the actual nil-element panic payload.
+- Program loading honors `skip_module_resolution` for package metadata and
+  normalizes custom default-library paths before priority ordering. Four new
+  native observations supplement the original unchanged 48 loader rows.
+- Linux realpath retries EINTR from `readlinkat` as well as `openat`. Other errors
+  are returned without being retried.
+
+The generated AST harness executes 1,026 exact native/Rust traces over all 192
+shapes, including the explicit SourceFile and limited SyntheticExpression
+cases. Every constructor, field update, clone hook, visitor, predicate and fact
+operation receives only the action links its own probe executes. The complete
+syntax utility family now has **1,122/1,122 exact matches**. Exact supporting
+scanner, parser, binder, navigation and loader links are documented in the
+`PHASE1-F5b-*-coverage.md` records. The four SyntheticExpression operations that
+carry Go's opaque checker-type payload remain pending the separate ownership
+and phase decision; the cast/child probes do not certify them.
+
+The owner approved exactly the two foreign-interface-input exceptions described
+in `PHASE1-F5b-filesystem-audit.md`. All 50 representable actions in those traces
+still compare; native observations and raw `different` outcomes remain intact.
+The three earlier ownership exceptions retain their separate scope.
+
+Final direct family captures:
+
+| Family | Actual results | Capture |
+| --- | --- | --- |
+| Leaves | 229 match; one approved difference | `target/phase1-f5b-leaves-03` |
+| Config | 485 match; one approved difference | `target/phase1-f5b-config-04` |
+| Filesystem | 355 match; three approved differences; one Linux-only native-unavailable row | `target/phase1-f5b-filesystem-04` |
+| Syntax utilities | 1,122 match; no differences or failed rows | `target/phase1-f5b-syntax-05` |
+
+Every one of the 309 config reference output identities matches. Native
+observations and provenance are frozen under `data/phase1/native`; the ordinary
+validators authenticate the complete request and dependency closures. Finder
+metadata and Python bytecode caches are excluded as non-inputs. A separately
+authenticated Linux capture can supply only the declared unavailable Realpath
+case; it cannot replace an executed difference, and its raw evidence stays
+separate. CI captures that exact Linux case.
+
+The installed-package witness now selects Cargo's actual emitted executable,
+including target overrides, and its source closure includes every public
+package's manifest, assets and documentation. It cannot run a stale binary from
+an assumed output path or retain a passing receipt after an omitted package
+input changes. Localized-envelope comparisons authenticate both the native
+request and the renderer's actual Rust input. Targeted regressions cover these
+failure modes and platform supplementation.
+
+All seven composed integration witnesses now pass, including six localized
+config envelopes and the retained-snapshot/path-order regressions. The isolated
+consumer verifies **31 Cargo archives**, native/parser-only builds and both
+WASM modes, all 108 bundled libraries, the pinned German TS2322 message and
+owner counters returning to baseline. Generation reproduces all managed
+outputs, all 69 original-client files and the locale tables. All **89 S11
+transport cases** and their negative controls pass. The recorded foundations
+producer reports `integration_complete = true`; that does not turn unfinished
+operation preparation into a passing `integration_prepared` result.
+
+The S07 operation inventory refresh changes only six added Rust mappings and
+18 moved mapping locations. Independently reviewed replay of authenticated
+native observations preserves `subset.json`, checker obligations and the pin
+byte-for-byte. Existing classification and historical measurements are not
+regraded.
+
+Validation: workspace clippy with warnings denied, formatting, dependency policy
+and tracker validation; 60 affected Rust tests in each of debug and release;
+Rust 1.96 for compiler/scanner/VFS; all 44 targeted integration, receipt and
+packaging script tests. The final self-test run passes 932 script tests with one
+platform skip. An obsolete assertion requiring more than 1,000 untested rows
+was replaced with a negative classification control: a file-level metric alone
+still cannot certify an operation.
+
+The final full program-syntax capture is
+`target/phase1-f5b-full-04/full`: **15,152/15,152 executable variants match**;
+the 54 native selection boundaries remain separately reported. Its derived
+908-row smoke selection also matches. The current E1 capture records 22,478
+requests, 6,195,294 matching observations, no failed requests, and passing
+encoder, decoder, runtime, utility and depth checks. Historical captures were
+preserved rather than relabeled as current.
+The final binder capture matches all 12,829 primary rows across 22,343 requests
+and all 18 supplemental requests. All 19 helper tests, 32 protocol controls,
+resolver/graph contracts and depth fixtures pass, with stable source inputs.
+
+The parent PR's CI also exposed two stale metadata entries: the program helper
+manifest retained the old name of the resolution-refusal test, and the isolated
+Rust consumer lockfile omitted dependency edges to `tsr_jsnum` and `tsr_locale`.
+Both are corrected without changing dependency versions or production behavior.
+The saved CI self-test records also contain 34 failures of offline workspace
+metadata on each runner. CI now prepares locked workspace metadata before the
+self-tests, rather than relying on the dependencies fetched by building xtask.
+The tests themselves retain offline metadata and their existing checks.
+A bounded check with an empty temporary Cargo home reproduces exit 101 for
+offline metadata, then passes both locked online preparation and offline replay
+without compiling or changing lockfiles.
+
+The remaining work is explicit in `coverage-report.json.gz`: exact private
+parser/binder/helper witnesses, handwritten AST contracts, the four semantic
+SyntheticExpression operations, and the Linux observation. Finishing this
+integration increment does not satisfy those requirements automatically.
+The 1,250 pending entries consist of 945 missing exact witnesses and 305
+unverified implementation classifications: 558 AST, 473 parser, 151 binder,
+65 compiler, two scanner and one Linux filesystem entry. Apart from an explicit
+decision to defer the four SyntheticExpression obligations, these are
+engineering and validation tasks, not requests for another blanket exception.
+`cargo xtask check P1A` and `cargo xtask check P1B` both report these pending
+requirements. P1B also requires current E3 instrumentation on the final
+relevant sources; the previous ownership result is not relabeled as current.
+The config production item passes, as do E1, binder, generation, transport and
+the recorded quality checks. The Linux-only witness is wired into the two-runner
+CI matrix and remains unclaimed until an actual Linux capture is available.
+
+P1A now consumes `adr.0020.status == Accepted`, the same dated acceptance
+condition used by S12's exit and every required item. The tracker evaluates
+sprints in filename order, so P1A previously read S12's derived metric before
+it existed, even though the completed report showed S12 done. This removes that
+false unknown without reopening historical measurements or weakening any
+Phase 1 operation, integration or safety requirement.
+
+
+## F5b — review refresh, 2026-09-23
+
+The review of `019ec1c` found production duplication, overstated witnesses and
+evidence-binding gaps. Commit `ce3150c` corrects those claims and implementations;
+[the disposition](PHASE1-F5b-review.md) records each finding and its limits.
+The earlier F5b counts and current-evidence statements above describe that
+historical checkpoint, not the reviewed sources.
+
+Fresh reviewed family captures report 229 leaves matches, 355 filesystem
+matches, 498 config matches (including all 309 reference envelopes) and
+1,123 syntax-utility matches. Five existing approved differences remain raw
+differences, and the Linux-only filesystem observation remains unavailable
+on this macOS host. Full program syntax matches all 15,152 executable variants;
+the 54 native selection boundaries remain separate. Raw captures and receipts
+are preserved in `data/phase1/captures`, with hashes and replay instructions.
+
+The corrected operation audit has **1,365 pending entries**: 947 missing exact
+witnesses, 303 unverified implementation mappings, 92 unresolved later-step
+transfers and 23 ordinary reference-loading/configuration operations.
+[The destination audit](PHASE1-F5b-destinations.md) distinguishes the latter from
+build scheduling, and supports 205 actual later-phase destinations against
+the accepted plan and pinned callers. These remaining entries prevent P1A/P1B
+completion despite passing family observations.
+
+E1, binder and scanner records from the preceding checkpoint are retained as
+historical evidence after the reviewed production edits. No performance
+benchmark or threshold change was part of this review refresh.
+
+The reviewed `program`, `foundations`, `config` and `syntax` records are current.
+Integration and routed Rust witnesses report complete; all 309 config outputs
+and 15,152 syntax rows match. Program helpers and option verification pass, but
+loader parity remains 10,727/10,728 because of the named pre-existing
+`typesVersions` package-directory trace defect in the review disposition.
+The Linux-only observation and operation audit still prevent complete Phase 1
+acceptance.
+
+## F5b — per-host applicability and composed rebuild, 2026-09-23
+
+The B1-3/B2-3 owner decisions are implemented in
+[the review record](PHASE1-F5b-review.md#b1-3-and-b2-3--owner-decisions-2026-09-23).
+Filesystem requests carry structured hosts and preserve their explanatory prose.
+Comparison derives host exclusions from authenticated native GOOS; an applicable
+native failure still fails. Filesystem preparation requires all applicable rows
+on both Linux and Darwin, in separate archives. CI captures the complete
+applicable inventory on each runner.
+
+The real OS → cached → tracking → program witness now rebuilds after physical
+create/delete/edit operations on both runtimes. It compares file sets, text,
+syntactic diagnostics, retained first-file symbols/text and the rebuild's full
+SeenFiles set, including misses and wildcard directories. An explicit
+`Program::load_live` enables this path; the existing `Program::load` retains its
+snapshot requirement. Watch scheduling remains outside this witness.
+
+A new Darwin capture records 356 matches, three existing approved differences
+and one Linux-only `not_applicable` row. The composed witness matches exactly.
+The separate archive, identity and replay command are in
+[data/phase1/captures/F5b-README.md](../data/phase1/captures/F5b-README.md).
+The Linux CI artifact is still required; no historical Darwin observation is
+substituted for it. The owner left stale family evidence and local-versus-CI
+confirmation for phase-end green-up; no broad corpus or benchmark was rerun.
+
+The pre-existing `typesVersions` loader defect is now fixed. A fresh native/Rust
+run of `typesVersionsDeclarationEmit.multiFileBackReferenceToSelf` matches every
+field and all 68 trace entries. Three native module-trace regressions also cover
+actual entry-versus-index selection, cold/warm caches and directory imports
+without `typesVersions`. The original full 10,727/10,728 result is historical;
+this bounded fix does not re-label it as a fresh full pass.

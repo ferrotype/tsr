@@ -286,10 +286,13 @@
       ],
       "case": "filesystem/tspath/root-length-encoding",
       "discriminates": "A port that returns the raw length for a URL instead of its bitwise complement: `file:///c:` must record encoded -11 and root 10, and `http://server` encoded -14 and root 13, so a port that drops the sign makes both columns equal and is caught on every URL row. The file-URL volume arm is the other half: `file:///c:` folds to 10 but `file:///c:d` to 8, `file:///c%3a` to 12 and `file:///c%3` to 8, so a port that stops at the authority, or that accepts any escape rather than %3a/%3A followed by end-of-string or '/', is caught. `file://other/c:/` folds to 13 -- the volume is absorbed only for an empty or `localhost` authority. `c:d` is 0 and `c:` is 2, so a port that treats any `<letter>:` prefix as a root fails; `^^/` and `x^/` are 0 against `^/`'s 2.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/path.go:GetEncodedRootLength",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -368,10 +371,13 @@
       ],
       "case": "filesystem/tspath/normalize-slashes-bytes",
       "discriminates": "A port that decodes to text before replacing. `\\xff\\a` must come back as the three bytes ff 2f 61; a UTF-8-lossy conversion yields ef bf bd 2f 61 and the frozen bytes reject it. It also catches a port that replaces only leading backslashes or only runs of them: `a/\\b`, `a\\/b` and `//server\\share` each keep every other byte and change exactly the backslashes, and `\\\\server\\path` must become `//server/path` rather than being recognised as a UNC root and left alone.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/path.go:NormalizeSlashes",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -583,10 +589,13 @@
       ],
       "case": "filesystem/tspath/combine-paths-algebra",
       "discriminates": "Four wrong implementations. (1) A port that resolves `..`: (\"path\",[\"dir\",\"..\",\"to\",\"file.ext\"]) must keep `dir/..` verbatim -- reduction belongs to ResolvePath. (2) A port that appends the separator before testing for the empty entry: (\"a\",[\"\",\"b\"]) must be `a/b`, not `a//b`, because an empty trailing path is skipped before any separator is written. (3) A port that treats only a leading '/' as absolute: (\"x\",[\"c:d\"]) joins (root length 0) while (\"c:\",[\"d:/x\"]) and (\"x\",[\"^/untitled/a\"]) and (\"x\",[\"http://h/a\"]) each replace the accumulated result, because GetRootLength is non-zero for DOS, untitled and URL roots alike -- the URL row needs the COMPLEMENT folded away, so a port that tests the signed value keeps `x/http://h/a`. (4) A port that tests the accumulated result with a backslash-aware predicate: (\"a\\\\\",[\"b\"]) is normalised to `a/` first and must give `a/b`.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/path.go:CombinePaths",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -773,10 +782,13 @@
       ],
       "case": "filesystem/tspath/directory-path",
       "discriminates": "A port whose fallback index is the root rather than zero, and one that keeps a root-only path's trailing separator by accident. `a` must give the empty string and `/` must give `/`: the first falls through `max(rootLength, LastIndex==-1)` to an empty slice, the second returns early because the root IS the whole path. `//server` must come back unchanged while `//server/share` gives `//server/` -- a port that trims the trailing separator before measuring the root turns the second into `//server`. `c:////` must give `c://` -- exactly ONE separator is removed, leaving `c:///`, and the LAST-separator index of that (4) then beats the root floor (3), so four bytes survive; a port that takes the last separator of the UNTRIMMED path answers `c:///`, and the root floor does not decide this row at all. `//server\\share` is the mixed-separator row that pins the leading NormalizeSlashes: the root of the RAW bytes is the whole string, so a port that measures before normalising returns it unchanged instead of `//server/`.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/path.go:GetDirectoryPath",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -919,10 +931,13 @@
       ],
       "case": "filesystem/tspath/normalize-path",
       "discriminates": "A port that cannot make a path longer, and one whose fast path has the wrong shape. `//server` must become `//server/` and `file:///c:` must become `file:///c:/`, because the bare-root exit ensures the trailing separator -- a normaliser that only ever deletes bytes cannot produce either. `.//a` must give `a` and not `/a`: the fast path's third guard rejects a trim that turned a relative path into a rooted one, so the slow walk runs. `/\\` must give `//` and `//\\\\` must give `///`, which pin that slashes are normalised before the root is measured. `/a/b/` must keep its trailing separator while `/a/..` gives `/`.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/path.go:NormalizePath",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -1167,10 +1182,13 @@
       ],
       "case": "filesystem/tspath/resolve-path",
       "discriminates": "A port that treats the zero-extra-paths call as CombinePaths(path), and a port that drops trailing separators. The contract is that trailing separators survive normalization: `/a/./` gives `/a/` but `/a/.` gives `/a`, and `/a/../` gives `/` as does `/a/..`; four rows a normaliser that strips first cannot all satisfy. (\"a\",[\"\",\"b\"]) pins that an empty extra path is skipped rather than resetting the accumulator, and (\"c:\",[]) must give `c:` where (\"c:\",[\"a\"]) gives `c:/a`.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/path.go:ResolvePath",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -1607,10 +1625,13 @@
       ],
       "case": "filesystem/tspath/normalized-absolute-path",
       "discriminates": "Three arms a port collapses. (1) The `length == rootLength` arm ADDS a separator: (\"c:\",\"\") must come back as `c:/` and (\"//a\",\"a\") as `//a/`, so a port that only ever strips trailing separators is caught. (2) The `length > rootLength` arm strips the whole run: `c:////` and `//server/share///` must lose every trailing separator, where NormalizePath would keep one. (3) The relative arms: (\"..\",\"\") stays `..` while (\"a/..\",\"\") is the empty string, and (\"a/../..\",\"..\") is `../..` -- a port that clamps `..` at the top of a relative path returns the empty string for all three. The untitled and URL rows pin that a rooted file name ignores the current directory.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/path.go:GetNormalizedAbsolutePath",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -1701,10 +1722,13 @@
       ],
       "case": "filesystem/tspath/to-file-name-lower-case",
       "discriminates": "Three wrong implementations. (a) A plain Unicode lowercase: U+0130 must survive unchanged in `/\u0130`, `\u0130\u0130`, `a\u0130B` and `K\u0130K`, and it is the one character the pin refuses to fold, because its lowercase form has its own distinct uppercase form and folding it would collide two different files onto one key. (b) An ASCII-only lowering: the Kelvin sign in `/K/X` must become a one-byte `k`, which shortens the string, and `/\u03a3/\u03c2` must lower the capital sigma while leaving the final sigma alone. (c) A port that preserves invalid bytes: Go's rune mapper decodes 0xff as U+FFFD and WRITES the replacement, so `A\\xff` grows from two bytes to four -- a byte-preserving port keeps `61 ff` and is caught.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/path.go:ToFileNameLowerCase",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -1851,10 +1875,13 @@
       ],
       "case": "filesystem/tspath/canonical-file-name-modes",
       "discriminates": "A port that folds in both modes, or that folds with a general Unicode lowercase. The case-sensitive column must be the identity on every row including `/A/B` and `c:\\A` -- it does not normalise slashes either. The case-insensitive column keeps U+0130 in `/A/\u0130/\u0131` while lowering the ASCII around it, which no general lowercase does, and lowers the Kelvin sign to a shorter one-byte `k`.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/path.go:GetCanonicalFileName",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -2077,10 +2104,13 @@
       ],
       "case": "filesystem/tspath/to-path-modes",
       "discriminates": "A port that routes every input through GetNormalizedAbsolutePath. That function ADDS a separator to a bare root and STRIPS one from a longer path, and ToPath's rooted branch does neither: `c:` must come back as `c:` and not `c:/`, and `/a/` as `/a/` and not `/a`. `c:d` is the mirror -- it is NOT rooted, so it is joined onto the base. The untitled row is the pin's own: `^/untitled/...` must come back untouched rather than joined onto `/home/user/project`. The `\u0130/A` and `C:/A` rows carry the canonicalization into the same trace, so a port that lowercases in the case-sensitive mode is caught here too.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/path.go:ToPath",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -2223,10 +2253,13 @@
       ],
       "case": "filesystem/tspath/base-file-name",
       "discriminates": "A port that omits the leading NormalizeSlashes. `//server\\share` is the row: after normalization its root is the nine bytes `//server/` and the base name is `share`, but measured on the RAW bytes the root is the whole fourteen-byte string and the answer becomes the empty string. `c:\\a\\b.ts` and `\\\\server\\share` are the controls that a backslash-aware scan alone still gets right, so the pair separates \"normalises\" from \"also accepts backslashes\". `//server/` must be empty while `c:/a/` gives `a`, which pins that the root-only early return runs on the untrimmed path.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/path.go:GetBaseFileName",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -2305,10 +2338,13 @@
       ],
       "case": "filesystem/tspath/has-extension",
       "discriminates": "A port that searches the whole path: `/a.b/c` must be false. A port that forgets the trailing-separator trim: `a.b/` must be true. A port that forgets the root floor: `c:`, `c:/`, `/` and `//server` must all be false because the path is entirely root and the base name is empty, while `file:///c:` is false for the same reason. `//server\\share.ts` is the row that carries GetBaseFileName's missing slash normalization into this operation: the pin answers true, a port measuring the raw root answers false.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/path.go:HasExtension",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -2395,10 +2431,13 @@
       ],
       "case": "filesystem/tspath/is-declaration-file-name",
       "discriminates": "`dir.d.ts/file` false against `/x/a.d.ts/` true pins the base-name step: a port that scans the whole path gets the first wrong, a port that does not trim the single trailing separator gets the second wrong. `style.d.css.ts` true pins the arbitrary `.d.<x>.ts` arm that every fixed-list port misses, and `a.d.json.ts` with it. The root rows `/`, `c:` and `//server` must be false through the empty base name rather than through a suffix test.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/extension.go:IsDeclarationFileName",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -2489,10 +2528,13 @@
       ],
       "case": "filesystem/tspath/remove-file-extension",
       "discriminates": "`a.d.ts` must give `a` and not `a.d`, which pins that `.d.ts` precedes `.ts` in the list -- a port that sorts the list, or iterates shortest-first, fails. `a.tsx` must give `a` even though `.ts` sits earlier in the list, because `.ts` is not a suffix of `a.tsx`. `.ts` must give the empty string, because this operation is a plain HasSuffix with no length guard, unlike FileExtensionIs. `a.ts/` and `a.TS` and `a.tsbuildinfo` must all come back unchanged.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/extension.go:RemoveFileExtension",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -2979,10 +3021,13 @@
       ],
       "case": "filesystem/tspath/relative-to-directory-or-url",
       "discriminates": "Three wrong implementations. (a) One that ignores `isAbsolutePathAnUrl`: (\"c:/a\",\"d:/b\") must differ between the two settings -- `d:/b` against `file:///d:/b`. (b) One that always uses the same prefix: the pin picks `file://` when the surviving root starts with '/' and `file:///` otherwise, so (\"c:/a\",\"/b\") under the URL setting must be `file:///b` with seven slashes' worth of prefix on a root that already begins with one. (c) One that uses a single comparer for every component: (\"/A\",\"/a/b\") under the case-SENSITIVE setting must still share component 0 (the roots are compared case-insensitively, always) and then diverge at `A` against `a`, giving `../a/b`, while the case-insensitive setting gives `b`. The URL prefix is only applied when the FIRST surviving component is a rooted disk path, so `^/untitled/a` against `c:/b` keeps its `file:///` treatment of `c:/` and not of `^/`.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/path.go:GetRelativePathToDirectoryOrUrl",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -3045,10 +3090,13 @@
       ],
       "case": "filesystem/tspath/ancestor-walk-sequence",
       "discriminates": "A port that stops one step early on a relative path. `a/b` must visit `a/b`, `a` and then the EMPTY string before the walk ends, because the walk ends when a directory is its own parent and not when it becomes empty; a port that guards on emptiness loses the last ancestor of every relative base. `/` and `c:` and `//server` must each visit exactly one element, because a root is its own parent. `c:\\a\\b` is the mixed-separator row: GetDirectoryPath normalises, so the first element keeps its backslashes and every later one has forward slashes -- a port that normalises the input up front records `c:/a/b` first and is caught.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/path.go:ForEachAncestorDirectory",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -3203,10 +3251,13 @@
       ],
       "case": "filesystem/tspath/root-predicates",
       "discriminates": "A port that equates the five. PathIsAbsolute is `!= 0` and IsRootedDiskPath is `> 0`, so every URL row separates them: `file:///path`, `file:///c:`, `file://server` and `http://server` must be absolute and NOT rooted disk paths. IsUrl is `< 0`, so `c:d` -- which has no `://` at all -- is not a URL, and neither is `//server` even though a scheme-searching port would have to look at it. IsDiskPathRoot needs `> 0 && == len`, so `file:///` is false where a GetRootLength-based port answers true, and `//server` is true while `//server/share` is false. IsDynamicFileName is the odd one out: it is `HasPrefix(\"^/\")`, so `^\\` is false where an isAnyDirectorySeparator reading says true, and `^/untitled/a` is true where IsDiskPathRoot is false.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/path.go:PathIsAbsolute",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -3317,10 +3368,13 @@
       ],
       "case": "filesystem/tspath/byte-predicates",
       "discriminates": "A port that widened either predicate. IsVolumeCharacter is two ASCII ranges: 0x40 and 0x5B must be false either side of A-Z, 0x60 and 0x7B either side of a-z, and 0x30-0x39 false -- a port written as `is_alphanumeric` admits the digits and one written over a decoded rune admits 0x80 and 0xFF, which are mere continuation bytes here. isAnyDirectorySeparator accepts exactly 0x2F and 0x5C: 0x5B and 0x5D on either side of the backslash catch an off-by-one range test, and 0x7C and 0xA5 catch a port that added the pipe or the yen sign.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/path.go:IsVolumeCharacter",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -3412,10 +3466,13 @@
       ],
       "case": "filesystem/tspath/file-url-volume-separator-end",
       "discriminates": "A port that reads the escape without its length guard, and one that accepts any hex casing or any escape. (\"file:///c%3\", 9) must give -1 -- the pin requires len(url) > start+2, and a three-byte window compare on a two-byte remainder either panics or silently matches. (\"file:///c%3b\", 9) and (\"file:///c%2a\", 9) must both be -1 while `%3a` and `%3A` are start+3. (\"file:///c:\", 10) is the `len(url) <= start` guard and must be -1 rather than a panic, and start past the end must be -1 too.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/path.go:getFileUrlVolumeSeparatorEnd",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -3498,10 +3555,13 @@
       ],
       "case": "filesystem/tspath/split-volume-path",
       "discriminates": "Three wrong implementations. (a) One that lowercases the whole path: `Z:\\x` must keep `\\x` and `C:/A` must keep `/A`, while both volumes fold to lowercase. (b) One that requires a separator after the colon, i.e. one that reuses GetEncodedRootLength's DOS arm: `c:d` must split into (`c:`, `d`, true) where the root length of `c:d` is 0. (c) One that accepts a percent-escaped or numeric volume: `%3a/a` and `1:/a` and `:/a` must all be (\"\", path, false) with the path returned unchanged.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/path.go:SplitVolumePath",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -3616,10 +3676,13 @@
       ],
       "case": "filesystem/tspath/trailing-separator-family",
       "discriminates": "A port that strips or tests only '/'. `a\\` must be true for the predicate, must strip to `a`, and must be left UNCHANGED by the ensure -- three rows a '/'-only reading gets wrong, and the ensure's is the one that silently corrupts a path into `a\\/`. A port that confuses the singular with the plural: `a//` must give `a/` singular and `a` plural, `a///` gives `a//` against `a`, and `///` gives `//` against the empty string. A harness that dispatched the typed wrappers to a re-canonicalising implementation: a Path is already rooted and folded, so the typed columns must equal the free ones byte for byte. The empty input separates the predicate from the ensure: false, but the ensure still produces `/`.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/path.go:HasTrailingDirectorySeparator",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -3826,10 +3889,13 @@
       ],
       "case": "filesystem/tspath/path-components-split",
       "discriminates": "A port that answers this with the normalized/reduced splitter, which is the only component routine the port has. `./a` must yield [\"\", \".\", \"a\"] and `a//b` must yield [\"\", \"a\", \"\", \"b\"]: the reduced form drops the dot and the interior empty, so the dispatch fails on the first two rows. `c:d` must yield [\"\", \"c:d\"] -- the root length is 0 -- while `c:` yields [\"c:\"] alone. Exactly ONE trailing empty is removed, so (\"a//\", 0) keeps the interior empty and gives [\"\", \"a\", \"\"], which a loop-trim reduces to [\"\", \"a\"] and a no-trim port grows to [\"\", \"a\", \"\", \"\"]. The split is on '/' only, so (\"a\\\\b\", 0) is one component.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/path.go:GetPathComponents",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -4080,10 +4146,13 @@
       ],
       "case": "filesystem/tspath/component-reduction",
       "discriminates": "A port that decides the root case by index rather than by content. The `..` guard keys on the ROOT STRING being non-empty, so [\"/\", \"..\"] reduces to [\"/\"] while [\"\", \"..\"] keeps the `..`, and [\"c:/\", \"..\"] and [\"^/\", \"..\"] behave like the rooted case. A port that lets `..` cancel another `..`: [\"\", \"..\", \"..\"] must keep both, and `/../..` must stay [\"/\"] while `../..` keeps two. The empty input reduces to the empty list, not to [\"\"], which a port that always seeds the root gets wrong. For the string reducer, `a//b` and `a///b` must both give [\"\", \"a\", \"b\"] -- it skips runs of separators itself rather than producing empty components.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/path.go:reducePathComponents",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -4318,10 +4387,13 @@
       ],
       "case": "filesystem/tspath/normalize-fast-path",
       "discriminates": "A port that omits the fast path's third guard -- the one the pin added and whose older shape it still keeps in its test file. `.//a` is the row: there is no `/./` to replace, trimming the leading `./` turns it into `/a`, and `/a` is rooted where the source was not, so the pin must DECLINE and fall through to the full walk. A port that keeps `/a` here changes the meaning of the path. For the guard itself: `...`, `a.`, `a..`, `.a`, `..a` and `a/.../b` must all be FALSE -- it counts dots per segment and requires a segment of exactly one or two dots -- while `.`, `..`, `//`, `/.`, `/..`, `./`, `../` and an interior `/./` are true. A port that tests `contains(\"..\")` fails half of them.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/path.go:simpleNormalizePath",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -4408,10 +4480,13 @@
       ],
       "case": "filesystem/tspath/trim-rune-count",
       "discriminates": "A port that advances by bytes instead of runes, and one that fails instead of clamping. (\"\\u212a\\u212a\\u212a\", 1) must leave the last two Kelvin signs -- six bytes -- where a byte-stepping port leaves five bytes of a mangled string. (\"abc\", 4), (\"\\u212a\\u212a\\u212a\", 4) and (\"\", 1) must all give the empty string rather than panicking: the `i >= len(s)` break is the clamp. A negative count is a no-op, because `for range n` with n < 0 does not iterate. The invalid-byte row pins that a failed decode still advances one byte.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/path.go:trimRuneCount",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -4742,10 +4817,13 @@
       ],
       "case": "filesystem/tspath/path-comparison-modes",
       "discriminates": "Three wrong implementations. (a) One that implements \"case sensitive\" as a whole-string byte comparison: (\"C:/a\",\"c:/a\") must be EQUAL even under the case-sensitive wrapper, because ComparePaths folds the ROOT segment case-insensitively unconditionally; (\"file:///a\",\"FILE:///a\") and (\"//server/a\",\"//SERVER/a\") are the URL and UNC mirrors. (b) One that loses a negation in the selector: the wrappers set UseCaseSensitiveFileNames and the selectors are handed its complement, so (true,\"A\",\"a\") must be less-than while (false,\"A\",\"a\") is equal. The sort row is the shipped-port control: ordering [\"c:/a\",\"C:/b\"] with the case-sensitive comparer puts `C:/b` first ('C' < 'c'), which is NOT what ComparePaths does with the same setting. (c) One that folds with full Unicode case folding: the equality selector is Go's EqualFold -- SIMPLE folding -- so (\"\u00df\",\"SS\") must be FALSE while (\"K\",\"k\") and (\"\u03c2\",\"\u03a3\") are true through the simple-fold orbit rather than through lowercasing.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/path.go:ComparePathsCaseSensitive",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -4807,10 +4885,13 @@
       ],
       "case": "filesystem/tspath/compare-separator-count",
       "discriminates": "A port that normalises slashes first -- the natural mistake, because everything around this operation does. (\"a\\\\b\",\"a/b\") must be less-than and (\"a\\\\b\\\\c\",\"a/b\") must be less-than too, where a normalising port answers equal and greater-than respectively. (\"a/b\",\"c/d\") must be EQUAL, which pins that this is a count and not a path comparison, and (\"c:/a\",\"a\") is greater-than because the root's separator counts like any other.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/path.go:CompareNumberOfDirectorySeparators",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -4971,10 +5052,13 @@
       ],
       "case": "filesystem/tspath/path-components-relative-to",
       "discriminates": "A port that uses one comparer for every index. Component 0 is compared case-INSENSITIVELY always, and later components by the requested comparer, so (\"/A\",\"/a/b\") with case_sensitive=true must give [\"\", \"..\", \"a\", \"b\"] -- the roots match, `A` and `a` do not -- while case_sensitive=false gives [\"\", \"b\"]. A uniform case-sensitive comparer breaks at index 0 and returns the whole `to` list instead. (\"c:/a\",\"d:/b\") must return the `to` components unchanged because nothing is shared, and (\"//server/a\",\"//SERVER/b\") must share its root under BOTH settings.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/path.go:GetPathComponentsRelativeTo",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -5149,10 +5233,13 @@
       ],
       "case": "filesystem/tspath/convert-to-relative-path",
       "discriminates": "A port that tests PathIsAbsolute (`!= 0`) instead of IsRootedDiskPath (`> 0`). A URL's encoded root is the bitwise COMPLEMENT and therefore negative, so a URL takes the early return. Most URL rows cannot see the difference -- the relative machinery would answer with the whole `to` path anyway once the roots diverge -- so the two rows that CAN are the point: (\"http://h/a/b\",\"http://h/a\") and (\"file:///c:/x/a\",\"file:///c:/x\") must come back whole, because the pin never converts them, while a PathIsAbsolute port shares the root with the current directory and answers `b` and `a`. The case setting is the other half: (\"/HERE/a\",\"/here\") must convert to `a` when case-insensitive and to `../HERE/a` when case-sensitive. `c:d` is returned unchanged because it is not rooted at all.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/path.go:ConvertToRelativePath",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -5255,10 +5342,13 @@
       ],
       "case": "filesystem/tspath/module-name-shape",
       "discriminates": "A port that treats any `<letter>:` prefix as absolute. `c:x` must become `./c:x` and must NOT be an external relative module name, because GetEncodedRootLength returns 2 only for a bare `c:` and 3 for `c:/` or `c:\\`, and `c:x` falls through to 0. The two operations then split on URLs: EnsurePathIsNonModuleName tests PathIsAbsolute, so `http://h/a` and `file:///c:/a` are returned unchanged, while IsExternalModuleNameRelative tests IsRootedDiskPath and answers FALSE for both -- a port written against one reading gets the other wrong. The empty string must become `./` rather than being special-cased, and `.\\a` and `..\\a` are relative because the dot-relative test accepts a backslash.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/path.go:EnsurePathIsNonModuleName",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -5345,10 +5435,13 @@
       ],
       "case": "filesystem/tspath/resolve-tripleslash-reference",
       "discriminates": "A port that treats any `<letter>:` prefix as absolute: `c:b.ts` is NOT rooted, so it must be joined onto the containing directory and give `/a/c:b.ts`, where `c:/b.ts` takes the early return and comes back normalised. A port that skips the normalisation: (\"b/../c.ts\",\"/a/c.ts\") must reduce to `/a/c.ts`, and `.\\b.ts` must have its separator normalised. (\"b.ts\",\"\") must give `b.ts`, because the directory of an empty containing file is empty and the join is a no-op. The URL rows are recorded as a CONTROL rather than as a discriminator, and the recorded answers say why: the early return tests IsRootedDiskPath, so a URL module name falls through to CombinePaths, where its own non-zero root length replaces the base anyway -- the PathIsAbsolute misreading is invisible at this operation and the frozen rows show it, so nobody has to re-derive it.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/path.go:ResolveTripleslashReference",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -5643,10 +5736,13 @@
       ],
       "case": "filesystem/tspath/starts-with-directory",
       "discriminates": "Three wrong implementations. (a) One that loop-trims the directory: `/a//` trims to `/a/` only, so `/a/b.ts` under it is FALSE because the file does not start with `/a//`. (b) One that drops the second prefix test: `C:\\a\\b.ts` under `c:\\a` must be true case-insensitively, which requires the backslash alternative. (c) One that trims '/' and '\\' in the other order or in one pass: `/a/` and `/a\\` behave differently from `/a/\\`. The identical-paths row is the contract everyone gets wrong: a file equal to its directory is NOT inside it, because the test appends a separator first. An empty directory name is always false, before any canonicalisation runs.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/path.go:StartsWithDirectory",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -5737,10 +5833,13 @@
       ],
       "case": "filesystem/tspath/contains-ignored-path",
       "discriminates": "A port that reads the first pattern as a path COMPONENT. `/a/node_modules/x` must be false while `/a/node_modules/.bin` is true: the pattern is the fifteen bytes ending in a dot, not the directory name. `node_modules/.bin` with no leading slash must be FALSE for the same reason. `/a/.gitignore` must be true, which pins that these are raw substrings and not component matches, and `a.#b` is true anywhere in the string. The backslash row `/a\\node_modules\\.bin` must be FALSE -- no normalization runs -- and the uppercase rows must be false because nothing is folded.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/ignoredpaths.go:ContainsIgnoredPath",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -5842,10 +5941,13 @@
       ],
       "case": "filesystem/tspath/typed-path-contains",
       "discriminates": "A port that implements the typed method by delegating to the free function. A Path is already rooted, reduced and case-folded, so the method does NOT combine with a current directory, does NOT reduce `.` or `..` and does NOT fold case: (\"/A\",\"/a/b\") must be FALSE for the method and TRUE for the free function under a case-insensitive comparer, and (\"/a\",\"/a/../b\") must be TRUE for the method -- `/a` is a byte prefix and the byte after it is a separator -- while the free function is FALSE at both case settings, because it reduces the child to [\"/\",\"b\"]. The neighbouring (\"/a\",\"/a/../a/b\") row is TRUE on all three columns and does not separate anything on its own; it is kept because the pair of `..` rows together shows the method never inspects `..`, answering true whether or not the reduction would have agreed. The empty parent is false for both but for different reasons. `/a` against `/ab` must be false -- the byte after the prefix has to be a separator -- while `/a/` against `/a/b` is true because the parent already ends in one.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/path.go:Path.ContainsPath",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -5912,10 +6014,13 @@
       ],
       "case": "filesystem/tspath/typed-path-directory",
       "discriminates": "A port that re-canonicalises inside the typed wrapper. A Path is already rooted, reduced and case-folded, so the method must be a pure byte operation: Path(\"/A/B\") must give `/A` and not `/a`, and Path(\"c:\\a\\b\") must still be slash-normalised by the underlying operation, because the wrapper adds nothing and removes nothing. A port that made the typed form stricter -- refusing a relative or unnormalised Path -- is caught by the `a/b` and `/a/./b` rows, which the pin answers without complaint.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/path.go:Path.GetDirectoryPath",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -6041,10 +6146,13 @@
       ],
       "case": "filesystem/tspath/ancestor-walk-stop-and-global-cache",
       "discriminates": "Three wrong implementations. (1) A port that stops BEFORE calling the callback at the global cache directory: the equality test runs AFTER the callback, so the cache directory is always visited and (\"/a\",\"/a/b/c\") must return `v:/a`, not the zero value. (2) A port that compares the cache location with a containment test rather than equality: (\"/zz\",\"/a/b\") must walk to the end and return the zero value, and (\"/a/b\", \"/a/b/c\") must stop at `/a/b` and not at `/a`. (3) A port that returns the LAST callback result when the walk is exhausted -- the obvious fold -- instead of the zero value: every unstopped row must record an empty returned value with ok=false, while a stopped row records the value and ok=true.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/path.go:ForEachAncestorDirectoryStoppingAtGlobalCache",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -6117,10 +6225,13 @@
       ],
       "case": "filesystem/tspath/ancestor-walk-path-dialect",
       "discriminates": "A port that re-canonicalises inside the typed wrapper. The pin converts the Path to a string and walks, and the walk's own GetDirectoryPath DOES normalise slashes, so `c:\\a\\b` is visited verbatim first and every later element has forward slashes -- the separators change MID-WALK, which a port that canonicalises the input up front cannot reproduce and a port that refuses a non-canonical Path cannot answer at all. `/A/B` must be visited with its original casing, because a Path is already folded and the wrapper folds nothing. The relative row `a/b` must still reach the empty Path last.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/path.go:ForEachAncestorDirectoryPath",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -6267,10 +6378,13 @@
       ],
       "case": "filesystem/tspath/extension-is-predicates",
       "discriminates": "For ExtensionIsTs, `.d.x.ts` (true) against `.d..ts` (false) pins the `len(ext) >= 7` boundary exactly, catching a port that writes `> 7` or `>= 6` or that tests only `starts_with(\".d.\") && ends_with(\".ts\")` with no length guard; `.json.ts` (false) catches a port that tests `contains(\".d.\")` rather than the first three bytes, and `.D.TS` (false) catches one that folds case. For ExtensionIsOneOf, `a.ts` in [\".ts\"] must be FALSE: this is whole-string equality, so a port that reuses the suffix predicate answers true and is caught, and `ts` in [\".ts\"] is false for the same reason. The empty extension is a member of [\"\"] and not of an empty list, which catches a port that short-circuits on \"no extension\".",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/extension.go:ExtensionIsTs",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -6423,10 +6537,13 @@
       ],
       "case": "filesystem/tspath/file-extension-is",
       "discriminates": "Two rows carry the whole case. (\"ats\",\"ts\") must be TRUE: there is no dot boundary, this is a raw suffix test, so a port that requires a '.' before the extension -- which is what the neighbouring tryGetExtensionFromPath does three lines away in the same file -- answers false. (\"ts\",\"ts\") and (\".ts\",\".ts\") must be FALSE, because the guard is `len(path) > len(extension)` and not `>=`; that single rule is what makes `.ts` not one of its own extensions, and every port written as a bare `ends_with` fails it. The empty extension is true for any non-empty path and false for the empty one. For the list form, a nil list and an empty list are both false and neither panics.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/path.go:FileExtensionIs",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -6549,10 +6666,13 @@
       ],
       "case": "filesystem/tspath/extension-family-predicates",
       "discriminates": "`.ts`, `.d.ts` and `.tsx` must be FALSE for every one of the four, because FileExtensionIs requires the path to be strictly longer than the extension -- that is the row the shipped private helper in the port gets wrong, and every plausible `ends_with` port with it. `style.d.css.ts` separates the TS predicate (TRUE: it ends with `.ts`) from the implementation predicate (FALSE: the declaration test recognises arbitrary `.d.<x>.ts`), so a port that shares one list between them fails one of the two. `a.json` must be false for the JS predicate, catching a port that folds the JSON extension into the JS list, and `a.json/` is false for the JSON one where a trailing-separator-trimming port says true. `dir.d.ts/a.ts` is TRUE for the implementation predicate, which pins that the declaration test runs on the BASE NAME and not on the whole path.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/extension.go:HasTSFileExtension",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -7228,10 +7348,13 @@
       ],
       "case": "filesystem/tspath/extension-first-versus-longest",
       "discriminates": "The FIRST-match rule against the LONGEST-match rule, which two of these four get opposite ways round. With [\".z\", \".y.z\"] on `/src/C.y.z` the worker and GetAnyExtensionFromPath must answer `.z` and GetLongestExtensionFromPath must answer `.y.z`; reversing the list flips the first two and leaves the third alone. A shared helper fails one of the two. (\"a.ts\", [], false) must be `.ts` while (\"a.ts\", [\".js\"], false) is empty: the arm is chosen by `len(extensions) > 0`, not by nil, so an Option-typed port collapses the two. GetLongestExtensionFromPath with a nil or empty list is EMPTY -- it does not fall back to the base name. `/src/xext` against `.ext` must be empty for the single-extension helper (the byte before the extension must be a '.') while FileExtensionIs, in its own case, answers true for the same shape. `ignore_case` returns the PATH's bytes, not the list's: `/a/b.EXT` against `.ext` gives `.EXT`.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/path.go:GetAnyExtensionFromPath",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -7354,10 +7477,13 @@
       ],
       "case": "filesystem/tspath/extension-extract-tables",
       "discriminates": "`a.json` must give `.json` for TryGetExtensionFromPath and EMPTY for TryExtractTSExtension -- a port that shares one list between the two fails it. `.ts`, `.d.ts` and `.json` must be EMPTY for both, which pins FileExtensionIs's strict `>` and is exactly where the shipped private port in the tree answers Some. `style.d.css.ts` separates all three extractors: `.ts` from the flat list, `.d.css.ts` from the declaration extractor, and `.d.ts` from the emit extractor, which reaches its third switch arm on the `.ts` suffix before the default is ever considered. `a.d.ts.d.ts` must give `.d.ts` and not `.d.ts.d.ts`, which forces the SUFFIX-before-INDEX order inside the declaration extractor -- a port that goes straight to the first `.d.` index, which is what the shipped private helper does, returns the whole tail. `.ts` must give `.d.ts.ts` for the emit extension: it misses every switch arm through the strict `>` and then the default's extension lookup, which uses the base name, still sees `.ts`. For the input extensions, `a.d.json.ts` must give exactly [\".json\"] while `a.d.ts` gives the four-element default in the order [\".tsx\", \".ts\", \".jsx\", \".js\"] -- any other order fails, and so does returning [\".ts\"] for it.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/extension.go:TryGetExtensionFromPath",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -7592,10 +7718,13 @@
       ],
       "case": "filesystem/tspath/change-extension-family",
       "discriminates": "(\"a.ts\",\"js\") must give `a.js`: the dot is prepended when the new extension has none, so a port that concatenates verbatim gives `ajs` -- which is exactly what the shipped private helper in the tree returns. (\"a.ts/\",\".js\") must give `a..js`, because the matched extension is measured on the TRIMMED path and then sliced off the UNTRIMMED one; a port that trims first gives `a.js` and one that finds no extension gives `a.ts/`. (\"a.d.ts.d.ts\",\".js\") separates ChangeFullExtension from every port built on the first `.d.` index: the declaration extractor matches the `.d.ts` SUFFIX first, so the answer is `a.d.ts.js` and not `a.js`. (\"a.d.ts\",\".js\") is NOT a contrast pair: extension.go:43 puts `.d.ts` first in extensionsToRemove, so ChangeExtension and ChangeFullExtension both answer `a.js`; those two rows separate the operations only together with the NIL-list one on the same path, which takes GetAnyExtensionFromPath's base-name arm, finds `.ts` and answers `a.d.js`. The pair that does contrast the list-driven rewrite with the declaration-aware one is (\"style.d.css.ts\",\".js\"): `style.d.css.js` for ChangeExtension, which matches the plain `.ts` suffix, against `style.js` for ChangeFullExtension, which matches `.d.css.ts` from the `.d.` onwards. An empty new extension DELETES the extension for ChangeExtension (`a.ts` -> `a`) and ChangeAnyExtension (`/p/f.ext` -> `/p/f`) but NOT for ChangeFullExtension: extension.go:186-190 normalises the new extension to `.` + ext with no empty-extension branch of its own, so (\"a.d.ts\",\"\") is `a.` -- a trailing dot -- and a port that shares one empty-extension guard across all three fails that row. A path whose extension is not in the caller's list comes back untouched.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/extension.go:ChangeExtension",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -7716,10 +7845,13 @@
       ],
       "case": "filesystem/tspath/remove-extension-family",
       "discriminates": "(\"a.ts\",\".js\") must give `a`. The pin never checks that the extension is actually a suffix -- it just slices -- so a port written as `strip_suffix(ext).unwrap_or(path)` returns `a.ts` and is wrong on the one row that separates the two readings. (\"a\",\".d.ts\") and (\"\",\".ts\") must PANIC rather than clamping to the empty string, which is what a saturating port would do. For RemoveAnyFileExtension, `/a/b.ext/` must give `/a/b.` and nothing else: the fallback measures `.ext` on the TRIMMED path but hands it to the unchecked slice, which cuts the UNTRIMMED one, so the trailing separator is consumed and the dot survives. A port that trims first gives `/a/b`, and one that returns `/a/b.ext` misses the fallback entirely. `a.d.ts` must give `a` through the first stage, while `/src/Component.vue` reaches the fallback.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/extension.go:RemoveExtension",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -8060,10 +8192,13 @@
       ],
       "case": "filesystem/tspath/common-parents",
       "discriminates": "Four things. (1) The guard precedes the empty check: `([], 0)` must PANIC with \"minComponents must be at least 1\", so a port that returns early for an empty list never panics and is caught. (2) The DOS row [c:/a/b/c/d, d:/a/b/c/d] with minComponents 1 must return BOTH paths unchanged: the divergence is at index 0, 0 < minComponents, so the worker regroups by the canonicalised Path of the diverging component and recurses. (3) That regrouping is ORDERED by sorted Path, not by map iteration, so a port that fans out in map order produces the right set in an unstable order and fails the frozen row; the case-insensitive rows make the key's canonicalisation observable too. (4) A path with fewer than minComponents components is IGNORED rather than dropped silently: ([/a/b/c/d, /a/b/c/e, /a/b/f/g, /x/y], 4) must report `/x/y` as ignored and still return two parents.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/path.go:GetCommonParents",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     },
     {
       "actions": [
@@ -8145,10 +8280,13 @@
       ],
       "case": "filesystem/tspath/normalized-absolute-path-without-root",
       "discriminates": "A port that strips only a leading '/' or a DOS volume. The root is measured with the COMPLEMENT FOLDED AWAY, so `http://h/a` loses the whole `http://h/` prefix and yields `a`, and `file:///c:/a` yields `a`; a port that tests the signed value returns the string unchanged or keeps `//h/a`. (\"c:\",\"\") must give the EMPTY string, because the normalised form is `c:/` and its root is all three bytes, and (\"/\",\"\") is empty for the same reason -- a port that slices a fixed number of bytes gets one of the two wrong. (\"//server/share/x\",\"\") loses the whole `//server/` root and keeps `share/x`.",
-      "host_applicability": "any",
       "operation": "tsc/internal/tspath/path.go:GetNormalizedAbsolutePathWithoutRoot",
       "order_sensitive": true,
-      "subject": "tspath"
+      "subject": "tspath",
+      "hosts": [
+        "any"
+      ],
+      "host_note": "any"
     }
   ]
 }

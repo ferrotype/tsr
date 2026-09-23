@@ -33,12 +33,44 @@ pub fn failure(op: &'static str, path: &[u8], error: std::io::Error) -> IoError 
 /// port: tsc/internal/nativepath/symlink_other.go:IsSymlinkOrReparsePoint
 #[cfg(not(windows))]
 pub fn is_symlink_or_reparse_point(name: &[u8]) -> bool {
-    std::fs::symlink_metadata(path(name)).is_ok_and(|m| m.file_type().is_symlink())
+    symlink_metadata(path(name)).is_ok_and(|m| m.file_type().is_symlink())
 }
 #[cfg(windows)]
 pub fn is_symlink_or_reparse_point(name: &[u8]) -> bool {
     use std::os::windows::fs::MetadataExt;
-    std::fs::symlink_metadata(path(name)).is_ok_and(|m| m.file_attributes() & 0x400 != 0)
+    symlink_metadata(path(name)).is_ok_and(|m| m.file_attributes() & 0x400 != 0)
+}
+/// Retry only a raw syscall EINTR, not a caller-created or wrapped error that
+/// merely has `ErrorKind::Interrupted`.
+/// port: tsc/internal/nativepath/eintr_unix.go:ignoringEINTR
+#[cfg(unix)]
+pub(super) fn ignoring_eintr<T>(
+    mut operation: impl FnMut() -> std::io::Result<T>,
+) -> std::io::Result<T> {
+    loop {
+        match operation() {
+            Err(error) if error.raw_os_error() == Some(rustix::io::Errno::INTR.raw_os_error()) => {}
+            result => return result,
+        }
+    }
+}
+// Rust's Unix std metadata/readlink functions do not retry EINTR; Go's os
+// functions do. Keep retries around each syscall, not whole filesystem actions.
+#[cfg(not(unix))]
+pub(super) fn ignoring_eintr<T>(
+    mut operation: impl FnMut() -> std::io::Result<T>,
+) -> std::io::Result<T> {
+    operation()
+}
+pub(super) fn metadata(path: impl AsRef<Path>) -> std::io::Result<std::fs::Metadata> {
+    ignoring_eintr(|| std::fs::metadata(path.as_ref()))
+}
+pub(super) fn symlink_metadata(path: impl AsRef<Path>) -> std::io::Result<std::fs::Metadata> {
+    ignoring_eintr(|| std::fs::symlink_metadata(path.as_ref()))
+}
+#[cfg(not(windows))]
+fn read_link(path: impl AsRef<Path>) -> std::io::Result<PathBuf> {
+    ignoring_eintr(|| std::fs::read_link(path.as_ref()))
 }
 /// port: tsc/internal/nativepath/realpath_linux.go:Realpath
 #[cfg(target_os = "linux")]
@@ -46,23 +78,21 @@ pub fn realpath(name: &[u8]) -> Result<Vec<u8>, IoError> {
     use rustix::fs::{openat, Mode, OFlags, CWD};
     use std::os::fd::AsRawFd;
     static PROC: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
-    if !*PROC.get_or_init(|| std::fs::metadata("/proc/self/fd").is_ok()) {
+    if !*PROC.get_or_init(|| metadata("/proc/self/fd").is_ok()) {
         return eval_symlinks(name);
     }
-    let fd = loop {
-        match openat(
+    let fd = ignoring_eintr(|| {
+        openat(
             CWD,
             path(name),
             OFlags::PATH | OFlags::CLOEXEC,
             Mode::empty(),
-        ) {
-            Err(rustix::io::Errno::INTR) => continue,
-            Err(e) => return Err(failure("open", name, e.into())),
-            Ok(fd) => break fd,
-        }
-    };
-    let resolved = std::fs::read_link(format!("/proc/self/fd/{}", fd.as_raw_fd()))
-        .map_err(|e| failure("readlink", name, e))?;
+        )
+        .map_err(std::io::Error::from)
+    })
+    .map_err(|error| failure("open", name, error))?;
+    let proc_path = format!("/proc/self/fd/{}", fd.as_raw_fd());
+    let resolved = read_link(&proc_path).map_err(|e| failure("readlink", name, e))?;
     Ok(bytes(&resolved))
 }
 /// port: tsc/internal/nativepath/realpath_other.go:Realpath
@@ -127,8 +157,7 @@ fn eval_symlinks(name: &[u8]) -> Result<Vec<u8>, IoError> {
             dest.push(b'/');
         }
         dest.extend_from_slice(part);
-        let info =
-            std::fs::symlink_metadata(path(&dest)).map_err(|e| failure("lstat", &dest, e))?;
+        let info = symlink_metadata(path(&dest)).map_err(|e| failure("lstat", &dest, e))?;
         if !info.file_type().is_symlink() {
             if !info.is_dir() && at < name.len() {
                 return Err(std::io::Error::from(std::io::ErrorKind::NotADirectory).into());
@@ -139,8 +168,7 @@ fn eval_symlinks(name: &[u8]) -> Result<Vec<u8>, IoError> {
         if links > 255 {
             return Err(IoError::message("EvalSymlinks: too many links"));
         }
-        let target =
-            bytes(&std::fs::read_link(path(&dest)).map_err(|e| failure("readlink", &dest, e))?);
+        let target = bytes(&read_link(path(&dest)).map_err(|e| failure("readlink", &dest, e))?);
         let mut next = target.clone();
         next.extend_from_slice(&name[at..]);
         name = next;
@@ -170,4 +198,54 @@ pub fn executable() -> Result<Vec<u8>, IoError> {
 /// port: tsc/internal/osutil/osutil.go:Args
 pub fn args() -> Vec<Vec<u8>> {
     std::env::args_os().map(|s| bytes(Path::new(&s))).collect()
+}
+
+#[cfg(all(test, unix))]
+mod tests {
+    use super::ignoring_eintr;
+
+    #[test]
+    fn interrupted_syscalls_retry_but_other_and_wrapped_errors_return_once() {
+        let interrupted =
+            || std::io::Error::from_raw_os_error(rustix::io::Errno::INTR.raw_os_error());
+        let mut attempts = 0;
+        let result = ignoring_eintr(|| {
+            attempts += 1;
+            if attempts < 3 {
+                Err(interrupted())
+            } else {
+                Ok(19)
+            }
+        });
+        assert_eq!(result.unwrap(), 19);
+        assert_eq!(attempts, 3);
+
+        let mut attempts = 0;
+        let error = ignoring_eintr::<()>(|| {
+            attempts += 1;
+            Err(std::io::Error::from_raw_os_error(
+                rustix::io::Errno::NOENT.raw_os_error(),
+            ))
+        })
+        .unwrap_err();
+        assert_eq!(attempts, 1);
+        assert_eq!(
+            error.raw_os_error(),
+            Some(rustix::io::Errno::NOENT.raw_os_error())
+        );
+
+        let mut attempts = 0;
+        let error = ignoring_eintr::<()>(|| {
+            attempts += 1;
+            assert_eq!(attempts, 1, "wrapped EINTR must not be retried");
+            Err(std::io::Error::new(
+                std::io::ErrorKind::Interrupted,
+                interrupted(),
+            ))
+        })
+        .unwrap_err();
+        assert_eq!(error.kind(), std::io::ErrorKind::Interrupted);
+        assert_eq!(error.raw_os_error(), None);
+        assert_eq!(attempts, 1);
+    }
 }

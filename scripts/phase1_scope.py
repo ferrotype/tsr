@@ -493,6 +493,40 @@ WITNESS_KINDS = ("rust_gated", "rust_ungated", "native_authority")
 COVERING_WITNESS_KINDS = ("rust_gated",)
 
 
+def case_claims_digest(case: dict) -> str:
+    """Bind the reviewed declaration, excluding only derived observation fields."""
+    claims = {key: value for key, value in case.items()
+              if key not in ("last_result", "result_evidence", "missing_operations")}
+    return hashlib.sha256(json.dumps(claims, sort_keys=True).encode()).hexdigest()
+
+
+def recorded_results(cases: dict) -> dict[str, str]:
+    """A recorded outcome belongs to its exact request and operation claims.
+
+    Old unbound records remain visible but cannot establish preparation or
+    coverage until an authenticated capture records them again.
+    """
+    import phase1_capture as capture
+
+    requests: dict[str, dict] = {}
+    for family in {case.get("family") for case in cases.get("cases", [])}:
+        if family in capture.FAMILIES:
+            requests.update({row["case"]: row for row in capture.load_requests(capture.FAMILIES[family])["requests"]})
+    results = {}
+    for case in cases.get("cases", []):
+        evidence = case.get("result_evidence", {})
+        request = requests.get(case["id"])
+        valid = (request is not None
+                 and evidence.get("request_sha256") == capture.digest(capture.request_bytes(request))
+                 and evidence.get("claims_sha256") == case_claims_digest(case)
+                 and evidence.get("result") == case.get("last_result")
+                 and evidence.get("missing_operations", []) == case.get("missing_operations", [])
+                 and isinstance(evidence.get("capture_sha256"), str)
+                 and re.fullmatch(r"[0-9a-f]{64}", evidence["capture_sha256"]) is not None)
+        results[case["id"]] = case.get("last_result", "not_run") if valid else "not_run"
+    return results
+
+
 def cases_by_operation() -> dict[str, list[str]]:
     """Invert the committed case manifest so each operation names its cases.
 
@@ -505,6 +539,7 @@ def cases_by_operation() -> dict[str, list[str]]:
         return {}
     document = json.loads(path.read_text())
     inverted: dict[str, list[str]] = {}
+    results = recorded_results(document)
     for case in document.get("cases", []):
         # A prepared case only covers an operation once it actually compares.
         # A case whose last result is `not_implemented` witnesses the gap; it
@@ -512,7 +547,7 @@ def cases_by_operation() -> dict[str, list[str]]:
         # implementations as done.
         # Absent means unrun, which is not evidence either. Only a recorded
         # match covers.
-        if case.get("last_result") != "match":
+        if results[case["id"]] != "match":
             continue
         for operation in case.get("coverage_operations", case.get("operations", [])):
             inverted.setdefault(operation, []).append(case["id"])
@@ -541,8 +576,9 @@ def witnessed_gaps() -> dict[str, list[str]]:
         return {}
     document = json.loads(path.read_text())
     gaps: dict[str, list[str]] = {}
+    results = recorded_results(document)
     for case in document.get("cases", []):
-        if case.get("last_result") != "not_implemented":
+        if results[case["id"]] != "not_implemented":
             continue
         for operation in case.get("missing_operations", []):
             gaps.setdefault(operation, []).append(case["id"])
@@ -757,8 +793,9 @@ def prepared_links(cases: dict, step: str = "leaves") -> dict[str, list[str]]:
     recorded matches, let an operation be prepared and exempted at once.
     """
     links: dict[str, list[str]] = {}
+    results = recorded_results(cases)
     for case in cases.get("cases", []):
-        if case.get("family") not in STEP_FAMILIES[step] or case.get("last_result") not in PREPARING_RESULTS:
+        if case.get("family") not in STEP_FAMILIES[step] or results[case["id"]] not in PREPARING_RESULTS:
             continue
         for operation in case.get("operations", []):
             links.setdefault(operation, []).append(case["id"])
@@ -843,7 +880,7 @@ STEP_FAMILIES = {
 }
 
 
-def leaf_preparation(scope: dict, cases: dict, step: str = "leaves") -> dict:
+def leaf_preparation(scope: dict, cases: dict, step: str = "leaves", *, supplemental_prepared_cases=()) -> dict:
     """Preparation is not parity: a classified gap is runnable, an absent link isn't.
 
     Keep the conservative package roster until an operation has an explicit
@@ -856,8 +893,16 @@ def leaf_preparation(scope: dict, cases: dict, step: str = "leaves") -> dict:
     """
     families = STEP_FAMILIES[step]
     prepared: dict[str, list[str]] = {}
+    results = recorded_results(cases)
+    supplemental = set(supplemental_prepared_cases)
+    by_id = {case["id"]: case for case in cases.get("cases", [])}
+    for identity in supplemental:
+        case = by_id.get(identity)
+        if case is None or results.get(identity) not in ("native_unavailable", "not_applicable"):
+            raise ValueError(f"{identity}: platform witness may only supplement a bound native-unavailable case")
+        results[identity] = "match"
     for case in cases.get("cases", []):
-        if case.get("family") not in families or case.get("last_result") not in PREPARING_RESULTS:
+        if case.get("family") not in families or results[case["id"]] not in PREPARING_RESULTS:
             continue
         for operation in case.get("operations", []):
             prepared.setdefault(operation, []).append(case["id"])
@@ -1105,7 +1150,8 @@ def reviewed_destinations() -> dict[str, dict]:
         raise ValueError("coverage-review.json has no current pinned review authority")
     known = {row["id"]: row for row in inventory()}
     decisions: dict[str, dict] = {}
-    for row in review.get("reviewed_operation_destinations", []):
+    unused = review.get("reviewed_unused_compiler_operations", [])
+    for row in [*review.get("reviewed_operation_destinations", []), *unused]:
         identity = row.get("operation")
         original = known.get(identity)
         if identity in decisions or original is None:
@@ -1113,7 +1159,9 @@ def reviewed_destinations() -> dict[str, dict]:
         if original["package"] != "internal/compiler":
             raise ValueError(f"{identity}: only the reviewed partial compiler scope can move")
         phase = row.get("destination_phase")
-        if type(phase) is not int or phase not in range(2, 8):
+        if row in unused and phase is not None:
+            raise ValueError(f"{identity}: unused operation cannot also name a destination")
+        if row not in unused and (type(phase) is not int or phase not in range(2, 8)):
             raise ValueError(f"{identity}: invalid reviewed destination phase {phase!r}")
         if not row.get("reason") or not row.get("evidence"):
             raise ValueError(f"{identity}: reviewed destination lacks a reason or source evidence")
@@ -1126,4 +1174,4 @@ def reviewed_destinations() -> dict[str, dict]:
         raise ValueError("coverage-review.json: duplicate or simultaneously resolved destination")
     if any(identity not in known for identity in unresolved):
         raise ValueError("coverage-review.json: unknown unresolved operation")
-    return decisions
+    return {identity: row for identity, row in decisions.items() if "destination_phase" in row}

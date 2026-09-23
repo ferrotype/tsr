@@ -15,6 +15,10 @@ import s06_utilities as utilities
 
 
 class ProgramPreflightTests(unittest.TestCase):
+    def test_committed_source_check_inventory_matches_the_runner(self):
+        manifest = json.loads((helpers.ROOT / 'data/s07/program-helper-tests.json').read_bytes())
+        self.assertEqual(manifest['checks'], helpers.CHECKS)
+
     def setUp(self):
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
@@ -123,6 +127,68 @@ class ProgramPreflightTests(unittest.TestCase):
             setup.assert_not_called()
             subset.assert_not_called()
             command.assert_not_called()
+
+    def test_helper_source_check_failure_stops_before_expensive_capture(self):
+        self.write_manifest()
+        def setup(args, *unused, **kwargs):
+            if args[0] == 'cargo':
+                return self.build
+            if args[0] == self.binary:
+                return self.valid_inventory
+            raise ValueError('stale helper source manifest')
+        with patch('s07_program_compare.input_fingerprints', return_value={}), \
+                patch('s07_producers.ROOT', self.root), patch.object(helpers, 'ROOT', self.root), \
+                patch.object(helpers, 'setup', side_effect=setup), \
+                patch('s07_producers.prepare_subset') as subset, \
+                patch('s07_producers.command') as command:
+            with self.assertRaisesRegex(ValueError, 'stale helper source manifest'):
+                program()
+            subset.assert_not_called()
+            command.assert_not_called()
+
+
+class ProgramResumeTests(unittest.TestCase):
+    def test_current_stages_reuse_without_capture_and_corruption_is_not_hidden(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / 'target/s07-program-reports').mkdir(parents=True)
+            loader_report = dict(loader_graph_parity=True, config_parity=True,
+                                 metrics={'subset_loads': True}, required_variants=2, passed_variants=2)
+            verification = dict(metrics={'option_verification': True}, passed_variants=2)
+            with patch('s07_producers.ROOT', root), \
+                    patch('s07_program_compare.input_fingerprints', side_effect=dict), \
+                    patch('s07_program_helpers.preflight', return_value='prepared'), \
+                    patch('s07_program_helpers.measure', return_value={'pass': True, 'tests': 1}), \
+                    patch('s07_producers.prepare_subset', return_value=(root/'sources', root/'native', root/'requests')), \
+                    patch('s07_subset_freeze.freeze'), \
+                    patch('s07_program_replay.replay_loader', return_value=loader_report) as replay_loader, \
+                    patch('s07_program_replay.replay_verification', return_value=verification), \
+                    patch('s07_program_compare.check_subset') as loader_capture, \
+                    patch('s07_verify_compare.capture') as verification_capture, \
+                    patch('s07_producers.command') as command, \
+                    patch('sys.stderr'):
+                self.assertTrue(program()['metrics']['subset_loads'])
+                loader_capture.assert_not_called()
+                verification_capture.assert_not_called()
+                command.assert_not_called()
+                for name in ('.cargo/config.toml', 'crates/tsr_bundled/bundled/libs/lib.d.ts'):
+                    path = root / name
+                    path.parent.mkdir(parents=True, exist_ok=True)
+                    path.write_text('before')
+                    def change_build_input(*args):
+                        path.write_text('after')
+                        return loader_report
+                    replay_loader.side_effect = change_build_input
+                    with self.subTest(changed_input=name):
+                        result = program()
+                        self.assertFalse(result['metrics']['source_stable'])
+                        self.assertFalse(result['metrics']['subset_loads'])
+                replay_loader.side_effect = ValueError('corrupt stored output')
+                with self.assertRaisesRegex(ValueError, 'corrupt stored output'):
+                    program()
+                loader_capture.assert_not_called()
+                verification_capture.assert_not_called()
+                command.assert_not_called()
 
 
 class BinderGateTests(unittest.TestCase):

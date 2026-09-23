@@ -169,3 +169,87 @@ fn mapped_diagnostics_select_text_without_mutating_the_ast() {
     drop(sources);
     assert_eq!(retained.text(), b"\nfoo");
 }
+
+#[test]
+fn request_locale_applies_to_chains_status_and_summary() {
+    use std::sync::Arc;
+    use tsr_ast::Diagnostic;
+    use tsr_compiler::diagnostic_writer::{
+        localized, localized_with_locale, DiagnosticWriter, FormattingOptions,
+    };
+    use tsr_jsstring::JsString;
+    let sources =
+        tsr_tsoptions::ParsedCommandLine::new(tsr_core::CompilerOptions::default(), vec![]);
+    let mut diagnostic = Diagnostic::compiler(
+        tsr_diagnostics::Unknown_compiler_option_0,
+        vec![JsString::from_bytes(b"notAnOption".as_slice())],
+    );
+    diagnostic.message_chain.push(Arc::new(Diagnostic::compiler(
+        tsr_diagnostics::Cannot_find_name_0,
+        vec![JsString::from_bytes(b"name".as_slice())],
+    )));
+    let mut writer = DiagnosticWriter::from_sources(
+        &sources,
+        FormattingOptions {
+            locale: tsr_locale::Locale::parse("de-DE").0,
+            ..Default::default()
+        },
+    );
+    // Text is from the pinned de-DE catalog; the envelope and indentation are
+    // WriteFlattenedDiagnosticMessage / FormatDiagnosticsStatusAndTime.
+    let flattened =
+        "Unbekannte Compileroption \"notAnOption\".\n  Der Name \"name\" wurde nicht gefunden.";
+    assert_eq!(
+        writer.flatten(&diagnostic, b"\n").unwrap(),
+        flattened.as_bytes()
+    );
+    assert_eq!(
+        writer.status(&diagnostic, b"12:34:56", false).unwrap(),
+        format!("12:34:56 - {flattened}").as_bytes()
+    );
+    assert_eq!(
+        writer.format(&[&diagnostic], false).unwrap(),
+        format!("error TS5023: {flattened}\n").as_bytes()
+    );
+    assert_eq!(
+        writer.error_summary(&[&diagnostic]).unwrap(),
+        "\n1 Fehler gefunden.\n\n".as_bytes()
+    );
+    assert_eq!(
+        localized(&diagnostic).unwrap(),
+        b"Unknown compiler option 'notAnOption'."
+    );
+    assert_eq!(
+        localized_with_locale(&diagnostic, &tsr_locale::Locale::parse("zz-ZZ").0).unwrap(),
+        localized(&diagnostic).unwrap()
+    );
+    let external = Diagnostic::external(
+        None,
+        tsr_core::TextRange::new(-1, -1),
+        JsString::default(),
+        1,
+        9999,
+        JsString::from_bytes(b"raw\xfftext".as_slice()),
+    );
+    assert_eq!(writer.flatten(&external, b"\n").unwrap(), b"raw\xfftext");
+}
+
+#[test]
+fn translated_error_table_heading_is_not_hardcoded() {
+    use tsr_compiler::diagnostic_writer::{DiagnosticWriter, FormattingOptions};
+    let sources =
+        tsr_tsoptions::ParsedCommandLine::new(tsr_core::CompilerOptions::default(), vec![]);
+    let writer = DiagnosticWriter::from_sources(
+        &sources,
+        FormattingOptions {
+            locale: tsr_locale::Locale::parse("ja-JP").0,
+            ..Default::default()
+        },
+    );
+    // An empty table still renders its translated heading, as the native leaf
+    // writeTabularErrorsDisplay does. This detects the old hardcoded English.
+    assert_eq!(
+        writer.tabular_errors(&[]).unwrap(),
+        "エラーの発生したファイル\n".as_bytes()
+    );
+}

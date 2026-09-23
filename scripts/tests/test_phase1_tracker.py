@@ -118,6 +118,30 @@ class ProducerClosureTests(unittest.TestCase):
                 self.assertEqual(before, fingerprint(root, specification), producer)
                 document.unlink()
 
+    def test_real_package_readme_is_excluded_from_replay_but_is_an_archive_input(self):
+        import phase1_producers
+        package_readme = ROOT / "crates/tsr_core/README.md"
+        self.assertTrue(package_readme.is_file())
+        name = str(package_readme.relative_to(ROOT))
+        ledger = runs()
+        for producer in ("config", "syntax"):
+            with self.subTest(producer=producer):
+                self.assertNotIn(name, selected(ROOT, ledger[producer]))
+                self.assertNotIn(name, phase1_producers.source_closure(producer))
+        self.assertIn(name, selected(ROOT, ledger["foundations"]))
+        self.assertIn(name, phase1_producers.source_closure("foundations"))
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            subprocess.run(["git", "init", "-q", str(root)], check=True)
+            path = root / name
+            path.parent.mkdir(parents=True)
+            path.write_text("original published README")
+            before = {producer: fingerprint(root, ledger[producer]) for producer in ("foundations", "config", "syntax")}
+            path.write_text("changed published README")
+            for producer in ("config", "syntax"):
+                self.assertEqual(before[producer], fingerprint(root, ledger[producer]))
+            self.assertNotEqual(before["foundations"], fingerprint(root, ledger["foundations"]))
+
     def test_generation_tracks_locale_output_and_its_actual_native_builder(self):
         specification = runs()["gen"]
         self.assertEqual(specification["command"], ["python3", "scripts/phase1_generation.py"])

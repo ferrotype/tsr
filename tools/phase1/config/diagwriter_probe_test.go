@@ -62,6 +62,8 @@ import (
 	"runtime"
 	"testing"
 
+	"golang.org/x/text/language"
+
 	"github.com/microsoft/TypeScript/tsc/internal/ast"
 	"github.com/microsoft/TypeScript/tsc/internal/core"
 	"github.com/microsoft/TypeScript/tsc/internal/diagnostics"
@@ -336,9 +338,21 @@ func phase1Segments(act phase1Action) *spanmap.SpanMap {
 // phase1FormatOpts builds the pinned FormattingOptions from the action. Every
 // field is required: a defaulted current directory would silently change what
 // ConvertToRelativePath returns.
+func phase1Locale(act phase1Action) locale.Locale {
+	raw, ok := act["locale"]
+	if !ok {
+		return locale.Default
+	}
+	tag, err := language.Parse(phase1JSONString(raw, "locale"))
+	if err != nil {
+		panic("phase1: malformed locale: " + err.Error())
+	}
+	return locale.Locale(tag)
+}
+
 func phase1FormatOpts(act phase1Action) *FormattingOptions {
 	return &FormattingOptions{
-		Locale: locale.Default,
+		Locale: phase1Locale(act),
 		ComparePathsOptions: tspath.ComparePathsOptions{
 			UseCaseSensitiveFileNames: act.flag("case_sensitive"),
 			CurrentDirectory:          act.bytes("current_directory"),
@@ -460,7 +474,7 @@ func phase1RowASTDiagnostic(state *phase1State, act phase1Action, op string, row
 		for _, entry := range chain {
 			entries = append(entries, []any{
 				int(entry.Code()),
-				phase1Hex(entry.Localize(locale.Default)),
+				phase1Hex(entry.Localize(phase1Locale(act))),
 			})
 		}
 		row["len"] = len(chain)
@@ -690,10 +704,14 @@ func phase1Sign(value int) int {
 
 func phase1RowFlatten(state *phase1State, act phase1Action, op string, row map[string]any) bool {
 	switch op {
+	case "error_summary":
+		var out bytes.Buffer
+		WriteErrorSummaryText(&out, FromASTDiagnostics(state.diagnostics(act.names("targets"))), phase1FormatOpts(act))
+		row["output_hex"] = phase1Hex(out.String())
 	case "flatten":
 		diag := WrapASTDiagnostic(state.diagnostic(act.bytes("target")))
 		row["text_hex"] = phase1Hex(
-			FlattenDiagnosticMessage(diag, act.bytes("new_line"), locale.Default))
+			FlattenDiagnosticMessage(diag, act.bytes("new_line"), phase1Locale(act)))
 	case "flatten_chain":
 		// flattenDiagnosticMessageChain is reached directly, at a caller-chosen
 		// level, so the indent arithmetic is observed without the parent
@@ -701,12 +719,12 @@ func phase1RowFlatten(state *phase1State, act phase1Action, op string, row map[s
 		var out bytes.Buffer
 		chain := WrapASTDiagnostic(state.diagnostic(act.bytes("target")))
 		flattenDiagnosticMessageChain(
-			&out, chain, act.bytes("new_line"), locale.Default, act.number("level"))
+			&out, chain, act.bytes("new_line"), phase1Locale(act), act.number("level"))
 		row["text_hex"] = phase1Hex(out.String())
 	case "write_flattened_ast":
 		var out bytes.Buffer
 		WriteFlattenedASTDiagnosticMessage(
-			&out, state.diagnostic(act.bytes("target")), act.bytes("new_line"), locale.Default)
+			&out, state.diagnostic(act.bytes("target")), act.bytes("new_line"), phase1Locale(act))
 		row["text_hex"] = phase1Hex(out.String())
 	default:
 		return false

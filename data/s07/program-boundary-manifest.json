@@ -1,0 +1,27 @@
+{
+  "adapters": {
+    "tools/s07/program/boundaries/export_test.go": "9ffb23cf7f16aa23818e27f381323e800af1ea2f3594c6490f0a8300b498b735",
+    "tools/s07/program/export_test.go": "881a36d2094efca8752e49067f039afdd89be3ae0b8443f488b612ae0c00dbc8"
+  },
+  "observations_sha256": "22b8d1deb306d7060aa500beace6a1c785551490404bf589408ae794351f30d0",
+  "requests_sha256": "085496f7159ab36c754b52b3d32b89ed8c00b4f62b87a834de3c8a9afe8a04ae",
+  "rows": 4,
+  "source_sha256": {
+    "tsc/internal/compiler/checkerpool.go": "149ee8eec37c7eade3fbdeabcca6489b23d3e100da91e06f2754231afc52c018",
+    "tsc/internal/compiler/emitHost.go": "8124a823366537c972bd93c36fc58afb47aa71c003193f8cf78cd5b32c46e882",
+    "tsc/internal/compiler/emitter.go": "2d4cd7039dcae8a35528fca3104835c81660989c2fc4e10db8bbc94a2818987c",
+    "tsc/internal/compiler/fileInclude.go": "7b9507db2d24e71998776fe583b12af7c4d3c5d4d214a4c4c07f1e5180fb5f4e",
+    "tsc/internal/compiler/fileloader.go": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
+    "tsc/internal/compiler/filesparser.go": "411a9e85dceb77ddbfc64cd40f247d16a337b78462c35f6a0273d5ad9edaf777",
+    "tsc/internal/compiler/host.go": "7f1cea0567a2817c8f6a1dc840fa6d24450e121832e4a516b1e85dfaf50ef6fb",
+    "tsc/internal/compiler/includeprocessor.go": "fbe67fc26d79dc7ea3ff0f332d93587c2952877fd0b386055ed5cf92428527be",
+    "tsc/internal/compiler/pkg.go": "6899c726ea136f1e760c39933a3f5f13d1cc7890526a866399a072b6a4604e07",
+    "tsc/internal/compiler/processingDiagnostic.go": "153ce3ee7fb427f35ac5c772ce66ada89f5cb0bb2ee766a8cdde078177cb9b80",
+    "tsc/internal/compiler/program.go": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
+    "tsc/internal/compiler/projectreferencedtsfakinghost.go": "3a49442ed27070c8af2392d12c316b588a956b8f538d5ef3c979ef97e3de9061",
+    "tsc/internal/compiler/projectreferencefilemapper.go": "9fe9076464b9e46ff27c456268c9be07464f00457f3a14bec141c1c0eb6b6a10",
+    "tsc/internal/compiler/projectreferenceparser.go": "5dd5e6790d4de30468a1de774196f9c5351036c1c254918afcd714ca73fd6b04",
+    "tsc/internal/compiler/s06_metadata_bridge.go": "f288ca660f9beb352d8de41674afba6adb5196675a558798c44c2265a3aad592"
+  },
+  "upstream_pin": "1f70213d4922b434345f639b441681e470c7cfc1"
+}

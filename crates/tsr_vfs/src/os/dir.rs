@@ -1,5 +1,5 @@
 //! io/fs.DirFS access used by Common's rooted dispatch.
-use super::native::{bytes, failure, path};
+use super::native::{self, bytes, failure, path};
 use crate::iofs::{self, FileMode, Fs, Handle, Info, IoError, Sys, Time};
 use std::{path::PathBuf, sync::Arc};
 pub(super) struct Dir {
@@ -71,7 +71,7 @@ impl Dir {
 impl Fs for Dir {
     fn stat(&self, name: &[u8]) -> Result<Arc<Info>, IoError> {
         let p = self.resolve(name, "stat")?;
-        let m = std::fs::metadata(&p).map_err(|e| failure("stat", name, e))?;
+        let m = native::metadata(&p).map_err(|e| failure("stat", name, e))?;
         let label = p
             .file_name()
             .map_or_else(|| bytes(&p), |s| bytes(std::path::Path::new(s)));
@@ -89,7 +89,7 @@ impl Fs for Dir {
         for entry in directory {
             let entry = entry.map_err(|e| failure("readdir", name, e))?;
             let m =
-                std::fs::symlink_metadata(entry.path()).map_err(|e| failure("lstat", name, e))?;
+                native::symlink_metadata(entry.path()).map_err(|e| failure("lstat", name, e))?;
             result.push(Arc::new(info(
                 &bytes(std::path::Path::new(&entry.file_name())),
                 &m,
