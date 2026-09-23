@@ -239,3 +239,27 @@ previously emitted 66). The bounded comparison is preserved at
 was rerun or relabeled as passing; that producer refresh remains phase-end
 work. Existing filesystem evidence likewise retains its original source
 identity after this resolver change.
+
+## CI receipt correction
+
+CI run `35796533723` failed on both native hosts because the operation inventory
+updated by `ae60330` was committed without its dependent subset-review refresh.
+Both hosts' 998-test script runs reported the same single failure:
+`test_committed_subset_review_covers_current_operation_inventory`. The E2 and
+program preflights rejected the same stale receipt; S03–S06 then failed through
+their dependencies. Builds, native contracts, Clippy, formatting, ownership
+instrumentation and the committed-view check passed.
+
+The follow-up review verified that only 17 Rust marker line anchors moved from
+the accepted operation matrix, and each still names the same pinned operation.
+All other matrix fields are unchanged. Replaying authenticated saved native
+observations produces byte-identical subset and checker-obligation documents;
+only the candidate rule's operation-matrix digest changes. The dependent rule
+and review are refreshed together under the existing mapping-only approval.
+This corrects the receipt without changing selection or claiming new measured
+evidence.
+
+Validation: the operation-inventory suite reproduces the CI failure before the
+refresh and passes all 12 tests afterward. The real subset-freeze check also
+passes against authenticated saved native observations. Hosted confirmation
+belongs to the next CI run.
