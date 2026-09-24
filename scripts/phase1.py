@@ -14,6 +14,8 @@ subprocess helpers rather than re-implementing them.
     python3 scripts/phase1.py capture --family FAMILY --output DIRECTORY [--case ID ...]
     python3 scripts/phase1.py compare --capture DIRECTORY [--require-parity]
     python3 scripts/phase1.py record  --capture DIRECTORY [--write]
+    python3 scripts/phase1.py record-mutations --results data/phase1/mutation/results.json.gz
+                                               [--witness ID ...] [--declare ORACLE] [--write]
     python3 scripts/phase1.py report --captures DIRECTORY ... --output FILE
 
 Diagnostics go to stderr; stdout carries one JSON object so the producer
@@ -171,6 +173,16 @@ def inventory_check() -> dict:
         # A `port:` marker outside a crate's src/ claims a production home for
         # code that is not one. Reported, not refused: these predate this step.
         "port_annotations_outside_src": scope_module.annotations_outside_src(),
+        # Declared mutation witnesses and what each still binds, in the live
+        # view (current Rust spans and homes). A stale claim is pending work
+        # with a named reason, not a manifest problem; these reasons are the
+        # ones a committed scope.json that no longer links an operation rests on.
+        "mutation_witnesses": {
+            identity: {"state": record["state"], "credited": len(record["operations"]),
+                       "stale": len(record["stale_operations"]), "reason": record["reason"],
+                       "stale_examples": dict(sorted(record["stale_operations"].items())[:20])}
+            for identity, record in scope_module.recorded_mutations(cases).items()
+        },
         "preparation": preparation,
         # One published result per preparation step. True only when every
         # operation on that step's roster is linked to a prepared case or a
@@ -323,6 +335,62 @@ def record_results(capture: Path, write: bool) -> dict:
     }
 
 
+def record_mutations(results: Path, write: bool, witnesses: list[str] | None = None,
+                     declare: str | None = None) -> dict:
+    """Write `mutation_evidence` for mutation_kill witnesses from a campaign.
+
+    The evidence decides coverage, so like `record` it is derived here, never
+    hand-written: from the committed results artifact the witness names, after
+    refusing a partial campaign, an un-run or unkilled claimed mutant, and any
+    claimed operation the campaign does not witness under the rules of
+    docs/PHASE1-mutation-witnesses.md. `--declare ORACLE` first (re)derives
+    that oracle's declaration from the same campaign; the owner reviews the
+    diff. Then run `inventory --write` and `phase1_coverage.py report`.
+    """
+    path = Path(results).resolve()
+    try:
+        relative = str(path.relative_to(ROOT.resolve()))
+    except ValueError:
+        raise ValueError(f"{results} is not a committed artifact under {scope_module.MUTATION_DIRECTORY}") from None
+    if not relative.startswith(scope_module.MUTATION_DIRECTORY + "/"):
+        raise ValueError(f"{results} is not a committed artifact under {scope_module.MUTATION_DIRECTORY}")
+    if not path.is_file():
+        raise ValueError(f"{relative} does not exist; a campaign's results must be in place before recording")
+    document = load(CASES)
+    entries = document.setdefault("witnesses", [])
+    unclaimed: dict[str, str] = {}
+    if declare is not None:
+        declared, unclaimed = scope_module.declare_mutation_witness(declare, relative, ROOT)
+        previous = next((row for row in entries if row.get("id") == declared["id"]), None)
+        if previous is not None and previous.get("kind") != "mutation_kill":
+            raise ValueError(f"{declared['id']} already names a {previous.get('kind')} witness")
+        if previous is None:
+            entries.append(declared)
+        else:
+            entries[entries.index(previous)] = declared
+        witnesses = [*(witnesses or []), declared["id"]]
+    targets = [row for row in entries if row.get("kind") == "mutation_kill" and row.get("artifact") == relative
+               and (not witnesses or row.get("id") in witnesses)]
+    missing = sorted(set(witnesses or []) - {row.get("id") for row in targets})
+    if missing or not targets:
+        raise ValueError(f"no mutation_kill witness recording {relative}" + (f": {', '.join(missing)}" if missing else ""))
+    recorded = {}
+    for witness in targets:
+        witness.pop("mutation_evidence", None)
+        evidence = scope_module.mutation_evidence(witness, ROOT)
+        witness["mutation_evidence"] = evidence
+        recorded[witness["id"]] = {"operations": len(witness["operations"]), "mutants": len(witness["mutants"]),
+                                   "kills": len(evidence["kills"])}
+    problems = [problem for problem in scope_module.witness_problems_in(document)
+                if any(problem.startswith(identity + ":") for identity in recorded)]
+    if problems:
+        raise ValueError("invalid mutation witness: " + "; ".join(problems[:5]))
+    if write:
+        CASES.write_text(json.dumps(document, indent=2, sort_keys=True) + "\n")
+    return {"results": relative, "witnesses": recorded, "declared": declare is not None,
+            "unclaimed": unclaimed, "written": write}
+
+
 def prepare(family: str, output: Path) -> dict:
     """Export native inputs and observations into a staging directory."""
     provenance = capture_module.capture(family, output)
@@ -425,6 +493,15 @@ def main() -> int:
     record_parser.add_argument("--capture", type=Path, required=True)
     record_parser.add_argument("--write", action="store_true")
 
+    mutations_parser = commands.add_parser("record-mutations")
+    mutations_parser.add_argument("--results", type=Path, required=True,
+                                  help="the committed mutation results artifact the witnesses name")
+    mutations_parser.add_argument("--witness", action="append", default=[],
+                                  help="record only these mutation_kill witnesses (default: all naming --results)")
+    mutations_parser.add_argument("--declare", choices=sorted(scope_module.MUTATION_ORACLES),
+                                  help="first derive mutation/ORACLE's declaration from the campaign")
+    mutations_parser.add_argument("--write", action="store_true")
+
     report_parser = commands.add_parser("report")
     report_parser.add_argument("--captures", type=Path, nargs="+", required=True)
     report_parser.add_argument("--output", type=Path, required=True)
@@ -453,6 +530,8 @@ def main() -> int:
         result = index["invocation_mapping"]
     elif args.command == "record":
         result = record_results(args.capture, args.write)
+    elif args.command == "record-mutations":
+        result = record_mutations(args.results, args.write, args.witness or None, args.declare)
     elif args.command == "compare":
         result = capture_module.compare(args.capture, args.require_parity)
     else:

@@ -15,10 +15,23 @@ use sha2::{Digest, Sha256};
 use tsr_compiler::diagnostic_writer::{DiagnosticWriter, FormattingOptions};
 use tsr_compiler::{FileCache, Program};
 
+use crate::jobs::{enter, Stage};
 use crate::{hex, observation, ts_compiler_error};
 
-fn observe(request: &Value, cache: &mut FileCache, counters: &tsr_arena::Counters) -> Value {
-    let program = match observation::try_load(request, cache, counters, None) {
+/// One row. It also switches the mutation witnesses' stage
+/// (`crate::jobs::enter`): the program load and `syntactic_diagnostics(None)`
+/// are production, file names and rendering observe, as the Go probe's
+/// coverage segments. Outside a mutation row the switch only sets a
+/// thread-local stage, so the schedule's own rows are unaffected.
+pub(crate) fn observe(
+    request: &Value,
+    cache: &mut FileCache,
+    counters: &tsr_arena::Counters,
+) -> Value {
+    enter(Stage::Production);
+    let loaded = observation::try_load(request, cache, counters, None);
+    enter(Stage::Observe);
+    let program = match loaded {
         Ok(program) => program,
         Err(ts_compiler_error::Error::Unsupported(name)) => {
             return json!({"state": "not_implemented", "operation": name});
@@ -52,7 +65,10 @@ fn syntactic(request: &Value, program: &Program) -> Result<Value, ts_compiler_er
                 .to_vec())
         })
         .collect::<Result<_, ts_compiler_error::Error>>()?;
-    let diagnostics = program.syntactic_diagnostics(None)?;
+    enter(Stage::Production);
+    let diagnostics = program.syntactic_diagnostics(None);
+    enter(Stage::Observe);
+    let diagnostics = diagnostics?;
     let structured: Vec<Value> = diagnostics
         .iter()
         .map(|d| observation::diagnostic(d, program))
@@ -82,7 +98,7 @@ fn syntactic(request: &Value, program: &Program) -> Result<Value, ts_compiler_er
     }))
 }
 
-fn panic_text(payload: &(dyn std::any::Any + Send)) -> String {
+pub(crate) fn panic_text(payload: &(dyn std::any::Any + Send)) -> String {
     payload
         .downcast_ref::<String>()
         .cloned()

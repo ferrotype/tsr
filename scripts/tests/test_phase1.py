@@ -820,6 +820,14 @@ class FreezeTests(unittest.TestCase):
     def setUp(self):
         self.temporary = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, self.temporary, ignore_errors=True)
+        # A freeze installs under phase1.ROOT. Every test here freezes into a
+        # temporary root holding a copy of the committed pilot inventory, so
+        # a test run never replaces (or restores) committed files in the tree.
+        self.root = Path(self.temporary) / "root"
+        shutil.copytree(ROOT / "data/phase1/native/pilot", self.root / "data/phase1/native/pilot")
+        redirected = patch.object(phase1, "ROOT", self.root)
+        redirected.start()
+        self.addCleanup(redirected.stop)
 
     def test_freeze_authenticates_before_installing(self):
         rows = [{"case": "a", "native": {"files": []},
@@ -880,23 +888,16 @@ class FreezeTests(unittest.TestCase):
                               "intended_signature": "pub fn parse_command_line(...)",
                               "production_home": "crates/tsr_tsoptions/src/command_line.rs"}}}]
         directory = self.build_capture("not-implemented", rows)
-        original = self.snapshot(ROOT / "data/phase1/native/pilot")
-        self.addCleanup(self.restore, ROOT / "data/phase1/native/pilot", original)
+        committed = self.snapshot(ROOT / "data/phase1/native/pilot")
         result = phase1.freeze(directory)
         self.assertEqual(result["frozen"], "pilot")
-
-    def restore(self, directory, original):
-        if original is None:
-            shutil.rmtree(directory, ignore_errors=True)
-            return
-        shutil.rmtree(directory, ignore_errors=True)
-        for relative, body in original.items():
-            target = directory / relative
-            target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_bytes(body)
+        self.assertEqual(result["destination"], "data/phase1/native/pilot")
+        installed = self.snapshot(self.root / "data/phase1/native/pilot")
+        self.assertNotEqual(installed, committed)
+        self.assertEqual(self.snapshot(ROOT / "data/phase1/native/pilot"), committed)
 
     def test_a_rejected_freeze_preserves_the_existing_frozen_inventory(self):
-        installed = ROOT / "data/phase1/native/pilot"
+        installed = self.root / "data/phase1/native/pilot"
         before = self.snapshot(installed)
         self.assertIsNotNone(before, "expected committed frozen observations to protect")
 
@@ -911,7 +912,7 @@ class FreezeTests(unittest.TestCase):
         self.assertEqual(self.snapshot(installed), before,
                          "a rejected freeze must not touch the frozen inventory")
         for leftover in ("pilot.incoming", "pilot.outgoing"):
-            self.assertFalse((ROOT / "data/phase1/native" / leftover).exists(), leftover)
+            self.assertFalse((self.root / "data/phase1/native" / leftover).exists(), leftover)
 
     def test_the_committed_frozen_layout_is_per_probe(self):
         installed = ROOT / "data/phase1/native/pilot"
@@ -1043,11 +1044,21 @@ class WitnessTests(unittest.TestCase):
     def test_committed_witnesses_validate(self):
         self.assertEqual(scope.witness_problems(), [])
 
-    def test_only_rust_gated_witnesses_confer_coverage(self):
-        self.assertEqual(scope.COVERING_WITNESS_KINDS, ("rust_gated",))
+    def test_only_rust_gated_and_bound_mutation_witnesses_confer_coverage(self):
+        # Deliberately widened for docs/PHASE1-mutation-witnesses.md. A
+        # mutation_kill witness confers only what recorded_mutations still
+        # binds (scripts/tests/test_phase1_mutation_witness.py); every other
+        # kind confers nothing.
+        self.assertEqual(scope.COVERING_WITNESS_KINDS, ("rust_gated", "mutation_kill"))
         linked = scope.cases_by_operation()
+        bound = scope.recorded_mutations(self.cases)
         for witness in self.cases.get("witnesses", []):
             if witness["kind"] == "rust_gated":
+                continue
+            if witness["kind"] == "mutation_kill":
+                credited = set(bound[witness["id"]]["operations"])
+                for operation in witness["operations"]:
+                    self.assertEqual(witness["id"] in linked.get(operation, []), operation in credited)
                 continue
             for operation in witness["operations"]:
                 self.assertNotIn(
@@ -1069,13 +1080,7 @@ class WitnessTests(unittest.TestCase):
             "artifact": "data/phase1/cases.json", "operations": [],
             "witnesses": "claims coverage with no gate",
         })
-        path = ROOT / "data/phase1/cases.json"
-        original = path.read_bytes()
-        try:
-            path.write_text(json.dumps(forged))
-            problems = scope.witness_problems()
-        finally:
-            path.write_bytes(original)
+        problems = scope.witness_problems_in(forged)
         self.assertTrue(any("must name the producer command" in p for p in problems))
 
     def test_a_witness_pointing_at_a_missing_artifact_is_rejected(self):
@@ -1085,14 +1090,13 @@ class WitnessTests(unittest.TestCase):
             "artifact": "data/phase1/does-not-exist.json", "operations": [],
             "witnesses": "points nowhere",
         })
-        path = ROOT / "data/phase1/cases.json"
-        original = path.read_bytes()
-        try:
-            path.write_text(json.dumps(forged))
-            problems = scope.witness_problems()
-        finally:
-            path.write_bytes(original)
+        problems = scope.witness_problems_in(forged)
         self.assertTrue(any("does not exist" in p for p in problems))
+
+    def test_witness_problems_validate_the_committed_manifest(self):
+        # The forged manifests above go through witness_problems_in directly,
+        # so no test writes the committed cases.json.
+        self.assertEqual(scope.witness_problems(), scope.witness_problems_in(self.cases))
 
     def test_every_covered_operation_names_a_real_link(self):
         # A covered row lists every case touching the operation, which can
@@ -1813,14 +1817,21 @@ class RosterLedgerTests(unittest.TestCase):
     def setUp(self):
         self.scope = json.loads((ROOT / "data/phase1/scope.json").read_text())
         self.cases = json.loads((ROOT / "data/phase1/cases.json").read_text())
+        # Every ledger is forged or removed in a temporary copy, never in the
+        # tree: a test run must not write committed files, even with the
+        # original bytes, while another process may be reading them.
+        directory = tempfile.TemporaryDirectory()
+        self.addCleanup(directory.cleanup)
+        copies = Path(directory.name)
+        for step in scope.STEP_PACKAGES:
+            committed = scope.roster_path(step)
+            if committed.is_file():
+                shutil.copyfile(committed, copies / committed.name)
+        redirected = patch.object(scope, "roster_path", lambda step: copies / f"{step}-roster.json")
+        redirected.start()
+        self.addCleanup(redirected.stop)
         self.path = scope.roster_path("leaves")
         self.original = self.path.read_bytes() if self.path.is_file() else None
-
-    def tearDown(self):
-        if self.original is None:
-            self.path.unlink(missing_ok=True)
-        else:
-            self.path.write_bytes(self.original)
 
     def forge(self, exemptions):
         document = json.loads(self.original) if self.original else {"version": 1}
@@ -1875,6 +1886,7 @@ class RosterLedgerTests(unittest.TestCase):
         self.assertEqual(scope.roster_problems(self.scope, self.cases), [])
         for step in scope.STEP_PACKAGES:
             path = scope.roster_path(step)
+            self.assertFalse(path.is_relative_to(ROOT), path)
             original = path.read_bytes()
             try:
                 path.unlink()

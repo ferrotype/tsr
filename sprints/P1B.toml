@@ -5,6 +5,9 @@
 # cases rather than copied into a second denominator. Syntax retains the full
 # data/phase1/syntax-schedule.json schedule plus existing e1/binder inventories.
 # Phase 0 remains closed through S12. No S07/S08 timing refresh is required.
+# Mutation-kill witnesses (docs/PHASE1-mutation-witnesses.md) confer P1A links
+# child-free; F4b separately requires their recorded kills to replay on current
+# sources (run.foundations.mutation_witnesses_complete).
 id = "P1B"
 title = "Phase 1 stage B: foundational compiler services"
 goal = "Every required Phase 1 operation and integration witness passes on current inputs, all 309 config outputs and the complete syntax/parser/binder inventories match, and generation and transport contracts remain valid."
@@ -16,6 +19,7 @@ exit = [
   "run.foundations.utilities_complete == true",
   "run.foundations.integration_complete == true",
   "run.foundations.rust_witnesses_complete == true",
+  "run.foundations.mutation_witnesses_complete == true",
   "run.config.inventory_complete == true",
   "run.config.tests_total == 309",
   "run.config.parity == 1",
@@ -86,7 +90,7 @@ id = "P1B-F4b"
 title = "Complete syntax schedule, exact parser/binder inventories and shared utilities pass"
 kind = "task"
 required = true
-done_when = ["run.syntax.inventory_complete == true", "run.syntax.parity == 1", "run.foundations.utilities_complete == true", "run.e1.parity == 1", "run.e1.frozen_denominator == true", "run.binder.parity == 1", "run.binder.reached_bind == true", "run.binder.supplemental_parity == 1", "run.binder.graph_contracts == true", "run.scanner.parity == 1", "run.e4.parity == 1"]
+done_when = ["run.syntax.inventory_complete == true", "run.syntax.parity == 1", "run.foundations.utilities_complete == true", "run.foundations.mutation_witnesses_complete == true", "run.e1.parity == 1", "run.e1.frozen_denominator == true", "run.binder.parity == 1", "run.binder.reached_bind == true", "run.binder.supplemental_parity == 1", "run.binder.graph_contracts == true", "run.scanner.parity == 1", "run.e4.parity == 1"]
 
 [[item]]
 id = "P1B-F5b"

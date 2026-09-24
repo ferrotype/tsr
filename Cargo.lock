@@ -472,10 +472,43 @@ dependencies = [
 ]
 
 [[package]]
+name = "phase1_mutants"
+version = "0.1.0"
+
+[[package]]
+name = "phase1_mutation_driver"
+version = "0.1.0"
+dependencies = [
+ "phase1_mutants",
+ "serde",
+ "serde_json",
+ "sha2",
+ "tsr_arena",
+ "tsr_ast",
+ "tsr_binder",
+ "tsr_core",
+ "tsr_encoder",
+ "tsr_jsstring",
+ "tsr_parser",
+]
+
+[[package]]
+name = "phase1_mutation_splicer"
+version = "0.1.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "serde_json",
+ "sha2",
+ "syn 2.0.119",
+]
+
+[[package]]
 name = "phase1_syntax"
 version = "0.1.0"
 dependencies = [
  "phase1_harness",
+ "phase1_mutants",
  "serde_json",
  "sha2",
  "tsr_arena",

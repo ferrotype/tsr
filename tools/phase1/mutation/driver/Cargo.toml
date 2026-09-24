@@ -1,0 +1,28 @@
+[package]
+name = "phase1_mutation_driver"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+description = "Phase 1 mutation witnesses: runs the E1 and binder oracles in process with one active mutant at a time"
+
+# The observers are the S06 E1 and S07 binder example observers, reused verbatim
+# (see src/e1.rs and src/binder.rs), so this crate needs their dependency set.
+# serde_json keeps its default sorted maps; every digest sorts keys itself, so
+# a workspace-wide `preserve_order` unification changes no digest.
+[dependencies]
+phase1_mutants = { version = "0.1.0", path = "../switch" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+tsr_arena = { version = "0.1.0", path = "../../../../crates/tsr_arena" }
+tsr_ast = { version = "0.1.0", path = "../../../../crates/tsr_ast" }
+tsr_binder = { version = "0.1.0", path = "../../../../crates/tsr_binder" }
+tsr_core = { version = "0.1.0", path = "../../../../crates/tsr_core" }
+tsr_encoder = { version = "0.1.0", path = "../../../../crates/tsr_encoder" }
+tsr_jsstring = { version = "0.1.0", path = "../../../../crates/tsr_jsstring" }
+tsr_parser = { version = "0.1.0", path = "../../../../crates/tsr_parser" }
+
+[lints]
+workspace = true

@@ -71,6 +71,67 @@ def rust_packages(family: str) -> list[str]:
     return sorted(str(p.relative_to(ROOT)) for p in seen)
 
 
+MUTATION_TOOLS = "tools/phase1/mutation"
+# The commands behind the mutation-witnesses receipt (confirm splices, builds,
+# replays and digests through all three).
+MUTATION_COMMANDS = ("scripts/phase1_mutation_run.py", "scripts/phase1_mutation_plan.py",
+                     "scripts/phase1_mutation_go.py")
+
+
+def python_import_closure(entries) -> set[str]:
+    """Every scripts/ module the entry scripts import, transitively.
+
+    Read from the syntax tree, at any nesting, so the lazy imports inside
+    functions (`comparable` from s07_binder, the protocol and codec fixtures
+    s06_protocol pulls in) count like top-level ones. Only modules that live
+    in scripts/ are followed; the standard library is not an input.
+    """
+    import ast
+    pending, seen = list(entries), set()
+    while pending:
+        relative = pending.pop()
+        if relative in seen:
+            continue
+        seen.add(relative)
+        tree = ast.parse((ROOT / relative).read_bytes(), filename=relative)
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                names = [alias.name for alias in node.names]
+            elif isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:
+                names = [node.module]
+            else:
+                continue
+            for name in names:
+                top = name.split(".")[0]
+                found = next((candidate for candidate in (f"scripts/{top}.py", f"scripts/{top}/__init__.py")
+                              if (ROOT / candidate).is_file()), None)
+                if found is not None:
+                    pending.append(found)
+    return seen
+
+
+def mutation_inputs() -> set[str]:
+    """What the mutation-witnesses receipt's replay depends on beyond the crates.
+
+    The switch, splicer, driver and Go instrumentation, the driver's local
+    dependency closure, every Python module the mutation commands import, and
+    every committed mutation artifact (the gzip ones are not caught by the
+    data/phase1 JSON glob).
+    """
+    paths: set[str] = set(python_import_closure(name for name in MUTATION_COMMANDS if (ROOT / name).is_file()))
+    tools = ROOT / MUTATION_TOOLS
+    directories = [tools] if tools.is_dir() else []
+    if (tools / "driver/Cargo.toml").is_file():
+        directories += [ROOT / name for name in rust_packages("mutation/driver")]
+    for directory in directories:
+        paths.update(str(path.resolve().relative_to(ROOT.resolve())) for path in capture.package_input_files(directory))
+    artifacts = ROOT / scope.MUTATION_DIRECTORY
+    if artifacts.is_dir():
+        paths.update(str(path.relative_to(ROOT)) for path in artifacts.rglob("*")
+                     if path.is_file() and path.name != ".DS_Store")
+    return paths
+
+
 def source_closure(producer: str) -> dict[str, str]:
     if producer not in GROUPS:
         raise ValueError(f"unknown producer {producer}")
@@ -94,6 +155,7 @@ def source_closure(producer: str) -> dict[str, str]:
     if producer == "foundations":
         import phase1_integration
         paths.update(phase1_integration.input_paths(ROOT))
+        paths.update(mutation_inputs())
     for name in sorted(paths):
         path = ROOT / name
         if not path.is_file():
@@ -471,6 +533,7 @@ def aggregate(producer: str, reports: dict[str, dict], health: dict) -> dict:
                        leaves_complete=complete("leaves"), filesystem_complete=complete("filesystem"),
                        utilities_complete=complete("syntax"),
                        rust_witnesses_complete=health["healthy"] and health["integration"].get("rust_witnesses", {}).get("state") == "match",
+                       mutation_witnesses_complete=health["healthy"] and health["integration"].get("mutation_witnesses", {}).get("state") == "match",
                        integration_complete=health["healthy"] and health["integration"].get("complete", False))
     elif producer == "config":
         owners = baseline_owners()
@@ -561,7 +624,8 @@ def observe(identity: str, output: Path) -> dict:
             witnesses[row["id"] + "/" + test["test"]] = test
     witnesses.update(transport={"command": ["python3", "scripts/s11.py", "capture"]},
                      generation={"command": manifest["generation"]["command"]},
-                     **{"rust-witnesses": {"command": ["python3", "scripts/phase1_integration.py", "observe-rust-witnesses"]}})
+                     **{"rust-witnesses": {"command": ["python3", "scripts/phase1_integration.py", "observe-rust-witnesses"]},
+                        integration.MUTATION_RECEIPT: {"command": scope.MUTATION_CONFIRM_COMMAND}})
     if identity not in witnesses:
         raise ValueError("unknown executable witness; case witnesses use normal family captures")
     command = witnesses[identity]["command"]

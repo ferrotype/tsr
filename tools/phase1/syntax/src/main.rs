@@ -9,6 +9,8 @@
 //! `phase1_syntax <requests.json> <observations.json>` answers the family's
 //! request schedule; `phase1_syntax --schedule <probe-requests.json>
 //! <rows.jsonl>` answers the corpus syntax schedule, one program per row.
+//! With `PHASE1_MUTATION=trace|kill` set, the harness is the mutation
+//! witnesses' `syntax` oracle instead (see `mutation.rs`).
 
 use std::collections::BTreeSet;
 use std::error::Error;
@@ -20,11 +22,19 @@ use tsr_compiler as ts_compiler_error;
 use tsr_compiler::{FileCache, Program, ProgramOptions};
 
 mod astnav;
+// The mutation driver's canonical JSON and trace/kill protocol, shared so
+// every mutation oracle speaks one protocol.
+#[allow(dead_code)]
+#[path = "../../mutation/driver/src/canonical.rs"]
+mod canonical;
 mod debug;
 mod diagnostics;
 mod evaluator;
 #[path = "../ast-generated/probe.rs"]
 mod generated_ast;
+#[path = "../../mutation/driver/src/jobs.rs"]
+mod jobs;
+mod mutation;
 mod parse_outputs;
 mod scanner_ast;
 mod schedule;
@@ -105,6 +115,12 @@ fn run(input: &str, output: &str) -> Result<(), Box<dyn Error>> {
 
 fn main() -> Result<(), Box<dyn Error>> {
     let args: Vec<String> = std::env::args().collect();
+    if let Some(mode) = std::env::var_os("PHASE1_MUTATION") {
+        let mode = mode
+            .into_string()
+            .map_err(|_| "PHASE1_MUTATION is not UTF-8")?;
+        return Ok(mutation::main(&mode, &args[1..])?);
+    }
     match args.as_slice() {
         [_, flag, input, output] if flag == "--schedule" => schedule::run(input, output),
         [_, input, output] => run(input, output),
