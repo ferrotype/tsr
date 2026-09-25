@@ -30,21 +30,23 @@ class InventoryTests(unittest.TestCase):
     def test_section_three_counts(self):
         counts = self.document["counts"]
         self.assertEqual(counts["variants"], 15206)
-        self.assertEqual(counts["executed"], 13434)
-        self.assertEqual(counts["executed_by_s08_tier"], {"acceptance": 9369, "excluded": 4065})
+        # The plan's 13,434 counted two stray .js files the runner never
+        # enumerates (compilerBaselineRegex); they are informational here.
+        self.assertEqual(counts["executed"], 13432)
+        self.assertEqual(counts["executed_by_s08_tier"], {"acceptance": 9367, "excluded": 4065})
         self.assertEqual(counts["executed_newly_included"], 4050)
         self.assertEqual(counts["executed_content_mapper"], 15)
-        self.assertEqual(counts["informational"], {"filename_skip": 52, "option_guard_skip": 1720})
+        self.assertEqual(counts["informational"], {"filename_skip": 52, "not_enumerated": 2, "option_guard_skip": 1720})
         self.assertEqual(counts["informational_options_rejected"], 39)
         self.assertEqual(counts["references"],
-                         {".errors.txt": 7301, ".types": 12753, ".symbols": 12753, ".trace.json": 148})
+                         {".errors.txt": 7301, ".types": 12751, ".symbols": 12751, ".trace.json": 148})
         self.assertEqual(counts["without_checked_reference"], 464)
         self.assertEqual(counts["emitted_only"], 413)
         self.assertEqual(counts["types_disabled"], 679)
         # The pinned GetEmitDeclarations is declaration || composite. The plan's
         # 1,756 also counted emitDeclarationOnly keys; C0.2 records the native requests.
         self.assertEqual(counts["emit_declarations_by_options"], 1754)
-        self.assertEqual(counts["checkpoint"], {"regression": 9369, "C2": 2954, "C3": 185, "C4": 926})
+        self.assertEqual(counts["checkpoint"], {"regression": 9367, "C2": 2954, "C3": 185, "C4": 926})
 
     def test_informational_rows_never_carry_an_owner_or_sample(self):
         for row in self.rows:
@@ -56,6 +58,15 @@ class InventoryTests(unittest.TestCase):
             else:
                 self.assertEqual(row["native_selection"], "runs")
                 self.assertNotEqual(row["boundary"], "options_rejected")
+                self.assertRegex(row["path"], inventory.RUNNER_TEST_FILE)
+
+    def test_only_runner_enumerated_files_are_executed(self):
+        stray = sorted(row["id"] for row in self.rows if row["native_selection"] == "not_enumerated")
+        self.assertEqual(stray, ["compiler/jsxNestedIndentation.js#configuration=0",
+                                 "conformance/parser/ecmascript5/Statements/ReturnStatements/parserReturnStatement4.js#configuration=0"])
+        for vid in stray:
+            row = next(row for row in self.rows if row["id"] == vid)
+            self.assertEqual(row["s08_tier"], "acceptance")
 
     def test_checkpoint_follows_the_latest_family(self):
         for row in self.executed:

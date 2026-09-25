@@ -13,8 +13,11 @@ from three committed inputs and never from a native or Rust run:
 * data/s07/e2-acceptance.json -- the S08 acceptance partition, kept as the
   9,369-variant regression subset.
 
-`executed` rows (the runner's 13,434 `runs`) form the Phase 2 denominator.
-The runner's skips are `informational` with their native reason and never
+`executed` rows form the Phase 2 denominator: the 13,432 variants the pinned
+runner enumerates (`compilerBaselineRegex`, `\.tsx?$`) and runs. The runner's
+option-guard and filename skips, and the two stray `.js` files the syntax
+schedule counted as `runs` but `EnumerateTestFiles` never lists
+(`not_enumerated`), are `informational` with their native reason and never
 enter a ratio. The checkpoint column is a completion owner derived from syntax
 families, not an execution outcome. The recorded sample is the owner-approved
 (2026-09-25) intermediate-checkpoint selection: about 300 executed variants
@@ -30,6 +33,7 @@ from collections import Counter
 import hashlib
 import json
 from pathlib import Path
+import re
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -44,6 +48,10 @@ OTHER_RULES = ("emitted_output_only", "content_mapper_execution", "project_refer
 KNOWN_RULES = frozenset(TYPE_FAMILIES + C4_FAMILIES + OTHER_RULES)
 CHECKED_KINDS = (".errors.txt", ".types", ".symbols")
 SELECTIONS = ("runs", "option_guard_skip", "filename_skip")
+# compiler_runner.go: compilerBaselineRegex. EnumerateTestFiles lists only
+# these, so any other physical file in the case directories is never a test,
+# whatever the syntax schedule's guard-based selection says.
+RUNNER_TEST_FILE = re.compile(r"\.tsx?$")
 CHECKPOINT_RULE = ("regression: the S08 acceptance variant; C4: uses JSX or decorators, whatever else it uses; "
                    "C2: uses a type-level family (explicit type parameters, type arguments, conditional, mapped, "
                    "indexed-access, infer, template-literal or import types); C3: executed with no such family "
@@ -115,6 +123,7 @@ def build_rows(subset, schedule, acceptance):
     tiers = {row["id"]: row for row in acceptance["variants"]}
     rows = []
     seen = set()
+    stray = {}
     for case in subset["cases"]:
         source = case["source"]
         suite = case["id"].split("/", 1)[0]
@@ -135,6 +144,9 @@ def build_rows(subset, schedule, acceptance):
             selection = native["native_selection"]
             if selection not in SELECTIONS:
                 raise ValueError("unknown native selection: " + vid)
+            enumerated = RUNNER_TEST_FILE.search(source["path"]) is not None
+            if not enumerated:
+                selection = "not_enumerated"
             boundary = native["boundary"]
             if boundary not in (None, "content_mapper", "options_rejected"):
                 raise ValueError("unknown native boundary: " + vid)
@@ -152,6 +164,11 @@ def build_rows(subset, schedule, acceptance):
                 if baseline["kind"] in references:
                     raise ValueError("duplicate reference kind: " + vid)
                 references[baseline["kind"]] = baseline["git_blob"]
+            if not enumerated:
+                # S07 indexed baselines by stem; they belong to the enumerated
+                # sibling test of the same name, checked after the loop.
+                stray[(suite, variant["configured_name"].rsplit(".", 1)[0])] = (vid, references)
+                references = {}
             harness = variant["harness_options"]
             options = variant["options"]
             content_mapper = "content_mapper_execution" in families
@@ -191,6 +208,12 @@ def build_rows(subset, schedule, acceptance):
             })
     if len(rows) != len(selections) or {row["id"] for row in rows} != set(selections):
         raise ValueError("inputs do not describe the same variants")
+    for (suite, stem), (vid, references) in stray.items():
+        siblings = [row for row in rows if row["suite"] == suite and row["tier"] == "executed"
+                    and row["configured_name"].rsplit(".", 1)[0] == stem]
+        if len(siblings) != 1 or any(siblings[0]["references"].get(kind) != blob for kind, blob in references.items()
+                                     if kind in CHECKED_KINDS):
+            raise ValueError("a non-enumerated file's baselines do not belong to one enumerated sibling: " + vid)
     return rows
 
 
