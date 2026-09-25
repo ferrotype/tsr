@@ -1,0 +1,75 @@
+# Phase 2, stage B: complete the type checker (C1-C7).
+#
+# Each checkpoint's detailed plan wires its own `done_when` metrics; until then
+# an item names metrics no producer emits yet, so the sprint stays open by
+# construction. The exit is PLAN's Phase 2 gate over the P2A denominator: every
+# executed compiler/conformance variant matches in errors, types and symbols
+# (approved divergences only), and the union-ordering and parent-pointer
+# sub-tests pass; the owner also assigned the 148 module-resolution trace
+# baselines to this gate (2026-09-25). Intermediate checkpoints run the
+# recorded 300-variant sample of data/phase2/inventory.json; full runs are
+# C0's gap map and C7's acceptance.
+id = "P2B"
+title = "Phase 2 stage B: the complete type checker"
+goal = "Every executed compiler and conformance variant matches the pinned checker in errors, types, symbols, display and the runner sub-tests, with checker execution, cancellation and the downstream checker contracts complete."
+exit = [
+  "sprint.P2A.done == 1",
+  "run.checker.harness_valid == true",
+  "run.checker.errors_parity == 1",
+  "run.checker.types_parity == 1",
+  "run.checker.symbols_parity == 1",
+  "run.checker.display_parity == 1",
+  "run.checker.trace_parity == 1",
+  "run.checker.ordering == 1",
+  "run.checker.parent_pointers == 1",
+  "run.checker.unsupported_required == 0",
+]
+
+[[item]]
+id = "P2B-C1"
+title = "C1: symbol, type and relation foundations"
+kind = "task"
+required = true
+done_when = ["run.checker.c1_complete == true"]
+
+[[item]]
+id = "P2B-C2"
+title = "C2: inference and advanced type interactions, with the ADR 0010 creation-trace mode"
+kind = "task"
+required = true
+done_when = ["run.checker.c2_complete == true"]
+
+[[item]]
+id = "P2B-C3"
+title = "C3: flow and ordinary program semantics"
+kind = "task"
+required = true
+done_when = ["run.checker.c3_complete == true"]
+
+[[item]]
+id = "P2B-C4"
+title = "C4: JSX and decorators"
+kind = "task"
+required = true
+done_when = ["run.checker.c4_complete == true"]
+
+[[item]]
+id = "P2B-C5"
+title = "C5: display, checker services and emit-resolver contracts"
+kind = "task"
+required = true
+done_when = ["run.checker.c5_complete == true"]
+
+[[item]]
+id = "P2B-C6"
+title = "C6: checker execution, partitioning and cancellation"
+kind = "task"
+required = true
+done_when = ["run.checker.c6_complete == true"]
+
+[[item]]
+id = "P2B-C7"
+title = "C7: full correctness and readiness report"
+kind = "task"
+required = true
+done_when = ["run.checker.c7_complete == true"]

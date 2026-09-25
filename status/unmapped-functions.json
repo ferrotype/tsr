@@ -443,7 +443,6 @@
       "tsc/internal/checker/checker.go:Checker.IsNullableType",
       "tsc/internal/checker/checker.go:Checker.ResolveAlias",
       "tsc/internal/checker/checker.go:Checker.TryGetThisTypeAtEx",
-      "tsc/internal/checker/checker.go:Checker.UnionTypes",
       "tsc/internal/checker/checker.go:Checker.addDeferredDiagnostic",
       "tsc/internal/checker/checker.go:Checker.addDeprecatedSuggestionWithSignature",
       "tsc/internal/checker/checker.go:Checker.addDuplicateDeclarationErrorsForSymbols",

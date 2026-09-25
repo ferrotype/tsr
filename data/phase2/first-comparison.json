@@ -1,0 +1,744 @@
+{
+ "all_domains_match": 12308,
+ "buckets": [
+  {
+   "bucket": "unsupported: checkExpressionWorker",
+   "owner": "C4",
+   "representative": "compiler/conflictMarkerTrivia3.tsx#configuration=0",
+   "variants": 439
+  },
+  {
+   "bucket": "unsupported: checkClassLikeDeclaration: decorators",
+   "owner": "C4",
+   "representative": "compiler/classExpressionWithDecorator1.ts#configuration=0",
+   "variants": 284
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "owner": "C2",
+   "representative": "compiler/typeParameterHasSelfAsConstraint.ts#configuration=0",
+   "variants": 73
+  },
+  {
+   "bucket": "unsupported: typeReferenceToTypeNode: applied outer arguments",
+   "owner": "C2",
+   "representative": "conformance/es6/classExpressions/typeArgumentInferenceWithClassExpression2.ts#configuration=0",
+   "variants": 36
+  },
+  {
+   "bucket": "unsupported: extractRedundantTemplateLiterals",
+   "owner": "C2",
+   "representative": "compiler/contextualPropertyOfGenericMappedType.ts#configuration=0",
+   "variants": 30
+  },
+  {
+   "bucket": "diagnostics: TS4025",
+   "owner": "C2",
+   "representative": "compiler/declarationEmitTupleRestSignatureLeadingVariadic.ts#configuration=0",
+   "variants": 27
+  },
+  {
+   "bucket": "unsupported: checkDecorators: parameter or binding",
+   "owner": "C4",
+   "representative": "conformance/decorators/invalid/decoratorOnFunctionParameter.ts#configuration=0",
+   "variants": 25
+  },
+  {
+   "bucket": "different: types",
+   "owner": "C2",
+   "representative": "compiler/constraintErrors1.ts#configuration=0",
+   "variants": 24
+  },
+  {
+   "bucket": "unsupported: content-mapper execution",
+   "owner": "Phase 5 (content mapper)",
+   "representative": "compiler/contentMapperInvalidExtension.ts#configuration=0",
+   "variants": 15
+  },
+  {
+   "bucket": "failed: checker_error",
+   "owner": "C2",
+   "representative": "compiler/interfaceMergeWithNonGenericTypeArguments.ts#configuration=0",
+   "variants": 13
+  },
+  {
+   "bucket": "diagnostics: TS2344",
+   "owner": "C2",
+   "representative": "compiler/unmetTypeConstraintInImportCall.ts#configuration=0",
+   "variants": 10
+  },
+  {
+   "bucket": "diagnostics: TS2339",
+   "owner": "C2",
+   "representative": "compiler/genericIndexedAccessMethodIntersectionCanBeAccessed.ts#configuration=0",
+   "variants": 9
+  },
+  {
+   "bucket": "diagnostics: TS2345",
+   "owner": "C2",
+   "representative": "compiler/superWithTypeArgument3.ts#configuration=0",
+   "variants": 9
+  },
+  {
+   "bucket": "diagnostics: TS2416",
+   "owner": "C2",
+   "representative": "compiler/mismatchedGenericArguments1.ts#configuration=0",
+   "variants": 9
+  },
+  {
+   "bucket": "diagnostics: TS2430",
+   "owner": "C2",
+   "representative": "conformance/types/mapped/mappedTypesAndObjects.ts#configuration=0",
+   "variants": 9
+  },
+  {
+   "bucket": "diagnostics: TS4060",
+   "owner": "C2",
+   "representative": "compiler/declarationEmitNestedGenerics.ts#configuration=0",
+   "variants": 9
+  },
+  {
+   "bucket": "unsupported: addIntraExpressionInferenceSite: array element",
+   "owner": "C2",
+   "representative": "compiler/inferringAnyFunctionType2.ts#configuration=0",
+   "variants": 7
+  },
+  {
+   "bucket": "diagnostics: TS2365",
+   "owner": "C2",
+   "representative": "conformance/expressions/binaryOperators/comparisonOperator/comparisonOperatorWithNumberOperand.ts#configuration=0",
+   "variants": 5
+  },
+  {
+   "bucket": "unsupported: conditionalTypeToTypeNode: shadowed distribution parameter",
+   "owner": "C2",
+   "representative": "compiler/recursiveConditionalCrash1.ts#configuration=0",
+   "variants": 5
+  },
+  {
+   "bucket": "diagnostics: TS2304",
+   "owner": "C4",
+   "representative": "compiler/anonymousClassDecoratorEs2022.ts#configuration=0",
+   "variants": 5
+  },
+  {
+   "bucket": "diagnostics: TS2352",
+   "owner": "C2",
+   "representative": "compiler/aliasInstantiationExpressionGenericIntersectionNoCrash1.ts#configuration=0",
+   "variants": 4
+  },
+  {
+   "bucket": "diagnostics: TS7060",
+   "owner": "C2",
+   "representative": "conformance/node/nodeModulesForbidenSyntax.ts#configuration=0",
+   "variants": 4
+  },
+  {
+   "bucket": "panic: tsr_checker::relater_tuples",
+   "owner": "C2",
+   "representative": "compiler/lambdaParameterWithTupleArgsHasCorrectAssignability.ts#configuration=0",
+   "variants": 3
+  },
+  {
+   "bucket": "unsupported: Expression_produces_a_union_type_that_is_too_complex_to_represent",
+   "owner": "C2",
+   "representative": "compiler/templateLiteralTypeTooComplex.ts#configuration=0",
+   "variants": 3
+  },
+  {
+   "bucket": "unsupported: getTypeFromImportTypeNode: CommonJS typedef export lookup",
+   "owner": "C2",
+   "representative": "conformance/jsdoc/jsdocImportTypeReferenceToStringLiteral.ts#configuration=0",
+   "variants": 3
+  },
+  {
+   "bucket": "emit order: native pre/post-emit sets differ",
+   "owner": "C5 / Phase 3 (emit order)",
+   "representative": "compiler/incorrectRecursiveMappedTypeConstraint.ts#configuration=0",
+   "variants": 3
+  },
+  {
+   "bucket": "diagnostics: TS2313",
+   "owner": "C2",
+   "representative": "compiler/circularBaseTypes.ts#configuration=0",
+   "variants": 2
+  },
+  {
+   "bucket": "diagnostics: TS2314",
+   "owner": "C2",
+   "representative": "compiler/typeAliasDeclarationEmit.ts#configuration=0",
+   "variants": 2
+  },
+  {
+   "bucket": "diagnostics: TS2636",
+   "owner": "C2",
+   "representative": "compiler/varianceAnnotationValidation.ts#configuration=0",
+   "variants": 2
+  },
+  {
+   "bucket": "diagnostics: TS2769",
+   "owner": "C2",
+   "representative": "conformance/types/typeRelationships/typeInference/unionAndIntersectionInference1.ts#configuration=0",
+   "variants": 2
+  },
+  {
+   "bucket": "diagnostics: TS2795",
+   "owner": "C2",
+   "representative": "conformance/types/typeAliases/intrinsicKeyword.ts#configuration=0",
+   "variants": 2
+  },
+  {
+   "bucket": "diagnostics: TS7053",
+   "owner": "C2",
+   "representative": "compiler/narrowingMutualSubtypes.ts#configuration=0",
+   "variants": 2
+  },
+  {
+   "bucket": "unsupported: node builder synthetic elision comments",
+   "owner": "C2",
+   "representative": "compiler/nestedSpreadsAndWidening.ts#configuration=0",
+   "variants": 2
+  },
+  {
+   "bucket": "unsupported: node builder synthetic property elision comments",
+   "owner": "C2",
+   "representative": "compiler/hugeDeclarationOutputGetsTruncatedWithError.ts#configuration=0",
+   "variants": 2
+  },
+  {
+   "bucket": "unsupported: someSymbolTableInScope: reparsed module",
+   "owner": "C2",
+   "representative": "conformance/jsdoc/declarations/jsDeclarationsImportAliasExposedWithinNamespace.ts#configuration=0",
+   "variants": 2
+  },
+  {
+   "bucket": "diagnostics: TS1240",
+   "owner": "C4",
+   "representative": "conformance/decorators/class/property/decoratorOnClassProperty6.ts#configuration=0",
+   "variants": 2
+  },
+  {
+   "bucket": "diagnostics: TS1241",
+   "owner": "C4",
+   "representative": "conformance/decorators/class/method/decoratorOnClassMethod8.ts#configuration=0",
+   "variants": 2
+  },
+  {
+   "bucket": "diagnostics: TS1329",
+   "owner": "C4",
+   "representative": "conformance/decorators/class/property/decoratorOnClassProperty11.ts#configuration=0",
+   "variants": 2
+  },
+  {
+   "bucket": "unsupported: getContextualType: decorator/JSX context",
+   "owner": "C4",
+   "representative": "conformance/decorators/class/decoratorChecksFunctionBodies.ts#configuration=0",
+   "variants": 2
+  },
+  {
+   "bucket": "diagnostics: TS1477",
+   "owner": "C2",
+   "representative": "conformance/types/typeParameters/typeArgumentLists/instantiationExpressionErrors.ts#configuration=0",
+   "variants": 1
+  },
+  {
+   "bucket": "diagnostics: TS1539",
+   "owner": "C2",
+   "representative": "compiler/bigintPropertyName.ts#configuration=0",
+   "variants": 1
+  },
+  {
+   "bucket": "diagnostics: TS18048",
+   "owner": "C2",
+   "representative": "compiler/specialIntersectionsInMappedTypes.ts#configuration=0",
+   "variants": 1
+  },
+  {
+   "bucket": "diagnostics: TS2315",
+   "owner": "C2",
+   "representative": "compiler/cjsExportGenericTypes.ts#configuration=0",
+   "variants": 1
+  },
+  {
+   "bucket": "diagnostics: TS2318",
+   "owner": "C2",
+   "representative": "compiler/awaitedTypeNoLib.ts#configuration=0",
+   "variants": 1
+  },
+  {
+   "bucket": "diagnostics: TS2337",
+   "owner": "C2",
+   "representative": "conformance/expressions/superCalls/errorSuperCalls.ts#configuration=0",
+   "variants": 1
+  },
+  {
+   "bucket": "diagnostics: TS2349",
+   "owner": "C2",
+   "representative": "conformance/jsdoc/declarations/jsDeclarationsFunctions.ts#configuration=0",
+   "variants": 1
+  },
+  {
+   "bucket": "diagnostics: TS2355",
+   "owner": "C2",
+   "representative": "conformance/jsdoc/errorOnFunctionReturnType.ts#configuration=0",
+   "variants": 1
+  },
+  {
+   "bucket": "diagnostics: TS2536",
+   "owner": "C2",
+   "representative": "conformance/types/unknown/unknownControlFlow.ts#configuration=0",
+   "variants": 1
+  },
+  {
+   "bucket": "diagnostics: TS2554",
+   "owner": "C2",
+   "representative": "compiler/superWithTypeArgument2.ts#configuration=0",
+   "variants": 1
+  },
+  {
+   "bucket": "diagnostics: TS2558",
+   "owner": "C2",
+   "representative": "compiler/superWithTypeArgument.ts#configuration=0",
+   "variants": 1
+  },
+  {
+   "bucket": "diagnostics: TS2677",
+   "owner": "C2",
+   "representative": "compiler/typeInferenceTypePredicate.ts#configuration=0",
+   "variants": 1
+  },
+  {
+   "bucket": "diagnostics: TS2741",
+   "owner": "C2",
+   "representative": "compiler/classExtendingAbstractClassWithMemberCalledTheSameAsItsOwnTypeParam.ts#configuration=0",
+   "variants": 1
+  },
+  {
+   "bucket": "diagnostics: TS4023",
+   "owner": "C2",
+   "representative": "compiler/mappedTypeGenericInstantiationPreservesHomomorphism.ts#configuration=0",
+   "variants": 1
+  },
+  {
+   "bucket": "diagnostics: TS4031",
+   "owner": "C2",
+   "representative": "compiler/declarationEmitShadowing.ts#configuration=0",
+   "variants": 1
+  },
+  {
+   "bucket": "diagnostics: TS4052",
+   "owner": "C2",
+   "representative": "compiler/declarationEmitStaticMethodNonIdentifierNames.ts#configuration=0",
+   "variants": 1
+  },
+  {
+   "bucket": "diagnostics: TS4076",
+   "owner": "C2",
+   "representative": "compiler/declarationEmitJsExportAssignedArrowNoCrash.ts#configuration=0",
+   "variants": 1
+  },
+  {
+   "bucket": "diagnostics: TS4082",
+   "owner": "C2",
+   "representative": "compiler/declarationEmitMappedTypeDistributivityPreservesConstraints.ts#configuration=0",
+   "variants": 1
+  },
+  {
+   "bucket": "diagnostics: TS7006",
+   "owner": "C2",
+   "representative": "compiler/contextualTypeCaching.ts#configuration=0",
+   "variants": 1
+  },
+  {
+   "bucket": "diagnostics: TS7031",
+   "owner": "C2",
+   "representative": "conformance/es6/destructuring/destructuringParameterDeclaration9.ts#configuration=1",
+   "variants": 1
+  },
+  {
+   "bucket": "diagnostics: TS9010",
+   "owner": "C2",
+   "representative": "compiler/declarationEmitIsolatedDeclarationErrorNotEmittedForNonEmittedFile.ts#configuration=0",
+   "variants": 1
+  },
+  {
+   "bucket": "different: display",
+   "owner": "C2",
+   "representative": "compiler/spuriousCircularityOnTypeImport.ts#configuration=0",
+   "variants": 1
+  },
+  {
+   "bucket": "failed: stack overflow",
+   "owner": "C2",
+   "representative": "compiler/infiniteConstraints2.ts#configuration=0",
+   "variants": 1
+  },
+  {
+   "bucket": "failed: walker_error",
+   "owner": "C2",
+   "representative": "compiler/packageDeduplicationDuplicateGlobals.ts#configuration=0",
+   "variants": 1
+  },
+  {
+   "bucket": "panic: tsr_ast::factory",
+   "owner": "C2",
+   "representative": "compiler/declarationEmitAugmentationUsesCorrectSourceFile.ts#configuration=0",
+   "variants": 1
+  },
+  {
+   "bucket": "panic: tsr_checker::infer_tuples",
+   "owner": "C2",
+   "representative": "compiler/sliceTupleTypeOutOfBounds.ts#configuration=0",
+   "variants": 1
+  },
+  {
+   "bucket": "unsupported: checkExpressionWorker",
+   "owner": "C2",
+   "representative": "conformance/types/import/importWithTypeArguments.ts#configuration=0",
+   "variants": 1
+  },
+  {
+   "bucket": "unsupported: checkIfTypePredicateVariableIsDeclaredInBindingPattern",
+   "owner": "C2",
+   "representative": "conformance/expressions/typeGuards/typeGuardFunctionErrors.ts#configuration=0",
+   "variants": 1
+  },
+  {
+   "bucket": "unsupported: reportOperatorError: awaited operand suggestions",
+   "owner": "C2",
+   "representative": "compiler/operationsAvailableOnPromisedType.ts#configuration=0",
+   "variants": 1
+  },
+  {
+   "bucket": "diagnostics: TS1272",
+   "owner": "C4",
+   "representative": "compiler/emitDecoratorMetadata_isolatedModules.ts#configuration=1",
+   "variants": 1
+  },
+  {
+   "bucket": "diagnostics: TS2318",
+   "owner": "C4",
+   "representative": "conformance/decorators/missingDecoratorType.ts#configuration=0",
+   "variants": 1
+  },
+  {
+   "bucket": "diagnostics: TS2331",
+   "owner": "C4",
+   "representative": "conformance/decorators/class/method/decoratorOnClassMethod11.ts#configuration=0",
+   "variants": 1
+  },
+  {
+   "bucket": "diagnostics: TS2593",
+   "owner": "C4",
+   "representative": "compiler/metadataImportType.ts#configuration=0",
+   "variants": 1
+  },
+  {
+   "bucket": "diagnostics: TS2660",
+   "owner": "C4",
+   "representative": "conformance/decorators/class/method/decoratorOnClassMethod12.ts#configuration=0",
+   "variants": 1
+  },
+  {
+   "bucket": "unsupported: checkSourceElementWorker: statement/type family",
+   "owner": "C4",
+   "representative": "conformance/classes/classStaticBlock/classStaticBlock19.ts#configuration=0",
+   "variants": 1
+  }
+ ],
+ "by_checkpoint": {
+  "C2": {
+   "match": 2612,
+   "open": 342
+  },
+  "C3": {
+   "match": 170,
+   "open": 15
+  },
+  "C4": {
+   "match": 159,
+   "open": 767
+  },
+  "regression": {
+   "match": 9367
+  }
+ },
+ "categories": {
+  "display": {
+   "different": 47,
+   "disabled": 679,
+   "failed": 20,
+   "match": 12037,
+   "unsupported": 649
+  },
+  "errors": {
+   "different": 223,
+   "failed": 19,
+   "match": 12372,
+   "unsupported": 818
+  },
+  "parent_pointers": {
+   "failed": 6,
+   "match": 13411,
+   "unsupported": 15
+  },
+  "symbols": {
+   "different": 9,
+   "disabled": 679,
+   "failed": 20,
+   "match": 12075,
+   "unsupported": 649
+  },
+  "trace": {
+   "disabled": 13278,
+   "match": 154
+  },
+  "types": {
+   "different": 69,
+   "disabled": 679,
+   "failed": 20,
+   "match": 12015,
+   "unsupported": 649
+  },
+  "union_ordering": {
+   "failed": 6,
+   "match": 13411,
+   "unsupported": 15
+  }
+ },
+ "changed_observations": [],
+ "dimensions": {
+  "area": {
+   "diagnostics: TS1240": 2,
+   "diagnostics: TS1241": 2,
+   "diagnostics: TS1272": 1,
+   "diagnostics: TS1329": 2,
+   "diagnostics: TS1477": 1,
+   "diagnostics: TS1539": 1,
+   "diagnostics: TS18048": 1,
+   "diagnostics: TS2304": 5,
+   "diagnostics: TS2313": 2,
+   "diagnostics: TS2314": 2,
+   "diagnostics: TS2315": 1,
+   "diagnostics: TS2318": 2,
+   "diagnostics: TS2322": 73,
+   "diagnostics: TS2331": 1,
+   "diagnostics: TS2337": 1,
+   "diagnostics: TS2339": 9,
+   "diagnostics: TS2344": 10,
+   "diagnostics: TS2345": 9,
+   "diagnostics: TS2349": 1,
+   "diagnostics: TS2352": 4,
+   "diagnostics: TS2355": 1,
+   "diagnostics: TS2365": 5,
+   "diagnostics: TS2416": 9,
+   "diagnostics: TS2430": 9,
+   "diagnostics: TS2536": 1,
+   "diagnostics: TS2554": 1,
+   "diagnostics: TS2558": 1,
+   "diagnostics: TS2593": 1,
+   "diagnostics: TS2636": 2,
+   "diagnostics: TS2660": 1,
+   "diagnostics: TS2677": 1,
+   "diagnostics: TS2741": 1,
+   "diagnostics: TS2769": 2,
+   "diagnostics: TS2795": 2,
+   "diagnostics: TS4023": 1,
+   "diagnostics: TS4025": 27,
+   "diagnostics: TS4031": 1,
+   "diagnostics: TS4052": 1,
+   "diagnostics: TS4060": 9,
+   "diagnostics: TS4076": 1,
+   "diagnostics: TS4082": 1,
+   "diagnostics: TS7006": 1,
+   "diagnostics: TS7031": 1,
+   "diagnostics: TS7053": 2,
+   "diagnostics: TS7060": 4,
+   "diagnostics: TS9010": 1,
+   "different: display": 1,
+   "different: types": 24,
+   "emit order: native pre/post-emit sets differ": 3,
+   "failed: checker_error": 13,
+   "failed: stack overflow": 1,
+   "failed: walker_error": 1,
+   "panic: tsr_ast::factory": 1,
+   "panic: tsr_checker::infer_tuples": 1,
+   "panic: tsr_checker::relater_tuples": 3,
+   "unsupported: Expression_produces_a_union_type_that_is_too_complex_to_represent": 3,
+   "unsupported: addIntraExpressionInferenceSite: array element": 7,
+   "unsupported: checkClassLikeDeclaration: decorators": 284,
+   "unsupported: checkDecorators: parameter or binding": 25,
+   "unsupported: checkExpressionWorker": 440,
+   "unsupported: checkIfTypePredicateVariableIsDeclaredInBindingPattern": 1,
+   "unsupported: checkSourceElementWorker: statement/type family": 1,
+   "unsupported: conditionalTypeToTypeNode: shadowed distribution parameter": 5,
+   "unsupported: content-mapper execution": 15,
+   "unsupported: extractRedundantTemplateLiterals": 30,
+   "unsupported: getContextualType: decorator/JSX context": 2,
+   "unsupported: getTypeFromImportTypeNode: CommonJS typedef export lookup": 3,
+   "unsupported: node builder synthetic elision comments": 2,
+   "unsupported: node builder synthetic property elision comments": 2,
+   "unsupported: reportOperatorError: awaited operand suggestions": 1,
+   "unsupported: someSymbolTableInScope: reparsed module": 2,
+   "unsupported: typeReferenceToTypeNode: applied outer arguments": 36
+  },
+  "family": {
+   "conditional_types": 91,
+   "content_mapper_execution": 15,
+   "decorators": 331,
+   "emitted_output_only": 182,
+   "explicit_type_parameters": 441,
+   "import_types": 13,
+   "indexed_access_types": 119,
+   "infer_types": 45,
+   "jsx": 436,
+   "mapped_types": 101,
+   "nonempty_type_arguments": 357,
+   "template_literal_types": 24
+  },
+  "first_code": {
+   "(none)": 901,
+   "1240": 2,
+   "1241": 2,
+   "1272": 1,
+   "1329": 2,
+   "1477": 1,
+   "1539": 1,
+   "18048": 1,
+   "2304": 5,
+   "2313": 5,
+   "2314": 2,
+   "2315": 1,
+   "2318": 2,
+   "2322": 73,
+   "2331": 1,
+   "2337": 1,
+   "2339": 9,
+   "2344": 10,
+   "2345": 10,
+   "2349": 1,
+   "2352": 4,
+   "2355": 1,
+   "2365": 5,
+   "2416": 9,
+   "2430": 9,
+   "2536": 1,
+   "2554": 1,
+   "2558": 1,
+   "2593": 1,
+   "2636": 2,
+   "2660": 1,
+   "2677": 1,
+   "2741": 1,
+   "2769": 2,
+   "2795": 2,
+   "4023": 1,
+   "4025": 28,
+   "4031": 1,
+   "4052": 1,
+   "4060": 9,
+   "4076": 1,
+   "4082": 1,
+   "5088": 1,
+   "7006": 1,
+   "7031": 1,
+   "7053": 2,
+   "7060": 4,
+   "9010": 1
+  },
+  "jsx": {
+   "preserve": 210,
+   "react": 158,
+   "react-jsx": 38,
+   "react-jsxdev": 19,
+   "react-native": 2,
+   "unset": 697
+  },
+  "module": {
+   "commonjs": 311,
+   "es2015": 9,
+   "es2020": 1,
+   "es2022": 4,
+   "esnext": 93,
+   "node16": 2,
+   "node18": 2,
+   "node20": 2,
+   "nodenext": 12,
+   "preserve": 7,
+   "unset": 681
+  },
+  "strict": {
+   "False": 883,
+   "True": 241
+  },
+  "target": {
+   "es2015": 869,
+   "es2017": 18,
+   "es2018": 4,
+   "es2020": 16,
+   "es2021": 1,
+   "es2022": 55,
+   "esnext": 123,
+   "unset": 38
+  }
+ },
+ "executed": 13432,
+ "harness_errors": 0,
+ "inventory_sha256": "c09721d36d361eb8646b2321ec3478da0fbdbf12253c086e7b1c34e966aea9b9",
+ "native_observation_sha256": "1b5356b425ad95a3e5e2a0bb29d42534e8d9d4a6159649f063f3317084a0e276",
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "previous": null,
+ "regression_subset": {
+  "all_domains_match": 9367,
+  "by_domain": {
+   "display": {
+    "disabled": 198,
+    "match": 9169
+   },
+   "errors": {
+    "match": 9367
+   },
+   "parent_pointers": {
+    "match": 9367
+   },
+   "symbols": {
+    "disabled": 198,
+    "match": 9169
+   },
+   "trace": {
+    "disabled": 9219,
+    "match": 148
+   },
+   "types": {
+    "disabled": 198,
+    "match": 9169
+   },
+   "union_ordering": {
+    "match": 9367
+   }
+  },
+  "rows": 9367
+ },
+ "rust_capture_sha256": "37fba879efd84ffe4a9bb112f06cf84d735da420d168ec4f2d9fc5358673fe6d",
+ "rust_source_stable": true,
+ "unsupported_operations": {
+  "Expression_produces_a_union_type_that_is_too_complex_to_represent": 12,
+  "addIntraExpressionInferenceSite: array element": 28,
+  "checkClassLikeDeclaration: decorators": 569,
+  "checkDecorators: parameter or binding": 82,
+  "checkExpressionWorker": 1733,
+  "checkIfTypePredicateVariableIsDeclaredInBindingPattern": 4,
+  "checkSourceElementWorker: statement/type family": 4,
+  "conditionalTypeToTypeNode: shadowed distribution parameter": 16,
+  "content-mapper execution": 75,
+  "extractRedundantTemplateLiterals": 120,
+  "getContextualType: decorator/JSX context": 6,
+  "getTypeFromImportTypeNode: CommonJS typedef export lookup": 12,
+  "node builder synthetic elision comments": 6,
+  "node builder synthetic property elision comments": 5,
+  "reportOperatorError: awaited operand suggestions": 4,
+  "someSymbolTableInScope: reparsed module": 8,
+  "typeReferenceToTypeNode: applied outer arguments": 111
+ },
+ "version": 1
+}
