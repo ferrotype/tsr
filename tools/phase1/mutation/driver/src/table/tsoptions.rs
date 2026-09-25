@@ -16,6 +16,10 @@ pub const COLUMNS: &[&str] = &[
     "tsoptions.ParsedCommandLine.WildcardDirectoryGlobs",
     "tsoptions.ParsedBuildCommandLine.ResolvedProjectPaths",
     "tsoptions.TargetToLibMap",
+    "tsoptions.CompilerOptionsAffectEmit",
+    "tsoptions.CompilerOptionsAffectDeclarationPath",
+    "tsoptions.CompilerOptionsAffectSemanticDiagnostics",
+    "tsoptions.ForEachCompilerOptionValue",
     "core.ResolveProjectReferencePath",
 ];
 
@@ -106,6 +110,14 @@ pub fn build(column: &str, input: &Value) -> Option<Result<Column, String>> {
             }))
         }
         "core.ResolveProjectReferencePath" => resolve_project_reference_path(input),
+        "tsoptions.CompilerOptionsAffectEmit" => affect_column(input, tsr_tsoptions::affects::compiler_options_affect_emit),
+        "tsoptions.CompilerOptionsAffectDeclarationPath" => {
+            affect_column(input, tsr_tsoptions::affects::compiler_options_affect_declaration_path)
+        }
+        "tsoptions.CompilerOptionsAffectSemanticDiagnostics" => {
+            affect_column(input, tsr_tsoptions::affects::compiler_options_affect_semantic_diagnostics)
+        }
+        "tsoptions.ForEachCompilerOptionValue" => for_each_compiler_option_value(input),
         _ => return None,
     })
 }
@@ -175,5 +187,85 @@ fn resolve_project_reference_path(input: &Value) -> Result<Column, String> {
                 ])
             })
             .collect::<Vec<_>>()))
+    }))
+}
+
+/// Go's `optionsOf`.
+fn options_of(text: Option<&str>) -> Result<Option<tsr_core::CompilerOptions>, String> {
+    let Some(text) = text else {
+        return Ok(None);
+    };
+    let input = json!({"files": {}, "currentDirectory": "/p", "caseSensitive": true, "jsonText": text, "args": null});
+    Ok(Some(parse_config(&input)?.0.options))
+}
+
+#[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct AffectCase {
+    #[serde(default)]
+    old: Option<String>,
+    #[serde(default)]
+    new: Option<String>,
+    #[serde(default)]
+    same: bool,
+}
+
+#[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct AffectCases {
+    cases: Vec<AffectCase>,
+}
+
+type Affect = fn(Option<&tsr_core::CompilerOptions>, Option<&tsr_core::CompilerOptions>) -> bool;
+
+/// Go's `affectColumn`.
+fn affect_column(input: &Value, affect: Affect) -> Result<Column, String> {
+    let cases: AffectCases = decode(input)?;
+    let options = cases
+        .cases
+        .iter()
+        .map(|case| Ok((options_of(case.old.as_deref())?, options_of(case.new.as_deref())?, case.same)))
+        .collect::<Result<Vec<_>, String>>()?;
+    Ok(Box::new(move || {
+        Ok(json!(options
+            .iter()
+            .map(|(old, new, same)| {
+                let new = if *same { old.as_ref() } else { new.as_ref() };
+                affect(old.as_ref(), new)
+            })
+            .collect::<Vec<_>>()))
+    }))
+}
+
+#[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct ForEachInput {
+    configs: Vec<String>,
+    stop_at: String,
+}
+
+fn for_each_compiler_option_value(input: &Value) -> Result<Column, String> {
+    let input: ForEachInput = decode(input)?;
+    let configs = input
+        .configs
+        .iter()
+        .map(|text| options_of(Some(text)).map(Option::unwrap_or_default))
+        .collect::<Result<Vec<_>, String>>()?;
+    let stop_at = input.stop_at;
+    Ok(Box::new(move || {
+        let mut out = Vec::new();
+        for options in &configs {
+            let mut visited = Vec::new();
+            let stopped = tsr_tsoptions::affects::for_each_compiler_option_value(
+                options,
+                |field| field.affects_semantic_diagnostics,
+                &mut |field, value, index| {
+                    visited.push(json!([hex(field.declaration.as_bytes()), value.is_none(), index]));
+                    field.declaration == stop_at
+                },
+            );
+            out.push(json!([stopped, visited]));
+        }
+        Ok(Value::Array(out))
     }))
 }

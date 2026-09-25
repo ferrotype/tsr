@@ -6,6 +6,7 @@ package main
 
 import (
 	"encoding/json"
+	"reflect"
 	"slices"
 
 	"github.com/microsoft/TypeScript/tsc/internal/core"
@@ -24,6 +25,44 @@ func hexes(texts []string) any {
 		out = append(out, Hex(text))
 	}
 	return out
+}
+
+// optionsOf parses a tsconfig text's compiler options as ParseConfig does
+// (under /p, with no other files); nil text is nil options.
+func optionsOf(text *string) *core.CompilerOptions {
+	if text == nil {
+		return nil
+	}
+	host := tsoptionstest.NewVFSParseConfigHost(map[string]string{}, "/p", true)
+	source := tsoptions.NewTsconfigSourceFileFromFilePath("/p/tsconfig.json", tspath.ToPath("/p/tsconfig.json", "/p", true), *text)
+	return tsoptions.ParseJsonSourceFileConfigFileContent(source, host, "/p", nil, nil, "/p/tsconfig.json", nil, nil).CompilerOptions()
+}
+
+type affectCase struct {
+	Old  *string `json:"old"`
+	New  *string `json:"new"`
+	Same bool    `json:"same"`
+}
+
+// affectColumn runs one Affects predicate over option pairs (the same
+// options where the case says so).
+func affectColumn(affect func(old, new *core.CompilerOptions) bool) func(in struct {
+	Cases []affectCase `json:"cases"`
+}) any {
+	return func(in struct {
+		Cases []affectCase `json:"cases"`
+	}) any {
+		out := []any{}
+		for _, c := range in.Cases {
+			old := optionsOf(c.Old)
+			new := optionsOf(c.New)
+			if c.Same {
+				new = old
+			}
+			out = append(out, affect(old, new))
+		}
+		return out
+	}
 }
 
 // configColumn is a column over a parsed tsconfig (the config input) and its
@@ -100,6 +139,29 @@ func init() {
 				return func() any { return hexes(parsed.ResolvedProjectPaths()) }, nil
 			},
 		},
+		typedValuesColumn("tsoptions.CompilerOptionsAffectEmit", affectColumn(tsoptions.CompilerOptionsAffectEmit)),
+		typedValuesColumn("tsoptions.CompilerOptionsAffectDeclarationPath", affectColumn(tsoptions.CompilerOptionsAffectDeclarationPath)),
+		typedValuesColumn("tsoptions.CompilerOptionsAffectSemanticDiagnostics", affectColumn(tsoptions.CompilerOptionsAffectSemanticDiagnostics)),
+		// Over the semantic-diagnostics options of each config: [whether a
+		// call stopping at stop_at stopped, [[name hex, zero, field index],
+		// ...] of the fields it visited].
+		typedValuesColumn("tsoptions.ForEachCompilerOptionValue", func(in struct {
+			Configs []string `json:"configs"`
+			StopAt  string   `json:"stop_at"`
+		}) any {
+			out := []any{}
+			for _, text := range in.Configs {
+				visited := []any{}
+				stopped := tsoptions.ForEachCompilerOptionValue(optionsOf(&text),
+					func(option *tsoptions.CommandLineOption) bool { return option.AffectsSemanticDiagnostics },
+					func(option *tsoptions.CommandLineOption, value reflect.Value, i int) bool {
+						visited = append(visited, []any{Hex(option.Name), value.IsZero(), Scalar(i)})
+						return option.Name == in.StopAt
+					})
+				out = append(out, []any{stopped, visited})
+			}
+			return out
+		}),
 		typedValuesColumn("tsoptions.TargetToLibMap", func(in struct{}) any {
 			entries := map[string]int{}
 			for target, lib := range tsoptions.TargetToLibMap() {

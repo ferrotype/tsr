@@ -1272,6 +1272,264 @@
           "name": "paths"
         }
       ]
+    },
+    {
+      "evidence": [
+        "internal/execute/incremental/programtosnapshot.go:209",
+        "internal/tsoptions/declscompiler.go:1254",
+        "internal/tsoptions/declscompiler.go:1263",
+        "internal/tsoptions/declscompiler.go:1269",
+        "internal/execute/incremental/snapshottobuildinfo.go:292",
+        "internal/tsoptions/declscompiler.go:1221"
+      ],
+      "id": "tsoptions.CompilerOptionsAffectEmit",
+      "input": "values",
+      "operations": [
+        "tsc/internal/tsoptions/declscompiler.go:CompilerOptionsAffectEmit",
+        "tsc/internal/tsoptions/declscompiler.go:optionsHaveChanges",
+        "tsc/internal/tsoptions/declscompiler.go:ForEachCompilerOptionValue"
+      ],
+      "projection": "the result per pair of parsed options (the same options where the case says so, nil where a side is absent)",
+      "rust": "tsr_tsoptions::affects::compiler_options_affect_emit",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "cases": [
+              {
+                "new": "{\"compilerOptions\": {\"target\": \"es2022\"}}",
+                "old": "{\"compilerOptions\": {\"target\": \"es2020\"}}"
+              },
+              {
+                "old": "{\"compilerOptions\": {\"target\": \"es2020\"}}",
+                "same": true
+              },
+              {
+                "new": "{\"compilerOptions\": {}}"
+              },
+              {},
+              {
+                "new": "{\"compilerOptions\": {\"strict\": true, \"noImplicitAny\": true}}",
+                "old": "{\"compilerOptions\": {\"strict\": true}}"
+              },
+              {
+                "new": "{\"compilerOptions\": {\"noImplicitAny\": false}}",
+                "old": "{\"compilerOptions\": {\"strict\": true}}"
+              },
+              {
+                "new": "{\"compilerOptions\": {\"allowJs\": true}}",
+                "old": "{\"compilerOptions\": {\"checkJs\": true}}"
+              },
+              {
+                "new": "{\"compilerOptions\": {\"outDir\": \"b\"}}",
+                "old": "{\"compilerOptions\": {\"outDir\": \"a\"}}"
+              },
+              {
+                "new": "{\"compilerOptions\": {}}",
+                "old": "{\"compilerOptions\": {\"noUnusedLocals\": true}}"
+              },
+              {
+                "new": "{\"compilerOptions\": {\"lib\": [\"es2015\", \"dom\"]}}",
+                "old": "{\"compilerOptions\": {\"lib\": [\"es2015\"]}}"
+              },
+              {
+                "new": "{\"compilerOptions\": {\"paths\": {\"a\": [\"c\"]}}}",
+                "old": "{\"compilerOptions\": {\"paths\": {\"a\": [\"b\"]}}}"
+              },
+              {
+                "new": "{\"compilerOptions\": {\"declarationDir\": \"e\", \"declaration\": true}}",
+                "old": "{\"compilerOptions\": {\"declarationDir\": \"d\", \"declaration\": true}}"
+              },
+              {
+                "new": "{\"compilerOptions\": {\"module\": \"commonjs\"}}",
+                "old": "{\"compilerOptions\": {\"module\": \"commonjs\"}}"
+              }
+            ]
+          },
+          "name": "pairs"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/execute/incremental/programtosnapshot.go:84",
+        "internal/tsoptions/declscompiler.go:1254",
+        "internal/tsoptions/declscompiler.go:1263",
+        "internal/tsoptions/declscompiler.go:1269",
+        "internal/execute/incremental/snapshottobuildinfo.go:292",
+        "internal/tsoptions/declscompiler.go:1221"
+      ],
+      "id": "tsoptions.CompilerOptionsAffectDeclarationPath",
+      "input": "values",
+      "operations": [
+        "tsc/internal/tsoptions/declscompiler.go:CompilerOptionsAffectDeclarationPath",
+        "tsc/internal/tsoptions/declscompiler.go:optionsHaveChanges",
+        "tsc/internal/tsoptions/declscompiler.go:ForEachCompilerOptionValue"
+      ],
+      "projection": "as tsoptions.CompilerOptionsAffectEmit",
+      "rust": "tsr_tsoptions::affects::compiler_options_affect_declaration_path",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "cases": [
+              {
+                "new": "{\"compilerOptions\": {\"target\": \"es2022\"}}",
+                "old": "{\"compilerOptions\": {\"target\": \"es2020\"}}"
+              },
+              {
+                "old": "{\"compilerOptions\": {\"target\": \"es2020\"}}",
+                "same": true
+              },
+              {
+                "new": "{\"compilerOptions\": {}}"
+              },
+              {},
+              {
+                "new": "{\"compilerOptions\": {\"strict\": true, \"noImplicitAny\": true}}",
+                "old": "{\"compilerOptions\": {\"strict\": true}}"
+              },
+              {
+                "new": "{\"compilerOptions\": {\"noImplicitAny\": false}}",
+                "old": "{\"compilerOptions\": {\"strict\": true}}"
+              },
+              {
+                "new": "{\"compilerOptions\": {\"allowJs\": true}}",
+                "old": "{\"compilerOptions\": {\"checkJs\": true}}"
+              },
+              {
+                "new": "{\"compilerOptions\": {\"outDir\": \"b\"}}",
+                "old": "{\"compilerOptions\": {\"outDir\": \"a\"}}"
+              },
+              {
+                "new": "{\"compilerOptions\": {}}",
+                "old": "{\"compilerOptions\": {\"noUnusedLocals\": true}}"
+              },
+              {
+                "new": "{\"compilerOptions\": {\"lib\": [\"es2015\", \"dom\"]}}",
+                "old": "{\"compilerOptions\": {\"lib\": [\"es2015\"]}}"
+              },
+              {
+                "new": "{\"compilerOptions\": {\"paths\": {\"a\": [\"c\"]}}}",
+                "old": "{\"compilerOptions\": {\"paths\": {\"a\": [\"b\"]}}}"
+              },
+              {
+                "new": "{\"compilerOptions\": {\"declarationDir\": \"e\", \"declaration\": true}}",
+                "old": "{\"compilerOptions\": {\"declarationDir\": \"d\", \"declaration\": true}}"
+              },
+              {
+                "new": "{\"compilerOptions\": {\"module\": \"commonjs\"}}",
+                "old": "{\"compilerOptions\": {\"module\": \"commonjs\"}}"
+              }
+            ]
+          },
+          "name": "pairs"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/execute/incremental/programtosnapshot.go:75",
+        "internal/tsoptions/declscompiler.go:1254",
+        "internal/tsoptions/declscompiler.go:1263",
+        "internal/tsoptions/declscompiler.go:1269",
+        "internal/execute/incremental/snapshottobuildinfo.go:292",
+        "internal/tsoptions/declscompiler.go:1221"
+      ],
+      "id": "tsoptions.CompilerOptionsAffectSemanticDiagnostics",
+      "input": "values",
+      "operations": [
+        "tsc/internal/tsoptions/declscompiler.go:CompilerOptionsAffectSemanticDiagnostics",
+        "tsc/internal/tsoptions/declscompiler.go:optionsHaveChanges",
+        "tsc/internal/tsoptions/declscompiler.go:ForEachCompilerOptionValue"
+      ],
+      "projection": "as tsoptions.CompilerOptionsAffectEmit",
+      "rust": "tsr_tsoptions::affects::compiler_options_affect_semantic_diagnostics",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "cases": [
+              {
+                "new": "{\"compilerOptions\": {\"target\": \"es2022\"}}",
+                "old": "{\"compilerOptions\": {\"target\": \"es2020\"}}"
+              },
+              {
+                "old": "{\"compilerOptions\": {\"target\": \"es2020\"}}",
+                "same": true
+              },
+              {
+                "new": "{\"compilerOptions\": {}}"
+              },
+              {},
+              {
+                "new": "{\"compilerOptions\": {\"strict\": true, \"noImplicitAny\": true}}",
+                "old": "{\"compilerOptions\": {\"strict\": true}}"
+              },
+              {
+                "new": "{\"compilerOptions\": {\"noImplicitAny\": false}}",
+                "old": "{\"compilerOptions\": {\"strict\": true}}"
+              },
+              {
+                "new": "{\"compilerOptions\": {\"allowJs\": true}}",
+                "old": "{\"compilerOptions\": {\"checkJs\": true}}"
+              },
+              {
+                "new": "{\"compilerOptions\": {\"outDir\": \"b\"}}",
+                "old": "{\"compilerOptions\": {\"outDir\": \"a\"}}"
+              },
+              {
+                "new": "{\"compilerOptions\": {}}",
+                "old": "{\"compilerOptions\": {\"noUnusedLocals\": true}}"
+              },
+              {
+                "new": "{\"compilerOptions\": {\"lib\": [\"es2015\", \"dom\"]}}",
+                "old": "{\"compilerOptions\": {\"lib\": [\"es2015\"]}}"
+              },
+              {
+                "new": "{\"compilerOptions\": {\"paths\": {\"a\": [\"c\"]}}}",
+                "old": "{\"compilerOptions\": {\"paths\": {\"a\": [\"b\"]}}}"
+              },
+              {
+                "new": "{\"compilerOptions\": {\"declarationDir\": \"e\", \"declaration\": true}}",
+                "old": "{\"compilerOptions\": {\"declarationDir\": \"d\", \"declaration\": true}}"
+              },
+              {
+                "new": "{\"compilerOptions\": {\"module\": \"commonjs\"}}",
+                "old": "{\"compilerOptions\": {\"module\": \"commonjs\"}}"
+              }
+            ]
+          },
+          "name": "pairs"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/execute/incremental/snapshottobuildinfo.go:292",
+        "internal/tsoptions/declscompiler.go:1221"
+      ],
+      "id": "tsoptions.ForEachCompilerOptionValue",
+      "input": "values",
+      "operations": [
+        "tsc/internal/tsoptions/declscompiler.go:ForEachCompilerOptionValue"
+      ],
+      "projection": "per config, over its semantic-diagnostics options: [whether a callback stopping at stop_at stopped, [[option name hex, whether the value is zero, reflect field index], ...] in field order]",
+      "rust": "tsr_tsoptions::affects::for_each_compiler_option_value",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "configs": [
+              "{\"compilerOptions\": {}}",
+              "{\"compilerOptions\": {\"strict\": true, \"noImplicitAny\": false, \"lib\": [\"dom\"]}}",
+              "{\"compilerOptions\": {\"noUnusedLocals\": true, \"exactOptionalPropertyTypes\": true}}"
+            ],
+            "stop_at": "noImplicitAny"
+          },
+          "name": "configs"
+        }
+      ]
     }
   ],
   "group": "tsoptions",
