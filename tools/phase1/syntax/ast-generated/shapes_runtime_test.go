@@ -239,6 +239,9 @@ func phase1ShapeSpecial(r phase1GeneratedRequest) (any, error) {
 	case "ModifierList":
 		labels = []string{"new", "clone"}
 		operation = "tsc/internal/ast/ast.go:NodeFactory.NewModifierList"
+	case "EmbeddedStatement":
+		labels = []string{"visit"}
+		operation = "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
 	default:
 		return nil, fmt.Errorf("unknown special shape")
 	}
@@ -251,6 +254,9 @@ func phase1ShapeSpecial(r phase1GeneratedRequest) (any, error) {
 		}
 	}
 	f := NewNodeFactory(NodeFactoryHooks{})
+	if r.Shape == "EmbeddedStatement" {
+		return phase1EmbeddedStatementSpecial(f, r.Mode)
+	}
 	if r.Shape == "ModifierList" {
 		return phase1ModifierListSpecial(f, r.Mode)
 	}
@@ -297,6 +303,47 @@ func phase1ShapeSpecial(r phase1GeneratedRequest) (any, error) {
 // nil element is not a modifier: ModifiersToFlags reads its kind) and clones
 // it through the factory: [pos, end, flags, nodes] of each list and whether
 // the clone is the same list.
+func phase1EmbeddedStatementSpecial(f *NodeFactory, mode string) (any, error) {
+	original, first, second := f.NewEmptyStatement(), f.NewEmptyStatement(), f.NewEmptyStatement()
+	for i, node := range []*Node{original, first, second} {
+		node.Loc = core.NewTextRange(10*(i+1), 10*(i+1)+1)
+	}
+	var replacement *Node
+	switch mode {
+	case "absent", "unchanged":
+		replacement = original
+	case "removed":
+	case "empty":
+		replacement = f.NewSyntaxList([]*Node{})
+	case "one":
+		replacement = f.NewSyntaxList([]*Node{first})
+	case "many":
+		replacement = f.NewSyntaxList([]*Node{first, second})
+	default:
+		return nil, fmt.Errorf("unknown embedded statement mode")
+	}
+	calls := []any{}
+	visitor := NewNodeVisitor(func(node *Node) *Node {
+		calls = append(calls, phase1GeneratedPos(node))
+		return replacement
+	}, f, NodeVisitorHooks{})
+	input := original
+	if mode == "absent" {
+		input = nil
+	}
+	visited := visitor.VisitEmbeddedStatement(input)
+	var result any
+	if visited != nil {
+		var multiline, list any
+		if visited.Kind == KindBlock {
+			multiline = visited.AsBlock().MultiLine
+			list = phase1ShapeListSnapshot(visited.AsBlock().Statements)
+		}
+		result = []any{visited.Kind, visited.Pos(), visited.End(), visited == original, visited == first, visited == second, multiline, list}
+	}
+	return map[string]any{"ordered": []any{[]any{"visit", calls, result}}}, nil
+}
+
 func phase1ModifierListSpecial(f *NodeFactory, mode string) (any, error) {
 	var raw []*Node
 	switch mode {

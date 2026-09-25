@@ -317,7 +317,8 @@ bridge.
   A symbol is `[first declaration reference, name as hex]`.
 - A column whose callers rely on a panic lists the panic's class in the spec's
   `panic_contract`; Go's `Guard` records `{"panic": class}` as the value, and the
-  Rust port returns that class through an explicit check. Classes are
+  Rust adapter invokes the port and records the caught payload, never an
+  expected class inferred from the input. Classes are
   `nil_dereference`, `index_out_of_range`, `runtime:<text>` for another runtime
   error, or `message:<text>` for a panic value. Any other panic
   is the stage's outcome: a Rust panic is a crash, never a kill, and a Go setup
@@ -485,4 +486,3 @@ kill pairs confirmed.
 The committed inventory, native freeze and Go reach are rewritten at
 integration (`select --write`, then the consolidated campaign), never by a
 group's package.
-

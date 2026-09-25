@@ -143184,7 +143184,7 @@
       "annotated_home": [
         "crates/tsr_ast/src/visitor.rs"
       ],
-      "basis": "witnessed by 22 exact link(s): syntax/generated-shape/DoStatement/empty, syntax/generated-shape/DoStatement/nil-element, syntax/generated-shape/DoStatement/nodes",
+      "basis": "witnessed by 28 exact link(s): syntax/generated-shape/DoStatement/empty, syntax/generated-shape/DoStatement/nil-element, syntax/generated-shape/DoStatement/nodes",
       "basis_kind": "rule",
       "cases": [
         "syntax/generated-shape/DoStatement/empty",
@@ -143208,6 +143208,12 @@
         "syntax/generated-shape/WithStatement/empty",
         "syntax/generated-shape/WithStatement/nil-element",
         "syntax/generated-shape/WithStatement/nodes",
+        "syntax/generated-special/EmbeddedStatement/absent",
+        "syntax/generated-special/EmbeddedStatement/empty",
+        "syntax/generated-special/EmbeddedStatement/many",
+        "syntax/generated-special/EmbeddedStatement/one",
+        "syntax/generated-special/EmbeddedStatement/removed",
+        "syntax/generated-special/EmbeddedStatement/unchanged",
         "witness/s06-factory-fixtures-rust"
       ],
       "depends_on": [
@@ -143517,30 +143523,12 @@
       "annotated_home": [
         "crates/tsr_ast/src/visitor.rs"
       ],
-      "basis": "witnessed by 21 exact link(s): syntax/generated-shape/DoStatement/empty, syntax/generated-shape/DoStatement/nil-element, syntax/generated-shape/DoStatement/nodes",
+      "basis": "witnessed by 3 exact link(s): syntax/generated-special/EmbeddedStatement/empty, syntax/generated-special/EmbeddedStatement/many, syntax/generated-special/EmbeddedStatement/one",
       "basis_kind": "rule",
       "cases": [
-        "syntax/generated-shape/DoStatement/empty",
-        "syntax/generated-shape/DoStatement/nil-element",
-        "syntax/generated-shape/DoStatement/nodes",
-        "syntax/generated-shape/ForInOrOfStatement/empty",
-        "syntax/generated-shape/ForInOrOfStatement/nil-element",
-        "syntax/generated-shape/ForInOrOfStatement/nodes",
-        "syntax/generated-shape/ForStatement/empty",
-        "syntax/generated-shape/ForStatement/nil-element",
-        "syntax/generated-shape/ForStatement/nodes",
-        "syntax/generated-shape/IfStatement/empty",
-        "syntax/generated-shape/IfStatement/nil-element",
-        "syntax/generated-shape/IfStatement/nodes",
-        "syntax/generated-shape/LabeledStatement/empty",
-        "syntax/generated-shape/LabeledStatement/nil-element",
-        "syntax/generated-shape/LabeledStatement/nodes",
-        "syntax/generated-shape/WhileStatement/empty",
-        "syntax/generated-shape/WhileStatement/nil-element",
-        "syntax/generated-shape/WhileStatement/nodes",
-        "syntax/generated-shape/WithStatement/empty",
-        "syntax/generated-shape/WithStatement/nil-element",
-        "syntax/generated-shape/WithStatement/nodes"
+        "syntax/generated-special/EmbeddedStatement/empty",
+        "syntax/generated-special/EmbeddedStatement/many",
+        "syntax/generated-special/EmbeddedStatement/one"
       ],
       "depends_on": [
         "internal/collections",

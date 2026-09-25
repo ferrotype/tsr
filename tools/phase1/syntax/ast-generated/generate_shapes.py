@@ -188,9 +188,9 @@ def runtime_links(name, list_members, mode, go):
     if 'v.visitIterationBody(' in visits and VISITOR + 'NodeVisitor.visitEmbeddedStatement' not in roles:
         roles.append(VISITOR + 'NodeVisitor.visitEmbeddedStatement')
     if mode != 'nil' and VISITOR + 'NodeVisitor.visitEmbeddedStatement' in roles:
-        # A present embedded statement (every mode but nil builds one) reaches
-        # the exported VisitEmbeddedStatement, which lifts the visited node.
-        roles += [VISITOR + 'NodeVisitor.VisitEmbeddedStatement', VISITOR + 'NodeVisitor.liftToBlock']
+        # These callbacks return ordinary nodes. The dedicated EmbeddedStatement
+        # cases below discriminate lifting a SyntaxList into a child or block.
+        roles.append(VISITOR + 'NodeVisitor.VisitEmbeddedStatement')
     links['visit'] = roles
     return links
 
@@ -255,6 +255,13 @@ def requests():
                                       ("clone", [AST + "ModifierList.Clone"])],
             "a modifier list built by the factory from the mode's tokens, then its factory clone: a distinct list with the "
             "same location, nodes and modifier flags")
+    for mode in ("absent", "removed", "unchanged", "empty", "one", "many"):
+        operations = [VISITOR + "NodeVisitor.VisitEmbeddedStatement"]
+        if mode in ("empty", "one", "many"):
+            operations.append(VISITOR + "NodeVisitor.liftToBlock")
+        special("EmbeddedStatement", mode, [("visit", operations)],
+                "visitor callback returns nil, its input, or an empty/single/multiple-child SyntaxList; "
+                "observe calls, returned identity/kind/range and block multiline/list contents")
     return rows
 
 

@@ -325,11 +325,13 @@ pub fn special(request: &Value) -> Result<Value, String> {
         ],
         "SyntheticExpression" => vec!["cast", "children-stop"],
         "ModifierList" => vec!["new", "clone"],
+        "EmbeddedStatement" => vec!["visit"],
         _ => return Err("unknown special shape".into()),
     };
     let operation = match shape {
         "SourceFile" => "tsc/internal/ast/ast.go:NodeFactory.NewSourceFile",
         "SyntheticExpression" => "tsc/internal/ast/ast_generated.go:Node.AsSyntheticExpression",
+        "EmbeddedStatement" => "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
         _ => "tsc/internal/ast/ast.go:NodeFactory.NewModifierList",
     };
     if request["operation"] != operation
@@ -337,10 +339,13 @@ pub fn special(request: &Value) -> Result<Value, String> {
     {
         return Err("special shape request identity or actions changed".into());
     }
+    let mut f = AstBuilder::new(SourceText::from_loaded_bytes(&b""[..]), &Counters::new());
+    if shape == "EmbeddedStatement" {
+        return embedded_statement_special(&mut f, mode);
+    }
     if !matches!(mode, "nil" | "empty" | "nodes" | "nil-element") {
         return Err("unknown special mode".into());
     }
-    let mut f = AstBuilder::new(SourceText::from_loaded_bytes(&b""[..]), &Counters::new());
     if shape == "ModifierList" {
         return modifier_list_special(&mut f, mode);
     }
@@ -445,6 +450,54 @@ pub fn special(request: &Value) -> Result<Value, String> {
             json!({"ordered":[["cast",d.is_spread(),pos(&f,d.tuple_name_source())],["children-stop",children(&f,root,0),children(&f,root,1)]]}),
         )
     }
+}
+
+fn embedded_statement_special(f: &mut AstBuilder, mode: &str) -> Result<Value, String> {
+    let original = f.new_empty_statement();
+    let first = f.new_empty_statement();
+    let second = f.new_empty_statement();
+    for (node, start) in [(original, 10), (first, 20), (second, 30)] {
+        f.node_mut(node)
+            .unwrap()
+            .set_range(TextRange::new(start, start + 1));
+    }
+    let replacement = match mode {
+        "absent" | "unchanged" => Some(original),
+        "removed" => None,
+        "empty" | "one" | "many" => {
+            let nodes = f.alloc_nodes(match mode {
+                "empty" => vec![],
+                "one" => vec![Some(first)],
+                _ => vec![Some(first), Some(second)],
+            });
+            Some(f.new_syntax_list(nodes))
+        }
+        _ => return Err("unknown embedded statement mode".into()),
+    };
+    let calls = RefCell::new(Vec::new());
+    let callback = |v: &mut NodeVisitor<'_>, node: Option<NodeId>| {
+        calls
+            .borrow_mut()
+            .push(node.map_or(Value::Null, |id| json!(v.factory().node(id).pos())));
+        replacement
+    };
+    let visited = NodeVisitor::new(Some(&callback), Some(&mut *f), NodeVisitorHooks::default())
+        .visit_embedded_statement((mode != "absent").then_some(original));
+    let result = visited.map_or(Value::Null, |id| {
+        let node = f.node(id);
+        let block = node.as_block();
+        json!([
+            node.kind().raw(),
+            node.pos(),
+            node.end(),
+            id == original,
+            id == first,
+            id == second,
+            block.as_ref().map(tsr_ast::BlockPayloadRead::multi_line),
+            block.map(|b| list_snapshot(f, b.statements()))
+        ])
+    });
+    Ok(json!({"ordered": [["visit", calls.into_inner(), result]]}))
 }
 
 /// A modifier list built by the factory from the mode's tokens (a nil element

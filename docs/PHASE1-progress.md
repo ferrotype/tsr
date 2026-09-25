@@ -3109,3 +3109,28 @@ Cost note, at the owner's request: each plan change re-ran the whole campaign
 (about 35 minutes), because the scripts cannot merge a partial rerun into the
 recorded results. That merge is the next tooling item before further witness
 increments; the mutation record lists it under its known limitations.
+
+### PR #56 witness corrections (2026-09-25)
+
+Review found that the 21 embedded-statement shape cases above only observed
+ordinary-node passthrough. They no longer claim `liftToBlock`. Six dedicated
+cases now observe absent, removed and unchanged statements and empty,
+single-child and multiple-child SyntaxList replacements. The three SyntaxList
+cases check returned identity/kind/range and block multiline/list contents.
+Replacing pinned Go's `liftToBlock` with `return node` changes all three
+observations; the previous 21 observations did not detect that mutation.
+
+The semaphore column now invokes `LimitedSemaphore::new(0)` and catches its
+actual panic payload. It no longer synthesizes the expected text from the
+input. Negative signed inputs report an adapter conversion error instead of
+pretending to execute a usize constructor. The two existing semaphore rows
+match the committed native outcomes and digests. Two Rust regression tests
+cover zero and negative inputs.
+
+The final syntax-family capture matches **1,169/1,169** rows and is frozen and
+recorded. Targeted Rust tests, clippy for both changed harnesses, generator/table
+checks and the affected Python tests pass. Coverage still has one pending
+operation, Linux `Realpath`; this correction does not rerun the full mutation
+campaign or certify the outstanding Linux capture. The capture and targeted
+diagnostic outputs are archived as described in
+[the capture index](../data/phase1/captures/F5b-README.md#pr-56-witness-corrections).

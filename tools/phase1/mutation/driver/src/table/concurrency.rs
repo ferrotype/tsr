@@ -288,13 +288,20 @@ pub fn build(column: &str, input: &Value) -> Option<Result<Column, String>> {
         "core.LimitedSemaphore" => typed::<SemaphoreCases>(input, |input| {
             let mut out = Vec::new();
             for case in &input.cases {
-                // Go's constructor panics on a non-positive limit, and so does
-                // the port's assertion; the declared class is the value.
-                if case.limit <= 0 {
-                    return Ok(panic_value("message:maxConcurrency must be positive"));
-                }
+                // Negative Go ints are outside this usize API. Zero is
+                // representable and must exercise the constructor's assertion.
                 let limit = usize::try_from(case.limit).map_err(text)?;
-                let semaphore = tsr_core::semaphore::LimitedSemaphore::new(limit);
+                let semaphore = match std::panic::catch_unwind(|| {
+                    tsr_core::semaphore::LimitedSemaphore::new(limit)
+                }) {
+                    Ok(semaphore) => semaphore,
+                    Err(payload) => {
+                        return Ok(panic_value(&format!(
+                            "message:{}",
+                            crate::jobs::panic_message(payload.as_ref())
+                        )));
+                    }
+                };
                 let values = Mutex::new(Vec::new());
                 let (running, most) = (AtomicI64::new(0), AtomicI64::new(0));
                 std::thread::scope(|scope| {
@@ -327,4 +334,36 @@ pub fn build(column: &str, input: &Value) -> Option<Result<Column, String>> {
         }),
         _ => return None,
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn semaphore_zero_observes_the_constructor_panic() {
+        // With no jobs, a constructor that wrongly accepts zero returns a
+        // normal value instead of hanging in acquire: the witness still fails.
+        let column = build(
+            "core.LimitedSemaphore",
+            &json!({"cases":[{"limit":0,"jobs":[]}]}),
+        )
+        .unwrap()
+        .unwrap();
+        assert_eq!(
+            column().unwrap(),
+            panic_value("message:maxConcurrency must be positive")
+        );
+    }
+
+    #[test]
+    fn semaphore_negative_limit_is_not_a_fabricated_panic() {
+        let column = build(
+            "core.LimitedSemaphore",
+            &json!({"cases":[{"limit":-1,"jobs":[]}]}),
+        )
+        .unwrap()
+        .unwrap();
+        assert!(column().is_err());
+    }
 }

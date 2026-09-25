@@ -9047,15 +9047,13 @@
           "tsc/internal/ast/ast_generated.go:IfStatement.VisitEachChild",
           "tsc/internal/ast/ast.go:Node.VisitEachChild",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
         ],
         "visit-same": [
           "tsc/internal/ast/ast_generated.go:IfStatement.VisitEachChild",
           "tsc/internal/ast/ast.go:Node.VisitEachChild",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
         ]
       },
       "operations": [
@@ -9079,7 +9077,6 @@
         "tsc/internal/ast/ast_generated.go:NodeFactory.NewIfStatement",
         "tsc/internal/ast/ast_generated.go:NodeFactory.UpdateIfStatement",
         "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-        "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock",
         "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement"
       ],
       "shape": "IfStatement",
@@ -9175,15 +9172,13 @@
           "tsc/internal/ast/ast_generated.go:IfStatement.VisitEachChild",
           "tsc/internal/ast/ast.go:Node.VisitEachChild",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
         ],
         "visit-same": [
           "tsc/internal/ast/ast_generated.go:IfStatement.VisitEachChild",
           "tsc/internal/ast/ast.go:Node.VisitEachChild",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
         ]
       },
       "operations": [
@@ -9207,7 +9202,6 @@
         "tsc/internal/ast/ast_generated.go:NodeFactory.NewIfStatement",
         "tsc/internal/ast/ast_generated.go:NodeFactory.UpdateIfStatement",
         "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-        "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock",
         "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement"
       ],
       "shape": "IfStatement",
@@ -9303,15 +9297,13 @@
           "tsc/internal/ast/ast_generated.go:IfStatement.VisitEachChild",
           "tsc/internal/ast/ast.go:Node.VisitEachChild",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
         ],
         "visit-same": [
           "tsc/internal/ast/ast_generated.go:IfStatement.VisitEachChild",
           "tsc/internal/ast/ast.go:Node.VisitEachChild",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
         ]
       },
       "operations": [
@@ -9335,7 +9327,6 @@
         "tsc/internal/ast/ast_generated.go:NodeFactory.NewIfStatement",
         "tsc/internal/ast/ast_generated.go:NodeFactory.UpdateIfStatement",
         "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-        "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock",
         "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement"
       ],
       "shape": "IfStatement",
@@ -9543,16 +9534,14 @@
           "tsc/internal/ast/ast.go:Node.VisitEachChild",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitIterationBody",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
         ],
         "visit-same": [
           "tsc/internal/ast/ast_generated.go:DoStatement.VisitEachChild",
           "tsc/internal/ast/ast.go:Node.VisitEachChild",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitIterationBody",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
         ]
       },
       "operations": [
@@ -9576,7 +9565,6 @@
         "tsc/internal/ast/ast_generated.go:NodeFactory.NewDoStatement",
         "tsc/internal/ast/ast_generated.go:NodeFactory.UpdateDoStatement",
         "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-        "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock",
         "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
         "tsc/internal/ast/visitor.go:NodeVisitor.visitIterationBody"
       ],
@@ -9667,16 +9655,14 @@
           "tsc/internal/ast/ast.go:Node.VisitEachChild",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitIterationBody",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
         ],
         "visit-same": [
           "tsc/internal/ast/ast_generated.go:DoStatement.VisitEachChild",
           "tsc/internal/ast/ast.go:Node.VisitEachChild",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitIterationBody",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
         ]
       },
       "operations": [
@@ -9700,7 +9686,6 @@
         "tsc/internal/ast/ast_generated.go:NodeFactory.NewDoStatement",
         "tsc/internal/ast/ast_generated.go:NodeFactory.UpdateDoStatement",
         "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-        "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock",
         "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
         "tsc/internal/ast/visitor.go:NodeVisitor.visitIterationBody"
       ],
@@ -9791,16 +9776,14 @@
           "tsc/internal/ast/ast.go:Node.VisitEachChild",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitIterationBody",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
         ],
         "visit-same": [
           "tsc/internal/ast/ast_generated.go:DoStatement.VisitEachChild",
           "tsc/internal/ast/ast.go:Node.VisitEachChild",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitIterationBody",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
         ]
       },
       "operations": [
@@ -9824,7 +9807,6 @@
         "tsc/internal/ast/ast_generated.go:NodeFactory.NewDoStatement",
         "tsc/internal/ast/ast_generated.go:NodeFactory.UpdateDoStatement",
         "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-        "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock",
         "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
         "tsc/internal/ast/visitor.go:NodeVisitor.visitIterationBody"
       ],
@@ -10033,16 +10015,14 @@
           "tsc/internal/ast/ast.go:Node.VisitEachChild",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitIterationBody",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
         ],
         "visit-same": [
           "tsc/internal/ast/ast_generated.go:WhileStatement.VisitEachChild",
           "tsc/internal/ast/ast.go:Node.VisitEachChild",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitIterationBody",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
         ]
       },
       "operations": [
@@ -10066,7 +10046,6 @@
         "tsc/internal/ast/ast_generated.go:WhileStatement.VisitEachChild",
         "tsc/internal/ast/ast_generated.go:WhileStatement.computeSubtreeFacts",
         "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-        "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock",
         "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
         "tsc/internal/ast/visitor.go:NodeVisitor.visitIterationBody"
       ],
@@ -10157,16 +10136,14 @@
           "tsc/internal/ast/ast.go:Node.VisitEachChild",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitIterationBody",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
         ],
         "visit-same": [
           "tsc/internal/ast/ast_generated.go:WhileStatement.VisitEachChild",
           "tsc/internal/ast/ast.go:Node.VisitEachChild",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitIterationBody",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
         ]
       },
       "operations": [
@@ -10190,7 +10167,6 @@
         "tsc/internal/ast/ast_generated.go:WhileStatement.VisitEachChild",
         "tsc/internal/ast/ast_generated.go:WhileStatement.computeSubtreeFacts",
         "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-        "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock",
         "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
         "tsc/internal/ast/visitor.go:NodeVisitor.visitIterationBody"
       ],
@@ -10281,16 +10257,14 @@
           "tsc/internal/ast/ast.go:Node.VisitEachChild",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitIterationBody",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
         ],
         "visit-same": [
           "tsc/internal/ast/ast_generated.go:WhileStatement.VisitEachChild",
           "tsc/internal/ast/ast.go:Node.VisitEachChild",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitIterationBody",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
         ]
       },
       "operations": [
@@ -10314,7 +10288,6 @@
         "tsc/internal/ast/ast_generated.go:WhileStatement.VisitEachChild",
         "tsc/internal/ast/ast_generated.go:WhileStatement.computeSubtreeFacts",
         "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-        "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock",
         "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
         "tsc/internal/ast/visitor.go:NodeVisitor.visitIterationBody"
       ],
@@ -10551,16 +10524,14 @@
           "tsc/internal/ast/ast.go:Node.VisitEachChild",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitIterationBody",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
         ],
         "visit-same": [
           "tsc/internal/ast/ast_generated.go:ForStatement.VisitEachChild",
           "tsc/internal/ast/ast.go:Node.VisitEachChild",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitIterationBody",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
         ]
       },
       "operations": [
@@ -10584,7 +10555,6 @@
         "tsc/internal/ast/ast_generated.go:NodeFactory.NewForStatement",
         "tsc/internal/ast/ast_generated.go:NodeFactory.UpdateForStatement",
         "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-        "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock",
         "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
         "tsc/internal/ast/visitor.go:NodeVisitor.visitIterationBody"
       ],
@@ -10689,16 +10659,14 @@
           "tsc/internal/ast/ast.go:Node.VisitEachChild",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitIterationBody",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
         ],
         "visit-same": [
           "tsc/internal/ast/ast_generated.go:ForStatement.VisitEachChild",
           "tsc/internal/ast/ast.go:Node.VisitEachChild",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitIterationBody",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
         ]
       },
       "operations": [
@@ -10722,7 +10690,6 @@
         "tsc/internal/ast/ast_generated.go:NodeFactory.NewForStatement",
         "tsc/internal/ast/ast_generated.go:NodeFactory.UpdateForStatement",
         "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-        "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock",
         "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
         "tsc/internal/ast/visitor.go:NodeVisitor.visitIterationBody"
       ],
@@ -10827,16 +10794,14 @@
           "tsc/internal/ast/ast.go:Node.VisitEachChild",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitIterationBody",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
         ],
         "visit-same": [
           "tsc/internal/ast/ast_generated.go:ForStatement.VisitEachChild",
           "tsc/internal/ast/ast.go:Node.VisitEachChild",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitIterationBody",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
         ]
       },
       "operations": [
@@ -10860,7 +10825,6 @@
         "tsc/internal/ast/ast_generated.go:NodeFactory.NewForStatement",
         "tsc/internal/ast/ast_generated.go:NodeFactory.UpdateForStatement",
         "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-        "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock",
         "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
         "tsc/internal/ast/visitor.go:NodeVisitor.visitIterationBody"
       ],
@@ -11084,16 +11048,14 @@
           "tsc/internal/ast/ast.go:Node.VisitEachChild",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitIterationBody",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
         ],
         "visit-same": [
           "tsc/internal/ast/ast_generated.go:ForInOrOfStatement.VisitEachChild",
           "tsc/internal/ast/ast.go:Node.VisitEachChild",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitIterationBody",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
         ]
       },
       "operations": [
@@ -11116,7 +11078,6 @@
         "tsc/internal/ast/ast_generated.go:NodeFactory.NewForInOrOfStatement",
         "tsc/internal/ast/ast_generated.go:NodeFactory.UpdateForInOrOfStatement",
         "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-        "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock",
         "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
         "tsc/internal/ast/visitor.go:NodeVisitor.visitIterationBody"
       ],
@@ -11215,16 +11176,14 @@
           "tsc/internal/ast/ast.go:Node.VisitEachChild",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitIterationBody",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
         ],
         "visit-same": [
           "tsc/internal/ast/ast_generated.go:ForInOrOfStatement.VisitEachChild",
           "tsc/internal/ast/ast.go:Node.VisitEachChild",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitIterationBody",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
         ]
       },
       "operations": [
@@ -11247,7 +11206,6 @@
         "tsc/internal/ast/ast_generated.go:NodeFactory.NewForInOrOfStatement",
         "tsc/internal/ast/ast_generated.go:NodeFactory.UpdateForInOrOfStatement",
         "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-        "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock",
         "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
         "tsc/internal/ast/visitor.go:NodeVisitor.visitIterationBody"
       ],
@@ -11346,16 +11304,14 @@
           "tsc/internal/ast/ast.go:Node.VisitEachChild",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitIterationBody",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
         ],
         "visit-same": [
           "tsc/internal/ast/ast_generated.go:ForInOrOfStatement.VisitEachChild",
           "tsc/internal/ast/ast.go:Node.VisitEachChild",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitIterationBody",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
         ]
       },
       "operations": [
@@ -11378,7 +11334,6 @@
         "tsc/internal/ast/ast_generated.go:NodeFactory.NewForInOrOfStatement",
         "tsc/internal/ast/ast_generated.go:NodeFactory.UpdateForInOrOfStatement",
         "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-        "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock",
         "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
         "tsc/internal/ast/visitor.go:NodeVisitor.visitIterationBody"
       ],
@@ -12759,15 +12714,13 @@
           "tsc/internal/ast/ast_generated.go:WithStatement.VisitEachChild",
           "tsc/internal/ast/ast.go:Node.VisitEachChild",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
         ],
         "visit-same": [
           "tsc/internal/ast/ast_generated.go:WithStatement.VisitEachChild",
           "tsc/internal/ast/ast.go:Node.VisitEachChild",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
         ]
       },
       "operations": [
@@ -12791,7 +12744,6 @@
         "tsc/internal/ast/ast_generated.go:WithStatement.VisitEachChild",
         "tsc/internal/ast/ast_generated.go:WithStatement.computeSubtreeFacts",
         "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-        "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock",
         "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement"
       ],
       "shape": "WithStatement",
@@ -12880,15 +12832,13 @@
           "tsc/internal/ast/ast_generated.go:WithStatement.VisitEachChild",
           "tsc/internal/ast/ast.go:Node.VisitEachChild",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
         ],
         "visit-same": [
           "tsc/internal/ast/ast_generated.go:WithStatement.VisitEachChild",
           "tsc/internal/ast/ast.go:Node.VisitEachChild",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
         ]
       },
       "operations": [
@@ -12912,7 +12862,6 @@
         "tsc/internal/ast/ast_generated.go:WithStatement.VisitEachChild",
         "tsc/internal/ast/ast_generated.go:WithStatement.computeSubtreeFacts",
         "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-        "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock",
         "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement"
       ],
       "shape": "WithStatement",
@@ -13001,15 +12950,13 @@
           "tsc/internal/ast/ast_generated.go:WithStatement.VisitEachChild",
           "tsc/internal/ast/ast.go:Node.VisitEachChild",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
         ],
         "visit-same": [
           "tsc/internal/ast/ast_generated.go:WithStatement.VisitEachChild",
           "tsc/internal/ast/ast.go:Node.VisitEachChild",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
         ]
       },
       "operations": [
@@ -13033,7 +12980,6 @@
         "tsc/internal/ast/ast_generated.go:WithStatement.VisitEachChild",
         "tsc/internal/ast/ast_generated.go:WithStatement.computeSubtreeFacts",
         "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-        "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock",
         "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement"
       ],
       "shape": "WithStatement",
@@ -16137,15 +16083,13 @@
           "tsc/internal/ast/ast_generated.go:LabeledStatement.VisitEachChild",
           "tsc/internal/ast/ast.go:Node.VisitEachChild",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
         ],
         "visit-same": [
           "tsc/internal/ast/ast_generated.go:LabeledStatement.VisitEachChild",
           "tsc/internal/ast/ast.go:Node.VisitEachChild",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
         ]
       },
       "operations": [
@@ -16169,7 +16113,6 @@
         "tsc/internal/ast/ast_generated.go:NodeFactory.NewLabeledStatement",
         "tsc/internal/ast/ast_generated.go:NodeFactory.UpdateLabeledStatement",
         "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-        "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock",
         "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement"
       ],
       "shape": "LabeledStatement",
@@ -16258,15 +16201,13 @@
           "tsc/internal/ast/ast_generated.go:LabeledStatement.VisitEachChild",
           "tsc/internal/ast/ast.go:Node.VisitEachChild",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
         ],
         "visit-same": [
           "tsc/internal/ast/ast_generated.go:LabeledStatement.VisitEachChild",
           "tsc/internal/ast/ast.go:Node.VisitEachChild",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
         ]
       },
       "operations": [
@@ -16290,7 +16231,6 @@
         "tsc/internal/ast/ast_generated.go:NodeFactory.NewLabeledStatement",
         "tsc/internal/ast/ast_generated.go:NodeFactory.UpdateLabeledStatement",
         "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-        "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock",
         "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement"
       ],
       "shape": "LabeledStatement",
@@ -16379,15 +16319,13 @@
           "tsc/internal/ast/ast_generated.go:LabeledStatement.VisitEachChild",
           "tsc/internal/ast/ast.go:Node.VisitEachChild",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
         ],
         "visit-same": [
           "tsc/internal/ast/ast_generated.go:LabeledStatement.VisitEachChild",
           "tsc/internal/ast/ast.go:Node.VisitEachChild",
           "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
         ]
       },
       "operations": [
@@ -16411,7 +16349,6 @@
         "tsc/internal/ast/ast_generated.go:NodeFactory.NewLabeledStatement",
         "tsc/internal/ast/ast_generated.go:NodeFactory.UpdateLabeledStatement",
         "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
-        "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock",
         "tsc/internal/ast/visitor.go:NodeVisitor.visitEmbeddedStatement"
       ],
       "shape": "LabeledStatement",
@@ -90275,6 +90212,138 @@
         "tsc/internal/ast/utilities.go:ModifiersToFlags"
       ],
       "shape": "ModifierList",
+      "subject": "generatedSpecial"
+    },
+    {
+      "actions": [
+        {
+          "op": "visit"
+        }
+      ],
+      "case": "syntax/generated-special/EmbeddedStatement/absent",
+      "discriminates": "visitor callback returns nil, its input, or an empty/single/multiple-child SyntaxList; observe calls, returned identity/kind/range and block multiline/list contents",
+      "mode": "absent",
+      "operation": "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
+      "operation_actions": {
+        "visit": [
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
+        ]
+      },
+      "operations": [
+        "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
+      ],
+      "shape": "EmbeddedStatement",
+      "subject": "generatedSpecial"
+    },
+    {
+      "actions": [
+        {
+          "op": "visit"
+        }
+      ],
+      "case": "syntax/generated-special/EmbeddedStatement/removed",
+      "discriminates": "visitor callback returns nil, its input, or an empty/single/multiple-child SyntaxList; observe calls, returned identity/kind/range and block multiline/list contents",
+      "mode": "removed",
+      "operation": "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
+      "operation_actions": {
+        "visit": [
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
+        ]
+      },
+      "operations": [
+        "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
+      ],
+      "shape": "EmbeddedStatement",
+      "subject": "generatedSpecial"
+    },
+    {
+      "actions": [
+        {
+          "op": "visit"
+        }
+      ],
+      "case": "syntax/generated-special/EmbeddedStatement/unchanged",
+      "discriminates": "visitor callback returns nil, its input, or an empty/single/multiple-child SyntaxList; observe calls, returned identity/kind/range and block multiline/list contents",
+      "mode": "unchanged",
+      "operation": "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
+      "operation_actions": {
+        "visit": [
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
+        ]
+      },
+      "operations": [
+        "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
+      ],
+      "shape": "EmbeddedStatement",
+      "subject": "generatedSpecial"
+    },
+    {
+      "actions": [
+        {
+          "op": "visit"
+        }
+      ],
+      "case": "syntax/generated-special/EmbeddedStatement/empty",
+      "discriminates": "visitor callback returns nil, its input, or an empty/single/multiple-child SyntaxList; observe calls, returned identity/kind/range and block multiline/list contents",
+      "mode": "empty",
+      "operation": "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
+      "operation_actions": {
+        "visit": [
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
+          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+        ]
+      },
+      "operations": [
+        "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
+        "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+      ],
+      "shape": "EmbeddedStatement",
+      "subject": "generatedSpecial"
+    },
+    {
+      "actions": [
+        {
+          "op": "visit"
+        }
+      ],
+      "case": "syntax/generated-special/EmbeddedStatement/one",
+      "discriminates": "visitor callback returns nil, its input, or an empty/single/multiple-child SyntaxList; observe calls, returned identity/kind/range and block multiline/list contents",
+      "mode": "one",
+      "operation": "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
+      "operation_actions": {
+        "visit": [
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
+          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+        ]
+      },
+      "operations": [
+        "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
+        "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+      ],
+      "shape": "EmbeddedStatement",
+      "subject": "generatedSpecial"
+    },
+    {
+      "actions": [
+        {
+          "op": "visit"
+        }
+      ],
+      "case": "syntax/generated-special/EmbeddedStatement/many",
+      "discriminates": "visitor callback returns nil, its input, or an empty/single/multiple-child SyntaxList; observe calls, returned identity/kind/range and block multiline/list contents",
+      "mode": "many",
+      "operation": "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
+      "operation_actions": {
+        "visit": [
+          "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
+          "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+        ]
+      },
+      "operations": [
+        "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement",
+        "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+      ],
+      "shape": "EmbeddedStatement",
       "subject": "generatedSpecial"
     }
   ],
