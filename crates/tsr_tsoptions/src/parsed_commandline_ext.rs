@@ -227,3 +227,39 @@ impl ParsedCommandLine {
         false
     }
 }
+
+impl ParsedCommandLine {
+    /// Go's `ReloadFileNamesOfParsedCommandLine`: a copy whose file names are
+    /// read again from the config's specs on `fs`, sharing the rest.
+    pub fn reload_file_names_of_parsed_command_line(
+        &self,
+        fs: &dyn tsr_vfs::FileSystem,
+    ) -> Result<Self, tsr_vfs::Error> {
+        let (file_names, literal_file_names_len) = self.reloaded_file_names(fs)?;
+        let mut copy = self.clone();
+        copy.root_file_names = file_names;
+        copy.literal_file_names_len = literal_file_names_len;
+        Ok(copy)
+    }
+
+    /// The file names `ReloadFileNamesOfParsedCommandLine` reads: its work,
+    /// apart from the copy. Go dereferences the config's specs, so a command
+    /// line without a config panics.
+    /// port: tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.ReloadFileNamesOfParsedCommandLine
+    fn reloaded_file_names(
+        &self,
+        fs: &dyn tsr_vfs::FileSystem,
+    ) -> Result<(Vec<JsString>, usize), tsr_vfs::Error> {
+        let specs = self
+            .config_specs
+            .as_ref()
+            .expect("runtime error: invalid memory address or nil pointer dereference");
+        crate::file_names_from_specs(
+            specs,
+            self.current_directory(),
+            &self.options,
+            fs,
+            &self.content_mapper_extensions(),
+        )
+    }
+}

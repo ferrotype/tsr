@@ -20,6 +20,10 @@ pub const COLUMNS: &[&str] = &[
     "tsoptions.CompilerOptionsAffectDeclarationPath",
     "tsoptions.CompilerOptionsAffectSemanticDiagnostics",
     "tsoptions.ForEachCompilerOptionValue",
+    "tsoptions.ConvertToTSConfig",
+    "tsoptions.computeFn",
+    "tsoptions.ExtendedConfigCacheEntry.ExtendedFileNames",
+    "tsoptions.ParsedCommandLine.ReloadFileNamesOfParsedCommandLine",
     "core.ResolveProjectReferencePath",
 ];
 
@@ -110,14 +114,48 @@ pub fn build(column: &str, input: &Value) -> Option<Result<Column, String>> {
             }))
         }
         "core.ResolveProjectReferencePath" => resolve_project_reference_path(input),
-        "tsoptions.CompilerOptionsAffectEmit" => affect_column(input, tsr_tsoptions::affects::compiler_options_affect_emit),
-        "tsoptions.CompilerOptionsAffectDeclarationPath" => {
-            affect_column(input, tsr_tsoptions::affects::compiler_options_affect_declaration_path)
+        "tsoptions.CompilerOptionsAffectEmit" => {
+            affect_column(input, tsr_tsoptions::affects::compiler_options_affect_emit)
         }
-        "tsoptions.CompilerOptionsAffectSemanticDiagnostics" => {
-            affect_column(input, tsr_tsoptions::affects::compiler_options_affect_semantic_diagnostics)
-        }
+        "tsoptions.CompilerOptionsAffectDeclarationPath" => affect_column(
+            input,
+            tsr_tsoptions::affects::compiler_options_affect_declaration_path,
+        ),
+        "tsoptions.CompilerOptionsAffectSemanticDiagnostics" => affect_column(
+            input,
+            tsr_tsoptions::affects::compiler_options_affect_semantic_diagnostics,
+        ),
         "tsoptions.ForEachCompilerOptionValue" => for_each_compiler_option_value(input),
+        "tsoptions.ConvertToTSConfig" => config_column::<String>(input, |parsed, name| {
+            let config = tsr_tsoptions::show_config::convert_to_ts_config(parsed, name.as_bytes());
+            let options: Vec<Value> = config
+                .compiler_options
+                .iter()
+                .map(|(key, value)| json!([hex(key.as_bytes()), show_value(value)]))
+                .collect();
+            let references = config
+                .references
+                .as_ref()
+                .map_or(Value::Null, |references| {
+                    json!(references
+                        .iter()
+                        .map(|(path, circular)| json!([hex(path.as_bytes()), circular]))
+                        .collect::<Vec<_>>())
+                });
+            Ok(json!([
+                options,
+                references,
+                hexes(config.files.as_deref()),
+                hexes(config.include.as_deref()),
+                hexes(config.exclude.as_deref()),
+                config.compile_on_save
+            ]))
+        }),
+        "tsoptions.computeFn" => compute_fn_column(input),
+        "tsoptions.ExtendedConfigCacheEntry.ExtendedFileNames" => extended_file_names(input),
+        "tsoptions.ParsedCommandLine.ReloadFileNamesOfParsedCommandLine" => {
+            reload_file_names(input)
+        }
         _ => return None,
     })
 }
@@ -224,7 +262,13 @@ fn affect_column(input: &Value, affect: Affect) -> Result<Column, String> {
     let options = cases
         .cases
         .iter()
-        .map(|case| Ok((options_of(case.old.as_deref())?, options_of(case.new.as_deref())?, case.same)))
+        .map(|case| {
+            Ok((
+                options_of(case.old.as_deref())?,
+                options_of(case.new.as_deref())?,
+                case.same,
+            ))
+        })
         .collect::<Result<Vec<_>, String>>()?;
     Ok(Box::new(move || {
         Ok(json!(options
@@ -260,12 +304,120 @@ fn for_each_compiler_option_value(input: &Value) -> Result<Column, String> {
                 options,
                 |field| field.affects_semantic_diagnostics,
                 &mut |field, value, index| {
-                    visited.push(json!([hex(field.declaration.as_bytes()), value.is_none(), index]));
+                    visited.push(json!([
+                        hex(field.declaration.as_bytes()),
+                        value.is_none(),
+                        index
+                    ]));
                     field.declaration == stop_at
                 },
             );
             out.push(json!([stopped, visited]));
         }
         Ok(Value::Array(out))
+    }))
+}
+
+/// Go's `showValue`.
+fn show_value(value: &tsr_tsoptions::ConfigValue) -> Value {
+    use tsr_tsoptions::ConfigValue as V;
+    match value {
+        V::Boolean(value) => json!(value),
+        V::String(text) => json!(hex(text.as_bytes())),
+        V::Integer(value) => json!(value),
+        #[allow(clippy::cast_possible_truncation)]
+        V::Number(value) => json!(*value as i64),
+        V::Array(None) => Value::Null,
+        V::Array(Some(items)) => Value::Array(items.iter().map(show_value).collect()),
+        V::Object(map) => Value::Array(
+            map.iter()
+                .map(|(key, value)| json!([hex(key.as_bytes()), show_value(value)]))
+                .collect(),
+        ),
+        other => json!(format!("unsupported {other:?}")),
+    }
+}
+
+#[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct Configs {
+    configs: Vec<String>,
+}
+
+fn compute_fn_column(input: &Value) -> Result<Column, String> {
+    let configs: Configs = decode(input)?;
+    let options = configs
+        .configs
+        .iter()
+        .map(|text| options_of(Some(text)).map(Option::unwrap_or_default))
+        .collect::<Result<Vec<_>, String>>()?;
+    Ok(Box::new(move || {
+        Ok(json!(options
+            .iter()
+            .map(|options| {
+                let module_kind =
+                    tsr_tsoptions::show_config::compute_fn(options.emit_module_kind().0);
+                let allow_js = tsr_tsoptions::show_config::compute_fn(options.allow_js());
+                json!([module_kind.1, allow_js.1 != 0])
+            })
+            .collect::<Vec<_>>()))
+    }))
+}
+
+fn extended_file_names(input: &Value) -> Result<Column, String> {
+    let (host, args) = config_host(input)?;
+    let names: Vec<String> = decode(&args)?;
+    let current = input["currentDirectory"]
+        .as_str()
+        .ok_or("currentDirectory")?
+        .as_bytes()
+        .to_vec();
+    let case_sensitive = input["caseSensitive"].as_bool().ok_or("caseSensitive")?;
+    let entries = names
+        .iter()
+        .map(|name| {
+            let path = tsr_tspath::to_path(name.as_bytes(), &current, case_sensitive);
+            tsr_tsoptions::parse_extended_config(
+                name.as_bytes(),
+                JsString::from_bytes(path.as_bytes()),
+                &[],
+                &host,
+            )
+            .map_err(|error| format!("{error:?}"))
+        })
+        .collect::<Result<Vec<_>, String>>()?;
+    Ok(Box::new(move || {
+        Ok(json!(entries
+            .iter()
+            .map(|entry| {
+                let names = entry.extended_file_names();
+                if names.is_empty() {
+                    Value::Null
+                } else {
+                    hexes(Some(names))
+                }
+            })
+            .collect::<Vec<_>>()))
+    }))
+}
+
+fn reload_file_names(input: &Value) -> Result<Column, String> {
+    use tsr_tsoptions::ParseConfigHost;
+    let (parsed, args) = parse_config(input)?;
+    let extra: Vec<String> = decode(&args)?;
+    let mut merged = input.clone();
+    for name in &extra {
+        merged["files"][name.as_str()] = json!("");
+    }
+    let (host, _) = config_host(&merged)?;
+    Ok(Box::new(move || {
+        let reloaded = parsed
+            .reload_file_names_of_parsed_command_line(host.fs())
+            .map_err(|error| format!("{error:?}"))?;
+        Ok(json!([
+            hexes(Some(&reloaded.root_file_names)),
+            hexes(reloaded.literal_file_names()),
+            hexes(Some(&parsed.root_file_names))
+        ]))
     }))
 }

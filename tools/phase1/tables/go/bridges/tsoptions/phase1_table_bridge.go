@@ -8,3 +8,15 @@
 // are outside data/go-functions.tsv, so only the wrapped function counts as
 // entered.
 package tsoptions
+
+import "github.com/microsoft/TypeScript/tsc/internal/core"
+
+// Phase1ComputeFn exposes computeFn over the two getter shapes the implied
+// options table uses.
+func Phase1ComputeFnInt[T ~int32](fn func(*core.CompilerOptions) T) func(*core.CompilerOptions) any {
+	return computeFn(fn)
+}
+
+func Phase1ComputeFnBool(fn func(*core.CompilerOptions) bool) func(*core.CompilerOptions) any {
+	return computeFn(fn)
+}

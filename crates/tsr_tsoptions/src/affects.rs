@@ -44,7 +44,10 @@ pub fn for_each_compiler_option_value(
 ) -> bool {
     let values = compiler_options_value(options);
     for field in COMPILER_OPTION_FIELDS {
-        if !field.declaration.is_empty() && decl_filter(field) && f(field, field_value(&values, field), field.index) {
+        if !field.declaration.is_empty()
+            && decl_filter(field)
+            && f(field, field_value(&values, field), field.index)
+        {
             return true;
         }
     }
@@ -92,11 +95,16 @@ pub fn compiler_options_affect_declaration_path(
     old_options: Option<&CompilerOptions>,
     new_options: Option<&CompilerOptions>,
 ) -> bool {
-    options_have_changes(old_options, new_options, |field| field.affects_declaration_path)
+    options_have_changes(old_options, new_options, |field| {
+        field.affects_declaration_path
+    })
 }
 
 /// port: tsc/internal/tsoptions/declscompiler.go:CompilerOptionsAffectEmit
-pub fn compiler_options_affect_emit(old_options: Option<&CompilerOptions>, new_options: Option<&CompilerOptions>) -> bool {
+pub fn compiler_options_affect_emit(
+    old_options: Option<&CompilerOptions>,
+    new_options: Option<&CompilerOptions>,
+) -> bool {
     options_have_changes(old_options, new_options, |field| field.affects_emit)
 }
 
@@ -105,5 +113,7 @@ pub fn compiler_options_affect_semantic_diagnostics(
     old_options: Option<&CompilerOptions>,
     new_options: Option<&CompilerOptions>,
 ) -> bool {
-    options_have_changes(old_options, new_options, |field| field.affects_semantic_diagnostics)
+    options_have_changes(old_options, new_options, |field| {
+        field.affects_semantic_diagnostics
+    })
 }

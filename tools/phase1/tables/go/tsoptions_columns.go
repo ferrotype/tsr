@@ -9,6 +9,7 @@ import (
 	"reflect"
 	"slices"
 
+	"github.com/microsoft/TypeScript/tsc/internal/collections"
 	"github.com/microsoft/TypeScript/tsc/internal/core"
 	"github.com/microsoft/TypeScript/tsc/internal/tsoptions"
 	"github.com/microsoft/TypeScript/tsc/internal/tsoptions/tsoptionstest"
@@ -63,6 +64,32 @@ func affectColumn(affect func(old, new *core.CompilerOptions) bool) func(in stru
 		}
 		return out
 	}
+}
+
+// showValue projects a --showConfig option value: strings as hex, integers
+// as scalars, lists and path maps element by element.
+func showValue(value any) any {
+	switch v := value.(type) {
+	case bool:
+		return v
+	case string:
+		return Hex(v)
+	case []string:
+		return hexes(v)
+	case *int:
+		return Scalar(*v)
+	case *collections.OrderedMap[string, []string]:
+		out := []any{}
+		for key, values := range v.Entries() {
+			out = append(out, []any{Hex(key), hexes(values)})
+		}
+		return out
+	}
+	if rv := reflect.ValueOf(value); rv.CanInt() {
+		return Scalar(int(rv.Int()))
+	}
+	fatal("showValue: unsupported %T", value)
+	return nil
 }
 
 // configColumn is a column over a parsed tsconfig (the config input) and its
@@ -162,6 +189,109 @@ func init() {
 			}
 			return out
 		}),
+		// ConvertToTSConfig with the args' config file name: [[[option hex,
+		// value], ...] in order, references [[path hex, circular]], files,
+		// include, exclude (hex lists or null), compileOnSave (or null)].
+		configColumn("tsoptions.ConvertToTSConfig", func(parsed *tsoptions.ParsedCommandLine, name string) any {
+			config := tsoptions.ConvertToTSConfig(parsed, name)
+			options := []any{}
+			for key, value := range config.CompilerOptions.Entries() {
+				options = append(options, []any{Hex(key), showValue(value)})
+			}
+			var references any
+			if config.References != nil {
+				list := []any{}
+				for _, reference := range config.References {
+					ref := reference.(*collections.OrderedMap[string, any])
+					path, _ := ref.Get("path")
+					circular, _ := ref.Get("circular")
+					list = append(list, []any{Hex(path.(string)), circular == true})
+				}
+				references = list
+			}
+			var compileOnSave any
+			if config.CompileOnSave != nil {
+				compileOnSave = *config.CompileOnSave
+			}
+			return []any{options, references, hexes(config.Files), hexes(config.Include), hexes(config.Exclude), compileOnSave}
+		}),
+		// computeFn (through the bridge) over a module-kind and a bool
+		// getter, per config: [emit module kind, allowJs].
+		typedValuesColumn("tsoptions.computeFn", func(in struct {
+			Configs []string `json:"configs"`
+		}) any {
+			moduleKind := tsoptions.Phase1ComputeFnInt((*core.CompilerOptions).GetEmitModuleKind)
+			allowJs := tsoptions.Phase1ComputeFnBool((*core.CompilerOptions).GetAllowJS)
+			out := []any{}
+			for _, text := range in.Configs {
+				options := optionsOf(&text)
+				out = append(out, []any{Scalar(int(moduleKind(options).(core.ModuleKind))), allowJs(options)})
+			}
+			return out
+		}),
+		// ParseExtendedConfig over the config input's files, for each file
+		// name of the args: its ExtendedFileNames.
+		Column{
+			ID:    "tsoptions.ExtendedConfigCacheEntry.ExtendedFileNames",
+			Input: "config",
+			Build: func(raw json.RawMessage) (func() any, error) {
+				var in ConfigInput
+				if err := DecodeInput(raw, &in); err != nil {
+					return nil, err
+				}
+				var names []string
+				if err := json.Unmarshal(in.Args, &names); err != nil {
+					return nil, err
+				}
+				host := tsoptionstest.NewVFSParseConfigHost(in.Files, in.CurrentDirectory, in.CaseSensitive)
+				entries := []*tsoptions.ExtendedConfigCacheEntry{}
+				for _, name := range names {
+					entries = append(entries, tsoptions.ParseExtendedConfig(name,
+						tspath.ToPath(name, in.CurrentDirectory, in.CaseSensitive), nil, host, nil))
+				}
+				return func() any {
+					out := []any{}
+					for _, entry := range entries {
+						// Callers read length and elements: nil and empty are one value.
+						if names := entry.ExtendedFileNames(); len(names) > 0 {
+							out = append(out, hexes(names))
+						} else {
+							out = append(out, nil)
+						}
+					}
+					return out
+				}, nil
+			},
+		},
+		// ReloadFileNamesOfParsedCommandLine on the config's files plus the
+		// args' new files: [the reloaded file names, its literal file names,
+		// the original's file names], each hex.
+		Column{
+			ID:    "tsoptions.ParsedCommandLine.ReloadFileNamesOfParsedCommandLine",
+			Input: "config",
+			Build: func(raw json.RawMessage) (func() any, error) {
+				parsed, in, err := ParseConfig(raw)
+				if err != nil {
+					return nil, err
+				}
+				var extra []string
+				if err := json.Unmarshal(in.Args, &extra); err != nil {
+					return nil, err
+				}
+				files := map[string]string{}
+				for name, text := range in.Files {
+					files[name] = text
+				}
+				for _, name := range extra {
+					files[name] = ""
+				}
+				fs := tsoptionstest.NewVFSParseConfigHost(files, in.CurrentDirectory, in.CaseSensitive).FS()
+				return func() any {
+					reloaded := parsed.ReloadFileNamesOfParsedCommandLine(fs)
+					return []any{hexes(reloaded.FileNames()), hexes(reloaded.LiteralFileNames()), hexes(parsed.FileNames())}
+				}, nil
+			},
+		},
 		typedValuesColumn("tsoptions.TargetToLibMap", func(in struct{}) any {
 			entries := map[string]int{}
 			for target, lib := range tsoptions.TargetToLibMap() {
