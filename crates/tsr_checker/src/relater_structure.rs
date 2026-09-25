@@ -243,7 +243,7 @@ impl Relater<'_> {
                 .readonly
         {
             let element = self.checker.get_type_arguments(source)?[0];
-            let result = self.related(element, target, SOURCE, 0)?;
+            let result = self.related_with_errors(element, target, SOURCE, 0, false)?;
             if result != tr::FALSE {
                 return Ok(result);
             }
@@ -262,13 +262,59 @@ impl Relater<'_> {
             };
             if mutable_source {
                 let element = self.checker.get_type_arguments(target)?[0];
-                let result = self.related(source, element, TARGET, 0)?;
+                let result = self.related_with_errors(source, element, TARGET, 0, false)?;
                 if result != tr::FALSE {
                     return Ok(result);
                 }
             }
         }
-        if t & tf::INDEXED_ACCESS != 0 {
+        if t & tf::TYPE_PARAMETER != 0 {
+            // A source type { [P in Q]: X } is related to a target type T if
+            // keyof T is related to Q and X is related to T[Q].
+            if self.checker.types.object_flags(source)? & of::MAPPED != 0
+                && self.checker.mapped_name(source)?.is_none()
+            {
+                let keys = self.checker.get_index_type(target, 0)?;
+                let constraint = self.checker.mapped_constraint(source)?;
+                if self.related_with_errors(keys, constraint, BOTH, 0, false)? != tr::FALSE
+                    && self.checker.mapped_modifiers(source)? & crate::mapped::INCLUDE_OPTIONAL == 0
+                {
+                    let template = self.checker.mapped_template(source)?;
+                    let parameter = self.checker.mapped_parameter(source)?;
+                    let indexed = self
+                        .checker
+                        .get_indexed_access_type(target, parameter, 0, None, None)?;
+                    let report = self.report_errors;
+                    let result = self.related_with_errors(template, indexed, BOTH, 0, report)?;
+                    if result != tr::FALSE {
+                        return Ok(result);
+                    }
+                }
+            }
+            if self.kind == RelationKind::Comparable && s & tf::TYPE_PARAMETER != 0 {
+                // A carve-out in comparability: a type parameter compares to
+                // another only when one extends the other (comparability is
+                // mostly bidirectional).
+                if let Some(constraint) = self.checker.constraint_of_type_parameter(source)? {
+                    let parts = if self.checker.types.flags(constraint)? & tf::UNION != 0 {
+                        self.checker.types.types_of(constraint)?.to_vec()
+                    } else {
+                        vec![constraint]
+                    };
+                    let mut mentions_parameter = false;
+                    for part in parts {
+                        if self.checker.types.flags(part)? & tf::TYPE_PARAMETER != 0 {
+                            mentions_parameter = true;
+                            break;
+                        }
+                    }
+                    if mentions_parameter {
+                        return self.related_with_errors(constraint, target, SOURCE, 0, false);
+                    }
+                }
+                return Ok(tr::FALSE);
+            }
+        } else if t & tf::INDEXED_ACCESS != 0 {
             let target_data = *self.checker.types.indexed_access(target)?;
             if s & tf::INDEXED_ACCESS != 0 {
                 let source_data = *self.checker.types.indexed_access(source)?;

@@ -107,7 +107,12 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:isSingleElementGenericTupleType
     pub(crate) fn is_single_element_generic_tuple_type(&self, ty: TypeId) -> Result<bool, Error> {
         Ok(self.is_generic_tuple_type(ty)?
-            && self.types.tuple(self.types.target(ty)?)?.element_infos.len() == 1)
+            && self
+                .types
+                .tuple(self.types.target(ty)?)?
+                .element_infos
+                .len()
+                == 1)
     }
 
     // port: tsc/internal/checker/checker.go:Checker.isArrayLikeType
