@@ -419,8 +419,9 @@ def mutant_key(op: str, file: str, function: str, site_line: int, operator: str,
     return hashlib.sha256(f"{op}|{file}|{function}|{site_line}|{operator}|{span_digest}".encode()).hexdigest()[:16]
 
 
-def span_intact(root: Path, mutant: dict) -> bool:
-    """Whether a planned mutant's span is unchanged in the sources under `root`.
+def span_shift(root: Path, mutant: dict) -> int | None:
+    """The line shift at which a planned mutant's span is found unchanged in the
+    sources under `root`, or None when it is not.
 
     The span is found again through its operations' markers, at the same offset
     from the marker as when planned, so code moving above it does not count as
@@ -428,7 +429,7 @@ def span_intact(root: Path, mutant: dict) -> bool:
     """
     path = Path(root) / mutant["file"]
     if not path.is_file():
-        return False
+        return None
     data = path.read_bytes()
     start, end = mutant["span"]
     current = markers(data.decode(errors="replace"))
@@ -437,8 +438,25 @@ def span_intact(root: Path, mutant: dict) -> bool:
             if marker["op"] == op:
                 shift = marker["line"] - planned
                 if span_sha256(data, start + shift, end + shift) == mutant["span_sha256"]:
-                    return True
-    return False
+                    return shift
+    return None
+
+
+def span_intact(root: Path, mutant: dict) -> bool:
+    """Whether a planned mutant's span is unchanged in the sources under `root` (`span_shift`)."""
+    return span_shift(root, mutant) is not None
+
+
+def relocated(mutant: dict, shift: int) -> dict:
+    """The planned mutant with every line it names moved by `shift`, so the
+    splicer (which checks spans at absolute lines) finds a moved span. Its id
+    and key stay: they are the campaign's identity of the mutant."""
+    if not shift:
+        return mutant
+    return {**mutant, "span": [mutant["span"][0] + shift, mutant["span"][1] + shift],
+            "site_line": mutant["site_line"] + shift,
+            "markers": {op: line + shift for op, line in mutant["markers"].items()},
+            "insert": [{**insert, "line": insert["line"] + shift} for insert in mutant["insert"]]}
 
 
 # ---------------------------------------------------------------------------
