@@ -156,9 +156,9 @@ impl CheckerState {
             }
         } else if let Some(node) = self.constraint_declaration(ty)? {
             let mut constraint = self.get_type_from_type_node(node)?;
-            if self.types.flags(constraint)? & tf::ANY != 0
-                && constraint != self.builtins.error_type
-            {
+            // An error type propagates so that downstream errors stay
+            // suppressed; an aliased error type (an unresolved name) counts.
+            if self.types.flags(constraint)? & tf::ANY != 0 && !self.is_error_type(constraint)? {
                 let parent = self.node(node)?.parent();
                 let grandparent = parent
                     .map(|parent| {

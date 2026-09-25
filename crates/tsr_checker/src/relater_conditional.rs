@@ -64,15 +64,17 @@ impl Relater<'_> {
             self.checker
                 .is_type_related_to(a, b, RelationKind::Assignable)?
         };
+        // The pin never reports the branch relations: conditional type
+        // breakdowns in error output "usually don't" read well.
         let mut result = if skip_true {
             tr::TRUE
         } else {
             let yes = self.checker.conditional_true_type(target, false)?;
-            self.related(source, yes, TARGET, intersection)?
+            self.related_with_errors(source, yes, TARGET, intersection, false)?
         };
         if result != tr::FALSE && !skip_false {
             let no = self.checker.conditional_false_type(target)?;
-            result &= self.related(source, no, TARGET, intersection)?;
+            result &= self.related_with_errors(source, no, TARGET, intersection, false)?;
         }
         Ok(result)
     }
