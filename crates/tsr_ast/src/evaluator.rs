@@ -130,27 +130,10 @@ pub fn is_truthy(value: Option<&EvaluatedValue>) -> Result<bool, Unhandled> {
         .ok_or(Unhandled::IsTruthy)
 }
 
-pub type OuterExpressionKinds = u16;
-/// Pinned `ast.OuterExpressionKinds` bits. Parentheses are always added by the
+/// The pinned `ast.OuterExpressionKinds` now live in `crate::utilities`; this
+/// path is kept for existing callers. Parentheses are always added by the
 /// evaluator; `EXCLUDE_JSDOC_TYPE_ASSERTION` still excludes assertion parentheses.
-pub mod outer_expression_kinds {
-    use super::OuterExpressionKinds;
-    pub const PARENTHESES: OuterExpressionKinds = 1 << 0;
-    pub const TYPE_ASSERTIONS: OuterExpressionKinds = 1 << 1;
-    pub const NON_NULL_ASSERTIONS: OuterExpressionKinds = 1 << 2;
-    pub const PARTIALLY_EMITTED_EXPRESSIONS: OuterExpressionKinds = 1 << 3;
-    pub const EXPRESSIONS_WITH_TYPE_ARGUMENTS: OuterExpressionKinds = 1 << 4;
-    pub const SATISFIES: OuterExpressionKinds = 1 << 5;
-    pub const EXCLUDE_JSDOC_TYPE_ASSERTION: OuterExpressionKinds = 1 << 6;
-    pub const ASSIGNMENTS: OuterExpressionKinds = 1 << 7;
-    pub const COMMA: OuterExpressionKinds = 1 << 8;
-    pub const ASSERTIONS: OuterExpressionKinds = TYPE_ASSERTIONS | NON_NULL_ASSERTIONS | SATISFIES;
-    pub const ALL: OuterExpressionKinds =
-        PARENTHESES | ASSERTIONS | PARTIALLY_EMITTED_EXPRESSIONS | EXPRESSIONS_WITH_TYPE_ARGUMENTS;
-    pub const ALL_EXCEPT_ASSERTIONS_OR_EXPRESSIONS_WITH_TYPE_ARGUMENTS: OuterExpressionKinds =
-        ALL & !ASSERTIONS & !EXPRESSIONS_WITH_TYPE_ARGUMENTS;
-    pub const EXPRESSION_TYPE_PASSTHROUGH: OuterExpressionKinds = PARENTHESES | ASSIGNMENTS | COMMA;
-}
+pub use crate::utilities::{outer_expression_kinds, OuterExpressionKinds};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Error<E> {

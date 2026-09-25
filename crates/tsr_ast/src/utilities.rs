@@ -91,6 +91,28 @@ pub fn skip_outer_expressions(
     Ok(node)
 }
 
+pub type OuterExpressionKinds = u16;
+/// Pinned `ast.OuterExpressionKinds` bits (utilities.go `OEK*`), shared by the
+/// evaluator, the checker and the transformers.
+pub mod outer_expression_kinds {
+    use super::OuterExpressionKinds;
+    pub const PARENTHESES: OuterExpressionKinds = 1 << 0;
+    pub const TYPE_ASSERTIONS: OuterExpressionKinds = 1 << 1;
+    pub const NON_NULL_ASSERTIONS: OuterExpressionKinds = 1 << 2;
+    pub const PARTIALLY_EMITTED_EXPRESSIONS: OuterExpressionKinds = 1 << 3;
+    pub const EXPRESSIONS_WITH_TYPE_ARGUMENTS: OuterExpressionKinds = 1 << 4;
+    pub const SATISFIES: OuterExpressionKinds = 1 << 5;
+    pub const EXCLUDE_JSDOC_TYPE_ASSERTION: OuterExpressionKinds = 1 << 6;
+    pub const ASSIGNMENTS: OuterExpressionKinds = 1 << 7;
+    pub const COMMA: OuterExpressionKinds = 1 << 8;
+    pub const ASSERTIONS: OuterExpressionKinds = TYPE_ASSERTIONS | NON_NULL_ASSERTIONS | SATISFIES;
+    pub const ALL: OuterExpressionKinds =
+        PARENTHESES | ASSERTIONS | PARTIALLY_EMITTED_EXPRESSIONS | EXPRESSIONS_WITH_TYPE_ARGUMENTS;
+    pub const ALL_EXCEPT_ASSERTIONS_OR_EXPRESSIONS_WITH_TYPE_ARGUMENTS: OuterExpressionKinds =
+        ALL & !ASSERTIONS & !EXPRESSIONS_WITH_TYPE_ARGUMENTS;
+    pub const EXPRESSION_TYPE_PASSTHROUGH: OuterExpressionKinds = PARENTHESES | ASSIGNMENTS | COMMA;
+}
+
 /// port: tsc/internal/ast/utilities.go:IsObjectBindingOrAssignmentElement
 pub fn is_object_binding_or_assignment_element(node: &(impl NodeAccess + ?Sized)) -> bool {
     matches!(

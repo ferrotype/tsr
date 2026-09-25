@@ -938,6 +938,9 @@ macro_rules! shape_reads {
                 TypeParameterDeclaration as_type_parameter_declaration => |data| data.modifiers(),
             )
         }
+        /// The payloads that embed `BodyBase` at the pin. ClassStaticBlockDeclaration
+        /// declares its own `Body` field without it, so this answers `None` there;
+        /// read that body through the payload accessor.
         /// port: tsc/internal/ast/ast.go:Node.Body
         $visibility fn body(&self) -> Option<$node_id> {
             $shape!(self;
@@ -946,7 +949,6 @@ macro_rules! shape_reads {
                 GetAccessorDeclaration as_get_accessor_declaration => |data| data.body(),
                 SetAccessorDeclaration as_set_accessor_declaration => |data| data.body(),
                 MethodDeclaration as_method_declaration => |data| data.body(),
-                ClassStaticBlockDeclaration as_class_static_block_declaration => |data| data.body(),
                 ArrowFunction as_arrow_function => |data| data.body(),
                 FunctionExpression as_function_expression => |data| data.body(),
                 ModuleDeclaration as_module_declaration => |data| data.body(),
@@ -975,10 +977,12 @@ macro_rules! shape_reads {
 pub(crate) use shape_reads;
 
 // IsLocalsContainer is a source predicate, not an inline-storage capability:
-// the pinned predicate includes TryStatement and SwitchStatement as well.
+// the payloads whose pinned LocalsContainerData is non-nil (LocalsContainerBase,
+// FunctionLikeBase or FunctionLikeWithBodyBase). SwitchStatement and
+// TryStatement embed none of them; their CaseBlock and CatchClause do.
 macro_rules! locals_container_shapes {
     ($select:ident, $node:expr) => {
-        $select!($node; SourceFile, ForStatement, ForInOrOfStatement, SwitchStatement, CaseBlock, TryStatement, CatchClause, Block, FunctionDeclaration, ClassDeclaration, ClassExpression, TypeAliasDeclaration, CallSignatureDeclaration, ConstructSignatureDeclaration, ConstructorDeclaration, GetAccessorDeclaration, SetAccessorDeclaration, IndexSignatureDeclaration, MethodSignatureDeclaration, MethodDeclaration, ClassStaticBlockDeclaration, ArrowFunction, FunctionExpression, ConditionalTypeNode, MappedTypeNode, FunctionTypeNode, ConstructorTypeNode, JSDocSignature, ModuleDeclaration)
+        $select!($node; SourceFile, ForStatement, ForInOrOfStatement, CaseBlock, CatchClause, Block, FunctionDeclaration, ClassDeclaration, ClassExpression, TypeAliasDeclaration, CallSignatureDeclaration, ConstructSignatureDeclaration, ConstructorDeclaration, GetAccessorDeclaration, SetAccessorDeclaration, IndexSignatureDeclaration, MethodSignatureDeclaration, MethodDeclaration, ClassStaticBlockDeclaration, ArrowFunction, FunctionExpression, ConditionalTypeNode, MappedTypeNode, FunctionTypeNode, ConstructorTypeNode, JSDocSignature, ModuleDeclaration)
     };
 }
 pub(crate) use locals_container_shapes;

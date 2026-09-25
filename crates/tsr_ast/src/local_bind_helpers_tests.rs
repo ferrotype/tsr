@@ -142,16 +142,23 @@ fn semantic_getters_share_kind_shape_and_nil_contracts() {
 }
 
 #[test]
-fn locals_container_predicate_includes_source_roles_without_inline_locals_storage() {
+fn locals_container_predicate_follows_the_pinned_payload_embedding() {
+    // Pinned Go: SwitchStatement and TryStatement embed no LocalsContainerBase,
+    // so IsLocalsContainer is false for them; their CaseBlock and CatchClause
+    // are the containers (data/s06/accessor-observations.tsv, IsLocalsContainer).
     let mut build = AstBuilder::new(SourceText::default(), &Counters::new());
     let switch = build.new_switch_statement(None, None);
+    let case_block = build.new_case_block(None);
     let attempt = build.new_try_statement(None, None, None);
+    let catch = build.new_catch_clause(None, None);
     let block = build.new_block(None, false);
     let token_block = build.new_token(K::Block.into());
     in_local_scope(build, |local| {
         for (node, expected) in [
-            (switch, true),
-            (attempt, true),
+            (switch, false),
+            (case_block, true),
+            (attempt, false),
+            (catch, true),
             (block, true),
             (token_block, false),
         ] {

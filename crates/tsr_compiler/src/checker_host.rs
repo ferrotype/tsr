@@ -1,6 +1,5 @@
 //! Retained program data for the checker; no loading or resolution is repeated.
-//! Project-reference programs are rejected by `Program::load`. The corresponding
-//! checker redirect API remains an explicit unsupported operation.
+//! Project-reference lookups read the program's published reference mapper.
 
 use crate::{metadata, output_paths, Program, ProgramFile};
 use std::sync::{Arc, OnceLock};
@@ -30,18 +29,30 @@ impl ProgramCheckerHost {
         &self.program
     }
 
-    fn file(&self, file_name: &[u8]) -> Option<&ProgramFile> {
-        let key = path::to_path(
+    fn to_path(&self, file_name: &[u8]) -> tsr_jsstring::JsString {
+        path::to_path(
             file_name,
             self.program.current_directory(),
             self.program.host().use_case_sensitive_file_names(),
-        );
-        self.program.file(key.as_bytes())
+        )
+    }
+
+    fn file(&self, file_name: &[u8]) -> Option<&ProgramFile> {
+        self.program.file(self.to_path(file_name).as_bytes())
     }
 
     fn required_file(&self, file_name: &[u8]) -> Result<&ProgramFile, Error> {
         self.file(file_name)
             .ok_or_else(|| tsr_arena::Error::WrongOwner.into())
+    }
+
+    /// The options a retained file was loaded with (getCompilerOptionsForFile).
+    fn file_options(&self, file: &ProgramFile) -> Result<&CompilerOptions, Error> {
+        let source = file.bound().view().source_file()?;
+        Ok(self.program.options_for_file(
+            source.parse_options().path.as_bytes(),
+            source.parse_options().file_name.as_bytes(),
+        ))
     }
 
     fn file_metadata(&self, file: &ProgramFile) -> Result<&SourceFileMetaData, Error> {
@@ -90,10 +101,12 @@ impl CheckerHost for ProgramCheckerHost {
 
     // port: tsc/internal/compiler/program.go:Program.GetSourceFileForResolvedModule
     fn get_source_file_for_resolved_module(&self, file_name: &[u8]) -> Option<&CompletedFile> {
-        // Package redirects are already entries in Program's by-path index.
-        // The upstream missing-file fallback is a project-reference redirect;
-        // programs requiring it are rejected during loading.
-        self.get_source_file(file_name)
+        // Package redirects are already entries in Program's by-path index. A
+        // referenced project's source is in the program as its output.
+        self.get_source_file(file_name).or_else(|| {
+            let output = self.program.parse_file_redirect(file_name)?;
+            self.get_source_file(output.as_bytes())
+        })
     }
 
     // port: tsc/internal/compiler/program.go:Program.GetEmitModuleFormatOfFile
@@ -102,7 +115,7 @@ impl CheckerHost for ProgramCheckerHost {
         let source = file.bound().view().source_file()?;
         Ok(metadata::emit_format(
             source.parse_options().file_name.as_bytes(),
-            self.program.options(),
+            self.file_options(file)?,
             self.file_metadata(file)?,
         ))
     }
@@ -121,7 +134,7 @@ impl CheckerHost for ProgramCheckerHost {
             source.parse_options().file_name.as_bytes(),
             self.file_metadata(file)?,
             usage_location,
-            self.program.options(),
+            self.file_options(file)?,
         )?)
     }
 
@@ -131,7 +144,7 @@ impl CheckerHost for ProgramCheckerHost {
         let source = file.bound().view().source_file()?;
         Ok(metadata::implied_for_emit(
             source.parse_options().file_name.as_bytes(),
-            self.program.options().emit_module_kind(),
+            self.file_options(file)?.emit_module_kind(),
             self.file_metadata(file)?,
         ))
     }
@@ -150,7 +163,7 @@ impl CheckerHost for ProgramCheckerHost {
             source.parse_options().file_name.as_bytes(),
             self.file_metadata(file)?,
             usage,
-            self.program.options(),
+            self.file_options(file)?,
         )
         .map_err(|error| match error {
             crate::Error::Ast(error) => error.into(),
@@ -172,7 +185,7 @@ impl CheckerHost for ProgramCheckerHost {
         Ok(metadata::normal_mode(
             source.parse_options().file_name.as_bytes(),
             self.file_metadata(file)?,
-            self.program.options(),
+            self.file_options(file)?,
         ))
     }
 
@@ -182,7 +195,7 @@ impl CheckerHost for ProgramCheckerHost {
         file_name: &[u8],
     ) -> Result<ResolutionMode, Error> {
         let file = self.required_file(file_name)?;
-        let options = self.program.options();
+        let options = self.file_options(file)?;
         let resolution = options.module_resolution_kind();
         if (tsr_core::ModuleResolutionKind::NODE16..=tsr_core::ModuleResolutionKind::NODE_NEXT)
             .contains(&resolution)
@@ -286,29 +299,25 @@ impl CheckerHost for ProgramCheckerHost {
         &self,
         file_name: &[u8],
     ) -> Result<Option<&ParsedCommandLine>, Error> {
-        self.required_file(file_name)?;
-        self.get_project_reference_from_output_dts(file_name)
+        let source = self
+            .required_file(file_name)?
+            .bound()
+            .view()
+            .source_file()?;
+        Ok(self.program.redirect_for_resolution(
+            source.parse_options().path.as_bytes(),
+            source.parse_options().file_name.as_bytes(),
+        ))
     }
 
     // port: tsc/internal/compiler/program.go:Program.GetProjectReferenceFromOutputDts
     fn get_project_reference_from_output_dts(
         &self,
-        _path: &[u8],
+        path: &[u8],
     ) -> Result<Option<&ParsedCommandLine>, Error> {
-        // Loader::new rejects nonempty project references before files load.
-        // This is an empty native lookup, not a fallback for an unloaded graph.
-        if self
+        Ok(self
             .program
-            .config()
-            .project_references
-            .as_ref()
-            .is_some_and(|references| !references.is_empty())
-        {
-            return Err(Error::Unsupported(
-                "GetProjectReferenceFromOutputDts: project references",
-            ));
-        }
-        Ok(None)
+            .project_reference_from_output_dts(self.to_path(path).as_bytes()))
     }
 
     // port: tsc/internal/compiler/program.go:Program.GetProjectReferenceFromSource
@@ -316,7 +325,9 @@ impl CheckerHost for ProgramCheckerHost {
         &self,
         path: &[u8],
     ) -> Result<Option<&ParsedCommandLine>, Error> {
-        self.get_project_reference_from_output_dts(path)
+        Ok(self
+            .program
+            .project_reference_from_source(self.to_path(path).as_bytes()))
     }
 
     fn get_module_specifier_paths(

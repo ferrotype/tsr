@@ -646,8 +646,8 @@ pub fn verify_compiler_options(program: &Program) -> Result<OptionVerification, 
     };
     removed_options(&mut v, options, &suggestion);
     initial_options(&mut v, options);
-    // The frozen S07 operation boundary rejects project references before
-    // Program construction. No reference verification result is manufactured.
+    let mut blocked = std::collections::BTreeSet::new();
+    verify_project_references(program, &mut v, &mut blocked);
     let emitted: Vec<_> = program
         .files()
         .iter()
@@ -778,7 +778,6 @@ pub fn verify_compiler_options(program: &Program) -> Result<OptionVerification, 
         }
     }
     final_options(&mut v, options);
-    let mut blocked = std::collections::BTreeSet::new();
     if !options.no_emit.is_true() && !options.suppress_output_path_check.is_true() {
         let mut seen = std::collections::BTreeSet::new();
         let mut verify_path = |name: Vec<u8>| {
@@ -826,6 +825,74 @@ pub fn verify_compiler_options(program: &Program) -> Result<OptionVerification, 
         include_diagnostics: includes,
         blocked_output_paths: blocked,
     })
+}
+
+/// Diagnostics sit at the parent's `references` entry, so a nested
+/// reference's diagnostic is in the referencing tsconfig, not the program's.
+/// port: tsc/internal/compiler/program.go:Program.verifyProjectReferences
+fn verify_project_references(
+    program: &Program,
+    v: &mut Verifier<'_>,
+    blocked: &mut std::collections::BTreeSet<JsString>,
+) {
+    let build_info_file_name = if program.options().suppress_output_path_check.is_true() {
+        JsString::default()
+    } else {
+        program.config().build_info_file_name()
+    };
+    program.range_resolved_project_reference(|_, config, parent, index| {
+        let reference = &parent
+            .project_references
+            .as_ref()
+            .expect("a walked reference belongs to its parent's references")[index];
+        let mut create = |message: &'static Message, args: Vec<JsString>| {
+            let diagnostic = tsr_tsoptions::diagnostic_at_reference_syntax(
+                parent,
+                isize::try_from(index).expect("reference index"),
+                message,
+                args.clone(),
+            )
+            .unwrap_or_else(|| Diagnostic::compiler(message, args));
+            v.diagnostics.push(diagnostic);
+        };
+        // !!! Deprecated in 5.0 and removed since 5.5
+        // verifyRemovedProjectReference(ref, parent, index);
+        let Some(config) = config else {
+            create(d::File_0_not_found, vec![reference.path.clone()]);
+            return true;
+        };
+        let reference_options = &config.options;
+        if (!reference_options.composite.is_true() || reference_options.no_emit.is_true())
+            && !parent.root_file_names.is_empty()
+        {
+            if !reference_options.composite.is_true() {
+                create(
+                    d::Referenced_project_0_must_have_setting_composite_Colon_true,
+                    vec![reference.path.clone()],
+                );
+            }
+            if reference_options.no_emit.is_true() {
+                create(
+                    d::Referenced_project_0_may_not_disable_emit,
+                    vec![reference.path.clone()],
+                );
+            }
+        }
+        if !build_info_file_name.is_empty()
+            && build_info_file_name == config.build_info_file_name()
+        {
+            create(
+                d::Cannot_write_file_0_because_it_will_overwrite_tsbuildinfo_file_generated_by_referenced_project_1,
+                vec![build_info_file_name.clone(), reference.path.clone()],
+            );
+            blocked.insert(tsr_tspath::to_path(
+                build_info_file_name.as_bytes(),
+                program.current_directory(),
+                program.host().use_case_sensitive_file_names(),
+            ));
+        }
+        true
+    });
 }
 
 // Go encoding/json string output (the baseUrl migration suggestion) replaces

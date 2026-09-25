@@ -12,6 +12,8 @@ mod include_reason;
 mod output_paths;
 mod plain_js_errors;
 mod program_diagnostics;
+mod project_references;
+pub use project_references::CompilerConfigHost;
 mod syntactic_diagnostics;
 mod verify_options;
 pub use verify_options::{verify_compiler_options, FileIncludeDiagnostic, OptionVerification};
@@ -23,6 +25,8 @@ pub use checker_host::ProgramCheckerHost;
 pub use loader::{Error, Program, ProgramOptions, Resolution, TypeResolution};
 pub use resolver_host::ProgramResolverHost;
 pub use tsr_ast::SourceFileMetaData;
+/// The message catalog that `Program::explain_file_include` takes its messages from.
+pub use tsr_diagnostics as messages;
 
 #[cfg(test)]
 mod boundary_tests;

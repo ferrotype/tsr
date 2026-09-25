@@ -306,6 +306,24 @@ fn check(
         "IsTypeOnly",
         outcome(|| f.view().node(n).unwrap().is_type_only().to_string()),
     );
+    // Payload-interface membership: the production predicates, each answering
+    // whether the pinned nodeData method returns non-nil for this payload.
+    emit(
+        "IsDeclarationNode",
+        outcome(|| is_declaration_node(&f.view().node(n).unwrap()).to_string()),
+    );
+    emit(
+        "IsLocalsContainer",
+        outcome(|| is_locals_container(&f.view().node(n).unwrap()).to_string()),
+    );
+    emit(
+        "FlowNodeData",
+        outcome(|| has_flow_node_data(&f.view().node(n).unwrap()).to_string()),
+    );
+    emit(
+        "BodyData",
+        outcome(|| has_body_data(&f.view().node(n).unwrap()).to_string()),
+    );
     emit("Text", outcome(|| hex(&f.view().node_text(n).unwrap())));
     emit(
         "RawText",
@@ -560,7 +578,7 @@ fn matches_pinned_go_node_accessor_observations() {
         constructor!("NewSemicolonClassElement", new_semicolon_class_element());
         constructor!(
             "NewClassStaticBlockDeclaration",
-            new_class_static_block_declaration(None, None)
+            new_class_static_block_declaration(None, Some(a))
         );
         constructor!("NewOmittedExpression", new_omitted_expression());
         constructor!(

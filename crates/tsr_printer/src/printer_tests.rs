@@ -949,3 +949,54 @@ fn literal_text_flags_type_precedence_and_newlines_match_the_pinned_go_values() 
         ],
     );
 }
+
+#[test]
+fn class_static_blocks_print_their_own_body_field() {
+    // Pinned Go printer (NewPrinter(PrinterOptions{}), NewTextWriter("\n", 0))
+    // on the same factory-built class, in a scratch overlay: emitClassStaticBlockDeclaration
+    // reads the payload's `node.Body`, which Node.Body answers nil for.
+    for (multi_line, expected) in [
+        (
+            true,
+            "class C {\n    static {\n        x;\n    }\n    static {\n    }\n}",
+        ),
+        (
+            false,
+            "class C {\n    static { x; }\n    static {\n    }\n}",
+        ),
+    ] {
+        let counters = Counters::new();
+        let context = EmitContext::new();
+        let mut ast = AstBuilder::with_hooks(
+            SourceText::from_bytes(&b""[..]),
+            &counters,
+            context.factory_hooks(),
+        );
+        let list = |ast: &mut AstBuilder, nodes: Vec<NodeId>| {
+            let slice = ast
+                .node_slice(nodes.into_iter().map(Some).collect())
+                .expect("list slice");
+            ast.new_list(TextRange::new(-1, -1), slice).expect("list")
+        };
+        let x = ast.new_identifier(JsString::from_bytes(&b"x"[..]));
+        let statement = ast.new_expression_statement(Some(x));
+        let statements = list(&mut ast, vec![statement]);
+        let body = ast.new_block(Some(statements), multi_line);
+        let block = ast.new_class_static_block_declaration(None, Some(body));
+        let no_statements = list(&mut ast, vec![]);
+        let empty_body = ast.new_block(Some(no_statements), false);
+        let empty = ast.new_class_static_block_declaration(None, Some(empty_body));
+        let members = list(&mut ast, vec![block, empty]);
+        let name = ast.new_identifier(JsString::from_bytes(&b"C"[..]));
+        let class = ast.new_class_declaration(None, Some(name), None, None, Some(members));
+        let mut writer = TextWriter::new(b"\n", 0);
+        Printer::new(PrinterOptions::default(), &context)
+            .write(ast.view(), class, None, &mut writer)
+            .expect("print");
+        assert_eq!(
+            String::from_utf8_lossy(writer.text()),
+            expected,
+            "multiLine={multi_line}"
+        );
+    }
+}

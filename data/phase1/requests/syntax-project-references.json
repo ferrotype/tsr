@@ -1,0 +1,1090 @@
+{
+  "family": "syntax",
+  "requests": [
+    {
+      "actions": [
+        {
+          "op": "load"
+        },
+        {
+          "op": "graph"
+        },
+        {
+          "op": "verify"
+        }
+      ],
+      "case": "syntax/project-references/no-references-control",
+      "discriminates": "A composite config without references: addProjectReferenceTasks builds the empty mapper and returns at once, every file keeps the base options, the reference walk reports nothing and no redirect is made. It pins that the new path leaves an ordinary program unchanged.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/fileloader.go:fileLoader.addProjectReferenceTasks",
+      "order_sensitive": true,
+      "subject": "projectReferences",
+      "workspace": {
+        "case_sensitive": true,
+        "cwd": "/home/src/workspaces/project",
+        "files": {
+          "/home/src/workspaces/project/app/a.ts": "export const a = 1;",
+          "/home/src/workspaces/project/app/tsconfig.json": "{\"compilerOptions\":{\"composite\":true}}"
+        },
+        "project": "app/tsconfig.json",
+        "suppress_output_path_check": false,
+        "symlinks": {},
+        "use_source_of_project_reference": false
+      }
+    },
+    {
+      "actions": [
+        {
+          "op": "load"
+        },
+        {
+          "op": "graph"
+        },
+        {
+          "op": "verify"
+        },
+        {
+          "op": "explain"
+        }
+      ],
+      "case": "syntax/project-references/redirect-to-output-dts",
+      "discriminates": "A referenced project's sources are replaced by their built .d.ts outputs: beta imports ../alpha/a, which becomes alpha/bin/a.d.ts; that output's './b' is resolved from the source location alpha/a.ts with alpha's options (trace 6215) and is redirected again to alpha/bin/b.d.ts. The sources never enter the program, the include reasons move to the outputs and each output explains its source (TS1428).",
+      "explain_files": [
+        "/home/src/workspaces/project/alpha/bin/a.d.ts",
+        "/home/src/workspaces/project/alpha/bin/b.d.ts"
+      ],
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+      "order_sensitive": true,
+      "subject": "projectReferences",
+      "workspace": {
+        "case_sensitive": true,
+        "cwd": "/home/src/workspaces/project",
+        "files": {
+          "/home/src/workspaces/project/alpha/a.ts": "export * from './b'; export const m: number = 3;",
+          "/home/src/workspaces/project/alpha/b.ts": "export const n = 1;",
+          "/home/src/workspaces/project/alpha/bin/a.d.ts": "export * from './b';",
+          "/home/src/workspaces/project/alpha/bin/b.d.ts": "export declare const n = 1;",
+          "/home/src/workspaces/project/alpha/tsconfig.json": "{\"compilerOptions\":{\"composite\":true,\"outDir\":\"bin\"}}",
+          "/home/src/workspaces/project/beta/b.ts": "import { m } from '../alpha/a'",
+          "/home/src/workspaces/project/beta/tsconfig.json": "{\"compilerOptions\":{\"composite\":true,\"outDir\":\"bin\",\"traceResolution\":true},\"references\":[{\"path\":\"../alpha\"}]}"
+        },
+        "project": "beta/tsconfig.json",
+        "suppress_output_path_check": false,
+        "symlinks": {},
+        "use_source_of_project_reference": false
+      }
+    },
+    {
+      "actions": [
+        {
+          "op": "load"
+        },
+        {
+          "op": "graph"
+        },
+        {
+          "op": "verify"
+        },
+        {
+          "op": "explain"
+        }
+      ],
+      "case": "syntax/project-references/reference-not-built",
+      "discriminates": "The referenced project has not been built: the redirected output utils/index.d.ts is missing. It is listed as a missing file with no loader diagnostic (the checker reports it later), and the import reason still belongs to the missing output.",
+      "explain_files": [
+        "/home/src/workspaces/solution/utils/index.d.ts"
+      ],
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+      "order_sensitive": true,
+      "subject": "projectReferences",
+      "workspace": {
+        "case_sensitive": true,
+        "cwd": "/home/src/workspaces/solution",
+        "files": {
+          "/home/src/workspaces/solution/project/index.ts": "import { x } from \"../utils\";",
+          "/home/src/workspaces/solution/project/tsconfig.json": "{\"references\":[{\"path\":\"../utils\"}]}",
+          "/home/src/workspaces/solution/utils/index.ts": "export const x = 10;",
+          "/home/src/workspaces/solution/utils/tsconfig.json": "{\"compilerOptions\":{\"composite\":true}}"
+        },
+        "project": "project/tsconfig.json",
+        "suppress_output_path_check": false,
+        "symlinks": {},
+        "use_source_of_project_reference": false
+      }
+    },
+    {
+      "actions": [
+        {
+          "op": "load"
+        },
+        {
+          "op": "graph"
+        },
+        {
+          "op": "verify"
+        },
+        {
+          "op": "explain"
+        }
+      ],
+      "case": "syntax/project-references/root-file-in-referenced-project",
+      "discriminates": "A root file of the program that belongs to a referenced project is redirected like an import: the root reason 'Part of files list' moves to lib/dist/a.d.ts, which explains its source.",
+      "explain_files": [
+        "/home/src/workspaces/project/lib/dist/a.d.ts"
+      ],
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+      "order_sensitive": true,
+      "subject": "projectReferences",
+      "workspace": {
+        "case_sensitive": true,
+        "cwd": "/home/src/workspaces/project",
+        "files": {
+          "/home/src/workspaces/project/app/main.ts": "export {};",
+          "/home/src/workspaces/project/app/tsconfig.json": "{\"files\":[\"main.ts\",\"../lib/src/a.ts\"],\"references\":[{\"path\":\"../lib\"}]}",
+          "/home/src/workspaces/project/lib/dist/a.d.ts": "export declare const a = 1;",
+          "/home/src/workspaces/project/lib/src/a.ts": "export const a = 1;",
+          "/home/src/workspaces/project/lib/tsconfig.json": "{\"compilerOptions\":{\"composite\":true,\"rootDir\":\"src\",\"outDir\":\"dist\"},\"include\":[\"src\"]}"
+        },
+        "project": "app/tsconfig.json",
+        "suppress_output_path_check": false,
+        "symlinks": {},
+        "use_source_of_project_reference": false
+      }
+    },
+    {
+      "actions": [
+        {
+          "op": "load"
+        },
+        {
+          "op": "graph"
+        },
+        {
+          "op": "verify"
+        }
+      ],
+      "case": "syntax/project-references/referenced-config-missing",
+      "discriminates": "The referenced config does not exist: GetResolvedProjectReference returns nil, the walk reports a nil config and verification reports TS6053 at the reference's syntax in the root tsconfig.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
+      "order_sensitive": true,
+      "subject": "projectReferences",
+      "workspace": {
+        "case_sensitive": true,
+        "cwd": "/home/src/workspaces/solution",
+        "files": {
+          "/home/src/workspaces/solution/project/index.ts": "export const x = 10;",
+          "/home/src/workspaces/solution/project/tsconfig.json": "{\"references\":[{\"path\":\"../utils\"}]}"
+        },
+        "project": "project/tsconfig.json",
+        "suppress_output_path_check": false,
+        "symlinks": {},
+        "use_source_of_project_reference": false
+      }
+    },
+    {
+      "actions": [
+        {
+          "op": "load"
+        },
+        {
+          "op": "graph"
+        },
+        {
+          "op": "verify"
+        }
+      ],
+      "case": "syntax/project-references/referenced-not-composite",
+      "discriminates": "A referenced project without composite, from a parent that has files: TS6306 at the reference.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
+      "order_sensitive": true,
+      "subject": "projectReferences",
+      "workspace": {
+        "case_sensitive": true,
+        "cwd": "/home/src/workspaces/project",
+        "files": {
+          "/home/src/workspaces/project/primary/a.ts": "export { };",
+          "/home/src/workspaces/project/primary/tsconfig.json": "{\"compilerOptions\":{\"composite\":false,\"outDir\":\"bin\"}}",
+          "/home/src/workspaces/project/reference/b.ts": "import * as mod_1 from \"../primary/a\";",
+          "/home/src/workspaces/project/reference/tsconfig.json": "{\"compilerOptions\":{\"composite\":true,\"outDir\":\"bin\"},\"files\":[\"b.ts\"],\"references\":[{\"path\":\"../primary\"}]}"
+        },
+        "project": "reference/tsconfig.json",
+        "suppress_output_path_check": false,
+        "symlinks": {},
+        "use_source_of_project_reference": false
+      }
+    },
+    {
+      "actions": [
+        {
+          "op": "load"
+        },
+        {
+          "op": "graph"
+        },
+        {
+          "op": "verify"
+        }
+      ],
+      "case": "syntax/project-references/container-not-composite-no-error",
+      "discriminates": "The same non-composite reference from a container config with an empty files list: no TS6306, because the parent has no files.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
+      "order_sensitive": true,
+      "subject": "projectReferences",
+      "workspace": {
+        "case_sensitive": true,
+        "cwd": "/home/src/workspaces/project",
+        "files": {
+          "/home/src/workspaces/project/primary/a.ts": "export { };",
+          "/home/src/workspaces/project/primary/tsconfig.json": "{\"compilerOptions\":{\"composite\":false,\"outDir\":\"bin\"}}",
+          "/home/src/workspaces/project/reference/b.ts": "import * as mod_1 from \"../primary/a\";",
+          "/home/src/workspaces/project/reference/tsconfig.json": "{\"compilerOptions\":{\"composite\":true,\"outDir\":\"bin\"},\"files\":[],\"references\":[{\"path\":\"../primary\"}]}"
+        },
+        "project": "reference/tsconfig.json",
+        "suppress_output_path_check": false,
+        "symlinks": {},
+        "use_source_of_project_reference": false
+      }
+    },
+    {
+      "actions": [
+        {
+          "op": "load"
+        },
+        {
+          "op": "graph"
+        },
+        {
+          "op": "verify"
+        }
+      ],
+      "case": "syntax/project-references/referenced-noemit-not-composite",
+      "discriminates": "A reference with noEmit and no composite: TS6306 and then TS6310 at the same reference, in that order.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
+      "order_sensitive": true,
+      "subject": "projectReferences",
+      "workspace": {
+        "case_sensitive": true,
+        "cwd": "/home/src/workspaces/solution",
+        "files": {
+          "/home/src/workspaces/solution/project/index.ts": "import { x } from \"../utils\";",
+          "/home/src/workspaces/solution/project/tsconfig.json": "{\"references\":[{\"path\":\"../utils\"}]}",
+          "/home/src/workspaces/solution/utils/index.ts": "export const x = 10;",
+          "/home/src/workspaces/solution/utils/tsconfig.json": "{\"compilerOptions\":{\"noEmit\":true}}"
+        },
+        "project": "project/tsconfig.json",
+        "suppress_output_path_check": false,
+        "symlinks": {},
+        "use_source_of_project_reference": false
+      }
+    },
+    {
+      "actions": [
+        {
+          "op": "load"
+        },
+        {
+          "op": "graph"
+        },
+        {
+          "op": "verify"
+        }
+      ],
+      "case": "syntax/project-references/buildinfo-collision",
+      "discriminates": "The program and its reference write the same .tsbuildinfo: TS6377 at the reference and the build info path blocked for emit. The reference's output is loaded with the reference's options.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
+      "order_sensitive": true,
+      "subject": "projectReferences",
+      "workspace": {
+        "case_sensitive": true,
+        "cwd": "/home/src/workspaces/solution",
+        "files": {
+          "/home/src/workspaces/solution/project/index.ts": "import { x } from \"../utils\";",
+          "/home/src/workspaces/solution/project/tsconfig.json": "{\"compilerOptions\":{\"incremental\":true,\"tsBuildInfoFile\":\"../shared.tsbuildinfo\"},\"references\":[{\"path\":\"../utils\"}]}",
+          "/home/src/workspaces/solution/utils/index.d.ts": "export declare const x = 10;",
+          "/home/src/workspaces/solution/utils/index.ts": "export const x = 10;",
+          "/home/src/workspaces/solution/utils/tsconfig.json": "{\"compilerOptions\":{\"composite\":true,\"tsBuildInfoFile\":\"../shared.tsbuildinfo\"}}"
+        },
+        "project": "project/tsconfig.json",
+        "suppress_output_path_check": false,
+        "symlinks": {},
+        "use_source_of_project_reference": false
+      }
+    },
+    {
+      "actions": [
+        {
+          "op": "load"
+        },
+        {
+          "op": "graph"
+        },
+        {
+          "op": "verify"
+        }
+      ],
+      "case": "syntax/project-references/buildinfo-collision-suppressed",
+      "discriminates": "The same collision with suppressOutputPathCheck set on the parsed options (it is not a tsconfig option): no TS6377 and nothing blocked.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
+      "order_sensitive": true,
+      "subject": "projectReferences",
+      "workspace": {
+        "case_sensitive": true,
+        "cwd": "/home/src/workspaces/solution",
+        "files": {
+          "/home/src/workspaces/solution/project/index.ts": "import { x } from \"../utils\";",
+          "/home/src/workspaces/solution/project/tsconfig.json": "{\"compilerOptions\":{\"incremental\":true,\"tsBuildInfoFile\":\"../shared.tsbuildinfo\"},\"references\":[{\"path\":\"../utils\"}]}",
+          "/home/src/workspaces/solution/utils/index.d.ts": "export declare const x = 10;",
+          "/home/src/workspaces/solution/utils/index.ts": "export const x = 10;",
+          "/home/src/workspaces/solution/utils/tsconfig.json": "{\"compilerOptions\":{\"composite\":true,\"tsBuildInfoFile\":\"../shared.tsbuildinfo\"}}"
+        },
+        "project": "project/tsconfig.json",
+        "suppress_output_path_check": true,
+        "symlinks": {},
+        "use_source_of_project_reference": false
+      }
+    },
+    {
+      "actions": [
+        {
+          "op": "load"
+        },
+        {
+          "op": "graph"
+        },
+        {
+          "op": "verify"
+        }
+      ],
+      "case": "syntax/project-references/diamond-nested",
+      "discriminates": "Nested references in a diamond: root references a and b, both reference c, b also references a missing project. The walk is preorder with path-level dedup (c under b is skipped) and each entry's parent is the referencing config; the nested TS6306 and TS6053 sit in a/tsconfig.json and b/tsconfig.json.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker",
+      "order_sensitive": true,
+      "subject": "projectReferences",
+      "workspace": {
+        "case_sensitive": true,
+        "cwd": "/home/src/workspaces/solution",
+        "files": {
+          "/home/src/workspaces/solution/a/a.d.ts": "export {};",
+          "/home/src/workspaces/solution/a/a.ts": "export {};",
+          "/home/src/workspaces/solution/a/tsconfig.json": "{\"compilerOptions\":{\"composite\":true},\"references\":[{\"path\":\"../c\"}]}",
+          "/home/src/workspaces/solution/b/b.d.ts": "export {};",
+          "/home/src/workspaces/solution/b/b.ts": "export {};",
+          "/home/src/workspaces/solution/b/tsconfig.json": "{\"compilerOptions\":{\"composite\":true},\"references\":[{\"path\":\"../c\"},{\"path\":\"../missing\"}]}",
+          "/home/src/workspaces/solution/c/c.ts": "export {};",
+          "/home/src/workspaces/solution/c/tsconfig.json": "{\"compilerOptions\":{\"composite\":false}}",
+          "/home/src/workspaces/solution/root/r.ts": "import \"../a/a\"; import \"../b/b\";",
+          "/home/src/workspaces/solution/root/tsconfig.json": "{\"compilerOptions\":{\"composite\":true},\"references\":[{\"path\":\"../a\"},{\"path\":\"../b\"}]}"
+        },
+        "project": "root/tsconfig.json",
+        "suppress_output_path_check": false,
+        "symlinks": {},
+        "use_source_of_project_reference": false
+      }
+    },
+    {
+      "actions": [
+        {
+          "op": "load"
+        },
+        {
+          "op": "graph"
+        },
+        {
+          "op": "verify"
+        }
+      ],
+      "case": "syntax/project-references/duplicate-reference",
+      "discriminates": "Two references naming the same config (a directory and its tsconfig.json): one parse task, both slots listed for the root, the walk visits the path once, so TS6053 is reported once, at index 0.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.start",
+      "order_sensitive": true,
+      "subject": "projectReferences",
+      "workspace": {
+        "case_sensitive": true,
+        "cwd": "/home/src/workspaces/solution",
+        "files": {
+          "/home/src/workspaces/solution/project/index.ts": "export const x = 10;",
+          "/home/src/workspaces/solution/project/tsconfig.json": "{\"references\":[{\"path\":\"../utils\"},{\"path\":\"../utils/tsconfig.json\"}]}"
+        },
+        "project": "project/tsconfig.json",
+        "suppress_output_path_check": false,
+        "symlinks": {},
+        "use_source_of_project_reference": false
+      }
+    },
+    {
+      "actions": [
+        {
+          "op": "load"
+        },
+        {
+          "op": "graph"
+        },
+        {
+          "op": "verify"
+        },
+        {
+          "op": "explain"
+        }
+      ],
+      "case": "syntax/project-references/child-overwrites-parent",
+      "discriminates": "One source file owned by a parent reference p and by its child c: the parent's maps are copied first and the child overwrites them, so shared/x.ts is redirected to c/outc/x.d.ts, not p/outp/shared/x.d.ts.",
+      "explain_files": [
+        "/home/src/workspaces/solution/p/outp/shared/x.d.ts",
+        "/home/src/workspaces/solution/c/outc/x.d.ts"
+      ],
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.initMapperWorker",
+      "order_sensitive": true,
+      "subject": "projectReferences",
+      "workspace": {
+        "case_sensitive": true,
+        "cwd": "/home/src/workspaces/solution",
+        "files": {
+          "/home/src/workspaces/solution/c/outc/x.d.ts": "export declare const x = 1;",
+          "/home/src/workspaces/solution/c/tsconfig.json": "{\"compilerOptions\":{\"composite\":true,\"outDir\":\"outc\",\"rootDir\":\"../shared\"},\"files\":[\"../shared/x.ts\"]}",
+          "/home/src/workspaces/solution/p/outp/shared/x.d.ts": "export declare const x = 1;",
+          "/home/src/workspaces/solution/p/tsconfig.json": "{\"compilerOptions\":{\"composite\":true,\"outDir\":\"outp\",\"rootDir\":\"..\"},\"files\":[\"../shared/x.ts\"],\"references\":[{\"path\":\"../c\"}]}",
+          "/home/src/workspaces/solution/root/r.ts": "import \"../shared/x\";",
+          "/home/src/workspaces/solution/root/tsconfig.json": "{\"references\":[{\"path\":\"../p\"}]}",
+          "/home/src/workspaces/solution/shared/x.ts": "export const x = 1;"
+        },
+        "project": "root/tsconfig.json",
+        "suppress_output_path_check": false,
+        "symlinks": {},
+        "use_source_of_project_reference": false
+      }
+    },
+    {
+      "actions": [
+        {
+          "op": "load"
+        },
+        {
+          "op": "graph"
+        },
+        {
+          "op": "verify"
+        },
+        {
+          "op": "explain"
+        }
+      ],
+      "case": "syntax/project-references/cycle-through-root",
+      "discriminates": "A reference that points back at the root project. The walk skips the root path, but the reparsed root config is a different ConfigFile, so the root's own r.ts is redirected to its output root/r.d.ts (the pinned behavior).",
+      "explain_files": [
+        "/home/src/workspaces/solution/root/r.d.ts"
+      ],
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rootConfigPath",
+      "order_sensitive": true,
+      "subject": "projectReferences",
+      "workspace": {
+        "case_sensitive": true,
+        "cwd": "/home/src/workspaces/solution",
+        "files": {
+          "/home/src/workspaces/solution/a/a.ts": "export {};",
+          "/home/src/workspaces/solution/a/tsconfig.json": "{\"compilerOptions\":{\"composite\":true},\"references\":[{\"path\":\"../root\"}]}",
+          "/home/src/workspaces/solution/root/r.d.ts": "export {};",
+          "/home/src/workspaces/solution/root/r.ts": "export {};",
+          "/home/src/workspaces/solution/root/tsconfig.json": "{\"compilerOptions\":{\"composite\":true},\"references\":[{\"path\":\"../a\"}]}"
+        },
+        "project": "root/tsconfig.json",
+        "suppress_output_path_check": false,
+        "symlinks": {},
+        "use_source_of_project_reference": false
+      }
+    },
+    {
+      "actions": [
+        {
+          "op": "load"
+        },
+        {
+          "op": "graph"
+        },
+        {
+          "op": "verify"
+        },
+        {
+          "op": "explain"
+        }
+      ],
+      "case": "syntax/project-references/redirect-resolution-options",
+      "discriminates": "Imports inside a redirected output resolve with the referenced project's options: lib/dist/a.d.ts resolves esm-package in bundler mode (ESNext, esm.d.ts) while the app's own file resolves it with node10 (CommonJS, cjs.d.ts); the trace shows 6215.",
+      "explain_files": [
+        "/home/src/workspaces/project/lib/dist/a.d.ts",
+        "/home/src/workspaces/project/app/src/index.ts"
+      ],
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getRedirectForResolution",
+      "order_sensitive": true,
+      "subject": "projectReferences",
+      "workspace": {
+        "case_sensitive": true,
+        "cwd": "/home/src/workspaces/project",
+        "files": {
+          "/home/src/workspaces/project/app/src/index.ts": "import { a } from \"../../lib/src/a\"; import { esm } from \"esm-package\";",
+          "/home/src/workspaces/project/app/tsconfig.json": "{\"compilerOptions\":{\"module\":\"commonjs\",\"moduleResolution\":\"node10\",\"rootDir\":\"src\",\"outDir\":\"dist\",\"traceResolution\":true},\"include\":[\"src\"],\"references\":[{\"path\":\"../lib\"}]}",
+          "/home/src/workspaces/project/lib/dist/a.d.ts": "import { esm } from \"esm-package\"; export declare const a: typeof esm;",
+          "/home/src/workspaces/project/lib/src/a.ts": "import { esm } from \"esm-package\"; export const a = esm;",
+          "/home/src/workspaces/project/lib/tsconfig.json": "{\"compilerOptions\":{\"composite\":true,\"declaration\":true,\"rootDir\":\"src\",\"outDir\":\"dist\",\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"include\":[\"src\"]}",
+          "/home/src/workspaces/project/node_modules/esm-package/cjs.d.ts": "export declare const cjs: number;",
+          "/home/src/workspaces/project/node_modules/esm-package/esm.d.ts": "export declare const esm: number;",
+          "/home/src/workspaces/project/node_modules/esm-package/package.json": "{\"name\":\"esm-package\",\"type\":\"module\",\"exports\":{\".\":{\"import\":\"./esm.d.ts\",\"require\":\"./cjs.d.ts\"}}}"
+        },
+        "project": "app/tsconfig.json",
+        "suppress_output_path_check": false,
+        "symlinks": {},
+        "use_source_of_project_reference": false
+      }
+    },
+    {
+      "actions": [
+        {
+          "op": "load"
+        },
+        {
+          "op": "graph"
+        },
+        {
+          "op": "verify"
+        },
+        {
+          "op": "explain"
+        }
+      ],
+      "case": "syntax/project-references/redirect-emit-format-explanation",
+      "discriminates": "The implied emit format of a redirected output uses the reference's options: with the reference on module nodenext, lib/dist/a.d.ts explains its source and then 'CommonJS because package.json was not found' (TS1461), which the root's esnext options would not produce.",
+      "explain_files": [
+        "/home/src/workspaces/project/lib/dist/a.d.ts",
+        "/home/src/workspaces/project/app/src/index.ts"
+      ],
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getCompilerOptionsForFile",
+      "order_sensitive": true,
+      "subject": "projectReferences",
+      "workspace": {
+        "case_sensitive": true,
+        "cwd": "/home/src/workspaces/project",
+        "files": {
+          "/home/src/workspaces/project/app/src/index.ts": "import { a } from \"../../lib/src/a\";",
+          "/home/src/workspaces/project/app/tsconfig.json": "{\"compilerOptions\":{\"module\":\"esnext\",\"moduleResolution\":\"bundler\",\"rootDir\":\"src\",\"outDir\":\"dist\"},\"include\":[\"src\"],\"references\":[{\"path\":\"../lib\"}]}",
+          "/home/src/workspaces/project/lib/dist/a.d.ts": "export declare const a = 1;",
+          "/home/src/workspaces/project/lib/src/a.ts": "export const a = 1;",
+          "/home/src/workspaces/project/lib/tsconfig.json": "{\"compilerOptions\":{\"composite\":true,\"rootDir\":\"src\",\"outDir\":\"dist\",\"module\":\"nodenext\"},\"include\":[\"src\"]}"
+        },
+        "project": "app/tsconfig.json",
+        "suppress_output_path_check": false,
+        "symlinks": {},
+        "use_source_of_project_reference": false
+      }
+    },
+    {
+      "actions": [
+        {
+          "op": "load"
+        },
+        {
+          "op": "graph"
+        },
+        {
+          "op": "verify"
+        },
+        {
+          "op": "explain"
+        }
+      ],
+      "case": "syntax/project-references/redirect-emit-format-explanation-control",
+      "discriminates": "Control for redirect-emit-format-explanation: the same output imported directly, without a reference, is explained with the root's esnext options and has no format line.",
+      "explain_files": [
+        "/home/src/workspaces/project/lib/dist/a.d.ts"
+      ],
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getCompilerOptionsForFile",
+      "order_sensitive": true,
+      "subject": "projectReferences",
+      "workspace": {
+        "case_sensitive": true,
+        "cwd": "/home/src/workspaces/project",
+        "files": {
+          "/home/src/workspaces/project/app/src/index.ts": "import { a } from \"../../lib/dist/a\";",
+          "/home/src/workspaces/project/app/tsconfig.json": "{\"compilerOptions\":{\"module\":\"esnext\",\"moduleResolution\":\"bundler\",\"rootDir\":\"src\",\"outDir\":\"dist\"},\"include\":[\"src\"]}",
+          "/home/src/workspaces/project/lib/dist/a.d.ts": "export declare const a = 1;"
+        },
+        "project": "app/tsconfig.json",
+        "suppress_output_path_check": false,
+        "symlinks": {},
+        "use_source_of_project_reference": false
+      }
+    },
+    {
+      "actions": [
+        {
+          "op": "load"
+        },
+        {
+          "op": "graph"
+        },
+        {
+          "op": "verify"
+        }
+      ],
+      "case": "syntax/project-references/type-reference-from-output",
+      "discriminates": "A type reference directive inside a redirected output resolves from the source location with the reference's typeRoots: lib/dist/a.d.ts's 'foo' resolves to lib/types/foo/index.d.ts although the root config has types [] and no typeRoots.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getRedirectForResolution",
+      "order_sensitive": true,
+      "subject": "projectReferences",
+      "workspace": {
+        "case_sensitive": true,
+        "cwd": "/home/src/workspaces/project",
+        "files": {
+          "/home/src/workspaces/project/app/main.ts": "import { a } from \"../lib/src/a\";",
+          "/home/src/workspaces/project/app/tsconfig.json": "{\"compilerOptions\":{\"types\":[]},\"files\":[\"main.ts\"],\"references\":[{\"path\":\"../lib\"}]}",
+          "/home/src/workspaces/project/lib/dist/a.d.ts": "/// <reference types=\"foo\" />\nexport declare const a = 1;",
+          "/home/src/workspaces/project/lib/src/a.ts": "/// <reference types=\"foo\" />\nexport const a = 1;",
+          "/home/src/workspaces/project/lib/tsconfig.json": "{\"compilerOptions\":{\"composite\":true,\"rootDir\":\"src\",\"outDir\":\"dist\",\"typeRoots\":[\"./types\"]},\"include\":[\"src\"]}",
+          "/home/src/workspaces/project/lib/types/foo/index.d.ts": "declare const foo: number;"
+        },
+        "project": "app/tsconfig.json",
+        "suppress_output_path_check": false,
+        "symlinks": {},
+        "use_source_of_project_reference": false
+      }
+    },
+    {
+      "actions": [
+        {
+          "op": "load"
+        },
+        {
+          "op": "graph"
+        },
+        {
+          "op": "verify"
+        },
+        {
+          "op": "explain"
+        }
+      ],
+      "case": "syntax/project-references/symlink-preserve",
+      "discriminates": "With preserveSymlinks, a package reached through a node_modules symlink resolves to the symlinked output path; its realpath is the reference's output, so it gets the reference's options and resolves './util' from the source location (trace 6215), which is then redirected to dist/util.d.ts.",
+      "explain_files": [
+        "/repo/app/node_modules/pkg/dist/index.d.ts"
+      ],
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getSourceToDtsIfSymlink",
+      "order_sensitive": true,
+      "subject": "projectReferences",
+      "workspace": {
+        "case_sensitive": true,
+        "cwd": "/repo",
+        "files": {
+          "/repo/app/main.ts": "import { u } from \"pkg\";",
+          "/repo/app/tsconfig.json": "{\"compilerOptions\":{\"preserveSymlinks\":true,\"traceResolution\":true},\"files\":[\"main.ts\"],\"references\":[{\"path\":\"../packages/pkg\"}]}",
+          "/repo/packages/pkg/dist/index.d.ts": "export * from \"./util\";",
+          "/repo/packages/pkg/dist/util.d.ts": "export declare const u = 1;",
+          "/repo/packages/pkg/package.json": "{\"name\":\"pkg\",\"types\":\"dist/index.d.ts\"}",
+          "/repo/packages/pkg/src/index.ts": "export * from \"./util\";",
+          "/repo/packages/pkg/src/util.ts": "export const u = 1;",
+          "/repo/packages/pkg/tsconfig.json": "{\"compilerOptions\":{\"composite\":true,\"rootDir\":\"src\",\"outDir\":\"dist\",\"traceResolution\":true},\"include\":[\"src\"]}"
+        },
+        "project": "app/tsconfig.json",
+        "suppress_output_path_check": false,
+        "symlinks": {
+          "/repo/app/node_modules/pkg": "/repo/packages/pkg"
+        },
+        "use_source_of_project_reference": false
+      }
+    },
+    {
+      "actions": [
+        {
+          "op": "load"
+        },
+        {
+          "op": "graph"
+        },
+        {
+          "op": "verify"
+        }
+      ],
+      "case": "syntax/project-references/symlink-preserve-outside-node_modules",
+      "discriminates": "The symlink lookup is only tried for paths containing /node_modules/: the same package reached through a symlink elsewhere keeps the root's options and './util' resolves next to the symlinked output.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getSourceToDtsIfSymlink",
+      "order_sensitive": true,
+      "subject": "projectReferences",
+      "workspace": {
+        "case_sensitive": true,
+        "cwd": "/repo",
+        "files": {
+          "/repo/app/main.ts": "import { u } from \"./linked/dist/index\";",
+          "/repo/app/tsconfig.json": "{\"compilerOptions\":{\"preserveSymlinks\":true,\"traceResolution\":true},\"files\":[\"main.ts\"],\"references\":[{\"path\":\"../packages/pkg\"}]}",
+          "/repo/packages/pkg/dist/index.d.ts": "export * from \"./util\";",
+          "/repo/packages/pkg/dist/util.d.ts": "export declare const u = 1;",
+          "/repo/packages/pkg/src/index.ts": "export * from \"./util\";",
+          "/repo/packages/pkg/src/util.ts": "export const u = 1;",
+          "/repo/packages/pkg/tsconfig.json": "{\"compilerOptions\":{\"composite\":true,\"rootDir\":\"src\",\"outDir\":\"dist\"},\"include\":[\"src\"]}"
+        },
+        "project": "app/tsconfig.json",
+        "suppress_output_path_check": false,
+        "symlinks": {
+          "/repo/app/linked": "/repo/packages/pkg"
+        },
+        "use_source_of_project_reference": false
+      }
+    },
+    {
+      "actions": [
+        {
+          "op": "load"
+        },
+        {
+          "op": "graph"
+        },
+        {
+          "op": "verify"
+        }
+      ],
+      "case": "syntax/project-references/symlink-no-preserve",
+      "discriminates": "Control for symlink-preserve without preserveSymlinks: resolution follows the symlink to the real output path, which the output map finds directly.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getSourceToDtsIfSymlink",
+      "order_sensitive": true,
+      "subject": "projectReferences",
+      "workspace": {
+        "case_sensitive": true,
+        "cwd": "/repo",
+        "files": {
+          "/repo/app/main.ts": "import { u } from \"pkg\";",
+          "/repo/app/tsconfig.json": "{\"compilerOptions\":{\"traceResolution\":true},\"files\":[\"main.ts\"],\"references\":[{\"path\":\"../packages/pkg\"}]}",
+          "/repo/packages/pkg/dist/index.d.ts": "export * from \"./util\";",
+          "/repo/packages/pkg/dist/util.d.ts": "export declare const u = 1;",
+          "/repo/packages/pkg/package.json": "{\"name\":\"pkg\",\"types\":\"dist/index.d.ts\"}",
+          "/repo/packages/pkg/src/index.ts": "export * from \"./util\";",
+          "/repo/packages/pkg/src/util.ts": "export const u = 1;",
+          "/repo/packages/pkg/tsconfig.json": "{\"compilerOptions\":{\"composite\":true,\"rootDir\":\"src\",\"outDir\":\"dist\"},\"include\":[\"src\"]}"
+        },
+        "project": "app/tsconfig.json",
+        "suppress_output_path_check": false,
+        "symlinks": {
+          "/repo/app/node_modules/pkg": "/repo/packages/pkg"
+        },
+        "use_source_of_project_reference": false
+      }
+    },
+    {
+      "actions": [
+        {
+          "op": "load"
+        },
+        {
+          "op": "graph"
+        },
+        {
+          "op": "verify"
+        }
+      ],
+      "case": "syntax/project-references/js-reference-source-under-node_modules",
+      "discriminates": "A JavaScript source of an allowJs reference, found through node_modules at maxNodeModuleJsDepth 0: it is not treated as JavaScript (it has a redirect), so it is not elided and is replaced by dist/index.d.ts.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getRedirectParsedCommandLineForResolution",
+      "order_sensitive": true,
+      "subject": "projectReferences",
+      "workspace": {
+        "case_sensitive": true,
+        "cwd": "/repo",
+        "files": {
+          "/repo/main.ts": "import { p } from \"pkg\";",
+          "/repo/node_modules/pkg/dist/index.d.ts": "export declare const p = 1;",
+          "/repo/node_modules/pkg/package.json": "{\"name\":\"pkg\",\"main\":\"src/index.js\"}",
+          "/repo/node_modules/pkg/src/index.js": "export const p = 1;",
+          "/repo/node_modules/pkg/tsconfig.json": "{\"compilerOptions\":{\"composite\":true,\"allowJs\":true,\"rootDir\":\"src\",\"outDir\":\"dist\"},\"include\":[\"src\"]}",
+          "/repo/tsconfig.json": "{\"compilerOptions\":{\"allowJs\":true},\"files\":[\"main.ts\"],\"references\":[{\"path\":\"./node_modules/pkg\"}]}"
+        },
+        "project": "tsconfig.json",
+        "suppress_output_path_check": false,
+        "symlinks": {},
+        "use_source_of_project_reference": false
+      }
+    },
+    {
+      "actions": [
+        {
+          "op": "load"
+        },
+        {
+          "op": "graph"
+        },
+        {
+          "op": "verify"
+        }
+      ],
+      "case": "syntax/project-references/js-reference-source-under-node_modules-control",
+      "discriminates": "Control without the reference: the same JavaScript file found through node_modules at depth 0 is elided and never enters the program.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getRedirectParsedCommandLineForResolution",
+      "order_sensitive": true,
+      "subject": "projectReferences",
+      "workspace": {
+        "case_sensitive": true,
+        "cwd": "/repo",
+        "files": {
+          "/repo/main.ts": "import { p } from \"pkg\";",
+          "/repo/node_modules/pkg/dist/index.d.ts": "export declare const p = 1;",
+          "/repo/node_modules/pkg/package.json": "{\"name\":\"pkg\",\"main\":\"src/index.js\"}",
+          "/repo/node_modules/pkg/src/index.js": "export const p = 1;",
+          "/repo/tsconfig.json": "{\"compilerOptions\":{\"allowJs\":true},\"files\":[\"main.ts\"]}"
+        },
+        "project": "tsconfig.json",
+        "suppress_output_path_check": false,
+        "symlinks": {},
+        "use_source_of_project_reference": false
+      }
+    },
+    {
+      "actions": [
+        {
+          "op": "load"
+        },
+        {
+          "op": "graph"
+        },
+        {
+          "op": "verify"
+        },
+        {
+          "op": "explain"
+        }
+      ],
+      "case": "syntax/project-references/use-source-disabled",
+      "discriminates": "UseSourceOfProjectReference requested but disableSourceOfProjectReferenceRedirect set: canUseProjectReferenceSource is false, so the program redirects to alpha/bin/a.d.ts and records the output-to-source map exactly like the default. The source-of-reference mode itself (Phase 5) is not exercised.",
+      "explain_files": [
+        "/home/src/workspaces/project/alpha/bin/a.d.ts"
+      ],
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/program.go:ProgramOptions.canUseProjectReferenceSource",
+      "order_sensitive": true,
+      "subject": "projectReferences",
+      "workspace": {
+        "case_sensitive": true,
+        "cwd": "/home/src/workspaces/project",
+        "files": {
+          "/home/src/workspaces/project/alpha/a.ts": "export const m: number = 3;",
+          "/home/src/workspaces/project/alpha/bin/a.d.ts": "export { };",
+          "/home/src/workspaces/project/alpha/tsconfig.json": "{\"compilerOptions\":{\"composite\":true,\"outDir\":\"bin\"}}",
+          "/home/src/workspaces/project/beta/b.ts": "import { m } from '../alpha/a'",
+          "/home/src/workspaces/project/beta/tsconfig.json": "{\"compilerOptions\":{\"composite\":true,\"outDir\":\"bin\",\"disableSourceOfProjectReferenceRedirect\":true},\"references\":[{\"path\":\"../alpha\"}]}"
+        },
+        "project": "beta/tsconfig.json",
+        "suppress_output_path_check": false,
+        "symlinks": {},
+        "use_source_of_project_reference": true
+      }
+    },
+    {
+      "actions": [
+        {
+          "op": "load"
+        },
+        {
+          "op": "graph"
+        },
+        {
+          "op": "verify"
+        }
+      ],
+      "case": "syntax/project-references/extends-in-referenced-config",
+      "discriminates": "A referenced config that extends a base config: GetResolvedProjectReference parses it for real, so the inherited module nodenext and outDir decide the output name dist/compiler/parser.d.ts and the options the output is parsed with.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/host.go:compilerHost.GetResolvedProjectReference",
+      "order_sensitive": true,
+      "subject": "projectReferences",
+      "workspace": {
+        "case_sensitive": true,
+        "cwd": "/home/src/workspaces/solution",
+        "files": {
+          "/home/src/workspaces/solution/dist/compiler/parser.d.ts": "export {};",
+          "/home/src/workspaces/solution/src/compiler/parser.ts": "export {};",
+          "/home/src/workspaces/solution/src/compiler/tsconfig.json": "{\"extends\":\"../tsconfig-base.json\",\"compilerOptions\":{}}",
+          "/home/src/workspaces/solution/src/services/services.ts": "import {} from \"../compiler/parser.ts\";",
+          "/home/src/workspaces/solution/src/services/tsconfig.json": "{\"extends\":\"../tsconfig-base.json\",\"compilerOptions\":{},\"references\":[{\"path\":\"../compiler\"}]}",
+          "/home/src/workspaces/solution/src/tsconfig-base.json": "{\"compilerOptions\":{\"module\":\"nodenext\",\"composite\":true,\"rootDir\":\".\",\"outDir\":\"../dist\",\"rewriteRelativeImportExtensions\":true}}"
+        },
+        "project": "src/services/tsconfig.json",
+        "suppress_output_path_check": false,
+        "symlinks": {},
+        "use_source_of_project_reference": false
+      }
+    },
+    {
+      "actions": [
+        {
+          "op": "load"
+        },
+        {
+          "op": "graph"
+        },
+        {
+          "op": "verify"
+        },
+        {
+          "op": "explain"
+        }
+      ],
+      "case": "syntax/project-references/redirect-reason-order",
+      "discriminates": "Three roots import the same referenced source. The single-threaded loader parses the last root first, so its import is the task that owns the redirect; collection visits the roots in order, so the output's reasons are r1, then r2 (the owning task, added when the redirect is first walked), then r3, not the visit order r1, r3, r2.",
+      "explain_files": [
+        "/home/src/workspaces/solution/lib/dist/s.d.ts"
+      ],
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+      "order_sensitive": true,
+      "subject": "projectReferences",
+      "workspace": {
+        "case_sensitive": true,
+        "cwd": "/home/src/workspaces/solution",
+        "files": {
+          "/home/src/workspaces/solution/app/r1.ts": "import \"../lib/src/s\";",
+          "/home/src/workspaces/solution/app/r2.ts": "import \"../lib/src/s\";",
+          "/home/src/workspaces/solution/app/r3.ts": "import \"../lib/src/s\";",
+          "/home/src/workspaces/solution/app/tsconfig.json": "{\"files\":[\"r1.ts\",\"r3.ts\",\"r2.ts\"],\"references\":[{\"path\":\"../lib\"}]}",
+          "/home/src/workspaces/solution/lib/dist/s.d.ts": "export declare const s = 1;",
+          "/home/src/workspaces/solution/lib/src/s.ts": "export const s = 1;",
+          "/home/src/workspaces/solution/lib/tsconfig.json": "{\"compilerOptions\":{\"composite\":true,\"rootDir\":\"src\",\"outDir\":\"dist\"},\"include\":[\"src\"]}"
+        },
+        "project": "app/tsconfig.json",
+        "suppress_output_path_check": false,
+        "symlinks": {},
+        "use_source_of_project_reference": false
+      }
+    },
+    {
+      "actions": [
+        {
+          "op": "load"
+        },
+        {
+          "op": "graph"
+        },
+        {
+          "op": "verify"
+        },
+        {
+          "op": "explain"
+        }
+      ],
+      "case": "syntax/project-references/redirect-output-loaded-first",
+      "discriminates": "The output is loaded directly (by r2, parsed first) before the source is redirected (owned by r3's import), so the redirected task is not the output's loaded task: r1's import of the source is dropped from the output's reasons, which are r3's then r2's.",
+      "explain_files": [
+        "/home/src/workspaces/solution/lib/dist/s.d.ts"
+      ],
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+      "order_sensitive": true,
+      "subject": "projectReferences",
+      "workspace": {
+        "case_sensitive": true,
+        "cwd": "/home/src/workspaces/solution",
+        "files": {
+          "/home/src/workspaces/solution/app/r1.ts": "import \"../lib/src/s\";",
+          "/home/src/workspaces/solution/app/r2.ts": "import \"../lib/dist/s\";",
+          "/home/src/workspaces/solution/app/r3.ts": "import \"../lib/src/s\";",
+          "/home/src/workspaces/solution/app/tsconfig.json": "{\"files\":[\"r1.ts\",\"r3.ts\",\"r2.ts\"],\"references\":[{\"path\":\"../lib\"}]}",
+          "/home/src/workspaces/solution/lib/dist/s.d.ts": "export declare const s = 1;",
+          "/home/src/workspaces/solution/lib/src/s.ts": "export const s = 1;",
+          "/home/src/workspaces/solution/lib/tsconfig.json": "{\"compilerOptions\":{\"composite\":true,\"rootDir\":\"src\",\"outDir\":\"dist\"},\"include\":[\"src\"]}"
+        },
+        "project": "app/tsconfig.json",
+        "suppress_output_path_check": false,
+        "symlinks": {},
+        "use_source_of_project_reference": false
+      }
+    },
+    {
+      "actions": [
+        {
+          "op": "load"
+        },
+        {
+          "op": "graph"
+        },
+        {
+          "op": "verify"
+        },
+        {
+          "op": "explain"
+        }
+      ],
+      "case": "syntax/project-references/missing-output-order",
+      "discriminates": "Missing files are listed in collection order: the unbuilt output reached through the first root precedes the second root, which does not exist.",
+      "explain_files": [
+        "/home/src/workspaces/solution/lib/dist/s.d.ts",
+        "/home/src/workspaces/solution/app/gone.ts"
+      ],
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+      "order_sensitive": true,
+      "subject": "projectReferences",
+      "workspace": {
+        "case_sensitive": true,
+        "cwd": "/home/src/workspaces/solution",
+        "files": {
+          "/home/src/workspaces/solution/app/main.ts": "import \"../lib/src/s\";",
+          "/home/src/workspaces/solution/app/tsconfig.json": "{\"files\":[\"main.ts\",\"gone.ts\"],\"references\":[{\"path\":\"../lib\"}]}",
+          "/home/src/workspaces/solution/lib/src/s.ts": "export const s = 1;",
+          "/home/src/workspaces/solution/lib/tsconfig.json": "{\"compilerOptions\":{\"composite\":true,\"rootDir\":\"src\",\"outDir\":\"dist\"},\"include\":[\"src\"]}"
+        },
+        "project": "app/tsconfig.json",
+        "suppress_output_path_check": false,
+        "symlinks": {},
+        "use_source_of_project_reference": false
+      }
+    },
+    {
+      "actions": [
+        {
+          "op": "load"
+        },
+        {
+          "op": "graph"
+        },
+        {
+          "op": "verify"
+        }
+      ],
+      "case": "syntax/project-references/json-source-of-reference-not-emitted",
+      "discriminates": "A referenced project's JSON source has no declaration output, so it is not redirected and loads as itself. As a referenced source it is not emitted: the composite root, whose outDir would place it at dist/data/values.json, does not ask for it in its file list (no TS6307 on the file).",
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
+      "order_sensitive": true,
+      "subject": "projectReferences",
+      "workspace": {
+        "case_sensitive": true,
+        "cwd": "/home/src/workspaces/solution",
+        "files": {
+          "/home/src/workspaces/solution/app/data/tsconfig.json": "{\"compilerOptions\":{\"composite\":true,\"resolveJsonModule\":true},\"files\":[\"values.json\"]}",
+          "/home/src/workspaces/solution/app/data/values.json": "{\"value\": 1}",
+          "/home/src/workspaces/solution/app/main.ts": "import data from \"./data/values.json\"; export const value = data.value;",
+          "/home/src/workspaces/solution/app/tsconfig.json": "{\"compilerOptions\":{\"composite\":true,\"resolveJsonModule\":true,\"outDir\":\"dist\"},\"files\":[\"main.ts\"],\"references\":[{\"path\":\"./data\"}]}"
+        },
+        "project": "app/tsconfig.json",
+        "suppress_output_path_check": false,
+        "symlinks": {},
+        "use_source_of_project_reference": false
+      }
+    }
+  ]
+}

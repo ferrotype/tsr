@@ -41,7 +41,7 @@ impl Snapshot {
         let mut locations = LocationIndex::new();
         // The loader-only observation API remains unchanged. Its records are
         // retained here alongside the verifier's later source processing writes.
-        for diagnostic in program.include_diagnostics() {
+        for diagnostic in program.loader_include_diagnostics()? {
             result.add(diagnostic.clone(), program, &file_name, &mut locations)?;
         }
         for request in &program.option_verification().include_diagnostics {
@@ -115,13 +115,8 @@ impl Snapshot {
     }
 }
 fn source_state(program: &Program, source: NodeId) -> Result<SourceFileRead<'_>, AstError> {
-    if let Some(config) = program
-        .config()
-        .config_file
-        .iter()
-        .chain(&program.config().config_dependencies)
-        .find(|config| config.root == source)
-    {
+    // Referenced configs own the nested reference diagnostics.
+    if let Some(config) = program.config_source(source) {
         config.file.view().source_file(source)
     } else {
         let index = program
@@ -135,7 +130,7 @@ fn source_state(program: &Program, source: NodeId) -> Result<SourceFileRead<'_>,
             .source_file(source)
     }
 }
-fn source_names(program: &Program, source: NodeId) -> Result<(&[u8], &[u8]), AstError> {
+pub(crate) fn source_names(program: &Program, source: NodeId) -> Result<(&[u8], &[u8]), AstError> {
     let state = source_state(program, source)?;
     Ok((state.file_name(), state.parse_options().path.as_bytes()))
 }

@@ -78,8 +78,14 @@ pub(crate) fn may_emit_with_force_dts(
     if force_dts_emit {
         return Ok(true);
     }
-    // Project-reference and mapper execution are excluded by the S07 operation
-    // boundary before a Program is constructed; no reference redirect is hidden.
+    // Source files from referenced projects are not emitted. Only a source
+    // without a declaration output (a declaration or JSON file) is loaded.
+    if program
+        .project_reference_from_source(source.parse_options().path.as_bytes())
+        .is_some()
+    {
+        return Ok(false);
+    }
     if source.script_kind != ScriptKind::JSON {
         return Ok(true);
     }

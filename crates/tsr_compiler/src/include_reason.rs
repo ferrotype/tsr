@@ -515,6 +515,31 @@ impl IncludeExplanations {
             return Ok(Arc::clone(existing));
         }
         let mut result = Vec::new();
+        // A package redirect is explained under its own name; otherwise the file
+        // must be in the program.
+        let (file, file_name) = if let Some(name) = program.redirect_file_names.get(file_path) {
+            (None, name.clone())
+        } else {
+            let Some(file) = program.file(file_path) else {
+                return Ok(Arc::from([]));
+            };
+            let name = file
+                .bound()
+                .view()
+                .source_file()?
+                .parse_options()
+                .file_name
+                .clone();
+            (Some(file), name)
+        };
+        let source =
+            program.source_of_project_reference_if_output_included(file_path, file_name.as_bytes());
+        if source != file_name.as_bytes() {
+            result.push(Arc::new(Diagnostic::compiler(
+                d::File_is_output_of_project_reference_source_0,
+                vec![file_name_for(program, source, relative)],
+            )));
+        }
         if let Some(target) = program.redirect_paths.get(file_path) {
             let target = program
                 .file(target.as_bytes())
@@ -528,16 +553,15 @@ impl IncludeExplanations {
                     relative,
                 )],
             )));
-        } else {
-            let Some(file) = program.file(file_path) else {
-                return Ok(Arc::from([]));
-            };
+        } else if let Some(file) = file {
             let source = file.bound().view().source_file()?;
             if tsr_ast::utilities::is_external_or_common_js_module(&source) {
                 let metadata = program.metadata(file_path).expect("loaded source metadata");
                 let emit = crate::metadata::implied_for_emit(
                     source.parse_options().file_name.as_bytes(),
-                    program.options().emit_module_kind(),
+                    program
+                        .options_for_file(file_path, source.parse_options().file_name.as_bytes())
+                        .emit_module_kind(),
                     metadata,
                 );
                 let mut args = Vec::new();
