@@ -262,14 +262,23 @@ impl CheckerState {
         self.add_type_optionality(ty, true, info.flags & ef::OPTIONAL != 0)
     }
 
-    // port: tsc/internal/checker/checker.go:Checker.getElementTypes
-    pub(crate) fn element_types(&mut self, ty: TypeId) -> Result<TypeList, Error> {
-        let arguments = self.get_type_arguments(ty)?;
-        let arity = self
+    /// The target's type parameter count, without its `this` type. A reference
+    /// resolved through a `this` argument carries one more type argument than
+    /// the target has elements, so tuple arities never come from the argument
+    /// list.
+    // port: tsc/internal/checker/checker.go:Checker.getTypeReferenceArity
+    pub(crate) fn get_type_reference_arity(&self, ty: TypeId) -> Result<usize, Error> {
+        Ok(self
             .types
             .interface(self.types.target(ty)?)?
             .type_parameters()
-            .len();
+            .len())
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.getElementTypes
+    pub(crate) fn element_types(&mut self, ty: TypeId) -> Result<TypeList, Error> {
+        let arguments = self.get_type_arguments(ty)?;
+        let arity = self.get_type_reference_arity(ty)?;
         Ok(if arguments.len() == arity {
             arguments
         } else {

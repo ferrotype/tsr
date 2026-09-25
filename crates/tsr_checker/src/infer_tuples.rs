@@ -14,6 +14,8 @@ impl CheckerState {
         let source_tuple = self.is_tuple_type(source)?;
         let sources = self.get_type_arguments(source)?;
         let targets = self.get_type_arguments(target)?;
+        let source_arity = self.get_type_reference_arity(source)?;
+        let target_arity = self.get_type_reference_arity(target)?;
         let target_data = self.types.tuple(self.types.target(target)?)?;
         let target_fixed = target_data.fixed_length;
         let target_flags = target_data.combined_flags;
@@ -25,14 +27,15 @@ impl CheckerState {
             None
         };
         if let Some(s) = &source_data {
-            if sources.len() == targets.len()
+            // port: tsc/internal/checker/inference.go:Checker.isTupleTypeStructureMatching
+            if source_arity == target_arity
                 && s.0
                     .iter()
                     .zip(infos.iter())
                     .all(|(a, b)| a.flags & ef::VARIABLE == b.flags & ef::VARIABLE)
             {
-                for (&s, &t) in sources.iter().zip(targets.iter()) {
-                    self.infer_from_types(run, s, t)?;
+                for i in 0..target_arity {
+                    self.infer_from_types(run, sources[i], targets[i])?;
                 }
                 return Ok(());
             }
@@ -61,12 +64,16 @@ impl CheckerState {
         for i in 0..start {
             self.infer_from_types(run, sources[i], targets[i])?;
         }
+        // Go computes these lengths in signed integers; a negative middle
+        // length matches no branch.
+        let source_middle = source_arity as isize - start as isize - end as isize;
+        let target_middle = target_arity as isize - start as isize - end as isize;
         if !source_tuple
-            || sources.len() - start - end == 1
+            || source_middle == 1
                 && source_data.as_ref().expect("source tuple").0[start].flags & ef::REST != 0
         {
             let rest = sources[start];
-            for i in start..targets.len() - end {
+            for i in start..target_arity.saturating_sub(end) {
                 let s = if infos[i].flags & ef::VARIADIC != 0 {
                     self.create_array_type(rest, false)?
                 } else {
@@ -75,7 +82,7 @@ impl CheckerState {
                 self.infer_from_types(run, s, targets[i])?;
             }
         } else {
-            let middle = targets.len() - start - end;
+            let middle = target_middle;
             if middle == 2 {
                 let a = infos[start].flags;
                 let b = infos[start + 1].flags;
@@ -90,7 +97,7 @@ impl CheckerState {
                             let s = self.slice_tuple(
                                 source,
                                 start,
-                                (end + sources.len()) as isize - arity as isize,
+                                (end + source_arity) as isize - arity as isize,
                             )?;
                             self.infer_from_types(run, s, targets[start])?;
                             let s = self.slice_tuple(source, start + arity, end as isize)?;
@@ -102,7 +109,7 @@ impl CheckerState {
                         let s = self.slice_tuple(
                             source,
                             start,
-                            sources.len() as isize - (start + arity) as isize,
+                            source_arity as isize - (start + arity) as isize,
                         )?;
                         self.infer_from_types(run, s, targets[start])?;
                         if let Some(s) =
@@ -113,7 +120,7 @@ impl CheckerState {
                     }
                 } else if a & ef::REST != 0 && b & ef::VARIADIC != 0 {
                     if let Some(arity) = self.inferred_fixed_tuple_arity(run, targets[start + 1])? {
-                        let end_index = sources.len()
+                        let end_index = source_arity
                             - infos
                                 .iter()
                                 .rev()
@@ -138,7 +145,7 @@ impl CheckerState {
                     }
                 }
             } else if middle == 1 && infos[start].flags & ef::VARIADIC != 0 {
-                let priority = if infos[targets.len() - 1].flags & ef::OPTIONAL != 0 {
+                let priority = if infos[target_arity - 1].flags & ef::OPTIONAL != 0 {
                     p::SPECULATIVE_TUPLE
                 } else {
                     p::NONE
@@ -154,8 +161,8 @@ impl CheckerState {
         for i in 0..end {
             self.infer_from_types(
                 run,
-                sources[sources.len() - i - 1],
-                targets[targets.len() - i - 1],
+                sources[source_arity - i - 1],
+                targets[target_arity - i - 1],
             )?;
         }
         Ok(())
@@ -197,7 +204,9 @@ impl CheckerState {
             return self.create_tuple_type(&[]);
         }
         let arguments = self.get_type_arguments(ty)?;
-        let end = arguments.len().saturating_sub(end_skip.max(0) as usize);
+        let end = self
+            .get_type_reference_arity(ty)?
+            .saturating_sub(end_skip.max(0) as usize);
         if start >= end {
             return self.create_tuple_type(&[]);
         }

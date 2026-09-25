@@ -41,8 +41,8 @@ impl Relater<'_> {
         }
         let source_arguments = self.checker.get_type_arguments(source)?;
         let target_arguments = self.checker.get_type_arguments(target)?;
-        let source_arity = source_arguments.len();
-        let target_arity = target_arguments.len();
+        let source_arity = self.checker.get_type_reference_arity(source)?;
+        let target_arity = self.checker.get_type_reference_arity(target)?;
         let source_rest = if source_tuple {
             self.checker
                 .types
@@ -109,7 +109,8 @@ impl Relater<'_> {
             .count();
         let mut result = tr::TRUE;
         let mut can_exclude = !excluded.is_empty();
-        for (position, &source_type) in source_arguments.iter().enumerate() {
+        for position in 0..source_arity {
+            let source_type = source_arguments[position];
             let source_flags = source_infos
                 .as_ref()
                 .map_or(ef::REST, |infos| infos[position].flags);
