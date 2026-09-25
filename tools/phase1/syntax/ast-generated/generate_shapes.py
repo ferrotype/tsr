@@ -181,11 +181,16 @@ def runtime_links(name, list_members, mode, go):
     if 'visitEachChild_' + name in visits:
         roles.append(AST + 'visitEachChild_' + name)
         visits += body_of_helper(go, 'visitEachChild_' + name)
-    for role in ('visitFunctionBody', 'visitParameters', 'visitEmbeddedStatement', 'visitIterationBody', 'visitToken'):
+    for role in ('visitFunctionBody', 'visitParameters', 'visitEmbeddedStatement', 'visitIterationBody', 'visitToken',
+                 'visitTopLevelStatements'):
         if 'v.' + role + '(' in visits:
             roles.append(VISITOR + 'NodeVisitor.' + role)
     if 'v.visitIterationBody(' in visits and VISITOR + 'NodeVisitor.visitEmbeddedStatement' not in roles:
         roles.append(VISITOR + 'NodeVisitor.visitEmbeddedStatement')
+    if mode != 'nil' and VISITOR + 'NodeVisitor.visitEmbeddedStatement' in roles:
+        # These callbacks return ordinary nodes. The dedicated EmbeddedStatement
+        # cases below discriminate lifting a SyntaxList into a child or block.
+        roles.append(VISITOR + 'NodeVisitor.VisitEmbeddedStatement')
     links['visit'] = roles
     return links
 
@@ -225,15 +230,38 @@ def requests():
                 'operations':sorted({op for _, ops in linked for op in ops}),
                 'operation_actions':dict(linked), 'actions':[{'op':label} for label,_ in linked],
                 'discriminates':'actual per-shape constructors and payload access; distinct fields, individual update changes, clone and visitor identity/hooks, child order and nonzero facts'})
-    for shape in SKIPPED:
-        if shape == "SourceFile":
-            linked = [("new",["tsc/internal/ast/ast.go:NodeFactory.NewSourceFile"]),("cast",[PREFIX+"Node.AsSourceFile"])]
-        else:
-            linked = [("cast",[PREFIX+"Node.AsSyntheticExpression"]),("children-stop",[PREFIX+"SyntheticExpression.ForEachChild"])]
-        for mode in ("nil","empty","nodes","nil-element"):
-            rows.append({"case":f"syntax/generated-special/{shape}/{mode}","subject":"generatedSpecial","shape":shape,"mode":mode,
-                "operation":linked[0][1][0],"operations":[op for _, ops in linked for op in ops],"operation_actions":dict(linked),"actions":[{"op":label} for label,_ in linked],
-                "discriminates":"SourceFile factory metadata/text/syntax, or SyntheticExpression payload cast and child traversal only; no semantic Type payload contract is claimed"})
+    ast_go = (ROOT / 'upstream/tsc/internal/ast/ast.go').read_text()
+    def special(shape, mode, linked, discriminates):
+        rows.append({"case":f"syntax/generated-special/{shape}/{mode}","subject":"generatedSpecial","shape":shape,"mode":mode,
+            "operation":linked[0][1][0],"operations":sorted({op for _, ops in linked for op in ops}),"operation_actions":dict(linked),
+            "actions":[{"op":label} for label,_ in linked],"discriminates":discriminates})
+    for mode in ("nil","empty","nodes","nil-element"):
+        # SourceFile's walk and visitor are hand-written in ast.go; the same
+        # body reading as the generated shapes, over that file.
+        links = runtime_links("SourceFile", {"Statements"}, mode, ast_go)
+        visit = [AST + "SourceFile.VisitEachChild", VISITOR + "NodeVisitor.VisitSourceFile"] + links["visit"]
+        special("SourceFile", mode, [
+            ("new", [AST + "NodeFactory.NewSourceFile"]), ("cast", [PREFIX + "Node.AsSourceFile"]),
+            ("children-stop", [AST + "SourceFile.ForEachChild"] + links["children"]),
+            ("visit-same", visit), ("visit-replace", visit)],
+            "SourceFile factory metadata/text/syntax, its hand-written child walk, and the visitor entry over its "
+            "top-level statements and end-of-file token: identity, visited positions and the updated fields")
+        special("SyntheticExpression", mode, [("cast",[PREFIX+"Node.AsSyntheticExpression"]),("children-stop",[PREFIX+"SyntheticExpression.ForEachChild"])],
+            "SyntheticExpression payload cast and child traversal only; no semantic Type payload contract is claimed")
+    for mode in ("nil","empty","nodes"):
+        # A nil element is not a modifier (ModifiersToFlags reads its kind), so
+        # the list is built from the mode's tokens only.
+        special("ModifierList", mode, [("new", [AST + "NodeFactory.NewModifierList", "tsc/internal/ast/utilities.go:ModifiersToFlags"]),
+                                      ("clone", [AST + "ModifierList.Clone"])],
+            "a modifier list built by the factory from the mode's tokens, then its factory clone: a distinct list with the "
+            "same location, nodes and modifier flags")
+    for mode in ("absent", "removed", "unchanged", "empty", "one", "many"):
+        operations = [VISITOR + "NodeVisitor.VisitEmbeddedStatement"]
+        if mode in ("empty", "one", "many"):
+            operations.append(VISITOR + "NodeVisitor.liftToBlock")
+        special("EmbeddedStatement", mode, [("visit", operations)],
+                "visitor callback returns nil, its input, or an empty/single/multiple-child SyntaxList; "
+                "observe calls, returned identity/kind/range and block multiline/list contents")
     return rows
 
 

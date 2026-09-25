@@ -1,251 +1,18 @@
 {
-  "accounted_operations": 3599,
+  "accounted_operations": 3616,
   "complete": false,
   "exempt_by_category": {
     "equivalent_rust": 83,
     "generated_assertion": 1,
     "go_runtime": 13,
     "go_test_harness": 155,
-    "later_step": 205,
+    "later_step": 209,
     "unused_at_pin": 22
   },
-  "exempt_operations": 479,
+  "exempt_operations": 483,
   "gap_problems": [],
   "later_step_unresolved": 0,
   "pending": [
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/ast/ast.go:ModifierList.Clone",
-      "rust_home": [
-        "crates/tsr_ast/src/clone.rs",
-        "crates/tsr_ast/src/factory.rs",
-        "crates/tsr_ast/src/node_accessors.rs",
-        "crates/tsr_ast/src/node_text.rs",
-        "crates/tsr_ast/src/source_file.rs",
-        "crates/tsr_ast/src/storage.rs",
-        "crates/tsr_ast/src/subtree_facts.rs",
-        "crates/tsr_ast/src/visitor.rs",
-        "crates/tsr_parser/src/lazy_jsdoc.rs",
-        "crates/tsr_parser/src/state.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/ast/ast.go:SourceFile.ForEachChild",
-      "rust_home": [
-        "crates/tsr_ast/src/clone.rs",
-        "crates/tsr_ast/src/factory.rs",
-        "crates/tsr_ast/src/node_accessors.rs",
-        "crates/tsr_ast/src/node_text.rs",
-        "crates/tsr_ast/src/source_file.rs",
-        "crates/tsr_ast/src/storage.rs",
-        "crates/tsr_ast/src/subtree_facts.rs",
-        "crates/tsr_ast/src/visitor.rs",
-        "crates/tsr_parser/src/lazy_jsdoc.rs",
-        "crates/tsr_parser/src/state.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/ast/ast.go:SourceFile.VisitEachChild",
-      "rust_home": [
-        "crates/tsr_ast/src/clone.rs",
-        "crates/tsr_ast/src/factory.rs",
-        "crates/tsr_ast/src/node_accessors.rs",
-        "crates/tsr_ast/src/node_text.rs",
-        "crates/tsr_ast/src/source_file.rs",
-        "crates/tsr_ast/src/storage.rs",
-        "crates/tsr_ast/src/subtree_facts.rs",
-        "crates/tsr_ast/src/visitor.rs",
-        "crates/tsr_parser/src/lazy_jsdoc.rs",
-        "crates/tsr_parser/src/state.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/ast/ast_generated.go:NodeFactory.NewSyntheticExpression",
-      "rust_home": [
-        "crates/tsr_ast/src/accessors_generated.rs",
-        "crates/tsr_ast/src/data_generated.rs",
-        "crates/tsr_ast/src/factory_generated.rs",
-        "crates/tsr_ast/src/runtime_generated.rs",
-        "crates/tsr_ast/src/subtree_generated.rs",
-        "crates/tsr_ast/src/transform_generated.rs",
-        "crates/tsr_ast/src/visitors_generated.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/ast/ast_generated.go:NodeFactory.UpdateSyntheticExpression",
-      "rust_home": [
-        "crates/tsr_ast/src/accessors_generated.rs",
-        "crates/tsr_ast/src/data_generated.rs",
-        "crates/tsr_ast/src/factory_generated.rs",
-        "crates/tsr_ast/src/runtime_generated.rs",
-        "crates/tsr_ast/src/subtree_generated.rs",
-        "crates/tsr_ast/src/transform_generated.rs",
-        "crates/tsr_ast/src/visitors_generated.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/ast/ast_generated.go:SyntheticExpression.Clone",
-      "rust_home": [
-        "crates/tsr_ast/src/accessors_generated.rs",
-        "crates/tsr_ast/src/data_generated.rs",
-        "crates/tsr_ast/src/factory_generated.rs",
-        "crates/tsr_ast/src/runtime_generated.rs",
-        "crates/tsr_ast/src/subtree_generated.rs",
-        "crates/tsr_ast/src/transform_generated.rs",
-        "crates/tsr_ast/src/visitors_generated.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/ast/ast_generated.go:SyntheticExpression.VisitEachChild",
-      "rust_home": [
-        "crates/tsr_ast/src/accessors_generated.rs",
-        "crates/tsr_ast/src/data_generated.rs",
-        "crates/tsr_ast/src/factory_generated.rs",
-        "crates/tsr_ast/src/runtime_generated.rs",
-        "crates/tsr_ast/src/subtree_generated.rs",
-        "crates/tsr_ast/src/transform_generated.rs",
-        "crates/tsr_ast/src/visitors_generated.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/ast/utilities.go:GetEmitModuleFormatOfFileWorker",
-      "rust_home": [
-        "crates/tsr_ast/src/clone.rs",
-        "crates/tsr_ast/src/runtime_id.rs",
-        "crates/tsr_ast/src/subtree_facts.rs",
-        "crates/tsr_ast/src/utilities.rs",
-        "crates/tsr_ast/src/utilities_middle.rs",
-        "crates/tsr_ast/src/utilities_tail.rs",
-        "crates/tsr_ast/src/visitor.rs",
-        "crates/tsr_parser/src/expressions.rs",
-        "crates/tsr_parser/src/js_syntax.rs",
-        "crates/tsr_parser/src/jsx.rs",
-        "crates/tsr_parser/src/predicates.rs",
-        "crates/tsr_parser/src/references.rs",
-        "crates/tsr_parser/src/reparser.rs",
-        "crates/tsr_parser/src/source_text.rs",
-        "crates/tsr_checker/src/meta_properties.rs",
-        "crates/tsr_checker/src/external_aliases.rs",
-        "crates/tsr_checker/src/unused_identifiers.rs",
-        "crates/tsr_checker/src/external_resolution.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/ast/utilities.go:GetPragmaArgument",
-      "rust_home": [
-        "crates/tsr_ast/src/clone.rs",
-        "crates/tsr_ast/src/runtime_id.rs",
-        "crates/tsr_ast/src/subtree_facts.rs",
-        "crates/tsr_ast/src/utilities.rs",
-        "crates/tsr_ast/src/utilities_middle.rs",
-        "crates/tsr_ast/src/utilities_tail.rs",
-        "crates/tsr_ast/src/visitor.rs",
-        "crates/tsr_parser/src/expressions.rs",
-        "crates/tsr_parser/src/js_syntax.rs",
-        "crates/tsr_parser/src/jsx.rs",
-        "crates/tsr_parser/src/predicates.rs",
-        "crates/tsr_parser/src/references.rs",
-        "crates/tsr_parser/src/reparser.rs",
-        "crates/tsr_parser/src/source_text.rs",
-        "crates/tsr_checker/src/meta_properties.rs",
-        "crates/tsr_checker/src/external_aliases.rs",
-        "crates/tsr_checker/src/unused_identifiers.rs",
-        "crates/tsr_checker/src/external_resolution.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/ast/utilities.go:GetPragmaFromSourceFile",
-      "rust_home": [
-        "crates/tsr_ast/src/clone.rs",
-        "crates/tsr_ast/src/runtime_id.rs",
-        "crates/tsr_ast/src/subtree_facts.rs",
-        "crates/tsr_ast/src/utilities.rs",
-        "crates/tsr_ast/src/utilities_middle.rs",
-        "crates/tsr_ast/src/utilities_tail.rs",
-        "crates/tsr_ast/src/visitor.rs",
-        "crates/tsr_parser/src/expressions.rs",
-        "crates/tsr_parser/src/js_syntax.rs",
-        "crates/tsr_parser/src/jsx.rs",
-        "crates/tsr_parser/src/predicates.rs",
-        "crates/tsr_parser/src/references.rs",
-        "crates/tsr_parser/src/reparser.rs",
-        "crates/tsr_parser/src/source_text.rs",
-        "crates/tsr_checker/src/meta_properties.rs",
-        "crates/tsr_checker/src/external_aliases.rs",
-        "crates/tsr_checker/src/unused_identifiers.rs",
-        "crates/tsr_checker/src/external_resolution.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/ast/visitor.go:NodeVisitor.VisitSourceFile",
-      "rust_home": [
-        "crates/tsr_ast/src/visitor.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock",
-      "rust_home": [
-        "crates/tsr_ast/src/visitor.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/ast/visitor.go:NodeVisitor.visitToken",
-      "rust_home": [
-        "crates/tsr_ast/src/visitor.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/ast/visitor.go:NodeVisitor.visitTopLevelStatements",
-      "rust_home": [
-        "crates/tsr_ast/src/visitor.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/binder/binder.go:Binder.bindSourceFileAsExternalModule",
-      "rust_home": [
-        "crates/tsr_binder/src/bindings.rs",
-        "crates/tsr_binder/src/containers.rs",
-        "crates/tsr_binder/src/declarations.rs",
-        "crates/tsr_binder/src/diagnostics.rs",
-        "crates/tsr_binder/src/dispatch.rs",
-        "crates/tsr_binder/src/expando.rs",
-        "crates/tsr_binder/src/expressions.rs",
-        "crates/tsr_binder/src/flow.rs",
-        "crates/tsr_binder/src/lib.rs",
-        "crates/tsr_binder/src/modules.rs",
-        "crates/tsr_binder/src/statements.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/fileloader.go:fileLoader.resolveLibrary",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/metadata.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/compiler/fileloader.go:fileLoader.resolveTripleslashPathReference",
-      "rust_home": [
-        "crates/tsr_compiler/src/loader.rs",
-        "crates/tsr_compiler/src/metadata.rs"
-      ]
-    },
     {
       "disposition": "covered",
       "operation": "tsc/internal/compiler/program.go:NewProgram",
@@ -258,10 +25,10 @@
     }
   ],
   "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
-  "prepared_operations": 1531,
+  "prepared_operations": 1541,
   "roster_problems": [],
   "step": "syntax",
   "total_operations": 3617,
   "version": 2,
-  "witnessed_operations": 1589
+  "witnessed_operations": 1592
 }

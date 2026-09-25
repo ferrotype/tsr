@@ -862,10 +862,11 @@ class CoverageLinkTests(unittest.TestCase):
         # no case link is untested, not covered. (An *unmapped* operation in
         # such a file stays `missing`; the metrics say nothing about it either.)
         # A reviewed equivalent_rust entry is the roster's answer, not a metric's.
+        # A reviewed later-phase destination is the review's answer, likewise.
         rows = [
             r for r in self.scope["operations"]
             if r.get("ledger_verification") and not r["cases"] and r["mapped_in_ledger"]
-            and r["disposition"] != "equivalent_rust"
+            and r["disposition"] not in ("equivalent_rust", "later_phase")
         ]
         for row in rows:
             self.assertEqual(row["disposition"], "implemented_untested", row["id"])

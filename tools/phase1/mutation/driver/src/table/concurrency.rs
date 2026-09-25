@@ -1,13 +1,15 @@
 //! Group `concurrency`: core concurrency, request context, BFS.
 //! Go: `tools/phase1/tables/go/concurrency_columns.go`; spec:
 //! `data/phase1/tables/concurrency.json`.
-use super::{decode, Column};
+use super::helpers::typed;
+use super::{panic_value, text, Column};
 use crate::protocol::hex;
 use serde::Deserialize;
 use serde_json::{json, Value};
 use std::collections::HashMap;
 use std::sync::atomic::{AtomicI64, Ordering};
 use std::sync::{Arc, Mutex};
+use std::time::Duration;
 use tsr_core::bfs::{self, BreadthFirstSearchLevel, BreadthFirstSearchOptions, VisitedSet};
 use tsr_core::context::{CheckerLifetime, RequestContext};
 
@@ -16,16 +18,8 @@ pub const COLUMNS: &[&str] = &[
     "core.BreadthFirstSearchParallel",
     "core.BreadthFirstSearchParallelEx",
     "core.ThrottleGroup",
+    "core.LimitedSemaphore",
 ];
-
-/// Go's `typedValuesColumn`.
-fn typed<I: serde::de::DeserializeOwned + 'static>(
-    input: &Value,
-    f: fn(&I) -> Result<Value, String>,
-) -> Result<Column, String> {
-    let input: I = decode(input)?;
-    Ok(Box::new(move || f(&input)))
-}
 
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -118,6 +112,19 @@ struct ThrottleCase {
 #[serde(deny_unknown_fields)]
 struct ThrottleCases {
     cases: Vec<ThrottleCase>,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct SemaphoreCase {
+    limit: i64,
+    jobs: Vec<i64>,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct SemaphoreCases {
+    cases: Vec<SemaphoreCase>,
 }
 
 /// Go's `bfsValue`.
@@ -244,24 +251,28 @@ pub fn build(column: &str, input: &Value) -> Option<Result<Column, String>> {
                 let values = Mutex::new(Vec::new());
                 let (running, most) = (AtomicI64::new(0), AtomicI64::new(0));
                 let semaphore = Arc::new(tsr_core::semaphore::LimitedSemaphore::new(case.limit));
-                let mut group = tsr_core::workgroup::ThrottleGroup::<String>::new(semaphore);
-                for job in &case.jobs {
-                    let (values, running, most) = (&values, &running, &most);
-                    group.go(move || {
-                        let now = running.fetch_add(1, Ordering::SeqCst) + 1;
-                        most.fetch_max(now, Ordering::SeqCst);
-                        values
-                            .lock()
-                            .unwrap_or_else(std::sync::PoisonError::into_inner)
-                            .push(job.value);
-                        running.fetch_sub(1, Ordering::SeqCst);
-                        if job.fail {
-                            return Err("job failed".to_owned());
-                        }
-                        Ok(())
-                    });
-                }
-                let failure = match group.wait() {
+                let result = std::thread::scope(|scope| {
+                    let mut group =
+                        tsr_core::workgroup::ThrottleGroup::<String>::new(scope, semaphore);
+                    for job in &case.jobs {
+                        let (values, running, most) = (&values, &running, &most);
+                        group.go(move || {
+                            let now = running.fetch_add(1, Ordering::SeqCst) + 1;
+                            most.fetch_max(now, Ordering::SeqCst);
+                            values
+                                .lock()
+                                .unwrap_or_else(std::sync::PoisonError::into_inner)
+                                .push(job.value);
+                            running.fetch_sub(1, Ordering::SeqCst);
+                            if job.fail {
+                                return Err("job failed".to_owned());
+                            }
+                            Ok(())
+                        });
+                    }
+                    group.wait()
+                });
+                let failure = match result {
                     Err(error) => json!(hex(error.as_bytes())),
                     Ok(()) => Value::Null,
                 };
@@ -278,6 +289,85 @@ pub fn build(column: &str, input: &Value) -> Option<Result<Column, String>> {
             }
             Ok(Value::Array(out))
         }),
+        "core.LimitedSemaphore" => typed::<SemaphoreCases>(input, |input| {
+            let mut out = Vec::new();
+            for case in &input.cases {
+                // Negative Go ints are outside this usize API. Zero is
+                // representable and must exercise the constructor's assertion.
+                let limit = usize::try_from(case.limit).map_err(text)?;
+                let semaphore = match std::panic::catch_unwind(|| {
+                    tsr_core::semaphore::LimitedSemaphore::new(limit)
+                }) {
+                    Ok(semaphore) => semaphore,
+                    Err(payload) => {
+                        return Ok(panic_value(&format!(
+                            "message:{}",
+                            crate::jobs::panic_message(payload.as_ref())
+                        )));
+                    }
+                };
+                let values = Mutex::new(Vec::new());
+                let (running, most) = (AtomicI64::new(0), AtomicI64::new(0));
+                std::thread::scope(|scope| {
+                    for &job in &case.jobs {
+                        let (values, running, most, semaphore) =
+                            (&values, &running, &most, &semaphore);
+                        scope.spawn(move || {
+                            let permit = semaphore.acquire();
+                            let now = running.fetch_add(1, Ordering::SeqCst) + 1;
+                            most.fetch_max(now, Ordering::SeqCst);
+                            values
+                                .lock()
+                                .unwrap_or_else(std::sync::PoisonError::into_inner)
+                                .push(job);
+                            // Hold the permit long enough for the other jobs
+                            // to contend for it, so an unbounded semaphore shows.
+                            std::thread::sleep(Duration::from_millis(10));
+                            running.fetch_sub(1, Ordering::SeqCst);
+                            drop(permit);
+                        });
+                    }
+                });
+                let mut values = values
+                    .into_inner()
+                    .unwrap_or_else(std::sync::PoisonError::into_inner);
+                values.sort_unstable();
+                out.push(json!([values, most.load(Ordering::SeqCst) <= case.limit]));
+            }
+            Ok(Value::Array(out))
+        }),
         _ => return None,
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn semaphore_zero_observes_the_constructor_panic() {
+        // With no jobs, a constructor that wrongly accepts zero returns a
+        // normal value instead of hanging in acquire: the witness still fails.
+        let column = build(
+            "core.LimitedSemaphore",
+            &json!({"cases":[{"limit":0,"jobs":[]}]}),
+        )
+        .unwrap()
+        .unwrap();
+        assert_eq!(
+            column().unwrap(),
+            panic_value("message:maxConcurrency must be positive")
+        );
+    }
+
+    #[test]
+    fn semaphore_negative_limit_is_not_a_fabricated_panic() {
+        let column = build(
+            "core.LimitedSemaphore",
+            &json!({"cases":[{"limit":-1,"jobs":[]}]}),
+        )
+        .unwrap()
+        .unwrap();
+        assert!(column().is_err());
+    }
 }

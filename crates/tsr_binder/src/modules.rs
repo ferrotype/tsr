@@ -20,12 +20,19 @@ impl Binder<'_, '_, '_> {
             self.set_node_symbol(self.file, Some(original));
         }
     }
-    // port: tsc/internal/binder/binder.go:Binder.bindSourceFileAsExternalModule
+    /// `bindSourceFileAsExternalModule`; the marker is on its statement site.
     pub fn bind_source_file_as_external_module(&mut self) {
         let file = checked(self.view().source_file(self.file));
-        let name = tsr_core::path::remove_file_extension(file.file_name());
-        let name = JsString::from_bytes([b"\"".as_slice(), name, b"\""].concat());
-        self.bind_anonymous_declaration(self.file, sf::VALUE_MODULE, name);
+        let stem = tsr_core::path::remove_file_extension(file.file_name());
+        // `"\"" + RemoveFileExtension(fileName) + "\""`. The closing quote is
+        // the skip-statement site: a mutant changes the module symbol's name
+        // instead of dropping the declaration, which only crashes downstream.
+        let mut name = Vec::with_capacity(stem.len() + 2);
+        name.push(b'"');
+        name.extend_from_slice(stem);
+        // port: tsc/internal/binder/binder.go:Binder.bindSourceFileAsExternalModule
+        name.push(b'"');
+        self.bind_anonymous_declaration(self.file, sf::VALUE_MODULE, JsString::from_bytes(name));
     }
     // port: tsc/internal/binder/binder.go:Binder.bindModuleDeclaration
     pub fn bind_module_declaration(&mut self, node: NodeId) {

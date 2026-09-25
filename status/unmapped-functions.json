@@ -348,7 +348,6 @@
       "tsc/internal/ast/ast.go:PragmaSpecification.IsTripleSlash",
       "tsc/internal/ast/ast.go:SetParseJSDocForNode",
       "tsc/internal/ast/ast.go:SourceFile.BindDiagnostics",
-      "tsc/internal/ast/ast.go:SourceFile.ForEachChild",
       "tsc/internal/ast/ast.go:SourceFile.copyFrom",
       "tsc/internal/ast/ast.go:SourceFile.resolveJSDoc",
       "tsc/internal/ast/ast.go:TemplateLiteralLikeNodeBase.LiteralLikeData",

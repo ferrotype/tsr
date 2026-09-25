@@ -31,8 +31,9 @@ scope evidence. Neither fact authorizes a phase exclusion.
 | Ordinary reference loading/configuration | 23 | Phase 1 work; ported and witnessed (closure phase A) |
 | Unused reference wrapper/helper chain | 1 | `unused_at_pin`, with complete pinned-tree caller check |
 
-There are now 205 reviewed later-phase destinations: 63 in Phase 2, 57 in
-Phase 3, 24 in Phase 4 and 61 in Phase 5. The 23 ordinary reference-loading
+There are now 209 reviewed later-phase destinations: 67 in Phase 2, 57 in
+Phase 3, 24 in Phase 4 and 61 in Phase 5 (the four Phase 2 rows outside the
+compiler package are the owner-decided SyntheticExpression operations below). The 23 ordinary reference-loading
 operations were Phase 1 work. The closure ported them and the
 `syntax/project-references` cases witness them against the pinned loader, so
 they are no longer unresolved or exempt from the syntax roster
@@ -58,6 +59,20 @@ destination, reason, evidence, plan clause or pinned source hash) makes
 `phase1_scope.reviewed_destinations` refuse the review and the coverage join
 report a problem until the owner approves again. It does not cover the 23
 reference-loading operations or the two reviewed-unused rows.
+
+On 2026-09-25, in the Phase 2 planning conversation, the owner also decided the
+four `SyntheticExpression` operations the closure left open
+(`NodeFactory.NewSyntheticExpression`, `UpdateSyntheticExpression`,
+`SyntheticExpression.Clone` and `.VisitEachChild`): a reviewed Phase 2 checker
+destination, chosen over an opaque Phase 1 type slot. They are the only rows
+outside `internal/compiler`; each carries `authority_basis` `owner_decision`,
+which `phase1_scope.reviewed_destinations` requires for a row outside the
+reviewed compiler scope. The renewed approval block covers all 209 rows. The
+basis: the payload's `Type` is a checker `*Type`, the only pinned production
+constructor is `Checker.createSyntheticExpression` (which the Rust checker
+already implements over its `TypeId` slot), and the API decoder's use is
+Phase 6. The generated-AST family keeps its cast and child-traversal case for
+the node without claiming these four.
 
 ## Why the reference paths differ
 

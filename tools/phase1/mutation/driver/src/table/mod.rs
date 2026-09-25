@@ -152,8 +152,8 @@ pub fn text(error: impl ToString) -> String {
 }
 
 /// The value a column records for a panic its callers rely on (a class of
-/// the spec's `panic_contract`), which the port returns through an explicit
-/// check: Go's `Guard` records the same `{"panic": class}`.
+/// the spec's `panic_contract`), observed by calling the production port and
+/// catching its panic: Go's `Guard` records the same `{"panic": class}`.
 #[allow(dead_code)] // for the columns whose spec declares a panic contract
 pub fn panic_value(class: &str) -> Value {
     json!({ "panic": class })

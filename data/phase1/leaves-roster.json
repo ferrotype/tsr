@@ -199,22 +199,10 @@
       "owner": "xtask/src/gen (the Rust tables are regenerated from the pin, which is the same guarantee)"
     },
     {
-      "category": "later_step",
-      "evidence": "`grep -rn core.NewLimitedSemaphore --include=*.go upstream/tsc` outside internal/core matches internal/vfs/osvfs and nothing else. The filesystem step prepares that package and its concurrency limit, so it owns whatever of the semaphore is observable through it.",
-      "operation": "tsc/internal/core/semaphore.go:LimitedSemaphore.Acquire",
-      "owner": "F2a (internal/vfs/osvfs), the only non-test caller"
-    },
-    {
       "category": "unused_at_pin",
       "evidence": "Reproduce: rg -n 'TryAcquire|core\\.Semaphore\\b' upstream/tsc --glob '*.go'. The only interface satisfaction is the compile-time assertion var _ Semaphore = (*LimitedSemaphore)(nil) at semaphore.go:22. UnlimitedSemaphore.TryAcquire is already exempt as go_runtime in leaves-roster.json.",
       "operation": "tsc/internal/core/semaphore.go:LimitedSemaphore.TryAcquire",
       "owner": "nobody at this pin; the first caller a later pin adds fixes the contract"
-    },
-    {
-      "category": "later_step",
-      "evidence": "`grep -rn core.NewLimitedSemaphore --include=*.go upstream/tsc` outside internal/core matches internal/vfs/osvfs and nothing else. The filesystem step prepares that package and its concurrency limit, so it owns whatever of the semaphore is observable through it.",
-      "operation": "tsc/internal/core/semaphore.go:NewLimitedSemaphore",
-      "owner": "F2a (internal/vfs/osvfs), the only non-test caller"
     },
     {
       "category": "go_runtime",
@@ -254,7 +242,7 @@
     },
     {
       "category": "equivalent_rust",
-      "evidence": "Replacement mechanism: a struct literal constructor (workgroup.rs:22 `Self { semaphore, tasks: Vec::new() }`). Caller-level witness (cited, not claimed): mutation/table core.ThrottleGroup column (ThrottleGroup.Go and Wait, limits 1 and 3). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "evidence": "Replacement mechanism: construction of an empty scope-bound task group in workgroup.rs, retaining the semaphore and initializing the first-error slot. Caller-level witness (cited, not claimed): mutation/table core.ThrottleGroup column (ThrottleGroup.Go and Wait, limits 1 and 3). Tasks start in Go, and Wait joins them; the thread scope bounds borrowed inputs. Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
       "operation": "tsc/internal/core/workgroup.go:NewThrottleGroup",
       "owner": "a struct literal constructor"
     },

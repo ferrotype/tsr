@@ -87,8 +87,9 @@ class CoverageTests(unittest.TestCase):
             self.assertEqual(coverage.build(), self.report)
 
     def test_name_inference_does_not_claim_confirmed_absence(self):
+        # Closure leaves no such gap; whatever the join infers by name stays
+        # owned by its family, never confirmed absent.
         inferred = [row for row in self.report["gaps"] if row["root_cause"] == "implementation_unverified"]
-        self.assertGreater(len(inferred), 0)
         self.assertTrue(all(row["owner"] == coverage.OWNERS[row["family"]] for row in inferred))
 
     def test_compiler_destinations_are_reviewed_without_claiming_coverage(self):
@@ -118,9 +119,9 @@ class CoverageTests(unittest.TestCase):
 
     def test_transfer_to_later_preparation_step_is_a_gap_until_answered(self):
         """Report-level agreement; LaterStepResolutionTests prove each resolution route."""
+        # At closure no transfer is left unresolved; the report and the
+        # preparation view must still agree, step by step.
         document = json.loads((ROOT / "data/phase1/scope.json").read_text())
-        unresolved = {row["id"] for row in self.report["gaps"] if row["root_cause"] == "later_step_unresolved"}
-        self.assertTrue(unresolved)
         for step in ("leaves", "config"):
             pending = {row["operation"] for row in scope.leaf_preparation(document, json.loads(
                 (ROOT / "data/phase1/cases.json").read_text()), step)["pending"]
@@ -284,9 +285,25 @@ class LaterStepResolutionTests(unittest.TestCase):
         linked |= {operation for _, operations in scope.covering_witness_operations(cls.cases, committed_scope=cls.scope)
                    for operation in operations}
         rows = {row["id"]: row for row in cls.scope["operations"]}
-        cls.operation = next(operation for operation, entry in sorted(scope.roster_exemptions("leaves").items())
-                             if entry["category"] == "later_step" and operation not in linked
-                             and rows[operation]["basis_kind"] != "review")
+        # The closure leaves no unresolved transfer in the committed rosters,
+        # so the routes are proved on a synthetic one: an exempt, unlinked leaf
+        # operation whose exemption the patched roster reports as later_step.
+        original = scope.roster_exemptions
+        cls.operation = next(operation for operation, entry in sorted(original("leaves").items())
+                             if entry["category"] != "later_step" and operation not in linked
+                             and rows[operation]["basis_kind"] != "review"
+                             and rows[operation]["disposition"] != "later_phase")
+
+        def transferred(step):
+            exemptions = copy.deepcopy(original(step))
+            if step in (None, "leaves"):
+                exemptions[cls.operation] = {**exemptions[cls.operation], "category": "later_step",
+                                             "owner": "a later step, for this test"}
+            return exemptions
+
+        patcher = patch.object(scope, "roster_exemptions", transferred)
+        patcher.start()
+        cls.addClassCleanup(patcher.stop)
         cls.case = next(case["id"] for case in cls.cases["cases"]
                         if case["family"] == "config" and results[case["id"]] == "match")
 
@@ -298,10 +315,15 @@ class LaterStepResolutionTests(unittest.TestCase):
         return {row["operation"]: row for row in report["pending"]}, report
 
     def gaps(self, cases):
+        # The join reads the transfer from the committed scope's roster state,
+        # so the synthetic transfer is written into that document as well.
         original = Path.read_bytes
-        target = ROOT / "data/phase1/cases.json"
-        replacement = json.dumps(cases).encode()
-        with patch.object(Path, "read_bytes", lambda path: replacement if path == target else original(path)):
+        document = copy.deepcopy(self.scope)
+        row = next(row for row in document["operations"] if row["id"] == self.operation)
+        row["roster"] = {**row["roster"], "state": "exempt:later_step", "owner": "a later step, for this test"}
+        replacements = {ROOT / "data/phase1/cases.json": json.dumps(cases).encode(),
+                        ROOT / "data/phase1/scope.json": json.dumps(document).encode()}
+        with patch.object(Path, "read_bytes", lambda path: replacements.get(path) or original(path)):
             report = coverage.build()
         return {row["id"]: row["root_cause"] for row in report["gaps"]}
 
@@ -345,7 +367,8 @@ class ReviewedDestinationTests(unittest.TestCase):
         review = json.loads((ROOT / "data/phase1/coverage-review.json").read_text())
         approval = review["approval"]
         self.assertEqual(scope.review_approval_problems(review), [])
-        self.assertEqual((approval["date"], approval["statement"], approval["rows"]), ("2026-09-25", "yes approved", 205))
+        self.assertEqual((approval["date"], approval["rows"]), ("2026-09-25", 209))
+        self.assertTrue(approval["statement"].startswith("yes approved"))
         self.assertEqual(approval["rows_sha256"], scope.review_approval_digest(review["reviewed_operation_destinations"]))
         for name, mutate in (
                 ("absent", lambda d: d.pop("approval")),
@@ -453,6 +476,22 @@ class ReviewedDestinationTests(unittest.TestCase):
         review["reviewed_operation_destinations"][0]["operation"] = "tsc/internal/compiler/program.go:Invented"
         with patch.object(Path, "read_text", lambda path, *a, **kw: json.dumps(review) if path == target else original(path, *a, **kw)):
             with self.assertRaisesRegex(ValueError, "unknown operation"):
+                scope.reviewed_destinations()
+
+    def test_a_row_outside_the_compiler_moves_only_by_owner_decision(self):
+        original = Path.read_text
+        target = ROOT / "data/phase1/coverage-review.json"
+        review = json.loads(original(target))
+        rows = review["reviewed_operation_destinations"]
+        decided = [row for row in rows if row["authority_basis"] == "owner_decision"]
+        self.assertEqual({row["operation"].split(":")[0] for row in decided}, {"tsc/internal/ast/ast_generated.go"})
+        self.assertEqual(len(decided), 4)
+        self.assertEqual({row["destination_phase"] for row in decided}, {2})
+        self.assertEqual(scope.reviewed_destinations()[decided[0]["operation"]]["destination_phase"], 2)
+        decided[0]["authority_basis"] = "accepted_plan_scope_interpretation"
+        review["approval"]["rows_sha256"] = scope.review_approval_digest(rows)
+        with patch.object(Path, "read_text", lambda path, *a, **kw: json.dumps(review) if path == target else original(path, *a, **kw)):
+            with self.assertRaisesRegex(ValueError, "only the reviewed partial compiler scope"):
                 scope.reviewed_destinations()
 
     def test_review_rejects_changed_pinned_source(self):

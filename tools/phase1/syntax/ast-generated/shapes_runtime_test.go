@@ -231,11 +231,17 @@ func phase1ShapeSpecial(r phase1GeneratedRequest) (any, error) {
 	var operation string
 	switch r.Shape {
 	case "SourceFile":
-		labels = []string{"new", "cast"}
+		labels = []string{"new", "cast", "children-stop", "visit-same", "visit-replace"}
 		operation = "tsc/internal/ast/ast.go:NodeFactory.NewSourceFile"
 	case "SyntheticExpression":
 		labels = []string{"cast", "children-stop"}
 		operation = "tsc/internal/ast/ast_generated.go:Node.AsSyntheticExpression"
+	case "ModifierList":
+		labels = []string{"new", "clone"}
+		operation = "tsc/internal/ast/ast.go:NodeFactory.NewModifierList"
+	case "EmbeddedStatement":
+		labels = []string{"visit"}
+		operation = "tsc/internal/ast/visitor.go:NodeVisitor.VisitEmbeddedStatement"
 	default:
 		return nil, fmt.Errorf("unknown special shape")
 	}
@@ -248,15 +254,115 @@ func phase1ShapeSpecial(r phase1GeneratedRequest) (any, error) {
 		}
 	}
 	f := NewNodeFactory(NodeFactoryHooks{})
+	if r.Shape == "EmbeddedStatement" {
+		return phase1EmbeddedStatementSpecial(f, r.Mode)
+	}
+	if r.Shape == "ModifierList" {
+		return phase1ModifierListSpecial(f, r.Mode)
+	}
 	inputs := phase1ShapeNewInputs(f, r.Mode)
 	if r.Shape == "SourceFile" {
 		root := f.NewSourceFile(SourceFileParseOptions{FileName: "/generated.ts", Path: "/canonical/generated.ts", ExternalModuleIndicatorOptions: ExternalModuleIndicatorOptions{JSX: true}}, "let text = 'source';\n", inputs.list(0, false), inputs.node(1, false))
-		d := root.AsSourceFile()
-		opts := d.ParseOptions()
-		fields := []any{d.FileName(), string(opts.Path), opts.ExternalModuleIndicatorOptions.JSX, opts.ExternalModuleIndicatorOptions.Force, d.Text(), phase1ShapeListSnapshot(d.Statements), phase1GeneratedPos(d.EndOfFileToken)}
-		return map[string]any{"ordered": []any{[]any{"new", root.Kind, fields}, []any{"cast", fields}}}, nil
+		fields := func(node *Node) []any {
+			d := node.AsSourceFile()
+			opts := d.ParseOptions()
+			return []any{d.FileName(), string(opts.Path), opts.ExternalModuleIndicatorOptions.JSX, opts.ExternalModuleIndicatorOptions.Force, d.Text(), phase1ShapeListSnapshot(d.Statements), phase1GeneratedPos(d.EndOfFileToken)}
+		}
+		out := []any{[]any{"new", root.Kind, fields(root)}, []any{"cast", fields(root)}, []any{"children-stop", phase1GeneratedChildren(root, 0), phase1GeneratedChildren(root, 1)}}
+		for _, label := range []string{"visit-same", "visit-replace"} {
+			// The visitor enters through VisitSourceFile; the callback descends
+			// once, into the file's own VisitEachChild, and records or replaces
+			// what that visit hands it, as the shape runs do for their root.
+			calls := []any{}
+			var visitor *NodeVisitor
+			visitor = NewNodeVisitor(func(node *Node) *Node {
+				calls = append(calls, phase1GeneratedPos(node))
+				if node == root {
+					return visitor.VisitEachChild(node)
+				}
+				if label == "visit-replace" {
+					for i, original := range inputs.allNodes {
+						if node == original {
+							return inputs.replacements[i]
+						}
+					}
+				}
+				return node
+			}, f, NodeVisitorHooks{})
+			visited := visitor.VisitSourceFile(root.AsSourceFile()).AsNode()
+			out = append(out, []any{label, visited == root, calls, []any{visited.Kind, uint32(visited.Flags), visited.Pos(), visited.End(), fields(visited)}})
+		}
+		return map[string]any{"ordered": out}, nil
 	}
 	root := f.NewSyntheticExpression(nil, r.Mode != "nil", inputs.node(0, false))
 	d := root.AsSyntheticExpression()
 	return map[string]any{"ordered": []any{[]any{"cast", d.IsSpread, phase1GeneratedPos(d.TupleNameSource)}, []any{"children-stop", phase1GeneratedChildren(root, 0), phase1GeneratedChildren(root, 1)}}}, nil
+}
+
+// phase1ModifierListSpecial builds a modifier list from the mode's tokens (a
+// nil element is not a modifier: ModifiersToFlags reads its kind) and clones
+// it through the factory: [pos, end, flags, nodes] of each list and whether
+// the clone is the same list.
+func phase1EmbeddedStatementSpecial(f *NodeFactory, mode string) (any, error) {
+	original, first, second := f.NewEmptyStatement(), f.NewEmptyStatement(), f.NewEmptyStatement()
+	for i, node := range []*Node{original, first, second} {
+		node.Loc = core.NewTextRange(10*(i+1), 10*(i+1)+1)
+	}
+	var replacement *Node
+	switch mode {
+	case "absent", "unchanged":
+		replacement = original
+	case "removed":
+	case "empty":
+		replacement = f.NewSyntaxList([]*Node{})
+	case "one":
+		replacement = f.NewSyntaxList([]*Node{first})
+	case "many":
+		replacement = f.NewSyntaxList([]*Node{first, second})
+	default:
+		return nil, fmt.Errorf("unknown embedded statement mode")
+	}
+	calls := []any{}
+	visitor := NewNodeVisitor(func(node *Node) *Node {
+		calls = append(calls, phase1GeneratedPos(node))
+		return replacement
+	}, f, NodeVisitorHooks{})
+	input := original
+	if mode == "absent" {
+		input = nil
+	}
+	visited := visitor.VisitEmbeddedStatement(input)
+	var result any
+	if visited != nil {
+		var multiline, list any
+		if visited.Kind == KindBlock {
+			multiline = visited.AsBlock().MultiLine
+			list = phase1ShapeListSnapshot(visited.AsBlock().Statements)
+		}
+		result = []any{visited.Kind, visited.Pos(), visited.End(), visited == original, visited == first, visited == second, multiline, list}
+	}
+	return map[string]any{"ordered": []any{[]any{"visit", calls, result}}}, nil
+}
+
+func phase1ModifierListSpecial(f *NodeFactory, mode string) (any, error) {
+	var raw []*Node
+	switch mode {
+	case "nil":
+	case "empty":
+		raw = []*Node{}
+	case "nodes":
+		raw = []*Node{f.NewToken(KindExportKeyword), f.NewToken(KindAsyncKeyword)}
+	default:
+		return nil, fmt.Errorf("unsupported ModifierList mode")
+	}
+	for i, node := range raw {
+		node.Loc = core.NewTextRange(10*i+2, 10*i+3)
+	}
+	list := f.NewModifierList(raw)
+	list.Loc = core.NewTextRange(5, 25)
+	snapshot := func(list *ModifierList) any {
+		return []any{list.Pos(), list.End(), uint32(list.ModifierFlags), phase1ShapeNodesSnapshot(list.Nodes)}
+	}
+	cloned := list.Clone(f)
+	return map[string]any{"ordered": []any{[]any{"new", snapshot(list)}, []any{"clone", cloned == list, snapshot(cloned)}}}, nil
 }

@@ -1,14 +1,19 @@
 //! Group `modules`: modules, imports, type-only forms, augmentations, symbol names.
 //! Go: `tools/phase1/tables/go/modules_columns.go`; spec:
 //! `data/phase1/tables/modules.json`.
-use super::helpers::{all, int, is_kind, node_map, node_predicate, ref_of, values_map};
+use super::helpers::{
+    all, int, is_kind, node_map, node_predicate, ref_of, source_column, typed, values_map,
+};
 use super::{text, Column, Parsed};
 use crate::protocol::hex;
+use serde::Deserialize;
 use serde_json::{json, Value};
 use tsr_arena::Error;
+use tsr_ast::utilities_middle::{get_pragma_argument, get_pragma_from_source_file};
 use tsr_ast::utilities_modules as modules;
-use tsr_ast::{AstView, NodeId, SymbolAccess, SymbolId, SyntaxKind as K};
+use tsr_ast::{AstView, NodeId, Pragma, SymbolAccess, SymbolId, SyntaxKind as K};
 use tsr_core::{CompilerOptions, ModuleKind, Tristate};
+use tsr_jsstring::JsString;
 
 pub const COLUMNS: &[&str] = &[
     "ast.IsAnyExportAssignment",
@@ -47,7 +52,80 @@ pub const COLUMNS: &[&str] = &[
     "ast.IsRequireVariableStatement",
     "ast.IsValidTypeOnlyAliasUseSite",
     "ast.IsVariableDeclarationInitializedToBareOrAccessedRequire",
+    "ast.GetPragmaFromSourceFile",
+    "ast.GetPragmaArgument",
+    "ast.GetEmitModuleFormatOfFileWorker",
 ];
+
+/// Go's `pragmaNames`: the pragma names the pinned parser records.
+const PRAGMA_NAMES: &[&[u8]] = &[
+    b"reference",
+    b"amd-dependency",
+    b"amd-module",
+    b"ts-check",
+    b"ts-nocheck",
+    b"jsx",
+    b"jsxfrag",
+    b"jsximportsource",
+    b"jsxruntime",
+];
+
+/// Go's `pragmaArguments`: the argument names those pragmas carry.
+const PRAGMA_ARGUMENTS: &[&[u8]] = &[
+    b"path",
+    b"types",
+    b"lib",
+    b"no-default-lib",
+    b"resolution-mode",
+    b"preserve",
+    b"name",
+    b"factory",
+];
+
+/// Go's `pragmaArgs`: a pragma's arguments sorted by name, or null.
+fn pragma_args(pragma: Option<&Pragma>) -> Value {
+    pragma.map_or(Value::Null, |pragma| {
+        Value::Array(
+            pragma
+                .args
+                .iter()
+                .map(|(name, argument)| {
+                    json!([hex(name.as_bytes()), hex(argument.value.as_bytes())])
+                })
+                .collect(),
+        )
+    })
+}
+
+/// Go's `pragmaValues`: `GetPragmaArgument` over every argument name, in order.
+fn pragma_values(pragma: Option<&Pragma>) -> Value {
+    Value::Array(
+        PRAGMA_ARGUMENTS
+            .iter()
+            .map(|name| {
+                json!(hex(get_pragma_argument(
+                    pragma,
+                    &JsString::from_bytes(*name)
+                )))
+            })
+            .collect(),
+    )
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct EmitFormatCase {
+    file_name: String,
+    module: i32,
+    implied_node_format: i32,
+    package_json_type: String,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct EmitFormatCases {
+    cases: Vec<EmitFormatCase>,
+}
 
 /// Go's `moduleKinds`.
 const MODULE_KINDS: &[ModuleKind] = &[
@@ -314,6 +392,52 @@ pub fn build(column: &str, input: &Value) -> Option<Result<Column, String>> {
                 tsr_ast::is_variable_declaration_initialized_to_bare_or_accessed_require(view, node)
             })
         }
+        "ast.GetPragmaFromSourceFile" => source_column(input, |parsed| {
+            let view = parsed.view();
+            let state = view.source_file(parsed.root()).map_err(text)?;
+            let pragmas = state.pragmas().map_err(text)?;
+            let mut out = Vec::new();
+            for name in PRAGMA_NAMES {
+                out.push(pragma_args(get_pragma_from_source_file(
+                    pragmas.iter(),
+                    name,
+                )));
+            }
+            Ok(Value::Array(out))
+        }),
+        "ast.GetPragmaArgument" => source_column(input, |parsed| {
+            let view = parsed.view();
+            let state = view.source_file(parsed.root()).map_err(text)?;
+            let pragmas = state.pragmas().map_err(text)?;
+            let mut out = Vec::new();
+            for pragma in pragmas.iter() {
+                out.push(json!([
+                    hex(pragma.name.as_bytes()),
+                    pragma_values(Some(pragma))
+                ]));
+            }
+            out.push(json!([Value::Null, pragma_values(None)]));
+            Ok(Value::Array(out))
+        }),
+        "ast.GetEmitModuleFormatOfFileWorker" => typed::<EmitFormatCases>(input, |input| {
+            let mut out = Vec::new();
+            for case in &input.cases {
+                let options = CompilerOptions {
+                    module: ModuleKind(case.module),
+                    ..CompilerOptions::default()
+                };
+                let meta = tsr_ast::SourceFileMetaData {
+                    package_json_type: JsString::from_bytes(case.package_json_type.as_bytes()),
+                    implied_node_format: ModuleKind(case.implied_node_format),
+                    ..tsr_ast::SourceFileMetaData::default()
+                };
+                out.push(json!(
+                    tsr_ast::emit_module_format_of_file(case.file_name.as_bytes(), &options, &meta)
+                        .0
+                ));
+            }
+            Ok(Value::Array(out))
+        }),
         _ => return None,
     })
 }

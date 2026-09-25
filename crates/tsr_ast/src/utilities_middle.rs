@@ -283,6 +283,20 @@ pub fn get_pragma_argument<'a>(pragma: Option<&'a Pragma>, name: &JsString) -> &
         .and_then(|pragma| pragma.args.get(name))
         .map_or(&[], |argument| argument.value.as_bytes())
 }
+/// The last pragma of the name wins.
+// port: tsc/internal/ast/utilities.go:GetPragmaFromSourceFile
+pub fn get_pragma_from_source_file<'a>(
+    pragmas: impl IntoIterator<Item = &'a Pragma>,
+    name: &[u8],
+) -> Option<&'a Pragma> {
+    let mut result = None;
+    for pragma in pragmas {
+        if pragma.name.as_bytes() == name {
+            result = Some(pragma);
+        }
+    }
+    result
+}
 // port: tsc/internal/ast/utilities.go:CreateModifiersFromModifierFlags
 pub fn create_modifiers_from_modifier_flags(
     flags: u32,

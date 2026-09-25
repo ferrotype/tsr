@@ -12,23 +12,17 @@
   },
   "exempt_operations": 54,
   "gap_problems": [],
-  "later_step_unresolved": 2,
+  "later_step_unresolved": 0,
   "pending": [
     {
       "disposition": "implemented_untested",
-      "operation": "tsc/internal/core/semaphore.go:LimitedSemaphore.Acquire",
-      "reason": "later_step_unresolved",
-      "rust_home": [
-        "crates/tsr_core/src/semaphore.rs"
-      ]
+      "operation": "tsc/internal/core/workgroup.go:ThrottleGroup.Go",
+      "rust_home": []
     },
     {
       "disposition": "implemented_untested",
-      "operation": "tsc/internal/core/semaphore.go:NewLimitedSemaphore",
-      "reason": "later_step_unresolved",
-      "rust_home": [
-        "crates/tsr_core/src/semaphore.rs"
-      ]
+      "operation": "tsc/internal/core/workgroup.go:ThrottleGroup.Wait",
+      "rust_home": []
     }
   ],
   "pin": "1f70213d4922b434345f639b441681e470c7cfc1",

@@ -9,21 +9,30 @@ pub struct Permit<'a> {
     semaphore: &'a LimitedSemaphore,
 }
 impl LimitedSemaphore {
-    /// port: tsc/internal/core/semaphore.go:NewLimitedSemaphore
-    pub const fn new(limit: usize) -> Self {
+    /// Go's `NewLimitedSemaphore`: a panic for a non-positive limit, then a
+    /// channel of that capacity. Bounding the permits is the skip-statement
+    /// site: a mutant leaves the semaphore unbounded, which the concurrency
+    /// table observes as more holders than the limit.
+    pub fn new(limit: usize) -> Self {
         assert!(limit > 0, "maxConcurrency must be positive");
-        Self {
-            limit,
+        let mut semaphore = Self {
+            limit: usize::MAX,
             held: Mutex::new(0),
             available: Condvar::new(),
-        }
+        };
+        // port: tsc/internal/core/semaphore.go:NewLimitedSemaphore
+        semaphore.limit = limit;
+        semaphore
     }
-    /// port: tsc/internal/core/semaphore.go:LimitedSemaphore.Acquire
+    /// Go's `Acquire`: `s.ch <- struct{}{}` blocks while the channel is full.
+    /// The wait loop is the skip-statement site: a mutant takes a permit past
+    /// the limit.
     pub fn acquire(&self) -> Permit<'_> {
         let mut held = self
             .held
             .lock()
             .unwrap_or_else(std::sync::PoisonError::into_inner);
+        // port: tsc/internal/core/semaphore.go:LimitedSemaphore.Acquire
         while *held == self.limit {
             held = self
                 .available

@@ -16,13 +16,13 @@ use crate::{
 pub use dir::{info, mode};
 use std::{
     io::Write,
-    sync::{Arc, OnceLock},
+    sync::{Arc, LazyLock, OnceLock},
 };
 use tsr_core::semaphore::LimitedSemaphore;
 use tsr_jsstring::JsString;
-static BLOCKING: LimitedSemaphore = LimitedSemaphore::new(128);
-static READ: LimitedSemaphore = LimitedSemaphore::new(128);
-static WRITE: LimitedSemaphore = LimitedSemaphore::new(32);
+static BLOCKING: LazyLock<LimitedSemaphore> = LazyLock::new(|| LimitedSemaphore::new(128));
+static READ: LazyLock<LimitedSemaphore> = LazyLock::new(|| LimitedSemaphore::new(128));
+static WRITE: LazyLock<LimitedSemaphore> = LazyLock::new(|| LimitedSemaphore::new(32));
 pub struct OsFs {
     common: Common,
     case_sensitive: bool,

@@ -41,11 +41,22 @@ The expanded generator `generate_shapes.py` adds four input modes for each of
 190 ordinary shapes. It emits actual New/Update calls and payload getters,
 with a separate update action per field. Runtime observations compare those
 results, clone hooks, child and visitor order and identity, names and generated
-facts. SourceFile is covered by an explicit factory/owner-metadata case;
-SyntheticExpression by its cast and child traversal only. Its four semantic
-Type-payload operations remain outside this fixture's claims.
+facts. SourceFile is covered by an explicit factory/owner-metadata case that
+also walks its hand-written `ForEachChild` and enters the visitor through
+`VisitSourceFile` (top-level statements, end-of-file token); a `ModifierList`
+special builds a modifier list and clones it through the factory;
+SyntheticExpression is covered by its cast and child traversal only. Its four
+semantic Type-payload operations are a reviewed Phase 2 checker destination
+(owner decision, 2026-09-25), outside this fixture's claims.
 
-The complete schedule is 1,026 rows and 1,380 distinct operation identities.
+EmbeddedStatement cases separately exercise absent and removed statements,
+unchanged identity, and callbacks returning empty, single-child and multi-child
+SyntaxLists. They observe the returned identity, kind and range, plus the
+created block's multiline flag and ordered statement list. Only the three
+SyntaxList cases claim `liftToBlock`; ordinary-node passthrough cannot establish
+that operation's lifting behavior.
+
+The complete schedule is 1,035 rows and 1,413 distinct operation identities.
 A native panic or unsupported action fails the capture; it never supplies
 coverage for later actions. Generated request actions are checked by both
 children before executing their fixed trace.

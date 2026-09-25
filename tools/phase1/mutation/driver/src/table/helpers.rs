@@ -107,6 +107,26 @@ struct Names {
     names_hex: Vec<Value>,
 }
 
+/// Go's `typedValuesColumn`: the input decoded into `I` in setup, then `f`
+/// in the column stage.
+pub fn typed<I: serde::de::DeserializeOwned + 'static>(
+    input: &Value,
+    f: fn(&I) -> Result<Value, String>,
+) -> Result<Column, String> {
+    let input: I = decode(input)?;
+    Ok(Box::new(move || f(&input)))
+}
+
+/// A file-level `source` column: setup parses, and the column stage runs `f`
+/// over the parsed file.
+pub fn source_column(
+    input: &Value,
+    f: fn(&Parsed) -> Result<Value, String>,
+) -> Result<Column, String> {
+    let parsed = parse_source(input)?;
+    Ok(Box::new(move || f(&parsed)))
+}
+
 /// Go's `ValuesMap`: `[f(name)]` over the input's synthetic byte strings.
 pub fn values_map(input: &Value, f: fn(&[u8]) -> Result<Value, String>) -> Result<Column, String> {
     let names = decode::<Names>(input)?

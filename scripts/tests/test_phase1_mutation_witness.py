@@ -2136,10 +2136,18 @@ class HarnessJoinTests(MutationFixture):
             return coverage.build()
 
     def real_pending_operation(self):
-        """A real witness-missing operation, a parser one while any remains."""
+        """A real witness-missing operation, a parser one while any remains.
+
+        At closure none may be left; then an exempt, unlinked operation stands
+        in, since the join's roster override decides its state either way.
+        """
         report = coverage.build()
         pending = [row["id"] for row in report["gaps"] if row["root_cause"] == "operation_witness_missing"]
-        return next((op for op in pending if op.startswith("tsc/internal/parser/parser.go:")), pending[0])
+        if pending:
+            return next((op for op in pending if op.startswith("tsc/internal/parser/parser.go:")), pending[0])
+        return next(row["id"] for row in report["operations"]
+                    if not row["links"] and str(row.get("roster_state")).startswith("exempt:")
+                    and row["disposition"] in ("implemented_untested", "missing"))
 
     def retarget(self, operation):
         """Point the fixture's OP_A home at a real pending scope operation."""
@@ -2217,8 +2225,9 @@ class HarnessJoinTests(MutationFixture):
     def test_a_bound_mutation_witness_resolves_a_later_step_operation(self):
         # HR3: a mutation witness is a gated link like a rust_gated one, so a
         # later-step operation it covers exactly is no later_step_unresolved gap.
-        operation = next(row["id"] for row in coverage.build()["gaps"]
-                         if row["root_cause"] == "later_step_unresolved")
+        # Closure leaves no unresolved transfer; the join's roster override
+        # makes any unlinked operation one for this test.
+        operation = self.real_pending_operation()
         self.retarget(operation)
         witness = self.campaign.record(self.campaign.declaration([operation], ["kA"]))
         report = self.join(witness, roster="exempt:later_step")

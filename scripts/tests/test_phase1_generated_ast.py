@@ -18,7 +18,7 @@ class GeneratedAstFixtureTests(unittest.TestCase):
         for name, source in GEN.outputs().items():
             self.assertEqual((BASE / name).read_text(), source, name)
         document = GEN.document()
-        self.assertEqual(len(document["requests"]), 1026)
+        self.assertEqual(len(document["requests"]), 1035)
         self.assertTrue(all("expected" not in row for row in document["requests"]))
 
     def test_every_pinned_predicate_has_an_exact_native_and_rust_dispatch(self):
@@ -70,6 +70,18 @@ class GeneratedAstFixtureTests(unittest.TestCase):
                     self.assertEqual(links["update-" + member["name"]],
                                      links["update-same"] + ["tsc/internal/ast/ast.go:updateNode"])
         self.assertEqual(set(GEN._shape_module["SKIPPED"]), {"SourceFile", "SyntheticExpression"})
+
+    def test_lift_coverage_requires_syntax_list_results(self):
+        rows = GEN.document()["requests"]
+        operation = "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock"
+        witnesses = [row for row in rows if operation in row["operations"]]
+        self.assertEqual({row["shape"] for row in witnesses}, {"EmbeddedStatement"})
+        self.assertEqual({row["mode"] for row in witnesses}, {"empty", "one", "many"})
+        for row in witnesses:
+            self.assertIn(operation, row["operation_actions"]["visit"])
+        boundaries = [row for row in rows if row.get("shape") == "EmbeddedStatement"]
+        self.assertEqual({row["mode"] for row in boundaries},
+                         {"absent", "removed", "unchanged", "empty", "one", "many"})
 
     def test_missing_rust_dispatch_is_not_silently_omitted(self):
         original = Path.read_text

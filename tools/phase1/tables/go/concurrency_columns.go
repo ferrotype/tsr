@@ -10,6 +10,7 @@ import (
 	"slices"
 	"sync"
 	"sync/atomic"
+	"time"
 
 	"github.com/microsoft/TypeScript/tsc/internal/collections"
 	"github.com/microsoft/TypeScript/tsc/internal/core"
@@ -182,6 +183,52 @@ func init() {
 				out = append(out, []any{ints(values), failure, most.Load() <= int64(c.Limit)})
 			}
 			return out
+		}),
+		// Per case: [the jobs' values sorted, whether no more jobs than the
+		// limit held a permit at once]. A non-positive limit is the declared
+		// panic of the constructor, recorded through Guard as the value.
+		typedValuesColumn("core.LimitedSemaphore", func(in struct {
+			Cases []struct {
+				Limit int   `json:"limit"`
+				Jobs  []int `json:"jobs"`
+			} `json:"cases"`
+		}) any {
+			return Guard([]string{"message:maxConcurrency must be positive"}, func() any {
+				out := []any{}
+				for _, c := range in.Cases {
+					semaphore := core.NewLimitedSemaphore(c.Limit)
+					var mu sync.Mutex
+					values := []int{}
+					var running, most atomic.Int64
+					var wg sync.WaitGroup
+					for _, job := range c.Jobs {
+						wg.Add(1)
+						go func() {
+							defer wg.Done()
+							release := semaphore.Acquire()
+							now := running.Add(1)
+							for {
+								seen := most.Load()
+								if now <= seen || most.CompareAndSwap(seen, now) {
+									break
+								}
+							}
+							mu.Lock()
+							values = append(values, job)
+							mu.Unlock()
+							// Hold the permit long enough for the other jobs to
+							// contend for it, so an unbounded semaphore shows.
+							time.Sleep(10 * time.Millisecond)
+							running.Add(-1)
+							release()
+						}()
+					}
+					wg.Wait()
+					slices.Sort(values)
+					out = append(out, []any{ints(values), most.Load() <= int64(c.Limit)})
+				}
+				return out
+			})
 		}),
 	)
 }

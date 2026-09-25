@@ -231,7 +231,37 @@ another way stay pending (see the Phase 1 closure report); with the case
 families recorded and the equivalent_rust roster entries, Phase 1 coverage has
 20 pending operations.
 
+Remaining-operations campaign (2026-09-25, after the closure merge), the same
+five oracles over one manifest of 1,104 operations (1,910 mutants, 276
+controls): **1,102 killed**. Per witness: e1 516, binder 712, facts 546,
+syntax 28, table 289. The table oracle's 11 groups hold 202 columns over 8,506
+rows, every column at native parity; the four new columns are
+`core.LimitedSemaphore` (concurrency), `ast.GetPragmaFromSourceFile`,
+`ast.GetPragmaArgument` and `ast.GetEmitModuleFormatOfFileWorker` (modules).
+`confirm` reproduces all 9,876 recorded kill pairs. Not killed: `NewThrottleGroup`
+(returns `Self`, no operator; `equivalent_rust` in the report) and
+`nativepath.Realpath` (Linux only). Sites the closure could not kill moved to
+statements: the binder's module-name quote (`bindSourceFileAsExternalModule`),
+the rooted-path branch (`resolveTripleslashPathReference`), the library
+resolution call (`resolveLibrary`), the semaphore's bound and its wait loop
+(`NewLimitedSemaphore`, `LimitedSemaphore.Acquire`, whose constructor is no
+longer `const` so that the switch can run; the VFS statics use `LazyLock`).
+With the recaptured syntax family (SourceFile walk and visitor actions, a
+`ModifierList` special, `liftToBlock` claimed by the embedded-statement shapes)
+and the four SyntheticExpression operations as a reviewed Phase 2 destination,
+Phase 1 coverage has one pending operation, `Realpath`, until a Linux host
+capture of this source closure is replayed.
+
 Known limitations:
+
+- A plan change costs a full campaign. `kill` takes `--mutants` and
+  `--skip-killed`, but `results` merges only kill files of one plan, so a new
+  or moved site re-plans the manifest and re-kills every oracle (about 35
+  minutes of machine time on 2026-09-25). Merging a partial rerun into the
+  recorded results (carrying unchanged mutants' kills whose spans and reach
+  still bind) and freezing only the rows of changed columns are the missing
+  pieces; until they exist, an increment must be batched, not run per
+  operation.
 
 - A site's operation set, which decides `hit_parser` and the syntax
   multi-operation rule, includes only operations in the plan. A site that also
@@ -244,6 +274,30 @@ Known limitations:
   reproducing binary digests; one combined build unifies features differently.
 - About 18 predicate mutants per oracle still hang on every candidate row; their
   operations are witnessed by other mutants or remain pending.
+
+### PR #56: cache and scheduling follow-up to the #55 review
+
+`ParsedCommandLine.WithFileNames` and `ReloadFileNamesOfParsedCommandLine`
+now copy the fields listed by the pinned constructors rather than cloning
+every initialized cache. Wildcard directories and include globs survive;
+file-name indexes, common directories, output maps, locale and reference-path
+caches start uninitialized. The ordinary Rust `Clone` and option setters keep
+their existing cache behavior. Focused regressions prime the old file caches
+before replacement/reload, check the new names and declaration paths, and
+verify the original still resolves its old files.
+
+`ThrottleGroup.Go` now starts each task when called, as the pin does, rather
+than postponing the tasks until `Wait`. Its constructor takes the caller's
+Rust thread scope so tasks may borrow inputs safely. `Wait` joins the tasks
+and returns the first error; the surrounding scope also joins tasks if the
+group is dropped. Regressions exercise a task signal received before `Wait`,
+completion despite an error, group disposal, and panic/permit cleanup. The
+table adapter supplies the scope and retains its observation format.
+
+These are production fixes with focused regression checks, not a new mutation
+campaign. The historical campaign counts above remain historical; changed
+inputs must be refreshed by the phase-end evidence run before being claimed
+current.
 
 ## 9. Operation tables (the `table` oracle)
 
@@ -287,7 +341,8 @@ bridge.
   A symbol is `[first declaration reference, name as hex]`.
 - A column whose callers rely on a panic lists the panic's class in the spec's
   `panic_contract`; Go's `Guard` records `{"panic": class}` as the value, and the
-  Rust port returns that class through an explicit check. Classes are
+  Rust adapter invokes the port and records the caught payload, never an
+  expected class inferred from the input. Classes are
   `nil_dereference`, `index_out_of_range`, `runtime:<text>` for another runtime
   error, or `message:<text>` for a panic value. Any other panic
   is the stage's outcome: a Rust panic is a crash, never a kill, and a Go setup
@@ -455,4 +510,3 @@ kill pairs confirmed.
 The committed inventory, native freeze and Go reach are rewritten at
 integration (`select --write`, then the consolidated campaign), never by a
 group's package.
-

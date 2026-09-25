@@ -65,3 +65,23 @@ this host. Pass the other independently authenticated host directory using
 sources or case claims. The earlier family/receipt archives above are historical
 after this increment; their former current-state descriptions apply to their
 checkpoint, not to the host-metadata and live-loader edits.
+
+## PR #56 witness corrections
+
+`pr56-syntax-witness-fixes.tar.gz` preserves the final syntax-family capture
+under `syntax-final/` and the bounded review checks under `targeted-checks/`.
+The archive is 1,710,475 bytes; SHA-256:
+`462dc0fb0c2f7966ad826262a44ccc280da34c598c894bfd44fb848ba7575e05`.
+Capture identity:
+`d2ccb89e7bb8e3cd6cd913c60208f28ba7511dd47c79e01319fc16edbaf920c8`.
+All 1,169 syntax cases match. Extract it into a scratch directory and replay:
+
+```sh
+python3 scripts/phase1.py compare --capture SCRATCH/syntax-final --require-parity
+```
+
+The bounded diagnostics retain both semaphore rows (native-matching outcome
+and digest, now from the actual constructor) and a Go overlay replacing
+`liftToBlock` with `return node`. All three new SyntaxList cases distinguish
+that mutant. These targeted diagnostics are not a replacement for a full
+mutation campaign. The ordinary capture replay still enforces source freshness.
