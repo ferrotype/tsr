@@ -31,6 +31,9 @@ pub const COLUMNS: &[&str] = &[
     "ast.IsJsxTagName",
     "ast.IsLet",
     "ast.IsPrototypeAccess",
+    "ast.TryGetTextOfPropertyName",
+    "ast.GetTextOfPropertyName",
+    "ast.IsComputedNonLiteralName",
 ];
 
 type Target = fn(AstView<'_>, NodeId, bool, bool) -> Result<bool, Error>;
@@ -171,6 +174,22 @@ pub fn build(column: &str, input: &Value) -> Option<Result<Column, String>> {
         }),
         "ast.IsPrototypeAccess" => node_predicate("source", input, all, |_, view, node| {
             targets::is_prototype_access(view, node)
+        }),
+        "ast.TryGetTextOfPropertyName" => node_map("source", input, all, |_, view, node| {
+            Ok(targets::try_get_text_of_property_name(view, node)
+                .map_err(text)?
+                .map_or(Value::Null, |text| json!(hex(&text))))
+        }),
+        "ast.GetTextOfPropertyName" => node_map("source", input, all, |_, view, node| {
+            let text = targets::get_text_of_property_name(view, node).map_err(text)?;
+            Ok(if text.is_empty() {
+                Value::Null
+            } else {
+                json!(hex(&text))
+            })
+        }),
+        "ast.IsComputedNonLiteralName" => node_predicate("source", input, all, |_, view, node| {
+            targets::is_computed_non_literal_name(view, node)
         }),
         _ => return None,
     })

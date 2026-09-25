@@ -424,3 +424,57 @@ pub fn is_prototype_access(view: AstView<'_>, node: NodeId) -> Result<bool, Erro
     }
     Ok(false)
 }
+
+/// Go's `(string, bool)` as an option.
+/// port: tsc/internal/ast/utilities.go:TryGetTextOfPropertyName
+pub fn try_get_text_of_property_name(
+    view: AstView<'_>,
+    name: NodeId,
+) -> Result<Option<Vec<u8>>, Error> {
+    let read = view.node(name)?;
+    Ok(match read.kind().known() {
+        Some(
+            K::Identifier
+            | K::PrivateIdentifier
+            | K::StringLiteral
+            | K::NumericLiteral
+            | K::BigIntLiteral
+            | K::NoSubstitutionTemplateLiteral,
+        ) => Some(view.node_text(name)?.as_bytes().to_vec()),
+        Some(K::ComputedPropertyName) => {
+            let expression = read.expression().expect(NIL);
+            if crate::utilities::is_string_or_numeric_literal_like(&view.node(expression)?) {
+                Some(view.node_text(expression)?.as_bytes().to_vec())
+            } else {
+                None
+            }
+        }
+        Some(K::JsxNamespacedName) => {
+            let namespace = read
+                .data_source()
+                .as_jsx_namespaced_name()
+                .ok_or(Error::InvalidGraph)?
+                .namespace()
+                .expect(NIL);
+            let mut text = view.node_text(namespace)?.as_bytes().to_vec();
+            text.push(b':');
+            text.extend_from_slice(view.node_text(read.name().expect(NIL))?.as_bytes());
+            Some(text)
+        }
+        _ => None,
+    })
+}
+
+/// port: tsc/internal/ast/utilities.go:GetTextOfPropertyName
+pub fn get_text_of_property_name(view: AstView<'_>, name: NodeId) -> Result<Vec<u8>, Error> {
+    Ok(try_get_text_of_property_name(view, name)?.unwrap_or_default())
+}
+
+/// port: tsc/internal/ast/utilities.go:IsComputedNonLiteralName
+pub fn is_computed_non_literal_name(view: AstView<'_>, name: NodeId) -> Result<bool, Error> {
+    let read = view.node(name)?;
+    Ok(read.kind() == K::ComputedPropertyName
+        && !crate::utilities::is_string_or_numeric_literal_like(
+            &view.node(read.expression().expect(NIL))?,
+        ))
+}

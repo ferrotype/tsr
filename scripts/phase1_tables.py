@@ -170,6 +170,10 @@ def go_registry(root=ROOT):
             if identity in found:
                 problems.append(f"column {identity} is registered twice in Go")
             found[identity] = (groups[0], "values", False)
+        for identity in re.findall(r'\bconfigColumn\(\s*"([^"]+)"', text):
+            if identity in found:
+                problems.append(f"column {identity} is registered twice in Go")
+            found[identity] = (groups[0], "config", False)
     return found, problems
 
 

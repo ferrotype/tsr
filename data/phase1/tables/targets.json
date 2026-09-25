@@ -363,6 +363,59 @@
       "rust": "tsr_ast::utilities_targets::is_prototype_access",
       "survey": true,
       "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ast/utilities.go:2178",
+        "internal/checker/flow.go:1776",
+        "internal/checker/nodecopy.go:30",
+        "internal/ls/completions.go:4314",
+        "internal/ls/completions.go:6480"
+      ],
+      "id": "ast.TryGetTextOfPropertyName",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:TryGetTextOfPropertyName"
+      ],
+      "projection": "[index, hex of the text] for every node where it succeeds",
+      "rust": "tsr_ast::utilities_targets::try_get_text_of_property_name",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:24314",
+        "internal/checker/services.go:1027",
+        "internal/ls/definition.go:486",
+        "internal/ls/sourcedefinition.go:534",
+        "internal/ls/sourcedefinition.go:595"
+      ],
+      "id": "ast.GetTextOfPropertyName",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:GetTextOfPropertyName"
+      ],
+      "projection": "[index, hex of the text] for every node where it is not empty",
+      "rust": "tsr_ast::utilities_targets::get_text_of_property_name",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:24309",
+        "internal/checker/checker.go:29935",
+        "internal/checker/relater.go:513",
+        "internal/tsoptions/tsconfigparsing.go:764"
+      ],
+      "id": "ast.IsComputedNonLiteralName",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsComputedNonLiteralName"
+      ],
+      "projection": "document-order indices of the nodes where it is true",
+      "rust": "tsr_ast::utilities_targets::is_computed_non_literal_name",
+      "survey": true,
+      "synthetic": []
     }
   ],
   "group": "targets",

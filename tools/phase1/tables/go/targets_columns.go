@@ -101,6 +101,22 @@ func init() {
 			func(_ *Parsed, node *ast.Node) bool { return ast.IsJsxTagName(node) }),
 		NodePredicate("ast.IsLet", "source", All,
 			func(_ *Parsed, node *ast.Node) bool { return ast.IsLet(node) }),
+		NodeMap("ast.TryGetTextOfPropertyName", "source", All,
+			func(_ *Parsed, node *ast.Node) any {
+				if text, ok := ast.TryGetTextOfPropertyName(node); ok {
+					return Hex(text)
+				}
+				return nil
+			}),
+		NodeMap("ast.GetTextOfPropertyName", "source", All,
+			func(_ *Parsed, node *ast.Node) any {
+				if text := ast.GetTextOfPropertyName(node); text != "" {
+					return Hex(text)
+				}
+				return nil
+			}),
+		NodePredicate("ast.IsComputedNonLiteralName", "source", All,
+			func(_ *Parsed, node *ast.Node) bool { return ast.IsComputedNonLiteralName(node) }),
 		NodePredicate("ast.IsPrototypeAccess", "source", All,
 			func(_ *Parsed, node *ast.Node) bool { return ast.IsPrototypeAccess(node) }),
 	)

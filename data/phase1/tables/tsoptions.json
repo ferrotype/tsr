@@ -450,6 +450,828 @@
           "name": "outside/ci"
         }
       ]
+    },
+    {
+      "evidence": [
+        "internal/project/configfileregistrybuilder.go:241"
+      ],
+      "id": "tsoptions.ParsedCommandLine.LiteralFileNames",
+      "input": "config",
+      "operations": [
+        "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.LiteralFileNames"
+      ],
+      "projection": "hex of the literal file names (the first literalFileNamesLen), per config",
+      "rust": "tsr_tsoptions::ParsedCommandLine::literal_file_names",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "args": null,
+            "caseSensitive": true,
+            "currentDirectory": "/p",
+            "files": {
+              "/p/lib/f.ts": "",
+              "/p/src/a.ts": "",
+              "/p/src/b.tsx": "",
+              "/p/src/c.d.ts": "",
+              "/p/src/d.json": "{}",
+              "/p/src/deep/g.ts": "",
+              "/p/src/e.mts": "",
+              "/p/src/skip/s.ts": "",
+              "/p/tests/t.ts": ""
+            },
+            "jsonText": "{\"compilerOptions\":{\"outDir\":\"out\",\"declaration\":true,\"sourceMap\":true,\"declarationMap\":true,\"jsx\":\"preserve\",\"resolveJsonModule\":true},\"include\":[\"src\"],\"files\":[\"lib/f.ts\"]}"
+          },
+          "name": "out-include"
+        },
+        {
+          "input": {
+            "args": null,
+            "caseSensitive": true,
+            "currentDirectory": "/p",
+            "files": {
+              "/p/lib/f.ts": "",
+              "/p/src/a.ts": "",
+              "/p/src/b.tsx": "",
+              "/p/src/c.d.ts": "",
+              "/p/src/d.json": "{}",
+              "/p/src/deep/g.ts": "",
+              "/p/src/e.mts": "",
+              "/p/src/skip/s.ts": "",
+              "/p/tests/t.ts": ""
+            },
+            "jsonText": "{\"compilerOptions\":{\"emitDeclarationOnly\":true,\"declaration\":true}}"
+          },
+          "name": "declaration-only"
+        },
+        {
+          "input": {
+            "args": null,
+            "caseSensitive": true,
+            "currentDirectory": "/p",
+            "files": {
+              "/p/lib/f.ts": "",
+              "/p/src/a.ts": "",
+              "/p/src/b.tsx": "",
+              "/p/src/c.d.ts": "",
+              "/p/src/d.json": "{}",
+              "/p/src/deep/g.ts": "",
+              "/p/src/e.mts": "",
+              "/p/src/skip/s.ts": "",
+              "/p/tests/t.ts": ""
+            },
+            "jsonText": "{\"compilerOptions\":{\"inlineSourceMap\":true,\"sourceMap\":true,\"declarationDir\":\"types\",\"declaration\":true},\"files\":[\"src/a.ts\",\"src/d.json\"]}"
+          },
+          "name": "files-inline"
+        },
+        {
+          "input": {
+            "args": null,
+            "caseSensitive": true,
+            "currentDirectory": "/p",
+            "files": {
+              "/p/lib/f.ts": "",
+              "/p/src/a.ts": "",
+              "/p/src/b.tsx": "",
+              "/p/src/c.d.ts": "",
+              "/p/src/d.json": "{}",
+              "/p/src/deep/g.ts": "",
+              "/p/src/e.mts": "",
+              "/p/src/skip/s.ts": "",
+              "/p/tests/t.ts": ""
+            },
+            "jsonText": "{\"include\":[\"src/**/*\",\"lib/*.ts\",\"tests\"],\"exclude\":[\"src/skip\"]}"
+          },
+          "name": "globs"
+        },
+        {
+          "input": {
+            "args": null,
+            "caseSensitive": false,
+            "currentDirectory": "/p",
+            "files": {
+              "/p/lib/f.ts": "",
+              "/p/src/a.ts": "",
+              "/p/src/b.tsx": "",
+              "/p/src/c.d.ts": "",
+              "/p/src/d.json": "{}",
+              "/p/src/deep/g.ts": "",
+              "/p/src/e.mts": "",
+              "/p/src/skip/s.ts": "",
+              "/p/tests/t.ts": ""
+            },
+            "jsonText": "{\"include\":[\"src/**/*\",\"lib/*.ts\",\"tests\"],\"exclude\":[\"src/skip\"]}"
+          },
+          "name": "globs-ci"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/project/project.go:357"
+      ],
+      "id": "tsoptions.ParsedCommandLine.WithFileNames",
+      "input": "config",
+      "operations": [
+        "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.WithFileNames"
+      ],
+      "projection": "[the copy's file names hex, its literal file names hex, the original's file names hex] with the args as the new names",
+      "rust": "tsr_tsoptions::ParsedCommandLine::with_file_names",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "args": [
+              "/p/x.ts",
+              "/p/y.ts"
+            ],
+            "caseSensitive": true,
+            "currentDirectory": "/p",
+            "files": {
+              "/p/lib/f.ts": "",
+              "/p/src/a.ts": "",
+              "/p/src/b.tsx": "",
+              "/p/src/c.d.ts": "",
+              "/p/src/d.json": "{}",
+              "/p/src/deep/g.ts": "",
+              "/p/src/e.mts": "",
+              "/p/src/skip/s.ts": "",
+              "/p/tests/t.ts": ""
+            },
+            "jsonText": "{\"compilerOptions\":{\"outDir\":\"out\",\"declaration\":true,\"sourceMap\":true,\"declarationMap\":true,\"jsx\":\"preserve\",\"resolveJsonModule\":true},\"include\":[\"src\"],\"files\":[\"lib/f.ts\"]}"
+          },
+          "name": "out-include"
+        },
+        {
+          "input": {
+            "args": [
+              "/p/x.ts",
+              "/p/y.ts"
+            ],
+            "caseSensitive": true,
+            "currentDirectory": "/p",
+            "files": {
+              "/p/lib/f.ts": "",
+              "/p/src/a.ts": "",
+              "/p/src/b.tsx": "",
+              "/p/src/c.d.ts": "",
+              "/p/src/d.json": "{}",
+              "/p/src/deep/g.ts": "",
+              "/p/src/e.mts": "",
+              "/p/src/skip/s.ts": "",
+              "/p/tests/t.ts": ""
+            },
+            "jsonText": "{\"compilerOptions\":{\"emitDeclarationOnly\":true,\"declaration\":true}}"
+          },
+          "name": "declaration-only"
+        },
+        {
+          "input": {
+            "args": [
+              "/p/x.ts",
+              "/p/y.ts"
+            ],
+            "caseSensitive": true,
+            "currentDirectory": "/p",
+            "files": {
+              "/p/lib/f.ts": "",
+              "/p/src/a.ts": "",
+              "/p/src/b.tsx": "",
+              "/p/src/c.d.ts": "",
+              "/p/src/d.json": "{}",
+              "/p/src/deep/g.ts": "",
+              "/p/src/e.mts": "",
+              "/p/src/skip/s.ts": "",
+              "/p/tests/t.ts": ""
+            },
+            "jsonText": "{\"compilerOptions\":{\"inlineSourceMap\":true,\"sourceMap\":true,\"declarationDir\":\"types\",\"declaration\":true},\"files\":[\"src/a.ts\",\"src/d.json\"]}"
+          },
+          "name": "files-inline"
+        },
+        {
+          "input": {
+            "args": [
+              "/p/x.ts",
+              "/p/y.ts"
+            ],
+            "caseSensitive": true,
+            "currentDirectory": "/p",
+            "files": {
+              "/p/lib/f.ts": "",
+              "/p/src/a.ts": "",
+              "/p/src/b.tsx": "",
+              "/p/src/c.d.ts": "",
+              "/p/src/d.json": "{}",
+              "/p/src/deep/g.ts": "",
+              "/p/src/e.mts": "",
+              "/p/src/skip/s.ts": "",
+              "/p/tests/t.ts": ""
+            },
+            "jsonText": "{\"include\":[\"src/**/*\",\"lib/*.ts\",\"tests\"],\"exclude\":[\"src/skip\"]}"
+          },
+          "name": "globs"
+        },
+        {
+          "input": {
+            "args": [
+              "/p/x.ts",
+              "/p/y.ts"
+            ],
+            "caseSensitive": false,
+            "currentDirectory": "/p",
+            "files": {
+              "/p/lib/f.ts": "",
+              "/p/src/a.ts": "",
+              "/p/src/b.tsx": "",
+              "/p/src/c.d.ts": "",
+              "/p/src/d.json": "{}",
+              "/p/src/deep/g.ts": "",
+              "/p/src/e.mts": "",
+              "/p/src/skip/s.ts": "",
+              "/p/tests/t.ts": ""
+            },
+            "jsonText": "{\"include\":[\"src/**/*\",\"lib/*.ts\",\"tests\"],\"exclude\":[\"src/skip\"]}"
+          },
+          "name": "globs-ci"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/execute/build/buildtask.go:295",
+        "internal/execute/build/buildtask.go:525",
+        "internal/execute/build/buildtask.go:787",
+        "internal/execute/build/buildtask.go:802",
+        "internal/execute/build/buildtask.go:829"
+      ],
+      "id": "tsoptions.ParsedCommandLine.GetOutputFileNames",
+      "input": "config",
+      "operations": [
+        "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.GetOutputFileNames"
+      ],
+      "projection": "hex of every output name the iterator yields, in order, per config",
+      "rust": "tsr_tsoptions::ParsedCommandLine::output_file_names",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "args": null,
+            "caseSensitive": true,
+            "currentDirectory": "/p",
+            "files": {
+              "/p/lib/f.ts": "",
+              "/p/src/a.ts": "",
+              "/p/src/b.tsx": "",
+              "/p/src/c.d.ts": "",
+              "/p/src/d.json": "{}",
+              "/p/src/deep/g.ts": "",
+              "/p/src/e.mts": "",
+              "/p/src/skip/s.ts": "",
+              "/p/tests/t.ts": ""
+            },
+            "jsonText": "{\"compilerOptions\":{\"outDir\":\"out\",\"declaration\":true,\"sourceMap\":true,\"declarationMap\":true,\"jsx\":\"preserve\",\"resolveJsonModule\":true},\"include\":[\"src\"],\"files\":[\"lib/f.ts\"]}"
+          },
+          "name": "out-include"
+        },
+        {
+          "input": {
+            "args": null,
+            "caseSensitive": true,
+            "currentDirectory": "/p",
+            "files": {
+              "/p/lib/f.ts": "",
+              "/p/src/a.ts": "",
+              "/p/src/b.tsx": "",
+              "/p/src/c.d.ts": "",
+              "/p/src/d.json": "{}",
+              "/p/src/deep/g.ts": "",
+              "/p/src/e.mts": "",
+              "/p/src/skip/s.ts": "",
+              "/p/tests/t.ts": ""
+            },
+            "jsonText": "{\"compilerOptions\":{\"emitDeclarationOnly\":true,\"declaration\":true}}"
+          },
+          "name": "declaration-only"
+        },
+        {
+          "input": {
+            "args": null,
+            "caseSensitive": true,
+            "currentDirectory": "/p",
+            "files": {
+              "/p/lib/f.ts": "",
+              "/p/src/a.ts": "",
+              "/p/src/b.tsx": "",
+              "/p/src/c.d.ts": "",
+              "/p/src/d.json": "{}",
+              "/p/src/deep/g.ts": "",
+              "/p/src/e.mts": "",
+              "/p/src/skip/s.ts": "",
+              "/p/tests/t.ts": ""
+            },
+            "jsonText": "{\"compilerOptions\":{\"inlineSourceMap\":true,\"sourceMap\":true,\"declarationDir\":\"types\",\"declaration\":true},\"files\":[\"src/a.ts\",\"src/d.json\"]}"
+          },
+          "name": "files-inline"
+        },
+        {
+          "input": {
+            "args": null,
+            "caseSensitive": true,
+            "currentDirectory": "/p",
+            "files": {
+              "/p/lib/f.ts": "",
+              "/p/src/a.ts": "",
+              "/p/src/b.tsx": "",
+              "/p/src/c.d.ts": "",
+              "/p/src/d.json": "{}",
+              "/p/src/deep/g.ts": "",
+              "/p/src/e.mts": "",
+              "/p/src/skip/s.ts": "",
+              "/p/tests/t.ts": ""
+            },
+            "jsonText": "{\"include\":[\"src/**/*\",\"lib/*.ts\",\"tests\"],\"exclude\":[\"src/skip\"]}"
+          },
+          "name": "globs"
+        },
+        {
+          "input": {
+            "args": null,
+            "caseSensitive": false,
+            "currentDirectory": "/p",
+            "files": {
+              "/p/lib/f.ts": "",
+              "/p/src/a.ts": "",
+              "/p/src/b.tsx": "",
+              "/p/src/c.d.ts": "",
+              "/p/src/d.json": "{}",
+              "/p/src/deep/g.ts": "",
+              "/p/src/e.mts": "",
+              "/p/src/skip/s.ts": "",
+              "/p/tests/t.ts": ""
+            },
+            "jsonText": "{\"include\":[\"src/**/*\",\"lib/*.ts\",\"tests\"],\"exclude\":[\"src/skip\"]}"
+          },
+          "name": "globs-ci"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/execute/watcher.go:312",
+        "internal/execute/watcher.go:393",
+        "internal/project/configfileregistrybuilder.go:604"
+      ],
+      "id": "tsoptions.ParsedCommandLine.PossiblyMatchesFileName",
+      "input": "config",
+      "operations": [
+        "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.PossiblyMatchesFileName"
+      ],
+      "projection": "one bool per probe file name, per config",
+      "rust": "tsr_tsoptions::ParsedCommandLine::possibly_matches_file_name",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "args": [
+              "/p/src/a.ts",
+              "/p/src/new.ts",
+              "/p/lib/f.ts",
+              "/p/lib/g.ts",
+              "/p/other.ts",
+              "/p/src/deep/x.ts",
+              "/p/src/x.d.ts",
+              "/p/tests/u.ts",
+              "/p/src/skip/z.ts",
+              "/p/SRC/a.ts"
+            ],
+            "caseSensitive": true,
+            "currentDirectory": "/p",
+            "files": {
+              "/p/lib/f.ts": "",
+              "/p/src/a.ts": "",
+              "/p/src/b.tsx": "",
+              "/p/src/c.d.ts": "",
+              "/p/src/d.json": "{}",
+              "/p/src/deep/g.ts": "",
+              "/p/src/e.mts": "",
+              "/p/src/skip/s.ts": "",
+              "/p/tests/t.ts": ""
+            },
+            "jsonText": "{\"compilerOptions\":{\"outDir\":\"out\",\"declaration\":true,\"sourceMap\":true,\"declarationMap\":true,\"jsx\":\"preserve\",\"resolveJsonModule\":true},\"include\":[\"src\"],\"files\":[\"lib/f.ts\"]}"
+          },
+          "name": "out-include"
+        },
+        {
+          "input": {
+            "args": [
+              "/p/src/a.ts",
+              "/p/src/new.ts",
+              "/p/lib/f.ts",
+              "/p/lib/g.ts",
+              "/p/other.ts",
+              "/p/src/deep/x.ts",
+              "/p/src/x.d.ts",
+              "/p/tests/u.ts",
+              "/p/src/skip/z.ts",
+              "/p/SRC/a.ts"
+            ],
+            "caseSensitive": true,
+            "currentDirectory": "/p",
+            "files": {
+              "/p/lib/f.ts": "",
+              "/p/src/a.ts": "",
+              "/p/src/b.tsx": "",
+              "/p/src/c.d.ts": "",
+              "/p/src/d.json": "{}",
+              "/p/src/deep/g.ts": "",
+              "/p/src/e.mts": "",
+              "/p/src/skip/s.ts": "",
+              "/p/tests/t.ts": ""
+            },
+            "jsonText": "{\"compilerOptions\":{\"emitDeclarationOnly\":true,\"declaration\":true}}"
+          },
+          "name": "declaration-only"
+        },
+        {
+          "input": {
+            "args": [
+              "/p/src/a.ts",
+              "/p/src/new.ts",
+              "/p/lib/f.ts",
+              "/p/lib/g.ts",
+              "/p/other.ts",
+              "/p/src/deep/x.ts",
+              "/p/src/x.d.ts",
+              "/p/tests/u.ts",
+              "/p/src/skip/z.ts",
+              "/p/SRC/a.ts"
+            ],
+            "caseSensitive": true,
+            "currentDirectory": "/p",
+            "files": {
+              "/p/lib/f.ts": "",
+              "/p/src/a.ts": "",
+              "/p/src/b.tsx": "",
+              "/p/src/c.d.ts": "",
+              "/p/src/d.json": "{}",
+              "/p/src/deep/g.ts": "",
+              "/p/src/e.mts": "",
+              "/p/src/skip/s.ts": "",
+              "/p/tests/t.ts": ""
+            },
+            "jsonText": "{\"compilerOptions\":{\"inlineSourceMap\":true,\"sourceMap\":true,\"declarationDir\":\"types\",\"declaration\":true},\"files\":[\"src/a.ts\",\"src/d.json\"]}"
+          },
+          "name": "files-inline"
+        },
+        {
+          "input": {
+            "args": [
+              "/p/src/a.ts",
+              "/p/src/new.ts",
+              "/p/lib/f.ts",
+              "/p/lib/g.ts",
+              "/p/other.ts",
+              "/p/src/deep/x.ts",
+              "/p/src/x.d.ts",
+              "/p/tests/u.ts",
+              "/p/src/skip/z.ts",
+              "/p/SRC/a.ts"
+            ],
+            "caseSensitive": true,
+            "currentDirectory": "/p",
+            "files": {
+              "/p/lib/f.ts": "",
+              "/p/src/a.ts": "",
+              "/p/src/b.tsx": "",
+              "/p/src/c.d.ts": "",
+              "/p/src/d.json": "{}",
+              "/p/src/deep/g.ts": "",
+              "/p/src/e.mts": "",
+              "/p/src/skip/s.ts": "",
+              "/p/tests/t.ts": ""
+            },
+            "jsonText": "{\"include\":[\"src/**/*\",\"lib/*.ts\",\"tests\"],\"exclude\":[\"src/skip\"]}"
+          },
+          "name": "globs"
+        },
+        {
+          "input": {
+            "args": [
+              "/p/src/a.ts",
+              "/p/src/new.ts",
+              "/p/lib/f.ts",
+              "/p/lib/g.ts",
+              "/p/other.ts",
+              "/p/src/deep/x.ts",
+              "/p/src/x.d.ts",
+              "/p/tests/u.ts",
+              "/p/src/skip/z.ts",
+              "/p/SRC/a.ts"
+            ],
+            "caseSensitive": false,
+            "currentDirectory": "/p",
+            "files": {
+              "/p/lib/f.ts": "",
+              "/p/src/a.ts": "",
+              "/p/src/b.tsx": "",
+              "/p/src/c.d.ts": "",
+              "/p/src/d.json": "{}",
+              "/p/src/deep/g.ts": "",
+              "/p/src/e.mts": "",
+              "/p/src/skip/s.ts": "",
+              "/p/tests/t.ts": ""
+            },
+            "jsonText": "{\"include\":[\"src/**/*\",\"lib/*.ts\",\"tests\"],\"exclude\":[\"src/skip\"]}"
+          },
+          "name": "globs-ci"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/tsoptions/parsedcommandline.go:423"
+      ],
+      "id": "tsoptions.ParsedCommandLine.WildcardDirectoryGlobs",
+      "input": "config",
+      "operations": [
+        "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.WildcardDirectoryGlobs"
+      ],
+      "projection": "per probe file name whether any glob matches, then the glob count (Go ranges over the wildcard directory map in random order)",
+      "rust": "tsr_tsoptions::ParsedCommandLine::wildcard_directory_globs",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "args": [
+              "/p/src/a.ts",
+              "/p/src/new.ts",
+              "/p/lib/f.ts",
+              "/p/lib/g.ts",
+              "/p/other.ts",
+              "/p/src/deep/x.ts",
+              "/p/src/x.d.ts",
+              "/p/tests/u.ts",
+              "/p/src/skip/z.ts",
+              "/p/SRC/a.ts"
+            ],
+            "caseSensitive": true,
+            "currentDirectory": "/p",
+            "files": {
+              "/p/lib/f.ts": "",
+              "/p/src/a.ts": "",
+              "/p/src/b.tsx": "",
+              "/p/src/c.d.ts": "",
+              "/p/src/d.json": "{}",
+              "/p/src/deep/g.ts": "",
+              "/p/src/e.mts": "",
+              "/p/src/skip/s.ts": "",
+              "/p/tests/t.ts": ""
+            },
+            "jsonText": "{\"compilerOptions\":{\"outDir\":\"out\",\"declaration\":true,\"sourceMap\":true,\"declarationMap\":true,\"jsx\":\"preserve\",\"resolveJsonModule\":true},\"include\":[\"src\"],\"files\":[\"lib/f.ts\"]}"
+          },
+          "name": "out-include"
+        },
+        {
+          "input": {
+            "args": [
+              "/p/src/a.ts",
+              "/p/src/new.ts",
+              "/p/lib/f.ts",
+              "/p/lib/g.ts",
+              "/p/other.ts",
+              "/p/src/deep/x.ts",
+              "/p/src/x.d.ts",
+              "/p/tests/u.ts",
+              "/p/src/skip/z.ts",
+              "/p/SRC/a.ts"
+            ],
+            "caseSensitive": true,
+            "currentDirectory": "/p",
+            "files": {
+              "/p/lib/f.ts": "",
+              "/p/src/a.ts": "",
+              "/p/src/b.tsx": "",
+              "/p/src/c.d.ts": "",
+              "/p/src/d.json": "{}",
+              "/p/src/deep/g.ts": "",
+              "/p/src/e.mts": "",
+              "/p/src/skip/s.ts": "",
+              "/p/tests/t.ts": ""
+            },
+            "jsonText": "{\"compilerOptions\":{\"emitDeclarationOnly\":true,\"declaration\":true}}"
+          },
+          "name": "declaration-only"
+        },
+        {
+          "input": {
+            "args": [
+              "/p/src/a.ts",
+              "/p/src/new.ts",
+              "/p/lib/f.ts",
+              "/p/lib/g.ts",
+              "/p/other.ts",
+              "/p/src/deep/x.ts",
+              "/p/src/x.d.ts",
+              "/p/tests/u.ts",
+              "/p/src/skip/z.ts",
+              "/p/SRC/a.ts"
+            ],
+            "caseSensitive": true,
+            "currentDirectory": "/p",
+            "files": {
+              "/p/lib/f.ts": "",
+              "/p/src/a.ts": "",
+              "/p/src/b.tsx": "",
+              "/p/src/c.d.ts": "",
+              "/p/src/d.json": "{}",
+              "/p/src/deep/g.ts": "",
+              "/p/src/e.mts": "",
+              "/p/src/skip/s.ts": "",
+              "/p/tests/t.ts": ""
+            },
+            "jsonText": "{\"compilerOptions\":{\"inlineSourceMap\":true,\"sourceMap\":true,\"declarationDir\":\"types\",\"declaration\":true},\"files\":[\"src/a.ts\",\"src/d.json\"]}"
+          },
+          "name": "files-inline"
+        },
+        {
+          "input": {
+            "args": [
+              "/p/src/a.ts",
+              "/p/src/new.ts",
+              "/p/lib/f.ts",
+              "/p/lib/g.ts",
+              "/p/other.ts",
+              "/p/src/deep/x.ts",
+              "/p/src/x.d.ts",
+              "/p/tests/u.ts",
+              "/p/src/skip/z.ts",
+              "/p/SRC/a.ts"
+            ],
+            "caseSensitive": true,
+            "currentDirectory": "/p",
+            "files": {
+              "/p/lib/f.ts": "",
+              "/p/src/a.ts": "",
+              "/p/src/b.tsx": "",
+              "/p/src/c.d.ts": "",
+              "/p/src/d.json": "{}",
+              "/p/src/deep/g.ts": "",
+              "/p/src/e.mts": "",
+              "/p/src/skip/s.ts": "",
+              "/p/tests/t.ts": ""
+            },
+            "jsonText": "{\"include\":[\"src/**/*\",\"lib/*.ts\",\"tests\"],\"exclude\":[\"src/skip\"]}"
+          },
+          "name": "globs"
+        },
+        {
+          "input": {
+            "args": [
+              "/p/src/a.ts",
+              "/p/src/new.ts",
+              "/p/lib/f.ts",
+              "/p/lib/g.ts",
+              "/p/other.ts",
+              "/p/src/deep/x.ts",
+              "/p/src/x.d.ts",
+              "/p/tests/u.ts",
+              "/p/src/skip/z.ts",
+              "/p/SRC/a.ts"
+            ],
+            "caseSensitive": false,
+            "currentDirectory": "/p",
+            "files": {
+              "/p/lib/f.ts": "",
+              "/p/src/a.ts": "",
+              "/p/src/b.tsx": "",
+              "/p/src/c.d.ts": "",
+              "/p/src/d.json": "{}",
+              "/p/src/deep/g.ts": "",
+              "/p/src/e.mts": "",
+              "/p/src/skip/s.ts": "",
+              "/p/tests/t.ts": ""
+            },
+            "jsonText": "{\"include\":[\"src/**/*\",\"lib/*.ts\",\"tests\"],\"exclude\":[\"src/skip\"]}"
+          },
+          "name": "globs-ci"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/execute/build/orchestrator.go:221",
+        "internal/core/projectreference.go:15",
+        "internal/execute/build/buildtask.go:215",
+        "internal/tsoptions/parsedbuildcommandline.go:32"
+      ],
+      "id": "tsoptions.ParsedBuildCommandLine.ResolvedProjectPaths",
+      "input": "config",
+      "operations": [
+        "tsc/internal/tsoptions/parsedbuildcommandline.go:ParsedBuildCommandLine.ResolvedProjectPaths",
+        "tsc/internal/core/projectreference.go:ResolveConfigFileNameOfProjectReference"
+      ],
+      "projection": "hex of the resolved project paths of ParseBuildCommandLine over the args",
+      "rust": "tsr_tsoptions::ParsedBuildCommandLine::resolved_project_paths",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "args": [
+              "src",
+              "lib/tsconfig.json",
+              "../other",
+              "--verbose",
+              "tests/x.json"
+            ],
+            "caseSensitive": true,
+            "currentDirectory": "/p",
+            "files": {
+              "/p/lib/f.ts": "",
+              "/p/src/a.ts": "",
+              "/p/src/b.tsx": "",
+              "/p/src/c.d.ts": "",
+              "/p/src/d.json": "{}",
+              "/p/src/deep/g.ts": "",
+              "/p/src/e.mts": "",
+              "/p/src/skip/s.ts": "",
+              "/p/tests/t.ts": ""
+            },
+            "jsonText": "{\"include\":[\"src/**/*\",\"lib/*.ts\",\"tests\"],\"exclude\":[\"src/skip\"]}"
+          },
+          "name": "projects"
+        },
+        {
+          "input": {
+            "args": [],
+            "caseSensitive": true,
+            "currentDirectory": "/p",
+            "files": {
+              "/p/lib/f.ts": "",
+              "/p/src/a.ts": "",
+              "/p/src/b.tsx": "",
+              "/p/src/c.d.ts": "",
+              "/p/src/d.json": "{}",
+              "/p/src/deep/g.ts": "",
+              "/p/src/e.mts": "",
+              "/p/src/skip/s.ts": "",
+              "/p/tests/t.ts": ""
+            },
+            "jsonText": "{\"include\":[\"src/**/*\",\"lib/*.ts\",\"tests\"],\"exclude\":[\"src/skip\"]}"
+          },
+          "name": "none"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/execute/tsctests/sys.go:152"
+      ],
+      "id": "tsoptions.TargetToLibMap",
+      "input": "values",
+      "operations": [
+        "tsc/internal/tsoptions/enummaps.go:TargetToLibMap"
+      ],
+      "projection": "[[lib file hex, target], ...] sorted by lib file (Go's is a map)",
+      "rust": "tsr_tsoptions::enum_maps::target_to_lib_map",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {},
+          "name": "map"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/core/projectreference.go:15",
+        "internal/execute/build/buildtask.go:215",
+        "internal/tsoptions/parsedbuildcommandline.go:32"
+      ],
+      "id": "core.ResolveProjectReferencePath",
+      "input": "values",
+      "operations": [
+        "tsc/internal/core/projectreference.go:ResolveProjectReferencePath",
+        "tsc/internal/core/projectreference.go:ResolveConfigFileNameOfProjectReference"
+      ],
+      "projection": "[ResolveConfigFileNameOfProjectReference hex, ResolveProjectReferencePath hex] per path",
+      "rust": "tsr_tsoptions::resolve_project_reference_path",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "paths": [
+              "/p/a",
+              "/p/a/tsconfig.json",
+              "/p/b.json",
+              "",
+              "/p/c/",
+              "rel/d",
+              "/p/e.JSON"
+            ]
+          },
+          "name": "paths"
+        }
+      ]
     }
   ],
   "group": "tsoptions",

@@ -15,7 +15,7 @@ struct AssignmentKey {
 }
 
 impl<R: DeclarationEmitResolver> Transformer<'_, R> {
-    // port: tsc/internal/ast/utilities.go:TryGetTextOfPropertyName
+    // Inline copy of `TryGetTextOfPropertyName`; its Phase 1 home is in tsr_ast (table group targets).
     fn property_text(&self, name: NodeId) -> Result<Option<JsString>, R::Error> {
         match self.node(name).kind().known() {
             Some(

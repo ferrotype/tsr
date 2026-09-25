@@ -502,6 +502,33 @@ impl tsr_tsoptions::ParseConfigHost for Host {
 
 /// The setup of a config column (Go's `ParseConfig`): the parsed command line
 /// and the column's own `args`.
+/// The VFS host of a config input (Go's `tsoptionstest.NewVFSParseConfigHost`)
+/// and its args, for columns that parse a command line rather than the
+/// tsconfig.
+pub fn config_host(input: &Value) -> Result<(impl tsr_tsoptions::ParseConfigHost, Value), String> {
+    crate::protocol::fields(input, "files currentDirectory caseSensitive jsonText args")?;
+    let current = input["currentDirectory"]
+        .as_str()
+        .ok_or("currentDirectory")?
+        .as_bytes()
+        .to_vec();
+    let case_sensitive = input["caseSensitive"].as_bool().ok_or("caseSensitive")?;
+    let mut builder = tsr_vfs::MemoryBuilder::new(&current, case_sensitive);
+    for (path, content) in input["files"].as_object().ok_or("files")? {
+        builder.insert_physical(
+            path.as_bytes(),
+            content.as_str().ok_or("file text")?.as_bytes().to_vec(),
+        );
+    }
+    Ok((
+        Host {
+            fs: Arc::new(builder.finish()),
+            cwd: JsString::from_bytes(current),
+        },
+        input["args"].clone(),
+    ))
+}
+
 pub fn parse_config(input: &Value) -> Result<(tsr_tsoptions::ParsedCommandLine, Value), String> {
     crate::protocol::fields(input, "files currentDirectory caseSensitive jsonText args")?;
     let current = input["currentDirectory"]
