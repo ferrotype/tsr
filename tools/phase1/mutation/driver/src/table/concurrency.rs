@@ -251,24 +251,28 @@ pub fn build(column: &str, input: &Value) -> Option<Result<Column, String>> {
                 let values = Mutex::new(Vec::new());
                 let (running, most) = (AtomicI64::new(0), AtomicI64::new(0));
                 let semaphore = Arc::new(tsr_core::semaphore::LimitedSemaphore::new(case.limit));
-                let mut group = tsr_core::workgroup::ThrottleGroup::<String>::new(semaphore);
-                for job in &case.jobs {
-                    let (values, running, most) = (&values, &running, &most);
-                    group.go(move || {
-                        let now = running.fetch_add(1, Ordering::SeqCst) + 1;
-                        most.fetch_max(now, Ordering::SeqCst);
-                        values
-                            .lock()
-                            .unwrap_or_else(std::sync::PoisonError::into_inner)
-                            .push(job.value);
-                        running.fetch_sub(1, Ordering::SeqCst);
-                        if job.fail {
-                            return Err("job failed".to_owned());
-                        }
-                        Ok(())
-                    });
-                }
-                let failure = match group.wait() {
+                let result = std::thread::scope(|scope| {
+                    let mut group =
+                        tsr_core::workgroup::ThrottleGroup::<String>::new(scope, semaphore);
+                    for job in &case.jobs {
+                        let (values, running, most) = (&values, &running, &most);
+                        group.go(move || {
+                            let now = running.fetch_add(1, Ordering::SeqCst) + 1;
+                            most.fetch_max(now, Ordering::SeqCst);
+                            values
+                                .lock()
+                                .unwrap_or_else(std::sync::PoisonError::into_inner)
+                                .push(job.value);
+                            running.fetch_sub(1, Ordering::SeqCst);
+                            if job.fail {
+                                return Err("job failed".to_owned());
+                            }
+                            Ok(())
+                        });
+                    }
+                    group.wait()
+                });
+                let failure = match result {
                     Err(error) => json!(hex(error.as_bytes())),
                     Ok(()) => Value::Null,
                 };

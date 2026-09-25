@@ -1,6 +1,6 @@
 {
-  "accounted_operations": 402,
-  "complete": true,
+  "accounted_operations": 401,
+  "complete": false,
   "exempt_by_category": {
     "go_test_harness": 17,
     "unused_at_pin": 4
@@ -15,12 +15,21 @@
     "problems": [],
     "total_outputs": 167
   },
-  "pending": [],
+  "pending": [
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.WithFileNames",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    }
+  ],
   "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
   "prepared_operations": 312,
   "roster_problems": [],
   "step": "config",
   "total_operations": 402,
   "version": 2,
-  "witnessed_operations": 69
+  "witnessed_operations": 68
 }

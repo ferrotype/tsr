@@ -3134,3 +3134,19 @@ operation, Linux `Realpath`; this correction does not rerun the full mutation
 campaign or certify the outstanding Linux capture. The capture and targeted
 diagnostic outputs are archived as described in
 [the capture index](../data/phase1/captures/F5b-README.md#pr-56-witness-corrections).
+
+### PR #56 production follow-up (2026-09-25)
+
+The #54/#55 review found two additional production defects: file-list copies
+retained stale name/common-directory/output caches, and `ThrottleGroup.Go`
+deferred execution until `Wait`. Both are corrected, with the pinned cache
+constructor fields preserved and an explicit thread scope for immediate task
+startup. The focused cache and workgroup tests pass, including startup before
+`Wait`, error completion and panic cleanup. Clippy passes for `tsr_core`,
+`tsr_tsoptions` and the adapted table driver. The S07 operation inventory still
+matches; no mapping anchors changed.
+
+The [mutation record](PHASE1-mutation-witnesses.md#pr-56-cache-and-scheduling-follow-up-to-the-55-review)
+describes the contracts and validation limits. Tracking views are regenerated
+with stale claims left pending. No full mutation campaign, corpus or benchmark
+was rerun for this follow-up.

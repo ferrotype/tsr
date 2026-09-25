@@ -242,7 +242,7 @@
     },
     {
       "category": "equivalent_rust",
-      "evidence": "Replacement mechanism: a struct literal constructor (workgroup.rs:22 `Self { semaphore, tasks: Vec::new() }`). Caller-level witness (cited, not claimed): mutation/table core.ThrottleGroup column (ThrottleGroup.Go and Wait, limits 1 and 3). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "evidence": "Replacement mechanism: construction of an empty scope-bound task group in workgroup.rs, retaining the semaphore and initializing the first-error slot. Caller-level witness (cited, not claimed): mutation/table core.ThrottleGroup column (ThrottleGroup.Go and Wait, limits 1 and 3). Tasks start in Go, and Wait joins them; the thread scope bounds borrowed inputs. Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
       "operation": "tsc/internal/core/workgroup.go:NewThrottleGroup",
       "owner": "a struct literal constructor"
     },

@@ -1,8 +1,8 @@
 {
   "counts": {
-    "covered": 4237,
+    "covered": 4234,
     "equivalent_rust": 92,
-    "implemented_untested": 189,
+    "implemented_untested": 192,
     "later_phase": 227,
     "missing": 50
   },
@@ -190150,7 +190150,7 @@
       "annotated_home": [
         "crates/tsr_core/src/workgroup.rs"
       ],
-      "basis": "Replacement mechanism: a struct literal constructor (workgroup.rs:22 `Self { semaphore, tasks: Vec::new() }`). Caller-level witness (cited, not claimed): mutation/table core.ThrottleGroup column (ThrottleGroup.Go and Wait, limits 1 and 3). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "basis": "Replacement mechanism: construction of an empty scope-bound task group in workgroup.rs, retaining the semaphore and initializing the first-error slot. Caller-level witness (cited, not claimed): mutation/table core.ThrottleGroup column (ThrottleGroup.Go and Wait, limits 1 and 3). Tasks start in Go, and Wait joins them; the thread scope bounds borrowed inputs. Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
       "basis_kind": "review",
       "cases": [],
       "depends_on": [
@@ -190223,11 +190223,9 @@
       "annotated_home": [
         "crates/tsr_core/src/workgroup.rs"
       ],
-      "basis": "witnessed by 1 exact link(s): mutation/table",
+      "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
-      "cases": [
-        "mutation/table"
-      ],
+      "cases": [],
       "depends_on": [
         "internal/collections",
         "internal/debug",
@@ -190236,7 +190234,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "covered",
+      "disposition": "implemented_untested",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/workgroup.go",
       "id": "tsc/internal/core/workgroup.go:ThrottleGroup.Go",
@@ -190249,7 +190247,7 @@
       "membership_reason": "core helpers and option semantics",
       "roster": {
         "owner": null,
-        "state": "prepared",
+        "state": "pending",
         "step": "leaves"
       },
       "rust_home": [],
@@ -190260,11 +190258,9 @@
       "annotated_home": [
         "crates/tsr_core/src/workgroup.rs"
       ],
-      "basis": "witnessed by 1 exact link(s): mutation/table",
+      "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
-      "cases": [
-        "mutation/table"
-      ],
+      "cases": [],
       "depends_on": [
         "internal/collections",
         "internal/debug",
@@ -190273,7 +190269,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "covered",
+      "disposition": "implemented_untested",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/workgroup.go",
       "id": "tsc/internal/core/workgroup.go:ThrottleGroup.Wait",
@@ -190286,7 +190282,7 @@
       "membership_reason": "core helpers and option semantics",
       "roster": {
         "owner": null,
-        "state": "prepared",
+        "state": "pending",
         "step": "leaves"
       },
       "rust_home": [],
@@ -264480,11 +264476,9 @@
       "annotated_home": [
         "crates/tsr_tsoptions/src/parsed_commandline_ext.rs"
       ],
-      "basis": "witnessed by 1 exact link(s): mutation/table",
+      "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
-      "cases": [
-        "mutation/table"
-      ],
+      "cases": [],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -264514,7 +264508,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "covered",
+      "disposition": "implemented_untested",
       "go_package": "internal/tsoptions",
       "go_source": "tsc/internal/tsoptions/parsedcommandline.go",
       "id": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.WithFileNames",
@@ -264527,7 +264521,7 @@
       "membership_reason": "config, command-line and build-option parsing",
       "roster": {
         "owner": null,
-        "state": "prepared",
+        "state": "pending",
         "step": "config"
       },
       "rust_home": [

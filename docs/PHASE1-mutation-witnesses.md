@@ -275,6 +275,30 @@ Known limitations:
 - About 18 predicate mutants per oracle still hang on every candidate row; their
   operations are witnessed by other mutants or remain pending.
 
+### PR #56: cache and scheduling follow-up to the #55 review
+
+`ParsedCommandLine.WithFileNames` and `ReloadFileNamesOfParsedCommandLine`
+now copy the fields listed by the pinned constructors rather than cloning
+every initialized cache. Wildcard directories and include globs survive;
+file-name indexes, common directories, output maps, locale and reference-path
+caches start uninitialized. The ordinary Rust `Clone` and option setters keep
+their existing cache behavior. Focused regressions prime the old file caches
+before replacement/reload, check the new names and declaration paths, and
+verify the original still resolves its old files.
+
+`ThrottleGroup.Go` now starts each task when called, as the pin does, rather
+than postponing the tasks until `Wait`. Its constructor takes the caller's
+Rust thread scope so tasks may borrow inputs safely. `Wait` joins the tasks
+and returns the first error; the surrounding scope also joins tasks if the
+group is dropped. Regressions exercise a task signal received before `Wait`,
+completion despite an error, group disposal, and panic/permit cleanup. The
+table adapter supplies the scope and retains its observation format.
+
+These are production fixes with focused regression checks, not a new mutation
+campaign. The historical campaign counts above remain historical; changed
+inputs must be refreshed by the phase-end evidence run before being claimed
+current.
+
 ## 9. Operation tables (the `table` oracle)
 
 Most operations the four oracles cannot witness are not reached by a parser run

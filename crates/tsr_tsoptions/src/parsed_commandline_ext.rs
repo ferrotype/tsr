@@ -171,14 +171,41 @@ impl ParsedCommandLine {
         None
     }
 
-    /// Go's `WithFileNames`: a copy with other file names (nil for none);
-    /// the caches and specs are shared as Go shares their pointers.
+    /// Go's `WithFileNames`: a copy with other file names (nil for none).
+    /// Keep wildcard directories and include globs; reset the other caches.
     /// port: tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.WithFileNames
     #[must_use]
     pub fn with_file_names(&self, file_names: Option<Vec<JsString>>) -> Self {
-        let mut copy = self.clone();
-        copy.root_file_names = file_names.unwrap_or_default();
-        copy
+        self.copy_with_file_names(file_names.unwrap_or_default(), self.literal_file_names_len)
+    }
+
+    // The two pinned constructors initialize the same fields, leaving the
+    // file-dependent caches (and locale/reference caches) uninitialized.
+    // Construct directly so warm output maps are not cloned just to drop them.
+    fn copy_with_file_names(
+        &self,
+        file_names: Vec<JsString>,
+        literal_file_names_len: usize,
+    ) -> Self {
+        Self {
+            options: self.options.clone(),
+            watch_options: self.watch_options.clone(),
+            root_file_names: file_names,
+            config_file: self.config_file.clone(),
+            errors: self.errors.clone(),
+            raw: self.raw.clone(),
+            compile_on_save: self.compile_on_save,
+            config_specs: self.config_specs.clone(),
+            config_base_path: self.config_base_path.clone(),
+            config_case_sensitive: self.config_case_sensitive,
+            wildcard_directories_cache: self.wildcard_directories_cache.clone(),
+            caches: self.caches.for_new_file_names(),
+            config_dependencies: self.config_dependencies.clone(),
+            type_acquisition: self.type_acquisition.clone(),
+            project_references: self.project_references.clone(),
+            literal_file_names_len,
+            content_mappers: self.content_mappers.clone(),
+        }
     }
 
     /// port: tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.PossiblyMatchesFileName
@@ -237,10 +264,7 @@ impl ParsedCommandLine {
         fs: &dyn tsr_vfs::FileSystem,
     ) -> Result<Self, tsr_vfs::Error> {
         let (file_names, literal_file_names_len) = self.reloaded_file_names(fs)?;
-        let mut copy = self.clone();
-        copy.root_file_names = file_names;
-        copy.literal_file_names_len = literal_file_names_len;
-        Ok(copy)
+        Ok(self.copy_with_file_names(file_names, literal_file_names_len))
     }
 
     /// The file names `ReloadFileNamesOfParsedCommandLine` reads: its work,

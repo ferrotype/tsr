@@ -335,3 +335,14 @@ impl ParsedCommandLine {
             })
     }
 }
+
+impl ParsedCaches {
+    /// WithFileNames and ReloadFileNames copy only includeGlobs from these
+    /// caches. In particular, names and output maps must describe the new files.
+    pub(crate) fn for_new_file_names(&self) -> Self {
+        Self {
+            globs: self.globs.clone(),
+            ..Self::default()
+        }
+    }
+}

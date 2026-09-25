@@ -1,6 +1,6 @@
 {
-  "accounted_operations": 460,
-  "complete": true,
+  "accounted_operations": 458,
+  "complete": false,
   "exempt_by_category": {
     "build_tooling": 11,
     "build_variant": 2,
@@ -13,12 +13,23 @@
   "exempt_operations": 54,
   "gap_problems": [],
   "later_step_unresolved": 0,
-  "pending": [],
+  "pending": [
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/workgroup.go:ThrottleGroup.Go",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/workgroup.go:ThrottleGroup.Wait",
+      "rust_home": []
+    }
+  ],
   "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
   "prepared_operations": 347,
   "roster_problems": [],
   "step": "leaves",
   "total_operations": 460,
   "version": 2,
-  "witnessed_operations": 59
+  "witnessed_operations": 57
 }
