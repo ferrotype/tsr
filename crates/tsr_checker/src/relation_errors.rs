@@ -270,8 +270,11 @@ impl Relater<'_> {
         } else {
             self.checker.types.flags(target)?
         };
+        // The pin excludes only the two variance-annotation check markers here,
+        // not the measurement markers.
         if target_flags & tf::TYPE_PARAMETER != 0
-            && !self.checker.variance.markers.contains(&target)
+            && target != self.checker.builtins.marker_super_type_for_check
+            && target != self.checker.builtins.marker_sub_type_for_check
         {
             let constraint = self.checker.base_constraint_of_type(target)?;
             if let Some(constraint) = constraint {
