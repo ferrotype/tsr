@@ -1,5 +1,130 @@
 {
  "dispositions": {
+  "tsc/internal/checker/checker.go:Checker.getArrayOrTupleTargetType": {
+   "disposition": "gap",
+   "item": "C1.4",
+   "reason": "array or tuple target from a type node; the Rust site is not identified by name yet"
+  },
+  "tsc/internal/checker/checker.go:Checker.getBaseTypeOfLiteralTypeUnion": {
+   "disposition": "gap",
+   "item": "C1.4",
+   "reason": "base type of a union of literals (with its cache); the Rust site is not identified by name yet"
+  },
+  "tsc/internal/checker/checker.go:Checker.getNormalizedTupleType": {
+   "disposition": "equivalent",
+   "reason": "normalize_tuple normalizes variadic elements for both the constructor and the relation-time normalization",
+   "rust": "crates/tsr_checker/src/arrays.rs:344"
+  },
+  "tsc/internal/checker/checker.go:Checker.getRestTypeOfTupleType": {
+   "disposition": "equivalent",
+   "reason": "slice_tuple takes the slice from fixed_length inline, which is the pin's definition",
+   "rust": "crates/tsr_checker/src/infer_tuples.rs:184"
+  },
+  "tsc/internal/checker/checker.go:Checker.getTypeFromLiteralTypeNode": {
+   "disposition": "gap",
+   "item": "C1.4",
+   "reason": "literal type node to type; the Rust site is not identified by name yet"
+  },
+  "tsc/internal/checker/checker.go:Checker.getUniqAssociatedNamesFromTupleType": {
+   "disposition": "gap",
+   "item": "C1.4",
+   "reason": "associated parameter names of a tuple; the Rust site is not identified by name yet"
+  },
+  "tsc/internal/checker/checker.go:Checker.getUniqueLiteralTypeForTypeParameter": {
+   "disposition": "gap",
+   "item": "C1.4",
+   "reason": "unique literal type for a type parameter; the Rust site is not identified by name yet"
+  },
+  "tsc/internal/checker/checker.go:Checker.getWidenedLiteralTypeForInitializer": {
+   "disposition": "gap",
+   "item": "C1.4",
+   "reason": "widened literal type of an initializer; the Rust site is not identified by name yet"
+  },
+  "tsc/internal/checker/checker.go:Checker.isArrayOrTupleLikeType": {
+   "disposition": "gap",
+   "item": "C1.4",
+   "reason": "array-or-tuple-like test; the Rust site is not identified by name yet"
+  },
+  "tsc/internal/checker/checker.go:Checker.isArrayOrTupleOrIntersection": {
+   "disposition": "gap",
+   "item": "C1.4",
+   "reason": "array, tuple or intersection test; the Rust site is not identified by name yet"
+  },
+  "tsc/internal/checker/checker.go:Checker.isArrayOrTupleSymbol": {
+   "disposition": "equivalent",
+   "reason": "the symbol test is done through the global Array/ReadonlyArray targets and the tuple object flag at the call sites",
+   "rust": "crates/tsr_checker/src/arrays.rs:79"
+  },
+  "tsc/internal/checker/checker.go:Checker.isArrayOrTupleType": {
+   "disposition": "equivalent",
+   "reason": "is_array_type(t) || is_tuple_type(t) at the call sites",
+   "rust": "crates/tsr_checker/src/arrays.rs:79"
+  },
+  "tsc/internal/checker/checker.go:Checker.isEmptyArrayLiteralType": {
+   "disposition": "gap",
+   "item": "C1.4",
+   "reason": "empty array literal test; the Rust site is not identified by name yet"
+  },
+  "tsc/internal/checker/checker.go:Checker.isEmptyLiteralType": {
+   "disposition": "gap",
+   "item": "C1.4",
+   "reason": "empty literal test; the Rust site is not identified by name yet"
+  },
+  "tsc/internal/checker/checker.go:Checker.isReadonlyArraySymbol": {
+   "disposition": "equivalent",
+   "reason": "the symbol test is done through the global ReadonlyArray target at the call sites",
+   "rust": "crates/tsr_checker/src/arrays.rs:89"
+  },
+  "tsc/internal/checker/checker.go:Checker.newUniqueESSymbolType": {
+   "disposition": "gap",
+   "item": "C1.4",
+   "reason": "unique symbol type constructor; the Rust site is not identified by name yet"
+  },
+  "tsc/internal/checker/checker.go:Checker.parseBigIntLiteralType": {
+   "disposition": "gap",
+   "item": "C1.4",
+   "reason": "bigint literal parsing; the Rust site is not identified by name yet"
+  },
+  "tsc/internal/checker/checker.go:getBigIntLiteralValue": {
+   "disposition": "equivalent",
+   "reason": "LiteralData.value holds the bigint value",
+   "rust": "crates/tsr_checker/src/types.rs:167"
+  },
+  "tsc/internal/checker/checker.go:getBooleanLiteralValue": {
+   "disposition": "equivalent",
+   "reason": "LiteralData.value holds the boolean value",
+   "rust": "crates/tsr_checker/src/types.rs:167"
+  },
+  "tsc/internal/checker/checker.go:getNumberLiteralValue": {
+   "disposition": "equivalent",
+   "reason": "LiteralData.value holds the number value",
+   "rust": "crates/tsr_checker/src/types.rs:167"
+  },
+  "tsc/internal/checker/checker.go:getStringLiteralValue": {
+   "disposition": "equivalent",
+   "reason": "LiteralData.value holds the string value",
+   "rust": "crates/tsr_checker/src/types.rs:167"
+  },
+  "tsc/internal/checker/checker.go:isConstEnumSymbol": {
+   "disposition": "equivalent",
+   "reason": "const_enum_object_type tests the symbol's const-enum flag inline",
+   "rust": "crates/tsr_checker/src/enums.rs:725"
+  },
+  "tsc/internal/checker/checker.go:isGenericTupleType": {
+   "disposition": "equivalent",
+   "reason": "is_generic_tuple_type is marked as the Checker method of the same name; the package-level function has the same body",
+   "rust": "crates/tsr_checker/src/template.rs:285"
+  },
+  "tsc/internal/checker/checker.go:isMutableTupleType": {
+   "disposition": "equivalent",
+   "reason": "the tuple half of is_mutable_array_or_tuple; callers test the tuple flag inline",
+   "rust": "crates/tsr_checker/src/arrays.rs:97"
+  },
+  "tsc/internal/checker/checker.go:isUnaryTupleTypeNode": {
+   "disposition": "gap",
+   "item": "C1.4",
+   "reason": "unary tuple node test; the Rust site is not identified by name yet"
+  },
   "tsc/internal/checker/relater.go:Checker.checkTypeAssignableToAndOptionallyElaborate": {
    "disposition": "gap",
    "item": "C1.6",
