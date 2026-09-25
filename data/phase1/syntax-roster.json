@@ -2873,10 +2873,34 @@
       "evidence": "upstream/tsc/internal/testutil/tsbaseline/util.go. The package is imported outside the harness only by internal/fourslash/fourslash.go. || RUST: Absent from crates/, intentionally. The baselines themselves are the port's obligation and are compared through its own harness (tools/s08/p5 renders error baselines for E2); the baseline-writing driver is not.",
       "operation": "tsc/internal/testutil/tsbaseline/util.go:sanitizeTestFilePath",
       "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "later_step",
+      "evidence": "Definition: upstream/tsc/internal/ast/ast_generated.go:6270-6276 (NewSyntheticExpression), 6278-6283 (UpdateSyntheticExpression), 6289-6291 (SyntheticExpression.VisitEachChild), 6293-6295 (SyntheticExpression.Clone). The payload's Type is `any` for a checker *Type. The only pinned production constructor is Checker.createSyntheticExpression (upstream/tsc/internal/checker/checker.go:30467), which the Rust checker already implements over its TypeId slot (crates/tsr_checker/src/destructuring_assignments.rs:392); the other constructor is the API decoder (upstream/tsc/internal/api/encoder/decoder_generated.go:856), Phase 6. The generated-AST family keeps its cast and child-traversal case (syntax/generated-special/SyntheticExpression) without claiming these four.",
+      "operation": "tsc/internal/ast/ast_generated.go:NodeFactory.NewSyntheticExpression",
+      "owner": "Phase 2 by the owner's 2026-09-25 decision, recorded in coverage-review.json"
+    },
+    {
+      "category": "later_step",
+      "evidence": "Definition: upstream/tsc/internal/ast/ast_generated.go:6270-6276 (NewSyntheticExpression), 6278-6283 (UpdateSyntheticExpression), 6289-6291 (SyntheticExpression.VisitEachChild), 6293-6295 (SyntheticExpression.Clone). The payload's Type is `any` for a checker *Type. The only pinned production constructor is Checker.createSyntheticExpression (upstream/tsc/internal/checker/checker.go:30467), which the Rust checker already implements over its TypeId slot (crates/tsr_checker/src/destructuring_assignments.rs:392); the other constructor is the API decoder (upstream/tsc/internal/api/encoder/decoder_generated.go:856), Phase 6. The generated-AST family keeps its cast and child-traversal case (syntax/generated-special/SyntheticExpression) without claiming these four.",
+      "operation": "tsc/internal/ast/ast_generated.go:NodeFactory.UpdateSyntheticExpression",
+      "owner": "Phase 2 by the owner's 2026-09-25 decision, recorded in coverage-review.json"
+    },
+    {
+      "category": "later_step",
+      "evidence": "Definition: upstream/tsc/internal/ast/ast_generated.go:6270-6276 (NewSyntheticExpression), 6278-6283 (UpdateSyntheticExpression), 6289-6291 (SyntheticExpression.VisitEachChild), 6293-6295 (SyntheticExpression.Clone). The payload's Type is `any` for a checker *Type. The only pinned production constructor is Checker.createSyntheticExpression (upstream/tsc/internal/checker/checker.go:30467), which the Rust checker already implements over its TypeId slot (crates/tsr_checker/src/destructuring_assignments.rs:392); the other constructor is the API decoder (upstream/tsc/internal/api/encoder/decoder_generated.go:856), Phase 6. The generated-AST family keeps its cast and child-traversal case (syntax/generated-special/SyntheticExpression) without claiming these four.",
+      "operation": "tsc/internal/ast/ast_generated.go:SyntheticExpression.Clone",
+      "owner": "Phase 2 by the owner's 2026-09-25 decision, recorded in coverage-review.json"
+    },
+    {
+      "category": "later_step",
+      "evidence": "Definition: upstream/tsc/internal/ast/ast_generated.go:6270-6276 (NewSyntheticExpression), 6278-6283 (UpdateSyntheticExpression), 6289-6291 (SyntheticExpression.VisitEachChild), 6293-6295 (SyntheticExpression.Clone). The payload's Type is `any` for a checker *Type. The only pinned production constructor is Checker.createSyntheticExpression (upstream/tsc/internal/checker/checker.go:30467), which the Rust checker already implements over its TypeId slot (crates/tsr_checker/src/destructuring_assignments.rs:392); the other constructor is the API decoder (upstream/tsc/internal/api/encoder/decoder_generated.go:856), Phase 6. The generated-AST family keeps its cast and child-traversal case (syntax/generated-special/SyntheticExpression) without claiming these four.",
+      "operation": "tsc/internal/ast/ast_generated.go:SyntheticExpression.VisitEachChild",
+      "owner": "Phase 2 by the owner's 2026-09-25 decision, recorded in coverage-review.json"
     }
   ],
   "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
   "purpose": "Operations removed from F4a's syntax roster, each with the category, the owner that does have it, and the evidence read at the pin. An entry here is a claim that this step owes no prepared case for the operation, and it is validated like any other claim: see roster_problems in scripts/phase1_scope.py.",
-  "rule": "Three categories are recorded: go_test_harness retains upstream test-renderer authority; unused_at_pin records a definition or closed wrapper/helper chain with no live pinned caller; later_step transfers preparation out of the syntax step only. Compiler later_step rows are individually adjudicated in coverage-review.json: 205 accepted-plan later-phase destinations. The ordinary reference-loading operations are not exempt: the syntax step prepares them (syntax/project-references).",
+  "rule": "Three categories are recorded: go_test_harness retains upstream test-renderer authority; unused_at_pin records a definition or closed wrapper/helper chain with no live pinned caller; later_step transfers preparation out of the syntax step only. Compiler later_step rows are individually adjudicated in coverage-review.json: 205 accepted-plan later-phase destinations, plus the four SyntheticExpression rows the owner decided on 2026-09-25 (authority_basis owner_decision). The ordinary reference-loading operations are not exempt: the syntax step prepares them (syntax/project-references).",
   "version": 1
 }

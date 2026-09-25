@@ -3,12 +3,12 @@
     "approved_by": "repository owner (Cristian Ianto), in the Phase 1 closure review conversation",
     "date": "2026-09-25",
     "decision": "docs/PHASE1-F5b-destinations.md#owner-approval",
-    "rows": 205,
-    "rows_sha256": "d253e0b5a3672c89f6c5d8fc124c48486df688da83df54cb1e84944a460e01a9",
+    "rows": 209,
+    "rows_sha256": "0e745ca8511cdea4e62f46a76db5c0994d0027b63e59c8ab7a774fcd5716f060",
     "scope": "reviewed_operation_destinations",
-    "statement": "yes approved"
+    "statement": "yes approved (the 205 reviewed compiler destinations); the four SyntheticExpression operations go to Phase 2 as a reviewed checker destination (chosen over an opaque Phase 1 type slot)"
   },
-  "authority": "Accepted docs/PHASE1-implementation-plan.md section 2 exclusions, interpreted per pinned compiler operation; the repository owner approved these reviewed destinations on 2026-09-25 (see `approval`). No row adds a deferral beyond the plan or waives behavior. Ordinary reference configuration/loading operations remain pending. See docs/PHASE1-F5b-destinations.md.",
+  "authority": "Accepted docs/PHASE1-implementation-plan.md section 2 exclusions, interpreted per pinned compiler operation, plus four internal/ast rows the owner decided individually (authority_basis owner_decision); the repository owner approved these reviewed destinations on 2026-09-25 (see `approval`). No row adds a deferral beyond the plan or waives behavior. Ordinary reference configuration/loading operations remain pending. See docs/PHASE1-F5b-destinations.md.",
   "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
   "reviewed_operation_destinations": [
     {
@@ -1855,6 +1855,42 @@
       "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReferenceInChildConfig",
       "plan_clause": "docs/PHASE1-implementation-plan.md:168-171 excludes LSP/project-system services; :154-158 directs explicit classification rather than importing editor services through coarse ledger labels.",
       "reason": "First required pinned consumer is the editor project system, not ordinary compiler parsing."
+    },
+    {
+      "authority_basis": "owner_decision",
+      "destination_phase": 2,
+      "evidence": "Definition: upstream/tsc/internal/ast/ast_generated.go:6270-6276 (NewSyntheticExpression), 6278-6283 (UpdateSyntheticExpression), 6289-6291 (SyntheticExpression.VisitEachChild), 6293-6295 (SyntheticExpression.Clone). The payload's Type is `any` for a checker *Type. The only pinned production constructor is Checker.createSyntheticExpression (upstream/tsc/internal/checker/checker.go:30467), which the Rust checker already implements over its TypeId slot (crates/tsr_checker/src/destructuring_assignments.rs:392); the other constructor is the API decoder (upstream/tsc/internal/api/encoder/decoder_generated.go:856), Phase 6. The generated-AST family keeps its cast and child-traversal case (syntax/generated-special/SyntheticExpression) without claiming these four.",
+      "go_source_sha256": "3f230a3441c80d0fcef442a29a47890712fe9866ad74dac10e77dc7ce41c1967",
+      "operation": "tsc/internal/ast/ast_generated.go:NodeFactory.NewSyntheticExpression",
+      "plan_clause": "docs/PHASE1-implementation-plan.md section 2, lines 162-163: full checker diagnostics and checker services remain Phase 2; owner decision 2026-09-25 (docs/PHASE1-F5b-destinations.md#owner-approval).",
+      "reason": "A node the checker creates for its own Type payload: its factory, update, clone and visitor are checker services, and an opaque Phase 1 payload would witness nothing the checker's own path does not."
+    },
+    {
+      "authority_basis": "owner_decision",
+      "destination_phase": 2,
+      "evidence": "Definition: upstream/tsc/internal/ast/ast_generated.go:6270-6276 (NewSyntheticExpression), 6278-6283 (UpdateSyntheticExpression), 6289-6291 (SyntheticExpression.VisitEachChild), 6293-6295 (SyntheticExpression.Clone). The payload's Type is `any` for a checker *Type. The only pinned production constructor is Checker.createSyntheticExpression (upstream/tsc/internal/checker/checker.go:30467), which the Rust checker already implements over its TypeId slot (crates/tsr_checker/src/destructuring_assignments.rs:392); the other constructor is the API decoder (upstream/tsc/internal/api/encoder/decoder_generated.go:856), Phase 6. The generated-AST family keeps its cast and child-traversal case (syntax/generated-special/SyntheticExpression) without claiming these four.",
+      "go_source_sha256": "3f230a3441c80d0fcef442a29a47890712fe9866ad74dac10e77dc7ce41c1967",
+      "operation": "tsc/internal/ast/ast_generated.go:NodeFactory.UpdateSyntheticExpression",
+      "plan_clause": "docs/PHASE1-implementation-plan.md section 2, lines 162-163: full checker diagnostics and checker services remain Phase 2; owner decision 2026-09-25 (docs/PHASE1-F5b-destinations.md#owner-approval).",
+      "reason": "A node the checker creates for its own Type payload: its factory, update, clone and visitor are checker services, and an opaque Phase 1 payload would witness nothing the checker's own path does not."
+    },
+    {
+      "authority_basis": "owner_decision",
+      "destination_phase": 2,
+      "evidence": "Definition: upstream/tsc/internal/ast/ast_generated.go:6270-6276 (NewSyntheticExpression), 6278-6283 (UpdateSyntheticExpression), 6289-6291 (SyntheticExpression.VisitEachChild), 6293-6295 (SyntheticExpression.Clone). The payload's Type is `any` for a checker *Type. The only pinned production constructor is Checker.createSyntheticExpression (upstream/tsc/internal/checker/checker.go:30467), which the Rust checker already implements over its TypeId slot (crates/tsr_checker/src/destructuring_assignments.rs:392); the other constructor is the API decoder (upstream/tsc/internal/api/encoder/decoder_generated.go:856), Phase 6. The generated-AST family keeps its cast and child-traversal case (syntax/generated-special/SyntheticExpression) without claiming these four.",
+      "go_source_sha256": "3f230a3441c80d0fcef442a29a47890712fe9866ad74dac10e77dc7ce41c1967",
+      "operation": "tsc/internal/ast/ast_generated.go:SyntheticExpression.Clone",
+      "plan_clause": "docs/PHASE1-implementation-plan.md section 2, lines 162-163: full checker diagnostics and checker services remain Phase 2; owner decision 2026-09-25 (docs/PHASE1-F5b-destinations.md#owner-approval).",
+      "reason": "A node the checker creates for its own Type payload: its factory, update, clone and visitor are checker services, and an opaque Phase 1 payload would witness nothing the checker's own path does not."
+    },
+    {
+      "authority_basis": "owner_decision",
+      "destination_phase": 2,
+      "evidence": "Definition: upstream/tsc/internal/ast/ast_generated.go:6270-6276 (NewSyntheticExpression), 6278-6283 (UpdateSyntheticExpression), 6289-6291 (SyntheticExpression.VisitEachChild), 6293-6295 (SyntheticExpression.Clone). The payload's Type is `any` for a checker *Type. The only pinned production constructor is Checker.createSyntheticExpression (upstream/tsc/internal/checker/checker.go:30467), which the Rust checker already implements over its TypeId slot (crates/tsr_checker/src/destructuring_assignments.rs:392); the other constructor is the API decoder (upstream/tsc/internal/api/encoder/decoder_generated.go:856), Phase 6. The generated-AST family keeps its cast and child-traversal case (syntax/generated-special/SyntheticExpression) without claiming these four.",
+      "go_source_sha256": "3f230a3441c80d0fcef442a29a47890712fe9866ad74dac10e77dc7ce41c1967",
+      "operation": "tsc/internal/ast/ast_generated.go:SyntheticExpression.VisitEachChild",
+      "plan_clause": "docs/PHASE1-implementation-plan.md section 2, lines 162-163: full checker diagnostics and checker services remain Phase 2; owner decision 2026-09-25 (docs/PHASE1-F5b-destinations.md#owner-approval).",
+      "reason": "A node the checker creates for its own Type payload: its factory, update, clone and visitor are checker services, and an opaque Phase 1 payload would witness nothing the checker's own path does not."
     }
   ],
   "reviewed_unused_compiler_operations": [

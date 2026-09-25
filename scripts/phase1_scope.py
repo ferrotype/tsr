@@ -2481,8 +2481,10 @@ def reviewed_destinations() -> dict[str, dict]:
 
     The old ``later_step`` roster category only exempts a preparation step.
     It does not remove an operation from Phase 1. This separate, pin-bound
-    review names the destination of the partial compiler surface explicitly.
-    Unknown IDs, a changed pinned source or duplicate decisions are errors.
+    review names the destination of the partial compiler surface explicitly,
+    plus the rows outside that package the owner decided one by one
+    (``authority_basis`` ``owner_decision``). Unknown IDs, a changed pinned
+    source or duplicate decisions are errors.
     """
     path = ROOT / "data/phase1/coverage-review.json"
     if not path.is_file():
@@ -2499,8 +2501,9 @@ def reviewed_destinations() -> dict[str, dict]:
         original = known.get(identity)
         if identity in decisions or original is None:
             raise ValueError(f"coverage-review.json: duplicate or unknown operation {identity}")
-        if original["package"] != "internal/compiler":
-            raise ValueError(f"{identity}: only the reviewed partial compiler scope can move")
+        if original["package"] != "internal/compiler" and row.get("authority_basis") != "owner_decision":
+            raise ValueError(f"{identity}: only the reviewed partial compiler scope, or a row the owner "
+                             "decided (authority_basis owner_decision), can move")
         phase = row.get("destination_phase")
         if row in unused and phase is not None:
             raise ValueError(f"{identity}: unused operation cannot also name a destination")

@@ -213,11 +213,22 @@ def build(root: Path = ROOT, *, supplemental_prepared_cases=()) -> dict:
         if not decision.get("reason") or not decision.get("evidence") or row.get("roster", {}).get("state") != "exempt:unused_at_pin":
             problems.append(f"{identity}: unused review lacks an exact roster exemption and evidence")
     roster = load("data/phase1/syntax-roster.json")
+    later_step = {row["operation"] for row in roster["exemptions"] if row["category"] == "later_step"}
     compiler_exemptions = {row["operation"] for row in roster["exemptions"]
                           if (row["category"] == "later_step" or row["operation"] in unused)
                           and row["operation"].startswith("tsc/internal/compiler/")}
+    # Every later-step exemption of the syntax roster is adjudicated by the
+    # review exactly once: a compiler row by the accepted plan, any other row
+    # only by a recorded owner decision on that operation.
+    outside = later_step - compiler_exemptions
+    for identity in sorted(outside):
+        if reviewed.get(identity, {}).get("authority_basis") != "owner_decision":
+            problems.append(f"{identity}: a later-step exemption outside the compiler needs an owner-decided destination")
+    for identity, decision in sorted(reviewed.items()):
+        if decision.get("authority_basis") == "owner_decision" and identity not in later_step:
+            problems.append(f"{identity}: owner-decided destination without a later-step roster exemption")
     if (reviewed.keys() & unresolved or reviewed.keys() & unused.keys() or unused.keys() & unresolved
-            or reviewed.keys() | unused.keys() | unresolved != compiler_exemptions):
+            or reviewed.keys() | unused.keys() | unresolved != compiler_exemptions | outside):
         problems.append("compiler destination review does not account for every later-step exemption exactly once")
 
     requests: dict[str, tuple[str, str, dict]] = {}
