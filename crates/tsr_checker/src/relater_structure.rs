@@ -316,6 +316,7 @@ impl Relater<'_> {
             }
         } else if t & tf::INDEXED_ACCESS != 0 {
             let target_data = *self.checker.types.indexed_access(target)?;
+            let mut original_chain = None;
             if s & tf::INDEXED_ACCESS != 0 {
                 let source_data = *self.checker.types.indexed_access(source)?;
                 let mut result = self.related(
@@ -334,6 +335,9 @@ impl Relater<'_> {
                 }
                 if result != tr::FALSE {
                     return Ok(result);
+                }
+                if self.report_errors && !self.errors.chain.is_empty() {
+                    original_chain = Some(self.errors.chain.clone());
                 }
             }
             let object = self
@@ -360,9 +364,23 @@ impl Relater<'_> {
                     .checker
                     .indexed_access_or_undefined(object, index, flags, None, None)?
                 {
+                    if self.report_errors && original_chain.is_some() {
+                        // create a new chain for the constraint error
+                        self.errors = saved.clone();
+                    }
                     let result = self.related(source, constraint, TARGET, intersection)?;
                     if result != tr::FALSE {
                         return Ok(result);
+                    }
+                    // prefer the shorter chain of the constraint comparison chain,
+                    // and the direct comparison chain
+                    if let Some(original) = original_chain {
+                        if self.report_errors
+                            && !self.errors.chain.is_empty()
+                            && original.len() <= self.errors.chain.len()
+                        {
+                            self.errors.chain = original;
+                        }
                     }
                 }
             }
@@ -570,6 +588,12 @@ impl Relater<'_> {
             && !self.checker.variance.markers.contains(&source)
             && !self.checker.variance.markers.contains(&target)
         {
+            // When strictNullChecks is disabled, the element type of the empty
+            // array literal is undefinedWideningType, and an empty array literal
+            // wouldn't be assignable to a `never[]` without this check.
+            if self.checker.is_empty_array_literal_type(source)? {
+                return Ok(tr::TRUE);
+            }
             let variances = self
                 .checker
                 .variances_of(self.checker.types.target(source)?)?;

@@ -153,14 +153,18 @@ impl Relater<'_> {
             if let Some(matching) = self.matching_discriminant_type(source, target)? {
                 reduced = matching;
             } else {
-                let mut non_primitive = false;
+                // filterPrimitivesIfContainsNonPrimitive: only a union that
+                // contains the `object` type drops its primitive constituents,
+                // and only when something remains.
+                let mut has_object_keyword = false;
                 for &part in self.checker.types.types_of(target)? {
-                    non_primitive |= self.checker.types.flags(part)?
-                        & (tf::INSTANTIABLE_NON_PRIMITIVE | tf::OBJECT | tf::INTERSECTION)
-                        != 0;
+                    has_object_keyword |= self.checker.types.flags(part)? & tf::NON_PRIMITIVE != 0;
                 }
-                if non_primitive {
-                    reduced = self.checker.filter_type_flags(target, !tf::PRIMITIVE)?;
+                if has_object_keyword {
+                    let filtered = self.checker.filter_type_flags(target, !tf::PRIMITIVE)?;
+                    if self.checker.types.flags(filtered)? & tf::NEVER == 0 {
+                        reduced = filtered;
+                    }
                 }
             }
         }

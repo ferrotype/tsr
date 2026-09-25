@@ -146,7 +146,7 @@ impl Relater<'_> {
     pub(crate) fn compare_signatures(
         &mut self,
         mut source: SignatureId,
-        target: SignatureId,
+        mut target: SignatureId,
         mode: u32,
         intersection: u32,
     ) -> Result<Ternary, Error> {
@@ -187,6 +187,7 @@ impl Relater<'_> {
             .is_some_and(|types| !types.is_empty())
             && source_parameters != self.checker.signatures.get(target)?.type_parameters
         {
+            target = self.checker.canonical_signature(target)?;
             source = self.checker.contextual_signature_instantiation(
                 source,
                 target,

@@ -325,6 +325,7 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.resolveCallExpression
+    // port: tsc/internal/checker/checker.go:Checker.resolveSignature
     fn resolve_call_expression(&mut self, node: NodeId) -> Result<SignatureId, Error> {
         let read = self.node(node)?;
         if read.kind() == K::NewExpression {

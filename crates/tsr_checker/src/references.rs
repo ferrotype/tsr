@@ -175,7 +175,7 @@ impl CheckerState {
                 return Ok(Some(*symbol));
             }
         }
-        let symbol = self.resolve_type_reference_symbol(node, ignore_errors)?;
+        let symbol = self.resolve_type_reference_symbol(node, sf::TYPE, ignore_errors)?;
         if !ignore_errors {
             *self.query.resolved_symbols.get_or_default(node) = Some(symbol);
         }
@@ -186,6 +186,7 @@ impl CheckerState {
     fn resolve_type_reference_symbol(
         &mut self,
         node: NodeId,
+        meaning: u32,
         ignore_errors: bool,
     ) -> Result<SymbolId, Error> {
         let read = self.node(node)?;
@@ -205,7 +206,7 @@ impl CheckerState {
         };
         Ok(match name {
             None => self.builtins.unknown_symbol,
-            Some(name) => match self.resolve_entity_name(name, sf::TYPE, ignore_errors)? {
+            Some(name) => match self.resolve_entity_name(name, meaning, ignore_errors)? {
                 Some(symbol) if symbol != self.builtins.unknown_symbol => symbol,
                 _ if ignore_errors => self.builtins.unknown_symbol,
                 _ => self.unresolved_symbol_for_name(name)?,
@@ -301,8 +302,45 @@ impl CheckerState {
                         _ => {}
                     }
                 }
-                let alias = self
-                    .alias_for_type_node(node)?
+                // We refrain from associating a local type alias with an
+                // instantiation of a top-level type alias because the local alias
+                // may end up being referenced in an inferred return type where it
+                // is not accessible.
+                let mut alias = None;
+                if let Some(candidate) = self.alias_for_type_node(node)? {
+                    if self.is_local_type_alias(symbol)?
+                        || !self.is_local_type_alias(candidate.symbol)?
+                    {
+                        alias = Some(candidate);
+                    }
+                }
+                if alias.is_none()
+                    && matches!(
+                        self.node(node)?.kind().known(),
+                        Some(K::TypeReference | K::ExpressionWithTypeArguments)
+                    )
+                {
+                    // A reference through an import, export or re-export names
+                    // the target, so the exported symbol refers to the type when
+                    // it is reserialized later.
+                    let import = self.resolve_type_reference_symbol(node, sf::ALIAS, true)?;
+                    if import != self.builtins.unknown_symbol
+                        && self.symbol(import)?.flags() & sf::ALIAS != 0
+                    {
+                        let resolved = self.resolve_alias(import)?;
+                        if self.symbol(resolved)?.flags() & sf::TYPE_ALIAS != 0 {
+                            let mut type_arguments = Vec::with_capacity(argument_nodes.len());
+                            for &argument in &argument_nodes {
+                                type_arguments.push(self.get_type_from_type_node(argument)?);
+                            }
+                            alias = Some(crate::TypeAlias {
+                                symbol: resolved,
+                                type_arguments: type_arguments.into(),
+                            });
+                        }
+                    }
+                }
+                let alias = alias
                     .map(|alias| self.types.push_alias(alias))
                     .transpose()?;
                 return self.type_alias_instantiation(symbol, ty, &parameters, &arguments, alias);
@@ -481,7 +519,7 @@ impl CheckerState {
         let read = self.node(node)?;
         match read.kind().known() {
             Some(K::TypeReference) => {
-                let symbol = self.resolve_type_reference_symbol(node, false)?;
+                let symbol = self.resolve_type_reference_symbol(node, sf::TYPE, false)?;
                 Ok(self.symbol(symbol)?.flags() & sf::TYPE_ALIAS != 0)
             }
             Some(K::TypeQuery) => Ok(true),
@@ -635,5 +673,29 @@ impl CheckerState {
             .resolved_type_arguments
             .get_or_insert(arguments)
             .clone())
+    }
+}
+
+impl CheckerState {
+    // port: tsc/internal/checker/checker.go:isLocalTypeAlias
+    fn is_local_type_alias(&self, symbol: SymbolId) -> Result<bool, Error> {
+        for declaration in self
+            .symbol_declarations(symbol)?
+            .to_vec()
+            .into_iter()
+            .flatten()
+        {
+            if matches!(
+                self.node(declaration)?.kind().known(),
+                Some(K::TypeAliasDeclaration | K::JSTypeAliasDeclaration)
+            ) {
+                return Ok(tsr_ast::utilities_containers::get_containing_function(
+                    self.ast(declaration)?,
+                    declaration,
+                )?
+                .is_some());
+            }
+        }
+        Ok(false)
     }
 }

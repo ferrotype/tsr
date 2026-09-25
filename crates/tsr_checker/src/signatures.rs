@@ -41,6 +41,7 @@ pub struct Signature {
     pub(crate) composite: Option<CompositeSignature>,
     pub mapper: Option<crate::MapperId>,
     pub erased: Option<SignatureId>,
+    pub canonical: Option<SignatureId>,
     pub base: Option<SignatureId>,
     pub isolated_signature_type: Option<TypeId>,
 }
@@ -119,6 +120,7 @@ impl SignatureStore {
                 composite: None,
                 mapper: None,
                 erased: None,
+                canonical: None,
                 base: None,
                 isolated_signature_type: None,
             },

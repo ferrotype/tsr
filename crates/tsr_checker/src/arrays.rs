@@ -495,3 +495,23 @@ impl CheckerState {
             .transpose()
     }
 }
+
+impl CheckerState {
+    // port: tsc/internal/checker/checker.go:Checker.isEmptyLiteralType
+    pub(crate) fn is_empty_literal_type(&self, ty: TypeId) -> bool {
+        if self.options.strict_null_checks {
+            ty == self.builtins.implicit_never_type
+        } else {
+            ty == self.builtins.undefined_widening_type
+        }
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.isEmptyArrayLiteralType
+    pub(crate) fn is_empty_array_literal_type(&mut self, ty: TypeId) -> Result<bool, Error> {
+        if !self.is_array_type(ty)? {
+            return Ok(false);
+        }
+        let element = self.get_type_arguments(ty)?[0];
+        Ok(self.is_empty_literal_type(element))
+    }
+}

@@ -272,8 +272,8 @@ impl CheckerState {
         Ok(ty)
     }
 
-    // port: tsc/internal/checker/checker.go:Checker.widenTypeInferredFromInitializer
-    pub(crate) fn widen_type_inferred_from_initializer(
+    // port: tsc/internal/checker/checker.go:Checker.getWidenedLiteralTypeForInitializer
+    pub(crate) fn widened_literal_type_for_initializer(
         &mut self,
         declaration: NodeId,
         ty: TypeId,
@@ -300,22 +300,25 @@ impl CheckerState {
                     })
                     .transpose()?
                     .unwrap_or(false);
-        let ty = if constant || readonly {
-            ty
-        } else {
-            self.widen_literal_type(ty)?
-        };
+        if constant || readonly {
+            return Ok(ty);
+        }
+        self.widen_literal_type(ty)
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.widenTypeInferredFromInitializer
+    pub(crate) fn widen_type_inferred_from_initializer(
+        &mut self,
+        declaration: NodeId,
+        ty: TypeId,
+    ) -> Result<TypeId, Error> {
+        let ty = self.widened_literal_type_for_initializer(declaration, ty)?;
         if self.node(declaration)?.flags() & nf::JAVA_SCRIPT_FILE != 0 {
-            let empty = if self.options.strict_null_checks {
-                self.builtins.implicit_never_type
-            } else {
-                self.builtins.undefined_widening_type
-            };
-            if ty == empty {
+            if self.is_empty_literal_type(ty) {
                 self.report_implicit_any(declaration, self.builtins.any_type)?;
                 return Ok(self.builtins.any_type);
             }
-            if self.is_array_type(ty)? && self.get_type_arguments(ty)?.first() == Some(&empty) {
+            if self.is_empty_array_literal_type(ty)? {
                 let any_array = *self
                     .query
                     .global_types

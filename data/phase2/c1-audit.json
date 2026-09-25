@@ -21,14 +21,9 @@
    "rust": "crates/tsr_checker/src/object_members.rs:196"
   },
   "tsc/internal/checker/checker.go:Checker.combineSymbolTables": {
-   "disposition": "gap",
-   "item": "C1.2",
-   "reason": "union of two symbol tables for export resolution; no Rust site found by name"
-  },
-  "tsc/internal/checker/checker.go:Checker.createCanonicalSignature": {
-   "disposition": "gap",
-   "item": "C1.3",
-   "reason": "canonical signatures (type parameters replaced by their defaults or unknown) have no Rust site"
+   "disposition": "equivalent",
+   "reason": "inlined in resolved_members_or_exports: an empty side returns the other, otherwise both merge into a fresh table",
+   "rust": "crates/tsr_checker/src/late_members.rs:160"
   },
   "tsc/internal/checker/checker.go:Checker.createInstantiatedSymbolTable": {
    "disposition": "equivalent",
@@ -71,19 +66,14 @@
    "rust": "crates/tsr_checker/src/indexes.rs:563"
   },
   "tsc/internal/checker/checker.go:Checker.getArrayOrTupleTargetType": {
-   "disposition": "gap",
-   "item": "C1.4",
-   "reason": "array or tuple target from a type node; the Rust site is not identified by name yet"
+   "disposition": "equivalent",
+   "reason": "inlined in source_array_or_tuple_type: the readonly operator parent, then the array target or the tuple target from the element infos",
+   "rust": "crates/tsr_checker/src/arrays.rs:242"
   },
   "tsc/internal/checker/checker.go:Checker.getBaseTypeOfLiteralTypeUnion": {
-   "disposition": "gap",
-   "item": "C1.4",
-   "reason": "base type of a union of literals (with its cache); the Rust site is not identified by name yet"
-  },
-  "tsc/internal/checker/checker.go:Checker.getCanonicalSignature": {
-   "disposition": "gap",
-   "item": "C1.3",
-   "reason": "canonical signature cache"
+   "disposition": "equivalent",
+   "reason": "inlined in base_literal_type under the literal_union_bases cache",
+   "rust": "crates/tsr_checker/src/infer_candidates.rs:289"
   },
   "tsc/internal/checker/checker.go:Checker.getClassOrInterfaceDeclarationsOfSymbol": {
    "disposition": "equivalent",
@@ -106,9 +96,9 @@
    "rust": "crates/tsr_checker/src/check.rs:210"
   },
   "tsc/internal/checker/checker.go:Checker.getDeclaredTypeOfAlias": {
-   "disposition": "gap",
-   "item": "C1.2",
-   "reason": "the declared type of an alias symbol through resolve_alias with its cache; the get_declared_type_of_symbol dispatch is the site to check"
+   "disposition": "equivalent",
+   "reason": "inlined in get_declared_type_of_symbol: the alias resolves and recurses; the target declared-type cache stands in for the alias link",
+   "rust": "crates/tsr_checker/src/query.rs:346"
   },
   "tsc/internal/checker/checker.go:Checker.getGlobalSymbol": {
    "disposition": "equivalent",
@@ -126,9 +116,9 @@
    "rust": "crates/tsr_checker/src/program_init.rs:223"
   },
   "tsc/internal/checker/checker.go:Checker.getIndexInfoWithReadonly": {
-   "disposition": "gap",
-   "item": "C1.3",
-   "reason": "index info copy with another readonly flag"
+   "disposition": "equivalent",
+   "reason": "inlined in the spread index loop: an index info with a different readonly flag is re-minted",
+   "rust": "crates/tsr_checker/src/object_spread.rs:166"
   },
   "tsc/internal/checker/checker.go:Checker.getIndexInfosOfStructuredType": {
    "disposition": "equivalent",
@@ -156,9 +146,9 @@
    "rust": "crates/tsr_checker/src/object_members.rs:398"
   },
   "tsc/internal/checker/checker.go:Checker.getIntersectedSignatures": {
-   "disposition": "gap",
-   "item": "C1.3",
-   "reason": "noImplicitAny combined signature of an intersection's signatures"
+   "disposition": "equivalent",
+   "reason": "inlined in contextual_signature_for_type: under noImplicitAny the applicable signatures combine when their type parameters are identical",
+   "rust": "crates/tsr_checker/src/return_inference.rs:648"
   },
   "tsc/internal/checker/checker.go:Checker.getNormalizedTupleType": {
    "disposition": "equivalent",
@@ -236,9 +226,9 @@
    "rust": "crates/tsr_checker/src/query.rs:687"
   },
   "tsc/internal/checker/checker.go:Checker.getTypeFromLiteralTypeNode": {
-   "disposition": "gap",
-   "item": "C1.4",
-   "reason": "literal type node to type; the Rust site is not identified by name yet"
+   "disposition": "equivalent",
+   "reason": "inlined in the LiteralType arm of the type node worker: the null keyword, else the regular literal type of the checked literal",
+   "rust": "crates/tsr_checker/src/query.rs:577"
   },
   "tsc/internal/checker/checker.go:Checker.getTypeFromTypeAliasReference": {
    "disposition": "equivalent",
@@ -251,24 +241,19 @@
    "rust": "crates/tsr_checker/src/enums.rs:255"
   },
   "tsc/internal/checker/checker.go:Checker.getTypeParametersForTypeAndSymbol": {
-   "disposition": "gap",
-   "item": "C1.5",
-   "reason": "type parameters of a reference target or alias for error reporting; no Rust site found by name"
+   "disposition": "equivalent",
+   "reason": "check_type_reference uses get_local_type_parameters of the resolved symbol after the error-type exit; the alias and interface branches agree with the pin",
+   "rust": "crates/tsr_checker/src/check_generics.rs:254"
   },
   "tsc/internal/checker/checker.go:Checker.getUniqAssociatedNamesFromTupleType": {
-   "disposition": "gap",
-   "item": "C1.4",
-   "reason": "associated parameter names of a tuple; the Rust site is not identified by name yet"
+   "disposition": "equivalent",
+   "reason": "reached only through getExpandedParameters (exports.go, nodebuilderscopes.go, pseudotypenodebuilder.go), never from tsc diagnostics; the node builder expansion that error display uses is ported here and reproduces the pin `(a, a_2, a_3, a_1)` naming",
+   "rust": "crates/tsr_checker/src/signature_parameters.rs:708"
   },
   "tsc/internal/checker/checker.go:Checker.getUniqueLiteralTypeForTypeParameter": {
-   "disposition": "gap",
-   "item": "C1.4",
-   "reason": "unique literal type for a type parameter; the Rust site is not identified by name yet"
-  },
-  "tsc/internal/checker/checker.go:Checker.getWidenedLiteralTypeForInitializer": {
-   "disposition": "gap",
-   "item": "C1.4",
-   "reason": "widened literal type of an initializer; the Rust site is not identified by name yet"
+   "disposition": "equivalent",
+   "reason": "the UniqueLiteral mapper arm maps type parameters to the unique literal type",
+   "rust": "crates/tsr_checker/src/mapper.rs:293"
   },
   "tsc/internal/checker/checker.go:Checker.hasLateBindableIndexSignature": {
    "disposition": "equivalent",
@@ -276,9 +261,9 @@
    "rust": "crates/tsr_checker/src/late_members.rs:260"
   },
   "tsc/internal/checker/checker.go:Checker.hasSignatureWithArityGreaterThan": {
-   "disposition": "gap",
-   "item": "C1.3",
-   "reason": "arity test over a symbol's signatures"
+   "disposition": "equivalent",
+   "reason": "inlined in the emit helper check as a parameter-count scan over the helper symbol signatures",
+   "rust": "crates/tsr_checker/src/emit_checks.rs:187"
   },
   "tsc/internal/checker/checker.go:Checker.hasSignatures": {
    "disposition": "equivalent",
@@ -301,14 +286,14 @@
    "rust": "crates/tsr_checker/src/instantiate.rs:339"
   },
   "tsc/internal/checker/checker.go:Checker.isArrayOrTupleLikeType": {
-   "disposition": "gap",
-   "item": "C1.4",
-   "reason": "array-or-tuple-like test; the Rust site is not identified by name yet"
+   "disposition": "later",
+   "owner": "C4",
+   "reason": "reached only from elaborateJsxComponents (jsx.go), whose port is C4 work"
   },
   "tsc/internal/checker/checker.go:Checker.isArrayOrTupleOrIntersection": {
-   "disposition": "gap",
-   "item": "C1.4",
-   "reason": "array, tuple or intersection test; the Rust site is not identified by name yet"
+   "disposition": "equivalent",
+   "reason": "array_tuple_intersection folds isArrayOrTupleType with the every-constituent intersection test, which is how both pin sites use it",
+   "rust": "crates/tsr_checker/src/mapped.rs:507"
   },
   "tsc/internal/checker/checker.go:Checker.isArrayOrTupleSymbol": {
    "disposition": "equivalent",
@@ -319,16 +304,6 @@
    "disposition": "equivalent",
    "reason": "is_array_type(t) || is_tuple_type(t) at the call sites",
    "rust": "crates/tsr_checker/src/arrays.rs:79"
-  },
-  "tsc/internal/checker/checker.go:Checker.isEmptyArrayLiteralType": {
-   "disposition": "gap",
-   "item": "C1.4",
-   "reason": "empty array literal test; the Rust site is not identified by name yet"
-  },
-  "tsc/internal/checker/checker.go:Checker.isEmptyLiteralType": {
-   "disposition": "gap",
-   "item": "C1.4",
-   "reason": "empty literal test; the Rust site is not identified by name yet"
   },
   "tsc/internal/checker/checker.go:Checker.isGlobalSymbolConstructor": {
    "disposition": "equivalent",
@@ -356,14 +331,14 @@
    "rust": "crates/tsr_checker/src/late_members.rs:260"
   },
   "tsc/internal/checker/checker.go:Checker.newUniqueESSymbolType": {
-   "disposition": "gap",
-   "item": "C1.4",
-   "reason": "unique symbol type constructor; the Rust site is not identified by name yet"
+   "disposition": "equivalent",
+   "reason": "inlined in es_symbol_like_type_for_node: a UniqueEsSymbol type with the symbol and the escaped name",
+   "rust": "crates/tsr_checker/src/late_members.rs:575"
   },
   "tsc/internal/checker/checker.go:Checker.parseBigIntLiteralType": {
-   "disposition": "gap",
-   "item": "C1.4",
-   "reason": "bigint literal parsing; the Rust site is not identified by name yet"
+   "disposition": "equivalent",
+   "reason": "template_bigint parses the matched text into a pseudo big int for the literal type",
+   "rust": "crates/tsr_checker/src/infer_templates.rs:191"
   },
   "tsc/internal/checker/checker.go:Checker.recordMergedSymbol": {
    "disposition": "equivalent",
@@ -371,9 +346,9 @@
    "rust": "crates/tsr_checker/src/merge.rs:90"
   },
   "tsc/internal/checker/checker.go:Checker.resolveAliasWithDeprecationCheck": {
-   "disposition": "gap",
-   "item": "C1.2",
-   "reason": "alias resolution with the deprecation suggestion; only signature deprecation checks exist"
+   "disposition": "equivalent",
+   "reason": "check_value_identifier resolves the alias; the deprecation walk adds suggestion diagnostics only, which the harness never captures (CaptureSuggestions is false)",
+   "rust": "crates/tsr_checker/src/value_references.rs:35"
   },
   "tsc/internal/checker/checker.go:Checker.resolveClassOrInterfaceMembers": {
    "disposition": "equivalent",
@@ -381,14 +356,9 @@
    "rust": "crates/tsr_checker/src/object_members.rs:126"
   },
   "tsc/internal/checker/checker.go:Checker.resolveIndirectionAlias": {
-   "disposition": "gap",
-   "item": "C1.2",
-   "reason": "indirection through a type-only alias; the type-only declaration propagation is not found by name"
-  },
-  "tsc/internal/checker/checker.go:Checker.resolveSignature": {
-   "disposition": "gap",
-   "item": "C1.3",
-   "reason": "the by-node-kind dispatch to call, new, tagged template, decorator, JSX and instantiation-expression resolution is not found by name; the individual resolvers exist"
+   "disposition": "equivalent",
+   "reason": "inlined in resolve_alias_worker and resolve_es_module_symbol: the resolved target is merged and the type-only declaration propagates to the source alias",
+   "rust": "crates/tsr_checker/src/module_aliases.rs:296"
   },
   "tsc/internal/checker/checker.go:Checker.resolveTypeReferenceMembers": {
    "disposition": "equivalent",
@@ -396,14 +366,14 @@
    "rust": "crates/tsr_checker/src/object_members.rs:126"
   },
   "tsc/internal/checker/checker.go:Checker.transformTypeOfMembers": {
-   "disposition": "gap",
-   "item": "C1.3",
-   "reason": "member type transformation for spread/omit"
+   "disposition": "equivalent",
+   "reason": "inlined in regular_object_literal_type: a property whose regularized type changes is re-created with the new type",
+   "rust": "crates/tsr_checker/src/relation_helpers.rs:147"
   },
   "tsc/internal/checker/checker.go:Checker.tryGetDeclaredTypeOfSymbol": {
-   "disposition": "gap",
-   "item": "C1.2",
-   "reason": "declared type by symbol kind without an error fallback; the get_declared_type_of_symbol dispatch is the site to check"
+   "disposition": "equivalent",
+   "reason": "inlined in get_declared_type_of_symbol as the flag dispatch; no matching flag yields the error type, and type_reference_from_symbol reports Type_0_is_not_generic before reaching it",
+   "rust": "crates/tsr_checker/src/query.rs:330"
   },
   "tsc/internal/checker/checker.go:Checker.typeHasCallOrConstructSignatures": {
    "disposition": "equivalent",
@@ -455,20 +425,15 @@
    "reason": "is_generic_tuple_type is marked as the Checker method of the same name; the package-level function has the same body",
    "rust": "crates/tsr_checker/src/template.rs:285"
   },
-  "tsc/internal/checker/checker.go:isLocalTypeAlias": {
-   "disposition": "gap",
-   "item": "C1.5",
-   "reason": "the local-alias rule that refrains from associating a top-level alias instantiation with a local alias is not found in references.rs"
-  },
   "tsc/internal/checker/checker.go:isMutableTupleType": {
    "disposition": "equivalent",
    "reason": "the tuple half of is_mutable_array_or_tuple; callers test the tuple flag inline",
    "rust": "crates/tsr_checker/src/arrays.rs:97"
   },
   "tsc/internal/checker/checker.go:isUnaryTupleTypeNode": {
-   "disposition": "gap",
-   "item": "C1.4",
-   "reason": "unary tuple node test; the Rust site is not identified by name yet"
+   "disposition": "equivalent",
+   "reason": "inlined in implied_constraint as a single-element tuple node test on both sides",
+   "rust": "crates/tsr_checker/src/substitution.rs:220"
   },
   "tsc/internal/checker/checker.go:signatureHasLiteralTypes": {
    "disposition": "equivalent",
@@ -486,9 +451,9 @@
    "rust": "crates/tsr_checker/src/compound_signatures.rs:94"
   },
   "tsc/internal/checker/relater.go:Checker.checkTypeAssignableToAndOptionallyElaborate": {
-   "disposition": "gap",
-   "item": "C1.6",
-   "reason": "no Rust site elaborates assignability errors through the expression (elaborateError); callers use check_type_related_ex without elaboration"
+   "disposition": "equivalent",
+   "reason": "callers pass RelationKind::Assignable to the port of checkTypeRelatedToAndOptionallyElaborate",
+   "rust": "crates/tsr_checker/src/call_errors.rs:203"
   },
   "tsc/internal/checker/relater.go:Checker.checkTypeAssignableToEx": {
    "disposition": "equivalent",
@@ -506,9 +471,9 @@
    "rust": "crates/tsr_checker/src/relater.rs:245"
   },
   "tsc/internal/checker/relater.go:Checker.compareTypePredicatesIdentical": {
-   "disposition": "gap",
-   "item": "C1.6",
-   "reason": "type predicate identity; no Rust site found by name yet, to be traced to its inline site or ported"
+   "disposition": "equivalent",
+   "reason": "inlined in compare_signatures_identical: one missing predicate is FALSE, kinds must match, then the predicate types compare",
+   "rust": "crates/tsr_checker/src/signature_identity.rs:96"
   },
   "tsc/internal/checker/relater.go:Checker.compareTypesAssignableSimple": {
    "disposition": "equivalent",
@@ -531,14 +496,14 @@
    "rust": "crates/tsr_checker/src/relater.rs:158"
   },
   "tsc/internal/checker/relater.go:Checker.elaborateDidYouMeanToCallOrConstruct": {
-   "disposition": "gap",
-   "item": "C1.6",
-   "reason": "the did-you-mean-to-call elaboration of a relation error; no Rust site found by name yet, to be traced to its inline site or ported"
+   "disposition": "equivalent",
+   "reason": "inlined in elaborate_call_error for the construct then the call signature kind",
+   "rust": "crates/tsr_checker/src/call_errors.rs:292"
   },
   "tsc/internal/checker/relater.go:Checker.filterPrimitivesIfContainsNonPrimitive": {
-   "disposition": "gap",
-   "item": "C1.6",
-   "reason": "primitive filtering for non-primitive unions; no Rust site found by name yet, to be traced to its inline site or ported"
+   "disposition": "equivalent",
+   "reason": "inlined in excess_properties: a union containing the object keyword drops its primitive constituents unless nothing remains",
+   "rust": "crates/tsr_checker/src/relater_excess.rs:159"
   },
   "tsc/internal/checker/relater.go:Checker.findBestTypeForInvokable": {
    "disposition": "equivalent",
@@ -566,19 +531,19 @@
    "rust": "crates/tsr_checker/src/relater.rs:99"
   },
   "tsc/internal/checker/relater.go:Checker.getRestArrayTypeOfTupleType": {
-   "disposition": "gap",
-   "item": "C1.6",
-   "reason": "rest array type of a tuple; no Rust site found by name yet, to be traced to its inline site or ported"
+   "disposition": "equivalent",
+   "reason": "inlined in slice_tuple: the rest element type becomes an array type",
+   "rust": "crates/tsr_checker/src/infer_tuples.rs:202"
   },
   "tsc/internal/checker/relater.go:Checker.getStringLikeTypeForType": {
-   "disposition": "gap",
-   "item": "C1.6",
-   "reason": "string-like type for template literal relation; no Rust site found by name yet, to be traced to its inline site or ported"
+   "disposition": "equivalent",
+   "reason": "inlined in infer_template_types: any and string-like sources pass through, other sources become a `${T}` template",
+   "rust": "crates/tsr_checker/src/template_relation.rs:49"
   },
   "tsc/internal/checker/relater.go:Checker.getThisTypeOfSignature": {
-   "disposition": "gap",
-   "item": "C1.6",
-   "reason": "this type of a signature; no Rust site found by name yet, to be traced to its inline site or ported"
+   "disposition": "equivalent",
+   "reason": "every site reads this_parameter and calls get_type_of_symbol; compare_signatures_identical is one",
+   "rust": "crates/tsr_checker/src/signature_identity.rs:72"
   },
   "tsc/internal/checker/relater.go:Checker.getTypeAtPosition": {
    "disposition": "equivalent",
@@ -586,14 +551,14 @@
    "rust": "crates/tsr_checker/src/signature_parameters.rs:234"
   },
   "tsc/internal/checker/relater.go:Checker.getTypeOfPropertyInType": {
-   "disposition": "gap",
-   "item": "C1.6",
-   "reason": "property type lookup used by discriminants; no Rust site found by name yet, to be traced to its inline site or ported"
+   "disposition": "equivalent",
+   "reason": "inlined in excess_properties: the constituent property type, else the applicable index value type, else undefined",
+   "rust": "crates/tsr_checker/src/relater_excess.rs:212"
   },
   "tsc/internal/checker/relater.go:Checker.getTypeOfPropertyInTypes": {
-   "disposition": "gap",
-   "item": "C1.6",
-   "reason": "property type lookup over several types; no Rust site found by name yet, to be traced to its inline site or ported"
+   "disposition": "equivalent",
+   "reason": "inlined in excess_properties as the union of the per-constituent property types",
+   "rust": "crates/tsr_checker/src/relater_excess.rs:217"
   },
   "tsc/internal/checker/relater.go:Checker.getUnmatchedProperties": {
    "disposition": "equivalent",
@@ -606,9 +571,9 @@
    "rust": "crates/tsr_checker/src/relation_errors.rs:620"
   },
   "tsc/internal/checker/relater.go:Checker.getVarianceStackIndex": {
-   "disposition": "gap",
-   "item": "C1.6",
-   "reason": "variance stack index; no Rust site found by name yet, to be traced to its inline site or ported"
+   "disposition": "equivalent",
+   "reason": "inlined in variances_worker as a position search over the variance stack",
+   "rust": "crates/tsr_checker/src/variance.rs:62"
   },
   "tsc/internal/checker/relater.go:Checker.hasCommonProperties": {
    "disposition": "equivalent",
@@ -616,14 +581,14 @@
    "rust": "crates/tsr_checker/src/relater_excess.rs:80"
   },
   "tsc/internal/checker/relater.go:Checker.hasCovariantVoidArgument": {
-   "disposition": "gap",
-   "item": "C1.6",
-   "reason": "covariant void argument check in variance relation; no Rust site found by name yet, to be traced to its inline site or ported"
+   "disposition": "equivalent",
+   "reason": "inlined in relater_variance: a covariant position whose target argument is void allows the structural fallback",
+   "rust": "crates/tsr_checker/src/relater_variance.rs:40"
   },
   "tsc/internal/checker/relater.go:Checker.instantiateTypePredicate": {
-   "disposition": "gap",
-   "item": "C1.6",
-   "reason": "type predicate instantiation; no Rust site found by name yet, to be traced to its inline site or ported"
+   "disposition": "equivalent",
+   "reason": "inlined in type_predicate_of_signature: the target predicate type is instantiated with the signature mapper and a new predicate is minted only when it changes",
+   "rust": "crates/tsr_checker/src/source_signatures.rs:96"
   },
   "tsc/internal/checker/relater.go:Checker.isMarkerType": {
    "disposition": "equivalent",
@@ -631,14 +596,9 @@
    "rust": "crates/tsr_checker/src/relater_structure.rs:180"
   },
   "tsc/internal/checker/relater.go:Checker.isMatchingSignature": {
-   "disposition": "gap",
-   "item": "C1.6",
-   "reason": "signature matching for identity; no Rust site found by name yet, to be traced to its inline site or ported"
-  },
-  "tsc/internal/checker/relater.go:Checker.isOrHasGenericConditional": {
-   "disposition": "gap",
-   "item": "C1.6",
-   "reason": "generic conditional test; no Rust site found by name yet, to be traced to its inline site or ported"
+   "disposition": "equivalent",
+   "reason": "inlined in compare_signatures_identical: equal parameter, minimum-argument and rest counts, or the partial-match minimum-count test",
+   "rust": "crates/tsr_checker/src/signature_identity.rs:24"
   },
   "tsc/internal/checker/relater.go:Checker.isTypeAssignableTo": {
    "disposition": "equivalent",
@@ -666,9 +626,9 @@
    "rust": "crates/tsr_checker/src/relater.rs:158"
   },
   "tsc/internal/checker/relater.go:Checker.isValidDeclarationForTupleLabel": {
-   "disposition": "gap",
-   "item": "C1.6",
-   "reason": "tuple label declaration validity; no Rust site found by name yet, to be traced to its inline site or ported"
+   "disposition": "equivalent",
+   "reason": "inlined in parameter_label_at: a named tuple member or a parameter with an identifier name",
+   "rust": "crates/tsr_checker/src/signature_parameters.rs:387"
   },
   "tsc/internal/checker/relater.go:Checker.putRelater": {
    "disposition": "equivalent",
@@ -681,24 +641,24 @@
    "rust": "crates/tsr_checker/src/diagnostics.rs:199"
   },
   "tsc/internal/checker/relater.go:Checker.shouldReportUnmatchedPropertyError": {
-   "disposition": "gap",
-   "item": "C1.6",
-   "reason": "the unmatched-property report condition; no Rust site found by name yet, to be traced to its inline site or ported"
+   "disposition": "equivalent",
+   "reason": "inlined in report_unmatched_property: a source with only signatures reports only when the target has signatures of the same kind",
+   "rust": "crates/tsr_checker/src/relation_errors.rs:604"
   },
   "tsc/internal/checker/relater.go:Checker.templateLiteralTypesDefinitelyUnrelated": {
-   "disposition": "gap",
-   "item": "C1.6",
-   "reason": "template literal unrelatedness; no Rust site found by name yet, to be traced to its inline site or ported"
+   "disposition": "equivalent",
+   "reason": "inlined in template_related under the comparable relation: differing common start or end text spans are unrelated",
+   "rust": "crates/tsr_checker/src/template_relation.rs:215"
   },
   "tsc/internal/checker/relater.go:Checker.typePredicateKindsMatch": {
-   "disposition": "gap",
-   "item": "C1.6",
-   "reason": "type predicate kind matching; no Rust site found by name yet, to be traced to its inline site or ported"
+   "disposition": "equivalent",
+   "reason": "inlined in compare_signatures_identical as the kind and parameter-index test",
+   "rust": "crates/tsr_checker/src/signature_identity.rs:102"
   },
   "tsc/internal/checker/relater.go:Relater.chainArgsMatch": {
-   "disposition": "gap",
-   "item": "C1.6",
-   "reason": "chain argument matching for suppression; no Rust site found by name yet, to be traced to its inline site or ported"
+   "disposition": "equivalent",
+   "reason": "inlined in report_relation_error: the head chain entry args are compared positionally for each suppressed message",
+   "rust": "crates/tsr_checker/src/relation_errors.rs:355"
   },
   "tsc/internal/checker/relater.go:Relater.getErrorState": {
    "disposition": "equivalent",
@@ -706,24 +666,24 @@
    "rust": "crates/tsr_checker/src/relater_structure.rs:91"
   },
   "tsc/internal/checker/relater.go:Relater.getUndefinedStrippedTargetIfNeeded": {
-   "disposition": "gap",
-   "item": "C1.6",
-   "reason": "undefined-stripped targets for union sources; no Rust site found by name yet, to be traced to its inline site or ported"
+   "disposition": "equivalent",
+   "reason": "inlined in each_source_related: the undefined-stripped target is computed before the loop",
+   "rust": "crates/tsr_checker/src/relater_compound.rs:132"
   },
   "tsc/internal/checker/relater.go:Relater.indexSignaturesIdenticalTo": {
-   "disposition": "gap",
-   "item": "C1.6",
-   "reason": "index signature identity; no Rust site found by name yet, to be traced to its inline site or ported"
+   "disposition": "equivalent",
+   "reason": "inlined in indexes_related under the identity relation: equal counts, a per-key lookup, readonly and value-type identity",
+   "rust": "crates/tsr_checker/src/relater_properties.rs:483"
   },
   "tsc/internal/checker/relater.go:Relater.isPropertySymbolTypeRelated": {
-   "disposition": "gap",
-   "item": "C1.6",
-   "reason": "property symbol type relation with the write type; no Rust site found by name yet, to be traced to its inline site or ported"
+   "disposition": "equivalent",
+   "reason": "inlined in property_related_as: partial-target optionality, the any/unknown short-circuit by relation, then the source property type",
+   "rust": "crates/tsr_checker/src/relater_properties.rs:389"
   },
   "tsc/internal/checker/relater.go:Relater.isSourceIntersectionNeedingExtraCheck": {
-   "disposition": "gap",
-   "item": "C1.6",
-   "reason": "the extra intersection check; no Rust site found by name yet, to be traced to its inline site or ported"
+   "disposition": "equivalent",
+   "reason": "inlined in structured_related: the apparent type is structured and no constituent equals the target or is non-inferrable",
+   "rust": "crates/tsr_checker/src/relater_structure.rs:67"
   },
   "tsc/internal/checker/relater.go:Relater.restoreErrorState": {
    "disposition": "equivalent",
@@ -741,14 +701,14 @@
    "rust": "crates/tsr_checker/src/relation_errors.rs:181"
   },
   "tsc/internal/checker/relater.go:Relater.typeRelatedToEachType": {
-   "disposition": "gap",
-   "item": "C1.6",
-   "reason": "source related to each intersection constituent; no Rust site found by name yet, to be traced to its inline site or ported"
+   "disposition": "equivalent",
+   "reason": "inlined in union_intersection_related: the intersection-target loop relates the source to each constituent with TARGET recursion and intersection state",
+   "rust": "crates/tsr_checker/src/relater_compound.rs:58"
   },
   "tsc/internal/checker/relater.go:Relater.typeRelatedToIndexInfo": {
-   "disposition": "gap",
-   "item": "C1.6",
-   "reason": "type related to an index info; no Rust site found by name yet, to be traced to its inline site or ported"
+   "disposition": "equivalent",
+   "reason": "inlined in indexes_related: the applicable index info, the inferable-index members, then the missing index signature error",
+   "rust": "crates/tsr_checker/src/relater_properties.rs:537"
   },
   "tsc/internal/checker/relater.go:Relation.get": {
    "disposition": "equivalent",
@@ -766,19 +726,19 @@
    "rust": "crates/tsr_checker/src/relater.rs:135"
   },
   "tsc/internal/checker/relater.go:TypeDiscriminator.len": {
-   "disposition": "gap",
-   "item": "C1.6",
-   "reason": "discriminator accessor; no Rust site found by name yet, to be traced to its inline site or ported"
+   "disposition": "equivalent",
+   "reason": "inlined in matching_discriminant_type: the discriminant property list is iterated directly",
+   "rust": "crates/tsr_checker/src/discriminants.rs:114"
   },
   "tsc/internal/checker/relater.go:TypeDiscriminator.matches": {
-   "disposition": "gap",
-   "item": "C1.6",
-   "reason": "discriminator accessor; no Rust site found by name yet, to be traced to its inline site or ported"
+   "disposition": "equivalent",
+   "reason": "inlined in matching_discriminant_type: the related test over the distributed property type against the constituent property type",
+   "rust": "crates/tsr_checker/src/discriminants.rs:114"
   },
   "tsc/internal/checker/relater.go:TypeDiscriminator.name": {
-   "disposition": "gap",
-   "item": "C1.6",
-   "reason": "discriminator accessor; no Rust site found by name yet, to be traced to its inline site or ported"
+   "disposition": "equivalent",
+   "reason": "inlined in matching_discriminant_type: each discriminant property name is read from the symbol",
+   "rust": "crates/tsr_checker/src/discriminants.rs:114"
   },
   "tsc/internal/checker/relater.go:asRecursionId": {
    "disposition": "equivalent",
@@ -786,9 +746,9 @@
    "rust": "crates/tsr_checker/src/constraints.rs:79"
   },
   "tsc/internal/checker/relater.go:chainDepth": {
-   "disposition": "gap",
-   "item": "C1.6",
-   "reason": "error chain depth; no Rust site found by name yet, to be traced to its inline site or ported"
+   "disposition": "equivalent",
+   "reason": "inlined in the indexed-access target case: chain lengths pick the shorter of the direct and constraint chains",
+   "rust": "crates/tsr_checker/src/relater_structure.rs:380"
   },
   "tsc/internal/checker/relater.go:getRecursionIdentityFromTarget": {
    "disposition": "equivalent",
@@ -816,19 +776,19 @@
    "rust": "crates/tsr_checker/src/relater.rs:382"
   },
   "tsc/internal/checker/relater.go:isObjectOrInstantiableNonPrimitive": {
-   "disposition": "gap",
-   "item": "C1.6",
-   "reason": "object-or-instantiable test; no Rust site found by name yet, to be traced to its inline site or ported"
+   "disposition": "equivalent",
+   "reason": "inlined in the key-property map computation as the object-or-instantiable-non-primitive flag test",
+   "rust": "crates/tsr_checker/src/relation_helpers.rs:211"
   },
   "tsc/internal/checker/relater.go:shouldCheckAsExcessProperty": {
-   "disposition": "gap",
-   "item": "C1.6",
-   "reason": "excess property check condition; no Rust site found by name yet, to be traced to its inline site or ported"
+   "disposition": "equivalent",
+   "reason": "inlined in excess_properties: the property value declaration must be a direct child of the container value declaration",
+   "rust": "crates/tsr_checker/src/relater_excess.rs:182"
   },
   "tsc/internal/checker/relater.go:visibilityToString": {
-   "disposition": "gap",
-   "item": "C1.6",
-   "reason": "visibility names in constructor errors; no Rust site found by name yet, to be traced to its inline site or ported"
+   "disposition": "equivalent",
+   "reason": "inlined in constructor_visibilities_are_compatible as the private/protected/public name of the accessibility flags",
+   "rust": "crates/tsr_checker/src/relater_signatures.rs:539"
   },
   "tsc/internal/checker/types.go:ConditionalType.CheckType": {
    "disposition": "equivalent",
