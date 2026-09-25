@@ -1,9 +1,39 @@
 {
  "dispositions": {
+  "tsc/internal/checker/checker.go:Checker.GetAliasedSymbol": {
+   "disposition": "equivalent",
+   "reason": "the public wrapper of resolve_alias",
+   "rust": "crates/tsr_checker/src/module_aliases.rs:255"
+  },
+  "tsc/internal/checker/checker.go:Checker.GetSymbolAtLocation": {
+   "disposition": "equivalent",
+   "reason": "the public wrapper of get_symbol_at_location with ignoreErrors",
+   "rust": "crates/tsr_checker/src/query.rs:100"
+  },
+  "tsc/internal/checker/checker.go:Checker.ResolveAlias": {
+   "disposition": "equivalent",
+   "reason": "the public wrapper of resolve_alias with the unknown-symbol test at the call site",
+   "rust": "crates/tsr_checker/src/module_aliases.rs:255"
+  },
+  "tsc/internal/checker/checker.go:Checker.addInheritedMembers": {
+   "disposition": "equivalent",
+   "reason": "inline in resolve_object_type_members, including the value-only replacement rule",
+   "rust": "crates/tsr_checker/src/object_members.rs:196"
+  },
+  "tsc/internal/checker/checker.go:Checker.combineSymbolTables": {
+   "disposition": "gap",
+   "item": "C1.2",
+   "reason": "union of two symbol tables for export resolution; no Rust site found by name"
+  },
   "tsc/internal/checker/checker.go:Checker.createCanonicalSignature": {
    "disposition": "gap",
    "item": "C1.3",
    "reason": "canonical signatures (type parameters replaced by their defaults or unknown) have no Rust site"
+  },
+  "tsc/internal/checker/checker.go:Checker.createInstantiatedSymbolTable": {
+   "disposition": "equivalent",
+   "reason": "the instantiated members go into a checker table inline",
+   "rust": "crates/tsr_checker/src/object_members.rs:126"
   },
   "tsc/internal/checker/checker.go:Checker.createUnionSignature": {
    "disposition": "equivalent",
@@ -19,6 +49,11 @@
    "disposition": "equivalent",
    "reason": "the key search of index_info_of_type",
    "rust": "crates/tsr_checker/src/object_members.rs:398"
+  },
+  "tsc/internal/checker/checker.go:Checker.getAliasSymbolForTypeNode": {
+   "disposition": "equivalent",
+   "reason": "alias_for_type_node returns the alias with its symbol",
+   "rust": "crates/tsr_checker/src/query.rs:687"
   },
   "tsc/internal/checker/checker.go:Checker.getApplicableIndexInfo": {
    "disposition": "equivalent",
@@ -49,6 +84,46 @@
    "disposition": "gap",
    "item": "C1.3",
    "reason": "canonical signature cache"
+  },
+  "tsc/internal/checker/checker.go:Checker.getClassOrInterfaceDeclarationsOfSymbol": {
+   "disposition": "equivalent",
+   "reason": "the declaration filter is inline where the pin calls it",
+   "rust": "crates/tsr_checker/src/class_check.rs:497"
+  },
+  "tsc/internal/checker/checker.go:Checker.getConstraintFromIndexedAccess": {
+   "disposition": "equivalent",
+   "reason": "inline in constraint_of_type's indexed-access branch",
+   "rust": "crates/tsr_checker/src/normalize.rs:285"
+  },
+  "tsc/internal/checker/checker.go:Checker.getConstraintOfIndexedAccess": {
+   "disposition": "equivalent",
+   "reason": "the indexed-access branch of constraint_of_type guards with has_non_circular_base_constraint inline",
+   "rust": "crates/tsr_checker/src/normalize.rs:285"
+  },
+  "tsc/internal/checker/checker.go:Checker.getDeclarationNodeFlagsFromSymbol": {
+   "disposition": "equivalent",
+   "reason": "get_combined_node_flags over the value declaration at the call sites",
+   "rust": "crates/tsr_checker/src/check.rs:210"
+  },
+  "tsc/internal/checker/checker.go:Checker.getDeclaredTypeOfAlias": {
+   "disposition": "gap",
+   "item": "C1.2",
+   "reason": "the declared type of an alias symbol through resolve_alias with its cache; the get_declared_type_of_symbol dispatch is the site to check"
+  },
+  "tsc/internal/checker/checker.go:Checker.getGlobalSymbol": {
+   "disposition": "equivalent",
+   "reason": "resolve_name with no location, the diagnostic and no use, as get_global_type does",
+   "rust": "crates/tsr_checker/src/program_init.rs:223"
+  },
+  "tsc/internal/checker/checker.go:Checker.getGlobalTypeSymbolResolver": {
+   "disposition": "equivalent",
+   "reason": "the memoized resolvers are the global-type cache of the query state",
+   "rust": "crates/tsr_checker/src/program_init.rs:223"
+  },
+  "tsc/internal/checker/checker.go:Checker.getGlobalTypesResolver": {
+   "disposition": "equivalent",
+   "reason": "the memoized resolvers are the global-type cache of the query state",
+   "rust": "crates/tsr_checker/src/program_init.rs:223"
   },
   "tsc/internal/checker/checker.go:Checker.getIndexInfoWithReadonly": {
    "disposition": "gap",
@@ -95,6 +170,16 @@
    "reason": "index_property_name",
    "rust": "crates/tsr_checker/src/indexes.rs:495"
   },
+  "tsc/internal/checker/checker.go:Checker.getReferencedValueOrAliasSymbol": {
+   "disposition": "equivalent",
+   "reason": "the resolved-symbol link with the resolve fallback, inline in the emit reference path",
+   "rust": "crates/tsr_checker/src/emit_reference.rs:156"
+  },
+  "tsc/internal/checker/checker.go:Checker.getResolvedSymbolOrNil": {
+   "disposition": "equivalent",
+   "reason": "the resolved-symbol link read at the call sites",
+   "rust": "crates/tsr_checker/src/access_expressions.rs:397"
+  },
   "tsc/internal/checker/checker.go:Checker.getRestTypeOfSignature": {
    "disposition": "equivalent",
    "reason": "rest_parameter_type with the any fallback at the call sites",
@@ -120,10 +205,55 @@
    "reason": "signatures_of_type resolves the structured members and selects the call or construct half inline",
    "rust": "crates/tsr_checker/src/object_members.rs:341"
   },
+  "tsc/internal/checker/checker.go:Checker.getSymbolFlags": {
+   "disposition": "equivalent",
+   "reason": "module_symbol_flags is the Ex form; the wrapper's default flags are passed at the call sites",
+   "rust": "crates/tsr_checker/src/module_aliases.rs:158"
+  },
+  "tsc/internal/checker/checker.go:Checker.getSymbolOfNode": {
+   "disposition": "equivalent",
+   "reason": "get_symbol_of_declaration returns the merged late-bound symbol of a declaration",
+   "rust": "crates/tsr_checker/src/query.rs:88"
+  },
+  "tsc/internal/checker/checker.go:Checker.getTargetOfExportAssignment": {
+   "disposition": "equivalent",
+   "reason": "target_of_alias_declaration dispatches on the alias declaration kind inline",
+   "rust": "crates/tsr_checker/src/module_aliases.rs:463"
+  },
+  "tsc/internal/checker/checker.go:Checker.getTargetOfExportSpecifier": {
+   "disposition": "equivalent",
+   "reason": "inline in target_of_alias_declaration",
+   "rust": "crates/tsr_checker/src/module_aliases.rs:463"
+  },
+  "tsc/internal/checker/checker.go:Checker.getTargetOfImportSpecifier": {
+   "disposition": "equivalent",
+   "reason": "inline in target_of_alias_declaration",
+   "rust": "crates/tsr_checker/src/module_aliases.rs:463"
+  },
+  "tsc/internal/checker/checker.go:Checker.getTypeArgumentsForAliasSymbol": {
+   "disposition": "equivalent",
+   "reason": "alias_for_type_node also carries the local type parameters as the alias arguments",
+   "rust": "crates/tsr_checker/src/query.rs:687"
+  },
   "tsc/internal/checker/checker.go:Checker.getTypeFromLiteralTypeNode": {
    "disposition": "gap",
    "item": "C1.4",
    "reason": "literal type node to type; the Rust site is not identified by name yet"
+  },
+  "tsc/internal/checker/checker.go:Checker.getTypeFromTypeAliasReference": {
+   "disposition": "equivalent",
+   "reason": "the alias branch of get_type_reference_type, including the arity check",
+   "rust": "crates/tsr_checker/src/references.rs:223"
+  },
+  "tsc/internal/checker/checker.go:Checker.getTypeOfFuncClassEnumModule": {
+   "disposition": "equivalent",
+   "reason": "the worker is ported; its value-links cache is the query state's",
+   "rust": "crates/tsr_checker/src/enums.rs:255"
+  },
+  "tsc/internal/checker/checker.go:Checker.getTypeParametersForTypeAndSymbol": {
+   "disposition": "gap",
+   "item": "C1.5",
+   "reason": "type parameters of a reference target or alias for error reporting; no Rust site found by name"
   },
   "tsc/internal/checker/checker.go:Checker.getUniqAssociatedNamesFromTupleType": {
    "disposition": "gap",
@@ -160,6 +290,16 @@
    "reason": "the signature list is instantiated inline in resolve_object_type_members",
    "rust": "crates/tsr_checker/src/object_members.rs:126"
   },
+  "tsc/internal/checker/checker.go:Checker.instantiateSymbolTable": {
+   "disposition": "equivalent",
+   "reason": "inline in resolve_object_type_members",
+   "rust": "crates/tsr_checker/src/object_members.rs:126"
+  },
+  "tsc/internal/checker/checker.go:Checker.instantiateSymbols": {
+   "disposition": "equivalent",
+   "reason": "instantiate_symbol applied per element at the call sites",
+   "rust": "crates/tsr_checker/src/instantiate.rs:339"
+  },
   "tsc/internal/checker/checker.go:Checker.isArrayOrTupleLikeType": {
    "disposition": "gap",
    "item": "C1.4",
@@ -189,6 +329,11 @@
    "disposition": "gap",
    "item": "C1.4",
    "reason": "empty literal test; the Rust site is not identified by name yet"
+  },
+  "tsc/internal/checker/checker.go:Checker.isGlobalSymbolConstructor": {
+   "disposition": "equivalent",
+   "reason": "the global SymbolConstructor symbol is compared at the call site",
+   "rust": "crates/tsr_checker/src/name_resolution.rs:820"
   },
   "tsc/internal/checker/checker.go:Checker.isLateBindableIndexSignature": {
    "disposition": "equivalent",
@@ -220,6 +365,26 @@
    "item": "C1.4",
    "reason": "bigint literal parsing; the Rust site is not identified by name yet"
   },
+  "tsc/internal/checker/checker.go:Checker.recordMergedSymbol": {
+   "disposition": "equivalent",
+   "reason": "merged_symbols.insert in clone_symbol",
+   "rust": "crates/tsr_checker/src/merge.rs:90"
+  },
+  "tsc/internal/checker/checker.go:Checker.resolveAliasWithDeprecationCheck": {
+   "disposition": "gap",
+   "item": "C1.2",
+   "reason": "alias resolution with the deprecation suggestion; only signature deprecation checks exist"
+  },
+  "tsc/internal/checker/checker.go:Checker.resolveClassOrInterfaceMembers": {
+   "disposition": "equivalent",
+   "reason": "resolve_object_type_members with the type as its own source",
+   "rust": "crates/tsr_checker/src/object_members.rs:126"
+  },
+  "tsc/internal/checker/checker.go:Checker.resolveIndirectionAlias": {
+   "disposition": "gap",
+   "item": "C1.2",
+   "reason": "indirection through a type-only alias; the type-only declaration propagation is not found by name"
+  },
   "tsc/internal/checker/checker.go:Checker.resolveSignature": {
    "disposition": "gap",
    "item": "C1.3",
@@ -234,6 +399,11 @@
    "disposition": "gap",
    "item": "C1.3",
    "reason": "member type transformation for spread/omit"
+  },
+  "tsc/internal/checker/checker.go:Checker.tryGetDeclaredTypeOfSymbol": {
+   "disposition": "gap",
+   "item": "C1.2",
+   "reason": "declared type by symbol kind without an error fallback; the get_declared_type_of_symbol dispatch is the site to check"
   },
   "tsc/internal/checker/checker.go:Checker.typeHasCallOrConstructSignatures": {
    "disposition": "equivalent",
@@ -270,6 +440,11 @@
    "reason": "LiteralData.value holds the string value",
    "rust": "crates/tsr_checker/src/types.rs:167"
   },
+  "tsc/internal/checker/checker.go:getTypeAliasInstantiationKey": {
+   "disposition": "equivalent",
+   "reason": "object_instantiation_key builds the same key",
+   "rust": "crates/tsr_checker/src/instantiate.rs:593"
+  },
   "tsc/internal/checker/checker.go:isConstEnumSymbol": {
    "disposition": "equivalent",
    "reason": "const_enum_object_type tests the symbol's const-enum flag inline",
@@ -279,6 +454,11 @@
    "disposition": "equivalent",
    "reason": "is_generic_tuple_type is marked as the Checker method of the same name; the package-level function has the same body",
    "rust": "crates/tsr_checker/src/template.rs:285"
+  },
+  "tsc/internal/checker/checker.go:isLocalTypeAlias": {
+   "disposition": "gap",
+   "item": "C1.5",
+   "reason": "the local-alias rule that refrains from associating a top-level alias instantiation with a local alias is not found in references.rs"
   },
   "tsc/internal/checker/checker.go:isMutableTupleType": {
    "disposition": "equivalent",

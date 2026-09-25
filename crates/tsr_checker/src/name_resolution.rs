@@ -220,6 +220,7 @@ impl NameResolverHooks for Hooks<'_> {
             .push(Effect::Error(location, message, args.to_vec()));
         Ok(())
     }
+    // port: tsc/internal/checker/checker.go:Checker.symbolReferenced
     fn symbol_referenced(
         &mut self,
         symbol: SymbolId,
