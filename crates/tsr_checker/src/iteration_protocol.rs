@@ -48,14 +48,16 @@ impl CheckerState {
         ] {
             let target = self.iteration_global(name, 3)?;
             if self.iteration_is_reference(ty, target)? {
+                // The pin indexes the first three arguments; a reference resolved
+                // through a this argument carries one more.
                 let arguments = self.get_type_arguments(ty)?;
-                let [yield_type, return_type, next_type] = arguments.as_ref() else {
+                if arguments.len() < 3 {
                     return Err(tsr_arena::Error::InvalidGraph.into());
-                };
+                }
                 return self.resolved_iteration_types(
-                    *yield_type,
-                    *return_type,
-                    *next_type,
+                    arguments[0],
+                    arguments[1],
+                    arguments[2],
                     asynchronous,
                 );
             }
@@ -77,9 +79,7 @@ impl CheckerState {
         for target in builtin_targets {
             if self.iteration_is_reference(ty, target)? {
                 let arguments = self.get_type_arguments(ty)?;
-                let [yield_type] = arguments.as_ref() else {
-                    return Err(tsr_arena::Error::InvalidGraph.into());
-                };
+                let yield_type = *arguments.first().ok_or(tsr_arena::Error::InvalidGraph)?;
                 let options = self.program()?.host.options();
                 let return_type =
                     if options.strict_option_value(options.strict_builtin_iterator_return) {
@@ -88,7 +88,7 @@ impl CheckerState {
                         self.builtins.any_type
                     };
                 return self.resolved_iteration_types(
-                    *yield_type,
+                    yield_type,
                     return_type,
                     self.builtins.unknown_type,
                     asynchronous,
@@ -349,12 +349,10 @@ impl CheckerState {
             let target = self.iteration_global(name, 1)?;
             if self.iteration_is_reference(ty, target)? {
                 let arguments = self.get_type_arguments(ty)?;
-                let [argument] = arguments.as_ref() else {
-                    return Err(tsr_arena::Error::InvalidGraph.into());
-                };
+                let argument = *arguments.first().ok_or(tsr_arena::Error::InvalidGraph)?;
                 return Ok(IterationTypes {
-                    yield_type: yield_.then_some(*argument),
-                    return_type: (!yield_).then_some(*argument),
+                    yield_type: yield_.then_some(argument),
+                    return_type: (!yield_).then_some(argument),
                     next_type: None,
                 });
             }
