@@ -251,7 +251,7 @@ E8: Separate Rust consumer feasibility and Node parse latency measured separatel
 | checkerbench | stale: source, pin, command or inputs changed | [result](status/evidence/5c877c889f3630fa74103cc142b2b07234e3bb68d28fbc875789b74e9d507c97.json) |
 | checkertext | stale: source, pin, command or inputs changed | [result](status/evidence/e19d93b1b2e77cd0a2bda635f9e50aecd53ca78e5e4a4c27d45adc3e2ed2dc70.json) |
 | clippy | stale: source, pin, command or inputs changed | [result](status/evidence/1139a58c2c3bd5afcdfbe91a672e1f5cff42f551afd819ea91888c0269c58ce5.json) |
-| config | stale: source, pin, command or inputs changed | [result](status/evidence/18691ea6acd5d6e70593955e38c262f0e58fcdae2953836acafe6a606c63b84b.json) |
+| config | current | [result](status/evidence/ce75ba0f137f143817162f3b8d048b4d38b2958028c3ffd5ad29585dd66b75c6.json) |
 | deny | stale: source, pin, command or inputs changed | [result](status/evidence/591ad73fa43511e46af99a450162caf7ec7638882f55a7f3176bdbd5ea64ff65.json) |
 | e1 | stale: source, pin, command or inputs changed | [result](status/evidence/df8264588b903add090b14987510317a755eca2ca910c885b5669baf93cea6db.json) |
 | e2 | stale: source, pin, command or inputs changed | [result](status/evidence/ea315699ea5079faf35a9d33257f266a4c20c5d8d7aebab5187cd5041b49e0b0.json) |
@@ -262,14 +262,14 @@ E8: Separate Rust consumer feasibility and Node parse latency measured separatel
 | e7 | stale: source, pin, command or inputs changed | [result](status/evidence/17a5f52a9809d5a6c148572c189148b42273c84e53005eccd24ab700dad8604b.json) |
 | e8 | stale: source, pin, command or inputs changed | [result](status/evidence/556276951ed1b6a50a1a7a17946129a76c78ce6659f311d05e5050b1a54e9d67.json) |
 | fmt | stale: source, pin, command or inputs changed | [result](status/evidence/dc47449558c50622bbab178a193f188aa62175a07b78e629065fd12cdc6a4d1a.json) |
-| foundations | stale: source, pin, command or inputs changed | [result](status/evidence/052f7c42e777edbf19a3b7872fa8c28f24d529682203d9a99a38f8fbd93abeb3.json) |
+| foundations | current | [result](status/evidence/0fc791e3b2ff8df12a0116954e0b1b730918c914e441201efe43a32b5be53600.json) |
 | gen | stale: source, pin, command or inputs changed | [result](status/evidence/acbeb3f87b196daef46e774ba1a2b611a80dadcb7f71b6a5dd3b50b6b2f22da3.json) |
 | oracle | stale: source, pin, command or inputs changed | [result](status/evidence/db9b5b2ec2719b6b57419acc4180632ba0a86b2ed29beb40ba799a720668ac7f.json) |
 | program | stale: source, pin, command or inputs changed | [result](status/evidence/fc2fbd0e18e6bbbad1ed50c2f6bca3b1c1173b0a81fa64a4d7dea84da69fcaf9.json) |
 | relater | stale: source, pin, command or inputs changed | [result](status/evidence/981fff12bacd54eab8b02804bdb78919731df5cccb1ad6a4c0890017a369c642.json) |
 | scanner | stale: source, pin, command or inputs changed | [result](status/evidence/a088df9f7c39827fc505dd973140afd89b8b19d7607a76be4497377fb2271394.json) |
 | selftest | stale: source, pin, command or inputs changed | [result](status/evidence/34efc9d73aae1391aeaf72661c9fda3d0eb0518cb6e705ed6185bc113aa1cd4a.json) |
-| syntax | stale: source, pin, command or inputs changed | [result](status/evidence/58164dfb48c39963598148d889db755f0c7765f9af1d8ceb20eaced3670aaa1a.json) |
+| syntax | current | [result](status/evidence/3ae136d19d6abdb630b0f40f56e75f77d8b4f03238414be44fcbf57178dd6aad.json) |
 | testhost | stale: source, pin, command or inputs changed | [result](status/evidence/52d848dc16df91c05bbd3d66d32a6b52a61d35b237264fa7ebc9a6256629367a.json) |
 | workspace | stale: source, pin, command or inputs changed | [result](status/evidence/3e8b72258aae6ba4457d1ba29e8559bdb080daef946d262827b31eff6488db17.json) |
 
@@ -282,20 +282,20 @@ Every Phase 1 operation, the 309 config/options reference outputs and each famil
 Exit checks:
 
 - [x] `adr.0020.status == Accepted`
-- [ ] `run.foundations.inventory_complete == true` (unknown metric)
-- [ ] `run.foundations.harness_pass == true` (unknown metric)
-- [ ] `run.foundations.leaves_prepared == true` (unknown metric)
-- [ ] `run.foundations.filesystem_prepared == true` (unknown metric)
-- [ ] `run.foundations.utilities_prepared == true` (unknown metric)
-- [ ] `run.foundations.integration_prepared == true` (unknown metric)
-- [ ] `run.config.prepared == true` (unknown metric)
-- [ ] `run.syntax.prepared == true` (unknown metric)
+- [x] `run.foundations.inventory_complete == true`
+- [x] `run.foundations.harness_pass == true`
+- [ ] `run.foundations.leaves_prepared == true`
+- [x] `run.foundations.filesystem_prepared == true`
+- [ ] `run.foundations.utilities_prepared == true`
+- [ ] `run.foundations.integration_prepared == true`
+- [ ] `run.config.prepared == true`
+- [ ] `run.syntax.prepared == true`
 
 Items:
 
-- [ ] P1A-F0 Inventory, manifests, baseline index and an executable pilot
+- [x] P1A-F0 Inventory, manifests, baseline index and an executable pilot
 - [ ] P1A-F1a Foundation leaf tests: core/collections, text/number, JSON, locale, diagnostics and library access
-- [ ] P1A-F2a Filesystem, path and both matching dialects, including the 142 matching baseline outputs
+- [x] P1A-F2a Filesystem, path and both matching dialects, including the 142 matching baseline outputs
 - [ ] P1A-F3a Config, command-line and resolution tests over all 309 reference outputs
 - [ ] P1A-F4a Syntax, binder, navigation and evaluator coverage
 - [ ] P1A-F5a Integration witnesses, producer wiring and the stage A coverage report
@@ -307,19 +307,19 @@ Every required Phase 1 operation and integration witness passes on current input
 Exit checks:
 
 - [ ] `sprint.P1A.done == 1`
-- [ ] `run.foundations.inventory_complete == true` (unknown metric)
-- [ ] `run.foundations.leaves_complete == true` (unknown metric)
-- [ ] `run.foundations.filesystem_complete == true` (unknown metric)
-- [ ] `run.foundations.utilities_complete == true` (unknown metric)
-- [ ] `run.foundations.integration_complete == true` (unknown metric)
-- [ ] `run.foundations.rust_witnesses_complete == true` (unknown metric)
-- [ ] `run.foundations.mutation_witnesses_complete == true` (unknown metric)
-- [ ] `run.config.inventory_complete == true` (unknown metric)
-- [ ] `run.config.tests_total == 309` (unknown metric)
-- [ ] `run.config.parity == 1` (unknown metric)
-- [ ] `run.config.direct_complete == true` (unknown metric)
-- [ ] `run.syntax.inventory_complete == true` (unknown metric)
-- [ ] `run.syntax.parity == 1` (unknown metric)
+- [x] `run.foundations.inventory_complete == true`
+- [ ] `run.foundations.leaves_complete == true`
+- [x] `run.foundations.filesystem_complete == true`
+- [ ] `run.foundations.utilities_complete == true`
+- [x] `run.foundations.integration_complete == true`
+- [x] `run.foundations.rust_witnesses_complete == true`
+- [ ] `run.foundations.mutation_witnesses_complete == true`
+- [x] `run.config.inventory_complete == true`
+- [x] `run.config.tests_total == 309`
+- [x] `run.config.parity == 1`
+- [ ] `run.config.direct_complete == true`
+- [x] `run.syntax.inventory_complete == true`
+- [x] `run.syntax.parity == 1`
 - [ ] `run.e1.parity == 1` (unknown metric)
 - [ ] `run.e1.frozen_denominator == true` (unknown metric)
 - [ ] `run.e1.encoder_success_error == true` (unknown metric)
@@ -360,7 +360,7 @@ Exit checks:
 Items:
 
 - [ ] P1B-F1b Foundation leaf implementations satisfy the exact required operation traces
-- [ ] P1B-F2b Filesystem, snapshots, paths and both matching dialects satisfy their required traces
+- [x] P1B-F2b Filesystem, snapshots, paths and both matching dialects satisfy their required traces
 - [ ] P1B-F3b All 309 config/options output identities and supplementary package/resolution cases pass
 - [ ] P1B-F4b Complete syntax schedule, exact parser/binder inventories and shared utilities pass
 - [ ] P1B-F5b Integrated services, generated locale/library assets, original client and all 89 transport cases pass

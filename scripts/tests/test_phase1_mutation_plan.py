@@ -237,6 +237,27 @@ class DigestTests(unittest.TestCase):
             path.unlink()
             self.assertFalse(mutation.span_intact(root, mutant))
 
+    def test_a_moved_span_reports_its_shift_and_relocates_every_line_for_the_splicer(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            path = root / "crates/x/src/lib.rs"
+            path.parent.mkdir(parents=True)
+            path.write_bytes(FIXTURE)
+            mutant = {"file": "crates/x/src/lib.rs", "span": [2, 5], "span_sha256": FIXTURE_SPAN_SHA256,
+                      "site_line": 3, "markers": {"tsc/x.go:B": 2}, "id": 7, "key": "k",
+                      "insert": [{"line": 3, "column": 17, "order": 1, "text": "x"}]}
+            self.assertEqual(mutation.span_shift(root, mutant), 0)
+            self.assertIs(mutation.relocated(mutant, 0), mutant)
+            path.write_bytes(b"// new\n// lines\n" + FIXTURE)
+            self.assertEqual(mutation.span_shift(root, mutant), 2)
+            moved = mutation.relocated(mutant, 2)
+            self.assertEqual((moved["span"], moved["site_line"], moved["markers"], moved["insert"][0]["line"]),
+                             ([4, 7], 5, {"tsc/x.go:B": 4}, 5))
+            self.assertEqual((moved["id"], moved["key"], moved["span_sha256"]), (7, "k", FIXTURE_SPAN_SHA256))
+            self.assertEqual(mutation.span_sha256(path.read_bytes(), *moved["span"]), FIXTURE_SPAN_SHA256)
+            path.write_bytes(FIXTURE.replace(b"true", b"false"))
+            self.assertIsNone(mutation.span_shift(root, mutant))
+
 
 def git(root: Path, *args: str) -> str:
     return subprocess.run(["git", "-C", str(root), *args], check=True, capture_output=True, text=True).stdout
