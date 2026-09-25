@@ -1084,12 +1084,13 @@
   },
   {
    "bucket": "failed: checker_error",
-   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; traced: the InvalidGraph arena error is raised in iteration_types_fast (iteration_protocol.rs:53) while computing the contextual element type of an array literal (iteration_types_of_iterable <- contextual_element_type <- is_const_context), which is C3's iteration and contextual typing, not symbol merging",
    "go": "tsc/internal/checker/checker.go:Checker.mergeSymbol",
    "id": "compiler/thislessFunctionsNotContextSensitive1.ts#configuration=0",
    "item": "C1.2",
    "mechanism": "after 2c87ef7 the checker stops with the arena error 'lazy roots must belong to the current transaction' (tsr_arena lazy.rs publish), the same defect as packageDeduplicationDuplicateGlobals; trace pending",
-   "status": "candidate"
+   "owner": "C3",
+   "status": "returned"
   },
   {
    "bucket": "failed: walker_error",

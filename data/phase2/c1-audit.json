@@ -344,6 +344,521 @@
    "disposition": "gap",
    "item": "C1.6",
    "reason": "visibility names in constructor errors; no Rust site found by name yet, to be traced to its inline site or ported"
+  },
+  "tsc/internal/checker/types.go:ConditionalType.CheckType": {
+   "disposition": "equivalent",
+   "reason": "ConditionalData.check_type",
+   "rust": "crates/tsr_checker/src/types.rs:420"
+  },
+  "tsc/internal/checker/types.go:ConditionalType.ExtendsType": {
+   "disposition": "equivalent",
+   "reason": "ConditionalData.extends_type",
+   "rust": "crates/tsr_checker/src/types.rs:421"
+  },
+  "tsc/internal/checker/types.go:ConstrainedType.AsConstrainedType": {
+   "disposition": "equivalent",
+   "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
+   "rust": "crates/tsr_checker/src/types.rs:546"
+  },
+  "tsc/internal/checker/types.go:IndexInfo.Declaration": {
+   "disposition": "equivalent",
+   "reason": "IndexInfo.declaration",
+   "rust": "crates/tsr_checker/src/signatures.rs:54"
+  },
+  "tsc/internal/checker/types.go:IndexInfo.IsReadonly": {
+   "disposition": "equivalent",
+   "reason": "IndexInfo.is_readonly",
+   "rust": "crates/tsr_checker/src/signatures.rs:52"
+  },
+  "tsc/internal/checker/types.go:IndexInfo.KeyType": {
+   "disposition": "equivalent",
+   "reason": "IndexInfo.key_type",
+   "rust": "crates/tsr_checker/src/signatures.rs:50"
+  },
+  "tsc/internal/checker/types.go:IndexInfo.ValueType": {
+   "disposition": "equivalent",
+   "reason": "IndexInfo.value_type",
+   "rust": "crates/tsr_checker/src/signatures.rs:51"
+  },
+  "tsc/internal/checker/types.go:IndexType.Target": {
+   "disposition": "equivalent",
+   "reason": "IndexData.target",
+   "rust": "crates/tsr_checker/src/types.rs:389"
+  },
+  "tsc/internal/checker/types.go:IndexedAccessType.IndexType": {
+   "disposition": "equivalent",
+   "reason": "IndexedAccessData.index_type",
+   "rust": "crates/tsr_checker/src/types.rs:397"
+  },
+  "tsc/internal/checker/types.go:IndexedAccessType.ObjectType": {
+   "disposition": "equivalent",
+   "reason": "IndexedAccessData.object_type",
+   "rust": "crates/tsr_checker/src/types.rs:396"
+  },
+  "tsc/internal/checker/types.go:InterfaceType.AsInterfaceType": {
+   "disposition": "equivalent",
+   "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
+   "rust": "crates/tsr_checker/src/types.rs:546"
+  },
+  "tsc/internal/checker/types.go:InterfaceType.LocalTypeParameters": {
+   "disposition": "equivalent",
+   "reason": "the slice of all_type_parameters after outer_type_parameter_count, without the this type, at the call sites",
+   "rust": "crates/tsr_checker/src/types.rs:283"
+  },
+  "tsc/internal/checker/types.go:InterfaceType.OuterTypeParameters": {
+   "disposition": "equivalent",
+   "reason": "the first outer_type_parameter_count of all_type_parameters",
+   "rust": "crates/tsr_checker/src/types.rs:262"
+  },
+  "tsc/internal/checker/types.go:IntrinsicType.IntrinsicName": {
+   "disposition": "equivalent",
+   "reason": "IntrinsicData.name",
+   "rust": "crates/tsr_checker/src/types.rs:162"
+  },
+  "tsc/internal/checker/types.go:LiteralType.FreshType": {
+   "disposition": "equivalent",
+   "reason": "LiteralData.fresh",
+   "rust": "crates/tsr_checker/src/types.rs:169"
+  },
+  "tsc/internal/checker/types.go:LiteralType.RegularType": {
+   "disposition": "equivalent",
+   "reason": "LiteralData.regular",
+   "rust": "crates/tsr_checker/src/types.rs:171"
+  },
+  "tsc/internal/checker/types.go:LiteralType.String": {
+   "disposition": "equivalent",
+   "reason": "the string form of LiteralData.value is produced where the pin calls String()",
+   "rust": "crates/tsr_checker/src/types.rs:167"
+  },
+  "tsc/internal/checker/types.go:LiteralType.Value": {
+   "disposition": "equivalent",
+   "reason": "LiteralData.value",
+   "rust": "crates/tsr_checker/src/types.rs:167"
+  },
+  "tsc/internal/checker/types.go:ObjectType.AsObjectType": {
+   "disposition": "equivalent",
+   "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
+   "rust": "crates/tsr_checker/src/types.rs:546"
+  },
+  "tsc/internal/checker/types.go:Signature.Declaration": {
+   "disposition": "equivalent",
+   "reason": "Signature.declaration",
+   "rust": "crates/tsr_checker/src/signatures.rs:34"
+  },
+  "tsc/internal/checker/types.go:Signature.Flags": {
+   "disposition": "equivalent",
+   "reason": "Signature.flags",
+   "rust": "crates/tsr_checker/src/signatures.rs:31"
+  },
+  "tsc/internal/checker/types.go:Signature.HasRestParameter": {
+   "disposition": "equivalent",
+   "reason": "a flags test on HAS_REST_PARAMETER at the call sites",
+   "rust": "crates/tsr_checker/src/signatures.rs:31"
+  },
+  "tsc/internal/checker/types.go:Signature.Id": {
+   "disposition": "equivalent",
+   "reason": "the SignatureId newtype is the identity; signatures are numbered from 1 as the pin's are",
+   "rust": "crates/tsr_checker/src/signatures.rs:163"
+  },
+  "tsc/internal/checker/types.go:Signature.MinArgumentCount": {
+   "disposition": "equivalent",
+   "reason": "Signature.min_argument_count",
+   "rust": "crates/tsr_checker/src/signatures.rs:32"
+  },
+  "tsc/internal/checker/types.go:Signature.Parameters": {
+   "disposition": "equivalent",
+   "reason": "Signature.parameters",
+   "rust": "crates/tsr_checker/src/signatures.rs:36"
+  },
+  "tsc/internal/checker/types.go:Signature.Target": {
+   "disposition": "equivalent",
+   "reason": "Signature.target",
+   "rust": "crates/tsr_checker/src/signatures.rs:40"
+  },
+  "tsc/internal/checker/types.go:Signature.ThisParameter": {
+   "disposition": "equivalent",
+   "reason": "Signature.this_parameter",
+   "rust": "crates/tsr_checker/src/signatures.rs:37"
+  },
+  "tsc/internal/checker/types.go:Signature.TypeParameters": {
+   "disposition": "equivalent",
+   "reason": "Signature.type_parameters",
+   "rust": "crates/tsr_checker/src/signatures.rs:35"
+  },
+  "tsc/internal/checker/types.go:StringMappingType.Target": {
+   "disposition": "equivalent",
+   "reason": "StringMappingData.target",
+   "rust": "crates/tsr_checker/src/types.rs:405"
+  },
+  "tsc/internal/checker/types.go:StructuredType.AsStructuredType": {
+   "disposition": "equivalent",
+   "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
+   "rust": "crates/tsr_checker/src/types.rs:546"
+  },
+  "tsc/internal/checker/types.go:StructuredType.CallSignatures": {
+   "disposition": "equivalent",
+   "reason": "StructuredMembers.signatures with call_signature_count",
+   "rust": "crates/tsr_checker/src/types.rs:187"
+  },
+  "tsc/internal/checker/types.go:StructuredType.ConstructSignatures": {
+   "disposition": "equivalent",
+   "reason": "the construct part of StructuredMembers.signatures after call_signature_count",
+   "rust": "crates/tsr_checker/src/types.rs:188"
+  },
+  "tsc/internal/checker/types.go:StructuredType.Properties": {
+   "disposition": "equivalent",
+   "reason": "StructuredMembers.properties",
+   "rust": "crates/tsr_checker/src/types.rs:185"
+  },
+  "tsc/internal/checker/types.go:SubstitutionType.BaseType": {
+   "disposition": "equivalent",
+   "reason": "SubstitutionData.base",
+   "rust": "crates/tsr_checker/src/types.rs:412"
+  },
+  "tsc/internal/checker/types.go:SubstitutionType.SubstConstraint": {
+   "disposition": "equivalent",
+   "reason": "SubstitutionData.constraint",
+   "rust": "crates/tsr_checker/src/types.rs:413"
+  },
+  "tsc/internal/checker/types.go:TemplateLiteralType.Texts": {
+   "disposition": "equivalent",
+   "reason": "TemplateLiteralData.texts",
+   "rust": "crates/tsr_checker/src/types.rs:381"
+  },
+  "tsc/internal/checker/types.go:TemplateLiteralType.Types": {
+   "disposition": "equivalent",
+   "reason": "TemplateLiteralData.types",
+   "rust": "crates/tsr_checker/src/types.rs:382"
+  },
+  "tsc/internal/checker/types.go:TupleElementInfo.LabeledDeclaration": {
+   "disposition": "equivalent",
+   "reason": "TupleElementInfo.labeled_declaration",
+   "rust": "crates/tsr_checker/src/types.rs:316"
+  },
+  "tsc/internal/checker/types.go:TupleElementInfo.TupleElementFlags": {
+   "disposition": "equivalent",
+   "reason": "TupleElementInfo.flags",
+   "rust": "crates/tsr_checker/src/types.rs:314"
+  },
+  "tsc/internal/checker/types.go:TupleType.ElementFlags": {
+   "disposition": "equivalent",
+   "reason": "the flags of each TupleElementInfo in TupleData.element_infos",
+   "rust": "crates/tsr_checker/src/types.rs:323"
+  },
+  "tsc/internal/checker/types.go:TupleType.ElementInfos": {
+   "disposition": "equivalent",
+   "reason": "TupleData.element_infos",
+   "rust": "crates/tsr_checker/src/types.rs:323"
+  },
+  "tsc/internal/checker/types.go:TupleType.FixedLength": {
+   "disposition": "equivalent",
+   "reason": "TupleData.fixed_length",
+   "rust": "crates/tsr_checker/src/types.rs:327"
+  },
+  "tsc/internal/checker/types.go:TupleType.IsReadonly": {
+   "disposition": "equivalent",
+   "reason": "TupleData.readonly",
+   "rust": "crates/tsr_checker/src/types.rs:329"
+  },
+  "tsc/internal/checker/types.go:Type.Alias": {
+   "disposition": "equivalent",
+   "reason": "alias_of(id) returns the alias record",
+   "rust": "crates/tsr_checker/src/types.rs:733"
+  },
+  "tsc/internal/checker/types.go:Type.AsConditionalType": {
+   "disposition": "equivalent",
+   "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
+   "rust": "crates/tsr_checker/src/types.rs:546"
+  },
+  "tsc/internal/checker/types.go:Type.AsConstrainedType": {
+   "disposition": "equivalent",
+   "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
+   "rust": "crates/tsr_checker/src/types.rs:546"
+  },
+  "tsc/internal/checker/types.go:Type.AsEvolvingArrayType": {
+   "disposition": "equivalent",
+   "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
+   "rust": "crates/tsr_checker/src/types.rs:546"
+  },
+  "tsc/internal/checker/types.go:Type.AsIndexType": {
+   "disposition": "equivalent",
+   "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
+   "rust": "crates/tsr_checker/src/types.rs:546"
+  },
+  "tsc/internal/checker/types.go:Type.AsIndexedAccessType": {
+   "disposition": "equivalent",
+   "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
+   "rust": "crates/tsr_checker/src/types.rs:546"
+  },
+  "tsc/internal/checker/types.go:Type.AsInstantiationExpressionType": {
+   "disposition": "equivalent",
+   "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
+   "rust": "crates/tsr_checker/src/types.rs:546"
+  },
+  "tsc/internal/checker/types.go:Type.AsInterfaceType": {
+   "disposition": "equivalent",
+   "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
+   "rust": "crates/tsr_checker/src/types.rs:546"
+  },
+  "tsc/internal/checker/types.go:Type.AsIntersectionType": {
+   "disposition": "equivalent",
+   "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
+   "rust": "crates/tsr_checker/src/types.rs:546"
+  },
+  "tsc/internal/checker/types.go:Type.AsIntrinsicType": {
+   "disposition": "equivalent",
+   "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
+   "rust": "crates/tsr_checker/src/types.rs:546"
+  },
+  "tsc/internal/checker/types.go:Type.AsLiteralType": {
+   "disposition": "equivalent",
+   "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
+   "rust": "crates/tsr_checker/src/types.rs:546"
+  },
+  "tsc/internal/checker/types.go:Type.AsMappedType": {
+   "disposition": "equivalent",
+   "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
+   "rust": "crates/tsr_checker/src/types.rs:546"
+  },
+  "tsc/internal/checker/types.go:Type.AsObjectType": {
+   "disposition": "equivalent",
+   "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
+   "rust": "crates/tsr_checker/src/types.rs:546"
+  },
+  "tsc/internal/checker/types.go:Type.AsReverseMappedType": {
+   "disposition": "equivalent",
+   "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
+   "rust": "crates/tsr_checker/src/types.rs:546"
+  },
+  "tsc/internal/checker/types.go:Type.AsStringMappingType": {
+   "disposition": "equivalent",
+   "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
+   "rust": "crates/tsr_checker/src/types.rs:546"
+  },
+  "tsc/internal/checker/types.go:Type.AsStructuredType": {
+   "disposition": "equivalent",
+   "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
+   "rust": "crates/tsr_checker/src/types.rs:546"
+  },
+  "tsc/internal/checker/types.go:Type.AsSubstitutionType": {
+   "disposition": "equivalent",
+   "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
+   "rust": "crates/tsr_checker/src/types.rs:546"
+  },
+  "tsc/internal/checker/types.go:Type.AsTemplateLiteralType": {
+   "disposition": "equivalent",
+   "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
+   "rust": "crates/tsr_checker/src/types.rs:546"
+  },
+  "tsc/internal/checker/types.go:Type.AsTupleType": {
+   "disposition": "equivalent",
+   "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
+   "rust": "crates/tsr_checker/src/types.rs:546"
+  },
+  "tsc/internal/checker/types.go:Type.AsTypeParameter": {
+   "disposition": "equivalent",
+   "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
+   "rust": "crates/tsr_checker/src/types.rs:546"
+  },
+  "tsc/internal/checker/types.go:Type.AsTypeReference": {
+   "disposition": "equivalent",
+   "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
+   "rust": "crates/tsr_checker/src/types.rs:546"
+  },
+  "tsc/internal/checker/types.go:Type.AsUnionOrIntersectionType": {
+   "disposition": "equivalent",
+   "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
+   "rust": "crates/tsr_checker/src/types.rs:546"
+  },
+  "tsc/internal/checker/types.go:Type.AsUnionType": {
+   "disposition": "equivalent",
+   "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
+   "rust": "crates/tsr_checker/src/types.rs:546"
+  },
+  "tsc/internal/checker/types.go:Type.AsUniqueESSymbolType": {
+   "disposition": "equivalent",
+   "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
+   "rust": "crates/tsr_checker/src/types.rs:546"
+  },
+  "tsc/internal/checker/types.go:Type.Distributed": {
+   "disposition": "equivalent",
+   "reason": "types_of(id) yields the union's constituents, or the type itself where the pin returns a singleton",
+   "rust": "crates/tsr_checker/src/types.rs:983"
+  },
+  "tsc/internal/checker/types.go:Type.Flags": {
+   "disposition": "equivalent",
+   "reason": "flags(id) reads the record's flags",
+   "rust": "crates/tsr_checker/src/types.rs:623"
+  },
+  "tsc/internal/checker/types.go:Type.Id": {
+   "disposition": "equivalent",
+   "reason": "the TypeId newtype is the identity",
+   "rust": "crates/tsr_checker/src/ids.rs:15"
+  },
+  "tsc/internal/checker/types.go:Type.IsBigIntLiteral": {
+   "disposition": "equivalent",
+   "reason": "a flags (or object flags, or target object flags for tuples) test at the call sites; the store exposes flags(id) and object_flags(id)",
+   "rust": "crates/tsr_checker/src/types.rs:623"
+  },
+  "tsc/internal/checker/types.go:Type.IsBooleanLike": {
+   "disposition": "equivalent",
+   "reason": "a flags (or object flags, or target object flags for tuples) test at the call sites; the store exposes flags(id) and object_flags(id)",
+   "rust": "crates/tsr_checker/src/types.rs:623"
+  },
+  "tsc/internal/checker/types.go:Type.IsClass": {
+   "disposition": "equivalent",
+   "reason": "a flags (or object flags, or target object flags for tuples) test at the call sites; the store exposes flags(id) and object_flags(id)",
+   "rust": "crates/tsr_checker/src/types.rs:623"
+  },
+  "tsc/internal/checker/types.go:Type.IsEnumLiteral": {
+   "disposition": "equivalent",
+   "reason": "a flags (or object flags, or target object flags for tuples) test at the call sites; the store exposes flags(id) and object_flags(id)",
+   "rust": "crates/tsr_checker/src/types.rs:623"
+  },
+  "tsc/internal/checker/types.go:Type.IsIndex": {
+   "disposition": "equivalent",
+   "reason": "a flags (or object flags, or target object flags for tuples) test at the call sites; the store exposes flags(id) and object_flags(id)",
+   "rust": "crates/tsr_checker/src/types.rs:623"
+  },
+  "tsc/internal/checker/types.go:Type.IsIntersection": {
+   "disposition": "equivalent",
+   "reason": "a flags (or object flags, or target object flags for tuples) test at the call sites; the store exposes flags(id) and object_flags(id)",
+   "rust": "crates/tsr_checker/src/types.rs:623"
+  },
+  "tsc/internal/checker/types.go:Type.IsNumberLiteral": {
+   "disposition": "equivalent",
+   "reason": "a flags (or object flags, or target object flags for tuples) test at the call sites; the store exposes flags(id) and object_flags(id)",
+   "rust": "crates/tsr_checker/src/types.rs:623"
+  },
+  "tsc/internal/checker/types.go:Type.IsString": {
+   "disposition": "equivalent",
+   "reason": "a flags (or object flags, or target object flags for tuples) test at the call sites; the store exposes flags(id) and object_flags(id)",
+   "rust": "crates/tsr_checker/src/types.rs:623"
+  },
+  "tsc/internal/checker/types.go:Type.IsStringLike": {
+   "disposition": "equivalent",
+   "reason": "a flags (or object flags, or target object flags for tuples) test at the call sites; the store exposes flags(id) and object_flags(id)",
+   "rust": "crates/tsr_checker/src/types.rs:623"
+  },
+  "tsc/internal/checker/types.go:Type.IsStringLiteral": {
+   "disposition": "equivalent",
+   "reason": "a flags (or object flags, or target object flags for tuples) test at the call sites; the store exposes flags(id) and object_flags(id)",
+   "rust": "crates/tsr_checker/src/types.rs:623"
+  },
+  "tsc/internal/checker/types.go:Type.IsTupleType": {
+   "disposition": "equivalent",
+   "reason": "a flags (or object flags, or target object flags for tuples) test at the call sites; the store exposes flags(id) and object_flags(id)",
+   "rust": "crates/tsr_checker/src/types.rs:623"
+  },
+  "tsc/internal/checker/types.go:Type.IsTypeParameter": {
+   "disposition": "equivalent",
+   "reason": "a flags (or object flags, or target object flags for tuples) test at the call sites; the store exposes flags(id) and object_flags(id)",
+   "rust": "crates/tsr_checker/src/types.rs:623"
+  },
+  "tsc/internal/checker/types.go:Type.IsUnion": {
+   "disposition": "equivalent",
+   "reason": "a flags (or object flags, or target object flags for tuples) test at the call sites; the store exposes flags(id) and object_flags(id)",
+   "rust": "crates/tsr_checker/src/types.rs:623"
+  },
+  "tsc/internal/checker/types.go:Type.Mapper": {
+   "disposition": "equivalent",
+   "reason": "the object payload's mapper field, read per payload kind at the call sites",
+   "rust": "crates/tsr_checker/src/types.rs:806"
+  },
+  "tsc/internal/checker/types.go:Type.ObjectFlags": {
+   "disposition": "equivalent",
+   "reason": "object_flags(id) reads the record's object flags",
+   "rust": "crates/tsr_checker/src/types.rs:627"
+  },
+  "tsc/internal/checker/types.go:Type.Symbol": {
+   "disposition": "equivalent",
+   "reason": "the record's symbol field",
+   "rust": "crates/tsr_checker/src/types.rs:611"
+  },
+  "tsc/internal/checker/types.go:Type.TargetInterfaceType": {
+   "disposition": "equivalent",
+   "reason": "interface(target(id)) is the target's interface payload",
+   "rust": "crates/tsr_checker/src/types.rs:917"
+  },
+  "tsc/internal/checker/types.go:Type.TargetTupleType": {
+   "disposition": "equivalent",
+   "reason": "tuple(target(id)) is the target's tuple payload",
+   "rust": "crates/tsr_checker/src/types.rs:996"
+  },
+  "tsc/internal/checker/types.go:TypeBase.AsConstrainedType": {
+   "disposition": "equivalent",
+   "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
+   "rust": "crates/tsr_checker/src/types.rs:546"
+  },
+  "tsc/internal/checker/types.go:TypeBase.AsInterfaceType": {
+   "disposition": "equivalent",
+   "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
+   "rust": "crates/tsr_checker/src/types.rs:546"
+  },
+  "tsc/internal/checker/types.go:TypeBase.AsObjectType": {
+   "disposition": "equivalent",
+   "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
+   "rust": "crates/tsr_checker/src/types.rs:546"
+  },
+  "tsc/internal/checker/types.go:TypeBase.AsStructuredType": {
+   "disposition": "equivalent",
+   "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
+   "rust": "crates/tsr_checker/src/types.rs:546"
+  },
+  "tsc/internal/checker/types.go:TypeBase.AsType": {
+   "disposition": "equivalent",
+   "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
+   "rust": "crates/tsr_checker/src/types.rs:546"
+  },
+  "tsc/internal/checker/types.go:TypeBase.AsTypeReference": {
+   "disposition": "equivalent",
+   "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
+   "rust": "crates/tsr_checker/src/types.rs:546"
+  },
+  "tsc/internal/checker/types.go:TypeBase.AsUnionOrIntersectionType": {
+   "disposition": "equivalent",
+   "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
+   "rust": "crates/tsr_checker/src/types.rs:546"
+  },
+  "tsc/internal/checker/types.go:TypeParameter.IsThisType": {
+   "disposition": "equivalent",
+   "reason": "TypeParameterData.is_this_type",
+   "rust": "crates/tsr_checker/src/types.rs:373"
+  },
+  "tsc/internal/checker/types.go:TypePredicate.Kind": {
+   "disposition": "equivalent",
+   "reason": "TypePredicate.kind",
+   "rust": "crates/tsr_checker/src/signatures.rs:16"
+  },
+  "tsc/internal/checker/types.go:TypePredicate.ParameterIndex": {
+   "disposition": "equivalent",
+   "reason": "TypePredicate.parameter_index",
+   "rust": "crates/tsr_checker/src/signatures.rs:17"
+  },
+  "tsc/internal/checker/types.go:TypePredicate.ParameterName": {
+   "disposition": "equivalent",
+   "reason": "TypePredicate.parameter_name",
+   "rust": "crates/tsr_checker/src/signatures.rs:18"
+  },
+  "tsc/internal/checker/types.go:TypePredicate.Type": {
+   "disposition": "equivalent",
+   "reason": "TypePredicate.t",
+   "rust": "crates/tsr_checker/src/signatures.rs:19"
+  },
+  "tsc/internal/checker/types.go:TypeReference.AsTypeReference": {
+   "disposition": "equivalent",
+   "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
+   "rust": "crates/tsr_checker/src/types.rs:546"
+  },
+  "tsc/internal/checker/types.go:UnionOrIntersectionType.AsUnionOrIntersectionType": {
+   "disposition": "equivalent",
+   "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
+   "rust": "crates/tsr_checker/src/types.rs:546"
+  },
+  "tsc/internal/checker/types.go:UnionOrIntersectionType.Types": {
+   "disposition": "equivalent",
+   "reason": "types_of(id)",
+   "rust": "crates/tsr_checker/src/types.rs:983"
   }
  },
  "groups": {
