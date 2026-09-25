@@ -1,0 +1,21 @@
+[package]
+name = "phase1_mutation_splicer"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+description = "Phase 1 mutation witnesses: resolves port-marker sites and splices type-directed mutant switches into a scratch workspace copy"
+
+# syn only locates sites. The splice itself is plain text insertion at recorded
+# byte positions, never a reprint, so comments, markers and line numbers stay
+# exactly as committed. `span-locations` gives the line/column of every token.
+[dependencies]
+proc-macro2 = { version = "1", features = ["span-locations"] }
+quote = "1"
+serde_json = "1"
+sha2 = "0.10"
+syn = { version = "2", features = ["full", "visit"] }
+
+[lints]
+workspace = true

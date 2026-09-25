@@ -12,6 +12,9 @@ description = "Phase 1 F4a: answers the syntax schedule and the syntax, AST, nav
 # direct dependency set as well as the compiler.
 [dependencies]
 phase1_harness = { version = "0.1.0", path = "../harness" }
+# The inert mutant switch: only spliced scratch copies of the workspace call it
+# from production code; the mutation mode (src/mutation.rs) drives it.
+phase1_mutants = { version = "0.1.0", path = "../mutation/switch" }
 serde_json = { version = "1", features = ["preserve_order"] }
 sha2 = "0.10"
 tsr_arena = { version = "0.1.0", path = "../../../crates/tsr_arena" }

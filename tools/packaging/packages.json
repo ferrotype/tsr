@@ -26,6 +26,24 @@
       "reason": "Repository-only Phase 1 foundation test harness"
     },
     {
+      "name": "phase1_mutants",
+      "manifest": "tools/phase1/mutation/switch/Cargo.toml",
+      "publish": false,
+      "reason": "Repository-only Phase 1 mutation-witness tool"
+    },
+    {
+      "name": "phase1_mutation_driver",
+      "manifest": "tools/phase1/mutation/driver/Cargo.toml",
+      "publish": false,
+      "reason": "Repository-only Phase 1 mutation-witness tool"
+    },
+    {
+      "name": "phase1_mutation_splicer",
+      "manifest": "tools/phase1/mutation/splicer/Cargo.toml",
+      "publish": false,
+      "reason": "Repository-only Phase 1 mutation-witness tool"
+    },
+    {
       "name": "phase1_syntax",
       "manifest": "tools/phase1/syntax/Cargo.toml",
       "publish": false,

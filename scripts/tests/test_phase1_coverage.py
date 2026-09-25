@@ -148,8 +148,15 @@ class CoverageTests(unittest.TestCase):
     def test_every_operation_rust_witness_has_executable_producer_route(self):
         manifest = json.loads((ROOT / "data/phase1/cases.json").read_text())
         expected = {row["id"] for row in manifest["witnesses"] if row["kind"] == "rust_gated" and row.get("operations")}
-        self.assertEqual({row["id"] for row in self.report["witnesses"]}, expected)
-        self.assertTrue(all(row["producer_metrics"] for row in self.report["witnesses"]))
+        mutations = {row["id"] for row in manifest["witnesses"] if row["kind"] == "mutation_kill"}
+        self.assertEqual({row["id"] for row in self.report["witnesses"]}, expected | mutations)
+        for row in self.report["witnesses"]:
+            if row.get("kind") == "mutation_kill":
+                # Routed only while bound; see test_phase1_mutation_witness.py.
+                self.assertEqual(row["producer_metrics"],
+                                 [scope.MUTATION_METRIC] if row["state"] == "bound" and row["operations"] else [])
+            else:
+                self.assertTrue(row["producer_metrics"])
 
     def test_approval_cannot_follow_a_changed_request(self):
         report = self.mutated("data/phase1/approved-differences.json", lambda d: d["differences"][0].update(request_sha256="0" * 64))

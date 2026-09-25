@@ -74,6 +74,15 @@ def metric_contributors(cases, witnesses, external_inventories=()):
     required = {row[0] for row in ROUTES.values() if row[0]} | {"run.config.parity"} | set(RUST_ROUTES)
     required.add("run.foundations.rust_witnesses_complete")
     required.update(("run.syntax.parity", "run.foundations.integration_complete"))
+    # Required while a mutation witness binds and credits an operation: that
+    # witness must route to the metric. A declared witness that no longer binds
+    # routes nowhere and is pending work (its operations are
+    # `mutation_witness_stale` gaps), not a harness problem, so a manifest
+    # whose every mutation witness went stale stays healthy and the producer
+    # reports the metric false.
+    if any(row.get("kind") == "mutation_kill" and row.get("state") == "bound" and row.get("operations")
+           for row in witnesses):
+        required.add(scope.MUTATION_METRIC)
     empty = sorted(metric for metric in required if not contributors[metric])
     if empty:
         raise ValueError("metrics have no contributing observations: " + ", ".join(empty))
@@ -280,6 +289,15 @@ def build(root: Path = ROOT, *, supplemental_prepared_cases=()) -> dict:
         witness_routes[identity] = {"producer_metrics": ["run.foundations.rust_witnesses_complete"],
                                    "runner": "scripts/phase1_integration.py", "command": command, "tests": tests}
     joined_witnesses = []
+    # Bound per recorded_mutations, in the committed view: committed artifacts
+    # and the committed scope.json only, never the live Rust sources, so this
+    # report stays a function of its recorded inputs. A declaration alone links
+    # nothing. Only mutation witnesses are read, so a manifest without one is
+    # unaffected.
+    mutations = scope.recorded_mutations(manifest, root, committed_scope=document)
+    stale_mutation_claims: dict[str, dict[str, str]] = defaultdict(dict)
+    for record in mutations.values():
+        inputs.update(record["inputs"])
     for witness in manifest.get("witnesses", []):
         identity = witness["id"]
         if identity in witness_ids or identity in set(case_ids):
@@ -293,10 +311,26 @@ def build(root: Path = ROOT, *, supplemental_prepared_cases=()) -> dict:
                 problems.append(f"{identity}: Rust witness has no audited producer route")
             joined_witnesses.append({"id": identity, "operations": witness["operations"],
                                      **(route or {"producer_metrics": []})})
+        credited: list[str] = []
+        if witness.get("kind") == "mutation_kill":
+            record = mutations[identity]
+            credited = record["operations"]
+            for operation, reason in record["stale_operations"].items():
+                stale_mutation_claims[operation][identity] = reason
+            # A stale or empty witness routes nowhere; its claimed operations
+            # are `mutation_witness_stale` gaps below, never problems.
+            joined_witnesses.append({
+                "id": identity, "kind": "mutation_kill", "oracle": witness.get("oracle"),
+                "operations": credited, "claimed_operations": witness.get("operations", []),
+                "state": record["state"], "reason": record["reason"],
+                "stale_operations": dict(sorted(record["stale_operations"].items())),
+                "producer_metrics": [scope.MUTATION_METRIC] if record["state"] == "bound" and credited else [],
+                "runner": "scripts/phase1_mutation_run.py", "command": scope.MUTATION_CONFIRM_COMMAND,
+                "artifact": witness.get("artifact")})
         for operation in witness.get("operations", []):
             if operation not in operations:
                 problems.append(f"{identity}: orphan witnessed operation {operation}")
-            if witness.get("kind") == "rust_gated":
+            if witness.get("kind") == "rust_gated" or operation in credited:
                 links[operation].append(identity)
     operation_rows, gaps = [], []
     preparing_cases = {row["id"] for row in joined_cases
@@ -309,13 +343,19 @@ def build(root: Path = ROOT, *, supplemental_prepared_cases=()) -> dict:
     # Only the producer passes these IDs, after authenticating a platform
     # capture. Recorded outcomes and committed coverage remain unchanged.
     preparing_cases.update(supplemental)
-    gated_witnesses = {row["id"] for row in manifest.get("witnesses", []) if row.get("kind") == "rust_gated"}
+    # Links already hold only the operations a mutation witness still confers.
+    gated_witnesses = {row["id"] for row in manifest.get("witnesses", []) if row.get("kind") in scope.COVERING_WITNESS_KINDS}
     for row in document["operations"]:
         identity, disposition = row["id"], row["disposition"]
         roster = row["roster"]
         step = roster.get("step")
-        if not set(row.get("cases", [])) <= set(links[identity]):
+        # A mutation link the committed scope records but that no longer binds
+        # (an artifact binding broke) is pending work: a gap below, not a
+        # problem here.
+        lost = {witness for witness in stale_mutation_claims.get(identity, {}) if witness not in links[identity]}
+        if not set(row.get("cases", [])) - lost <= set(links[identity]):
             problems.append(f"{identity}: scope claims a case/witness that does not link this operation")
+        linked = set(links[identity]) & (preparing_cases | gated_witnesses)
         root_cause = None
         if identity in unresolved:
             root_cause = "compiler_destination_unreviewed"
@@ -323,10 +363,14 @@ def build(root: Path = ROOT, *, supplemental_prepared_cases=()) -> dict:
             # A transfer out of F1a/F3a is not a transfer out of Phase 1. Keep
             # these operations visible until an exact witness or a reviewed
             # phase destination supplies their actual owner.
-            if not (set(links[identity]) & (preparing_cases | gated_witnesses)):
+            if not linked:
                 root_cause = "later_step_unresolved"
-        elif roster.get("state") == "pending" and not (set(links[identity]) & (preparing_cases | gated_witnesses)):
-            root_cause = ("implementation_unverified" if disposition == "missing" and row.get("basis_kind") == "rule"
+        elif (roster.get("state") == "pending" or lost & set(row.get("cases", []))) and not linked:
+            # A declared mutation claim that no longer binds is not the same
+            # gap as an operation nobody has witnessed: name it. The committed
+            # scope may still call the operation prepared through that claim.
+            root_cause = ("mutation_witness_stale" if identity in stale_mutation_claims else
+                          "implementation_unverified" if disposition == "missing" and row.get("basis_kind") == "rule"
                           else "operation_witness_missing")
         joined = {"id": identity, "family": step, "disposition": disposition,
                   "destination_phase": row["destination_phase"], "roster_state": roster.get("state"),
@@ -336,6 +380,8 @@ def build(root: Path = ROOT, *, supplemental_prepared_cases=()) -> dict:
         if root_cause:
             gaps.append({**joined, "native": identity, "rust": row.get("annotated_home") or row.get("rust_home"),
                          "reason": row["basis"], "dependencies": row.get("depends_on", []),
+                         **({"mutation_witnesses": dict(sorted(stale_mutation_claims[identity].items()))}
+                            if root_cause == "mutation_witness_stale" else {}),
                          "reproduce": "python3 scripts/phase1_coverage.py explain --operation " + shlex.quote(identity)})
     case_causes = {"different": "observation_difference", "not_implemented": "reported_missing_operation",
                    "native_unavailable": "native_platform_unavailable", "not_applicable": "other_host_evidence_required",

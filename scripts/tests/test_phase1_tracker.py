@@ -70,7 +70,9 @@ class ProducerClosureTests(unittest.TestCase):
             "foundations": (
                 "crates/tsr_core/src/nested/contract.rs",
                 "tools/phase1/filesystem/nested/oracle.go",
+                "tools/phase1/mutation/nested/driver.rs",
                 "data/phase1/requests/nested/required.json",
+                "data/phase1/mutation/nested/results.json.gz",
                 "scripts/phase1_integration.py",
             ),
             "config": (
@@ -197,7 +199,8 @@ class SprintConsumersTests(unittest.TestCase):
             "F2b": ["run.foundations.filesystem_complete == true"],
             "F3b": ["run.config.inventory_complete == true", "run.config.tests_total == 309",
                     "run.config.parity == 1", "run.config.direct_complete == true"],
-            "F4b": ["run.foundations.utilities_complete == true", "run.syntax.inventory_complete == true",
+            "F4b": ["run.foundations.utilities_complete == true", "run.foundations.mutation_witnesses_complete == true",
+                    "run.syntax.inventory_complete == true",
                     "run.syntax.parity == 1", "run.e1.parity == 1", "run.e1.frozen_denominator == true",
                     "run.binder.parity == 1", "run.binder.reached_bind == true",
                     "run.binder.supplemental_parity == 1", "run.binder.graph_contracts == true"],

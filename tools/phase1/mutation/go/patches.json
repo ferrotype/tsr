@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "about": "Exact-once text splices applied to copies of the oracle sources inside a git-archive export of the pin. Each 'old' must occur exactly once; the build refuses otherwise. Segment names are interpreted by scripts/phase1_mutation_go.py SEGMENTS.",
+  "oracles": {
+    "e1": [
+      {
+        "file": "protocol.go",
+        "why": "every pinned stage is one segment named after the stage, including a stage whose action panics",
+        "old": "func (s *session) stage(name string, action func() error) bool {\n\toutcome, message := capture(action)\n",
+        "new": "func (s *session) stage(name string, action func() error) bool {\n\tphase1CoverBegin(name)\n\toutcome, message := capture(action)\n\tphase1CoverEnd(s.id)\n"
+      },
+      {
+        "file": "behavior.go",
+        "why": "the parse stage also renders its observations (SourceFile state, diagnostic accessors); only ParseSourceFile is production, the rest is the parse:observe segment",
+        "old": "\t\tsf = parser.ParseSourceFile(opts, string(raw(r.data[\"source_hex\"])), core.ScriptKind(r.data[\"script_kind\"].(int64)))\n",
+        "new": "\t\tsf = parser.ParseSourceFile(opts, string(raw(r.data[\"source_hex\"])), core.ScriptKind(r.data[\"script_kind\"].(int64)))\n\t\tphase1CoverEnd(s.id)\n\t\tphase1CoverBegin(\"parse:observe\")\n"
+      }
+    ],
+    "binder": [
+      {
+        "file": "protocol.go",
+        "why": "every pinned stage is one segment named after the stage, including a stage whose action panics",
+        "old": "func (s *session) stage(name string, action func() error) bool {\n\toutcome, message := capture(action)\n",
+        "new": "func (s *session) stage(name string, action func() error) bool {\n\tphase1CoverBegin(name)\n\toutcome, message := capture(action)\n\tphase1CoverEnd(s.id)\n"
+      },
+      {
+        "file": "graph_stream.go",
+        "why": "the graph observer runs outside stage(); bracket it as an observation segment named after its graph stage",
+        "old": "func dumpGraph(s *session, stage string, file *ast.SourceFile) {\n",
+        "new": "func dumpGraph(s *session, stage string, file *ast.SourceFile) {\n\tphase1CoverBegin(stage)\n\tdefer phase1CoverEnd(s.id)\n"
+      }
+    ]
+  }
+}
