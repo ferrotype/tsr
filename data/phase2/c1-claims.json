@@ -252,7 +252,7 @@
   },
   {
    "bucket": "diagnostics: TS2322",
-   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26 structured diff matches the pin: the generic mapped target's key relation never reports (1a539f4)",
    "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
    "id": "compiler/inferenceOuterResultNotIncorrectlyInstantiatedWithInnerResult.ts#configuration=0",
    "item": "C1.6",
@@ -459,7 +459,7 @@
   },
   {
    "bucket": "diagnostics: TS2322",
-   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26 structured diff matches the pin: matched after the C1.1 audit ports (0702c77)",
    "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
    "id": "conformance/types/conditional/conditionalTypes2.ts#configuration=0",
    "item": "C1.6",
@@ -1112,138 +1112,138 @@
   },
   {
    "bucket": "diagnostics: TS2322",
-   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26 structured diff matches the pin: conditional-target branch relations never report (1a539f4)",
    "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
    "id": "compiler/conditionalTypeAssignabilityWhenDeferred.ts#configuration=0",
    "item": "C1.6",
    "mechanism": "same TS2322 diagnostics with a different elaboration chain or related entry; mapped, conditional and template-literal targets are involved, so each row needs its trace before it counts",
-   "status": "candidate"
+   "status": "claimed"
   },
   {
    "bucket": "diagnostics: TS2322",
-   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26 structured diff matches the pin: matched after the C1.1 audit ports (0702c77)",
    "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
    "id": "compiler/errorInfoForRelatedIndexTypesNoConstraintElaboration.ts#configuration=0",
    "item": "C1.6",
    "mechanism": "same TS2322 diagnostics with a different elaboration chain or related entry; mapped, conditional and template-literal targets are involved, so each row needs its trace before it counts",
-   "status": "candidate"
+   "status": "claimed"
   },
   {
    "bucket": "diagnostics: TS2322",
-   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26 structured diff matches the pin: distributive conditional constraints use someType over the extends type (9b7e1e6)",
    "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
    "id": "compiler/flatArrayNoExcessiveStackDepth.ts#configuration=0",
    "item": "C1.6",
    "mechanism": "same TS2322 diagnostics with a different elaboration chain or related entry; mapped, conditional and template-literal targets are involved, so each row needs its trace before it counts",
-   "status": "candidate"
+   "status": "claimed"
   },
   {
    "bucket": "diagnostics: TS2322",
-   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26 structured diff matches the pin: the generic mapped target's key relation never reports (1a539f4)",
    "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
    "id": "compiler/genericMappedTypeAsClause.ts#configuration=0",
    "item": "C1.6",
    "mechanism": "same TS2322 diagnostics with a different elaboration chain or related entry; mapped, conditional and template-literal targets are involved, so each row needs its trace before it counts",
-   "status": "candidate"
+   "status": "claimed"
   },
   {
    "bucket": "diagnostics: TS2322",
-   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26 structured diff matches the pin: the generic mapped target's key relation never reports (1a539f4)",
    "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
    "id": "compiler/indexSignatureAndMappedType.ts#configuration=0",
    "item": "C1.6",
    "mechanism": "same TS2322 diagnostics with a different elaboration chain or related entry; mapped, conditional and template-literal targets are involved, so each row needs its trace before it counts",
-   "status": "candidate"
+   "status": "claimed"
   },
   {
    "bucket": "diagnostics: TS2322",
-   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26 structured diff matches the pin: an unresolved constraint keeps its aliased error type (1a539f4)",
    "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
    "id": "compiler/objectLiteralExcessProperties.ts#configuration=0",
    "item": "C1.6",
    "mechanism": "same TS2322 diagnostics with a different elaboration chain or related entry; mapped, conditional and template-literal targets are involved, so each row needs its trace before it counts",
-   "status": "candidate"
+   "status": "claimed"
   },
   {
    "bucket": "diagnostics: TS2322",
-   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26 structured diff matches the pin: conditional-target branch relations never report (1a539f4)",
    "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
    "id": "compiler/recursiveConditionalTypes.ts#configuration=0",
    "item": "C1.6",
    "mechanism": "same TS2322 diagnostics with a different elaboration chain or related entry; mapped, conditional and template-literal targets are involved, so each row needs its trace before it counts",
-   "status": "candidate"
+   "status": "claimed"
   },
   {
    "bucket": "diagnostics: TS2322",
-   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26 structured diff matches the pin: the generic mapped target's key relation never reports (1a539f4)",
    "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
    "id": "conformance/types/keyof/keyofAndIndexedAccess2.ts#configuration=0",
    "item": "C1.6",
    "mechanism": "same TS2322 diagnostics with a different elaboration chain or related entry; mapped, conditional and template-literal targets are involved, so each row needs its trace before it counts",
-   "status": "candidate"
+   "status": "claimed"
   },
   {
    "bucket": "diagnostics: TS2322",
-   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26 structured diff matches the pin: matched after the C1.1 audit ports (0702c77)",
    "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
    "id": "conformance/types/literal/stringMappingOverPatternLiterals.ts#configuration=0",
    "item": "C1.6",
    "mechanism": "same TS2322 diagnostics with a different elaboration chain or related entry; mapped, conditional and template-literal targets are involved, so each row needs its trace before it counts",
-   "status": "candidate"
+   "status": "claimed"
   },
   {
    "bucket": "diagnostics: TS2322",
-   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26 structured diff matches the pin: matched after the C1.1 audit ports (0702c77)",
    "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
    "id": "conformance/types/literal/templateLiteralTypes5.ts#configuration=0",
    "item": "C1.6",
    "mechanism": "same TS2322 diagnostics with a different elaboration chain or related entry; mapped, conditional and template-literal targets are involved, so each row needs its trace before it counts",
-   "status": "candidate"
+   "status": "claimed"
   },
   {
    "bucket": "diagnostics: TS2322",
-   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26 structured diff matches the pin: the failed mapped chain resets the error state (post-9b7e1e6)",
    "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
    "id": "conformance/types/mapped/mappedTypeAsClauseRelationships.ts#configuration=0",
    "item": "C1.6",
    "mechanism": "same TS2322 diagnostics with a different elaboration chain or related entry; mapped, conditional and template-literal targets are involved, so each row needs its trace before it counts",
-   "status": "candidate"
+   "status": "claimed"
   },
   {
    "bucket": "diagnostics: TS2322",
-   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26 structured diff matches the pin: conditional-target branch relations never report (1a539f4)",
    "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
    "id": "compiler/exactOptionalPropertyTypesIdentical.ts#configuration=0",
    "item": "C1.6",
    "mechanism": "structured diagnostics equal; the rendered .errors.txt or the pre/post-emit sets differ; the rendering diff decides the owner",
-   "status": "candidate"
+   "status": "claimed"
   },
   {
    "bucket": "diagnostics: TS2322",
-   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26 structured diff matches the pin: matched after the C1.1 audit ports (0702c77)",
    "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
    "id": "compiler/genericConditionalConstrainedToUnknownNotAssignableToConcreteObject.ts#configuration=0",
    "item": "C1.6",
    "mechanism": "structured diagnostics equal; the rendered .errors.txt or the pre/post-emit sets differ; the rendering diff decides the owner",
-   "status": "candidate"
+   "status": "claimed"
   },
   {
    "bucket": "diagnostics: TS2636",
-   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26 structured diff matches the pin: matched after the C1.1 audit ports (0702c77)",
    "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
    "id": "compiler/varianceAnnotationValidation.ts#configuration=0",
    "item": "C1.6",
    "mechanism": "structured diagnostics equal; the rendered .errors.txt or the pre/post-emit sets differ; the rendering diff decides the owner",
-   "status": "candidate"
+   "status": "claimed"
   },
   {
    "bucket": "diagnostics: TS2769",
-   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26 structured diff matches the pin: conditional-target branch relations never report (1a539f4)",
    "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
    "id": "conformance/functions/strictBindCallApply1.ts#configuration=0",
    "item": "C1.6",
    "mechanism": "structured diagnostics equal; the rendered .errors.txt or the pre/post-emit sets differ; the rendering diff decides the owner",
-   "status": "candidate"
+   "status": "claimed"
   }
  ],
  "scope": "C1 claims causes inside rows another checkpoint owns (docs/PHASE2-C1-plan.md, section 3). A row counts only with status claimed, after its reproduction named a foundation function; candidate rows are the C0 buckets the plan lists and carry no metric weight. A row with status blocked names the blocker (data/phase2/blockers.json) that withholds its observation after the foundation cause is fixed; it carries no metric weight either. A row with status returned went back to its owner after its reproduction named a non-foundation cause; it carries no metric weight.",
