@@ -25,7 +25,20 @@ pub fn observe(request: &Value) -> Option<Outcome> {
 }
 
 /// The program spec in the shape the S07 loader bridge reads.
+///
+/// `single_threaded` selects the native probe's work groups: absent or true is
+/// the pinned single-threaded group, false the parallel one. The port has one
+/// sequential loader (`Loader::run` drains its pending worklist, then binding
+/// and collection walk the files in order), so the field changes nothing here;
+/// a case and its parallel twin must both match that one result. Any value
+/// other than a boolean is a malformed schedule.
 fn loader_request(program: &Value) -> Result<Value, String> {
+    if program
+        .get("single_threaded")
+        .is_some_and(|value| !value.is_boolean())
+    {
+        return Err("single_threaded must be a boolean when present".into());
+    }
     let files = program
         .get("files")
         .and_then(Value::as_object)
@@ -138,4 +151,36 @@ fn run(request: &Value) -> Result<Value, String> {
         "plain_hex": hex(&plain),
         "pretty_hex": hex(&pretty),
     }))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn program(single_threaded: Option<Value>) -> Value {
+        let mut spec = json!({
+            "cwd": "/", "case_sensitive": true, "files": {"/a.ts": "let a = ;\n"},
+            "roots": ["/a.ts"], "options": {"noLib": true},
+        });
+        if let Some(value) = single_threaded {
+            spec["single_threaded"] = value;
+        }
+        spec
+    }
+
+    #[test]
+    fn single_threaded_is_optional_and_does_not_reach_the_loader() {
+        let absent = loader_request(&program(None)).unwrap();
+        for value in [json!(true), json!(false)] {
+            assert_eq!(loader_request(&program(Some(value))).unwrap(), absent);
+        }
+        assert!(absent.get("single_threaded").is_none());
+    }
+
+    #[test]
+    fn single_threaded_must_be_a_boolean() {
+        for value in [json!("false"), json!(0), json!(null)] {
+            assert!(loader_request(&program(Some(value))).is_err());
+        }
+    }
 }

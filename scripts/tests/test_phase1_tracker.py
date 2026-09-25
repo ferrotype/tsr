@@ -107,18 +107,37 @@ class ProducerClosureTests(unittest.TestCase):
                         path.unlink()
                         self.assertEqual(before, fingerprint(root, ledger[producer]))
 
-    def test_unrelated_documentation_does_not_stale_code_captures(self):
+    def test_unpackaged_crate_prose_does_not_stale_code_captures(self):
+        """Real in-crate notes and phase documents are neither closure inputs nor ledger sources."""
+        import phase1_producers
+
+        prose = ("crates/tsr_jsnum/SLICE.md", "crates/tsr_jsstring/SLICE.md", "docs/PHASE1-progress.md")
+        self.assertTrue(all((ROOT / name).is_file() for name in prose))
+        ledger = runs()
+        for producer in ("foundations", "config", "syntax"):
+            with self.subTest(producer=producer):
+                selection = selected(ROOT, ledger[producer])
+                closure = phase1_producers.source_closure(producer)
+                for name in prose:
+                    self.assertNotIn(name, selection)
+                    self.assertNotIn(name, closure)
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             subprocess.run(["git", "init", "-q", str(root)], check=True)
-            document = root / "docs/unrelated-phase1-note.md"
-            document.parent.mkdir()
+            note, source = root / "crates/tsr_jsnum/SLICE.md", root / "crates/tsr_jsnum/src/lib.rs"
+            source.parent.mkdir(parents=True)
+            note.write_text("original note\n")
+            source.write_text("pub fn original() {}\n")
             for producer in ("foundations", "config", "syntax"):
-                specification = runs()[producer]
-                before = fingerprint(root, specification)
-                document.write_text("An editorial change, not a producer input.\n")
-                self.assertEqual(before, fingerprint(root, specification), producer)
-                document.unlink()
+                with self.subTest(producer=producer, scratch=True):
+                    before = fingerprint(root, ledger[producer])
+                    self.assertIn("crates/tsr_jsnum/src/lib.rs", before)
+                    note.write_text("an editorial change, not a producer input\n")
+                    self.assertEqual(before, fingerprint(root, ledger[producer]))
+                    source.write_text("pub fn changed() {}\n")
+                    self.assertNotEqual(before, fingerprint(root, ledger[producer]))
+                    note.write_text("original note\n")
+                    source.write_text("pub fn original() {}\n")
 
     def test_real_package_readme_is_excluded_from_replay_but_is_an_archive_input(self):
         import phase1_producers
@@ -233,6 +252,72 @@ class SprintConsumersTests(unittest.TestCase):
         self.assertEqual(len(observed), 309)
         self.assertEqual(len(set(observed)), 309)
         self.assertEqual(set(observed), expected)
+
+    def test_host_capture_starts_from_a_clean_host_directory(self):
+        """rust-cache restores target/; the host step must not trip over (or upload) an earlier capture."""
+        import contextlib
+        import textwrap
+        import types
+        from unittest.mock import patch
+
+        workflow = (ROOT / ".github/workflows/status.yml").read_text()
+        step = workflow.split("- name: Filesystem observations applicable to this native host\n", 1)[1]
+        script = textwrap.dedent(step.split("<<'PY'\n", 1)[1].split("\n          PY\n", 1)[0])
+        goos = {"linux": "linux", "darwin": "darwin"}[sys.platform]
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            platform = root / "target/phase1-platform"
+            (platform / goos / "stale").mkdir(parents=True)
+            (platform / goos / "provenance.json").write_text("{}")
+            (platform / "records" / goos).mkdir(parents=True)
+            (platform / "records" / goos / "host-stale.json").write_text("{}")
+            (platform / (goos + "-record.json")).write_text("stale")
+            seen = {}
+
+            def capture(family, output, cases):
+                seen.update(family=family, cases=cases, existed=Path(output).exists(),
+                            records=sorted(path.name for path in (platform / "records").rglob("*") if path.is_file()),
+                            summary=(platform / (goos + "-record.json")).exists())
+                Path(output).mkdir(parents=True, exist_ok=False)  # as phase1_capture.capture does
+
+            fakes = {"phase1_capture": types.SimpleNamespace(capture=capture),
+                     "phase1_producers": types.SimpleNamespace(
+                         host_inventory=lambda host: [f"{host}-case"],
+                         platform_summary=lambda output, records: {"state": "match", "records": str(records)})}
+            with patch.dict(sys.modules, fakes), patch.object(sys, "path", list(sys.path)), \
+                 contextlib.chdir(root), self.assertRaises(SystemExit) as exited:
+                exec(compile(script, "status.yml", "exec"), {"__name__": "__main__"})
+            self.assertFalse(exited.exception.code)
+            self.assertEqual(seen, {"family": "filesystem", "cases": [f"{goos}-case"], "existed": False,
+                                    "records": [], "summary": False})
+            self.assertEqual(json.loads((platform / (goos + "-record.json")).read_text())["state"], "match")
+
+    def test_ci_fails_on_scope_drift_although_the_self_tests_only_report_it(self):
+        """The strict drift check must run in CI; selftest reports drift without failing."""
+        import contextlib
+        import io
+        from unittest.mock import patch
+        import phase1
+
+        workflow = (ROOT / ".github/workflows/status.yml").read_text()
+        import re
+        producers_job = re.split(r"\n  (?=[\w-]+:)", workflow.split("  producers:\n", 1)[1], maxsplit=1)[0]
+        steps = {chunk.split("\n", 1)[0]: chunk for chunk in producers_job.split("      - name: ")[1:]}
+        step = steps["Phase 1 operation audit matches the current sources"]
+        self.assertIn("\n        run: python3 scripts/phase1.py inventory --check\n", step + "\n")
+        self.assertNotIn("continue-on-error", step)
+        harness = steps["Phase 1 manifest, harness and producer contracts"]
+        gate = "        if: ${{ !cancelled() && steps.validate.outcome == 'success' }}\n"
+        self.assertIn(gate, step)
+        self.assertIn(gate, harness)
+        # That command's exit status is the inventory check's `ok`, which is
+        # false on drift (test_phase1.py ScopeDriftTests).
+        for ok, status in ((False, 1), (True, 0)):
+            with self.subTest(ok=ok), \
+                    patch.object(phase1, "inventory_check", return_value={"ok": ok}), \
+                    patch.object(sys, "argv", ["phase1.py", "inventory", "--check"]), \
+                    contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(phase1.main(), status)
 
     def test_ci_gates_harness_health_without_requiring_unfinished_parity(self):
         workflow = (ROOT / ".github/workflows/status.yml").read_text()

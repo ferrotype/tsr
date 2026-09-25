@@ -58,7 +58,8 @@ impl<F: ParserFactory> Parser<'_, F> {
         if kind != K::ClassDeclaration {
             return;
         }
-        let Some(export) = self.js_find_modifier(modifiers, 0, K::ExportKeyword) else {
+        let Some(export) = self.js_find_modifier_where(modifiers, 0, Self::is_export_modifier)
+        else {
             return;
         };
         let default = self.js_find_modifier(modifiers, 0, K::DefaultKeyword);
@@ -411,10 +412,19 @@ impl<F: ParserFactory> Parser<'_, F> {
     }
 
     fn js_find_modifier(&self, nodes: NodeSlice, start: usize, kind: K) -> Option<usize> {
+        self.js_find_modifier_where(nodes, start, |p, id| p.factory.node(id).kind() == kind)
+    }
+    /// `core.FindIndex` over the modifiers from `start`.
+    fn js_find_modifier_where(
+        &self,
+        nodes: NodeSlice,
+        start: usize,
+        predicate: impl Fn(&Self, NodeId) -> bool,
+    ) -> Option<usize> {
         self.factory
             .read_nodes(nodes.slice(start..nodes.len()).expect("modifier range"))
             .iter()
-            .position(|id| self.factory.node(id.expect("parsed modifier")).kind() == kind)
+            .position(|id| predicate(self, id.expect("parsed modifier")))
             .map(|index| start + index)
     }
     fn js_list_has_non_reparsed_node(&self, list: NodeListId) -> bool {

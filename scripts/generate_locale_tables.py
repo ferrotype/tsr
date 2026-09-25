@@ -144,7 +144,8 @@ def generate():
         command(["rustfmt", "--edition", "2021", "--config-path", str(ROOT / "rustfmt.toml"), str(test_path)], cwd=ROOT)
         native = test_path.read_bytes()
     for path in ["scripts/generate_locale_tables.py", "scripts/s04.py", "scripts/s04_common.py",
-                 "scripts/s04_runtime.py", "scripts/tracking-bootstrap.py", "data/s04/toolchains.toml",
+                 "scripts/s04_runtime.py", "scripts/s05_tables.py", "scripts/tracking-bootstrap.py",
+                 "data/s04/toolchains.toml",
                  "upstream/tsc/go.mod", "upstream/tsc/go.sum", "rustfmt.toml",
                  *(f"tools/phase1/locale/{name}" for name in EXPORTS)]:
         inputs[path] = digest((ROOT / path).read_bytes())

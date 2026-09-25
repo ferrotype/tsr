@@ -14,7 +14,7 @@ fn option_diagnostics_locations_paths_and_output_conflicts_match_go() {
         "../../../data/s07/verify-options-observations.json"
     ))
     .unwrap();
-    assert_eq!(requests.len(), 103);
+    assert_eq!(requests.len(), 115);
     assert_eq!(requests.len(), expected.len());
     let mut cache = FileCache::new();
     let counters = tsr_arena::Counters::new();

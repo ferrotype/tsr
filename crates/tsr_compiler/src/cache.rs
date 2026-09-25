@@ -59,6 +59,7 @@ impl FileCache {
             }
         }
         let parsed = tsr_parser::parse_source_file_with_counters(source, kind, options, counters);
+        // port: tsc/internal/compiler/program.go:Program.BindSourceFiles
         let bound = tsr_binder::bind_parsed_file(parsed)?;
         let file = Arc::new(ProgramFile { bound });
         entries.push(Arc::downgrade(&file));

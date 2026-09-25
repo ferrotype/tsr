@@ -126,28 +126,15 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.getEffectiveCheckNode
-    pub(crate) fn effective_expression_check_node(
-        &self,
-        mut node: NodeId,
-    ) -> Result<NodeId, Error> {
-        loop {
-            let read = self.node(node)?;
-            if !matches!(
-                read.kind().known(),
-                Some(K::ParenthesizedExpression | K::SatisfiesExpression)
-            ) {
-                return Ok(node);
-            }
-            if read.kind() == K::ParenthesizedExpression
-                && read.flags() & tsr_ast::node_flags::JAVA_SCRIPT_FILE != 0
-                && read.type_node().is_some()
-            {
-                return Ok(node);
-            }
-            node = read
-                .expression()
-                .ok_or(Error::MissingLink("effective check expression"))?;
-        }
+    pub(crate) fn effective_expression_check_node(&self, node: NodeId) -> Result<NodeId, Error> {
+        use tsr_ast::utilities::{self as u, outer_expression_kinds as o};
+        let view = self.ast(node)?;
+        let kinds = if u::is_in_js_file(Some(&view.node(node)?)) {
+            o::PARENTHESES | o::SATISFIES | o::EXCLUDE_JSDOC_TYPE_ASSERTION
+        } else {
+            o::PARENTHESES | o::SATISFIES
+        };
+        Ok(u::skip_outer_expressions(view, node, kinds)?)
     }
 
     // port: tsc/internal/checker/relater.go:Checker.getBestMatchIndexedAccessTypeOrUndefined

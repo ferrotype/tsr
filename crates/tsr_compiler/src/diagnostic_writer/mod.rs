@@ -332,13 +332,7 @@ pub trait DiagnosticSources {
 }
 impl DiagnosticSources for Program {
     fn diagnostic_source(&self, id: NodeId) -> Result<SourceFileRead<'_>> {
-        if let Some(config) = self
-            .config()
-            .config_file
-            .iter()
-            .chain(&self.config().config_dependencies)
-            .find(|c| c.root == id)
-        {
+        if let Some(config) = self.config_source(id) {
             return Ok(config.file.view().source_file(id)?);
         }
         let index = self

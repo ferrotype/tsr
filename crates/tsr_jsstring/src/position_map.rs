@@ -19,12 +19,13 @@ impl PositionMap {
     pub fn structural_bytes(&self) -> usize {
         self.entries.capacity() * std::mem::size_of::<PositionMapEntry>()
     }
-    /// port: tsc/internal/ast/positionmap.go:ComputePositionMap
+    /// ComputePositionMap: one entry after each non-ASCII sequence.
     pub fn new(text: &[u8]) -> Self {
         let mut entries = Vec::new();
         let mut delta = 0;
         let mut byte_offset = 0;
         while byte_offset < text.len() {
+            // port: tsc/internal/ast/positionmap.go:ComputePositionMap
             if text[byte_offset].is_ascii() {
                 byte_offset += 1;
                 continue;

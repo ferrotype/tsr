@@ -81,7 +81,7 @@ impl IncludeReason {
 
     /// The caller's `Option` handles Go's nil-reason arm.
     /// port: tsc/internal/compiler/fileInclude.go:FileIncludeReason.isReferencedFile
-    fn is_referenced(&self) -> bool {
+    pub(crate) fn is_referenced(&self) -> bool {
         matches!(
             self.data,
             IncludeReasonData::Import { .. }
@@ -456,6 +456,83 @@ impl IncludeReason {
     }
 }
 
+/// A diagnostic the loader records while collecting files, converted once the
+/// program exists (the pin's processingDiagnostic).
+#[derive(Clone, Debug)]
+pub(crate) enum ProcessingDiagnostic {
+    /// A type or library reference directive that names nothing.
+    UnknownReference(Arc<IncludeReason>),
+    /// A diagnostic explained by the include reasons of `file` (empty for
+    /// none) and by `reason`.
+    ExplainingFileInclude {
+        file: JsString,
+        reason: Option<Arc<IncludeReason>>,
+        message: &'static Message,
+        args: Vec<JsString>,
+    },
+}
+impl ProcessingDiagnostic {
+    /// port: tsc/internal/compiler/processingDiagnostic.go:processingDiagnostic.toDiagnostic
+    pub(crate) fn to_diagnostic(&self, program: &Program) -> Result<Diagnostic, AstError> {
+        match self {
+            Self::UnknownReference(reason) => {
+                let location = reason.reference_location(program)?;
+                let (IncludeReasonData::TypeReference { file, index }
+                | IncludeReasonData::LibReference { file, index }) = &reason.data
+                else {
+                    panic!("unknown include kind");
+                };
+                let owner = program
+                    .file(file.as_bytes())
+                    .expect("included reference source is loaded");
+                let view = owner.bound().view().ast();
+                let source = view.source_file(owner.source())?;
+                if matches!(reason.data, IncludeReasonData::TypeReference { .. }) {
+                    let reference = &source.type_reference_directives()?[*index];
+                    return Ok(location.diagnostic_at(
+                        d::Cannot_find_type_definition_file_for_0,
+                        vec![reference.file_name.clone()],
+                    ));
+                }
+                let reference = &source.lib_reference_directives()?[*index];
+                let lib_name = path::file_name_lower_case(reference.file_name.as_bytes());
+                let unqualified = lib_name.strip_prefix(b"lib.").unwrap_or(&lib_name);
+                let unqualified = unqualified.strip_suffix(b".d.ts").unwrap_or(unqualified);
+                let suggestion = tsr_scanner::get_spelling_suggestion_for_strings(
+                    unqualified,
+                    tsr_tsoptions::LIB_MAP
+                        .iter()
+                        .map(|(name, _)| name.as_bytes()),
+                )
+                .unwrap_or_default();
+                let message = if suggestion.is_empty() {
+                    d::Cannot_find_lib_definition_for_0
+                } else {
+                    d::Cannot_find_lib_definition_for_0_Did_you_mean_1
+                };
+                Ok(location.diagnostic_at(
+                    message,
+                    vec![
+                        JsString::from_bytes(lib_name.as_ref()),
+                        JsString::from_bytes(suggestion),
+                    ],
+                ))
+            }
+            Self::ExplainingFileInclude {
+                file,
+                reason,
+                message,
+                args,
+            } => program.explain_file_include_with_reason(
+                file.as_bytes(),
+                reason.as_deref(),
+                message,
+                args.clone(),
+            ),
+        }
+    }
+}
+
 #[derive(Debug)]
 struct ReferenceLocation {
     source: NodeId,
@@ -515,6 +592,31 @@ impl IncludeExplanations {
             return Ok(Arc::clone(existing));
         }
         let mut result = Vec::new();
+        // A package redirect is explained under its own name; otherwise the file
+        // must be in the program.
+        let (file, file_name) = if let Some(name) = program.redirect_file_names.get(file_path) {
+            (None, name.clone())
+        } else {
+            let Some(file) = program.file(file_path) else {
+                return Ok(Arc::from([]));
+            };
+            let name = file
+                .bound()
+                .view()
+                .source_file()?
+                .parse_options()
+                .file_name
+                .clone();
+            (Some(file), name)
+        };
+        let source =
+            program.source_of_project_reference_if_output_included(file_path, file_name.as_bytes());
+        if source != file_name.as_bytes() {
+            result.push(Arc::new(Diagnostic::compiler(
+                d::File_is_output_of_project_reference_source_0,
+                vec![file_name_for(program, source, relative)],
+            )));
+        }
         if let Some(target) = program.redirect_paths.get(file_path) {
             let target = program
                 .file(target.as_bytes())
@@ -528,17 +630,13 @@ impl IncludeExplanations {
                     relative,
                 )],
             )));
-        } else {
-            let Some(file) = program.file(file_path) else {
-                return Ok(Arc::from([]));
-            };
+        } else if let Some(file) = file {
             let source = file.bound().view().source_file()?;
             if tsr_ast::utilities::is_external_or_common_js_module(&source) {
                 let metadata = program.metadata(file_path).expect("loaded source metadata");
-                let emit = crate::metadata::implied_for_emit(
+                let emit = program.implied_node_format_for_emit(
+                    file_path,
                     source.parse_options().file_name.as_bytes(),
-                    program.options().emit_module_kind(),
-                    metadata,
                 );
                 let mut args = Vec::new();
                 let message = if emit == ModuleKind::ESNEXT
@@ -677,7 +775,7 @@ fn file_name_for(program: &Program, file_name: &[u8], relative: bool) -> JsStrin
             program.current_directory(),
             file_name,
             program.current_directory(),
-            program.host().use_case_sensitive_file_names(),
+            program.use_case_sensitive_file_names(),
         ))
     } else {
         JsString::from_bytes(file_name)

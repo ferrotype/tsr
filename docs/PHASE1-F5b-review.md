@@ -15,12 +15,12 @@ inherit their acceptance.
 | I05 | Confirmed. Binder and scanner position assertions now preserve the pinned Go debug payload; the scanner out-of-range regression checks the actual payload. |
 | I30 | Confirmed. Retry helpers now cover Unix metadata/readlink and the affected OS stat/remove paths, including macOS symlink evaluation. A focused test distinguishes EINTR retry from other errors and already-wrapped errors. This is not a new Linux-native measurement. |
 | I04, I35 | Confirmed. Evaluator descriptions no longer claim absent increment/decrement, assignment or synthesized outer-node inputs. The unterminated-literal description now says the unfinished template consumes the later regex/comment-looking bytes. No coverage is inferred for those unexecuted branches. |
-| I36 | Confirmed. The navigation rescan test now constructs the containing JSX/non-JSX node and executes production classification before scanning, rather than supplying the fixture boolean directly. |
+| I36 | Closed by a production witness. `syntax/astnav/jsx-child-shift-gap-scan` parses TSX whose `<<` is scanned inside error-recovery JSX children, so both production call sites (getTokenAtPosition's gap scan and findRightmostValidToken) take the rescan arm, and whose type-argument `<<` is scanned under a TypeReference and a CallExpression, where both keep the width-2 token. Native and Rust answers match; disabling either Rust call site, forcing it to treat every containing node as a JSX child, or dropping the JSX-child test from the predicate makes the case differ. |
 | I37 | Partly confirmed. The directives row cannot witness default settings overwritten by setup, nor a callback it never invokes. Those credits are removed. A new default-state request observes `NewScanner` before configuration and trivia skipping after `Reset`. `SetOnError` already has a separate valid `state/reset` witness: callback reinstallation affects the later invalid-byte diagnostic. |
 | I31 | Confirmed. The native writer probe now accepts a locale. Twelve native/Rust traces compare German, Japanese and unsupported-locale fallback for nested chains, table headings, summary branches and plain/colored status lines. All twelve match and are included in the reviewed config-family capture recorded below. |
 | I21 | Confirmed. The new paths request inserts `x*z` before `x*`, opposite lexical order, with equal prefix lengths and a separate exact-match control. Native and Rust choose the same file. Deliberately sorting the request changes the Rust observation, so the witness detects the claimed defect. |
 | I23 | Confirmed. The snapshot-retention regression remains useful but did not exercise cached/tracking composition. B2-3 below adds the actual live OS → cached → tracking → program rebuild witness on both runtimes. Watch scheduling remains outside the claim. |
-| I40 | Confirmed. `scripts/phase1_navigation_rescan.py` reproduces the five pinned private-operation observations without editing upstream. Its README gives the command; `--write` explicitly refreshes observations/provenance and the derived Rust TSV. The reproduced operation results match all five retained rows. |
+| I40 | Closed. The access-only rescan overlay (`f5b/native-navigation-rescan`), its derived TSV, the Rust unit that read it and `scripts/phase1_navigation_rescan.py` are retired; the rescan credit is carried by the I36 production case, which every syntax capture compares natively. |
 
 ## Harness and evidence corrections
 
@@ -30,7 +30,7 @@ inherit their acceptance.
 | I08 | Confirmed. Request serialization preserves object insertion order at every depth; canonical sorting is reserved for observation metadata. The native paths negative control above demonstrates why this matters. |
 | I09 | Confirmed. Syntax replay now rejects a changed source closure with a typed stale-capture result instead of returning a passing comparison with a warning. |
 | I10 | Confirmed. A `later_step` preparation exemption does not remove an operation from Phase 1. Unresolved leaves/config transfers now appear in gap accounting; the current audit identifies 92 such entries. |
-| I13 | Confirmed. Config and syntax no longer depend on unrelated installed-package/transport integration health or recomputing live whole-workspace classification. Their consumed audit/runner inputs are included in the producer closure and ledger. The inventory audit remains a separate check. |
+| I13 | Confirmed. Config and syntax no longer depend on unrelated installed-package/transport integration health or recomputing live whole-workspace classification. The mutation-witness binding later added harness reads outside the closures (oracle Go sources, instrumentation patches, request inventories, mutation artifacts); the Phase 1 closure binds every file harness health reads into the config, syntax and foundations closures and ledger globs, and `test_phase1_producers.HarnessInputTests` traces the reads to keep it so. The inventory audit remains a separate check. |
 | I14 | Confirmed. Rust-side witnesses now have explicit execution routes to metrics. The five contracts previously pointing only to `workspace` compilation get an exact named-test receipt, `rust-witnesses`; its named tests passed in the reviewed receipt; compilation alone still cannot satisfy the metric. |
 | I15 | Confirmed. The 142 matchFiles observations contribute to both config baseline parity and filesystem completion. |
 | I16 | Confirmed. Ordinary in-crate Markdown is excluded from behavioral capture inputs. Literal embedded Markdown and packages with arbitrary build-script inputs remain conservative inputs; archive receipts deliberately include package README files. The regression uses actual temporary package files and changes both prose and an embedded asset. |
@@ -58,8 +58,8 @@ inherit their acceptance.
   syntax inventory references have been refreshed to the recorded E1/binder
   artifacts as stale where appropriate. The program helper pass now executes
   all 28 named tests, including the composed live-filesystem boundary witness.
-  P1A/P1B remain incomplete: the current report has 1,365 pending
-  entries—947 missing witnesses, 303 unverified implementation mappings,
+  P1A/P1B remain incomplete: the report at `02009ce` has 1,364 pending
+  entries—947 missing witnesses, 302 unverified implementation mappings,
   92 unresolved later-step transfers and 23 ordinary loader/configuration
   operations. The original 1,250 count is a historical checkpoint.
 - **I41:** the Linux step now emits an authenticated platform summary, including
@@ -115,7 +115,7 @@ All seven executable integration receipts passed on these inputs and are retaine
 archive is also retained. The `program`, `foundations`, `config` and `syntax` producers now have valid
 recorded results on these inputs. Foundations reports integration and Rust
 witnesses complete; config reports all direct cases complete. The family
-matches do not discharge the 1,365 remaining
+matches do not discharge the 1,364 remaining
 operation entries, the Linux-only observation, or ownership instrumentation.
 No performance benchmark is implied or required by these correctness captures.
 

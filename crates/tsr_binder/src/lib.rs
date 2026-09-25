@@ -43,7 +43,7 @@ pub mod reference_resolver;
 mod statements;
 pub use containers::get_container_flags;
 pub use declarations::get_symbol_name_for_private_identifier;
-pub use diagnostics::find_use_strict_prologue;
+pub use diagnostics::{find_use_strict_prologue, is_use_strict_prologue_directive};
 
 /// Bind one logical source file once, retaining its completed graph explicitly.
 /// First binding runs on the reserved native parser stack before entering its
@@ -59,7 +59,6 @@ pub fn bind_source_file(
     file.retain_bound(source)
 }
 
-// port: tsc/internal/binder/binder.go:bindSourceFile
 fn bind_source_file_worker(
     file: &tsr_ast::AstFile,
     source: tsr_ast::NodeId,
@@ -95,11 +94,15 @@ fn initialize_binding(builder: &mut tsr_ast::BindBuilder<'_>) {
     }
 }
 
+/// The body `bindSourceFile` runs under `BindOnce`, on either binder backend.
+// port: tsc/internal/binder/binder.go:bindSourceFile
 fn run_binding(mut binder: Binder<'_, '_, '_>) {
     let source = binder.file;
     binder.unreachable_flow = Some(binder.new_flow_node(tsr_ast::flow_flags::UNREACHABLE));
     binder.bind(Some(source));
     binder.bind_deferred_expando_assignments();
+    // `file.SymbolCount = b.symbolCount`, a skip-statement site (PB20).
+    // port: tsc/internal/binder/binder.go:bindSourceFile
     binder.builder.set_symbol_count(binder.symbol_count);
 }
 

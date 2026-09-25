@@ -211,7 +211,7 @@ impl<'scope> Binder<'_, 'scope, '_> {
         self.bind_break_or_continue_statement(
             self.node_label(node),
             self.current_break_target,
-            |label| label.break_target,
+            ActiveLabel::break_target,
         );
     }
     // port: tsc/internal/binder/binder.go:Binder.bindContinueStatement
@@ -219,7 +219,7 @@ impl<'scope> Binder<'_, 'scope, '_> {
         self.bind_break_or_continue_statement(
             self.node_label(node),
             self.current_continue_target,
-            |label| label.continue_target,
+            ActiveLabel::continue_target,
         );
     }
     // port: tsc/internal/binder/binder.go:Binder.bindBreakOrContinueStatement

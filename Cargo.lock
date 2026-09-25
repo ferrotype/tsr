@@ -487,9 +487,15 @@ dependencies = [
  "tsr_ast",
  "tsr_binder",
  "tsr_core",
+ "tsr_diagnostics",
  "tsr_encoder",
  "tsr_jsstring",
+ "tsr_locale",
  "tsr_parser",
+ "tsr_scanner",
+ "tsr_tsoptions",
+ "tsr_tspath",
+ "tsr_vfs",
 ]
 
 [[package]]
@@ -853,6 +859,7 @@ dependencies = [
  "tsr_diagnostics",
  "tsr_jsnum",
  "tsr_jsstring",
+ "tsr_locale",
 ]
 
 [[package]]

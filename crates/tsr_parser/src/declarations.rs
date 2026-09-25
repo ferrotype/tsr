@@ -10,13 +10,17 @@ impl<F: ParserFactory> Parser<'_, F> {
         let jsdoc = self.jsdoc_scanner_info();
         let modifiers = self.parse_modifiers_ex(true, false, false);
         let saved = self.context_flags;
-        if self.has_modifier_kind(modifiers, K::DeclareKeyword) {
+        if self.some_modifier(modifiers, Self::is_declare_modifier) {
             self.mark_modifiers_ambient(modifiers.expect("declare modifier"));
             self.set_context_flags(node_flags::AMBIENT, true);
         }
         let node = self.parse_declaration_worker(pos, jsdoc, modifiers);
         self.context_flags = saved;
         node
+    }
+    /// port: tsc/internal/parser/parser.go:isDeclareModifier
+    pub(crate) fn is_declare_modifier(&self, modifier: NodeId) -> bool {
+        self.factory.node(modifier).kind() == K::DeclareKeyword
     }
     /// port: tsc/internal/parser/parser.go:Parser.parseDeclarationWorker
     pub(crate) fn parse_declaration_worker(

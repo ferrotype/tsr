@@ -204,7 +204,8 @@ class CoverageDecodingTests(unittest.TestCase):
             path = Path(scratch) / "s"
             for oracle, segment, expected in (("e1", "node_index_before", {THING}), ("binder", "bound_graph", set()),
                                               ("binder", "bind", {KIND, THING}), ("syntax", "render", set()),
-                                              ("facts", "facts:walk", set()), ("facts", "subtree_facts", {KIND, THING})):
+                                              ("facts", "facts:walk", set()), ("facts", "subtree_facts", {KIND, THING}),
+                                              ("table", "column", {KIND, THING})):
                 path.write_bytes(stream(segment))
                 rows, segments = go._decode_shard((oracle, str(path), packages_dump, META_HASH))
                 self.assertEqual(rows, {"r": expected}, (oracle, segment))
@@ -224,9 +225,26 @@ class StageRuleTests(unittest.TestCase):
         production = {oracle: {segment for segment, rule in spec.segments.items() if rule == "production"}
                       for oracle, spec in go.ORACLES.items()}
         self.assertEqual(production, {"e1": {"parse"}, "binder": {"parse", "bind", "repeat_bind"},
-                                      "syntax": {"load", "syntactic"}, "facts": {"parse", "subtree_facts"}})
+                                      "syntax": {"load", "syntactic"}, "facts": {"parse", "subtree_facts"},
+                                      "table": {"column"}})
         observe = {oracle: spec.observe_counts for oracle, spec in go.ORACLES.items()}
-        self.assertEqual(observe, {"e1": ("tsc/internal/parser/",), "binder": (), "syntax": (), "facts": ()})
+        self.assertEqual(observe, {"e1": ("tsc/internal/parser/",), "binder": (), "syntax": (), "facts": (),
+                                   "table": ()})
+
+    def test_cover_packages_are_per_oracle_and_the_frozen_four_keep_theirs(self):
+        # The four recorded oracles instrument exactly the packages their
+        # committed reach files were decoded under; the table adds core,
+        # tsoptions and tspath, whose operations its columns enter.
+        for oracle in ("e1", "binder", "syntax", "facts"):
+            self.assertEqual(go.ORACLES[oracle].cover_packages, go.COVER_PACKAGES)
+            self.assertEqual(go.stage_rule(oracle)["production"]["packages"], list(go.COVER_PACKAGES))
+        table = go.ORACLES["table"].cover_packages
+        self.assertEqual(table, go.COVER_PACKAGES + ("internal/core", "internal/tsoptions", "internal/tspath"))
+        self.assertEqual(go.stage_rule("table")["production"]["packages"], list(table))
+        flags = go.cover_flags("table")[-1]
+        for package in ("internal/phase1table", "internal/core", "internal/tsoptions", "internal/tspath"):
+            self.assertIn(f"{go.MODULE}/{package}", flags)
+        self.assertNotIn("internal/tspath", go.cover_flags("facts")[-1])
 
     def test_stage_rule_digest_moves_with_the_rule(self):
         for oracle in go.ORACLES:
@@ -736,8 +754,35 @@ class DigestTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "malformed outcomes"):
             go.facts_row({"row": "r", "outcomes": {"parse": "ok"}, "digest": "x"})
 
+    def test_table_digest_is_sha256_of_the_canonical_value_and_only_when_the_column_ran(self):
+        value = [[3, [1, 2]], {"b": True, "a": "x\u00e9"}, None]
+        digest = go.sha256(canonical(value))
+        ok = {"row": "r", "outcomes": {"setup": "ok", "column": "ok"}, "digests": {"column": digest}}
+        self.assertEqual(go.table_row(ok), {"outcomes": {"setup": "ok", "column": "ok"}, "digests": {"column": digest}})
+        self.assertEqual(go.table_row({**ok, "value": value})["digests"], {"column": digest})
+        with self.assertRaisesRegex(ValueError, "differs from its own value"):
+            go.table_row({**ok, "value": value[:2]})
+        failed = {"row": "r", "outcomes": {"setup": "ok", "column": "panic"}, "messages": {"column": "6d"}}
+        self.assertEqual(go.table_row(failed), {"outcomes": {"setup": "ok", "column": "panic"}, "digests": {},
+                                                "messages": {"column": "6d"}})
+        with self.assertRaisesRegex(ValueError, "exactly when the column stage completed"):
+            go.table_row({**failed, "digests": {"column": digest}})
+        with self.assertRaisesRegex(ValueError, "exactly when the column stage completed"):
+            go.table_row({"row": "r", "outcomes": {"setup": "ok", "column": "ok"}})
+        with self.assertRaisesRegex(ValueError, "malformed outcomes"):
+            go.table_row({"row": "r", "outcomes": {"column": "ok"}, "digests": {"column": digest}})
+        self.assertEqual(go.row_digests("table", ok), go.table_row(ok))
+
+    def test_table_freeze_refuses_rows_that_did_not_complete(self):
+        rows = [{"row": "a", "outcomes": {"setup": "ok", "column": "ok"}, "digests": {"column": "x"}},
+                {"row": "b", "outcomes": {"setup": "panic", "column": "not_run"}, "digests": {},
+                 "messages": {"setup": "696e7075743a2062616420"}}]
+        refused = go.table_refusals(rows)
+        self.assertEqual([item["row"] for item in refused], ["b"])
+        self.assertEqual(refused[0]["messages"], {"setup": "input: bad "})
+
     def test_row_digests_dispatches_every_oracle(self):
-        self.assertEqual(set(go.ORACLES), {"e1", "binder", "syntax", "facts"})
+        self.assertEqual(set(go.ORACLES), {"e1", "binder", "syntax", "facts", "table"})
         self.assertEqual(go.row_digests("syntax", {"id": "r", **self.SYNTAX_VALUES})["outcomes"], {"program": "ok"})
 
 
@@ -826,6 +871,51 @@ class RequestAndDocumentTests(unittest.TestCase):
         self.assertIn('phase1CoverBegin("parse:observe")', go.instrumented_sources("e1")["tsc/internal/s06oracle/behavior.go"].decode())
         self.assertIn("defer phase1CoverEnd(s.id)", go.instrumented_sources("binder")["tsc/internal/s07binder/graph_stream.go"].decode())
 
+    def test_table_driver_is_every_go_file_of_its_directory_plus_the_bridges(self):
+        spec = go.ORACLES["table"]
+        package = f"tsc/{spec.package}"
+        names = sorted(path.name for path in (ROOT / go.TABLE_DIR).glob("*.go"))
+        self.assertEqual(list(spec.sources), names)
+        self.assertIn("main.go", names)
+        for group in ("runtime", "class", "modules", "positions", "targets", "containers", "diagnostics", "core",
+                      "concurrency", "tsoptions"):
+            self.assertIn(f"{group}_columns.go", names)
+        self.assertIn(("bridges/tsoptions/phase1_table_bridge.go", "internal/tsoptions/phase1_table_bridge.go"),
+                      spec.bridges)
+        plain, cover = go.driver_sources("table", cover=False), go.instrumented_sources("table")
+        expected = {f"{package}/{name}" for name in names} | {f"tsc/{target}" for _, target in spec.bridges}
+        self.assertEqual(set(plain), expected | {f"{package}/phase1_cover_off.go"})
+        self.assertEqual(set(cover), expected | {f"{package}/phase1_cover.go"})
+        for source, target in spec.bridges:
+            self.assertEqual(plain[f"tsc/{target}"], (ROOT / go.TABLE_DIR / source).read_bytes())
+            self.assertIn(f"{go.TABLE_DIR}/{source}", go.oracle_sources("table"))
+        self.assertEqual(segment_literals("table"), set(spec.segments))
+        # The request loop brackets only the column stage; setup is no segment.
+        main = (ROOT / go.TABLE_DIR / "main.go").read_text()
+        self.assertIn('stage(req.ID, "column", outcomes, messages', main)
+        self.assertIn('unbracketed("setup", outcomes, messages', main)
+
+    def test_table_inventory_can_be_read_from_a_scratch_selection(self):
+        with tempfile.TemporaryDirectory() as scratch:
+            inventory = Path(scratch) / "requests.json"
+            requests = [{"id": "c@x", "column": "c", "op": "table", "input": {"a": 1}}]
+            inventory.write_text(json.dumps({"version": 1, "pin": go.pin(), "requests": [
+                {"id": "c@x", "column": "c", "group": "core", "input": {"a": 1},
+                 "request_sha256": go.sha256(canonical(requests[0]))}]}))
+            with go.table_inventory(inventory):
+                self.assertEqual(go.table_inventory_path(), inventory.resolve())
+                self.assertEqual(go.inventory_rows("table"), [("c@x", go.sha256(canonical(requests[0])))])
+                self.assertEqual(len(go.verify_requests("table", requests)), 1)
+                with self.assertRaisesRegex(ValueError, "differ from the inventory"):
+                    go.verify_requests("table", [{**requests[0], "input": {"a": 2}}])
+                with self.assertRaisesRegex(ValueError, "differ from the inventory"):
+                    go.verify_requests("table", [{**requests[0], "column": "d"}])
+                with self.assertRaisesRegex(ValueError, "the inventory has 1"):
+                    go.verify_requests("table", [])
+                binding = go.inventory_binding("table", requests)
+                self.assertEqual(binding["inventory_file_sha256"], go.file_sha256(inventory))
+            self.assertEqual(go.table_inventory_path(), ROOT / go.TABLE_INVENTORY)
+
     def test_driver_builds_carry_the_hook_only_when_instrumented(self):
         for oracle in ("syntax", "facts"):
             package = f"tsc/{go.ORACLES[oracle].package}"
@@ -866,8 +956,12 @@ class RequestAndDocumentTests(unittest.TestCase):
             self.assertIn(body, driver, block)
 
 
-@unittest.skipUnless(all(go.native_path(oracle).exists() and go.reach_path(oracle).exists() for oracle in go.ORACLES),
-                     "frozen mutation artifacts are not present")
+# The oracles whose frozen artifacts are committed: the four recorded ones, and
+# the table once its campaign is recorded.
+FROZEN = [oracle for oracle in go.ORACLES if go.native_path(oracle).exists() and go.reach_path(oracle).exists()]
+
+
+@unittest.skipUnless({"e1", "binder", "syntax", "facts"} <= set(FROZEN), "frozen mutation artifacts are not present")
 class FrozenArtifactTests(unittest.TestCase):
     """Child-free: the committed files still bind the current inputs."""
 
@@ -878,12 +972,12 @@ class FrozenArtifactTests(unittest.TestCase):
 
     def test_no_subprocess_is_started(self):
         with patch("subprocess.run", side_effect=AssertionError("child")), patch("subprocess.Popen", side_effect=AssertionError("child")):
-            for oracle in go.ORACLES:
+            for oracle in FROZEN:
                 go.load_native(oracle)
                 go.load_reach(oracle)
 
     def test_native_files_bind_inventory_sources_and_fresh_run(self):
-        for oracle, spec in go.ORACLES.items():
+        for oracle, spec in ((oracle, go.ORACLES[oracle]) for oracle in FROZEN):
             document = go.load_native(oracle)
             self.assertEqual(document["oracle_sources"], go.oracle_sources(oracle), f"{oracle} oracle sources changed")
             self.assertEqual(document["fresh_run"]["equal"], True)
@@ -908,7 +1002,7 @@ class FrozenArtifactTests(unittest.TestCase):
         self.assertTrue(document["parse_outcomes_equal_e1"])
 
     def test_reach_files_bind_native_rules_instrumentation_and_every_row(self):
-        for oracle in go.ORACLES:
+        for oracle in FROZEN:
             document = go.read_document(go.reach_path(oracle))
             native = go.load_native(oracle)
             self.assertEqual(go.reach_problems(oracle, document, go.file_sha256(go.native_path(oracle))), [], oracle)
@@ -924,13 +1018,15 @@ class FrozenArtifactTests(unittest.TestCase):
             self.assertEqual(len(reach), document["summary"]["operations_entered"])
             self.assertFalse(set(reach) & set(document["unstable_ops"]))
             self.assertLessEqual(set(go.POOL_OPERATIONS), set(document["unstable_ops"]))
-            self.assertEqual(len(reach[self.EVERY_ROW[oracle]]), len(native["rows"]), f"{oracle}: every row enters it")
+            if oracle in self.EVERY_ROW:
+                self.assertEqual(len(reach[self.EVERY_ROW[oracle]]), len(native["rows"]),
+                                 f"{oracle}: every row enters it")
 
     def test_reach_files_hold_only_reproducible_fields(self):
         # GR1: nothing in the header may vary with pool or scheduling state, and
         # the summary is over the plan's homes set, never the coverage report.
         planned = go.planned_operations()
-        for oracle in go.ORACLES:
+        for oracle in FROZEN:
             document = go.read_document(go.reach_path(oracle))
             index = {op: go.decode_gaps(gaps) for op, gaps in document["op_row_gaps"].items()}
             self.assertEqual(document["summary"], go.reach_summary(index, document["unstable_ops"], planned), oracle)
@@ -948,7 +1044,7 @@ class FrozenArtifactTests(unittest.TestCase):
             self.assertNotIn(b"witness_missing", header, oracle)
 
     def test_observation_segments_counted_only_what_the_rule_allows(self):
-        for oracle, spec in go.ORACLES.items():
+        for oracle, spec in ((oracle, go.ORACLES[oracle]) for oracle in FROZEN):
             segments = go.read_document(go.reach_path(oracle))["segments"]
             self.assertEqual(set(segments), set(spec.segments))
             for segment, rule in spec.segments.items():

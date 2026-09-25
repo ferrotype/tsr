@@ -241,24 +241,12 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.getSyntacticTruthySemantics
-    fn syntactic_truthiness(&mut self, mut node: NodeId) -> Result<u8, Error> {
-        loop {
-            let read = self.node(node)?;
-            if matches!(
-                read.kind().known(),
-                Some(
-                    K::ParenthesizedExpression
-                        | K::AsExpression
-                        | K::TypeAssertionExpression
-                        | K::NonNullExpression
-                        | K::SatisfiesExpression
-                )
-            ) {
-                node = required(read.expression(), "outer expression")?;
-            } else {
-                break;
-            }
-        }
+    fn syntactic_truthiness(&mut self, node: NodeId) -> Result<u8, Error> {
+        let node = tsr_ast::utilities::skip_outer_expressions(
+            self.ast(node)?,
+            node,
+            tsr_ast::utilities::outer_expression_kinds::ALL,
+        )?;
         let read = self.node(node)?;
         Ok(match read.kind().known() {
             Some(K::NumericLiteral) => {

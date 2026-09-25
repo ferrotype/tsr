@@ -92,24 +92,11 @@ impl Symbol {
             ..Self::default()
         }
     }
-    // port: tsc/internal/ast/symbol.go:Symbol.IsExternalModule
-    pub fn is_external_module(&self) -> bool {
-        self.flags & symbol_flags::MODULE != 0
-            && is_ambient_module_symbol_name(self.name.as_bytes())
-    }
     // port: tsc/internal/ast/symbol.go:Symbol.IsStatic
     pub fn is_static(&self, view: AstView<'_>) -> Result<bool, Error> {
         self.value_declaration.map_or(Ok(false), |node| {
             Ok(view.node(node)?.modifier_flags(view)? & modifier_flags::STATIC != 0)
         })
-    }
-    // port: tsc/internal/ast/symbol.go:Symbol.CombinedLocalAndExportSymbolFlags
-    pub fn combined_local_and_export_symbol_flags(
-        &self,
-        resolve_flags: impl FnOnce(SymbolId) -> Result<SymbolFlags, Error>,
-    ) -> Result<SymbolFlags, Error> {
-        self.export_symbol
-            .map_or(Ok(self.flags), |id| Ok(self.flags | resolve_flags(id)?))
     }
 }
 
@@ -184,12 +171,14 @@ impl std::ops::Deref for SymbolName<'_> {
         self.as_bytes()
     }
 }
-// port: tsc/internal/ast/symbol.go:SymbolName
+/// Go's `SymbolName`. The port marker is on the private-name test, a site the
+/// mutation splicer can negate (the name enum has no replacement value).
 pub fn symbol_name<'a>(
     symbol: &'a (impl crate::SymbolAccess + ?Sized),
     view: AstView<'a>,
 ) -> Result<SymbolName<'a>, Error> {
     if let Some(declaration) = symbol.value_declaration() {
+        // port: tsc/internal/ast/symbol.go:SymbolName
         if crate::utilities::is_private_identifier_class_element_declaration(view, declaration)? {
             let name = view
                 .node(declaration)?
@@ -252,21 +241,21 @@ pub fn is_ambient_module_symbol_name(name: &[u8]) -> bool {
 pub use crate::symbol_tables::{
     SymbolTable, SymbolTableId, SymbolTableMut, SymbolTableRead, SymbolTables,
 };
-// port: tsc/internal/ast/utilities.go:GetSymbolTable
+// The binder allocates its tables through `ensure_binding_*` in tsr_binder,
+// which carry the GetSymbolTable/GetMembers/GetExports markers; these
+// storage-level helpers have no production caller.
 pub fn get_symbol_table<'a>(
     tables: &'a mut SymbolTables,
     id: &mut Option<SymbolTableId>,
 ) -> Result<SymbolTableMut<'a>, Error> {
     tables.get_or_create(id)
 }
-// port: tsc/internal/ast/utilities.go:GetMembers
 pub fn get_members<'a>(
     symbol: &mut Symbol,
     tables: &'a mut SymbolTables,
 ) -> Result<SymbolTableMut<'a>, Error> {
     get_symbol_table(tables, &mut symbol.members)
 }
-// port: tsc/internal/ast/utilities.go:GetExports
 pub fn get_exports<'a>(
     symbol: &mut Symbol,
     tables: &'a mut SymbolTables,
@@ -294,7 +283,9 @@ pub fn is_locals_container(node: &(impl NodeAccess + ?Sized)) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{AstBuilder, Factory, FactoryMethods, Node, RuntimeFactory, SyntaxKind};
+    use crate::{
+        AstBuilder, Factory, FactoryMethods, Node, RuntimeFactory, SymbolAccess, SyntaxKind,
+    };
     use tsr_arena::SymbolArena;
     use tsr_jsstring::SourceText;
 

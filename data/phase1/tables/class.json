@@ -1,0 +1,500 @@
+{
+  "columns": [
+    {
+      "evidence": [
+        "internal/checker/checker.go:10240",
+        "internal/checker/checker.go:10271",
+        "internal/checker/checker.go:29040",
+        "internal/transformers/tstransforms/legacydecorators.go:666",
+        "internal/transformers/tstransforms/legacydecorators.go:723"
+      ],
+      "id": "ast.Node.Decorators",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/ast.go:Node.Decorators"
+      ],
+      "projection": "[node reference, [decorator references]] of every node with a nonempty result; callers read only length and elements, so nil and empty are one value",
+      "rust": "tsr_ast::utilities_class::decorators",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:10234",
+        "internal/checker/checker.go:10269",
+        "internal/checker/utilities.go:1752",
+        "internal/transformers/estransforms/classfields.go:1751",
+        "internal/transformers/estransforms/esdecorator.go:585",
+        "internal/ast/utilities.go:4334"
+      ],
+      "id": "ast.ClassOrConstructorParameterIsDecorated",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:ClassOrConstructorParameterIsDecorated",
+        "tsc/internal/ast/utilities.go:GetFirstConstructorWithBody",
+        "tsc/internal/ast/utilities.go:NodeIsDecorated",
+        "tsc/internal/ast/utilities.go:NodeCanBeDecorated",
+        "tsc/internal/ast/utilities.go:ChildIsDecorated",
+        "tsc/internal/ast/utilities.go:GetThisParameter",
+        "tsc/internal/ast/utilities.go:HasAbstractModifier",
+        "tsc/internal/ast/utilities.go:HasAmbientModifier"
+      ],
+      "projection": "[index, bits] where bit 0 is the result without and bit 1 with legacy decorators; rows with no bit are omitted, over class declarations and expressions",
+      "rust": "tsr_ast::utilities_class::class_or_constructor_parameter_is_decorated",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:10239",
+        "internal/transformers/tstransforms/metadata.go:227",
+        "internal/ast/utilities.go:4341",
+        "internal/ls/codeactions_missingmemberfixer.go:87",
+        "internal/transformers/tstransforms/legacydecorators.go:711",
+        "internal/transformers/tstransforms/typeserializer.go:79"
+      ],
+      "id": "ast.ClassElementOrClassElementParameterIsDecorated",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:ClassElementOrClassElementParameterIsDecorated",
+        "tsc/internal/ast/utilities.go:GetAllAccessorDeclarations",
+        "tsc/internal/ast/utilities.go:GetAllAccessorDeclarationsForDeclaration",
+        "tsc/internal/ast/utilities.go:IsThisParameter",
+        "tsc/internal/ast/utilities.go:NodeIsDecorated",
+        "tsc/internal/ast/utilities.go:NodeCanBeDecorated"
+      ],
+      "projection": "[index, bits] where bit 0 is the result without and bit 1 with legacy decorators; rows with no bit are omitted, over the class elements whose parent is the class, which the decorator transforms pass as parent",
+      "rust": "tsr_ast::utilities_class::class_element_or_class_element_parameter_is_decorated",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ast/utilities.go:4385",
+        "internal/transformers/estransforms/esdecorator.go:510",
+        "internal/transformers/tstransforms/legacydecorators.go:838",
+        "internal/ast/utilities.go:4331",
+        "internal/ast/utilities.go:4357",
+        "internal/ast/utilities.go:4365"
+      ],
+      "id": "ast.NodeOrChildIsDecorated",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:NodeOrChildIsDecorated",
+        "tsc/internal/ast/utilities.go:NodeIsDecorated",
+        "tsc/internal/ast/utilities.go:NodeCanBeDecorated",
+        "tsc/internal/ast/utilities.go:ChildIsDecorated",
+        "tsc/internal/ast/utilities.go:GetThisParameter",
+        "tsc/internal/ast/utilities.go:HasAbstractModifier",
+        "tsc/internal/ast/utilities.go:HasAmbientModifier"
+      ],
+      "projection": "[index, bits] where bit 0 is the result without and bit 1 with legacy decorators; rows with no bit are omitted, over the nodes other than the source file with their parent and grandparent as the parent arguments",
+      "rust": "tsr_ast::utilities_class::node_or_child_is_decorated",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ast/utilities.go:4374",
+        "internal/checker/checker.go:6190",
+        "internal/checker/checker.go:28597",
+        "internal/checker/checker.go:28695",
+        "internal/checker/grammarchecks.go:242",
+        "internal/ast/utilities.go:4324"
+      ],
+      "id": "ast.NodeCanBeDecorated",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:NodeCanBeDecorated",
+        "tsc/internal/ast/utilities.go:GetThisParameter",
+        "tsc/internal/ast/utilities.go:HasAbstractModifier",
+        "tsc/internal/ast/utilities.go:HasAmbientModifier"
+      ],
+      "projection": "[index, bits] where bit 0 is the result without and bit 1 with legacy decorators; rows with no bit are omitted, over the nodes other than the source file with their parent and grandparent (decorated or not)",
+      "rust": "tsr_ast::utilities_class::node_can_be_decorated",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ast/utilities.go:4341",
+        "internal/ls/codeactions_missingmemberfixer.go:87",
+        "internal/transformers/tstransforms/legacydecorators.go:711",
+        "internal/transformers/tstransforms/typeserializer.go:79",
+        "internal/transformers/tstransforms/typeserializer.go:139",
+        "internal/ast/utilities.go:4458"
+      ],
+      "id": "ast.GetAllAccessorDeclarations",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:GetAllAccessorDeclarations",
+        "tsc/internal/ast/utilities.go:GetAllAccessorDeclarationsForDeclaration"
+      ],
+      "projection": "[index, [first, second, set, get accessor references]] for every accessor whose parent has a member list, searched in the parent's members",
+      "rust": "tsr_ast::utilities_class::get_all_accessor_declarations",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ast/utilities.go:4458",
+        "internal/ast/utilities.go:4473",
+        "internal/checker/grammarchecks.go:249",
+        "internal/pseudochecker/lookup.go:147",
+        "internal/pseudochecker/lookup.go:364"
+      ],
+      "id": "ast.GetAllAccessorDeclarationsForDeclaration",
+      "input": "bound",
+      "operations": [
+        "tsc/internal/ast/utilities.go:GetAllAccessorDeclarationsForDeclaration"
+      ],
+      "projection": "[index, [first, second, set, get accessor references]] for every accessor, with its symbol's declarations as the checker passes them",
+      "rust": "tsr_ast::utilities_class::get_all_accessor_declarations_for_declaration",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:4625",
+        "internal/checker/checker.go:4686",
+        "internal/checker/checker.go:8793",
+        "internal/checker/checker.go:8838",
+        "internal/checker/checker.go:12019"
+      ],
+      "id": "ast.GetClassLikeDeclarationOfSymbol",
+      "input": "bound",
+      "operations": [
+        "tsc/internal/ast/utilities.go:GetClassLikeDeclarationOfSymbol"
+      ],
+      "projection": "[index, reference of the first class-like declaration of the node's symbol] for every node where it is not nil among the nodes with a symbol",
+      "rust": "tsr_ast::utilities_class::get_class_like_declaration_of_symbol",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ast/utilities.go:1751",
+        "internal/transformers/declarations/transform.go:2146",
+        "internal/transformers/estransforms/esdecorator.go:639",
+        "internal/ast/utilities.go:1776"
+      ],
+      "id": "ast.GetHeritageClause",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:GetHeritageClause",
+        "tsc/internal/ast/utilities.go:getHeritageClauses"
+      ],
+      "projection": "[index, [extends clause reference, implements clause reference]] for every node with either",
+      "rust": "tsr_ast::utilities_class::get_heritage_clause",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ast/utilities.go:1743",
+        "internal/ast/utilities.go:1747",
+        "internal/ast/utilities.go:3132",
+        "internal/ls/utilities.go:924"
+      ],
+      "id": "ast.GetHeritageElements",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:GetHeritageElements"
+      ],
+      "projection": "[index, [extends element references, implements element references]] for every node with either",
+      "rust": "tsr_ast::utilities_class::get_heritage_elements",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:2885",
+        "internal/checker/checker.go:4337",
+        "internal/checker/checker.go:4753",
+        "internal/checker/checker.go:4800",
+        "internal/checker/checker.go:8088"
+      ],
+      "id": "ast.GetClassExtendsHeritageElement",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:GetClassExtendsHeritageElement"
+      ],
+      "projection": "[index, reference of the first extends element] for every node where it is not nil",
+      "rust": "tsr_ast::utilities_class::get_class_extends_heritage_element",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:5103",
+        "internal/checker/checker.go:17662",
+        "internal/checker/checker.go:19822",
+        "internal/checker/nodebuilder_hover.go:279",
+        "internal/checker/utilities.go:1751"
+      ],
+      "id": "ast.GetExtendsHeritageClauseElements",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:GetExtendsHeritageClauseElements"
+      ],
+      "projection": "[index, element references] for every node with extends elements; callers read length and elements",
+      "rust": "tsr_ast::utilities_class::get_extends_heritage_clause_elements",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:4389",
+        "internal/checker/nodebuilder_hover.go:282",
+        "internal/ls/codeactions_fixclassincorrectlyimplementsinterface.go:39",
+        "internal/ls/codeactions_fixclassincorrectlyimplementsinterface.go:88",
+        "internal/ls/utilities.go:929"
+      ],
+      "id": "ast.GetImplementsHeritageClauseElements",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:GetImplementsHeritageClauseElements"
+      ],
+      "projection": "[index, element references] for every node with implements elements; callers read length and elements",
+      "rust": "tsr_ast::utilities_class::get_implements_heritage_clause_elements",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:17664",
+        "internal/ls/utilities.go:602",
+        "internal/transformers/declarations/transform.go:744"
+      ],
+      "id": "ast.GetHeritageClauseElementName",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:GetHeritageClauseElementName"
+      ],
+      "projection": "[index, reference of the element's name] for every node where it is not nil, over expressions with type arguments and type references (its type assertion panics on other kinds)",
+      "rust": "tsr_ast::utilities_class::get_heritage_clause_element_name",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ast/utilities.go:4334",
+        "internal/checker/checker.go:29050",
+        "internal/ls/callhierarchy.go:321",
+        "internal/transformers/declarations/transform.go:1920",
+        "internal/transformers/estransforms/esdecorator.go:734"
+      ],
+      "id": "ast.GetFirstConstructorWithBody",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:GetFirstConstructorWithBody"
+      ],
+      "projection": "[index, reference of the first constructor with a body] for every node where it is not nil, over the kinds whose Node.Members does not panic",
+      "rust": "tsr_ast::utilities_class::get_first_constructor_with_body",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ast/utilities.go:4324",
+        "internal/checker/checker.go:12200",
+        "internal/checker/checker.go:12334",
+        "internal/checker/checker.go:14035",
+        "internal/checker/checker.go:20253"
+      ],
+      "id": "ast.GetThisParameter",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:GetThisParameter"
+      ],
+      "projection": "[index, reference of the this parameter] for every node where it is not nil, over the kinds whose data embeds FunctionLikeBase (Node.Parameters panics on others)",
+      "rust": "tsr_ast::utilities_class::get_this_parameter",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/utilities.go:68",
+        "internal/checker/utilities.go:343",
+        "internal/checker/checker.go:6985",
+        "internal/checker/checker.go:7288",
+        "internal/pseudochecker/lookup.go:107"
+      ],
+      "id": "ast.HasModifier",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:HasModifier"
+      ],
+      "projection": "[index, indices of the masks it finds] for every node: each syntactic and JSDoc-only flag alone, then Export|Default, Public|Private|Protected and SyntacticModifiers",
+      "rust": "tsr_ast::utilities::has_syntactic_modifier",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ast/utilities.go:4311",
+        "internal/checker/checker.go:4782",
+        "internal/checker/checker.go:4807",
+        "internal/checker/checker.go:5043",
+        "internal/checker/grammarchecks.go:1916"
+      ],
+      "id": "ast.HasAbstractModifier",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:HasAbstractModifier"
+      ],
+      "projection": "document-order indices of the nodes where it is true",
+      "rust": "tsr_ast::utilities_class::has_abstract_modifier",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ast/utilities.go:4311",
+        "internal/checker/checker.go:4762"
+      ],
+      "id": "ast.HasAmbientModifier",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:HasAmbientModifier"
+      ],
+      "projection": "document-order indices of the nodes where it is true",
+      "rust": "tsr_ast::utilities_class::has_ambient_modifier",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ls/change/tracker.go:681",
+        "internal/ls/change/tracker.go:695",
+        "internal/ls/change/trackerimpl.go:390",
+        "internal/ls/completions.go:4689"
+      ],
+      "id": "ast.IsClassOrTypeElement",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsClassOrTypeElement"
+      ],
+      "projection": "document-order indices of the nodes where it is true",
+      "rust": "tsr_ast::utilities_class::is_class_or_type_element",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:32174",
+        "internal/testutil/tsbaseline/type_symbol_baseline.go:373"
+      ],
+      "id": "ast.IsExpressionWithTypeArgumentsInClassExtendsClause",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsExpressionWithTypeArgumentsInClassExtendsClause"
+      ],
+      "projection": "document-order indices of the nodes where it is true",
+      "rust": "tsr_ast::utilities_class::is_expression_with_type_arguments_in_class_extends_clause",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:10249",
+        "internal/ls/completions.go:5345",
+        "internal/transformers/estransforms/classfields.go:1445",
+        "internal/transformers/estransforms/classfields.go:2058"
+      ],
+      "id": "ast.IsInitializedProperty",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsInitializedProperty"
+      ],
+      "projection": "document-order indices of the nodes where it is true",
+      "rust": "tsr_ast::utilities_middle::is_initialized_property",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:32247",
+        "internal/checker/utilities.go:1166",
+        "internal/testutil/tsbaseline/type_symbol_baseline.go:309"
+      ],
+      "id": "ast.IsNameOfHeritageClauseTypeReference",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsNameOfHeritageClauseTypeReference"
+      ],
+      "projection": "document-order indices of the nodes where it is true, over the nodes other than the source file (it reads node.Parent unconditionally)",
+      "rust": "tsr_ast::utilities_class::is_name_of_heritage_clause_type_reference",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ast/utilities.go:3345",
+        "internal/ast/utilities.go:4249",
+        "internal/ast/utilities.go:4362",
+        "internal/checker/checker.go:7376",
+        "internal/checker/checker.go:10522"
+      ],
+      "id": "ast.IsThisParameter",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsThisParameter"
+      ],
+      "projection": "document-order indices of the nodes where it is true",
+      "rust": "tsr_ast::utilities_class::is_this_parameter",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ast/utilities.go:1431",
+        "internal/ls/findallreferences.go:2047"
+      ],
+      "id": "ast.TryGetClassExtendingExpressionWithTypeArguments",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:TryGetClassExtendingExpressionWithTypeArguments"
+      ],
+      "projection": "[index, reference of the extending class] for every node where it is not nil",
+      "rust": "tsr_ast::utilities_class::try_get_class_extending_expression_with_type_arguments",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ast/utilities.go:1438",
+        "internal/checker/checker.go:32290"
+      ],
+      "id": "ast.TryGetClassImplementingOrExtendingHeritageClauseElement",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:TryGetClassImplementingOrExtendingHeritageClauseElement"
+      ],
+      "projection": "[index, [class reference, isImplements]] for every node with a class",
+      "rust": "tsr_ast::utilities_class::try_get_class_implementing_or_extending_heritage_clause_element",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/nodebuilder.go:209",
+        "internal/checker/nodebuilder.go:221",
+        "internal/checker/nodebuilder_hover.go:207",
+        "internal/checker/nodebuilder_hover.go:522",
+        "internal/checker/nodebuilder_hover.go:538"
+      ],
+      "id": "ast.ReplaceModifiers",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:ReplaceModifiers"
+      ],
+      "projection": "[index, [result with nil modifiers, result with the node's own modifiers]] over the kinds it handles (its default arm panics); a result that is the node itself is true, a new node is [kind, references of its children in ForEachChild order], which are the original's children",
+      "rust": "tsr_ast::utilities_class::replace_modifiers",
+      "survey": true,
+      "synthetic": []
+    }
+  ],
+  "group": "class",
+  "version": 1
+}

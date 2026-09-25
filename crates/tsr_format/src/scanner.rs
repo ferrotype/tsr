@@ -96,7 +96,7 @@ fn should_rescan_jsx_identifier(view: AstView<'_>, node: &NodeRead<'_>) -> Resul
     })
 }
 
-// port: tsc/internal/ast/utilities.go:IsJsxTagName
+// Inline copy of `IsJsxTagName`; its Phase 1 home is in tsr_ast (table group targets).
 fn is_jsx_tag_name(view: AstView<'_>, node: &NodeRead<'_>) -> Result<bool, Error> {
     let Some(parent) = node.parent() else {
         return Ok(false);

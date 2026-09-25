@@ -604,6 +604,78 @@ func phase1Walk(t *testing.T, request phase1Request) map[string]any {
 	return map[string]any{"ordered": rows}
 }
 
+// phase1InfoRow renders every fs.FileInfo member of one entry: Name, Size,
+// IsDir, Mode as the uint32 both sides can name, ModTime as its zero flag plus
+// its Unix seconds and nanoseconds, and whether Sys is nil. Arrays, not an
+// object, because the payload is order-sensitive.
+func phase1InfoRow(info fs.FileInfo) []any {
+	modTime := info.ModTime()
+	return []any{
+		info.Name(), info.Size(), info.IsDir(), uint32(info.Mode()),
+		modTime.IsZero(), modTime.Unix(), modTime.Nanosecond(), info.Sys() == nil,
+	}
+}
+
+// phase1FileInfo records the fileInfo members the other bundled cases never
+// read (embed.go:198-224): ModTime, Mode, Sys, and the fs.DirEntry half, Type
+// and Info. A Stat result is the pinned *fileInfo, which is also a DirEntry
+// (embed.go:189-192), so its Type and Info are asked directly. A walk hands
+// the callback the scheme root's `libs` entry wrapped by
+// fs.FileInfoToDirEntry (embed.go:84-86), whose Type reads fileInfo.Mode, and
+// then each library's *fileInfo itself, whose Type and Info are the pinned
+// methods. The Rust port has no DirEntry type: its walk entry carries the
+// FileInfo value, and the type bits are that value's mode.
+func phase1FileInfo(t *testing.T, request phase1Request) map[string]any {
+	t.Helper()
+	wrapped := bundled.WrapFS(&phase1StubFS{})
+	rows := []any{}
+	for _, action := range decodePhase1Action(t, request.Actions) {
+		switch action.Op {
+		case "stat":
+			info := wrapped.Stat(action.Path)
+			if info == nil {
+				rows = append(rows, []any{"stat", action.Path, false})
+				continue
+			}
+			entry, ok := info.(fs.DirEntry)
+			if !ok {
+				t.Fatalf("phase1: Stat(%q) returned %T, which is not a DirEntry", action.Path, info)
+			}
+			viaEntry, err := entry.Info()
+			if err != nil {
+				t.Fatalf("phase1: Stat(%q).Info() failed: %v", action.Path, err)
+			}
+			rows = append(rows, []any{
+				"stat", action.Path, true, phase1InfoRow(info),
+				uint32(entry.Type()), phase1InfoRow(viaEntry),
+			})
+		case "walk":
+			// One row per action: the callback sequence travels as a list.
+			entries := []any{}
+			err := wrapped.WalkDir(action.Root, func(path string, entry vfs.DirEntry, err error) error {
+				if err != nil {
+					return err
+				}
+				info, err := entry.Info()
+				if err != nil {
+					return err
+				}
+				entries = append(entries, []any{
+					path, entry.Name(), entry.IsDir(), uint32(entry.Type()), phase1InfoRow(info),
+				})
+				return nil
+			})
+			if err != nil {
+				t.Fatalf("phase1: walking %s failed: %v", action.Root, err)
+			}
+			rows = append(rows, []any{"walk", action.Root, entries})
+		default:
+			t.Fatalf("phase1: unsupported bundled file-info action: %q", action.Op)
+		}
+	}
+	return map[string]any{"ordered": rows}
+}
+
 func TestPhase1LeavesBundled(t *testing.T) {
 	input, err := os.ReadFile(os.Getenv("S08_REQUESTS"))
 	if err != nil {
@@ -650,6 +722,9 @@ func TestPhase1LeavesBundled(t *testing.T) {
 		case "BundledSourceDir":
 			row["result"] = "observed"
 			row["observation"] = phase1SourceDir()
+		case "BundledFileInfo":
+			row["result"] = "observed"
+			row["observation"] = phase1FileInfo(t, request)
 		default:
 			row["result"] = "native_unavailable"
 			row["reason"] = "subject is not served by the bundled probe"

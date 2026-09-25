@@ -112,10 +112,35 @@ impl ProgramCheckerHost {
         let program = self.program();
         let cwd = program.current_directory();
         let case_sensitive = self.use_case_sensitive_file_names();
+        // The only caller, tsr_checker's GetModuleSpecifiersForFileWithInfo port,
+        // passes the module's own file and the importer's own name. The pin names
+        // both by their source when they are included project-reference outputs
+        // (GetModuleSpecifiersWithInfo and GetModuleSpecifiersForFileWithInfo).
+        // The module is renamed here. The importer's source also chooses the
+        // directory that tsr_checker's proximity sort starts from, and that sort
+        // reads the importer's own name, so an output importer is refused.
+        let importer_path = path::to_path(importer, cwd, case_sensitive);
+        if program
+            .source_of_project_reference_if_output_included(importer_path.as_bytes(), importer)
+            != importer
+        {
+            return Err(Error::Unsupported(
+                "module specifiers for an importer that is a project-reference output",
+            ));
+        }
+        let target_path = path::to_path(target, cwd, case_sensitive);
+        let target =
+            program.source_of_project_reference_if_output_included(target_path.as_bytes(), target);
         let imported = path::to_path(target, cwd, case_sensitive);
-        // Nonempty project references are rejected by Program::load, so there
-        // is no project-reference redirect. Package-identity redirects remain.
-        let mut targets = vec![path::absolute(target, cwd)];
+        // A referenced project's source is named by its declaration output
+        // first, then as itself and through package-identity redirects.
+        let reference_redirect = program
+            .references
+            .project_reference_from_source(imported.as_bytes())
+            .filter(|output| !output.output_dts.is_empty())
+            .map(|output| path::absolute(output.output_dts.as_bytes(), cwd));
+        let mut targets: Vec<Vec<u8>> = reference_redirect.iter().cloned().collect();
+        targets.push(path::absolute(target, cwd));
         for (alias, destination) in &program.redirect_paths {
             if destination == &imported {
                 let name = program
@@ -157,7 +182,7 @@ impl ProgramCheckerHost {
                     result.push(ModuleSpecifierPath {
                         is_in_node_modules: contains(&option, b"/node_modules/"),
                         file_name: JsString::from_bytes(option),
-                        is_redirect: false,
+                        is_redirect: reference_redirect.as_ref() == Some(target),
                     });
                     filter_ignored = true;
                 }
@@ -169,8 +194,8 @@ impl ProgramCheckerHost {
             }
             result.push(ModuleSpecifierPath {
                 is_in_node_modules: contains(&target, b"/node_modules/"),
+                is_redirect: reference_redirect.as_ref() == Some(&target),
                 file_name: JsString::from_bytes(target),
-                is_redirect: false,
             });
         }
         Ok(result)

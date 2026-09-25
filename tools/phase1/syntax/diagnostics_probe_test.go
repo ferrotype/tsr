@@ -22,6 +22,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"os"
 	"runtime"
 	"strings"
@@ -42,6 +43,20 @@ type phase1SyntaxProgram struct {
 	Files         map[string]string    `json:"files"`
 	Roots         []string             `json:"roots"`
 	Options       core.CompilerOptions `json:"options"`
+	// Absent means single-threaded, which every request written before this
+	// field existed relies on, so their bytes and observations are unchanged.
+	// false builds the program with the pinned parallel work groups
+	// (core.NewWorkGroup(false) at fileloader.go:169 and program.go:558).
+	SingleThreaded *bool `json:"single_threaded"`
+}
+
+// phase1SyntaxSingleThreaded maps the optional request field onto the
+// ProgramOptions tristate. Only an explicit false selects the parallel groups.
+func phase1SyntaxSingleThreaded(spec *phase1SyntaxProgram) core.Tristate {
+	if spec.SingleThreaded != nil && !*spec.SingleThreaded {
+		return core.TSFalse
+	}
+	return core.TSTrue
 }
 
 type phase1SyntaxRequest struct {
@@ -84,7 +99,30 @@ func phase1SyntaxObserve(t *testing.T, request phase1SyntaxRequest) map[string]a
 	options := spec.Options
 	compare := tspath.ComparePathsOptions{CurrentDirectory: spec.Cwd, UseCaseSensitiveFileNames: spec.CaseSensitive}
 	config := tsoptions.NewParsedCommandLine(&options, spec.Roots, nil, compare)
-	program := NewProgram(ProgramOptions{Host: host, Config: config, SingleThreaded: core.TSTrue})
+	program := NewProgram(ProgramOptions{Host: host, Config: config, SingleThreaded: phase1SyntaxSingleThreaded(spec)})
+	// The expected mode is read from the raw request field, not from
+	// phase1SyntaxSingleThreaded: the parallel case gives the same bytes as its
+	// single-threaded twin, so this guard is the only thing that can show a
+	// regression in that helper instead of recording a match for work groups
+	// that never ran.
+	wantSingleThreaded := spec.SingleThreaded == nil || *spec.SingleThreaded
+	if program.SingleThreaded() != wantSingleThreaded {
+		t.Fatalf("%s: the program did not take the requested work-group mode (single_threaded %v)", request.Case, wantSingleThreaded)
+	}
+	// The guard above pins the argument the program passes to core.NewWorkGroup
+	// (fileloader.go:169, program.go:558); this one pins the group that
+	// argument selects. NewWorkGroup's only behavior is that choice, and both
+	// groups give the same bytes, so no compared output can show it: without
+	// this guard a NewWorkGroup that ignored or inverted its argument would
+	// still record a match crediting NewWorkGroup, and in the parallel twin the
+	// parallel group's Queue and RunAndWait, for groups that never ran.
+	wantGroup := "*core.parallelWorkGroup"
+	if wantSingleThreaded {
+		wantGroup = "*core.singleThreadedWorkGroup"
+	}
+	if group := fmt.Sprintf("%T", core.NewWorkGroup(wantSingleThreaded)); group != wantGroup {
+		t.Fatalf("%s: core.NewWorkGroup(%v) built %s, want %s", request.Case, wantSingleThreaded, group, wantGroup)
+	}
 	var target *ast.SourceFile
 	if request.Scope != nil {
 		target = program.GetSourceFile(*request.Scope)

@@ -20,6 +20,26 @@ def fixtures():
             if syntax: row.update(config_name='/tsconfig.json',config_text=json.dumps({'compilerOptions':opts},indent=2).encode().hex())
             rows.append(row)
     row=copy.deepcopy(rows[0]);row.update(id='options/duplicate-property-order',options={'noLib':True,'strictPropertyInitialization':True,'strictNullChecks':False},config_name='/tsconfig.json',config_text=b'{"compilerOptions":{"strictNullChecks":false,"strictPropertyInitialization":true,"strictNullChecks":true}}'.hex());rows.append(row)
+    # Valid JSX factories (the entity-name parse succeeds) and package maps
+    # under the resolutions that support them.
+    extra=[('jsx-factories-valid',{'jsx':3,'jsxFactory':'React.createElement','jsxFragmentFactory':'React.Fragment'}),
+           ('package-maps-node16',{'module':100,'moduleResolution':3,'resolvePackageJsonExports':True}),
+           ('package-maps-nodenext',{'module':199,'moduleResolution':99,'customConditions':['c']}),
+           ('package-maps-bundler',{'module':99,'moduleResolution':100,'resolvePackageJsonImports':True})]
+    for name,extra_options in extra:
+        for syntax in [False,True]:
+            opts={'noLib':True,'noEmit':True,'target':99,**extra_options}
+            row=dict(id=f'options/extra/{name}/{"syntax" if syntax else "command"}',cwd='/',case_sensitive=True,roots=['/src/a.ts','/src/a.js'],files={'/src/a.ts':b'export let value=1;'.hex(),'/src/a.js':b'let other=2;'.hex()},options=opts)
+            if syntax: row.update(config_name='/tsconfig.json',config_text=json.dumps({'compilerOptions':opts},indent=2).encode().hex())
+            rows.append(row)
+    # Output paths on a case-insensitive host (an output that overwrites an
+    # input spelled in another case; two outputs differing only in case), and
+    # a TypeScript dependency found in node_modules, which is not emitted.
+    files=lambda values:{name:text.encode().hex() for name,text in values.items()}
+    rows.append(dict(id='outputs/case-insensitive-overwrite',cwd='/',case_sensitive=False,roots=['/src/x.ts','/src/X.js'],files=files({'/src/x.ts':'export let value=1;','/src/X.js':'let other=2;'}),options={'noLib':True,'noEmit':False,'target':99,'allowJs':True}))
+    rows.append(dict(id='outputs/case-insensitive-collision',cwd='/',case_sensitive=False,roots=['/src/a.ts','/src/A.tsx'],files=files({'/src/a.ts':'export let value=1;','/src/A.tsx':'export let other=2;'}),options={'noLib':True,'noEmit':False,'target':99,'jsx':3}))
+    rows.append(dict(id='outputs/external-library-not-emitted',cwd='/src/app',case_sensitive=True,roots=['/src/app/main.ts'],files=files({'/src/app/main.ts':'import "pkg";','/src/node_modules/pkg/index.ts':'export const p = 1;'}),options={'noLib':True,'noEmit':False,'target':99,'outDir':'/out','rootDir':'/src/app'}))
+    rows.append(dict(id='outputs/external-library-control',cwd='/src/app',case_sensitive=True,roots=['/src/app/main.ts'],files=files({'/src/app/main.ts':'import "../pkg";','/src/pkg/index.ts':'export const p = 1;'}),options={'noLib':True,'noEmit':False,'target':99,'outDir':'/out','rootDir':'/src/app'}))
     return rows
 
 def main():

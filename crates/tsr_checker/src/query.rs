@@ -63,7 +63,7 @@ fn required<T>(value: Option<T>, name: &'static str) -> Result<T, Error> {
 }
 
 impl CheckerState {
-    // port: tsc/internal/ast/utilities.go:IsTypeDeclaration
+    // Inline copy of `IsTypeDeclaration`; its Phase 1 home is in tsr_ast (table group positions).
     pub(crate) fn is_type_declaration(&self, node: NodeId) -> Result<bool, Error> {
         let read = self.node(node)?;
         Ok(match read.kind().known() {
@@ -1234,7 +1234,7 @@ impl CheckerState {
     }
 }
 
-// port: tsc/internal/ast/utilities.go:IsInExpressionContext
+// Inline copy of `IsInExpressionContext`; its Phase 1 home is in tsr_ast (table group positions).
 pub(crate) fn is_in_expression_context(
     view: tsr_ast::AstView<'_>,
     node: NodeId,
@@ -1302,7 +1302,7 @@ pub(crate) fn is_in_expression_context(
     })
 }
 
-// port: tsc/internal/ast/utilities.go:IsExpressionNode
+// Inline copy of `IsExpressionNode`; its Phase 1 home is in tsr_ast (table group positions).
 pub(crate) fn is_expression_node(view: tsr_ast::AstView<'_>, node: NodeId) -> Result<bool, Error> {
     let read = view.node(node)?;
     Ok(match read.kind().known() {
@@ -1424,7 +1424,7 @@ pub(crate) fn is_expression_node(view: tsr_ast::AstView<'_>, node: NodeId) -> Re
     })
 }
 
-// port: tsc/internal/ast/utilities.go:IsPartOfTypeNode
+// Inline copy of `IsPartOfTypeNode`; its Phase 1 home is in tsr_ast (table group positions).
 fn part_of_type_node(view: tsr_ast::AstView<'_>, node: NodeId) -> Result<bool, Error> {
     let read = view.node(node)?;
     let kind = read.kind();
@@ -1450,7 +1450,7 @@ fn part_of_type_node(view: tsr_ast::AstView<'_>, node: NodeId) -> Result<bool, E
             Some(parent) => view.node(parent)?.kind() != K::VoidExpression,
             None => true,
         },
-        // port: tsc/internal/ast/utilities.go:isPartOfTypeExpressionWithTypeArguments
+        // Inline copy of `isPartOfTypeExpressionWithTypeArguments`; its Phase 1 home is in tsr_ast (table group positions).
         Some(K::ExpressionWithTypeArguments) => match read.parent() {
             Some(parent) if view.node(parent)?.kind() == K::HeritageClause => {
                 let heritage = view.node(parent)?;
@@ -1469,7 +1469,7 @@ fn part_of_type_node(view: tsr_ast::AstView<'_>, node: NodeId) -> Result<bool, E
     })
 }
 
-// port: tsc/internal/ast/utilities.go:IsThisInTypeQuery
+// Inline copy of `IsThisInTypeQuery`; its Phase 1 home is in tsr_ast (table group positions).
 pub(crate) fn is_this_in_type_query(
     view: tsr_ast::AstView<'_>,
     node: NodeId,

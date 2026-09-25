@@ -5,9 +5,9 @@ use crate::{need, Binder, ContainerFlags as C};
 use std::ops::ControlFlow;
 use tsr_arena::Error;
 use tsr_ast::{
-    flow_flags as F, modifier_flags, node_flags as N, symbol_flags as S, utilities as u, AstView,
-    ChildVisitor, FlowData, JsString, NodeAccess, NodeDataRead, NodeId, NodeListId, NodeSlice,
-    SyntaxKind as K,
+    flow_flags as F, has_body_data, has_flow_node_data, modifier_flags, node_flags as N,
+    symbol_flags as S, utilities as u, AstView, ChildVisitor, FlowData, JsString, NodeAccess,
+    NodeId, NodeListId, NodeSlice, SyntaxKind as K,
 };
 
 // port: tsc/internal/binder/binder.go:GetContainerFlags
@@ -28,71 +28,6 @@ pub fn get_container_flags(view: AstView<'_>, id: NodeId) -> Result<C, Error> {
         }
     };
     Ok(rule.flags(fact))
-}
-
-// FlowNodeData is a payload interface. Open SyntaxKind values can disagree with
-// the payload, so this follows the generated Go embedding graph, not kind ranges.
-pub(crate) fn has_flow_node_data(node: &(impl NodeAccess + ?Sized)) -> bool {
-    matches!(
-        node.data(),
-        NodeDataRead::Identifier(_)
-            | NodeDataRead::QualifiedName(_)
-            | NodeDataRead::EmptyStatement(_)
-            | NodeDataRead::IfStatement(_)
-            | NodeDataRead::DoStatement(_)
-            | NodeDataRead::WhileStatement(_)
-            | NodeDataRead::ForStatement(_)
-            | NodeDataRead::ForInOrOfStatement(_)
-            | NodeDataRead::BreakStatement(_)
-            | NodeDataRead::ContinueStatement(_)
-            | NodeDataRead::ReturnStatement(_)
-            | NodeDataRead::WithStatement(_)
-            | NodeDataRead::SwitchStatement(_)
-            | NodeDataRead::ThrowStatement(_)
-            | NodeDataRead::TryStatement(_)
-            | NodeDataRead::DebuggerStatement(_)
-            | NodeDataRead::LabeledStatement(_)
-            | NodeDataRead::ExpressionStatement(_)
-            | NodeDataRead::Block(_)
-            | NodeDataRead::VariableStatement(_)
-            | NodeDataRead::BindingElement(_)
-            | NodeDataRead::MissingDeclaration(_)
-            | NodeDataRead::FunctionDeclaration(_)
-            | NodeDataRead::ClassDeclaration(_)
-            | NodeDataRead::InterfaceDeclaration(_)
-            | NodeDataRead::TypeAliasDeclaration(_)
-            | NodeDataRead::EnumDeclaration(_)
-            | NodeDataRead::ModuleBlock(_)
-            | NodeDataRead::NotEmittedStatement(_)
-            | NodeDataRead::ImportDeclaration(_)
-            | NodeDataRead::ExportAssignment(_)
-            | NodeDataRead::NamespaceExportDeclaration(_)
-            | NodeDataRead::GetAccessorDeclaration(_)
-            | NodeDataRead::SetAccessorDeclaration(_)
-            | NodeDataRead::MethodDeclaration(_)
-            | NodeDataRead::KeywordExpression(_)
-            | NodeDataRead::ArrowFunction(_)
-            | NodeDataRead::FunctionExpression(_)
-            | NodeDataRead::PropertyAccessExpression(_)
-            | NodeDataRead::ElementAccessExpression(_)
-            | NodeDataRead::MetaProperty(_)
-            | NodeDataRead::ModuleDeclaration(_)
-            | NodeDataRead::ImportEqualsDeclaration(_)
-            | NodeDataRead::ExportDeclaration(_)
-    )
-}
-fn has_body_data(node: &(impl NodeAccess + ?Sized)) -> bool {
-    matches!(
-        node.data(),
-        NodeDataRead::FunctionDeclaration(_)
-            | NodeDataRead::ConstructorDeclaration(_)
-            | NodeDataRead::GetAccessorDeclaration(_)
-            | NodeDataRead::SetAccessorDeclaration(_)
-            | NodeDataRead::MethodDeclaration(_)
-            | NodeDataRead::ArrowFunction(_)
-            | NodeDataRead::FunctionExpression(_)
-            | NodeDataRead::ModuleDeclaration(_)
-    )
 }
 
 // The pinned schema's largest immediate visitor has nine fields (a method).

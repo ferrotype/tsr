@@ -14,6 +14,7 @@ from pathlib import Path
 import re
 import subprocess
 import sys
+import tomllib
 
 from s04_common import strict_json_loads
 
@@ -58,12 +59,14 @@ RUST_WITNESS_TESTS = {
     "witness/nativepath-raw-eintr-retry": (
         ["cargo", "test", "--locked", "-p", "tsr_vfs", "--lib", "os::native::tests::interrupted_syscalls_retry_but_other_and_wrapped_errors_return_once", "--", "--exact"],
         ["os::native::tests::interrupted_syscalls_retry_but_other_and_wrapped_errors_return_once"]),
-    "f5b/native-navigation-rescan": (
-        ["cargo", "test", "--locked", "-p", "tsr_astnav", "--lib", "tests::jsx_shift_rescan_matches_the_pinned_private_operation", "--", "--exact"],
-        ["tests::jsx_shift_rescan_matches_the_pinned_private_operation"]),
     "witness/s08-p5-errors-rust": (
         ["cargo", "test", "--locked", "-p", "tsr_compiler", "--test", "diagnostic_writer", "native_plain_pretty_and_error_baseline_bytes_match", "--", "--exact"],
         ["native_plain_pretty_and_error_baseline_bytes_match"]),
+    # Every Kind from -1 through KindCount+1, frozen from the pinned parser
+    # package by tools/phase1/parser-tokens/observe.py.
+    "witness/parser-keyword-or-punctuation": (
+        ["cargo", "test", "--locked", "-p", "tsr_parser", "--lib", "tokens::tests::keyword_or_punctuation_matches_the_pinned_kind_table", "--", "--exact"],
+        ["tokens::tests::keyword_or_punctuation_matches_the_pinned_kind_table"]),
 }
 
 
@@ -342,42 +345,232 @@ def request_index(root):
     return result
 
 
-def input_paths(root=ROOT):
-    """Static integration dependencies; producer adds transitive Rust closure."""
-    document = load(root, MANIFEST)
-    paths = {MANIFEST, "scripts/phase1_integration.py", "scripts/phase1_generation.py",
-             "scripts/s04_common.py", "scripts/s11.py", "scripts/s11_contracts.py",
-             "scripts/generate_locale_tables.py", "scripts/s03.py", "data/upstream.json",
-             "data/s04/toolchains.toml", "data/s03/generated.json",
-             "data/phase1/locale-tables-manifest.json", "tools/packaging/packages.json", "tools/packaging/verification.json",
-             "crates/tsr_bundled/bundled/manifest.json", "upstream/package.json", "scripts/package_assets.py",
-             "tools/s10/toolchains.json", "LICENSE", "NOTICE", "licenses/GO-BSD-3-Clause.txt",
-             ".gitmodules", "data/s03/api-special-codecs.json", "scripts/s05_tables.py",
-             "crates/tsr_testhost/Cargo.toml", "data/s07/program-requests.json"}
-    for folder in ("data/s11", "tools/s11", "tools/phase1/locale", "tools/s03", "xtask"):
-        paths.update(str(p.relative_to(root)) for p in (root / folder).rglob("*")
-                     if p.is_file() and p.name != ".DS_Store" and "__pycache__" not in p.parts)
-    # Archive verification builds every public package, including packages no
-    # Phase 1 adapter depends on. Bind their manifests, build scripts and assets
-    # as well as Rust sources; a dependency-only closure misses archive changes.
-    for package in load(root, "tools/packaging/packages.json")["packages"]:
-        if package["publish"]:
+TRANSPORT_COMMAND = ["python3", "scripts/s11.py", "capture"]
+RUST_WITNESS_COMMAND = ["python3", "scripts/phase1_integration.py", "observe-rust-witnesses"]
+
+
+def receipt_specs(document):
+    """Every receipt foundations consumes, keyed by identity, with the command it must record.
+
+    `observe` executes exactly these commands and `evaluate` accepts nothing else.
+    """
+    import phase1_scope
+    specs = {row["id"]: row for row in document["witnesses"] if row["kind"] != "cases"}
+    specs.update({"transport": {"command": TRANSPORT_COMMAND},
+                  "generation": {"command": document["generation"]["command"]},
+                  "rust-witnesses": {"command": RUST_WITNESS_COMMAND},
+                  MUTATION_RECEIPT: {"command": phase1_scope.MUTATION_CONFIRM_COMMAND}})
+    # Additional named tests are independent required observations. A passing
+    # resolver case cannot stand in for the explicit source-order tie test.
+    for row in document["witnesses"]:
+        for test in row.get("additional_tests", []):
+            specs[row["id"] + "/" + test["test"]] = {**test, "kind": "test"}
+    return specs
+
+
+# What every receipt command reads to build and pin anything: Cargo resolution,
+# the Rust toolchain, the upstream pin and the Go toolchain the probes run.
+RECEIPT_BUILD_INPUTS = ("Cargo.toml", "Cargo.lock", "rust-toolchain.toml", "data/upstream.json", ".gitmodules",
+                        "data/s04/toolchains.toml")
+# `s04.verified_upstream` loads this hyphenated module by path, which an import
+# scan cannot see.
+S04_DYNAMIC_INPUTS = ("scripts/tracking-bootstrap.py",)
+# `cargo xtask gen --verify` regenerates into these crates and compares ([gen]).
+GENERATED_CRATES = ("crates/tsr_ast", "crates/tsr_diagnostics", "crates/tsr_json", "crates/tsr_locale",
+                    "crates/tsr_encoder")
+# Beyond each command's entry scripts (their import closure), its `cargo -p`
+# packages (their local dependency closure) and a named witness's references.
+# `packages` build with their local dependencies and embedded assets;
+# `directories` contribute their own non-prose files (generation neither builds
+# the generated crates' tests nor runs the xtask unit tests that embed ledgers);
+# `families` take a capture family's whole source closure (the localized
+# driver reruns config's probes and binary).
+RECEIPT_INPUTS = {
+    "transport": {"packages": ("tsr_testhost",), "directories": ("data/s11", "tools/s11")},
+    "generation": {"scripts": ("scripts/generate_locale_tables.py", "scripts/s03.py"),
+                   "directories": ("xtask", "tools/s03", "data/s03", "tools/phase1/locale", *GENERATED_CRATES),
+                   # xtask reads the upstream pin from PORTS.toml before it dispatches `gen`.
+                   "files": ("data/phase1/locale-tables-manifest.json", "data/s06/generated-ast-scope.json",
+                             "rustfmt.toml", "PORTS.toml"),
+                   "crate_manifests": True},
+    "rust-witnesses": {"packages": tuple(sorted({command[command.index("-p") + 1]
+                                                 for command, _ in RUST_WITNESS_TESTS.values()})),
+                       # The keyword table's pinned-Go overlay, requests and frozen
+                       # rows: the tsr_parser table is generated from them.
+                       "directories": ("tools/phase1/parser-tokens",)},
+    "localized-config-diagnostics": {"packages": ("tsr_compiler",), "families": ("config",)},
+    "installed-generated-assets": {"files": ("tools/packaging/packages.json", "tools/packaging/consumer.rs",
+                                             "tools/s10/toolchains.json", "LICENSE", "NOTICE",
+                                             "licenses/GO-BSD-3-Clause.txt"),
+                                   "published": True},
+}
+
+
+def _relative(path, root):
+    return str(Path(path).resolve().relative_to(Path(root).resolve()))
+
+
+def _cargo_packages(command):
+    """The `-p`/`--package` arguments of a cargo command."""
+    if not command or command[0] != "cargo":
+        return []
+    return [command[index + 1] for index, argument in enumerate(command[:-1]) if argument in ("-p", "--package")]
+
+
+def _include_pattern(pattern):
+    """A Cargo `include` entry (gitignore syntax) as a regex over package-relative paths."""
+    if pattern.startswith("!"):
+        raise ValueError(f"negated Cargo include pattern {pattern!r} is not supported")
+    anchored = pattern.startswith("/") or "/" in pattern.rstrip("/")
+    body = pattern.strip("/")
+    out, index = "", 0
+    while index < len(body):
+        if body.startswith("**/", index):
+            out, index = out + "(?:.*/)?", index + 3
+        elif body.startswith("**", index):
+            out, index = out + ".*", index + 2
+        elif body[index] == "*":
+            out, index = out + "[^/]*", index + 1
+        elif body[index] == "?":
+            out, index = out + "[^/]", index + 1
+        else:
+            out, index = out + re.escape(body[index]), index + 1
+    # A matched directory includes everything beneath it.
+    return re.compile(("" if anchored else "(?:.*/)?") + out + "(?:/.*)?")
+
+
+def packaged_files(directory):
+    """The files `cargo package` puts in this package's archive.
+
+    Honors the manifest's `include` (gitignore syntax) and names its `readme`
+    and `license-file`, so in-crate prose that is not packaged (SLICE.md) is
+    not an archive input. Without `include` Cargo packages every file, so every
+    file is returned.
+    """
+    directory = Path(directory)
+    manifest = tomllib.loads((directory / "Cargo.toml").read_text())["package"]
+    files = sorted(path for path in directory.rglob("*") if path.is_file() and path.name != ".DS_Store"
+                   and not any(part in (".git", "target", "__pycache__")
+                               for part in path.relative_to(directory).parts))
+    include = manifest.get("include")
+    if include is None:
+        selected = set(files)
+    else:
+        patterns = [_include_pattern(pattern) for pattern in include]
+        selected = {path for path in files
+                    if any(pattern.fullmatch(path.relative_to(directory).as_posix()) for pattern in patterns)}
+    selected.add(directory / "Cargo.toml")
+    for field in ("readme", "license-file"):
+        if isinstance(manifest.get(field), str):
+            selected.add(directory / manifest[field])
+    return sorted(selected)
+
+
+def receipt_input_paths(identity, root=ROOT, document=None):
+    """Every file one receipt's command reads: the receipt's own closure.
+
+    A receipt is current exactly while these files are unchanged, so an edit
+    that only another receipt depends on (or a coverage record) never makes it
+    unavailable. The foundations producer closure contains every receipt
+    closure; tests/test_phase1_integration.py checks each against the ledger.
+    """
+    import phase1_capture as capture
+    import phase1_producers as producers
+    document = load(root, MANIFEST) if document is None else document
+    specs = receipt_specs(document)
+    if identity not in specs:
+        raise ValueError(f"unknown integration receipt: {identity}")
+    spec, extra = specs[identity], RECEIPT_INPUTS.get(identity, {})
+    command = spec["command"]
+    paths = set(RECEIPT_BUILD_INPUTS)
+    if (root / ".cargo").is_dir():
+        paths.update(_relative(path, root) for path in (root / ".cargo").rglob("*")
+                     if path.is_file() and path.name != ".DS_Store")
+    scripts = [argument for argument in command if argument.startswith("scripts/") and argument.endswith(".py")]
+    python = producers.python_import_closure([*scripts, *extra.get("scripts", ())])
+    if "scripts/s04.py" in python:
+        python.update(S04_DYNAMIC_INPUTS)
+    paths.update(python)
+    names = producers.workspace_packages()
+    packages = [names[name] for name in (*_cargo_packages(command), *extra.get("packages", ()))]
+    directories = [root / name for name in producers.rust_package_closure(packages)] if packages else []
+    for directory in directories:
+        paths.update(_relative(path, root) for path in capture.package_input_files(directory))
+    for name in extra.get("directories", ()):
+        paths.update(_relative(path, root) for path in (root / name).rglob("*")
+                     if path.is_file() and path.name != ".DS_Store" and path.suffix.lower() != ".md"
+                     and not any(part in (".git", "target", "__pycache__")
+                                 for part in path.relative_to(root / name).parts))
+    paths.update(extra.get("files", ()))
+    if extra.get("crate_manifests"):
+        paths.update(f"{member}/Cargo.toml" for member in names.values() if member.startswith("crates/"))
+    for family in extra.get("families", ()):
+        paths.update(capture.source_closure(family, producers.rust_packages(family)))
+    if extra.get("published"):
+        # Archive verification checks every package's publication policy and
+        # builds every public package from its archive contents alone.
+        for package in load(root, "tools/packaging/packages.json")["packages"]:
             paths.add(package["manifest"])
-            directory = (root / package["manifest"]).parent
-            paths.update(str(p.relative_to(root)) for p in directory.rglob("*")
-                         if p.is_file() and p.name != ".DS_Store"
-                         and not any(part in {".git", "target", "__pycache__"}
-                                     for part in p.relative_to(directory).parts))
-    requests = request_index(root)
-    for witness in document["witnesses"]:
-        for reference in witness["references"]:
-            paths.add(requests[reference]["path"] if witness["kind"] == "cases" else reference)
-        paths.update(test["path"] for test in witness.get("additional_tests", []))
+            if package["publish"]:
+                paths.update(_relative(path, root) for path in packaged_files(root / Path(package["manifest"]).parent))
+    if identity == "generation":
+        generated = load(root, document["generation"]["generated_manifest"])
+        locale = load(root, document["generation"]["locale_manifest"])
+        paths.update(generated["files"])
+        paths.update(locale["outputs"])
+        paths.update(path for path in locale["inputs"] if not path.startswith("golang.org/"))
+    if identity == MUTATION_RECEIPT:
+        # Every oracle binary's closure (the driver and phase1_syntax), the
+        # tools and artifacts; the Go side the kills are bound to; and every
+        # file the splice of the full manifest rewrites
+        # (with its crate manifest, which gains the switch dependency), whether
+        # or not the driver links that crate.
+        paths.update(producers.mutation_inputs())
+        paths.update(producers.mutation_binding_inputs())
+        import phase1_mutation_go as go
+        paths.update(definition.probes for definition in go.ORACLES.values() if definition.probes)
+        import phase1_scope
+        manifest = strict_json_loads((root / phase1_scope.MUTATION_MANIFEST).read_bytes())
+        for mutant in manifest.get("mutants", []):
+            paths.add(mutant["file"])
+            paths.add("/".join(mutant["file"].split("/")[:2]) + "/Cargo.toml")
+    if spec.get("kind") in ("test", "driver", "installed"):
+        paths.update(spec.get("references", ()))
+        if "path" in spec:
+            paths.add(spec["path"])
+    return sorted(path for path in paths if Path(path).name != ".DS_Store")
+
+
+def receipt_inputs(identity, source_inputs, root=ROOT, document=None):
+    """This receipt's closure, digested from the caller's producer snapshot.
+
+    Reading the digests from one snapshot keeps every receipt's inputs and the
+    producer record consistent with each other. The foundations closure
+    contains every receipt closure by construction (input_paths), and
+    tests/test_phase1_integration.py holds it to that.
+    """
+    return {path: source_inputs[path] for path in receipt_input_paths(identity, root, document)
+            if path in source_inputs}
+
+
+def input_paths(root=ROOT):
+    """Every file integration check and every receipt command reads.
+
+    The foundations producer binds all of them; each receipt is bound only to
+    its own closure (receipt_input_paths).
+    """
+    document = load(root, MANIFEST)
+    paths = {MANIFEST, "scripts/phase1_integration.py", "scripts/phase1_generation.py", "scripts/s04_common.py",
+             "data/s11/cases.json", "data/s11/mapper-fixtures.json", "data/upstream.json", "upstream/package.json",
+             "upstream/tsc/internal/diagnostics/loc/de-DE.json.gz",
+             document["generation"]["generated_manifest"], document["generation"]["locale_manifest"]}
+    paths.update(str(path.relative_to(root)) for path in sorted((root / "data/phase1/requests").glob("*-*.json")))
     generated = load(root, document["generation"]["generated_manifest"])
     locale = load(root, document["generation"]["locale_manifest"])
     paths.update(generated["files"])
     paths.update(locale["outputs"])
-    paths.update(p for p in locale["inputs"] if not p.startswith("golang.org/"))
+    for identity in receipt_specs(document):
+        paths.update(receipt_input_paths(identity, root, document))
     return sorted(paths)
 
 
@@ -522,6 +715,8 @@ def receipt(identity, command, source_inputs, stdout, *, stderr="", exit_code=0,
 
     The caller fingerprints the complete producer closure before and after the
     command and may record a receipt only when those two maps are identical.
+    `source_inputs` is the receipt's own closure (receipt_inputs) taken from
+    that snapshot.
     """
     result = {"id": identity, "command": command, "source_inputs": source_inputs,
               "exit_code": exit_code, "stdout": stdout, "stderr": stderr,
@@ -539,7 +734,8 @@ def evaluate(preparation, family_reports, receipts=(), *, source_inputs=None, ro
     `family_reports` must come directly from normal capture replay. Reports may
     not be constructed from the inventory's last-result convenience fields.
     Receipts are authenticated against the caller's freshly recomputed complete
-    producer input map; absent receipts remain pending instead of becoming pass.
+    producer input map, each on its own closure (receipt_inputs); absent
+    receipts remain pending instead of becoming pass.
     """
     import copy
     result = copy.deepcopy(preparation)
@@ -554,19 +750,7 @@ def evaluate(preparation, family_reports, receipts=(), *, source_inputs=None, ro
                 problems.append(f"{identity}: malformed contributing comparison")
             cases[identity] = row.get("result")
     document = load(root, MANIFEST)
-    import phase1_scope
-    expected = {row["id"]: row for row in document["witnesses"] if row["kind"] != "cases"}
-    expected.update({
-        "transport": {"command": ["python3", "scripts/s11.py", "capture"]},
-        "generation": {"command": document["generation"]["command"]},
-        "rust-witnesses": {"command": ["python3", "scripts/phase1_integration.py", "observe-rust-witnesses"]},
-        MUTATION_RECEIPT: {"command": phase1_scope.MUTATION_CONFIRM_COMMAND},
-    })
-    # Additional named tests are independent required observations. A passing
-    # resolver case cannot stand in for the explicit source-order tie test.
-    for row in document["witnesses"]:
-        for test in row.get("additional_tests", []):
-            expected[row["id"] + "/" + test["test"]] = {**test, "kind": "test"}
+    expected = receipt_specs(document)
     measured = {}
     unavailable = {}
     for item in receipts:
@@ -598,11 +782,16 @@ def evaluate(preparation, family_reports, receipts=(), *, source_inputs=None, ro
                 for name, digest in recorded_inputs.items()):
             problems.append(f"{identity}: malformed integration receipt inputs")
             continue
-        if recorded_inputs != source_inputs:
+        # Each receipt is bound to its own closure, digested from the same
+        # producer snapshot: an input only another receipt reads cannot make
+        # it unavailable. It is current while every input it recorded is
+        # unchanged and it recorded every input of its closure, so a receipt
+        # that recorded more (an older whole-closure receipt) stays as strict.
+        compared = receipt_inputs(identity, source_inputs, root, document).keys() | recorded_inputs.keys()
+        changed_inputs = sorted(name for name in compared if recorded_inputs.get(name) != source_inputs.get(name))
+        if changed_inputs:
             measured[identity] = "unavailable"
-            unavailable[identity] = {"reason": "integration receipt inputs changed", "changed_inputs": sorted(
-                name for name in recorded_inputs.keys() | source_inputs.keys()
-                if recorded_inputs.get(name) != source_inputs.get(name))}
+            unavailable[identity] = {"reason": "integration receipt inputs changed", "changed_inputs": changed_inputs}
             continue
         # A confirmation that printed its receipt reports lost kills through
         # exit code 1, so that output is validated either way; one that died

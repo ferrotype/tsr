@@ -23,8 +23,8 @@ impl CheckerState {
             || !options.use_define_for_class_fields())
     }
 
-    // port: tsc/internal/ast/utilities.go:GetEnclosingBlockScopeContainer
-    // port: tsc/internal/ast/utilities.go:IsBlockScope
+    // Inline copy of `GetEnclosingBlockScopeContainer`; its Phase 1 home is in tsr_ast (table group containers).
+    // Inline copy of `IsBlockScope`; its Phase 1 home is in tsr_ast (table group containers).
     pub(crate) fn enclosing_emit_block_scope(&self, node: NodeId) -> Result<Option<NodeId>, Error> {
         let mut current = self.node(node)?.parent();
         while let Some(node) = current {

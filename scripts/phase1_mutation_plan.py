@@ -73,14 +73,17 @@ def default_ops(root: Path = ROOT) -> list[str]:
 
     Those whose coverage root cause is operation_witness_missing or
     mutation_witness_stale, plus every operation a mutation_kill witness of the
-    report claims. A recorded witness takes its operations out of the first set;
-    they stay planned, or re-planning would change the committed manifest that
-    every witness binds.
+    report claims, plus every operation a table column claims
+    (data/phase1/tables/<group>.json, docs section 9). A recorded witness takes
+    its operations out of the first set; they stay planned, or re-planning would
+    change the committed manifest that every witness binds.
     """
+    import phase1_tables
     report = strict_json_loads(gzip.decompress((Path(root) / COVERAGE_REPORT).read_bytes()))
     ops = {row["id"] for row in report["operations"] if row.get("root_cause") in (ROOT_CAUSE, STALE_CAUSE)}
     ops.update(op for witness in report.get("witnesses", []) if witness.get("kind") == "mutation_kill"
                for op in witness.get("claimed_operations", []))
+    ops.update(phase1_tables.claimed_operations(phase1_tables.load_specs(root=Path(root))))
     return sorted(ops)
 
 

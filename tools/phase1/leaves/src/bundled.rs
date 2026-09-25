@@ -264,7 +264,9 @@ pub fn observe(request: &Value) -> Option<Outcome> {
         "BundledWalk" => Some(extra::walk(request)),
         "BundledWrapper" => Some(extra::wrapper()),
         "BundledSourceDir" => Some(extra::source_dir()),
+        "BundledFileInfo" => Some(file_info::observe(request)),
         _ => None,
     }
 }
 mod extra;
+mod file_info;

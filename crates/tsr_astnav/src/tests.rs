@@ -217,60 +217,73 @@ fn deep_preceding_and_rightmost_searches_fit_a_small_caller_stack() {
 }
 
 #[test]
-fn jsx_shift_rescan_matches_the_pinned_private_operation() {
-    // Direct Go observations and access-only overlay are retained under
-    // tools/phase1/syntax/astnav-rescan. Parsed JSX alone does not establish
-    // the containing-node kind; this tests both values of that predicate.
-    for line in include_str!("testdata/navigation-rescan.tsv")
-        .lines()
-        .filter(|line| !line.starts_with('#'))
-    {
-        let fields: Vec<_> = line.split('\t').collect();
-        assert_eq!(fields.len(), 7);
-        let text: Vec<u8> = fields[0]
-            .as_bytes()
-            .chunks_exact(2)
-            .map(|pair| u8::from_str_radix(std::str::from_utf8(pair).unwrap(), 16).unwrap())
-            .collect();
-        let expected: Vec<i64> = fields[2..]
-            .iter()
-            .map(|value| value.parse().unwrap())
-            .collect();
-        let mut scanner = tsr_scanner::Scanner::new();
-        scanner.set_text(&text);
-        scanner.scan();
-        let before = i64::from(scanner.token() as u16);
-        // Build the containing node, then execute the same classification as
-        // both production navigation paths. Passing the fixture boolean here
-        // would miss a broken is_jsx_child implementation entirely.
-        use tsr_ast::{AstBuilder, FactoryMethods};
-        let mut builder = AstBuilder::new(SourceText::default(), &tsr_arena::Counters::new());
-        let containing = if fields[1] == "true" {
-            builder.new_jsx_expression(None, None)
-        } else {
-            builder.new_source_file(
-                SourceFileParseOptions {
-                    file_name: tsr_ast::JsString::from_bytes(b"/rescan.ts".as_slice()),
-                    ..Default::default()
-                },
-                SourceText::default(),
-                None,
-                None,
-            )
-        };
-        let jsx_child = tsr_ast::utilities::is_jsx_child(&builder.view().node(containing).unwrap());
-        assert_eq!(jsx_child, fields[1] == "true");
-        let after = super::scan_navigation_token(&mut scanner, jsx_child);
+fn a_shift_is_rescanned_by_both_navigation_scans_only_inside_a_jsx_child() {
+    // The request of syntax/astnav/jsx-child-shift-gap-scan. Each `<` of `<<`
+    // in the first three lines opens an error-recovery JsxSelfClosingElement
+    // whose other children are zero-width, so the `<` is found by scanning,
+    // and the scanner reads `<<`. The pinned answers (native capture of that
+    // case) are the width-1 `<`: unrescanned, the gap scan returns the element
+    // and the rightmost-token scan returns the width-2 `<<`.
+    let text = b"const a = <div><<</div>;\nconst b = <>{1}<<</>;\nconst c = <a><<b/></a>;\n\
+        type F = A<<T>() => T>;\nlet g = f<<T>(x: T) => T>(y);\n";
+    let (file, root) = parse(b"/a.tsx", text, tsr_core::ScriptKind::TSX);
+    let mut provider = tsr_parser::ParserJsDocProvider::default();
+    let mut navigator = Navigator::new(file.view(), root, &mut provider);
+    let parent_kind = |token: NodeId| {
+        let parent = file.view().node(token).unwrap().parent().unwrap();
+        file.view().node(parent).unwrap().kind().known().unwrap()
+    };
+    for start in [15, 16, 40, 41, 60] {
+        let expected = Some((K::LessThanToken, start, start + 1));
+        // getTokenAtPosition's scan between the children of the element.
+        let token = navigator.get_token_at_position(i64::from(start)).unwrap();
+        assert_eq!(describe(&file, Some(token)), expected, "token at {start}");
         assert_eq!(
-            [
-                before,
-                i64::from(after as u16),
-                scanner.token_start(),
-                scanner.token_end(),
-                i64::from(scanner.token_flags())
-            ],
-            expected.as_slice(),
-            "native navigation rescan row {line}"
+            parent_kind(token),
+            K::JsxSelfClosingElement,
+            "the scanned token's containing node at {start}"
+        );
+        // findRightmostValidToken's scan after the element's last child.
+        let preceding = navigator
+            .find_preceding_token(i64::from(start) + 1)
+            .unwrap();
+        assert_eq!(
+            describe(&file, preceding),
+            expected,
+            "preceding {}",
+            start + 1
+        );
+    }
+    // The last two lines scan a `<<` whose containing node is not a JSX child
+    // (the `<` of type arguments before a generic function type), where the
+    // pinned answers keep the unrescanned `<<`: the gap scan's `<<` overruns
+    // the next child, so the containing node is returned, and the
+    // rightmost-token scan returns the width-2 `<<`. A predicate that ignored
+    // the containing node would answer a width-1 `<` at both.
+    for (start, container, container_range) in [
+        (81, K::TypeReference, (79, 93)),
+        (104, K::CallExpression, (102, 123)),
+    ] {
+        let token = navigator.get_token_at_position(i64::from(start)).unwrap();
+        assert_eq!(
+            describe(&file, Some(token)),
+            Some((container, container_range.0, container_range.1)),
+            "token at {start}"
+        );
+        let preceding = navigator
+            .find_preceding_token(i64::from(start) + 1)
+            .unwrap();
+        assert_eq!(
+            describe(&file, preceding),
+            Some((K::LessThanLessThanToken, start, start + 2)),
+            "preceding {}",
+            start + 1
+        );
+        assert_eq!(
+            parent_kind(preceding.unwrap()),
+            container,
+            "the scanned token's containing node at {}",
+            start + 1
         );
     }
 }

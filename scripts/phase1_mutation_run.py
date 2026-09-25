@@ -3,7 +3,7 @@
 
 docs/PHASE1-mutation-witnesses.md is the contract. This module runs the Rust
 side of every oracle and owns the Rust half of the evidence. The ``e1``,
-``binder`` and ``facts`` oracles are ``phase1_mutation_driver``
+``binder``, ``facts`` and ``table`` oracles are ``phase1_mutation_driver``
 (tools/phase1/mutation/driver); the ``syntax`` oracle is the ``phase1_syntax``
 harness in its mutation mode (``PHASE1_MUTATION=trace|kill``). Both speak one
 protocol (tools/phase1/mutation/driver/src/jobs.rs).
@@ -45,6 +45,16 @@ protocol (tools/phase1/mutation/driver/src/jobs.rs).
   killed. A mutant that is not killed and that some traced oracle did not run
   (``not_run``; skipped mutants carry ``skipped_by``) or did not finish
   (``budget``) makes the results ``partial``: those states are not final.
+* The ``table`` oracle adds two rules (docs section 9). **Column parity**: a
+  kill on a row of column C credits only while every row of C matches native
+  in the base trace (``kill`` records each column's parity, ``results`` keeps
+  it, ``confirm`` re-traces it). **One home per table operation**: an
+  operation a table column claims (``data/phase1/tables/<group>.json``) has no
+  excusable home on any oracle, so an extra marked copy must be reached and
+  killed or lose its marker. ``results`` writes that set as
+  ``one_home_operations`` and the scope check applies the same set to every
+  mutation witness; an operation a column credits only through its callee
+  keeps the ordinary excusal rule.
 * ``confirm`` splices the full manifest (the campaign's mutant ids), replays
   every recorded kill pair and its control plus the pairs' base rows, requires
   each pair to reproduce its recorded stages and digests, re-traces every
@@ -85,9 +95,13 @@ DEFAULT_OUT = TARGET / "run"
 DRIVER = "phase1_mutation_driver"
 SYNTAX = "phase1_syntax"
 # The Rust binary of each oracle.
-PACKAGES = {"e1": DRIVER, "binder": DRIVER, "facts": DRIVER, "syntax": SYNTAX}
+PACKAGES = {"e1": DRIVER, "binder": DRIVER, "facts": DRIVER, "syntax": SYNTAX, "table": DRIVER}
 # Oracles whose kill rows are re-run with their frames dumped.
-DUMPING = ("binder", "facts", "syntax")
+DUMPING = ("binder", "facts", "syntax", "table")
+# Oracles whose rows belong to columns: a kill credits only on a column whose
+# every row matches native (column parity), and an operation a column claims
+# has one home, never an excused one.
+COLUMN_ORACLES = ("table",)
 VERSION = 1
 # Release semantics without fat LTO: one schemata build serves every mutant.
 BUILD_ENV = {"CARGO_PROFILE_RELEASE_LTO": "false", "CARGO_PROFILE_RELEASE_CODEGEN_UNITS": "16"}
@@ -116,6 +130,9 @@ NON_FINAL_STATES = ("budget", "not_run")
 # markers for several operations made the difference, so such a site is never
 # credited there.
 WHOLE_PROGRAM_ORACLES = ("syntax",)
+ONE_HOME_REASON = ("one home per table operation: a table column claims this operation, so a marked copy "
+                   "that no traced oracle reaches is never excused; it must be reached and killed or lose "
+                   "its marker")
 
 
 def file_sha256(path):
@@ -217,13 +234,30 @@ def frame_digests(oracle, frames):
     """One row's outcomes and compared digests, by ``phase1_mutation_go.row_digests``.
 
     E1 and binder frames are the example protocol's; a syntax row's frame is its
-    schedule row; facts frames are driver session frames, turned into the row
-    shape of the Go facts driver (outcomes plus the node list).
+    schedule row; facts and table frames are driver session frames, turned into
+    the row shape of the Go facts or table driver (outcomes plus the node list
+    or the column value).
     """
     if oracle == "syntax":
         if len(frames) != 1:
             raise ValueError("a syntax row has exactly one frame")
         return go.row_digests("syntax", frames[0])
+    if oracle == "table":
+        spec = go.oracle_spec("table")
+        outcomes, messages, record = {}, {}, {"row": frames[0].get("id")}
+        for frame in frames:
+            if frame["tag"] == "stage":
+                outcomes[frame["stage"]] = frame["outcome"]
+                if frame["outcome"] != "ok":
+                    messages[frame["stage"]] = frame["message_hex"]
+            elif frame["tag"] == "observation" and frame["stage"] == "column":
+                if "value" in record:
+                    raise ValueError("a table row observes one column value")
+                record["value"] = frame["value"]
+        record["outcomes"] = {stage: outcomes.get(stage, "not_run") for stage in spec.operations}
+        if messages:
+            record["messages"] = messages
+        return go.row_digests("table", record)
     if oracle == "facts":
         spec = go.oracle_spec("facts")
         outcomes, messages, pairs = {}, {}, None
@@ -246,6 +280,58 @@ def frame_digests(oracle, frames):
 
 def read_frames(path):
     return [json.loads(line) for line in Path(path).read_bytes().splitlines() if line.strip()]
+
+
+# ---------------------------------------------------------------------------
+# table columns
+
+def row_columns(requests):
+    """{row id: column} of a materialized table request file."""
+    columns = {}
+    for line in Path(requests).read_bytes().splitlines():
+        if line.strip():
+            request = strict_json_loads(line)
+            columns[request["id"]] = request["column"]
+    return columns
+
+
+def column_parity(column_of, rows, natives=None):
+    """{column: {rows, base_match, mismatched}} over trace rows (``base_match``)
+    or, with ``natives`` ({row: native row}), over rows compared here."""
+    parity = {}
+    for row in rows:
+        column = column_of[row["row"]]
+        entry = parity.setdefault(column, {"rows": 0, "base_match": 0, "mismatched": []})
+        entry["rows"] += 1
+        if natives is None:
+            matched = row["base_match"]
+        else:
+            native = natives[row["row"]]
+            matched = (not row.get("error") and row["outcomes"] == native["outcomes"]
+                       and row["digests"] == native["digests"] and row.get("messages") == native.get("messages"))
+        entry["base_match"] += bool(matched)
+        if not matched and len(entry["mismatched"]) < 20:
+            entry["mismatched"].append(row["row"])
+    return dict(sorted(parity.items()))
+
+
+def parity_gate(column_of, parity):
+    """The column-parity rule as a kill gate: the reason a row cannot be credited, or None."""
+    def gate(row):
+        column = column_of[row]
+        entry = parity[column]
+        if entry["base_match"] != entry["rows"]:
+            return (f"column {column} differs from native on {entry['rows'] - entry['base_match']} of its "
+                    f"{entry['rows']} rows (first {entry['mismatched'][:3]}): column parity fails")
+        return None
+    return gate
+
+
+def table_operations(columns):
+    """The operations the table specs claim for these columns: they have one home each."""
+    import phase1_tables
+    claims = {column["id"]: column["operations"] for _, column in phase1_tables.columns(phase1_tables.load_specs())}
+    return sorted({op for column in columns for op in claims.get(column, ())})
 
 
 # ---------------------------------------------------------------------------
@@ -501,7 +587,10 @@ def mutant_jobs(mutant, candidate_rows, rows, reach, max_kills, max_rows=0):
         groups = [candidate_rows] if candidate_rows else []
     else:
         groups = [[index for index in candidate_rows if index in reach.get(op, ())] for op in ops]
-        groups = [group for group in groups if group]
+        # Operations Go entered on the same rows share one job: two identical
+        # jobs would dump the same (mutant, row) files, and crediting the first
+        # removes the second's.
+        groups = [group for position, group in enumerate(groups) if group and group not in groups[:position]]
     jobs = []
     for group in groups:
         job = {"mutant": mutant["id"], "rows": [rows[index]["row"] for index in group[:max_rows or None]],
@@ -802,12 +891,12 @@ def _dumps(result):
     return [path for path in (result.get("dump"), (result.get("control") or {}).get("dump")) if path]
 
 
-def _kill_entry(mutant, record, rows_by_id, natives, reach, oracle, keep_dumps):
+def _kill_entry(mutant, record, rows_by_id, natives, reach, oracle, keep_dumps, gate=None):
     """The credited kills and notes of one job record."""
     kills, notes, crash_rows = [], [], []
     for result in record["results"]:
         try:
-            kill_row, note = _credit(mutant, record, result, rows_by_id, natives, reach, oracle)
+            kill_row, note = _credit(mutant, record, result, rows_by_id, natives, reach, oracle, gate)
         finally:
             if not keep_dumps:
                 for path in _dumps(result):
@@ -821,11 +910,17 @@ def _kill_entry(mutant, record, rows_by_id, natives, reach, oracle, keep_dumps):
     return kills, notes, crash_rows
 
 
-def _credit(mutant, record, result, rows_by_id, natives, reach, oracle):
-    """(kill, None) when one reported row is a creditable kill, else (None, note or None)."""
+def _credit(mutant, record, result, rows_by_id, natives, reach, oracle, gate=None):
+    """(kill, None) when one reported row is a creditable kill, else (None, note or None).
+
+    ``gate`` (the table oracle's column parity) names why a row cannot be
+    credited at all.
+    """
     row = result["row"]
     if result["crash"] or not result["differs"]:
         return None, None
+    if gate is not None and (reason := gate(row)):
+        return None, reason
     control = result.get("control")
     if mutant.get("control") is not None and control is None:
         return None, "no control run for an allocating mutant"
@@ -950,6 +1045,12 @@ def kill(oracle, ws=None, plan=None, trace=None, go_reach=None, jobs=None, out=N
     rows = trace_document["rows"]
     rows_by_id = {row["row"]: (index, row) for index, row in enumerate(rows)}
     natives = native_document["rows"]
+    parity, gate, one_home = None, None, None
+    if oracle in COLUMN_ORACLES:
+        column_of = row_columns(requests)
+        parity = column_parity(column_of, rows)
+        gate = parity_gate(column_of, parity)
+        one_home = table_operations(parity)
     selected = [mutant for mutant in plan_document["mutants"]
                 if not is_control(mutant) and (mutants is None or mutant["id"] in mutants)]
     skip_keys, skip_settings = skip_source(skip_killed) if skip_killed else (set(), None)
@@ -1004,7 +1105,7 @@ def kill(oracle, ws=None, plan=None, trace=None, go_reach=None, jobs=None, out=N
         kills, notes, crash_rows = [], [], []
         for record in mutant_records:
             found, record_notes, record_crashes = _kill_entry(mutant, record, rows_by_id, natives, reach, oracle,
-                                                              keep_dumps)
+                                                              keep_dumps, gate)
             kills += [kill_row for kill_row in found if kill_row["row"] not in {row["row"] for row in kills}]
             notes += record_notes
             crash_rows += record_crashes
@@ -1060,6 +1161,13 @@ def kill(oracle, ws=None, plan=None, trace=None, go_reach=None, jobs=None, out=N
                     "seconds": round(time.monotonic() - started, 1)},
         "mutants": entries,
     }
+    if parity is not None:
+        # Column parity of the base trace (every kill on a column that is not
+        # at parity was refused) and the operations with one home each.
+        document["columns"] = parity
+        document["one_home_operations"] = one_home
+        document["summary"]["columns_diverging"] = sorted(column for column, entry in parity.items()
+                                                          if entry["base_match"] != entry["rows"])
     path = out / f"kill-{oracle}.json.gz"
     write_gzip(path, document)
     return {"oracle": oracle, "path": str(path), "file_sha256": file_sha256(path), **document["summary"]}
@@ -1137,6 +1245,11 @@ def results(plan, kill_files, out=None):
             raise ValueError(f"{path} has no reach table; re-run kill")
         campaigns[document["oracle"]] = (Path(path), document)
     traced = sorted(campaigns)
+    # Column parity per column oracle, and the operations that have one home
+    # each (a table column claims them): no home of theirs is ever excused.
+    columns = {oracle: document["columns"] for oracle, (_, document) in sorted(campaigns.items())
+               if "columns" in document}
+    one_home = sorted({op for _, document in campaigns.values() for op in document.get("one_home_operations") or ()})
     per_mutant = defaultdict(dict)
     skipped_by = defaultdict(dict)
     for oracle, (_, document) in campaigns.items():
@@ -1195,12 +1308,14 @@ def results(plan, kill_files, out=None):
             observed = any(isinstance(entry, list) and len(entry) == 3 and entry[2] > 0
                            for oracle in traced for entry in reaches[oracle])
             killed = any(op in kill_row["ops"] for key in keys for kill_row in by_key[key]["kills"])
-            excused = (bool(keys) and bool(traced) and measured == traced and not reached and not observed
-                       and not killed)
+            excusable = (bool(keys) and bool(traced) and measured == traced and not reached and not observed
+                         and not killed)
+            excused = excusable and op not in one_home
+            why = {"reason": reason} if excused else {"reason": ONE_HOME_REASON} if excusable else {}
             evaluated.append({**{field: home.get(field) for field in ("file", "function", "site_kind", "site_line",
                                                                       "span_sha256")},
                               "mutants": keys, "reached": reached, "observed": observed, "killed": killed,
-                              "measured": measured, "excused": excused, **({"reason": reason} if excused else {})})
+                              "measured": measured, "excused": excused, **why})
         state = _op_state(evaluated, states)
         summary[state] += 1
         operations[op] = {
@@ -1226,6 +1341,9 @@ def results(plan, kill_files, out=None):
         "unsupported": plan_document["unsupported"],
         "operations": operations,
     }
+    if columns:
+        document["columns"] = columns
+        document["one_home_operations"] = one_home
     out = Path(out) if out else DEFAULT_OUT / "results.json.gz"
     write_gzip(out, document)
     return {"path": str(out), "file_sha256": file_sha256(out), **document["summary"]}
@@ -1282,7 +1400,8 @@ def confirm(results_path, plan=None, *, root=ROOT, ws=None, drivers=None, reques
     (and its control's digests, with a stage where the mutant differs from
     native and from its control); each base row must equal native; no mutant of
     an excused home may be executed, while producing or while observing, on any
-    row of any traced oracle. A mutant whose span changed since
+    row of any traced oracle; and on a column oracle every row of a column with
+    a recorded kill must still equal native (column parity). A mutant whose span changed since
     planning cannot be spliced: its pairs are ``stale`` failures, and a stale
     excused home fails the receipt too. Returns the receipt, with the per-pair
     list ``pairs``.
@@ -1444,6 +1563,20 @@ def confirm(results_path, plan=None, *, root=ROOT, ws=None, drivers=None, reques
                                          else "an excused home executes while observing"})
             trace_summary[oracle] = {"rows": len(traced_rows), "mutants_reached": len(hit),
                                      "mutants_observed": len(observed)}
+            if oracle in COLUMN_ORACLES:
+                # Column parity holds on the replay too: every row of a column
+                # with a recorded kill still equals native.
+                column_of = row_columns(request_file)
+                parity = column_parity(column_of, traced_rows, native_rows)
+                for column in sorted({column_of[kill_row["row"]] for _, kill_row in recorded}):
+                    entry = parity[column]
+                    if entry["base_match"] != entry["rows"]:
+                        failures.append({"oracle": oracle, "column": column, "rows": entry["rows"],
+                                         "base_match": entry["base_match"], "first": entry["mismatched"][:5],
+                                         "failure": "a column with a recorded kill no longer equals native on "
+                                                    "every row (column parity)"})
+                trace_summary[oracle]["columns_diverging"] = sorted(
+                    column for column, entry in parity.items() if entry["base_match"] != entry["rows"])
     reproduced = sum(pair["state"] == "reproduced" for pair in pairs)
     for pair in pairs:
         if pair["state"] != "reproduced":

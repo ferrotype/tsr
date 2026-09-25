@@ -3,11 +3,11 @@
   "complete": true,
   "exempt_by_category": {
     "go_test_harness": 17,
-    "later_step": 24,
     "unused_at_pin": 4
   },
-  "exempt_operations": 45,
+  "exempt_operations": 21,
   "gap_problems": [],
+  "later_step_unresolved": 0,
   "outputs": {
     "complete": true,
     "exact_outputs": 167,
@@ -22,5 +22,5 @@
   "step": "config",
   "total_operations": 402,
   "version": 2,
-  "witnessed_operations": 45
+  "witnessed_operations": 69
 }

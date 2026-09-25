@@ -342,8 +342,7 @@ fn checker_host_retains_program_and_preserves_foreign_source_and_vfs_errors() {
         Err(Error::Arena(tsr_arena::Error::WrongOwner))
     );
     assert_eq!(host.file_exists(b"loop"), Err(tsr_vfs::Error::SymlinkCycle));
-    // Project references are rejected before files load, so the native lookup
-    // is an empty one rather than an unported boundary.
+    // A program without references has empty reference lookups.
     assert!(host
         .get_redirect_for_resolution(b"main.ts")
         .unwrap()
@@ -354,4 +353,174 @@ fn checker_host_retains_program_and_preserves_foreign_source_and_vfs_errors() {
         .is_none());
     drop(host);
     assert!(weak.upgrade().is_none());
+}
+
+#[test]
+fn checker_host_reads_project_references_and_their_options() {
+    struct Host(Arc<dyn tsr_vfs::FileSystem>);
+    impl tsr_tsoptions::ParseConfigHost for Host {
+        fn fs(&self) -> &dyn tsr_vfs::FileSystem {
+            self.0.as_ref()
+        }
+        fn current_directory(&self) -> &[u8] {
+            b"/src"
+        }
+        fn resolve_config(&self, _: &[u8], _: &[u8]) -> Result<Option<JsString>, tsr_vfs::Error> {
+            unreachable!("fixture has no config inheritance")
+        }
+        fn resolve_content_mapper(
+            &self,
+            _: &[u8],
+            _: &[u8],
+        ) -> Result<tsr_tsoptions::config_mappers::MapperResolution, tsr_vfs::Error> {
+            unreachable!("fixture has no content mappers")
+        }
+    }
+    let mut fs = MemoryBuilder::new(b"/src", true);
+    for (name, text) in [
+        (
+            b"/src/tsconfig.json".as_slice(),
+            br#"{"compilerOptions":{"noLib":true,"module":"esnext"},"files":["main.ts"],"references":[{"path":"./lib"}]}"#.as_slice(),
+        ),
+        (b"/src/main.ts", b"import { a } from './lib/a';"),
+        (
+            b"/src/lib/tsconfig.json",
+            br#"{"compilerOptions":{"composite":true,"module":"nodenext"}}"#,
+        ),
+        (b"/src/lib/a.ts", b"import { b } from './b';\nexport const a = 1;"),
+        (
+            b"/src/lib/a.d.ts",
+            b"import { b } from './b';\nexport declare const a = 1;",
+        ),
+    ] {
+        fs.insert_loaded(name, text);
+    }
+    let host = Host(Arc::new(fs.finish()));
+    let config = tsr_tsoptions::get_parsed_command_line_of_config_file(
+        b"/src/tsconfig.json",
+        &CompilerOptions::default(),
+        &tsr_tsoptions::ConfigValue::Null,
+        &host,
+    )
+    .unwrap()
+    .command_line
+    .unwrap();
+    let program = Arc::new(
+        Program::load(
+            ProgramOptions {
+                config,
+                host: host.0,
+                current_directory: JsString::from_bytes(b"/src".as_slice()),
+                default_library_path: JsString::from_bytes(b"/lib".as_slice()),
+                skip_module_resolution: false,
+            },
+            &mut FileCache::new(),
+            &Counters::new(),
+        )
+        .unwrap(),
+    );
+    let host = ProgramCheckerHost::new(program);
+    let name = |config: Option<&ParsedCommandLine>| config.map(ParsedCommandLine::config_name);
+    let lib = Some(JsString::from_bytes(b"/src/lib/tsconfig.json".as_slice()));
+    assert_eq!(
+        name(
+            host.get_project_reference_from_output_dts(b"lib/a.d.ts")
+                .unwrap()
+        ),
+        lib
+    );
+    assert_eq!(
+        name(
+            host.get_project_reference_from_source(b"/src/lib/a.ts")
+                .unwrap()
+        ),
+        lib
+    );
+    assert_eq!(
+        name(
+            host.get_redirect_for_resolution(b"/src/lib/a.d.ts")
+                .unwrap()
+        ),
+        lib
+    );
+    assert_eq!(
+        name(host.get_redirect_for_resolution(b"/src/main.ts").unwrap()),
+        None
+    );
+    // The resolved source is in the program as its output.
+    let output = host.get_source_file(b"/src/lib/a.d.ts").unwrap();
+    assert!(std::ptr::eq(
+        host.get_source_file_for_resolved_module(b"/src/lib/a.ts")
+            .unwrap(),
+        output
+    ));
+    // Each format and mode accessor reads the options for its file: the
+    // output follows the reference's nodenext options and the program's own
+    // file the program's esnext ones. Pinned Go (Program accessors, and
+    // getModeForUsageLocation of a synthetic `tslib` import for the helpers):
+    //   lib/a.d.ts: implied=1 emitFormat=1 emitSyntax=1 mode=1 default=1 helpers=1
+    //   main.ts:    implied=0 emitFormat=99 emitSyntax=99 mode=99 default=0 helpers=99
+    for (file, specifier, [implied, format, syntax, mode, default, helpers]) in [
+        (
+            b"/src/lib/a.d.ts".as_slice(),
+            b"./b".as_slice(),
+            [ModuleKind::COMMON_JS; 6],
+        ),
+        (
+            b"/src/main.ts",
+            b"./lib/a",
+            [
+                ModuleKind::NONE,
+                ModuleKind::ESNEXT,
+                ModuleKind::ESNEXT,
+                ModuleKind::ESNEXT,
+                ModuleKind::NONE,
+                ModuleKind::ESNEXT,
+            ],
+        ),
+    ] {
+        let location = usage(host.get_source_file(file).unwrap(), specifier);
+        assert_eq!(host.get_implied_node_format_for_emit(file), Ok(implied));
+        assert_eq!(host.get_emit_module_format_of_file(file), Ok(format));
+        assert_eq!(
+            host.get_emit_syntax_for_usage_location(file, location),
+            Ok(syntax)
+        );
+        assert_eq!(host.get_mode_for_usage_location(file, location), Ok(mode));
+        assert_eq!(host.get_default_resolution_mode_for_file(file), Ok(default));
+        assert_eq!(host.get_import_helpers_resolution_mode(file), Ok(helpers));
+    }
+    // A referenced source is named by its output first (GetEachFileNameOfModule).
+    let paths = host
+        .get_module_specifier_paths(b"/src/main.ts", b"/src/lib/a.ts")
+        .unwrap();
+    let paths: Vec<_> = paths
+        .iter()
+        .map(|path| (path.file_name.as_bytes(), path.is_redirect))
+        .collect();
+    assert_eq!(
+        paths,
+        [
+            (b"/src/lib/a.d.ts".as_slice(), true),
+            (b"/src/lib/a.ts".as_slice(), false)
+        ]
+    );
+    // The module's own file is the included output, which the pin names by its
+    // source first (GetModuleSpecifiersWithInfo), so the paths are the same.
+    let from_output = host
+        .get_module_specifier_paths(b"/src/main.ts", b"/src/lib/a.d.ts")
+        .unwrap();
+    assert_eq!(
+        from_output
+            .iter()
+            .map(|path| (path.file_name.as_bytes(), path.is_redirect))
+            .collect::<Vec<_>>(),
+        paths
+    );
+    // An output importer's source directory drives tsr_checker's sort, which
+    // cannot see it, so the host refuses.
+    assert!(matches!(
+        host.get_module_specifier_paths(b"/src/lib/a.d.ts", b"/src/main.ts"),
+        Err(Error::Unsupported(_))
+    ));
 }

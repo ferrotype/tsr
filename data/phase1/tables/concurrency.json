@@ -1,0 +1,499 @@
+{
+  "columns": [
+    {
+      "evidence": [
+        "internal/lsp/server.go:981",
+        "internal/testutil/projecttestutil/projecttestutil.go:281",
+        "internal/project/checkerpool.go:125",
+        "internal/api/session.go:623",
+        "internal/api/session.go:640",
+        "internal/api/session.go:3992"
+      ],
+      "id": "core.RequestContext",
+      "input": "values",
+      "operations": [
+        "tsc/internal/core/context.go:WithRequestID",
+        "tsc/internal/core/context.go:GetRequestID",
+        "tsc/internal/core/context.go:WithCheckerLifetime",
+        "tsc/internal/core/context.go:GetCheckerLifetime"
+      ],
+      "projection": "each Get's result as operations derive one context: the request id hex, the checker lifetime",
+      "rust": "tsr_core::context::RequestContext",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "ops": [
+              {
+                "op": "get_request_id"
+              },
+              {
+                "op": "get_checker_lifetime"
+              },
+              {
+                "id": "r1",
+                "op": "with_request_id"
+              },
+              {
+                "op": "get_request_id"
+              },
+              {
+                "lifetime": 2,
+                "op": "with_checker_lifetime"
+              },
+              {
+                "op": "get_checker_lifetime"
+              },
+              {
+                "id": "",
+                "op": "with_request_id"
+              },
+              {
+                "op": "get_request_id"
+              },
+              {
+                "lifetime": 1,
+                "op": "with_checker_lifetime"
+              },
+              {
+                "op": "get_checker_lifetime"
+              },
+              {
+                "id": "r2",
+                "op": "with_request_id"
+              },
+              {
+                "op": "get_request_id"
+              }
+            ]
+          },
+          "name": "ops"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/core/bfs.go:58",
+        "internal/project/projectcollection.go:252",
+        "internal/project/projectcollectionbuilder.go:921",
+        "internal/core/bfs.go:120",
+        "internal/core/bfs.go:124"
+      ],
+      "id": "core.BreadthFirstSearchParallel",
+      "input": "values",
+      "operations": [
+        "tsc/internal/core/bfs.go:BreadthFirstSearchParallel",
+        "tsc/internal/core/bfs.go:BreadthFirstSearchParallelEx",
+        "tsc/internal/core/bfs.go:updateMin"
+      ],
+      "projection": "[stopped, path hex from the found node to the start] per graph; visit reports the graph's results and stops",
+      "rust": "tsr_core::bfs::breadth_first_search_parallel",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "graphs": [
+              {
+                "edges": {
+                  "a": [
+                    "b",
+                    "c"
+                  ],
+                  "b": [
+                    "d"
+                  ],
+                  "c": [
+                    "d",
+                    "e"
+                  ],
+                  "d": [],
+                  "e": [
+                    "f"
+                  ]
+                },
+                "start": "a",
+                "stops": [
+                  "d"
+                ]
+              },
+              {
+                "edges": {
+                  "a": [
+                    "b",
+                    "c"
+                  ],
+                  "b": [
+                    "d"
+                  ],
+                  "c": [
+                    "d",
+                    "e"
+                  ],
+                  "d": [],
+                  "e": [
+                    "f"
+                  ]
+                },
+                "results": [
+                  "c",
+                  "e"
+                ],
+                "start": "a"
+              },
+              {
+                "edges": {
+                  "a": [
+                    "b",
+                    "c"
+                  ],
+                  "b": [
+                    "d"
+                  ],
+                  "c": [
+                    "d",
+                    "e"
+                  ],
+                  "d": [],
+                  "e": [
+                    "f"
+                  ]
+                },
+                "start": "a",
+                "stops": [
+                  "a"
+                ]
+              },
+              {
+                "edges": {
+                  "a": [
+                    "b"
+                  ],
+                  "b": [
+                    "a"
+                  ]
+                },
+                "start": "a"
+              },
+              {
+                "edges": {
+                  "a": [
+                    "b",
+                    "c"
+                  ],
+                  "b": [
+                    "d"
+                  ],
+                  "c": [
+                    "d",
+                    "e"
+                  ],
+                  "d": [],
+                  "e": [
+                    "f"
+                  ]
+                },
+                "start": "a",
+                "stops": [
+                  "c",
+                  "b"
+                ]
+              },
+              {
+                "edges": {
+                  "a": [
+                    "b",
+                    "c"
+                  ],
+                  "b": [
+                    "d"
+                  ],
+                  "c": [
+                    "d",
+                    "e"
+                  ],
+                  "d": [],
+                  "e": [
+                    "f"
+                  ]
+                },
+                "results": [
+                  "b"
+                ],
+                "start": "a",
+                "stops": [
+                  "f"
+                ]
+              }
+            ]
+          },
+          "name": "graphs"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/core/bfs.go:58",
+        "internal/project/projectcollection.go:252",
+        "internal/project/projectcollectionbuilder.go:921",
+        "internal/api/session.go:1130",
+        "internal/api/session.go:1144",
+        "internal/api/session.go:1160"
+      ],
+      "id": "core.BreadthFirstSearchParallelEx",
+      "input": "values",
+      "operations": [
+        "tsc/internal/core/bfs.go:BreadthFirstSearchParallelEx",
+        "tsc/internal/core/bfs.go:BreadthFirstSearchLevel.Has",
+        "tsc/internal/core/bfs.go:BreadthFirstSearchLevel.Delete",
+        "tsc/internal/core/bfs.go:BreadthFirstSearchLevel.Range",
+        "tsc/internal/core/bfs.go:updateMin"
+      ],
+      "projection": "[stopped, path hex, [per level: [the nodes Range read hex, Has]]] per graph, keyed by a node prefix, with a preseeded visited set and a PreprocessLevel that records and prunes each level; which job reaches a key first is the level order, never scheduling",
+      "rust": "tsr_core::bfs::breadth_first_search_parallel_ex",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "graphs": [
+              {
+                "edges": {
+                  "a": [
+                    "b1",
+                    "c1"
+                  ],
+                  "b1": [
+                    "d1",
+                    "d2"
+                  ],
+                  "c1": [
+                    "e1"
+                  ],
+                  "d1": [],
+                  "d2": [
+                    "f1"
+                  ],
+                  "e1": [],
+                  "f1": []
+                },
+                "key_len": 1,
+                "levels": [
+                  {
+                    "has": "a",
+                    "range": 5
+                  },
+                  {
+                    "delete": [
+                      "c"
+                    ],
+                    "has": "b",
+                    "range": 1
+                  },
+                  {
+                    "has": "zz",
+                    "range": 10
+                  }
+                ],
+                "start": "a",
+                "stops": [
+                  "f1"
+                ],
+                "visited": [
+                  "c"
+                ]
+              },
+              {
+                "edges": {
+                  "a": [
+                    "b1",
+                    "c1"
+                  ],
+                  "b1": [
+                    "d1",
+                    "d2"
+                  ],
+                  "c1": [
+                    "e1"
+                  ],
+                  "d1": [],
+                  "d2": [
+                    "f1"
+                  ],
+                  "e1": [],
+                  "f1": []
+                },
+                "levels": [
+                  {
+                    "has": "a",
+                    "range": 1
+                  },
+                  {
+                    "has": "c1",
+                    "range": 3
+                  }
+                ],
+                "start": "a",
+                "stops": [
+                  "f1",
+                  "e1"
+                ],
+                "visited": [
+                  "b1"
+                ]
+              },
+              {
+                "edges": {
+                  "a": [
+                    "b1",
+                    "c1"
+                  ],
+                  "b1": [
+                    "d1",
+                    "d2"
+                  ],
+                  "c1": [
+                    "e1"
+                  ],
+                  "d1": [],
+                  "d2": [
+                    "f1"
+                  ],
+                  "e1": [],
+                  "f1": []
+                },
+                "levels": [
+                  {},
+                  {
+                    "delete": [
+                      "b1"
+                    ],
+                    "has": "b1",
+                    "range": 2
+                  }
+                ],
+                "results": [
+                  "d1"
+                ],
+                "start": "a"
+              },
+              {
+                "edges": {
+                  "a": [
+                    "b",
+                    "c"
+                  ],
+                  "b": [
+                    "d"
+                  ],
+                  "c": [
+                    "d",
+                    "e"
+                  ],
+                  "d": [],
+                  "e": [
+                    "f"
+                  ]
+                },
+                "levels": [
+                  {},
+                  {
+                    "delete": [
+                      "b"
+                    ],
+                    "has": "c",
+                    "range": 2
+                  }
+                ],
+                "start": "a",
+                "stops": [
+                  "d"
+                ]
+              }
+            ]
+          },
+          "name": "graphs"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/project/ata/ata.go:286",
+        "internal/core/workgroup.go:39",
+        "internal/core/workgroup.go:109",
+        "internal/ipc/conn_async.go:98",
+        "internal/ipc/conn_async.go:108",
+        "internal/ls/autoimport/registry.go:886"
+      ],
+      "id": "core.ThrottleGroup",
+      "input": "values",
+      "operations": [
+        "tsc/internal/core/workgroup.go:NewThrottleGroup",
+        "tsc/internal/core/workgroup.go:ThrottleGroup.Go",
+        "tsc/internal/core/workgroup.go:ThrottleGroup.Wait"
+      ],
+      "projection": "[the jobs' values sorted, Wait's error hex or null, whether no more jobs than the limit ran at once] per case; at most one job fails, so the first error is scheduling-free",
+      "rust": "tsr_core::workgroup::ThrottleGroup",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "cases": [
+              {
+                "jobs": [
+                  {
+                    "value": 1
+                  },
+                  {
+                    "value": 2
+                  },
+                  {
+                    "value": 3
+                  }
+                ],
+                "limit": 1
+              },
+              {
+                "jobs": [
+                  {
+                    "value": 5
+                  },
+                  {
+                    "fail": true,
+                    "value": 4
+                  }
+                ],
+                "limit": 3
+              },
+              {
+                "jobs": [],
+                "limit": 2
+              },
+              {
+                "jobs": [
+                  {
+                    "value": 7
+                  },
+                  {
+                    "value": 8
+                  },
+                  {
+                    "value": 9
+                  },
+                  {
+                    "value": 10
+                  },
+                  {
+                    "value": 11
+                  }
+                ],
+                "limit": 4
+              }
+            ]
+          },
+          "name": "cases"
+        }
+      ]
+    }
+  ],
+  "group": "concurrency",
+  "version": 1
+}

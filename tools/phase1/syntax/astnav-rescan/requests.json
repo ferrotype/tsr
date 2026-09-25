@@ -1,1 +1,0 @@
-{"requests":[{"case":"shift-jsx","Text":"<< word\n tail", "JSX":true},{"case":"shift-ordinary","Text":"<< word\n tail", "JSX":false},{"case":"less-jsx","Text":"< word", "JSX":true},{"case":"shift-assign-jsx","Text":"<<=1", "JSX":true},{"case":"shift-close-jsx","Text":"<</p>", "JSX":true}]}

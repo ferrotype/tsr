@@ -1,23 +1,41 @@
 {
-  "accounted_operations": 460,
-  "complete": true,
+  "accounted_operations": 458,
+  "complete": false,
   "exempt_by_category": {
-    "build_tooling": 8,
+    "build_tooling": 11,
     "build_variant": 2,
-    "equivalent_rust": 8,
+    "equivalent_rust": 9,
     "generated_assertion": 6,
     "go_runtime": 12,
-    "later_step": 68,
-    "unused_at_pin": 4
+    "later_step": 9,
+    "unused_at_pin": 5
   },
-  "exempt_operations": 108,
+  "exempt_operations": 54,
   "gap_problems": [],
-  "pending": [],
+  "later_step_unresolved": 2,
+  "pending": [
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/semaphore.go:LimitedSemaphore.Acquire",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_core/src/semaphore.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/semaphore.go:NewLimitedSemaphore",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_core/src/semaphore.rs"
+      ]
+    }
+  ],
   "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
-  "prepared_operations": 342,
+  "prepared_operations": 347,
   "roster_problems": [],
   "step": "leaves",
   "total_operations": 460,
   "version": 2,
-  "witnessed_operations": 10
+  "witnessed_operations": 57
 }

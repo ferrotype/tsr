@@ -1,0 +1,431 @@
+{
+  "columns": [
+    {
+      "evidence": [
+        "internal/api/proto.go:1639",
+        "internal/api/proto.go:1599",
+        "internal/ast/diagnostic.go:121",
+        "internal/ast/diagnostic.go:129",
+        "internal/compiler/program.go:2057",
+        "internal/compiler/program.go:2060"
+      ],
+      "id": "ast.NewDiagnosticFromText",
+      "input": "values",
+      "operations": [
+        "tsc/internal/ast/diagnostic.go:NewDiagnosticFromText",
+        "tsc/internal/ast/diagnostic.go:Diagnostic.Localize",
+        "tsc/internal/ast/diagnostic.go:Diagnostic.String",
+        "tsc/internal/ast/diagnostic.go:Diagnostic.displayMessageArgs"
+      ],
+      "projection": "each case's diagnostic as [code, category, message key hex, [args hex], message text hex, reportsUnnecessary, reportsDeprecated, skippedOnNoEmit, chain length, related length, pos, end, String hex, [Localize hex in en, de, zh-CN]]",
+      "rust": "tsr_ast::Diagnostic::from_text",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "cases": [
+              {
+                "args_hex": [],
+                "category": 1,
+                "chain": false,
+                "code": 2304,
+                "deprecated": false,
+                "end": 5,
+                "key": "",
+                "pos": 0,
+                "related": false,
+                "skipped": false,
+                "source_hex": "",
+                "text_hex": "706c61696e2074657874",
+                "unnecessary": false
+              },
+              {
+                "args_hex": [],
+                "category": 0,
+                "chain": false,
+                "code": -1,
+                "deprecated": false,
+                "end": 2,
+                "key": "",
+                "pos": 2,
+                "related": false,
+                "skipped": false,
+                "source_hex": "",
+                "text_hex": "616420686f63207b307d",
+                "unnecessary": false
+              },
+              {
+                "args_hex": [],
+                "category": 2,
+                "chain": true,
+                "code": 1,
+                "deprecated": true,
+                "end": 9,
+                "key": "",
+                "pos": 3,
+                "related": true,
+                "skipped": false,
+                "source_hex": "",
+                "text_hex": "",
+                "unnecessary": true
+              },
+              {
+                "args_hex": [],
+                "category": 3,
+                "chain": false,
+                "code": 7,
+                "deprecated": false,
+                "end": -1,
+                "key": "",
+                "pos": -1,
+                "related": false,
+                "skipped": false,
+                "source_hex": "",
+                "text_hex": "54c3a4787420e29883",
+                "unnecessary": true
+              }
+            ],
+            "locales": [
+              "en",
+              "de",
+              "zh-CN"
+            ]
+          },
+          "name": "text"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/execute/incremental/snapshot.go:178",
+        "internal/execute/incremental/snapshot.go:221",
+        "internal/execute/incremental/snapshot.go:248",
+        "internal/execute/incremental/snapshot.go:280",
+        "internal/api/proto.go:1599",
+        "internal/ast/diagnostic.go:121"
+      ],
+      "id": "ast.NewDiagnosticFromSerialized",
+      "input": "values",
+      "operations": [
+        "tsc/internal/ast/diagnostic.go:NewDiagnosticFromSerialized",
+        "tsc/internal/ast/diagnostic.go:Diagnostic.Localize",
+        "tsc/internal/ast/diagnostic.go:Diagnostic.String",
+        "tsc/internal/ast/diagnostic.go:Diagnostic.displayMessageArgs"
+      ],
+      "projection": "each case's diagnostic as [code, category, message key hex, [args hex], message text hex, reportsUnnecessary, reportsDeprecated, skippedOnNoEmit, chain length, related length, pos, end, String hex, [Localize hex in en, de, zh-CN]]",
+      "rust": "tsr_ast::Diagnostic::from_serialized",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "cases": [
+              {
+                "args_hex": [
+                  "78"
+                ],
+                "category": 1,
+                "chain": false,
+                "code": 2304,
+                "deprecated": false,
+                "end": 2,
+                "key": "Cannot_find_name_0_2304",
+                "pos": 1,
+                "related": false,
+                "skipped": false,
+                "source_hex": "",
+                "text_hex": "",
+                "unnecessary": false
+              },
+              {
+                "args_hex": [],
+                "category": 1,
+                "chain": false,
+                "code": 2304,
+                "deprecated": false,
+                "end": 0,
+                "key": "Cannot_find_name_0_2304",
+                "pos": 0,
+                "related": false,
+                "skipped": false,
+                "source_hex": "",
+                "text_hex": "",
+                "unnecessary": false
+              },
+              {
+                "args_hex": [
+                  "61",
+                  "42"
+                ],
+                "category": 1,
+                "chain": true,
+                "code": 2339,
+                "deprecated": false,
+                "end": 0,
+                "key": "Property_0_does_not_exist_on_type_1_2339",
+                "pos": 0,
+                "related": true,
+                "skipped": true,
+                "source_hex": "",
+                "text_hex": "",
+                "unnecessary": false
+              },
+              {
+                "args_hex": [
+                  "79",
+                  "6578747261"
+                ],
+                "category": 0,
+                "chain": false,
+                "code": 9,
+                "deprecated": true,
+                "end": 8,
+                "key": "Cannot_find_name_0_2304",
+                "pos": 4,
+                "related": false,
+                "skipped": false,
+                "source_hex": "",
+                "text_hex": "",
+                "unnecessary": true
+              }
+            ],
+            "locales": [
+              "en",
+              "de",
+              "zh-CN"
+            ]
+          },
+          "name": "serialized"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/compiler/program.go:811",
+        "internal/compiler/program.go:1519",
+        "internal/contentmapper/hostimpl.go:1158",
+        "internal/api/proto.go:1599",
+        "internal/ast/diagnostic.go:121",
+        "internal/ast/diagnostic.go:129"
+      ],
+      "id": "ast.NewExternalDiagnostic",
+      "input": "values",
+      "operations": [
+        "tsc/internal/ast/diagnostic.go:NewExternalDiagnostic",
+        "tsc/internal/ast/diagnostic.go:Diagnostic.Localize",
+        "tsc/internal/ast/diagnostic.go:Diagnostic.String"
+      ],
+      "projection": "each case's diagnostic as [code, category, message key hex, [args hex], message text hex, reportsUnnecessary, reportsDeprecated, skippedOnNoEmit, chain length, related length, pos, end, String hex, [Localize hex in en, de, zh-CN]]",
+      "rust": "tsr_ast::Diagnostic::external",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "cases": [
+              {
+                "args_hex": [],
+                "category": 0,
+                "chain": false,
+                "code": 1234,
+                "deprecated": false,
+                "end": 3,
+                "key": "",
+                "pos": 1,
+                "related": false,
+                "skipped": false,
+                "source_hex": "65736c696e74",
+                "text_hex": "65787465726e616c206d657373616765",
+                "unnecessary": false
+              },
+              {
+                "args_hex": [],
+                "category": 1,
+                "chain": false,
+                "code": 0,
+                "deprecated": false,
+                "end": 0,
+                "key": "",
+                "pos": 0,
+                "related": false,
+                "skipped": false,
+                "source_hex": "",
+                "text_hex": "6e6f20736f75726365",
+                "unnecessary": false
+              }
+            ],
+            "locales": [
+              "en",
+              "de",
+              "zh-CN"
+            ]
+          },
+          "name": "external"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:3123",
+        "internal/checker/checker.go:4554",
+        "internal/checker/checker.go:5146",
+        "internal/checker/checker.go:8941",
+        "internal/checker/checker.go:9422"
+      ],
+      "id": "ast.NewDiagnosticChain",
+      "input": "values",
+      "operations": [
+        "tsc/internal/ast/diagnostic.go:NewDiagnosticChain"
+      ],
+      "projection": "each case's diagnostic as [code, category, message key hex, [args hex], message text hex, reportsUnnecessary, reportsDeprecated, skippedOnNoEmit, chain length, related length, pos, end, String hex, [Localize hex in en, de, zh-CN]]; the diagnostic is Cannot_find_name_0 with the case's arguments, chained to an ad hoc diagnostic where the case asks",
+      "rust": "tsr_ast::Diagnostic::chain",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "cases": [
+              {
+                "args_hex": [
+                  "6e"
+                ],
+                "category": 0,
+                "chain": false,
+                "code": 0,
+                "deprecated": false,
+                "end": 0,
+                "key": "",
+                "pos": 0,
+                "related": false,
+                "skipped": false,
+                "source_hex": "",
+                "text_hex": "",
+                "unnecessary": false
+              },
+              {
+                "args_hex": [
+                  "6d"
+                ],
+                "category": 1,
+                "chain": true,
+                "code": 17,
+                "deprecated": false,
+                "end": 6,
+                "key": "",
+                "pos": 2,
+                "related": true,
+                "skipped": false,
+                "source_hex": "",
+                "text_hex": "68656164",
+                "unnecessary": false
+              },
+              {
+                "args_hex": [
+                  "6b"
+                ],
+                "category": 0,
+                "chain": true,
+                "code": 18,
+                "deprecated": false,
+                "end": 0,
+                "key": "",
+                "pos": 0,
+                "related": false,
+                "skipped": false,
+                "source_hex": "",
+                "text_hex": "6865616432",
+                "unnecessary": false
+              }
+            ],
+            "locales": [
+              "en",
+              "de",
+              "zh-CN"
+            ]
+          },
+          "name": "chain"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/execute/incremental/programtosnapshot.go:380",
+        "internal/execute/incremental/programtosnapshot.go:391",
+        "internal/execute/incremental/programtosnapshot.go:428",
+        "internal/execute/incremental/snapshottobuildinfo.go:176",
+        "internal/checker/checker.go:15806",
+        "internal/checker/checker.go:15818"
+      ],
+      "id": "ast.Diagnostic.RepopulateInfo",
+      "input": "values",
+      "operations": [
+        "tsc/internal/ast/diagnostic.go:Diagnostic.RepopulateInfo",
+        "tsc/internal/ast/diagnostic.go:Diagnostic.SetRepopulateInfo"
+      ],
+      "projection": "[whether the info of a fresh ad hoc diagnostic is nil, [kind, module reference hex, mode, package name hex] after SetRepopulateInfo] per case",
+      "rust": "tsr_ast::Diagnostic::repopulate_info",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "cases": [
+              {
+                "args_hex": [],
+                "category": 1,
+                "chain": false,
+                "code": 4,
+                "deprecated": false,
+                "end": 2,
+                "key": "",
+                "pos": 1,
+                "related": false,
+                "skipped": false,
+                "source_hex": "2e2f6d6f64",
+                "text_hex": "706b67",
+                "unnecessary": false
+              },
+              {
+                "args_hex": [],
+                "category": 99,
+                "chain": false,
+                "code": 5,
+                "deprecated": false,
+                "end": 0,
+                "key": "",
+                "pos": 0,
+                "related": false,
+                "skipped": false,
+                "source_hex": "",
+                "text_hex": "",
+                "unnecessary": false
+              }
+            ],
+            "locales": [
+              "en",
+              "de",
+              "zh-CN"
+            ]
+          },
+          "name": "repopulate"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/compiler/emitter.go:52",
+        "internal/compiler/emitter.go:57",
+        "internal/compiler/emitter.go:85",
+        "internal/compiler/emitter.go:380",
+        "internal/compiler/emitter.go:575"
+      ],
+      "id": "ast.DiagnosticsCollection.GetDiagnostics",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/diagnostic.go:DiagnosticsCollection.GetDiagnostics"
+      ],
+      "projection": "[index, [[in the file, pos, end, code, args hex], ...]] of the source file: GetDiagnostics over one Cannot_find_name_0 diagnostic per top-level statement (the first 20, added last to first) and two global ones, in its sorted order",
+      "rust": "tsr_ast::diagnostic_api::DiagnosticsCollection::get_diagnostics",
+      "survey": true,
+      "synthetic": []
+    }
+  ],
+  "group": "diagnostics",
+  "version": 1
+}

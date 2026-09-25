@@ -205,3 +205,7 @@ pub(crate) fn token_is_identifier_or_keyword(kind: SyntaxKind) -> bool {
 pub(crate) fn token_is_identifier_or_keyword_or_greater_than(kind: SyntaxKind) -> bool {
     kind == SyntaxKind::GreaterThanToken || token_is_identifier_or_keyword(kind)
 }
+
+#[cfg(test)]
+#[path = "tokens_tests.rs"]
+mod tests;

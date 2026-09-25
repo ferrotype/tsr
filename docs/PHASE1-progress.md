@@ -15,7 +15,7 @@ moved pin invalidates it.
 | F2a — filesystem, path and matching tests | **pending Linux observation**: `filesystem_prepared: false`; 359 cases, 314 of 316 roster operations accounted for; all 142 baselines prepared (68 exact, 74 owner-approved exceptions). The Linux realpath case must observe `Realpath` and `ignoringEINTR`. |
 | F3a — config, command-line and resolution tests | **complete**: `config_prepared: true`; 486 cases, all 402 roster operations prepared, witnessed or exempted, and all 309 reference outputs prepared (F2a's 142 plus F3a's 167, all 167 exact) |
 | F4a — syntax, binder and utility coverage | **prepared, roster open**: every primary and expanded request accounted for; all 15,206 variants scheduled (15,152 observed, 54 on named boundaries). Review corrected source authentication, ordered requests and operation claims. F4b now passes all 83 utility cases and all 15,152 executable syntax variants. `syntax_prepared: false`: 2,803 of 3,617 operations still need exact witness attribution; this is separate from the implementation results below. |
-| F4b — syntax/binder implementation | **prepared production behavior implemented and validated**: 83/83 utility cases, 15,152/15,152 executable syntax variants, parser and binder primary parity 1.0. E1/binder evidence is refreshed; operation attribution and compiler disposition alignment remain for F5a, not claimed complete here. |
+| F4b — syntax/binder implementation | **prepared production behavior implemented and validated**: 83/83 utility cases, 15,152/15,152 executable syntax variants, parser and binder primary parity 1.0. E1/binder evidence was refreshed at `02009ce`; operation attribution and compiler disposition alignment remain for F5a, not claimed complete here. |
 | F5a — integration checks and the stage A review | not started |
 
 `python3 scripts/phase1.py inventory --check` computes this: it reports
@@ -2967,9 +2967,12 @@ on this macOS host. Full program syntax matches all 15,152 executable variants;
 the 54 native selection boundaries remain separate. Raw captures and receipts
 are preserved in `data/phase1/captures`, with hashes and replay instructions.
 
-The corrected operation audit has **1,365 pending entries**: 947 missing exact
-witnesses, 303 unverified implementation mappings, 92 unresolved later-step
-transfers and 23 ordinary reference-loading/configuration operations.
+At `02009ce` the corrected operation audit had **1,364 pending entries**: 947
+missing exact witnesses, 302 unverified implementation mappings, 92 unresolved
+later-step transfers and 23 ordinary reference-loading/configuration operations.
+The mutation-kill witnesses later brought the report at `d4e0cb1` to 582 (165
+missing witnesses, 302, 92 and 23); see
+[the mutation-witness record](PHASE1-mutation-witnesses.md).
 [The destination audit](PHASE1-F5b-destinations.md) distinguishes the latter from
 build scheduling, and supports 205 actual later-phase destinations against
 the accepted plan and pinned callers. These remaining entries prevent P1A/P1B
@@ -2979,7 +2982,9 @@ E1, binder and scanner records from the preceding checkpoint are retained as
 historical evidence after the reviewed production edits. No performance
 benchmark or threshold change was part of this review refresh.
 
-The reviewed `program`, `foundations`, `config` and `syntax` records are current.
+At `02009ce` the reviewed `program`, `foundations`, `config` and `syntax` records
+were current. Later source edits have made all four stale in
+`status/status.json`; they are re-recorded at the end of the phase.
 Integration and routed Rust witnesses report complete; all 309 config outputs
 and 15,152 syntax rows match. Program helpers and option verification pass, but
 loader parity remains 10,727/10,728 because of the named pre-existing
@@ -3018,3 +3023,40 @@ field and all 68 trace entries. Three native module-trace regressions also cover
 actual entry-versus-index selection, cold/warm caches and directory imports
 without `typesVersions`. The original full 10,727/10,728 result is historical;
 this bounded fix does not re-label it as a fresh full pass.
+
+## Phase 1 closure (2026-09-25)
+
+Pending operations fell from 566 at the start of phase B to **20**
+(`python3 scripts/phase1_coverage.py report`; no coverage problems). How:
+
+- **Ports and the table oracle.** 250 operations, most with callers only in
+  later phases, were ported where Rust lacked them and tabulated in 11 table
+  groups (198 columns, 8,490 rows, every column at native parity); see
+  [PHASE1-mutation-witnesses.md](PHASE1-mutation-witnesses.md) section 9.
+- **One consolidated mutation campaign** over five oracles (e1, binder, facts,
+  syntax, table): 1,094 of 1,112 planned operations killed, and `confirm` replays
+  all 9,860 recorded kill pairs against the final sources. The splicer gained a
+  `skip_statement` operator for unit statements, and markers on unmutable sites
+  moved to the statements that do the operation's work.
+- **Case claims.** The generated-AST cases now claim the shared runtime they
+  enter (the factory, counters, positions, child-visit helpers, `cloneNode`,
+  `updateNode` on each changed update, the visitor roles); the bind, line-map
+  and JSDoc-cache cases claim their `SourceFile` accessors; three new
+  parse-output cases witness `@import` reparsing, backtick-quoted `@param`
+  names and multi-line pragma line ends. All five families were recaptured
+  and recorded; natives were refrozen.
+- **equivalent_rust**, per the owner's 2026-09-25 decision, for 23
+  accessor-style operations (payload assertions, default arms, a struct-literal
+  constructor, a `Vec` push), each citing its caller-level witness.
+
+What remains (20):
+
+| Operations | Why | What would close it |
+| --- | --- | --- |
+| `NodeFactory.NewSyntheticExpression`, `UpdateSyntheticExpression`, `SyntheticExpression.Clone`, `.VisitEachChild` | deferred by design: the payload's `Type` belongs to the checker | an owner decision: an opaque type slot now, or a reviewed checker destination |
+| `SourceFile.ForEachChild`, `SourceFile.VisitEachChild`, `NodeVisitor.VisitSourceFile`, `visitToken`, `visitTopLevelStatements`, `liftToBlock`, `ModifierList.Clone` | no Phase 1 oracle walks or visits a whole `SourceFile` or clones a modifier list | generated-special SourceFile visit and clone actions |
+| `GetPragmaArgument`, `GetPragmaFromSourceFile`, `GetEmitModuleFormatOfFileWorker` | reached, but no oracle output observes their result (mutants survive) | a table column (the last two live in `tsr_compiler`) |
+| `Binder.bindSourceFileAsExternalModule`, `fileLoader.resolveTripleslashPathReference` | their only mutants crash downstream, and a crash is never a kill | a value-changing mutation site |
+| `fileLoader.resolveLibrary` | no sound operator for its return type; the `libReplacement` path is not exercised | a case with `libReplacement` |
+| `NewLimitedSemaphore`, `LimitedSemaphore.Acquire` | still a `later_step` roster exemption | a leaves case over the semaphore's bounds |
+| `nativepath.Realpath` | a Linux-only case | the Linux CI host capture |

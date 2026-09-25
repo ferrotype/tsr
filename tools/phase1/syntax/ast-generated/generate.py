@@ -33,6 +33,37 @@ def predicate_dispatch():
     return [(name, argument, rust_declarations[name]) for name, argument in declarations]
 
 
+AST = "tsc/internal/ast/ast.go:"
+
+
+def runtime_actions(shape, mode, actions):
+    """The typed actions with the shared runtime operations the probe enters:
+    the factory, its counters and node and list positions; the 'new'
+    snapshot's full child walk (Node.ForEachChild and the pinned body's visit
+    helpers; visitNodes only on a built list); updateNode on the changed
+    update; cloneNode; Node.VisitEachChild and the JSDoc tag's hand-written
+    visitor."""
+    listed = mode != "nil" and shape != "QualifiedName"
+    walk = [AST + "visit"] if shape != "Block" else []
+    if shape != "QualifiedName":
+        walk.append(AST + "visitNodeList")
+        if listed:
+            walk.append(AST + "visitNodes")
+    if shape == "JSDocParameterOrPropertyTag":
+        walk.append(AST + "forEachChild_JSDocParameterOrPropertyTag")
+    extra = {"new": [AST + "NewNodeFactory", AST + "NodeFactory.newNode", AST + "newNode", AST + "Node.Pos",
+                     AST + "Node.End", "tsc/internal/ast/ast_generated.go:Node.ForEachChild"]
+             + ([AST + "NodeList.Pos", AST + "NodeList.End"] if listed else []) + walk,
+             "children-stop": ["tsc/internal/ast/ast_generated.go:Node.ForEachChild"],
+             "update-changed": [AST + "updateNode"], "clone": [AST + "cloneNode"],
+             "visit-same": [AST + "Node.VisitEachChild"], "visit-replace": [AST + "Node.VisitEachChild"],
+             "counts": [AST + "NodeFactory.NodeCount", AST + "NodeFactory.TextCount"]}
+    if shape == "JSDocParameterOrPropertyTag":
+        for label in ("visit-same", "visit-replace"):
+            extra[label] = extra[label] + [AST + "visitEachChild_JSDocParameterOrPropertyTag"]
+    return {label: ops + [op for op in extra.get(label, []) if op not in ops] for label, ops in actions.items()}
+
+
 def document():
     schema = json.loads((ROOT / "data/s03/schema/ast.json").read_text())
     nodes = {row["name"]: row for row in schema["nodes"]}
@@ -64,10 +95,12 @@ def document():
             for mode in (("nil",) if shape == "QualifiedName" else ("nil", "empty", "nodes", "nil-element")):
                 for first in ((False, True) if shape == "JSDocParameterOrPropertyTag" else (False,)):
                     identity = f"syntax/generated-ast/{shape}/{int(absent)}-{mode}-{int(first)}"
+                    linked = runtime_actions(shape, mode, actions)
                     requests.append({"case": identity, "operation": claims[0], "subject": "generatedAst",
                         "shape": shape, "absent": absent, "list": mode, "name_first": first,
                         "actions": [{"op": name} for name in schedule],
-                        "operations": claims, "operation_actions": actions, "discriminates": "typed field wiring, update/clone identity and hooks, visitor ordering, nil/list behavior and subtree facts"})
+                        "operations": claims + sorted({op for ops in linked.values() for op in ops} - set(claims)),
+                        "operation_actions": linked, "discriminates": "typed field wiring, update/clone identity and hooks, visitor ordering, nil/list behavior and subtree facts"})
     upper = max(row["value"] for row in schema["kinds"]) + 1
     for name, argument, _ in predicate_dispatch():
         operation = prefix + name

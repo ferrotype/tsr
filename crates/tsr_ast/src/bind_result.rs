@@ -836,6 +836,7 @@ impl AstFile {
     /// dispatch to a reserved-stack worker before entering this boundary.
     /// The source must own its logical parsed syntax. Rebinding a shallow source
     /// clone whose child parents name another source is not supported in S07.
+    /// port: tsc/internal/ast/ast.go:SourceFile.BindOnce
     pub fn bind_with(
         &self,
         source: NodeId,
@@ -859,6 +860,7 @@ impl AstFile {
             result,
         }))
     }
+    /// port: tsc/internal/ast/ast.go:SourceFile.IsBound
     pub fn is_bound(&self, source: NodeId) -> Result<bool, Error> {
         Ok(self.bound_view(source)?.is_some())
     }

@@ -526,7 +526,7 @@ impl CheckerState {
         Ok(())
     }
 
-    // port: tsc/internal/ast/utilities.go:HasContextSensitiveParameters
+    // Inline copy of `HasContextSensitiveParameters`; its Phase 1 home is in tsr_ast (table group containers).
     fn body_has_context_sensitive_parameters(&self, node: NodeId) -> Result<bool, Error> {
         let read = self.node(node)?;
         if read.type_parameter_list().is_some() {

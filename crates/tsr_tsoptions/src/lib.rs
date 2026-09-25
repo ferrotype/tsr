@@ -376,3 +376,9 @@ pub use config_value::normalize_json_value;
 mod extended_config;
 pub use config_parse::{parse_extended_config, ExtendedConfigCacheEntry};
 pub use extended_config::ExtendedConfigCache;
+
+// Phase 1 operation-table group tsoptions (docs/PHASE1-mutation-witnesses.md, section 9).
+pub mod affects;
+pub mod enum_maps;
+pub mod parsed_commandline_ext;
+pub mod show_config;

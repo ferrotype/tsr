@@ -186,7 +186,7 @@ impl CheckerState {
         }
     }
 
-    // port: tsc/internal/ast/utilities.go:NodeCanBeDecorated
+    // Inline copy of `NodeCanBeDecorated`; its Phase 1 home is in tsr_ast (table group class).
     fn grammar_can_decorate(&self, node: NodeId, legacy: bool) -> Result<bool, Error> {
         let read = self.node(node)?;
         if legacy
@@ -387,7 +387,7 @@ impl CheckerState {
                     let symbol = self
                         .get_symbol_of_declaration(node)?
                         .ok_or(Error::MissingLink("decorated accessor symbol"))?;
-                    // port: tsc/internal/ast/utilities.go:GetAllAccessorDeclarationsForDeclaration
+                    // Inline copy of `GetAllAccessorDeclarationsForDeclaration`; its Phase 1 home is in tsr_ast (table group class).
                     let other_kind = if kind == K::GetAccessor {
                         K::SetAccessor
                     } else {

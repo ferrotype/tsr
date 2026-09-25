@@ -33,6 +33,16 @@ pub(crate) struct ActiveLabel<'scope> {
     pub name: JsString,
     pub referenced: bool,
 }
+impl<'scope> ActiveLabel<'scope> {
+    // port: tsc/internal/binder/binder.go:ActiveLabel.BreakTarget
+    pub(crate) fn break_target(&self) -> Option<BindingFlow<'scope>> {
+        self.break_target
+    }
+    // port: tsc/internal/binder/binder.go:ActiveLabel.ContinueTarget
+    pub(crate) fn continue_target(&self) -> Option<BindingFlow<'scope>> {
+        self.continue_target
+    }
+}
 
 pub(crate) struct Binder<'build, 'scope, 'ast> {
     pub builder: crate::backend::Backend<'build, 'scope, 'ast>,
@@ -154,6 +164,7 @@ impl<'build, 'scope, 'ast> Binder<'build, 'scope, 'ast> {
             .set_node_fallthrough_flow(id, value)
             .expect("binder writes its own file");
     }
+    // port: tsc/internal/ast/ast.go:Node.Symbol
     pub fn symbol(&self, node: NodeId) -> Option<SymbolId> {
         self.builder
             .node_symbol(node)
@@ -175,7 +186,8 @@ impl<'build, 'scope, 'ast> Binder<'build, 'scope, 'ast> {
             .table_mut(table)
             .expect("binder symbol table belongs to result")
     }
-    // port: tsc/internal/ast/utilities.go:GetLocals
+    /// GetLocals on a checked node; the binder's own scopes go through
+    /// `ensure_binding_locals`.
     pub fn ensure_locals(&mut self, node: NodeId) -> SymbolTableId {
         if let Some(table) = self.locals(node) {
             return table;

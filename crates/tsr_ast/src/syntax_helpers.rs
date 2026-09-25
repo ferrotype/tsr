@@ -349,10 +349,15 @@ pub(crate) fn is_optional_chain<N: Read + ?Sized>(node: &N) -> bool {
         )
 }
 
+/// port: tsc/internal/ast/utilities.go:getQuestionDotToken
+pub(crate) fn get_question_dot_token<N: Read + ?Sized>(node: &N) -> Option<N::Id> {
+    node.question_dot_token()
+}
+
 pub(crate) fn is_optional_chain_root<N: Read + ?Sized>(node: &N) -> bool {
     is_optional_chain(node)
         && node.kind() != K::NonNullExpression
-        && node.question_dot_token().is_some()
+        && get_question_dot_token(node).is_some()
 }
 
 pub(crate) fn is_outermost_optional_chain<V: View>(

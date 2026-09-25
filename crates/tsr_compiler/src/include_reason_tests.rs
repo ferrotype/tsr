@@ -97,6 +97,46 @@ fn diagnostic(diagnostic: &Diagnostic, program: &Program) -> Value {
     json!({"File":file,"Pos":diagnostic.loc.pos(),"End":diagnostic.loc.end(),"Code":diagnostic.code,"Args":diagnostic.message_args.iter().map(|arg| hex(arg.as_bytes())).collect::<Vec<_>>(),"Chain":diagnostic.message_chain.iter().map(|d| self::diagnostic(d,program)).collect::<Vec<_>>(),"Related":diagnostic.related_information.iter().map(|d| self::diagnostic(d,program)).collect::<Vec<_>>()})
 }
 
+/// The program accessors the native producer reads on the loaded program.
+fn program_accessors(program: &Program, queries: &[Value]) -> Value {
+    let parsing: Vec<_> = program
+        .config_file_parsing_diagnostics()
+        .iter()
+        .map(|d| diagnostic(d, program))
+        .collect();
+    let source_files: Vec<_> = queries
+        .iter()
+        .map(|query| {
+            let name = query.as_str().unwrap();
+            let found = program
+                .source_file(name.as_bytes())
+                .map_or_else(String::new, |file| {
+                    String::from_utf8(
+                        file.bound()
+                            .view()
+                            .source_file()
+                            .unwrap()
+                            .file_name()
+                            .to_vec(),
+                    )
+                    .unwrap()
+                });
+            json!({"query":name,"file":found})
+        })
+        .collect();
+    let files: Vec<_> = program
+        .program()
+        .files()
+        .iter()
+        .map(|file| {
+            let state = file.bound().view().source_file().unwrap();
+            let path = state.parse_options().path.as_bytes();
+            json!({"path":std::str::from_utf8(path).unwrap(),"default_library":program.is_lib(path)})
+        })
+        .collect();
+    json!({"config_file_parsing_diagnostics":parsing,"source_files":source_files,"files":files})
+}
+
 #[test]
 fn independently_observed_go_include_explanations() {
     let requests: Vec<Value> = serde_json::from_str(include_str!(
@@ -203,12 +243,11 @@ fn independently_observed_go_include_explanations() {
                 include_files.insert(std::str::from_utf8(key).unwrap().to_owned(), json!(values));
             }
         }
-        assert_eq!(
-            json!({"id":request["id"],"queries":observed,"program":globals,"include_globals":include_globals,"include_files":include_files}),
-            expected,
-            "{}",
-            request["id"]
-        );
+        let mut actual = json!({"id":request["id"],"queries":observed,"program":globals,"include_globals":include_globals,"include_files":include_files});
+        if let Some(queries) = request["source_file_queries"].as_array() {
+            actual["program_accessors"] = program_accessors(&program, queries);
+        }
+        assert_eq!(actual, expected, "{}", request["id"]);
     }
 }
 

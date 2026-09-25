@@ -548,7 +548,7 @@ impl CheckerState {
         Ok(true)
     }
 
-    // port: tsc/internal/ast/utilities.go:ClassOrConstructorParameterIsDecorated
+    // Inline copy of `ClassOrConstructorParameterIsDecorated`; its Phase 1 home is in tsr_ast (table group class).
     fn class_or_constructor_parameter_is_decorated(&self, class: NodeId) -> Result<bool, Error> {
         if self.has_decorators(class)? {
             return Ok(true);

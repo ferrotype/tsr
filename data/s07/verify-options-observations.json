@@ -2998,5 +2998,174 @@
     ],
     "id": "options/duplicate-property-order",
     "includes": []
+  },
+  {
+    "blocked": [],
+    "diagnostics": [],
+    "id": "options/extra/jsx-factories-valid/command",
+    "includes": []
+  },
+  {
+    "blocked": [],
+    "diagnostics": [],
+    "id": "options/extra/jsx-factories-valid/syntax",
+    "includes": []
+  },
+  {
+    "blocked": [],
+    "diagnostics": [],
+    "id": "options/extra/package-maps-node16/command",
+    "includes": []
+  },
+  {
+    "blocked": [],
+    "diagnostics": [],
+    "id": "options/extra/package-maps-node16/syntax",
+    "includes": []
+  },
+  {
+    "blocked": [],
+    "diagnostics": [],
+    "id": "options/extra/package-maps-nodenext/command",
+    "includes": []
+  },
+  {
+    "blocked": [],
+    "diagnostics": [],
+    "id": "options/extra/package-maps-nodenext/syntax",
+    "includes": []
+  },
+  {
+    "blocked": [],
+    "diagnostics": [],
+    "id": "options/extra/package-maps-bundler/command",
+    "includes": []
+  },
+  {
+    "blocked": [],
+    "diagnostics": [],
+    "id": "options/extra/package-maps-bundler/syntax",
+    "includes": []
+  },
+  {
+    "blocked": [
+      "/src/x.js"
+    ],
+    "diagnostics": [
+      {
+        "File": "",
+        "Pos": -1,
+        "End": -1,
+        "Code": 5055,
+        "Category": 1,
+        "Key": "Cannot_write_file_0_because_it_would_overwrite_input_file_5055",
+        "Args": [
+          "/src/x.js"
+        ],
+        "Text": "",
+        "Chain": [
+          {
+            "File": "",
+            "Pos": -1,
+            "End": -1,
+            "Code": 5068,
+            "Category": 1,
+            "Key": "Adding_a_tsconfig_json_file_will_help_organize_projects_that_contain_both_TypeScript_and_JavaScript__5068",
+            "Args": null,
+            "Text": "",
+            "Chain": null,
+            "Related": null
+          }
+        ],
+        "Related": null
+      },
+      {
+        "File": "",
+        "Pos": -1,
+        "End": -1,
+        "Code": 5055,
+        "Category": 1,
+        "Key": "Cannot_write_file_0_because_it_would_overwrite_input_file_5055",
+        "Args": [
+          "/src/X.js"
+        ],
+        "Text": "",
+        "Chain": [
+          {
+            "File": "",
+            "Pos": -1,
+            "End": -1,
+            "Code": 5068,
+            "Category": 1,
+            "Key": "Adding_a_tsconfig_json_file_will_help_organize_projects_that_contain_both_TypeScript_and_JavaScript__5068",
+            "Args": null,
+            "Text": "",
+            "Chain": null,
+            "Related": null
+          }
+        ],
+        "Related": null
+      },
+      {
+        "File": "",
+        "Pos": -1,
+        "End": -1,
+        "Code": 5056,
+        "Category": 1,
+        "Key": "Cannot_write_file_0_because_it_would_be_overwritten_by_multiple_input_files_5056",
+        "Args": [
+          "/src/X.js"
+        ],
+        "Text": "",
+        "Chain": null,
+        "Related": null
+      }
+    ],
+    "id": "outputs/case-insensitive-overwrite",
+    "includes": []
+  },
+  {
+    "blocked": [
+      "/src/a.js"
+    ],
+    "diagnostics": [
+      {
+        "File": "",
+        "Pos": -1,
+        "End": -1,
+        "Code": 5056,
+        "Category": 1,
+        "Key": "Cannot_write_file_0_because_it_would_be_overwritten_by_multiple_input_files_5056",
+        "Args": [
+          "/src/A.js"
+        ],
+        "Text": "",
+        "Chain": null,
+        "Related": null
+      }
+    ],
+    "id": "outputs/case-insensitive-collision",
+    "includes": []
+  },
+  {
+    "blocked": [],
+    "diagnostics": [],
+    "id": "outputs/external-library-not-emitted",
+    "includes": []
+  },
+  {
+    "blocked": [],
+    "diagnostics": [],
+    "id": "outputs/external-library-control",
+    "includes": [
+      {
+        "args": [
+          "/src/pkg/index.ts",
+          "/src/app"
+        ],
+        "code": 6059,
+        "file": "/src/pkg/index.ts"
+      }
+    ]
   }
 ]

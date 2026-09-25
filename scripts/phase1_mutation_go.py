@@ -18,6 +18,12 @@ for four oracles:
 * ``facts`` runs ``tools/phase1/mutation/go/facts`` over the S06 primary
   requests: after the S06 parse, the ``[kind, SubtreeFacts()]`` pair of every
   node in document order.
+* ``table`` runs the operation-table driver ``tools/phase1/tables/go`` (every
+  ``.go`` file there, plus the ``bridges/<package>/*.go`` files copied into
+  ``internal/<package>``) over the committed table inventory
+  ``data/phase1/tables/requests.json`` (``scripts/phase1_tables.py``): one row
+  is one ``(column, input)`` pair, ``setup`` builds the input outside any
+  coverage segment and ``column`` is the only production segment.
 
 Commands:
 
@@ -59,6 +65,7 @@ Digests (``digest_rule`` in the native file):
 * syntax: per compared field of ``phase1_syntax.COMPARED``, sha256 over
   ``canonical(value)`` of the row's field.
 * facts: sha256 over ``canonical([[kind, facts], ...])`` of the node list.
+* table: sha256 over ``canonical(value)`` of the column stage's single value.
 
 Go reach rule (``stage_rule`` in the reach file, section 3 of the contract): a
 function is entered on a row when the entry block of its FuncDecl ran (the
@@ -85,6 +92,7 @@ from __future__ import annotations
 
 import argparse
 import ast
+import contextlib
 from dataclasses import dataclass
 import functools
 import gzip
@@ -158,6 +166,28 @@ class Oracle:
     # Operation-id prefixes an observation segment counts (empty: nothing).
     observe_counts: tuple
     digest_rule: str
+    # The packages a -cover build instruments besides the main package: the
+    # production segments count every operation of these packages.
+    cover_packages: tuple = COVER_PACKAGES
+
+
+# The operation-table oracle (scripts/phase1_tables.py, docs section 9). Its
+# driver is every .go file of TABLE_DIR, so the per-group column files of the
+# stage-2 packages need no registration here; bridges/<package>/<file>.go is
+# copied into internal/<package>/<file>.go of the export.
+TABLE_DIR = "tools/phase1/tables/go"
+TABLE_INVENTORY = "data/phase1/tables/requests.json"
+TABLE_COVER_PACKAGES = COVER_PACKAGES + ("internal/core", "internal/tsoptions", "internal/tspath")
+
+
+def _table_sources():
+    return tuple(sorted(path.name for path in (ROOT / TABLE_DIR).glob("*.go")))
+
+
+def _table_bridges():
+    base = ROOT / TABLE_DIR / "bridges"
+    return tuple(sorted((path.relative_to(ROOT / TABLE_DIR).as_posix(), f"internal/{path.parent.name}/{path.name}")
+                        for path in base.glob("*/*.go")))
 
 
 ORACLES = {
@@ -206,6 +236,17 @@ ORACLES = {
         digest_rule="sha256 over canonical([[kind, facts], ...]): for every node of a pre-order "
                     "ForEachChild walk from the SourceFile, its Kind and (*ast.Node).SubtreeFacts(); "
                     "a panicking stage digests the pairs computed before the panic"),
+    "table": Oracle(
+        name="table", inventory=TABLE_INVENTORY, probes=None,
+        operations=("setup", "column"), compared=("column",),
+        kind="batch", package="internal/phase1table", source_dir=TABLE_DIR,
+        sources=_table_sources(), bridges=_table_bridges(),
+        segments={"column": "production"},
+        observe_counts=(),
+        digest_rule="sha256 over canonical(value) of the column stage's single value, canonical being "
+                    "json.dumps(sort_keys=True, separators=(',', ':'), ensure_ascii=True); setup builds the "
+                    "input outside any segment and a row that does not complete both stages is never frozen",
+        cover_packages=TABLE_COVER_PACKAGES),
 }
 
 
@@ -256,7 +297,7 @@ def stage_rule(oracle):
     spec = oracle_spec(oracle)
     return {"segments": dict(sorted(spec.segments.items())),
             "production": {"counts": "every operation of the instrumented packages",
-                           "packages": list(COVER_PACKAGES)},
+                           "packages": list(spec.cover_packages)},
             "observe": {"counts": "operations whose id starts with one of these prefixes",
                         "prefixes": list(spec.observe_counts)},
             "entry_rule": ENTRY_RULE,
@@ -336,6 +377,40 @@ def committed_inventory(oracle):
     return inventory["requests"], probes
 
 
+# The table inventory a scratch campaign reads instead of TABLE_INVENTORY
+# (phase1_tables.py campaign); empty for every committed artifact.
+_TABLE_INVENTORY_OVERRIDE = []
+
+
+@contextlib.contextmanager
+def table_inventory(path):
+    """Read the table oracle's inventory from ``path`` (a scratch selection) inside the block."""
+    _TABLE_INVENTORY_OVERRIDE.append(Path(path).resolve())
+    try:
+        yield
+    finally:
+        _TABLE_INVENTORY_OVERRIDE.pop()
+
+
+def table_inventory_path():
+    return _TABLE_INVENTORY_OVERRIDE[-1] if _TABLE_INVENTORY_OVERRIDE else ROOT / TABLE_INVENTORY
+
+
+def table_inventory_document():
+    """The table inventory (data/phase1/tables/requests.json unless overridden), at the current pin."""
+    path = table_inventory_path()
+    document = strict_json_loads(path.read_bytes())
+    if (not isinstance(document, dict) or document.get("version") != 1 or document.get("pin") != pin()
+            or not isinstance(document.get("requests"), list)):
+        raise ValueError(f"{path} is not a version 1 table inventory at the current pin")
+    return document
+
+
+def _relative(path):
+    path = Path(path)
+    return str(path.relative_to(ROOT)) if path.is_relative_to(ROOT) else str(path)
+
+
 def syntax_inventory():
     """The loaded rows of the committed syntax schedule, in schedule order."""
     schedule = strict_json_loads((ROOT / SYNTAX_SCHEDULE).read_bytes())
@@ -348,6 +423,8 @@ def inventory_rows(oracle):
     """The (id, committed request digest) list a native freeze covers, in order."""
     if oracle == "syntax":
         return [(row["id"], row["loading_request_sha256"]) for row in syntax_inventory()]
+    if oracle == "table":
+        return [(row["id"], row["request_sha256"]) for row in table_inventory_document()["requests"]]
     recipes, _ = committed_inventory(oracle)
     return [(recipe["id"], recipe["request_sha256"]) for recipe in recipes]
 
@@ -384,6 +461,17 @@ def verify_requests(oracle, requests):
     """Refuse unless every row and the whole sequence match the committed freeze."""
     if oracle == "syntax":
         return verify_syntax_requests(requests)
+    if oracle == "table":
+        recipes = table_inventory_document()["requests"]
+        if len(requests) != len(recipes):
+            raise ValueError(f"table: {len(requests)} requests, the inventory has {len(recipes)}")
+        mismatched = [recipe["id"] for request, recipe in zip(requests, recipes)
+                      if request.get("id") != recipe["id"] or request.get("column") != recipe["column"]
+                      or sha256(canonical(request)) != recipe["request_sha256"]]
+        if mismatched:
+            raise ValueError(f"table: {len(mismatched)} requests differ from the inventory's request_sha256, "
+                             f"first {mismatched[:3]}")
+        return [recipe["request_sha256"] for recipe in recipes]
     recipes, probes = committed_inventory(oracle)
     if len(requests) != len(recipes):
         raise ValueError(f"{oracle}: {len(requests)} requests, committed inventory has {len(recipes)}")
@@ -451,6 +539,11 @@ def materialize(oracle, *, export=None, out=None):
     source = None
     if oracle == "syntax":
         requests, source = syntax_requests(export)
+    elif oracle == "table":
+        import phase1_tables
+        requests = phase1_tables.materialize_requests(table_inventory_document())
+        source = {"inventory": _relative(table_inventory_path()),
+                  "inventory_file_sha256": file_sha256(table_inventory_path())}
     else:
         requests = parser_requests(Path(export) if export else None)
         if oracle == "binder":
@@ -628,6 +721,31 @@ def facts_row(record, spec=ORACLES["facts"]):
     return row
 
 
+def table_row(record, spec=ORACLES["table"]):
+    """Outcomes and the column digest of one table row.
+
+    ``digests.column`` is the driver's; with ``value`` present (raw mode) the
+    digest is recomputed from it and must agree. A digest exactly when the
+    column stage completed.
+    """
+    outcomes = dict(record["outcomes"])
+    if set(outcomes) != set(spec.operations) or any(not isinstance(value, str) for value in outcomes.values()):
+        raise ValueError(f"table row {record.get('row')!r} has malformed outcomes")
+    digest = (record.get("digests") or {}).get("column")
+    if "value" in record:
+        recomputed = sha256(canonical(record["value"]))
+        if digest is not None and digest != recomputed:
+            raise ValueError(f"table row {record.get('row')!r}: digest differs from its own value")
+        digest = recomputed
+    if (outcomes["column"] == "ok") != (digest is not None):
+        raise ValueError(f"table row {record.get('row')!r}: a digest exactly when the column stage completed")
+    row = {"outcomes": {stage: outcomes[stage] for stage in spec.operations},
+           "digests": {"column": digest} if digest is not None else {}}
+    if record.get("messages"):
+        row["messages"] = dict(record["messages"])
+    return row
+
+
 def finish_row(spec, outcomes, messages, digests):
     ran = [stage for stage in spec.operations if stage in outcomes]
     if ran != list(outcomes) or ran != list(spec.operations[:len(ran)]):
@@ -642,8 +760,9 @@ def finish_row(spec, outcomes, messages, digests):
 
 
 def row_digests(oracle, records):
-    """One row's outcomes and compared digests: frames (e1, binder) or a row (syntax, facts)."""
-    return {"e1": e1_row, "binder": binder_row, "syntax": syntax_row, "facts": facts_row}[oracle](records)
+    """One row's outcomes and compared digests: frames (e1, binder) or a row (syntax, facts, table)."""
+    return {"e1": e1_row, "binder": binder_row, "syntax": syntax_row, "facts": facts_row,
+            "table": table_row}[oracle](records)
 
 
 # ---------------------------------------------------------------------------
@@ -761,11 +880,13 @@ def go_version(env):
 
 
 def driver_sources(oracle, *, cover):
-    """The files a Phase 1 driver build adds to the export: its sources and the hook (or its stub)."""
+    """The files a Phase 1 driver build adds to the export: its sources, its bridges and the hook (or its stub)."""
     spec = oracle_spec(oracle)
     files = {f"tsc/{spec.package}/{name}": (ROOT / spec.source_dir / name).read_bytes() for name in spec.sources}
     hook = "phase1_cover.go" if cover else "phase1_cover_off.go"
     files[f"tsc/{spec.package}/{hook}"] = (TOOL / hook).read_bytes()
+    for source, target in spec.bridges:
+        files[f"tsc/{target}"] = (ROOT / spec.source_dir / source).read_bytes()
     return files
 
 
@@ -821,6 +942,11 @@ def oracle_sources(oracle):
 
 def inventory_binding(oracle, rows):
     spec = oracle_spec(oracle)
+    if oracle == "table":
+        document = table_inventory_document()
+        return {"inventory": _relative(table_inventory_path()),
+                "inventory_file_sha256": file_sha256(table_inventory_path()), "rows": len(rows),
+                "selection_sha256": document.get("selection_sha256"), "specs": document.get("specs")}
     binding = {"inventory": spec.inventory, "inventory_file_sha256": file_sha256(ROOT / spec.inventory),
                "rows": len(rows)}
     if spec.probes:
@@ -909,9 +1035,51 @@ def facts_digest_check(binary, rows, frozen, *, count=160):
             "rule": "PHASE1_FACTS_RAW=1 rows: facts_digest(list) equals the driver digest and the frozen digest"}
 
 
-def native(oracle, *, jobs=8, second_jobs=5, out=None, binary=None, probe_check=True):
+def table_digest_check(binary, rows, frozen):
+    """Every table row once more with PHASE1_TABLE_RAW=1: the canonical value
+    each digest is taken over, digested again in Python, must give the driver's
+    digest and the frozen one (the Go canonical encoder is Python's)."""
+    workdir = TARGET / "native-table-raw"
+    if workdir.exists():
+        shutil.rmtree(workdir)
+    workdir.mkdir(parents=True)
+    env = dict(os.environ, PHASE1_TABLE_RAW="1")
+    job = ("table", str(binary), [(index, *row) for index, row in enumerate(rows)], str(workdir / "shard-0.stderr"), env)
+    results, _ = _run_batch_shard(job)
+    for index, result in results:
+        if strip_timing([result])[0] != frozen[index]:
+            raise RuntimeError(f"table: raw-mode row {result['row']} differs from the frozen digest")
+    values = 0
+    for line in (workdir / "shard-0.rows.ndjson").read_bytes().splitlines():
+        record = strict_json_loads(line)
+        values += "value" in record
+    shutil.rmtree(workdir)
+    if values != len(rows):
+        raise RuntimeError(f"table: {len(rows) - values} raw rows carry no value")
+    return {"rows": len(rows), "values": values, "equal": True,
+            "rule": "PHASE1_TABLE_RAW=1 rows: sha256(canonical(value)) of every row equals the driver digest "
+                    "and the frozen digest"}
+
+
+def table_refusals(rows):
+    """Rows a table freeze refuses: any row whose setup or column did not complete."""
+    return [{"row": row["row"], "outcomes": row["outcomes"],
+             "messages": {stage: bytes.fromhex(text).decode(errors="replace")[:300]
+                          for stage, text in (row.get("messages") or {}).items()}}
+            for row in rows if any(value != "ok" for value in row["outcomes"].values())]
+
+
+def columns_of(rows):
+    """{column: row count} of materialized table requests, in first-seen order."""
+    counts = {}
+    for _, _, request in rows:
+        counts[request["column"]] = counts.get(request["column"], 0) + 1
+    return counts
+
+
+def native(oracle, *, jobs=8, second_jobs=5, out=None, binary=None, probe_check=True, requests=None):
     spec = oracle_spec(oracle)
-    rows = load_requests(oracle)
+    rows = load_requests(oracle, requests)
     if binary is None:
         binary, version = build_plain(oracle)
     else:
@@ -941,6 +1109,13 @@ def native(oracle, *, jobs=8, second_jobs=5, out=None, binary=None, probe_check=
         if probe_check:
             extra["probe_check"] = syntax_probe_check(rows, frozen)
         first = frozen
+    if oracle == "table":
+        refused = table_refusals(first)
+        if refused:
+            raise RuntimeError(f"table: {len(refused)} rows did not complete setup and column in Go; a table "
+                               f"freeze refuses them (inputs outside the column's contract), first {refused[:3]}")
+        extra["digest_check"] = table_digest_check(binary, rows, first)
+        extra["columns"] = columns_of(rows)
     if oracle == "facts":
         extra["digest_check"] = facts_digest_check(binary, rows, first)
         e1 = read_document(native_path("e1")) if native_path("e1").exists() else None
@@ -1073,7 +1248,7 @@ def instrumented_sources(oracle):
 
 def cover_flags(oracle):
     spec = oracle_spec(oracle)
-    packages = [f"{MODULE}/{spec.package}"] + [f"{MODULE}/{package}" for package in COVER_PACKAGES]
+    packages = [f"{MODULE}/{spec.package}"] + [f"{MODULE}/{package}" for package in spec.cover_packages]
     return ["-trimpath", "-mod=readonly", "-cover", "-covermode=atomic", "-coverpkg=" + ",".join(packages)]
 
 
@@ -1505,14 +1680,22 @@ def stats_path(oracle, *, verify=False):
     return TARGET / "go" / f"{'verify-' if verify else ''}reach-{oracle}.stats.json"
 
 
-def reach(oracle, *, jobs=8, second_jobs=5, only=None, out=None, covdata_samples=6, stats=None):
-    """Two instrumented runs + decode. With ``only`` it is a diagnostic sample, never written."""
+def reach(oracle, *, jobs=8, second_jobs=5, only=None, out=None, covdata_samples=6, stats=None, native=None,
+          requests=None, manifest=None):
+    """Two instrumented runs + decode. With ``only`` it is a diagnostic sample, never written.
+
+    ``native``, ``requests`` and ``manifest`` default to the committed native
+    freeze, the materialized requests and the committed plan; a scratch table
+    campaign names its own.
+    """
     started = time.monotonic()
-    native_document = load_native(oracle)
-    rows = load_requests(oracle)
+    native_file = Path(native) if native else native_path(oracle)
+    native_document = load_native(oracle, native_file)
+    rows = load_requests(oracle, requests)
     selected = select_rows(rows, only)
     # A diagnostic sample may run before any plan exists; a written index may not.
-    planned = planned_operations() if not only or (ROOT / MANIFEST).exists() else None
+    manifest = Path(manifest) if manifest else ROOT / MANIFEST
+    planned = planned_operations(manifest) if not only or manifest.exists() else None
     binary, version, env = build_instrumented(oracle)
     run_env = dict(env, **reach_environment(oracle))
     shardings = [1] if only else [jobs, second_jobs]
@@ -1550,7 +1733,7 @@ def reach(oracle, *, jobs=8, second_jobs=5, only=None, out=None, covdata_samples
                                   for item in runs[0]["covdata"]],
                 "instrumented_packages": runs[0]["instrumented"]}
     document, statistics = reach_document(
-        oracle, rows, runs, native_document=native_document, native_sha256=file_sha256(native_path(oracle)),
+        oracle, rows, runs, native_document=native_document, native_sha256=file_sha256(native_file),
         go_version=version, binary_sha256=file_sha256(binary), planned=planned)
     out = Path(out) if out else reach_path(oracle)
     write_ops_document(out, document)

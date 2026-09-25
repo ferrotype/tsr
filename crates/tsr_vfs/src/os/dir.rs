@@ -83,7 +83,7 @@ impl Fs for Dir {
             .map_err(|e| failure("read", name, e))
     }
     fn read_dir(&self, name: &[u8]) -> Result<Vec<Arc<Info>>, IoError> {
-        let directory = std::fs::read_dir(self.resolve(name, "readdir")?)
+        let directory = native::read_dir(&self.resolve(name, "readdir")?)
             .map_err(|e| failure("open", name, e))?;
         let mut result = Vec::new();
         for entry in directory {

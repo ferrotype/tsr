@@ -41,9 +41,12 @@ class GeneratedAstFixtureTests(unittest.TestCase):
         for row in requests:
             actions = row["operation_actions"]
             self.assertEqual(set(actions), {action["op"] for action in row["actions"]})
-            self.assertEqual(actions["counts"], [])
+            self.assertEqual(actions["counts"], ["tsc/internal/ast/ast.go:NodeFactory.NodeCount",
+                                                 "tsc/internal/ast/ast.go:NodeFactory.TextCount"])
             self.assertEqual(set(row["operations"]), {op for ops in actions.values() for op in ops})
-            self.assertEqual(actions["update-same"], actions["update-changed"])
+            # Only a changed update runs updateNode.
+            self.assertEqual(actions["update-same"] + ["tsc/internal/ast/ast.go:updateNode"],
+                             actions["update-changed"])
             self.assertEqual(actions["visit-same"], actions["visit-replace"])
             self.assertEqual("facts" in actions, row["shape"] in ("Block", "QualifiedName"))
         dynamic = [r for r in requests if r["shape"] == "JSDocParameterOrPropertyTag"]
@@ -64,7 +67,8 @@ class GeneratedAstFixtureTests(unittest.TestCase):
                 self.assertEqual(set(links), {action["op"] for action in row["actions"]})
                 self.assertEqual(set(row["operations"]), {op for ops in links.values() for op in ops})
                 for member in shape["update_members"]:
-                    self.assertEqual(links["update-" + member["name"]], links["update-same"])
+                    self.assertEqual(links["update-" + member["name"]],
+                                     links["update-same"] + ["tsc/internal/ast/ast.go:updateNode"])
         self.assertEqual(set(GEN._shape_module["SKIPPED"]), {"SourceFile", "SyntheticExpression"})
 
     def test_missing_rust_dispatch_is_not_silently_omitted(self):

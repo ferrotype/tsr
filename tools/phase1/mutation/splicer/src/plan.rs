@@ -574,6 +574,20 @@ impl FilePlan<'_> {
                 ));
                 out.push((end_line, end_column, -1, ")".to_owned()));
             }
+            (Target::Stmt(at), Shape::Skip) if !control => {
+                let StmtKind::Unit { span } = &self.index.stmts[at].kind else {
+                    return Err("not a unit statement".to_owned());
+                };
+                let (line, column) = self.byte_pos(span.0)?;
+                let (end_line, end_column) = self.byte_pos(span.1)?;
+                out.push((
+                    line,
+                    column,
+                    0,
+                    "if !::phase1_mutants::{HIT}({ID}) { ".to_owned(),
+                ));
+                out.push((end_line, end_column, -1, " }".to_owned()));
+            }
             _ => return Err(format!("operator {} does not fit its site", operator.name)),
         }
         Ok(out)

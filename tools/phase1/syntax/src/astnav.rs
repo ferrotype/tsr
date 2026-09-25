@@ -3,15 +3,19 @@
 //! `tsr_astnav::Navigator` over a file parsed by the production parser. The
 //! answers use the probe's shapes: a sweep is run-length encoded over every
 //! byte offset from 0 to the text length inclusive, a node is [kind, pos, end,
-//! ordinal] with the ordinal assigned on first sight so identity is compared,
-//! and an upstream panic is ["panic", message].
+//! ordinal] with the ordinal assigned on first sight so identity is compared
+//! (`child_of_kind_payload` appends the node's text and flags, so the payload
+//! of a created token is compared too), and an upstream panic is ["panic",
+//! message].
 
 use std::collections::HashMap;
 use std::panic::{catch_unwind, AssertUnwindSafe};
 
 use serde_json::{json, Value};
 use tsr_arena::NodeId;
-use tsr_ast::{AstView, ChildVisitor, NodeListId, NodeSlice, SourceFileParseOptions, SyntaxKind};
+use tsr_ast::{
+    AstView, ChildVisitor, NodeDataRead, NodeListId, NodeSlice, SourceFileParseOptions, SyntaxKind,
+};
 use tsr_astnav::{ChildVisit, Error as NavError, HookVisit, Navigator};
 use tsr_jsstring::SourceText;
 
@@ -53,6 +57,92 @@ impl Answers<'_, '_, '_> {
         let ordinal = *self.ordinals.entry(id).or_insert(next);
         let node = self.view.node(id)?;
         Ok(json!([node.kind().raw(), node.pos(), node.end(), ordinal]))
+    }
+
+    /// A node answer followed by what the node carries beyond its kind and
+    /// range, in the probe's `payload` shape: a name's text; a literal's text
+    /// and token flags; for a template piece also its raw text and template
+    /// flags; for JSX text also whether it is only whitespace.
+    /// `child_of_kind_payload` uses it to compare the tokens `create_token`
+    /// builds.
+    fn payload(&mut self, id: Option<NodeId>) -> Result<Value, tsr_arena::Error> {
+        use SyntaxKind as K;
+        // A node answer is an array exactly when there is a node.
+        let (Some(id), Value::Array(mut fields)) = (id, self.node(id)?) else {
+            return Ok(Value::Null);
+        };
+        let text = |bytes: &[u8]| Value::String(String::from_utf8_lossy(bytes).into_owned());
+        let node = self.view.node(id)?;
+        match (node.kind().known(), node.data()) {
+            (Some(K::Identifier), NodeDataRead::Identifier(data)) => {
+                fields.push(text(data.text()));
+            }
+            (Some(K::PrivateIdentifier), NodeDataRead::PrivateIdentifier(data)) => {
+                fields.push(text(data.text()));
+            }
+            (Some(K::NumericLiteral), NodeDataRead::NumericLiteral(data)) => {
+                fields.extend([text(data.text()), json!(data.token_flags())]);
+            }
+            (Some(K::BigIntLiteral), NodeDataRead::BigIntLiteral(data)) => {
+                fields.extend([text(data.text()), json!(data.token_flags())]);
+            }
+            (Some(K::StringLiteral), NodeDataRead::StringLiteral(data)) => {
+                fields.extend([text(data.text()), json!(data.token_flags())]);
+            }
+            (Some(K::RegularExpressionLiteral), NodeDataRead::RegularExpressionLiteral(data)) => {
+                fields.extend([text(data.text()), json!(data.token_flags())]);
+            }
+            (Some(K::JsxText), NodeDataRead::JsxText(data)) => fields.extend([
+                text(data.text()),
+                json!(data.token_flags()),
+                json!(data.contains_only_trivia_white_spaces()),
+            ]),
+            (
+                Some(K::NoSubstitutionTemplateLiteral),
+                NodeDataRead::NoSubstitutionTemplateLiteral(data),
+            ) => fields.extend([
+                text(data.text()),
+                json!(data.token_flags()),
+                text(data.raw_text()),
+                json!(data.template_flags()),
+            ]),
+            (Some(K::TemplateHead), NodeDataRead::TemplateHead(data)) => fields.extend([
+                text(data.text()),
+                json!(data.token_flags()),
+                text(data.raw_text()),
+                json!(data.template_flags()),
+            ]),
+            (Some(K::TemplateMiddle), NodeDataRead::TemplateMiddle(data)) => fields.extend([
+                text(data.text()),
+                json!(data.token_flags()),
+                text(data.raw_text()),
+                json!(data.template_flags()),
+            ]),
+            (Some(K::TemplateTail), NodeDataRead::TemplateTail(data)) => fields.extend([
+                text(data.text()),
+                json!(data.token_flags()),
+                text(data.raw_text()),
+                json!(data.template_flags()),
+            ]),
+            (
+                Some(
+                    K::Identifier
+                    | K::PrivateIdentifier
+                    | K::NumericLiteral
+                    | K::BigIntLiteral
+                    | K::StringLiteral
+                    | K::RegularExpressionLiteral
+                    | K::JsxText
+                    | K::NoSubstitutionTemplateLiteral
+                    | K::TemplateHead
+                    | K::TemplateMiddle
+                    | K::TemplateTail,
+                ),
+                _,
+            ) => return Err(tsr_arena::Error::InvalidGraph),
+            _ => {}
+        }
+        Ok(Value::Array(fields))
     }
 
     /// One question: an upstream assertion becomes its pinned panic text; a
@@ -106,6 +196,10 @@ impl Answers<'_, '_, '_> {
 
     fn found(&mut self, id: Option<NodeId>) -> Result<Value, NavError> {
         Ok(self.node(id)?)
+    }
+
+    fn found_payload(&mut self, id: Option<NodeId>) -> Result<Value, NavError> {
+        Ok(self.payload(id)?)
     }
 }
 
@@ -243,7 +337,8 @@ fn run(request: &Value) -> Result<Outcome, String> {
                 let token = a.token(p)?;
                 Ok(json!(a.nav.get_start_of_node(token, true)?))
             })?,
-            "child_of_kind" => {
+            which @ ("child_of_kind" | "child_of_kind_payload") => {
+                let payload = which == "child_of_kind_payload";
                 let wanted: Vec<&str> = action
                     .get("kinds")
                     .and_then(Value::as_array)
@@ -257,7 +352,11 @@ fn run(request: &Value) -> Result<Outcome, String> {
                             .ok_or_else(|| format!("unknown kind {name}"))?;
                         let found = answers.answer(|a| {
                             let found = a.nav.find_child_of_kind(container, kind)?;
-                            a.found(found)
+                            if payload {
+                                a.found_payload(found)
+                            } else {
+                                a.found(found)
+                            }
                         })?;
                         rows.push(json!([index, name, found]));
                     }

@@ -2,9 +2,519 @@
   "exemptions": [
     {
       "category": "unused_at_pin",
+      "evidence": "ast.go:1948 `func (node *AccessorDeclarationBase) IsAccessorDeclaration() {}` (empty body). `grep -rn IsAccessorDeclaration upstream/tsc` returns only the definition; go/types reference scan over ./... with tests finds 0 uses; no interface in the tree names the method. Go reach 0 in e1/syntax/binder/facts.",
+      "operation": "tsc/internal/ast/ast.go:AccessorDeclarationBase.IsAccessorDeclaration",
+      "owner": "nothing at the pin calls it"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: enum-match arm of tsr_ast node_semantics.rs modifiers() / node_accessors.rs MutableNode::set_modifiers (exact Go payload set) (node_accessors.rs:333 `NodeData::BinaryExpression(data) => data.modifiers = value`). Caller-level witness (cited, not claimed): witness/s06-accessor-observations-rust SetModifiers rows (set a public modifier, ModifierFlags reads it back through Node.Modifiers; 35 value:1 vs 157 value:0). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:BinaryExpression.setModifiers",
+      "owner": "enum-match arm of tsr_ast node_semantics.rs modifiers() / node_accessors.rs MutableNode::set_modifiers (exact Go payload set)"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: enum-match arms of the ClassDeclaration and ClassExpression payloads in tsr_ast node_semantics.rs (members, heritage_clauses, type_parameters) (node_semantics.rs:688-724 `Some(SyntaxKind::ClassExpression) => $field!(self, ClassExpression, ...)`: the class-like payload is the enum variant itself). Caller-level witness (cited, not claimed): witness/s06-accessor-observations-rust Members/HeritageClauses/TypeParameters rows on the ClassDeclaration and ClassExpression constructors. Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:ClassLikeBase.ClassLikeData",
+      "owner": "enum-match arms of the ClassDeclaration and ClassExpression payloads in tsr_ast node_semantics.rs (members, heritage_clauses, type_parameters)"
+    },
+    {
+      "category": "unused_at_pin",
+      "evidence": "ast.go:1797. Both embedders (ClassDeclaration, ClassExpression) declare their own generated Name() (ast_generated.go), so Go method resolution never selects ClassLikeBase.Name for any of the 194 concrete nodeData types (scratch go/ast resolver); go/types finds 0 static selections of it (ClassLikeData() results are only used for .Members/.HeritageClauses). Go reach 0 in all four indexes.",
+      "operation": "tsc/internal/ast/ast.go:ClassLikeBase.Name",
+      "owner": "nothing at the pin calls it"
+    },
+    {
+      "category": "unused_at_pin",
+      "evidence": "Static RTA/VTA reachability from every Phase 1 root set: unreachable. Go reach 0 on all 4 oracles. Embedding audit script over tsc/internal/ast/*.go: 74 CompositeBase embedders, 0 without an override.",
+      "operation": "tsc/internal/ast/ast.go:CompositeBase.computeSubtreeFacts",
+      "owner": "dispatch-dead / no selector call at the pin; not a claim that the name has no textual caller"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: function_fields shape-table arm in tsr_ast node_semantics.rs:955 (exact Go payload set; default arm reproduces Go's nil dereference message) (node_semantics.rs:955 function_fields arms for the 7 FunctionLikeBase payloads). Caller-level witness (cited, not claimed): witness/s06-accessor-observations-rust ParameterList/TypeParameterList/Type/SetType rows (values on the 14 function-like constructors, Go's nil-dereference on the other 178). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:FunctionLikeBase.FunctionLikeData",
+      "owner": "function_fields shape-table arm in tsr_ast node_semantics.rs:955 (exact Go payload set; default arm reproduces Go's nil dereference message)"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: function_fields shape-table arm in tsr_ast node_semantics.rs:955 (exact Go payload set; default arm reproduces Go's nil dereference message) (function_fields arms for the 7 FunctionLikeWithBodyBase payloads). Caller-level witness (cited, not claimed): witness/s06-accessor-observations-rust ParameterList/TypeParameterList/Type/SetType rows (values on the 14 function-like constructors, Go's nil-dereference on the other 178). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:FunctionLikeWithBodyBase.FunctionLikeData",
+      "owner": "function_fields shape-table arm in tsr_ast node_semantics.rs:955 (exact Go payload set; default arm reproduces Go's nil dereference message)"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: enum-match arm reading the literal payload's token_flags/text in tsr_ast utilities_middle.rs (utilities_middle.rs:355-361 `NodeDataRead::StringLiteral(data) => data.token_flags()` (and Numeric, BigInt, RegularExpression)). Caller-level witness (cited, not claimed): witness/s06-ast-utilities-middle-rust IsUnterminatedLiteral rows. Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:LiteralLikeNodeBase.LiteralLikeData",
+      "owner": "enum-match arm reading the literal payload's token_flags/text in tsr_ast utilities_middle.rs"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: enum-match arm of tsr_ast node_semantics.rs modifiers() / node_accessors.rs MutableNode::set_modifiers (exact Go payload set) (node_semantics.rs:903-936 shape_reads modifiers() arms (33 payloads = Go ModifiersBase 24 + NamedMemberBase 9)). Caller-level witness (cited, not claimed): witness/s06-accessor-observations-rust SetModifiers rows (set a public modifier, ModifierFlags reads it back through Node.Modifiers; 35 value:1 vs 157 value:0). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:ModifiersBase.Modifiers",
+      "owner": "enum-match arm of tsr_ast node_semantics.rs modifiers() / node_accessors.rs MutableNode::set_modifiers (exact Go payload set)"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: enum-match arm of tsr_ast node_semantics.rs modifiers() / node_accessors.rs MutableNode::set_modifiers (exact Go payload set) (crates/tsr_ast/src/node_accessors.rs:309-343 MutableNode::set_modifiers arms (33 payloads = Go set)). Caller-level witness (cited, not claimed): witness/s06-accessor-observations-rust SetModifiers rows (set a public modifier, ModifierFlags reads it back through Node.Modifiers; 35 value:1 vs 157 value:0). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:ModifiersBase.setModifiers",
+      "owner": "enum-match arm of tsr_ast node_semantics.rs modifiers() / node_accessors.rs MutableNode::set_modifiers (exact Go payload set)"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: enum-match arm of tsr_ast node_semantics.rs modifiers() / node_accessors.rs MutableNode::set_modifiers (exact Go payload set) (node_semantics.rs modifiers() arms for the 9 NamedMemberBase payloads). Caller-level witness (cited, not claimed): witness/s06-accessor-observations-rust SetModifiers rows (set a public modifier, ModifierFlags reads it back through Node.Modifiers; 35 value:1 vs 157 value:0). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:NamedMemberBase.Modifiers",
+      "owner": "enum-match arm of tsr_ast node_semantics.rs modifiers() / node_accessors.rs MutableNode::set_modifiers (exact Go payload set)"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: generated enum-match arm of declaration_name_generated for the NamedMemberBase payloads (node_read_generated.rs:30963 declaration_name_generated `Self::PropertyDeclaration(data) => data.name()` (and the other member payloads)). Caller-level witness (cited, not claimed): witness/s06-accessor-observations-rust Name rows on the member constructors. Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:NamedMemberBase.Name",
+      "owner": "generated enum-match arm of declaration_name_generated for the NamedMemberBase payloads"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: enum-match arm of tsr_ast node_semantics.rs modifiers() / node_accessors.rs MutableNode::set_modifiers (exact Go payload set) (node_accessors.rs set_modifiers arms for the 9 NamedMemberBase payloads). Caller-level witness (cited, not claimed): witness/s06-accessor-observations-rust SetModifiers rows (set a public modifier, ModifierFlags reads it back through Node.Modifiers; 35 value:1 vs 157 value:0). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:NamedMemberBase.setModifiers",
+      "owner": "enum-match arm of tsr_ast node_semantics.rs modifiers() / node_accessors.rs MutableNode::set_modifiers (exact Go payload set)"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: the FlowData::ReduceLabel enum variant (a Go type assertion becomes a match) (flow.rs:64 `ReduceLabel(FlowReduceLabelData)`). Caller-level witness (cited, not claimed): witness/s07-binder-corpus flow edges (reduce-label nodes of try/finally). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:Node.AsFlowReduceLabelData",
+      "owner": "the FlowData::ReduceLabel enum variant (a Go type assertion becomes a match)"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: the FlowData::SwitchClause enum variant (flow.rs:63 `SwitchClause(FlowSwitchClauseData)`). Caller-level witness (cited, not claimed): witness/s07-binder-corpus flow edges (switch-clause nodes). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:Node.AsFlowSwitchClauseData",
+      "owner": "the FlowData::SwitchClause enum variant"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: Rust &mut borrow through AstBuilder::node_mut / Factory::node_mut -> NodeMut (crates/tsr_ast/src/storage.rs AstBuilder::node_mut / Factory::node_mut -> NodeMut). Caller-level witness (cited, not claimed): witness/s06-accessor-observations-rust SetExpression/SetType/SetInitializer/SetModifiers rows. Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:Node.AsMutable",
+      "owner": "Rust &mut borrow through AstBuilder::node_mut / Factory::node_mut -> NodeMut"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: a Rust NodeId is Copy and passed directly; identity (precedent: leaves-roster core.go:Identity) (none needed: a Rust NodeId is Copy and is passed directly). Caller-level witness (cited, not claimed): language semantics (identity); every Phase 1 witness passes NodeIds. Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:Node.AsNode",
+      "owner": "a Rust NodeId is Copy and passed directly; identity (precedent: leaves-roster core.go:Identity)"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: the same enum-match arms (Rust has no ClassLikeBase indirection: the variant is the class-like payload) (node_semantics.rs:688-724 ClassDeclaration/ClassExpression arms). Caller-level witness (cited, not claimed): witness/s06-accessor-observations-rust Members/HeritageClauses rows (values on the two class constructors, nil on the other 190). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:Node.ClassLikeData",
+      "owner": "the same enum-match arms (Rust has no ClassLikeBase indirection: the variant is the class-like payload)"
+    },
+    {
+      "category": "unused_at_pin",
+      "evidence": "ast.go:1158-1170. go/types reference scan of upstream/tsc ./... including tests: 0 selections of (*ast.Node).Contains (all textual `.Contains(` hits are strings/slices/sets/other types). Go reach 0.",
+      "operation": "tsc/internal/ast/ast.go:Node.Contains",
+      "owner": "nothing at the pin calls it"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: function_fields shape-table arm in tsr_ast node_semantics.rs:955 (exact Go payload set) (node_semantics.rs:955 function_fields arms for the FunctionLikeBase payloads). Caller-level witness (cited, not claimed): witness/s06-accessor-observations-rust ParameterList/TypeParameterList/Type rows (values on the function-like constructors). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:Node.FunctionLikeData",
+      "owner": "function_fields shape-table arm in tsr_ast node_semantics.rs:955 (exact Go payload set)"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: a kind comparison, the same body as the generated IsJSDoc predicate (runtime_generated.rs:2758 is_js_doc (`kind == SyntaxKind::JSDoc`)). Caller-level witness (cited, not claimed): syntax/generated-predicate/IsJSDoc (every declared kind). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:Node.IsJSDoc",
+      "owner": "a kind comparison, the same body as the generated IsJSDoc predicate"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: a Go range-over-func adapter over ForEachChild; Rust callers use for_each_child with ControlFlow::Break for the early stop (runtime_generated.rs:3566 for_each_child_generated (ControlFlow<()>)). Caller-level witness (cited, not claimed): syntax/generated-shape/*/ children-stop actions (full order and early stop). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:Node.IterChildren",
+      "owner": "a Go range-over-func adapter over ForEachChild; Rust callers use for_each_child with ControlFlow::Break for the early stop"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: the same enum match over the five LiteralLike payloads (utilities_middle.rs:355-361). Caller-level witness (cited, not claimed): witness/s06-ast-utilities-middle-rust IsUnterminatedLiteral rows. Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:Node.LiteralLikeData",
+      "owner": "the same enum match over the five LiteralLike payloads"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: the same enum match over the four template payloads (utilities_middle.rs:370-373). Caller-level witness (cited, not claimed): witness/s06-ast-utilities-middle-rust IsUnterminatedLiteral rows on template literals. Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:Node.TemplateLiteralLikeData",
+      "owner": "the same enum match over the four template payloads"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: header and payload share one Node record addressed by NodeId; no upcast (crates/tsr_ast/src/factory.rs:90 AstBuilder::new_node_before_hook -> Node::from_factory_parts (header and payload stored under one NodeId)). Caller-level witness (cited, not claimed): syntax/generated-ast|generated-shape|generated-special cases (tools/phase1/syntax/ast-generated) 'new' and 'cast' actions (1,026/1,026 match). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:NodeDefault.AsNode",
+      "owner": "header and payload share one Node record addressed by NodeId; no upcast"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: the default arm of the same enum matches (`_ => None`) (node_semantics.rs member/heritage accessors' default arms). Caller-level witness (cited, not claimed): witness/s06-accessor-observations-rust Members/HeritageClauses rows on the 190 non-class constructors. Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:NodeDefault.ClassLikeData",
+      "owner": "the default arm of the same enum matches (`_ => None`)"
+    },
+    {
+      "category": "unused_at_pin",
+      "evidence": "ast.go:1217 returns nil. Method resolution selects it only for FlowSwitchClauseData and FlowReduceLabelData (flow.go:43-75, synthetic KindUnknown payloads created by the binder); every AST payload has its own generated Clone. 0 static selections; Go reach 0; not entered by the generated fixture.",
+      "operation": "tsc/internal/ast/ast.go:NodeDefault.Clone",
+      "owner": "interface default arm that no valid pinned path dispatches to (every cloned payload declares its own Clone; flow data are FlowData enum variants in Rust)"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "upstream/tsc/internal/ast/ast.go:1223 `func (node *NodeDefault) ExportableData() *ExportableBase { return nil }`. Its two pinned readers: Node.LocalSymbol (ast.go:249-255, `data := n.ExportableData(); if data != nil { return data.LocalSymbol }; return nil`) and binder.go:413 (`node.ExportableData().LocalSymbol = local`, reached only for declarations that embed ExportableBase at the pin; a NodeDefault payload there is a nil dereference). So the arm's only non-crashing observable is a nil local symbol. A pinned-Go overlay that returns `&ExportableBase{}` instead leaves all 95 rows of data/s07/resolver-observations.tsv identical (PB19 review, 2026-09-25), so no row discriminates it and it is not claimed. Caller-level witness: witness/s07-resolver-audited-helper-paths rows default/nil and default/scan. There, Go GetLocalSymbolForExportDefault enters this arm on the ExportAssignment of `export default 0` (go test -cover of tools/s07/resolver/export_test.go: ast.go:1223 entered twice). Rust get_local_symbol_for_export_default (crates/tsr_binder/src/name_resolver.rs:819-826) reads `NodeBinding.local_symbol == None` on the same declaration. Both skip it, and both return nil (default/nil) or the class's local (default/scan). || RUST: bind_result.rs:20-29 NodeBinding; declarations.rs:426 the only non-test local-symbol write.",
+      "operation": "tsc/internal/ast/ast.go:NodeDefault.ExportableData",
+      "owner": "`NodeBinding.local_symbol: Option<SymbolId>` (crates/tsr_ast/src/bind_result.rs:23, `#[derive(Default)]`, so `None`). Rust has no payload-typed ExportableData accessor: a node's local symbol is that binding field, and the binder writes it only in declare_module_member (crates/tsr_binder/src/declarations.rs:426, `set_binding_node_local_symbol`, the port of binder.go:413). Every node the binder does not write reads `None`, which is the nil Node.LocalSymbol returns through this arm. Owner decision 2 (2026-09-25): accessor-style operation."
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: the default arm of the generated child walk (runtime_generated.rs:4412 `_ => ControlFlow::Continue(())`). Caller-level witness (cited, not claimed): witness/s06-e1-parse-corpus whole-tree child walks over every token leaf. Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:NodeDefault.ForEachChild",
+      "owner": "the default arm of the generated child walk"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: function_fields shape-table arm in tsr_ast node_semantics.rs:955 (exact Go payload set; default arm reproduces Go's nil dereference message) (function_fields `$shape!` default -> None, then .expect(Go's nil-dereference message)). Caller-level witness (cited, not claimed): witness/s06-accessor-observations-rust ParameterList/TypeParameterList/Type/SetType rows (values on the 14 function-like constructors, Go's nil-dereference on the other 178). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:NodeDefault.FunctionLikeData",
+      "owner": "function_fields shape-table arm in tsr_ast node_semantics.rs:955 (exact Go payload set; default arm reproduces Go's nil dereference message)"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: the match's default arm, which reproduces Go's nil dereference as a panic (utilities_middle.rs:361 `_ => panic!(\"LiteralLike payload\")`). Caller-level witness (cited, not claimed): witness/s06-ast-utilities-middle-rust IsUnterminatedLiteral rows. Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:NodeDefault.LiteralLikeData",
+      "owner": "the match's default arm, which reproduces Go's nil dereference as a panic"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: enum-match arm of tsr_ast node_semantics.rs modifiers() / node_accessors.rs MutableNode::set_modifiers (exact Go payload set) (node_semantics.rs modifiers(): the $shape! default (None) for the 161 other payloads). Caller-level witness (cited, not claimed): witness/s06-accessor-observations-rust SetModifiers rows (set a public modifier, ModifierFlags reads it back through Node.Modifiers; 35 value:1 vs 157 value:0). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:NodeDefault.Modifiers",
+      "owner": "enum-match arm of tsr_ast node_semantics.rs modifiers() / node_accessors.rs MutableNode::set_modifiers (exact Go payload set)"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: the default arm of the generated declaration-name match (node_read_generated.rs:31006 declaration_name_generated `_ => None`). Caller-level witness (cited, not claimed): witness/s06-accessor-observations-rust Name rows on the constructors without a name (nil). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:NodeDefault.Name",
+      "owner": "the default arm of the generated declaration-name match"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: the match's default arm (panic, as Go's nil dereference) (utilities_middle.rs:375 `_ => panic!(\"TemplateLiteralLike payload\")`). Caller-level witness (cited, not claimed): witness/s06-ast-utilities-middle-rust IsUnterminatedLiteral rows. Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:NodeDefault.TemplateLiteralLikeData",
+      "owner": "the match's default arm (panic, as Go's nil dereference)"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: the default arm of the generated visitor dispatch (transform_generated.rs:2880 `_ => return original_id`). Caller-level witness (cited, not claimed): witness/s06-factory-fixtures-rust visitor scenarios over leaf tokens. Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:NodeDefault.VisitEachChild",
+      "owner": "the default arm of the generated visitor dispatch"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: enum-match arm of tsr_ast node_semantics.rs modifiers() / node_accessors.rs MutableNode::set_modifiers (exact Go payload set) (node_accessors.rs:344 `_ => {}`). Caller-level witness (cited, not claimed): witness/s06-accessor-observations-rust SetModifiers rows (set a public modifier, ModifierFlags reads it back through Node.Modifiers; 35 value:1 vs 157 value:0). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:NodeDefault.setModifiers",
+      "owner": "enum-match arm of tsr_ast node_semantics.rs modifiers() / node_accessors.rs MutableNode::set_modifiers (exact Go payload set)"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: Rust trait objects / generic Factory bounds (factory.rs:20) (none: Rust passes &mut dyn Factory / RuntimeFactory (factory.rs:20) or BorrowedFactory). Caller-level witness (cited, not claimed): syntax/generated-ast|generated-shape|generated-special cases (tools/phase1/syntax/ast-generated) 'clone' actions. Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:NodeFactory.AsNodeFactory",
+      "owner": "Rust trait objects / generic Factory bounds (factory.rs:20)"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: struct literal CommentRange { loc, kind, has_trailing_new_line } (tsr_scanner trivia.rs:334) (crates/tsr_scanner/src/trivia.rs:334 `CommentRange { loc, kind, has_trailing_new_line }` struct literal in CommentRanges::next). Caller-level witness (cited, not claimed): witness/s05-scanner-operation-actions comment-range actions (pos/end/kind/hasTrailingNewLine of every yielded range). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:NodeFactory.NewCommentRange",
+      "owner": "struct literal CommentRange { loc, kind, has_trailing_new_line } (tsr_scanner trivia.rs:334)"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: an alias of NewToken: Factory::new_modifier builds the same token payload (factory.rs:36 `self.new_token_data(kind, crate::TokenData {})`). Caller-level witness (cited, not claimed): witness/s06-e1-parse-corpus modifier tokens in the encoded tree. Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:NodeFactory.NewModifier",
+      "owner": "an alias of NewToken: Factory::new_modifier builds the same token payload"
+    },
+    {
+      "category": "go_runtime",
+      "evidence": "ast.go:3183: resets the factory's arenas keeping hooks and counts. Only caller checker/nodebuilder.go (phase 2). Go reach 0.",
+      "operation": "tsc/internal/ast/ast.go:NodeFactory.ReleaseArenas",
+      "owner": "Go arena release; Rust drops the arena with its owner (precedent: leaves-roster core/arena.go entries, plan lines 437-438)"
+    },
+    {
+      "category": "unused_at_pin",
+      "evidence": "ast.go:3163-3165. `grep -rn IsTripleSlash upstream/tsc` returns only the definition; go/types scan with tests: 0 uses. Go reach 0.",
+      "operation": "tsc/internal/ast/ast.go:PragmaSpecification.IsTripleSlash",
+      "owner": "nothing at the pin calls it"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: static linkage: tsr_parser lazy_jsdoc.rs is called directly; no package-init hook (none needed: crates/tsr_parser/src/lazy_jsdoc.rs implements Node.JSDoc inside the parser crate). Caller-level witness (cited, not claimed): syntax/parse-outputs/lazy-jsdoc-in-typescript (lazy JSDoc parsed on demand, identical nodes on repeat). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:SetParseJSDocForNode",
+      "owner": "static linkage: tsr_parser lazy_jsdoc.rs is called directly; no package-init hook"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: the NoSubstitutionTemplateLiteral arm of the same match (utilities_middle.rs:360). Caller-level witness (cited, not claimed): witness/s06-ast-utilities-middle-rust IsUnterminatedLiteral rows on template literals. Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:TemplateLiteralLikeNodeBase.LiteralLikeData",
+      "owner": "the NoSubstitutionTemplateLiteral arm of the same match"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: enum-match arms reading template_flags for the four template payloads (utilities_middle.rs:370-373 `NodeDataRead::TemplateHead(data) => data.template_flags()` (and NoSubstitutionTemplateLiteral, Middle, Tail)). Caller-level witness (cited, not claimed): witness/s06-ast-utilities-middle-rust IsUnterminatedLiteral rows on template literals. Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:TemplateLiteralLikeNodeBase.TemplateLiteralLikeData",
+      "owner": "enum-match arms reading template_flags for the four template payloads"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field(s) `message_chain`; callers assign directly)) (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field(s) `message_chain`; callers assign directly)). Caller-level witness (cited, not claimed): the syntax mutation oracle's native observer reads the Go getters (tools/phase1/mutation/go/syntax/main.go:82-94) while the Rust driver reads the tsr_ast::Diagnostic fields; 15,152/15,152 syntax-schedule rows match (data/phase1/syntax-full.json). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/diagnostic.go:Diagnostic.AddMessageChain",
+      "owner": "public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field(s) `message_chain`; callers assign directly))"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field(s) `related_information`; callers assign directly)) (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field(s) `related_information`; callers assign directly)). Caller-level witness (cited, not claimed): the syntax mutation oracle's native observer reads the Go getters (tools/phase1/mutation/go/syntax/main.go:82-94) while the Rust driver reads the tsr_ast::Diagnostic fields; 15,152/15,152 syntax-schedule rows match (data/phase1/syntax-full.json). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/diagnostic.go:Diagnostic.AddRelatedInfo",
+      "owner": "public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field(s) `related_information`; callers assign directly))"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `category` of tsr_ast::Diagnostic)) (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `category` of tsr_ast::Diagnostic)). Caller-level witness (cited, not claimed): the syntax mutation oracle's native observer reads the Go getters (tools/phase1/mutation/go/syntax/main.go:82-94) while the Rust driver reads the tsr_ast::Diagnostic fields; 15,152/15,152 syntax-schedule rows match (data/phase1/syntax-full.json). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/diagnostic.go:Diagnostic.Category",
+      "owner": "public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `category` of tsr_ast::Diagnostic))"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:9 (#[derive(Clone)] on tsr_ast::Diagnostic)) (crates/tsr_ast/src/diagnostic.rs:9 (#[derive(Clone)] on tsr_ast::Diagnostic)). Caller-level witness (cited, not claimed): witness/s07-include-reasons-rust 4 related-information merge rows (compact_and_merge_related_infos clones before merging). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/diagnostic.go:Diagnostic.Clone",
+      "owner": "public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:9 (#[derive(Clone)] on tsr_ast::Diagnostic))"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `code` of tsr_ast::Diagnostic)) (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `code` of tsr_ast::Diagnostic)). Caller-level witness (cited, not claimed): the syntax mutation oracle's native observer reads the Go getters (tools/phase1/mutation/go/syntax/main.go:82-94) while the Rust driver reads the tsr_ast::Diagnostic fields; 15,152/15,152 syntax-schedule rows match (data/phase1/syntax-full.json). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/diagnostic.go:Diagnostic.Code",
+      "owner": "public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `code` of tsr_ast::Diagnostic))"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `loc` of tsr_ast::Diagnostic)) (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `loc` of tsr_ast::Diagnostic)). Caller-level witness (cited, not claimed): the syntax mutation oracle's native observer reads the Go getters (tools/phase1/mutation/go/syntax/main.go:82-94) while the Rust driver reads the tsr_ast::Diagnostic fields; 15,152/15,152 syntax-schedule rows match (data/phase1/syntax-full.json). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/diagnostic.go:Diagnostic.End",
+      "owner": "public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `loc` of tsr_ast::Diagnostic))"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `file` of tsr_ast::Diagnostic)) (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `file` of tsr_ast::Diagnostic)). Caller-level witness (cited, not claimed): the syntax mutation oracle's native observer reads the Go getters (tools/phase1/mutation/go/syntax/main.go:82-94) while the Rust driver reads the tsr_ast::Diagnostic fields; 15,152/15,152 syntax-schedule rows match (data/phase1/syntax-full.json). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/diagnostic.go:Diagnostic.File",
+      "owner": "public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `file` of tsr_ast::Diagnostic))"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `loc` of tsr_ast::Diagnostic)) (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `loc` of tsr_ast::Diagnostic)). Caller-level witness (cited, not claimed): the syntax mutation oracle's native observer reads the Go getters (tools/phase1/mutation/go/syntax/main.go:82-94) while the Rust driver reads the tsr_ast::Diagnostic fields; 15,152/15,152 syntax-schedule rows match (data/phase1/syntax-full.json). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/diagnostic.go:Diagnostic.Len",
+      "owner": "public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `loc` of tsr_ast::Diagnostic))"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `loc` of tsr_ast::Diagnostic)) (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `loc` of tsr_ast::Diagnostic)). Caller-level witness (cited, not claimed): the syntax mutation oracle's native observer reads the Go getters (tools/phase1/mutation/go/syntax/main.go:82-94) while the Rust driver reads the tsr_ast::Diagnostic fields; 15,152/15,152 syntax-schedule rows match (data/phase1/syntax-full.json). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/diagnostic.go:Diagnostic.Loc",
+      "owner": "public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `loc` of tsr_ast::Diagnostic))"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `message_args` of tsr_ast::Diagnostic)) (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `message_args` of tsr_ast::Diagnostic)). Caller-level witness (cited, not claimed): the syntax mutation oracle's native observer reads the Go getters (tools/phase1/mutation/go/syntax/main.go:82-94) while the Rust driver reads the tsr_ast::Diagnostic fields; 15,152/15,152 syntax-schedule rows match (data/phase1/syntax-full.json). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/diagnostic.go:Diagnostic.MessageArgs",
+      "owner": "public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `message_args` of tsr_ast::Diagnostic))"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `message_chain` of tsr_ast::Diagnostic)) (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `message_chain` of tsr_ast::Diagnostic)). Caller-level witness (cited, not claimed): the syntax mutation oracle's native observer reads the Go getters (tools/phase1/mutation/go/syntax/main.go:82-94) while the Rust driver reads the tsr_ast::Diagnostic fields; 15,152/15,152 syntax-schedule rows match (data/phase1/syntax-full.json). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/diagnostic.go:Diagnostic.MessageChain",
+      "owner": "public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `message_chain` of tsr_ast::Diagnostic))"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `message_key` of tsr_ast::Diagnostic)) (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `message_key` of tsr_ast::Diagnostic)). Caller-level witness (cited, not claimed): the syntax mutation oracle's native observer reads the Go getters (tools/phase1/mutation/go/syntax/main.go:82-94) while the Rust driver reads the tsr_ast::Diagnostic fields; 15,152/15,152 syntax-schedule rows match (data/phase1/syntax-full.json). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/diagnostic.go:Diagnostic.MessageKey",
+      "owner": "public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `message_key` of tsr_ast::Diagnostic))"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `message_text` of tsr_ast::Diagnostic)) (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `message_text` of tsr_ast::Diagnostic)). Caller-level witness (cited, not claimed): the syntax mutation oracle's native observer reads the Go getters (tools/phase1/mutation/go/syntax/main.go:82-94) while the Rust driver reads the tsr_ast::Diagnostic fields; 15,152/15,152 syntax-schedule rows match (data/phase1/syntax-full.json). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/diagnostic.go:Diagnostic.MessageText",
+      "owner": "public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `message_text` of tsr_ast::Diagnostic))"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `loc` of tsr_ast::Diagnostic)) (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `loc` of tsr_ast::Diagnostic)). Caller-level witness (cited, not claimed): the syntax mutation oracle's native observer reads the Go getters (tools/phase1/mutation/go/syntax/main.go:82-94) while the Rust driver reads the tsr_ast::Diagnostic fields; 15,152/15,152 syntax-schedule rows match (data/phase1/syntax-full.json). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/diagnostic.go:Diagnostic.Pos",
+      "owner": "public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `loc` of tsr_ast::Diagnostic))"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `related_information` of tsr_ast::Diagnostic)) (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `related_information` of tsr_ast::Diagnostic)). Caller-level witness (cited, not claimed): the syntax mutation oracle's native observer reads the Go getters (tools/phase1/mutation/go/syntax/main.go:82-94) while the Rust driver reads the tsr_ast::Diagnostic fields; 15,152/15,152 syntax-schedule rows match (data/phase1/syntax-full.json). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/diagnostic.go:Diagnostic.RelatedInformation",
+      "owner": "public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `related_information` of tsr_ast::Diagnostic))"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `reports_deprecated` of tsr_ast::Diagnostic)) (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `reports_deprecated` of tsr_ast::Diagnostic)). Caller-level witness (cited, not claimed): the syntax mutation oracle's native observer reads the Go getters (tools/phase1/mutation/go/syntax/main.go:82-94) while the Rust driver reads the tsr_ast::Diagnostic fields; 15,152/15,152 syntax-schedule rows match (data/phase1/syntax-full.json). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/diagnostic.go:Diagnostic.ReportsDeprecated",
+      "owner": "public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `reports_deprecated` of tsr_ast::Diagnostic))"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `reports_unnecessary` of tsr_ast::Diagnostic)) (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `reports_unnecessary` of tsr_ast::Diagnostic)). Caller-level witness (cited, not claimed): the syntax mutation oracle's native observer reads the Go getters (tools/phase1/mutation/go/syntax/main.go:82-94) while the Rust driver reads the tsr_ast::Diagnostic fields; 15,152/15,152 syntax-schedule rows match (data/phase1/syntax-full.json). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/diagnostic.go:Diagnostic.ReportsUnnecessary",
+      "owner": "public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `reports_unnecessary` of tsr_ast::Diagnostic))"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field(s) `category`; callers assign directly)) (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field(s) `category`; callers assign directly)). Caller-level witness (cited, not claimed): the syntax mutation oracle's native observer reads the Go getters (tools/phase1/mutation/go/syntax/main.go:82-94) while the Rust driver reads the tsr_ast::Diagnostic fields; 15,152/15,152 syntax-schedule rows match (data/phase1/syntax-full.json). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/diagnostic.go:Diagnostic.SetCategory",
+      "owner": "public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field(s) `category`; callers assign directly))"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field(s) `source`, `message_text`; callers assign directly)) (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field(s) `source`, `message_text`; callers assign directly)). Caller-level witness (cited, not claimed): the syntax mutation oracle's native observer reads the Go getters (tools/phase1/mutation/go/syntax/main.go:82-94) while the Rust driver reads the tsr_ast::Diagnostic fields; 15,152/15,152 syntax-schedule rows match (data/phase1/syntax-full.json). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/diagnostic.go:Diagnostic.SetExternalData",
+      "owner": "public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field(s) `source`, `message_text`; callers assign directly))"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field(s) `file`; callers assign directly)) (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field(s) `file`; callers assign directly)). Caller-level witness (cited, not claimed): the syntax mutation oracle's native observer reads the Go getters (tools/phase1/mutation/go/syntax/main.go:82-94) while the Rust driver reads the tsr_ast::Diagnostic fields; 15,152/15,152 syntax-schedule rows match (data/phase1/syntax-full.json). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/diagnostic.go:Diagnostic.SetFile",
+      "owner": "public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field(s) `file`; callers assign directly))"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field(s) `loc`; callers assign directly)) (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field(s) `loc`; callers assign directly)). Caller-level witness (cited, not claimed): the syntax mutation oracle's native observer reads the Go getters (tools/phase1/mutation/go/syntax/main.go:82-94) while the Rust driver reads the tsr_ast::Diagnostic fields; 15,152/15,152 syntax-schedule rows match (data/phase1/syntax-full.json). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/diagnostic.go:Diagnostic.SetLocation",
+      "owner": "public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field(s) `loc`; callers assign directly))"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field(s) `message_chain`; callers assign directly)) (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field(s) `message_chain`; callers assign directly)). Caller-level witness (cited, not claimed): the syntax mutation oracle's native observer reads the Go getters (tools/phase1/mutation/go/syntax/main.go:82-94) while the Rust driver reads the tsr_ast::Diagnostic fields; 15,152/15,152 syntax-schedule rows match (data/phase1/syntax-full.json). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/diagnostic.go:Diagnostic.SetMessageChain",
+      "owner": "public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field(s) `message_chain`; callers assign directly))"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field(s) `related_information`; callers assign directly)) (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field(s) `related_information`; callers assign directly)). Caller-level witness (cited, not claimed): the syntax mutation oracle's native observer reads the Go getters (tools/phase1/mutation/go/syntax/main.go:82-94) while the Rust driver reads the tsr_ast::Diagnostic fields; 15,152/15,152 syntax-schedule rows match (data/phase1/syntax-full.json). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/diagnostic.go:Diagnostic.SetRelatedInfo",
+      "owner": "public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field(s) `related_information`; callers assign directly))"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field(s) `skipped_on_no_emit`; callers assign directly)) (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field(s) `skipped_on_no_emit`; callers assign directly)). Caller-level witness (cited, not claimed): the syntax mutation oracle's native observer reads the Go getters (tools/phase1/mutation/go/syntax/main.go:82-94) while the Rust driver reads the tsr_ast::Diagnostic fields; 15,152/15,152 syntax-schedule rows match (data/phase1/syntax-full.json). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/diagnostic.go:Diagnostic.SetSkippedOnNoEmit",
+      "owner": "public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field(s) `skipped_on_no_emit`; callers assign directly))"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `skipped_on_no_emit` of tsr_ast::Diagnostic)) (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `skipped_on_no_emit` of tsr_ast::Diagnostic)). Caller-level witness (cited, not claimed): the syntax mutation oracle's native observer reads the Go getters (tools/phase1/mutation/go/syntax/main.go:82-94) while the Rust driver reads the tsr_ast::Diagnostic fields; 15,152/15,152 syntax-schedule rows match (data/phase1/syntax-full.json). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/diagnostic.go:Diagnostic.SkippedOnNoEmit",
+      "owner": "public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `skipped_on_no_emit` of tsr_ast::Diagnostic))"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `source` of tsr_ast::Diagnostic)) (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `source` of tsr_ast::Diagnostic)). Caller-level witness (cited, not claimed): the syntax mutation oracle's native observer reads the Go getters (tools/phase1/mutation/go/syntax/main.go:82-94) while the Rust driver reads the tsr_ast::Diagnostic fields; 15,152/15,152 syntax-schedule rows match (data/phase1/syntax-full.json). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/diagnostic.go:Diagnostic.Source",
+      "owner": "public field / Vec::push / derive(Clone) of tsr_ast::Diagnostic (crates/tsr_ast/src/diagnostic.rs:10-26 (pub field `source` of tsr_ast::Diagnostic))"
+    },
+    {
+      "category": "unused_at_pin",
+      "evidence": "Definition diagnostic.go:329-343. The type-checked reference search over the whole pinned module with tests (GOOS darwin, linux, windows) finds no use, no method value and no interface requiring it; `grep -rn '\\.Lookup(' upstream/tsc` finds only pprof, flag and reflect tag lookups.",
+      "operation": "tsc/internal/ast/diagnostic.go:DiagnosticsCollection.Lookup",
+      "owner": "nothing at the pin calls it"
+    },
+    {
+      "category": "generated_assertion",
+      "evidence": "upstream/tsc/internal/ast/kind_stringer_generated.go:7-363 is `func _() { var x [1]struct{}; _ = x[KindUnknown-0] ... }` emitted by stringer; its comment says an \"invalid array index\" compile error signals changed constants. Precedent: six identical generated_assertion exemptions in data/phase1/lea\u2026",
+      "operation": "tsc/internal/ast/kind_stringer_generated.go:_",
+      "owner": "xtask/src/gen (kinds_generated.rs from the pinned schema)"
+    },
+    {
+      "category": "unused_at_pin",
+      "evidence": "grep -rn 'IsStatic\\b' upstream/tsc --include='*.go' minus ast.IsStatic( and parameter names leaves only symbol.go:27.",
+      "operation": "tsc/internal/ast/symbol.go:Symbol.IsStatic",
+      "owner": "dispatch-dead / no selector call at the pin; not a claim that the name has no textual caller"
+    },
+    {
+      "category": "unused_at_pin",
+      "evidence": "`grep -rn GetInitializerOfBinaryExpression upstream` returns exactly 1 line, the definition at upstream/tsc/internal/ast/utilities.go:1423 (verified this session over the whole upstream tree: tsc, packages, tools; tests included). Go reach e1/binder/facts/syntax = 0/0/0/0.",
+      "operation": "tsc/internal/ast/utilities.go:GetInitializerOfBinaryExpression",
+      "owner": "nothing at the pin calls it"
+    },
+    {
+      "category": "unused_at_pin",
+      "evidence": "`grep -rn IsModuleExportsQualifiedName upstream` returns exactly 1 line, the definition at upstream/tsc/internal/ast/utilities.go:2927 (verified this session over the whole upstream tree: tsc, packages, tools; tests included). Go reach e1/binder/facts/syntax = 0/0/0/0.",
+      "operation": "tsc/internal/ast/utilities.go:IsModuleExportsQualifiedName",
+      "owner": "nothing at the pin calls it"
+    },
+    {
+      "category": "unused_at_pin",
+      "evidence": "`grep -rn IsUnaryExpression upstream` returns exactly 1 line, the definition at upstream/tsc/internal/ast/utilities.go:430 (verified this session over the whole upstream tree: tsc, packages, tools; tests included). Go reach e1/binder/facts/syntax = 0/0/0/0.",
+      "operation": "tsc/internal/ast/utilities.go:IsUnaryExpression",
+      "owner": "nothing at the pin calls it"
+    },
+    {
+      "category": "unused_at_pin",
+      "evidence": "`grep -rn IsVoidZero upstream` returns exactly 1 line, the definition at upstream/tsc/internal/ast/utilities.go:1355 (verified this session over the whole upstream tree: tsc, packages, tools; tests included). Go reach e1/binder/facts/syntax = 0/0/0/0.",
+      "operation": "tsc/internal/ast/utilities.go:IsVoidZero",
+      "owner": "nothing at the pin calls it"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: matches!(kind, A | B | ...) reproduces slices.Contains(kinds, node.Kind) ([\"crates/tsr_ast/src/utilities.rs::node_kind_is@fn:582\"]). Caller-level witness (cited, not claimed): witness/s06-utilities-front-rust IsAnyImportSyntax/IsImportNode rows and witness/s06-ast-utilities-middle-rust IsBreakOrContinueStatement/IsJSDocLinkLike rows (covered callers). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/utilities.go:NodeKindIs",
+      "owner": "matches!(kind, A | B | ...) reproduces slices.Contains(kinds, node.Kind)"
+    },
+    {
+      "category": "go_runtime",
+      "evidence": "utilities.go:871-897: the function exists to build one pooled closure (\"Consolidate state into one allocation. Similar to https://go.dev/cl/552375\") for sync.Pool.New; its only caller is the pool at :873, and SetParentInChildren (:899-903) Gets/Puts it. Which rows enter it depends on pool history, not input. The recursion it closes over is SetParentInChildren's caller-visible contract, already wi\u2026",
+      "operation": "tsc/internal/ast/utilities.go:newParentInChildrenSetter",
+      "owner": "SetParentInChildren (tsr_ast/src/clone.rs:120), witnessed by mutation/binder and mutation/e1; Rust has no sync.Pool here"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: a Vec push (Go's append onto the virtual ancestor stack) (binder_helpers.rs:976 push_ancestor `result.push(id)`). Caller-level witness (cited, not claimed): witness/s07-ast-helpers-rust module-instance-state rows module/5 and module/6 (the alias-order ancestor fallback). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/utilities.go:pushAncestor",
+      "owner": "a Vec push (Go's append onto the virtual ancestor stack)"
+    },
+    {
+      "category": "unused_at_pin",
       "evidence": "upstream/tsc/internal/astnav/tokens.go:282. A bare-name search over the pinned tree returns exactly one occurrence, the definition itself (verified in this session). docs/S09-3-formatter-plan.md already records it as not ported. || RUST: Absent; tsr_astnav has no counterpart and needs none.",
       "operation": "tsc/internal/astnav/tokens.go:findRightmostNode",
       "owner": "nothing at the pin calls it"
+    },
+    {
+      "category": "unused_at_pin",
+      "evidence": "Definition binder.go:1381-1390 (chooses one of three ES5 strict-mode messages). The type-checked reference search over the pinned module with tests (GOOS darwin/linux/windows) and `grep -rn --include='*.go' getStrictModeBlockScopeFunctionDeclarationMessage upstream/tsc` return only the definition.",
+      "operation": "tsc/internal/binder/binder.go:Binder.getStrictModeBlockScopeFunctionDeclarationMessage",
+      "owner": "nothing at the pin calls it"
+    },
+    {
+      "category": "go_runtime",
+      "evidence": "`return binderPool.Get().(*Binder)` (binder.go:111-113); only caller bindSourceFile:122. a sync.Pool accessor/constructor; category go_runtime ('a Go language mechanism -- scheduling, sync, arenas, vet markers -- with no caller-visible contract'). Every go-reach header lists newParser and Parser.initializeClosures as pool operations (unstable, never credited); getParser/putParser/getBinder/putBin\u2026",
+      "operation": "tsc/internal/binder/binder.go:getBinder",
+      "owner": "none needed: Rust builds a fresh Binder per bind (crates/tsr_binder/src/lib.rs:90 Binder::from_backend inside bind_parsed_file)"
+    },
+    {
+      "category": "unused_at_pin",
+      "evidence": "Definition binder.go:2761-2775 (ValueDeclaration is a function declaration or a variable initialized with a function-like). The type-checked reference search over the pinned module with tests (GOOS darwin/linux/windows) and `grep -rn --include='*.go' isFunctionSymbol upstream/tsc` return only the definition.",
+      "operation": "tsc/internal/binder/binder.go:isFunctionSymbol",
+      "owner": "nothing at the pin calls it"
+    },
+    {
+      "category": "unused_at_pin",
+      "evidence": "Definition binder.go:2748-2754 (prefix +/- over a numeric literal). The type-checked reference search over the pinned module with tests (GOOS darwin/linux/windows) and `grep -rn --include='*.go' isSignedNumericLiteral upstream/tsc` return only the definition.",
+      "operation": "tsc/internal/binder/binder.go:isSignedNumericLiteral",
+      "owner": "nothing at the pin calls it"
+    },
+    {
+      "category": "go_runtime",
+      "evidence": "Resets `*b = Binder{bindFunc: b.bindFunc}` and returns it to binderPool (binder.go:115-118); only caller bindSourceFile:123 (defer). a sync.Pool accessor/constructor; category go_runtime ('a Go language mechanism -- scheduling, sync, arenas, vet markers -- with no caller-visible contract'). Every go-reach header lists newParser and Parser.initializeClosures as pool operations (unstable, never cre\u2026",
+      "operation": "tsc/internal/binder/binder.go:putBinder",
+      "owner": "none needed"
     },
     {
       "category": "later_step",
@@ -403,6 +913,30 @@
       "owner": "Phase 3 under the accepted section 2 boundary"
     },
     {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: enum variant match on tsr_compiler IncludeReasonData replaces the interface type assertion (crates/tsr_compiler/src/include_reason.rs (IncludeReasonData::AutomaticType matched in compute_location / compute_diagnostic / related-info code)). Caller-level witness (cited, not claimed): witness/s07-include-reasons-rust rows whose rendered reasons depend on the payload: Behavioral witness: witness/s07-include-reasons-rust rows automatic-type-package, whose rendered reasons depend on the payload.. Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/compiler/fileInclude.go:FileIncludeReason.asAutomaticTypeDirectiveFileData",
+      "owner": "enum variant match on tsr_compiler IncludeReasonData replaces the interface type assertion"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: enum variant match on tsr_compiler IncludeReasonData replaces the interface type assertion (crates/tsr_compiler/src/include_reason.rs (IncludeReasonData::Root { index } matched in compute_location / compute_diagnostic / related-info code)). Caller-level witness (cited, not claimed): witness/s07-include-reasons-rust rows whose rendered reasons depend on the payload: Behavioral witness: witness/s07-include-reasons-rust rows config/files, singleton-import, whose rendered reasons depend on the payload.. Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/compiler/fileInclude.go:FileIncludeReason.asIndex",
+      "owner": "enum variant match on tsr_compiler IncludeReasonData replaces the interface type assertion"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: enum variant match on tsr_compiler IncludeReasonData replaces the interface type assertion (crates/tsr_compiler/src/include_reason.rs (IncludeReasonData::Lib { index: Option<usize> } matched in compute_location / compute_diagnostic / related-info code)). Caller-level witness (cited, not claimed): witness/s07-include-reasons-rust rows whose rendered reasons depend on the payload: Behavioral witness: witness/s07-include-reasons-rust rows explicit-library, default-library, whose rendered reasons depend on the payload.. Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/compiler/fileInclude.go:FileIncludeReason.asLibFileIndex",
+      "owner": "enum variant match on tsr_compiler IncludeReasonData replaces the interface type assertion"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: enum variant match on tsr_compiler IncludeReasonData replaces the interface type assertion (crates/tsr_compiler/src/include_reason.rs (IncludeReasonData::{Import,ReferenceFile,TypeReference,LibReference} { file, index, .. } matched in compute_location / compute_diagnostic / related-info code)). Caller-level witness (cited, not claimed): witness/s07-include-reasons-rust rows whose rendered reasons depend on the payload: Behavioral witness: witness/s07-include-reasons-rust rows references, singleton-import, library-directive, whose rendered reasons depend on the payload.. Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/compiler/fileInclude.go:FileIncludeReason.asReferencedFileData",
+      "owner": "enum variant match on tsr_compiler IncludeReasonData replaces the interface type assertion"
+    },
+    {
       "category": "later_step",
       "evidence": "Definition: upstream/tsc/internal/compiler/fileloader.go:587-613. upstream/tsc/internal/compiler/fileloader.go. Gated by a content-mapper extension (fileloader.go:410) or a content-mapper project; the F4a syntax schedule carries the 15 content-mapped variants as this named boundary. Authority: docs/PHASE1-implementation-plan.md section 2, lines 168-171: LSP/fourslash, production mapper host and project-system services remain Phase 5, per ADR 0019.",
       "operation": "tsc/internal/compiler/fileloader.go:ContentMapperInitializationDiagnostic",
@@ -446,12 +980,6 @@
     },
     {
       "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/fileloader.go:326-342. Caller: newFileLoader/load setup at fileloader.go:177, before module.NewResolver at :178; method initializes a mapper even when references are empty (:327-334). Loads referenced configuration graph during ordinary program construction. A WorkGroup scheduling config reads is not project-reference build scheduling. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/fileloader.go:fileLoader.addProjectReferenceTasks",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
-    },
-    {
-      "category": "later_step",
       "evidence": "Definition: upstream/tsc/internal/compiler/fileloader.go:624-631. upstream/tsc/internal/compiler/fileloader.go. Gated by a content-mapper extension (fileloader.go:410) or a content-mapper project; the F4a syntax schedule carries the 15 content-mapped variants as this named boundary. Authority: docs/PHASE1-implementation-plan.md section 2, lines 168-171: LSP/fourslash, production mapper host and project-system services remain Phase 5, per ADR 0019.",
       "operation": "tsc/internal/compiler/fileloader.go:fileLoader.contentMapperUnavailable",
       "owner": "Phase 5 under the accepted section 2 boundary"
@@ -487,10 +1015,40 @@
       "owner": "Phase 5 under the accepted section 2 boundary"
     },
     {
-      "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/filesparser.go:185-193. Caller: parseTask.load at filesparser.go:73-76, before parsing the requested source Creates a redirected parse subtask preserving lib/include reason and avoiding duplicated depth accounting; does not schedule compilation of a referenced project. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/filesparser.go:parseTask.redirect",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: struct field / map entry in tsr_compiler loader.rs (crates/tsr_compiler/src/loader.rs:83-84 (Program.redirect_paths / redirect_file_names maps built at loader.rs:328-333)) (crates/tsr_compiler/src/loader.rs:83-84 (Program.redirect_paths / redirect_file_names maps built at loader.rs:328-333)). Caller-level witness (cited, not claimed): witness/s07-include-reasons-rust row 'package-redirect'. Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/compiler/fileloader.go:redirectsFile.FileName",
+      "owner": "struct field / map entry in tsr_compiler loader.rs (crates/tsr_compiler/src/loader.rs:83-84 (Program.redirect_paths / redirect_file_names maps built at loader.rs:328-333))"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: struct field / map entry in tsr_compiler loader.rs (crates/tsr_compiler/src/loader.rs:83-84 (Program.redirect_paths / redirect_file_names maps built at loader.rs:328-333)) (crates/tsr_compiler/src/loader.rs:83-84 (Program.redirect_paths / redirect_file_names maps built at loader.rs:328-333)). Caller-level witness (cited, not claimed): witness/s07-include-reasons-rust row 'package-redirect'. Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/compiler/fileloader.go:redirectsFile.Path",
+      "owner": "struct field / map entry in tsr_compiler loader.rs (crates/tsr_compiler/src/loader.rs:83-84 (Program.redirect_paths / redirect_file_names maps built at loader.rs:328-333))"
+    },
+    {
+      "category": "go_runtime",
+      "evidence": "parseTaskDataPool Get/Put (filesparser.go:243-248); only caller filesParser.start:272/275. A sync.Pool mechanism (go_runtime category). Unlike the parser pool it is not in the go-reach unstable list, but a pool accessor has no caller-visible contract.",
+      "operation": "tsc/internal/compiler/filesparser.go:getParseTaskData",
+      "owner": "none needed (Rust keeps per-path state in Loader.depths/child_tasks maps)"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: struct field / map entry in tsr_compiler loader.rs (crates/tsr_compiler/src/loader.rs:1155-1165 (LoadTask.name / IncludeEdge.path fields)) (crates/tsr_compiler/src/loader.rs:1155-1165 (LoadTask.name / IncludeEdge.path fields)). Caller-level witness (cited, not claimed): syntax-schedule file lists (15,152/15,152) and witness/s07-program-loader-rust rows. Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/compiler/filesparser.go:parseTask.FileName",
+      "owner": "struct field / map entry in tsr_compiler loader.rs (crates/tsr_compiler/src/loader.rs:1155-1165 (LoadTask.name / IncludeEdge.path fields))"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: struct field / map entry in tsr_compiler loader.rs (crates/tsr_compiler/src/loader.rs:1155-1165 (LoadTask.name / IncludeEdge.path fields)) (crates/tsr_compiler/src/loader.rs:1155-1165 (LoadTask.name / IncludeEdge.path fields)). Caller-level witness (cited, not claimed): syntax-schedule file lists (15,152/15,152) and witness/s07-program-loader-rust rows. Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/compiler/filesparser.go:parseTask.Path",
+      "owner": "struct field / map entry in tsr_compiler loader.rs (crates/tsr_compiler/src/loader.rs:1155-1165 (LoadTask.name / IncludeEdge.path fields))"
+    },
+    {
+      "category": "go_runtime",
+      "evidence": "parseTaskDataPool Get/Put (filesparser.go:250-253); only caller filesParser.start:272/275. A sync.Pool mechanism (go_runtime category). Unlike the parser pool it is not in the go-reach unstable list, but a pool accessor has no caller-visible contract.",
+      "operation": "tsc/internal/compiler/filesparser.go:putParseTaskData",
+      "owner": "none needed (Rust keeps per-path state in Loader.depths/child_tasks maps)"
     },
     {
       "category": "later_step",
@@ -499,10 +1057,28 @@
       "owner": "Phase 4 under the accepted section 2 boundary"
     },
     {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: tsr_compiler ProgramOptions struct literal / field read (loader.rs:56-62) (crates/tsr_compiler/src/loader.rs:56-62 ProgramOptions {host, current_directory, default_library_path} (struct literal at each caller)). Caller-level witness (cited, not claimed): every syntax-schedule row and S07 program row constructs the host with the same cwd/fs/library path and matches (15,152/15,152; witness/s07-program-loader-rust). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/compiler/host.go:NewCompilerHost",
+      "owner": "tsr_compiler ProgramOptions struct literal / field read (loader.rs:56-62)"
+    },
+    {
       "category": "later_step",
       "evidence": "Definition: upstream/tsc/internal/compiler/host.go:115-117. upstream/tsc/internal/compiler/host.go. Gated by a content-mapper extension (fileloader.go:410) or a content-mapper project; the F4a syntax schedule carries the 15 content-mapped variants as this named boundary. Authority: docs/PHASE1-implementation-plan.md section 2, lines 168-171: LSP/fourslash, production mapper host and project-system services remain Phase 5, per ADR 0019.",
       "operation": "tsc/internal/compiler/host.go:compilerHost.ContentMapperProject",
       "owner": "Phase 5 under the accepted section 2 boundary"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: tsr_compiler ProgramOptions struct literal / field read (loader.rs:56-62) (crates/tsr_compiler/src/loader.rs:56-62 ProgramOptions.default_library_path (Loader.lib_path)). Caller-level witness (cited, not claimed): every syntax-schedule row and S07 program row constructs the host with the same cwd/fs/library path and matches (15,152/15,152; witness/s07-program-loader-rust). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/compiler/host.go:compilerHost.DefaultLibraryPath",
+      "owner": "tsr_compiler ProgramOptions struct literal / field read (loader.rs:56-62)"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: tsr_compiler ProgramOptions struct literal / field read (loader.rs:56-62) (crates/tsr_compiler/src/loader.rs:56-62 ProgramOptions.host: Arc<dyn FileSystem>). Caller-level witness (cited, not claimed): every syntax-schedule row and S07 program row constructs the host with the same cwd/fs/library path and matches (15,152/15,152; witness/s07-program-loader-rust). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/compiler/host.go:compilerHost.FS",
+      "owner": "tsr_compiler ProgramOptions struct literal / field read (loader.rs:56-62)"
     },
     {
       "category": "later_step",
@@ -511,16 +1087,28 @@
       "owner": "Phase 5 under the accepted section 2 boundary"
     },
     {
-      "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/host.go:119-122. Caller: projectReferenceParseTask.parse at projectreferenceparser.go:24 host.go:119-121 calls tsoptions.GetParsedCommandLineOfConfigFilePath with the extended-config cache; config parsing, not a builder. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/host.go:compilerHost.GetResolvedProjectReference",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: tsr_compiler ProgramOptions struct literal / field read (loader.rs:56-62) (crates/tsr_compiler/src/loader.rs:56-62 ProgramOptions.current_directory (Loader.cwd)). Caller-level witness (cited, not claimed): every syntax-schedule row and S07 program row constructs the host with the same cwd/fs/library path and matches (15,152/15,152; witness/s07-program-loader-rust). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/compiler/host.go:compilerHost.GetCurrentDirectory",
+      "owner": "tsr_compiler ProgramOptions struct literal / field read (loader.rs:56-62)"
     },
     {
       "category": "later_step",
       "evidence": "Definition: upstream/tsc/internal/compiler/includeprocessor.go:28-33. upstream/tsc/internal/compiler/includeprocessor.go:28. Its sole call is Program.ReuseProgram in internal/compiler/program.go; the normal NewProgram path constructs a fresh processor. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation. Authority: docs/PHASE1-implementation-plan.md section 2, lines 165-167: CLI execution, project-reference build scheduling, watch, tracing and process services remain Phase 4; their options remain Phase 1.",
       "operation": "tsc/internal/compiler/includeprocessor.go:updateFileIncludeProcessor",
       "owner": "Phase 4 under the accepted section 2 boundary"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: typed struct/enum data passed directly replaces the interface type assertion (none: Rust creates unknown-reference diagnostics directly in the loader (loader.rs:909-914)). Caller-level witness (cited, not claimed): witness/s07-include-reasons-rust rows through createDiagnosticExplainingFile / processing diagnostics. Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/compiler/processingDiagnostic.go:processingDiagnostic.asFileIncludeReason",
+      "owner": "typed struct/enum data passed directly replaces the interface type assertion"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: typed struct/enum data passed directly replaces the interface type assertion (crates/tsr_compiler/src/include_reason.rs:584 (explain_file_include_with_reason receives the typed FileIncludeDiagnostic fields)). Caller-level witness (cited, not claimed): witness/s07-include-reasons-rust rows through createDiagnosticExplainingFile / processing diagnostics. Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/compiler/processingDiagnostic.go:processingDiagnostic.asIncludeExplainingDiagnostic",
+      "owner": "typed struct/enum data passed directly replaces the interface type assertion"
     },
     {
       "category": "later_step",
@@ -703,6 +1291,12 @@
       "owner": "Phase 5 under the accepted section 2 boundary"
     },
     {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: load-time capture: tsr_compiler stores the usage mode / package id in IncludeReasonData::Import (struct field) instead of an explanation-time Program lookup ([\"crates/tsr_compiler/src/checker_host.rs::get_mode_for_usage_location@fn:140\"]). Caller-level witness (cited, not claimed): witness/s07-include-reasons-rust package rows ('type-reference-package-zero', 'singleton-import' package import) observe the package id in include explanations. Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/compiler/program.go:Program.GetModeForUsageLocation",
+      "owner": "load-time capture: tsr_compiler stores the usage mode / package id in IncludeReasonData::Import (struct field) instead of an explanation-time Program lookup"
+    },
+    {
       "category": "later_step",
       "evidence": "Definition: upstream/tsc/internal/compiler/program.go:147-153. upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); Authority: docs/PHASE1-implementation-plan.md section 2, lines 162-163: full checker diagnostics and checker services remain Phase 2.",
       "operation": "tsc/internal/compiler/program.go:Program.GetNearestAncestorDirectoryWithPackageJson",
@@ -749,6 +1343,12 @@
       "evidence": "Definition: upstream/tsc/internal/compiler/program.go:172-174. upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); Authority: docs/PHASE1-implementation-plan.md section 2, lines 162-163: full checker diagnostics and checker services remain Phase 2.",
       "operation": "tsc/internal/compiler/program.go:Program.GetRedirectTargets",
       "owner": "Phase 2 under the accepted section 2 boundary"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: load-time capture: tsr_compiler stores the usage mode / package id in IncludeReasonData::Import (struct field) instead of an explanation-time Program lookup ([\"crates/tsr_compiler/src/checker_host.rs::get_resolved_module@fn:204\"]). Caller-level witness (cited, not claimed): witness/s07-include-reasons-rust package rows ('type-reference-package-zero', 'singleton-import' package import) observe the package id in include explanations. Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/compiler/program.go:Program.GetResolvedModule",
+      "owner": "load-time capture: tsr_compiler stores the usage mode / package id in IncludeReasonData::Import (struct field) instead of an explanation-time Program lookup"
     },
     {
       "category": "later_step",
@@ -803,12 +1403,6 @@
       "evidence": "Definition: upstream/tsc/internal/compiler/program.go:241-282. upstream/tsc/internal/compiler/program.go. Reached only from Program.Emit (program.go:1839) or the declaration-diagnostics emit host (program.go:1576), through the printer and the declaration transformer. Authority: docs/PHASE1-implementation-plan.md section 2, line 164: JS/declaration emit, source maps and transforms remain Phase 3.",
       "operation": "tsc/internal/compiler/program.go:Program.GetSourceFileFromReference",
       "owner": "Phase 3 under the accepted section 2 boundary"
-    },
-    {
-      "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/program.go:180-185. Caller: processingDiagnostic.createDiagnosticExplainingFile -> includeProcessor.explainRedirectAndImpliedFormat (processingDiagnostic.go:106 / includeprocessor.go:144); Program.GetProgramDiagnostics at program.go:794-800 requests those global load diagnostics. Also emit and CLI ExplainFiles. Required by ordinary load diagnostics/options; exact scope clarification needed before exempting the reference-enabled branch. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/program.go:Program.GetSourceOfProjectReferenceIfOutputIncluded",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
     },
     {
       "category": "later_step",
@@ -914,12 +1508,6 @@
     },
     {
       "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/program.go:218-220. Caller: Program.verifyProjectReferences at program.go:1375, plus project-system consumers Required by ordinary load diagnostics/options; exact scope clarification needed before exempting the reference-enabled branch. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
-    },
-    {
-      "category": "later_step",
       "evidence": "upstream/tsc/internal/compiler/program.go:222-227. Caller: project/projectcollectionbuilder.go:670  Authority: docs/PHASE1-implementation-plan.md:168-171 excludes LSP/project-system services; :154-158 directs explicit classification rather than importing editor services through coarse ledger labels.",
       "operation": "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReferenceInChildConfig",
       "owner": "Phase 5 under the accepted section 2 boundary"
@@ -941,6 +1529,12 @@
       "evidence": "Definition: upstream/tsc/internal/compiler/program.go:323-416. upstream/tsc/internal/compiler/program.go:323. internal/execute/watcher.go calls it directly; Program.UpdateProgram also calls it for the later project system. Immutable snapshot construction/cache reuse already exercised in Phase 1 is a distinct path. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation. Authority: docs/PHASE1-implementation-plan.md section 2, lines 165-167: CLI execution, project-reference build scheduling, watch, tracing and process services remain Phase 4; their options remain Phase 1.",
       "operation": "tsc/internal/compiler/program.go:Program.ReuseProgram",
       "owner": "Phase 4 under the accepted section 2 boundary"
+    },
+    {
+      "category": "go_runtime",
+      "evidence": "`opts.SingleThreaded.DefaultIfUnknown(Options().SingleThreaded).IsTrue()` (program.go:553-555) only selects goroutine scheduling for WorkGroups (NewProgram:289, BindSourceFiles:558, collectDiagnosticsFromFiles:659, checker pool). Results are order-independent by construction; the syntax oracle runs Go with SingleThreaded=true and Rust matches.",
+      "operation": "tsc/internal/compiler/program.go:Program.SingleThreaded",
+      "owner": "none needed: the Rust loader is sequential"
     },
     {
       "category": "later_step",
@@ -1091,18 +1685,6 @@
       "evidence": "Definition: upstream/tsc/internal/compiler/program.go:455-467. upstream/tsc/internal/compiler/program.go:455. Its only calls are in Program.ReuseProgram. Initial tslib/importHelpers dependency processing is a separate Phase 1 loader operation. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation. Authority: docs/PHASE1-implementation-plan.md section 2, lines 165-167: CLI execution, project-reference build scheduling, watch, tracing and process services remain Phase 4; their options remain Phase 1.",
       "operation": "tsc/internal/compiler/program.go:Program.needsImportHelpersImportSpecifier",
       "owner": "Phase 4 under the accepted section 2 boundary"
-    },
-    {
-      "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/program.go:1365-1400. Caller: Program.verifyCompilerOptions at program.go:1047 during NewProgram; reports missing config, composite/noEmit and output-path conflicts Validation includes TS6306/TS6310-style composite/noEmit errors and missing references without running a project build; output-conflict checks are emission-adjacent but do not erase ordinary options diagnostics. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
-    },
-    {
-      "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/program.go:51-53. Caller: ordinary parseTask.load redirect predicate through projectreferencefilemapper.go:36, filesparser.go:351,491, and projectReferenceParser.initMapper/initMapperWorker. True is enabled only by project/project.go:454; false controls ordinary .d.ts redirection. Mixed branch: normal loading uses false to choose reference declaration outputs; true source substitution is Phase 5. Preserve both obligations rather than defer the whole predicate under a build-scheduling label. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/program.go:ProgramOptions.canUseProjectReferenceSource",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
     },
     {
       "category": "later_step",
@@ -1280,42 +1862,6 @@
     },
     {
       "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go:80-83. Caller: fileLoader.loadSourceFile at fileloader.go:404 Shared with later consumers but reached from ordinary loader/resolution or config diagnostics. Later use alone cannot defer its required Phase 1 path. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getCompilerOptionsForFile",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
-    },
-    {
-      "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go:35-53. Caller: parseTask.load at filesparser.go:73; also Program.GetParseFileRedirect Shared with later consumers but reached from ordinary loader/resolution or config diagnostics. Later use alone cannot defer its required Phase 1 path. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
-    },
-    {
-      "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go:72-74. Caller: getRedirectForResolution at projectreferencefilemapper.go:99 and getSourceToDtsIfSymlink at :183; also source-mode/editor accesses Shared with later consumers but reached from ordinary loader/resolution or config diagnostics. Later use alone cannot defer its required Phase 1 path. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromOutputDts",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
-    },
-    {
-      "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go:68-70. Caller: getParseFileRedirect .d.ts branch at projectreferencefilemapper.go:47 and getRedirectForResolution at :93; also checker/emit Program accessor Shared with later consumers but reached from ordinary loader/resolution or config diagnostics. Later use alone cannot defer its required Phase 1 path. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
-    },
-    {
-      "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go:90-109. Caller: ordinary module and type-reference resolution at fileloader.go:774,828 Shared with later consumers but reached from ordinary loader/resolution or config diagnostics. Later use alone cannot defer its required Phase 1 path. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getRedirectForResolution",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
-    },
-    {
-      "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go:85-88. Caller: getCompilerOptionsForFile at projectreferencefilemapper.go:81 and ordinary import loading at fileloader.go:886 Shared with later consumers but reached from ordinary loader/resolution or config diagnostics. Later use alone cannot defer its required Phase 1 path. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getRedirectParsedCommandLineForResolution",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
-    },
-    {
-      "category": "later_step",
       "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go:55-66. Caller: Program.GetResolvedProjectReferences -> project/projectcollectionbuilder.go:661 and ls/autoimport/util.go:184  Authority: docs/PHASE1-implementation-plan.md:168-171 excludes LSP/project-system services; :154-158 directs explicit classification rather than importing editor services through coarse ledger labels.",
       "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getResolvedProjectReferences",
       "owner": "Phase 5 under the accepted section 2 boundary"
@@ -1328,21 +1874,9 @@
     },
     {
       "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go:163-192. Caller: getRedirectForResolution at projectreferencefilemapper.go:104; metadata is populated during ordinary loading when preserveSymlinks is enabled Shared with later consumers but reached from ordinary loader/resolution or config diagnostics. Later use alone cannot defer its required Phase 1 path. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getSourceToDtsIfSymlink",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
-    },
-    {
-      "category": "later_step",
       "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go:76-78. Caller: Program.IsSourceFromProjectReference -> Program.SkipTypeChecking at program.go:827; also editor project collection queries  Authority: docs/PHASE1-implementation-plan.md:162-163 excludes checker services/semantics; the underlying ordinary loader map remains independently in question.",
       "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.isSourceFromProjectReference",
       "owner": "Phase 2 under the accepted section 2 boundary"
-    },
-    {
-      "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go:116-127. Caller: Program.RangeResolvedProjectReference -> Program.verifyProjectReferences at program.go:1375 Shared with later consumers but reached from ordinary loader/resolution or config diagnostics. Later use alone cannot defer its required Phase 1 path. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
     },
     {
       "category": "later_step",
@@ -1351,52 +1885,52 @@
       "owner": "Phase 5 under the accepted section 2 boundary"
     },
     {
-      "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go:129-148. Caller: rangeResolvedProjectReference at projectreferencefilemapper.go:126; also recursive traversal and Phase 5 child traversal Shared with later consumers but reached from ordinary loader/resolution or config diagnostics. Later use alone cannot defer its required Phase 1 path. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
+      "category": "go_runtime",
+      "evidence": "Package init `ast.SetParseJSDocForNode(parseJSDocForNode)` (jsdoc.go:13-15) registers the parser into a package-level variable to break the ast->parser import cycle (ast.go:18-25, used at ast.go:2746-2764). Rust passes the parser as a JsDocProvider value instead. The observable lazy-JSDoc behavior is covered: jsdoc.go:parseJSDocForNode and ast.go:Node.JSDoc by syntax/parse-outputs/lazy-jsdoc-in-t\u2026",
+      "operation": "tsc/internal/parser/jsdoc.go:init#1",
+      "owner": "none needed: tsr_ast::JsDocProvider trait implemented by crates/tsr_parser/src/lazy_jsdoc.rs ParserJsDocProvider and passed explicitly"
     },
     {
-      "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go:28-33. Caller: projectReferenceParser.initMapper at projectreferenceparser.go:76 and rangeResolvedProjectReference at projectreferencefilemapper.go:123 Shared with later consumers but reached from ordinary loader/resolution or config diagnostics. Later use alone cannot defer its required Phase 1 path. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rootConfigPath",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
+      "category": "go_runtime",
+      "evidence": "Called only from newParser (pool New) to allocate the setParentFromContext visitor once per pooled parser (parser.go:146-151); putParser preserves it across reuse. The closure's behavior (n.Parent = p.currentParent) runs inside overrideParentInImmediateChildren (parser.go:5971-5975), which is covered. Pool operation, unstable in go-reach.",
+      "operation": "tsc/internal/parser/parser.go:Parser.initializeClosures",
+      "owner": "none needed; the closure body's effect is ported by Parser.overrideParentInImmediateChildren (crates/tsr_parser/src/state.rs, covered by mutation/binder and mutation/e1)"
     },
     {
-      "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/projectreferenceparser.go:34-40. Caller: fileLoader.addProjectReferenceTasks (fileloader.go:340) and projectReferenceParseTask.parse (projectreferenceparser.go:30) Reads referenced tsconfigs, computes source/output indexes and orders/deduplicates config tasks; no referenced project is emitted or built. Source-mode fake-host installation within initMapper remains Phase 5; the ordinary .d.ts mapping path is separate. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/projectreferenceparser.go:createProjectReferenceParseTasks",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: a struct literal snapshot of the parser state (state.rs:154-165 `ParserState { scanner_state: self.scanner.mark(), .. }`). Caller-level witness (cited, not claimed): witness/s06-e1-parse-corpus speculative parses (lookahead and tryParse rewind through mark). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/parser/parser.go:Parser.mark",
+      "owner": "a struct literal snapshot of the parser state"
     },
     {
-      "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/projectreferenceparser.go:19-32. Caller: projectReferenceParser.start queues task.parse; fileLoader.addProjectReferenceTasks calls projectReferenceParser.parse (fileloader.go:341) Reads referenced tsconfigs, computes source/output indexes and orders/deduplicates config tasks; no referenced project is emitted or built. Source-mode fake-host installation within initMapper remains Phase 5; the ordinary .d.ts mapping path is separate. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParseTask.parse",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
+      "category": "unused_at_pin",
+      "evidence": "Only reference: isListTerminator's PCJsxChildren arm (parser.go:956-957). That arm cannot execute at the pin: PCJsxChildren occurs only at parser.go:36, 815, 908, 956 and 4876; parseJsxChildren (4873-4894) uses its own loop, never parseList/parseDelimitedList (the isListTerminator callers at 619/671/698); and isInSomeParsingContext (747) evaluates isListElement first, which returns true unconditi\u2026",
+      "operation": "tsc/internal/parser/parser.go:Parser.nextTokenIsSlash",
+      "owner": "closed unreachable arm: parseJsxChildren never calls parseList and isListElement is true for JSX children first (parser.go:747,908,956); not a claim that the name has no textual caller"
     },
     {
-      "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/projectreferenceparser.go:70-80. Caller: projectReferenceParser.parse after RunAndWait (projectreferenceparser.go:52) Reads referenced tsconfigs, computes source/output indexes and orders/deduplicates config tasks; no referenced project is emitted or built. Source-mode fake-host installation within initMapper remains Phase 5; the ordinary .d.ts mapping path is separate. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.initMapper",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: parent-field setter: tsr_parser access.rs:467 unparse_expression_with_type_arguments performs the same parent writes (owner decision 2: setters) (crates/tsr_parser/src/access.rs:467 unparse_expression_with_type_arguments). Caller-level witness (cited, not claimed): parent edges compared by witness/s07-binder-corpus and mutation/e1 (non-discriminating at the pin because finishNode sets the same edges; the triage showed a skip mutant survives). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/parser/parser.go:Parser.unparseExpressionWithTypeArguments",
+      "owner": "parent-field setter: tsr_parser access.rs:467 unparse_expression_with_type_arguments performs the same parent writes (owner decision 2: setters)"
     },
     {
-      "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/projectreferenceparser.go:82-115. Caller: projectReferenceParser.initMapper and recursive child mapping (projectreferenceparser.go:76,113) Reads referenced tsconfigs, computes source/output indexes and orders/deduplicates config tasks; no referenced project is emitted or built. Source-mode fake-host installation within initMapper remains Phase 5; the ordinary .d.ts mapping path is separate. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.initMapperWorker",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
+      "category": "go_runtime",
+      "evidence": "`return parserPool.Get().(*Parser)` (parser.go:126-128); callers ParseSourceFile:136, ParseIsolatedEntityName:283, parseJSDocForNode (jsdoc.go:20). It is a sync.Pool accessor/constructor; category go_runtime ('a Go language mechanism -- scheduling, sync, arenas, vet markers -- with no caller-visible contract'). Every go-reach header lists newParser and Parser.initializeClosures as pool operations\u2026",
+      "operation": "tsc/internal/parser/parser.go:getParser",
+      "owner": "none needed: crates/tsr_parser/src/state.rs:92 Parser::new constructs fresh state per parse"
     },
     {
-      "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/projectreferenceparser.go:48-53. Caller: projectReferenceParser.start queues task.parse; fileLoader.addProjectReferenceTasks calls projectReferenceParser.parse (fileloader.go:341) Reads referenced tsconfigs, computes source/output indexes and orders/deduplicates config tasks; no referenced project is emitted or built. Source-mode fake-host installation within initMapper remains Phase 5; the ordinary .d.ts mapping path is separate. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.parse",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
+      "category": "go_runtime",
+      "evidence": "Only reference is parserPool.New (parser.go:120-124). Listed in every go-reach header as a pool operation (unstable, never credited). a sync.Pool accessor/constructor; category go_runtime ('a Go language mechanism -- scheduling, sync, arenas, vet markers -- with no caller-visible contract'). Every go-reach header lists newParser and Parser.initializeClosures as pool operations (unstable, never cr\u2026",
+      "operation": "tsc/internal/parser/parser.go:newParser",
+      "owner": "none needed"
     },
     {
-      "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/projectreferenceparser.go:55-68. Caller: projectReferenceParser.parse and its own recursion (projectreferenceparser.go:50,64) Reads referenced tsconfigs, computes source/output indexes and orders/deduplicates config tasks; no referenced project is emitted or built. Source-mode fake-host installation within initMapper remains Phase 5; the ordinary .d.ts mapping path is separate. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.start",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
+      "category": "go_runtime",
+      "evidence": "Resets `*p = Parser{scanner, setParentFromContext}` and returns it to parserPool (parser.go:130-133); callers are the three getParser sites' defers. a sync.Pool accessor/constructor; category go_runtime ('a Go language mechanism -- scheduling, sync, arenas, vet markers -- with no caller-visible contract'). Every go-reach header lists newParser and Parser.initializeClosures as pool operations (uns\u2026",
+      "operation": "tsc/internal/parser/parser.go:putParser",
+      "owner": "none needed (Rust Parser is dropped after each parse)"
     },
     {
       "category": "go_test_harness",
@@ -1409,6 +1943,18 @@
       "evidence": "upstream/tsc/internal/repo/paths.go. The package is every non-test caller is test harness: testrunner/compiler_runner.go, testutil/baseline/baseline.go, testutil/fixtures/benchfixtures.go, testutil/harnessutil/harnessutil.go, testutil/jstest/node.go. || RUST: Absent, intentionally. The port finds its roots with ROOT = Path(__file__).resolve().parents[1] in scripts and with include_str! in Rust tests.",
       "operation": "tsc/internal/repo/paths.go:TestDataPath",
       "owner": "no step: upstream's test harness keeps it; this port drives its comparisons through scripts/phase1*.py and Rust tests that assert against frozen rows"
+    },
+    {
+      "category": "unused_at_pin",
+      "evidence": "grep over upstream/tsc/internal/scanner.",
+      "operation": "tsc/internal/scanner/regexp.go:regExpParser.setPos",
+      "owner": "dispatch-dead / no selector call at the pin; not a claim that the name has no textual caller"
+    },
+    {
+      "category": "go_runtime",
+      "evidence": "Code read of both sides; unstable_ops in every go-reach index.",
+      "operation": "tsc/internal/scanner/scanner.go:cleared",
+      "owner": "memo-cache reset with no caller-visible effect (caches map text to values that depend only on that text)"
     },
     {
       "category": "go_test_harness",
@@ -2331,6 +2877,6 @@
   ],
   "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
   "purpose": "Operations removed from F4a's syntax roster, each with the category, the owner that does have it, and the evidence read at the pin. An entry here is a claim that this step owes no prepared case for the operation, and it is validated like any other claim: see roster_problems in scripts/phase1_scope.py.",
-  "rule": "Three categories are recorded: go_test_harness retains upstream test-renderer authority; unused_at_pin records a definition or closed wrapper/helper chain with no live pinned caller; later_step transfers preparation out of the syntax step only. Compiler later_step rows are individually adjudicated in coverage-review.json: 205 accepted-plan later-phase destinations and 23 unresolved ordinary-loader obligations. The unresolved rows remain pending Phase 1 work and gain neither coverage nor a later-phase exemption from this syntax roster.",
+  "rule": "Three categories are recorded: go_test_harness retains upstream test-renderer authority; unused_at_pin records a definition or closed wrapper/helper chain with no live pinned caller; later_step transfers preparation out of the syntax step only. Compiler later_step rows are individually adjudicated in coverage-review.json: 205 accepted-plan later-phase destinations. The ordinary reference-loading operations are not exempt: the syntax step prepares them (syntax/project-references).",
   "version": 1
 }

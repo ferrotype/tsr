@@ -1,0 +1,396 @@
+{
+  "columns": [
+    {
+      "evidence": [
+        "internal/checker/grammarchecks.go:727"
+      ],
+      "id": "binder.FindUseStrictPrologue",
+      "input": "source",
+      "operations": [
+        "tsc/internal/binder/binder.go:FindUseStrictPrologue",
+        "tsc/internal/binder/binder.go:isUseStrictPrologueDirective"
+      ],
+      "projection": "[container reference, result reference] for every statement container (Node.CanHaveStatements, taken in setup with its statements) whose result is not nil",
+      "rust": "tsr_binder::find_use_strict_prologue",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ast/ast.go:2981",
+        "internal/ast/ast.go:2991",
+        "internal/ls/signaturehelp.go:275",
+        "internal/ls/symbols.go:165",
+        "internal/ls/symbols.go:166"
+      ],
+      "id": "ast.GetDeclarationName",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/ast.go:GetDeclarationName"
+      ],
+      "projection": "[index, hex of the declaration name] for every node where it is not empty",
+      "rust": "tsr_ast::source_file_tables::get_declaration_name",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ls/symbols.go:570",
+        "internal/ast/ast.go:2972",
+        "internal/ast/ast.go:2981",
+        "internal/ast/ast.go:2991",
+        "internal/ls/signaturehelp.go:275",
+        "internal/ls/symbols.go:165"
+      ],
+      "id": "ast.SourceFile.GetDeclarationMap",
+      "input": "bound",
+      "operations": [
+        "tsc/internal/ast/ast.go:SourceFile.GetDeclarationMap",
+        "tsc/internal/ast/ast.go:SourceFile.computeDeclarationMap",
+        "tsc/internal/ast/ast.go:GetDeclarationName"
+      ],
+      "projection": "[index, [[name hex, declaration references], ...] sorted by name] of the bound source file (an overload group shares a symbol)",
+      "rust": "tsr_ast::source_file_tables::get_declaration_map",
+      "survey": true,
+      "synthetic": [
+        {
+          "input": {
+            "filename": "/table/duplicates.ts",
+            "script_kind": 3,
+            "source": "class C { m() {} m() {} n(): void; n(): void {} }\nconst o = { f() {}, f() {} };\nfunction g(): void;\nfunction g() {}\n"
+          },
+          "name": "duplicate-members"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/ls/completions.go:4032",
+        "internal/ls/findallreferences.go:2740",
+        "internal/ast/ast.go:2859"
+      ],
+      "id": "ast.SourceFile.GetNameTable",
+      "input": "source_jsdoc",
+      "operations": [
+        "tsc/internal/ast/ast.go:SourceFile.GetNameTable",
+        "tsc/internal/ast/utilities.go:literalIsName"
+      ],
+      "projection": "[index, [[name hex, position or -1], ...] sorted by name] of the source file, whose JSDoc the table reads",
+      "rust": "tsr_ast::source_file_tables::get_name_table",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/printer/emitcontext.go:514",
+        "internal/ast/ast.go:2676"
+      ],
+      "id": "ast.SourceFile.HasIdentifier",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/ast.go:SourceFile.HasIdentifier",
+        "tsc/internal/ast/ast.go:collectIdentifiersForSourceFile"
+      ],
+      "projection": "[index, [HasIdentifier of each probe]] of the source file, the probes being the sorted texts of every identifier, private identifier and string, numeric, bigint and template literal, then the empty name and one no file declares",
+      "rust": "tsr_ast::source_file_tables::has_identifier",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/api/encoder/encoder.go:409",
+        "internal/api/encoder/encoder.go:419",
+        "internal/ast/ast.go:2405"
+      ],
+      "id": "ast.GetOrComputeSourceFileData",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/ast.go:GetOrComputeSourceFileData",
+        "tsc/internal/ast/ast.go:NewSourceFileDataKey",
+        "tsc/internal/ast/ast.go:getSourceFileDataCell"
+      ],
+      "projection": "[index, [first value, the same key again, a second key, compute calls]] of the source file under two fresh keys",
+      "rust": "tsr_ast::source_file_tables::get_or_compute_source_file_data",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:2138",
+        "internal/checker/checker.go:2773",
+        "internal/checker/checker.go:3436",
+        "internal/checker/checker.go:3752",
+        "internal/checker/checker.go:3804"
+      ],
+      "id": "ast.GetFunctionFlags",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/functionflags.go:GetFunctionFlags"
+      ],
+      "projection": "[index, flags] for every node",
+      "rust": "tsr_ast::utilities_containers::get_function_flags",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/printer/printer.go:2807",
+        "internal/printer/printer.go:3227",
+        "internal/ast/precedence.go:211",
+        "internal/ast/precedence.go:204"
+      ],
+      "id": "ast.GetExpressionPrecedence",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/precedence.go:GetExpressionPrecedence",
+        "tsc/internal/ast/precedence.go:GetOperatorPrecedence",
+        "tsc/internal/ast/precedence.go:getOperator"
+      ],
+      "projection": "[index, precedence] for every node",
+      "rust": "tsr_ast::precedence::get_expression_precedence",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:30169",
+        "internal/printer/printer.go:2673",
+        "internal/printer/printer.go:3427",
+        "internal/printer/printer.go:4014",
+        "internal/transformers/declarations/tracker.go:64"
+      ],
+      "id": "ast.GetLeftmostExpression",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/precedence.go:GetLeftmostExpression"
+      ],
+      "projection": "[index, [reference without, with stopAtCallExpressions]] for every node where either is not the node",
+      "rust": "tsr_ast::precedence::get_leftmost_expression",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/printer/printer.go:2298"
+      ],
+      "id": "ast.GetTypeNodePrecedence",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/precedence.go:GetTypeNodePrecedence"
+      ],
+      "projection": "[index, precedence] over the kinds it handles (its default arm panics)",
+      "rust": "tsr_ast::precedence::get_type_node_precedence",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:20584",
+        "internal/checker/checker.go:20871",
+        "internal/checker/checker.go:31296",
+        "internal/ls/documenthighlights.go:391",
+        "internal/ls/documenthighlights.go:473"
+      ],
+      "id": "ast.ForEachReturnStatement",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:ForEachReturnStatement"
+      ],
+      "projection": "[index, [every return statement, the first one]] of every block with a return",
+      "rust": "tsr_ast::utilities_containers::for_each_return_statement",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:2703",
+        "internal/checker/checker.go:5978",
+        "internal/checker/checker.go:6016",
+        "internal/checker/checker.go:11144",
+        "internal/checker/checker.go:24008"
+      ],
+      "id": "ast.GetContainingFunction",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:GetContainingFunction"
+      ],
+      "projection": "[index, reference of the containing function] for every node where it is not nil, over the nodes other than the source file (it reads node.Parent)",
+      "rust": "tsr_ast::utilities_containers::get_containing_function",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:1965",
+        "internal/checker/checker.go:8118",
+        "internal/checker/checker.go:10711",
+        "internal/checker/checker.go:10728",
+        "internal/checker/checker.go:10777",
+        "internal/ast/utilities.go:2222"
+      ],
+      "id": "ast.GetEnclosingBlockScopeContainer",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:GetEnclosingBlockScopeContainer",
+        "tsc/internal/ast/utilities.go:IsBlockScope"
+      ],
+      "projection": "[index, reference of the enclosing block scope] for every node where it is not nil",
+      "rust": "tsr_ast::utilities_containers::get_enclosing_block_scope_container",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ast/utilities.go:2222"
+      ],
+      "id": "ast.IsBlockScope",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsBlockScope"
+      ],
+      "projection": "document-order indices of the nodes where it is true, with the node's parent as the parent argument",
+      "rust": "tsr_ast::utilities_containers::is_block_scope",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:10951"
+      ],
+      "id": "ast.GetNewTargetContainer",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:GetNewTargetContainer"
+      ],
+      "projection": "[index, reference of the new.target container] for every node where it is not nil, over the nodes other than the source file (GetThisContainer panics on a parentless node)",
+      "rust": "tsr_ast::utilities_containers::get_new_target_container",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:12323",
+        "internal/checker/checker.go:12327",
+        "internal/checker/checker.go:31936",
+        "internal/checker/checker.go:32510",
+        "internal/checker/symbolaccessibility.go:762",
+        "internal/ast/utilities.go:4557"
+      ],
+      "id": "ast.GetReparsedNodeForNode",
+      "input": "source_jsdoc",
+      "operations": [
+        "tsc/internal/ast/utilities.go:GetReparsedNodeForNode",
+        "tsc/internal/ast/utilities.go:findCloneInNode"
+      ],
+      "projection": "[index, the reparsed clone] for every node of the JSDoc walk whose clone is not the node itself: its reference when the walk holds it, else [\"fields\", kind, pos, end] (a clone no walk reaches)",
+      "rust": "tsr_ast::utilities_containers::get_reparsed_node_for_node",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ls/findallreferences.go:1576",
+        "internal/ls/findallreferences.go:1597"
+      ],
+      "id": "ast.GetSuperContainer",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:GetSuperContainer"
+      ],
+      "projection": "[index, [reference without, with stopOnFunctions]] for every node where either is not nil",
+      "rust": "tsr_ast::utilities_containers::get_super_container",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:10298",
+        "internal/checker/checker.go:31282",
+        "internal/ls/inlay_hints.go:103"
+      ],
+      "id": "ast.HasContextSensitiveParameters",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:HasContextSensitiveParameters"
+      ],
+      "projection": "document-order indices of the nodes where it is true, over the kinds whose data embeds FunctionLikeBase (Node.Parameters panics on others)",
+      "rust": "tsr_ast::utilities_containers::has_context_sensitive_parameters",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ast/utilities.go:794",
+        "internal/transformers/tstransforms/typeeraser.go:270"
+      ],
+      "id": "ast.IsJSDocTypeAssertion",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsJSDocTypeAssertion"
+      ],
+      "projection": "document-order indices of the nodes where it is true",
+      "rust": "tsr_ast::utilities::is_jsdoc_type_assertion",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ast/utilities.go:818",
+        "internal/checker/utilities.go:1869",
+        "internal/printer/factory.go:438"
+      ],
+      "id": "ast.IsOuterExpression",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsOuterExpression"
+      ],
+      "projection": "[index, bits] where bit i is the result under kinds i of None of Parentheses, TypeAssertions, NonNullAssertions, PartiallyEmittedExpressions, ExpressionsWithTypeArguments, Satisfies, Parentheses|ExcludeJSDocTypeAssertion, Assignments, Comma, All; rows with no bit are omitted",
+      "rust": "tsr_ast::utilities::is_outer_expression",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ast/utilities.go:830",
+        "internal/ast/utilities.go:841",
+        "internal/ast/utilities.go:3729",
+        "internal/checker/checker.go:2911",
+        "internal/checker/checker.go:9536",
+        "internal/ast/utilities.go:818"
+      ],
+      "id": "ast.SkipOuterExpressions",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:SkipOuterExpressions",
+        "tsc/internal/ast/utilities.go:IsOuterExpression"
+      ],
+      "projection": "[index, [result reference under each kinds of None of Parentheses, TypeAssertions, NonNullAssertions, PartiallyEmittedExpressions, ExpressionsWithTypeArguments, Satisfies, Parentheses|ExcludeJSDocTypeAssertion, Assignments, Comma, All]] where any result is not the node",
+      "rust": "tsr_ast::utilities::skip_outer_expressions",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ast/utilities.go:412",
+        "internal/ast/utilities.go:431",
+        "internal/ast/utilities.go:452",
+        "internal/printer/printer.go:2506",
+        "internal/printer/printer.go:2575",
+        "internal/ast/utilities.go:830"
+      ],
+      "id": "ast.SkipPartiallyEmittedExpressions",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:SkipPartiallyEmittedExpressions",
+        "tsc/internal/ast/utilities.go:SkipOuterExpressions",
+        "tsc/internal/ast/utilities.go:IsOuterExpression"
+      ],
+      "projection": "[index, [the result on two factory partially emitted expressions around the expression, the result on the expression itself where it is not the expression]] for every expression node; a result no walk holds is projected as [\"fields\", kind, pos, end]",
+      "rust": "tsr_ast::skip_partially_emitted_expressions",
+      "survey": true,
+      "synthetic": []
+    }
+  ],
+  "group": "containers",
+  "version": 1
+}

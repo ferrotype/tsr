@@ -556,7 +556,7 @@ impl CheckerState {
             && !self.is_literal_import_type_node(location)?
             && !self.is_part_of_type_only_import_or_export_declaration(location)?
         {
-            // port: tsc/internal/core/core.go:ShouldRewriteModuleSpecifier
+            // Inline copy of `ShouldRewriteModuleSpecifier`; its Phase 1 home is in tsr_ast (table group core).
             let should_rewrite =
                 specifier_is_relative(name.as_bytes()) && has_ts_file_extension(name.as_bytes());
             let host = self.program()?.host.clone();
@@ -626,7 +626,7 @@ impl CheckerState {
         Ok(view.node(literal)?.kind() == K::StringLiteral)
     }
 
-    // port: tsc/internal/ast/utilities.go:IsPartOfTypeOnlyImportOrExportDeclaration
+    // Inline copy of `IsPartOfTypeOnlyImportOrExportDeclaration`; its Phase 1 home is in tsr_ast (table group modules).
     fn is_part_of_type_only_import_or_export_declaration(
         &self,
         node: NodeId,
@@ -640,7 +640,7 @@ impl CheckerState {
         )
     }
 
-    // port: tsc/internal/ast/utilities.go:IsEmittableImport
+    // Inline copy of `IsEmittableImport`; its Phase 1 home is in tsr_ast (table group modules).
     #[allow(
         clippy::match_same_arms,
         reason = "Keep the pinned upstream per-kind dispatch auditable when individual syntax cases change"
@@ -842,7 +842,7 @@ impl CheckerState {
         Ok(())
     }
 
-    // port: tsc/internal/ast/utilities.go:HasResolutionModeOverride
+    // Inline copy of `HasResolutionModeOverride`; its Phase 1 home is in tsr_ast (table group modules).
     fn has_resolution_mode_override(&self, node: NodeId) -> Result<bool, Error> {
         let read = self.node(node)?;
         let attributes = match read.kind().known() {
@@ -1026,7 +1026,7 @@ impl CheckerState {
     }
 }
 
-// port: tsc/internal/ast/utilities.go:IsTypeOnlyImportOrExportDeclaration
+// Inline copy of `IsTypeOnlyImportOrExportDeclaration`; its Phase 1 home is in tsr_ast (table group modules).
 pub(crate) fn type_only_import_or_export_declaration(
     view: tsr_ast::AstView<'_>,
     node: &tsr_ast::NodeRead<'_>,

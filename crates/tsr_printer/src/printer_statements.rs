@@ -356,7 +356,14 @@ impl Session<'_, '_> {
     // port: tsc/internal/printer/printer.go:Printer.emitClassStaticBlockDeclaration
     fn emit_class_static_block_declaration(&mut self, node: NodeId) -> Result<(), Error> {
         self.enter_node(node);
-        let body = self.node(node)?.body();
+        // `node.Body` is the payload's own field: Node.Body is nil for this
+        // payload at the pin, which does not embed BodyBase.
+        let body = self
+            .node(node)?
+            .data_source()
+            .as_class_static_block_declaration()
+            .ok_or(Error::MissingNode("class static block payload"))?
+            .body();
         self.write_keyword(b"static");
         self.emit_function_body_node(body)?;
         self.exit_node(node);

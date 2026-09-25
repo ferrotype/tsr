@@ -180,6 +180,7 @@ impl NameResolver {
                 }
                 _ => false,
             };
+            // port: tsc/internal/ast/ast.go:Node.Locals
             let locals = host.binding(current)?.and_then(|binding| binding.locals);
             if locals.is_some() && !middle::is_global_source_file(host.ast(current)?, current)? {
                 result = Self::lookup(host, hooks, locals, name, meaning)?;
@@ -816,6 +817,7 @@ pub fn get_local_symbol_for_export_default(
         return Ok(None);
     }
     for declaration in host.declarations(required_symbol(symbol))?.iter() {
+        // port: tsc/internal/ast/ast.go:Node.LocalSymbol
         if let Some(local) = host
             .binding(required(declaration))?
             .and_then(|b| b.local_symbol)
@@ -947,6 +949,7 @@ fn table_entry(
     };
     Ok(host.table(table)?.get(name).flatten())
 }
+/// port: tsc/internal/ast/utilities.go:GetDeclarationOfKind
 fn declaration_of_kind(
     host: &dyn ResolverHost,
     symbol: SymbolId,

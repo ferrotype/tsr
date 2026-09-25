@@ -5,7 +5,7 @@ use tsr_arena::NodeId;
 use tsr_ast::{modifier_flags as mf, node_flags as nf, SyntaxKind as K};
 
 impl CheckerState {
-    // port: tsc/internal/ast/utilities.go:IsValidTypeOnlyAliasUseSite
+    // Inline copy of `IsValidTypeOnlyAliasUseSite`; its Phase 1 home is in tsr_ast (table group modules).
     pub(crate) fn valid_type_only_alias_use_site(&self, node: NodeId) -> Result<bool, Error> {
         if self.node(node)?.flags() & (nf::AMBIENT | nf::JS_DOC) != 0
             || tsr_ast::is_part_of_type_query(self.ast(node)?, node)?
@@ -84,7 +84,7 @@ impl CheckerState {
         Ok(!self.expression_node(node)? && !shorthand)
     }
 
-    // port: tsc/internal/ast/utilities.go:IsExpressionNode
+    // Inline copy of `IsExpressionNode`; its Phase 1 home is in tsr_ast (table group positions).
     pub(crate) fn expression_node(&self, mut node: NodeId) -> Result<bool, Error> {
         let read = self.node(node)?;
         Ok(match read.kind().known() {
@@ -216,7 +216,7 @@ impl CheckerState {
         })
     }
 
-    // port: tsc/internal/ast/utilities.go:IsInExpressionContext
+    // Inline copy of `IsInExpressionContext`; its Phase 1 home is in tsr_ast (table group positions).
     pub(crate) fn in_expression_context(&self, node: NodeId) -> Result<bool, Error> {
         let Some(parent) = self.node(node)?.parent() else {
             return Ok(false);

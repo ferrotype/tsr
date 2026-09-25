@@ -16,8 +16,8 @@
 //! | `GetResolvedModules`, `GetPackagesMap` | P2: whole-map views; add when a caller in the closure needs them |
 //! | `GetJSXRuntimeImportSpecifier` | JSX remains outside the frozen denominator |
 //! | `GetImportHelpersImportSpecifier` | P4: checker consumes the synthetic import as its retained `tslib` reference and host-computed import resolution mode; no synthetic syntax escapes the compiler |
-//! | `GetRedirectTargets`, `GetSourceOfProjectReferenceIfOutputIncluded` | P4: package-identity redirects feed the module paths; project references remain rejected by loading |
-//! | `GetRedirectForResolution`, `GetProjectReferenceFromSource`, `GetProjectReferenceFromOutputDts` | P4: the compiler adapter proves the project-reference map is empty because loading rejects nonempty references; the lookup therefore returns `None` without supporting reference loading |
+//! | `GetRedirectTargets`, `GetSourceOfProjectReferenceIfOutputIncluded` | P4: package-identity redirects feed the module paths; the compiler adapter maps an included reference output to its source, and refuses module-specifier generation from an output importer until the checker side is ported |
+//! | `GetRedirectForResolution`, `GetProjectReferenceFromSource`, `GetProjectReferenceFromOutputDts` | P4: the compiler adapter delegates to the loader's project-reference mapper; Phase 1 witnesses the mapper, not these checker lookups |
 //! | `GetSymlinkCache`, `GetPackageJsonInfo`, `GetNearestAncestorDirectoryWithPackageJson`, `GetGlobalTypingsCacheLocation` | P4: module paths use retained resolutions plus native runtime-dependency discovery; direct package queries share the retained resolver cache; global typings cache has no configured input |
 //! | `ContentMapperExtensions`, `GetResolvedModuleFromModuleSpecifier` | Content mapper execution remains outside the loaded-program closure; module references use retained resolutions |
 
@@ -90,8 +90,8 @@ pub trait CheckerHost: Send + Sync {
         force_dts_emit: bool,
     ) -> Result<bool, Error>;
     fn is_source_file_default_library(&self, path: &[u8]) -> bool;
-    /// The retained compiler adapter proves these reference lookups are empty
-    /// because loading rejects nonempty project-reference configurations.
+    /// The retained compiler adapter answers these reference lookups from the
+    /// loader's project-reference mapper.
     fn get_redirect_for_resolution(
         &self,
         file_name: &[u8],

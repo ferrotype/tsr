@@ -9,7 +9,7 @@ use tsr_diagnostics as diagnostics;
 mod tests;
 
 impl<F: ParserFactory> Parser<'_, F> {
-    /// port: tsc/internal/parser/parser.go:Parser.parseListIndex
+    /// Parser.parseListIndex.
     pub(crate) fn parse_list_index(
         &mut self,
         kind: ParsingContext,
@@ -20,6 +20,7 @@ impl<F: ParserFactory> Parser<'_, F> {
         let mut outer_reparse_list = std::mem::take(&mut self.reparse_list);
         let mut list = self.factory.start_list_buffer();
         while !self.is_list_terminator(kind) {
+            // port: tsc/internal/parser/parser.go:Parser.parseListIndex
             if self.is_list_element(kind, false) {
                 let element = parse_element(self, list.len());
                 for reparsed in self.reparse_list.drain(..) {
@@ -130,11 +131,17 @@ impl<F: ParserFactory> Parser<'_, F> {
     pub(crate) fn parse_empty_node_list(&mut self) -> NodeListId {
         self.new_node_list(TextRange::new(self.node_pos(), self.node_pos()), vec![])
     }
-    /// port: tsc/internal/parser/parser.go:Parser.createMissingList
+    /// An empty list at the current position that carries the missing-list
+    /// sentinel `isMissingNodeList` tests.
     pub(crate) fn create_missing_list(&mut self) -> NodeListId {
         let list = self.parse_empty_node_list();
+        // port: tsc/internal/parser/parser.go:Parser.createMissingList
         self.factory.mark_list_missing(list);
         list
+    }
+    /// port: tsc/internal/parser/parser.go:isMissingNodeList
+    pub(crate) fn is_missing_node_list(&self, list: Option<NodeListId>) -> bool {
+        list.is_some_and(|list| self.factory.read_list(list).is_missing())
     }
     /// port: tsc/internal/parser/parser.go:Parser.abortParsingListOrMoveToNextToken
     pub(crate) fn abort_parsing_list_or_move_to_next_token(

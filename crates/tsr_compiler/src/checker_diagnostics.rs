@@ -22,8 +22,7 @@ impl Program {
         Ok(source)
     }
 
-    /// Source selection for semantic and suggestion diagnostics. Project references
-    /// are absent because the loader rejects nonempty reference configurations.
+    /// Source selection for semantic and suggestion diagnostics.
     // port: tsc/internal/compiler/program.go:Program.SkipTypeChecking
     // port: tsc/internal/compiler/program.go:Program.canIncludeBindAndCheckDiagnostics
     pub fn skip_type_checking(
@@ -37,6 +36,9 @@ impl Program {
             || options.skip_lib_check.is_true() && source.is_declaration_file
             || options.skip_default_lib_check.is_true()
                 && self.is_lib(source.parse_options().path.as_bytes())
+            || self
+                .references
+                .is_source_from_project_reference(source.parse_options().path.as_bytes())
             || source
                 .check_js_directive
                 .is_some_and(|directive| !directive.enabled)

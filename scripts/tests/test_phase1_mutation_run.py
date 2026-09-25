@@ -625,6 +625,123 @@ class HomeTests(unittest.TestCase):
                          "a reach entry without an observation count measured nothing")
 
 
+class TableRuleTests(unittest.TestCase):
+    """The table oracle's column parity and one-home rules (docs section 9)."""
+
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory()
+        self.dir = Path(self.temporary.name)
+
+    def tearDown(self):
+        self.temporary.cleanup()
+
+    def requests(self, columns):
+        path = self.dir / "requests-table.ndjson"
+        path.write_bytes(b"".join(canonical({"id": row, "column": column, "op": "table", "input": {}}) + b"\n"
+                                  for row, column in columns.items()))
+        return path
+
+    def test_column_parity_is_every_row_of_the_column_matching_native(self):
+        column_of = run.row_columns(self.requests({"a1": "A", "a2": "A", "b1": "B"}))
+        self.assertEqual(column_of, {"a1": "A", "a2": "A", "b1": "B"})
+        rows = [{"row": "a1", "base_match": True}, {"row": "a2", "base_match": False},
+                {"row": "b1", "base_match": True}]
+        parity = run.column_parity(column_of, rows)
+        self.assertEqual(parity, {"A": {"rows": 2, "base_match": 1, "mismatched": ["a2"]},
+                                  "B": {"rows": 1, "base_match": 1, "mismatched": []}})
+        gate = run.parity_gate(column_of, parity)
+        self.assertIsNone(gate("b1"))
+        self.assertIn("column A differs from native on 1 of its 2 rows", gate("a1"))
+        # Against native rows directly (the confirmation replay): outcomes, digests and messages.
+        ok = {"setup": "ok", "column": "ok"}
+        natives = {"a1": {"outcomes": ok, "digests": {"column": "x"}}, "a2": {"outcomes": ok, "digests": {"column": "y"}},
+                   "b1": {"outcomes": ok, "digests": {"column": "z"}}}
+        replay = [{"row": "a1", "outcomes": ok, "digests": {"column": "x"}},
+                  {"row": "a2", "outcomes": ok, "digests": {"column": "y"}, "error": "session defect"},
+                  {"row": "b1", "outcomes": ok, "digests": {"column": "z"}}]
+        self.assertEqual(run.column_parity(column_of, replay, natives)["A"]["base_match"], 1)
+        self.assertEqual(run.column_parity(column_of, replay, natives)["B"]["base_match"], 1)
+
+    def test_a_kill_on_a_column_without_parity_is_never_credited(self):
+        column_of = {"a1": "A", "a2": "A", "b1": "B"}
+        parity = {"A": {"rows": 2, "base_match": 1, "mismatched": ["a2"]}, "B": {"rows": 1, "base_match": 1,
+                                                                               "mismatched": []}}
+        gate = run.parity_gate(column_of, parity)
+        mutant_entry = mutant(1, ["op/a"], "a.rs::f")
+        native = {"row": "a1", "request_sha256": "q", "outcomes": {"setup": "ok", "column": "ok"},
+                  "digests": {"column": "n"}}
+        rows_by_id = {"a1": (0, {**native, "hits": [1], "base_match": True}),
+                      "b1": (1, {**native, "row": "b1", "hits": [1], "base_match": True})}
+        record = {"rechecks": {"a1": True, "b1": True}}
+        result = {"row": "a1", "crash": False, "differs": ["column"], "kill": True, "digests": {"column": "m"},
+                  "outcomes": {"setup": "ok", "column": "ok"}, "dump": None}
+        reach = {"op/a": {0, 1}}
+        # The table oracle dumps kills; skip the dump check to isolate the gate.
+        with patch.object(run, "DUMPING", ()):
+            kill, note = run._credit(mutant_entry, record, result, rows_by_id, [native, native], reach, "table", gate)
+            self.assertIsNone(kill)
+            self.assertIn("column parity fails", note)
+            kill, note = run._credit(mutant_entry, record, {**result, "row": "b1"}, rows_by_id, [native, native],
+                                     reach, "table", gate)
+            self.assertIsNone(note)
+            self.assertEqual((kill["row"], kill["ops"], kill["stages"]), ("b1", ["op/a"], ["column"]))
+
+    def test_table_frames_digest_by_the_go_rule(self):
+        value = [[0, [1]], {"x": "\u00e9"}]
+        frames = [{"tag": "begin", "id": "r"}, {"tag": "stage", "stage": "setup", "outcome": "ok", "message_hex": ""},
+                  {"tag": "stage", "stage": "column", "outcome": "ok", "message_hex": ""},
+                  {"tag": "observation", "stage": "column", "kind": "value", "value": value}, {"tag": "end"}]
+        row = run.frame_digests("table", frames)
+        self.assertEqual(row, {"outcomes": {"setup": "ok", "column": "ok"},
+                               "digests": {"column": hashlib.sha256(canonical(value)).hexdigest()}})
+        panicked = run.frame_digests("table", [frames[0], frames[1], {**frames[2], "outcome": "panic", "message_hex": "6d"},
+                                               frames[4]])
+        self.assertEqual((panicked["outcomes"], panicked["digests"], panicked["messages"]),
+                         ({"setup": "ok", "column": "panic"}, {}, {"column": "6d"}))
+        with self.assertRaisesRegex(ValueError, "one column value"):
+            run.frame_digests("table", frames[:4] + [frames[3], frames[4]])
+        self.assertIn("table", run.DUMPING)
+        self.assertEqual(run.PACKAGES["table"], run.DRIVER)
+
+    def test_a_table_operation_never_has_an_excused_home(self):
+        key = {id_: f"{id_:016x}" for id_ in range(1, 5)}
+        homes = {"op/a": [{"file": "a.rs", "function": "f", "site_kind": "fn", "site_line": 1, "span_sha256": "s",
+                           "mutants": [key[1]]},
+                          {"file": "a.rs", "function": "g", "site_kind": "fn", "site_line": 9, "span_sha256": "t",
+                           "mutants": [key[2]]}]}
+        plan = {"version": 1, "unsupported": [], "homes": homes, "mutants": [
+            mutant(1, ["op/a"], "a.rs::f"), mutant(2, ["op/a"], "a.rs::g")]}
+        plan_path = self.dir / "plan.json"
+        plan_path.write_bytes(canonical(plan) + b"\n")
+        entries = [entry(1, key[1], ["op/a"], "killed", [{"row": "r", "ops": ["op/a"]}], 1),
+                   entry(2, key[2], ["op/a"], "not_reached")]
+        reach = {key[1]: [1, 1, 0], key[2]: [0, 0, 0]}
+
+        def merge(one_home):
+            document = kill_file("table", go.file_sha256(plan_path), entries, reach)
+            document["columns"] = {"C": {"rows": 1, "base_match": 1, "mismatched": []}}
+            document["one_home_operations"] = one_home
+            run.write_gzip(self.dir / "kill-table.json.gz", document)
+            run.results(plan_path, [self.dir / "kill-table.json.gz"], self.dir / "results.json.gz")
+            return run.read_gzip(self.dir / "results.json.gz")
+
+        excused = merge([])
+        self.assertEqual(excused["operations"]["op/a"]["state"], "killed", "the unreached copy is excused")
+        self.assertEqual(excused["columns"], {"table": {"C": {"rows": 1, "base_match": 1, "mismatched": []}}})
+        results = merge(["op/a"])
+        self.assertEqual(results["operations"]["op/a"]["state"], "partial")
+        copy = next(home for home in results["operations"]["op/a"]["homes"] if home["function"] == "g")
+        self.assertEqual((copy["excused"], copy["reason"]), (False, run.ONE_HOME_REASON))
+        self.assertEqual(results["one_home_operations"], ["op/a"])
+
+    def test_table_operations_are_the_spec_claims_of_the_traced_columns(self):
+        import phase1_tables
+        specs = phase1_tables.load_specs()
+        column = next(column for _, column in phase1_tables.columns(specs) if column["operations"])
+        self.assertEqual(run.table_operations([column["id"], "no.such.column"]), sorted(column["operations"]))
+        self.assertEqual(run.table_operations(["runtime.walk"]), [])
+
+
 class TraceTests(Fixture):
     def test_trace_checks_rows_against_native_and_the_frames_in_shards(self):
         self.native_document["rows"][1]["digests"]["parse"] = "0" * 64
@@ -715,6 +832,9 @@ class SharedSiteTests(unittest.TestCase):
         jobs = run.mutant_jobs(shared, [0, 1, 2, 3, 4], rows, reach, 3)
         self.assertEqual([job["rows"] for job in jobs], [["r0", "r1", "r2", "r3"], ["r4"]],
                          "op/b's only row is not left behind op/a's first three kills")
+        twins = mutant(12, ["op/a", "op/c"], "f::twins")
+        self.assertEqual([job["rows"] for job in run.mutant_jobs(twins, [0, 1], rows, {"op/a": {0, 1}, "op/c": {0, 1}}, 3)],
+                         [["r0", "r1"]], "operations entered on the same rows share one job, so no dump is written twice")
         single = mutant(10, ["op/a"], "f::single", control=11)
         self.assertEqual(run.mutant_jobs(single, [2, 0], rows, reach, 3),
                          [{"mutant": 10, "rows": ["r2", "r0"], "max_kills": 3, "control": 11}])

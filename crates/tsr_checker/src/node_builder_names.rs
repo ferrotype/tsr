@@ -302,7 +302,7 @@ impl NodeBuilder<'_> {
         ))
     }
 
-    // port: tsc/internal/ast/utilities.go:GetSourceFileOfModule
+    // Inline copy of `GetSourceFileOfModule`; its Phase 1 home is in tsr_ast (table group modules).
     fn module_source_file(&self, symbol: SymbolId) -> Result<Option<NodeId>, Error> {
         let mut declaration = self.checker.symbol(symbol)?.value_declaration();
         if declaration.is_none() {

@@ -122,21 +122,7 @@ impl OsFs {
     /// port: tsc/internal/vfs/osvfs/os.go:osFS.ensureDirectoryExists
     pub fn ensure_directory(&self, path: &[u8]) -> Result<(), Error> {
         let _permit = BLOCKING.acquire();
-        // os.MkdirAll's stat fast path distinguishes a file from EEXIST.
-        match native::metadata(native::path(path)) {
-            Ok(m) if m.is_dir() => return Ok(()),
-            Ok(_) => {
-                return Err(native::failure(
-                    "mkdir",
-                    path,
-                    std::io::Error::from(std::io::ErrorKind::NotADirectory),
-                )
-                .into())
-            }
-            Err(_) => {}
-        }
-        std::fs::create_dir_all(native::path(path))
-            .map_err(|e| Error::from(native::failure("mkdir", path, e)))
+        native::mkdir_all(path).map_err(Error::from)
     }
     /// port: tsc/internal/vfs/osvfs/os.go:osFS.writeFileEnsuringDir
     pub fn write_ensuring_directory(
@@ -359,7 +345,7 @@ pub fn global_typings_cache_location() -> Vec<u8> {
             } else {
                 b"typescript"
             },
-            b"7.1",
+            tsr_core::version_major_minor().as_bytes(),
         ],
     )
 }

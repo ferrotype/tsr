@@ -8,6 +8,7 @@
   },
   "exempt_operations": 7,
   "gap_problems": [],
+  "later_step_unresolved": 0,
   "outputs": {
     "complete": true,
     "exact_outputs": 68,

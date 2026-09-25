@@ -141,11 +141,84 @@ def actions(shape):
     return rows
 
 
+AST = 'tsc/internal/ast/ast.go:'
+VISITOR = 'tsc/internal/ast/visitor.go:'
+
+
+def body(go, name, method):
+    """The pinned body of a generated method, or ''."""
+    match = re.search(r'func \(node \*' + name + r'\) ' + method + r'\([^\n]*\{\n(.*?)\n\}', go, re.S)
+    return match[1] if match else ''
+
+
+def runtime_links(name, list_members, mode, go):
+    """The shared runtime operations each action enters, read from the pinned
+    bodies the probe calls: the factory and its counters, node and list
+    positions in every snapshot, the child-visit helpers of ForEachChild,
+    cloneNode, updateNode on a changed field, and the visitor roles of
+    VisitEachChild. A list helper that runs only on a non-nil list is linked
+    only in the modes that build one."""
+    lists = mode != 'nil' and bool(list_members)
+    links = {'new': [AST + 'NewNodeFactory', AST + 'NodeFactory.newNode', AST + 'newNode', AST + 'Node.Pos', AST + 'Node.End']
+             + ([AST + 'NodeList.Pos', AST + 'NodeList.End'] if lists else []),
+             'counts': [AST + 'NodeFactory.NodeCount', AST + 'NodeFactory.TextCount'],
+             'clone': [AST + 'cloneNode'], 'update': [AST + 'updateNode']}
+    children = body(go, name, 'ForEachChild')
+    if 'forEachChild_' in children:
+        children += body_of_helper(go, 'forEachChild_' + name)
+    walk = [PREFIX + 'Node.ForEachChild']
+    for helper in ('visit', 'visitNodeList', 'visitModifiers'):
+        if re.search(r'\b' + helper + r'\(v, ', children):
+            walk.append(AST + helper)
+    listed = set(re.findall(r'\bvisit(?:NodeList|Modifiers)\(v, node\.(\w+)\)', children))
+    if re.search(r'\bvisitNodes\(v, ', children) or (lists and listed & list_members):
+        walk.append(AST + 'visitNodes')
+    if 'forEachChild_' + name in children:
+        walk.append(AST + 'forEachChild_' + name)
+    links['children'] = walk
+    visits = body(go, name, 'VisitEachChild')
+    roles = [AST + 'Node.VisitEachChild']
+    if 'visitEachChild_' + name in visits:
+        roles.append(AST + 'visitEachChild_' + name)
+        visits += body_of_helper(go, 'visitEachChild_' + name)
+    for role in ('visitFunctionBody', 'visitParameters', 'visitEmbeddedStatement', 'visitIterationBody', 'visitToken'):
+        if 'v.' + role + '(' in visits:
+            roles.append(VISITOR + 'NodeVisitor.' + role)
+    if 'v.visitIterationBody(' in visits and VISITOR + 'NodeVisitor.visitEmbeddedStatement' not in roles:
+        roles.append(VISITOR + 'NodeVisitor.visitEmbeddedStatement')
+    links['visit'] = roles
+    return links
+
+
+def body_of_helper(go, helper):
+    source = (ROOT / 'upstream/tsc/internal/ast/ast.go').read_text()
+    match = re.search(r'func ' + helper + r'\([^\n]*\{\n(.*?)\n\}', source, re.S)
+    return match[1] if match else ''
+
+
+def linked_actions(shape, mode, go):
+    """The shape's actions with the runtime operations each one enters."""
+    list_members = {m['name'] for m in shape['members'] if m['rust_type'] == 'Option<NodeListId>'}
+    links = runtime_links(shape['name'], list_members, mode, go)
+    out = []
+    for label, ops in actions(shape):
+        extra = links.get(label, [])
+        if label == 'children-stop':
+            extra = links['children']
+        elif label in ('visit-same', 'visit-replace'):
+            extra = links['visit']
+        elif label.startswith('update-') and label != 'update-same':
+            extra = links['update']
+        out.append((label, ops + [op for op in extra if op not in ops]))
+    return out
+
+
 def requests():
     rows = []
+    go = (ROOT / 'upstream/tsc/internal/ast/ast_generated.go').read_text()
     for shape in inventory():
-        linked = actions(shape)
         for mode in ('nil','empty','nodes','nil-element'):
+            linked = linked_actions(shape, mode, go)
             rows.append({'case':f'syntax/generated-shape/{shape["name"]}/{mode}',
                 'subject':'generatedShape', 'shape':shape['name'], 'mode':mode,
                 'operation':PREFIX+'NodeFactory.New'+shape['name'],

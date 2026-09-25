@@ -259,7 +259,9 @@ def workspace_symbol_index() -> dict[str, list[str]]:
     Searching the whole workspace rather than the ledger's claimed files is
     deliberate: 117 of the 169 Phase 1 ledger rows record no Rust home, and
     several name a crate directory that does not exist because the behavior
-    moved (see KNOWN_HOMES).
+    moved (see KNOWN_HOMES). build() judges a bare name only inside the Phase 1
+    home crates (phase1_home_crates); a same-named function elsewhere is named
+    in the basis but is not evidence.
     """
     index: dict[str, list[str]] = {}
     for path in sorted((ROOT / "crates").rglob("*.rs")):
@@ -268,6 +270,29 @@ def workspace_symbol_index() -> dict[str, list[str]]:
         for name in set(re.findall(r"\bfn\s+([a-z0-9_]+)", text)):
             index.setdefault(name, []).append(rel)
     return index
+
+
+def phase1_home_crates() -> frozenset[str]:
+    """The crates a Phase 1 operation can live in: the PORTS.toml homes of Phase 1 packages.
+
+    A crate the ledger names for a Phase 1 package (its `crate`, or a `rust`
+    path under crates/), plus the actual homes KNOWN_HOMES records for them. A
+    bare function name defined only in some other crate -- a formatter, the
+    API, a wasm binding -- says nothing about a Phase 1 operation, so it must
+    not move a disposition. Explicit `port:` markers are claims and count
+    wherever they are.
+    """
+    present = {path.name for path in (ROOT / "crates").iterdir() if path.is_dir()}
+    homes: set[str] = set()
+    for entry in ledger():
+        if MEMBERSHIP.get(entry.get("package"), (None,))[0] not in ("full", "partial"):
+            continue
+        homes.add(entry.get("crate") or "")
+        homes.update(match[1] for path in entry.get("rust") or [] if (match := re.match(r"crates/([^/]+)/", path)))
+    for package, text in KNOWN_HOMES.items():
+        if MEMBERSHIP.get(package, (None,))[0] in ("full", "partial"):
+            homes.update(re.findall(r"\btsr_[a-z0-9_]+", text))
+    return frozenset(homes & present)
 
 
 # `/// port: tsc/internal/<pkg>/<file>.go:<Symbol>` above a `fn`. The annotation
@@ -388,6 +413,7 @@ def classify(
     coverage: list[str],
     ports: dict[str, set[str]] | None = None,
     identity: str = "",
+    elsewhere: dict[str, list[str]] | None = None,
 ) -> tuple[str, str]:
     """Return (disposition, basis). Basis records how the disposition was reached.
 
@@ -403,6 +429,7 @@ def classify(
     status = entry.get("status")
     verify = entry.get("verify") or []
     ports = ports or {}
+    elsewhere = elsewhere or {}
 
     if status == "out-of-scope":
         return "later_phase", "ledger marks the source file out of scope for the port"
@@ -451,6 +478,14 @@ def classify(
         return (
             "missing",
             f"unmapped; `{candidate}` matches an unrelated generic Rust helper, which is not evidence",
+        )
+    outside = elsewhere.get(candidate, [])
+    if outside:
+        shown = ", ".join(outside[:2]) + (" ..." if len(outside) > 2 else "")
+        return (
+            "missing",
+            f"unmapped; `{candidate}` is defined only outside the Phase 1 home crates ({shown}), "
+            "which is not evidence",
         )
     home = KNOWN_HOMES.get(entry["package"])
     if home:
@@ -591,7 +626,22 @@ MUTATION_ORACLES = {
     # The S06 requests again, with a per-node SubtreeFacts stage.
     "facts": {"inventory": "data/s06/requests.json", "rows": "requests", "request": "request_sha256",
               "select": None},
+    # The operation tables (scripts/phase1_tables.py): each row names its column.
+    "table": {"inventory": "data/phase1/tables/requests.json", "rows": "requests", "request": "request_sha256",
+              "select": None, "column": "column"},
 }
+# Oracles whose rows belong to columns (docs/PHASE1-mutation-witnesses.md
+# section 9). Column parity: a kill on a row of column C credits only while the
+# campaign's base trace matched native on every row of C (the results record
+# each column's parity, checked here against the inventory's rows of C). One
+# home: an operation a current table spec column claims (table_spec_state; the
+# results' one_home_operations, which phase1_mutation_run.results applied, must
+# be exactly the claims of the inventory's columns) has no excused home in any
+# mutation witness, so an extra marked copy must be reached and killed or lose
+# its marker. An operation the table witness claims only through a column's
+# callee keeps the ordinary excusal rule. The column witness is also bound to
+# the specs its inventory was selected from, so a spec edit stales it.
+MUTATION_COLUMN_ORACLES = ("table",)
 # Final states. `not_credited_multi_op`: the mutant's only differing rows are
 # rows of an oracle that never credits a site carrying several operations (see
 # MUTATION_SINGLE_OPERATION_ORACLES). `budget` (the row budget stopped the
@@ -857,6 +907,39 @@ def mutation_go_bindings(oracle: str) -> tuple[dict | None, str | None]:
     return bindings, None
 
 
+def table_spec_state(root: Path = ROOT) -> tuple[dict | None, str | None]:
+    """The current operation-table specs, as rules 6 and 7 read them (section 9).
+
+    Returns ({"specs": {relative path: sha256}, "claims": {column: [operation]}},
+    None) or (None, reason). A tree without the spec directory has no tables
+    (both empty). A missing or malformed group spec is a reason: without the
+    current claims rule 7 cannot be applied to any mutation witness.
+    """
+    import phase1_tables
+    if not (root / phase1_tables.SPEC_DIRECTORY).is_dir():
+        return {"specs": {}, "claims": {}}, None
+    specs: dict[str, str] = {}
+    claims: dict[str, list[str]] = {}
+    for group in phase1_tables.GROUPS:
+        relative = f"{phase1_tables.SPEC_DIRECTORY}/{group}.json"
+        try:
+            raw = (root / relative).read_bytes()
+            document = json.loads(raw)
+        except (OSError, ValueError) as error:
+            return None, f"table spec {relative} is unreadable: {error}"
+        specs[relative] = hashlib.sha256(raw).hexdigest()
+        columns = document.get("columns") if isinstance(document, dict) else None
+        if not isinstance(columns, list):
+            return None, f"table spec {relative} has no column list"
+        for column in columns:
+            operations = column.get("operations") if isinstance(column, dict) else None
+            if (not isinstance(column, dict) or not isinstance(column.get("id"), str) or column["id"] in claims
+                    or not isinstance(operations, list) or not all(isinstance(op, str) for op in operations)):
+                return None, f"table spec {relative} has a malformed or duplicated column"
+            claims[column["id"]] = sorted(set(operations))
+    return {"specs": specs, "claims": claims}, None
+
+
 def mutation_artifacts(oracle: object, artifact: object, root: Path = ROOT) -> tuple[dict | None, str | None]:
     """Load and cross-check the committed artifacts one oracle's kills rest on.
 
@@ -885,13 +968,16 @@ def mutation_artifacts(oracle: object, artifact: object, root: Path = ROOT) -> t
     bindings, reason = mutation_go_bindings(oracle)
     if reason:
         return None, reason
+    tables, reason = table_spec_state(root)
+    if reason:
+        return None, reason
     pin = json.loads((root / "data/upstream.json").read_text())["pin"]
     key = (oracle, artifact, pin, json.dumps(spec, sort_keys=True), json.dumps(bindings, sort_keys=True),
-           *(loaded[name][0] for name in files))
+           json.dumps(tables, sort_keys=True), *(loaded[name][0] for name in files))
     if key not in _CONTEXT_CACHE:
         if len(_CONTEXT_CACHE) > 16:
             _CONTEXT_CACHE.clear()
-        _CONTEXT_CACHE[key] = _mutation_context(oracle, artifact, spec, pin, files, loaded, bindings)
+        _CONTEXT_CACHE[key] = _mutation_context(oracle, artifact, spec, pin, files, loaded, bindings, tables)
     return _CONTEXT_CACHE[key]
 
 
@@ -930,7 +1016,7 @@ def _manifest_homes(manifest: dict, by_key: dict) -> tuple[dict | None, dict, st
 
 
 def _mutation_context(oracle: str, artifact: str, spec: dict, pin: str, files: dict,
-                      loaded: dict, bindings: dict) -> tuple[dict | None, str | None]:
+                      loaded: dict, bindings: dict, tables: dict) -> tuple[dict | None, str | None]:
     manifest, results, native, reach, inventory = (loaded[name][1] for name in list(files)[:5])
     if not isinstance(inventory, dict) or not isinstance(inventory.get(spec["rows"]), list):
         return None, f"{spec['inventory']} has no {spec['rows']} list"
@@ -1007,6 +1093,41 @@ def _mutation_context(oracle: str, artifact: str, spec: dict, pin: str, files: d
     selected = [row for row in inventory[spec["rows"]] if isinstance(row, dict)
                 and (spec["select"] is None or row.get(spec["select"][0]) == spec["select"][1])]
     committed = [(row.get("id"), row.get(spec["request"])) for row in selected]
+    column_of, parity = {}, {}
+    if spec.get("column"):
+        column_of = {row.get("id"): row.get(spec["column"]) for row in selected}
+        recorded = results.get("columns") if isinstance(results.get("columns"), dict) else {}
+        parity = recorded.get(oracle) if isinstance(recorded.get(oracle), dict) else {}
+    # The operations the table columns claim, as the results applied rule 7.
+    one_home = results.get("one_home_operations", [])
+    if not isinstance(one_home, list) or not all(isinstance(op, str) for op in one_home) \
+            or one_home != sorted(set(one_home)):
+        return None, "mutation results list their one-home operations malformed"
+    if results.get("columns") and "one_home_operations" not in results:
+        return None, "mutation results record column parity but no one-home operations"
+    if spec.get("column"):
+        # The specs bind the column witness: the committed inventory (and the
+        # native freeze taken from it) was selected from the current specs, and
+        # the results applied rule 7 to exactly what the current specs claim for
+        # the inventory's columns. A spec edit stales it until the campaign reruns.
+        if not tables["specs"]:
+            return None, f"there are no operation-table specs for the {oracle} columns"
+        selected_from = inventory.get("specs") if isinstance(inventory.get("specs"), dict) else {}
+        changed = sorted({path for path in set(selected_from) | set(tables["specs"])
+                          if selected_from.get(path) != tables["specs"].get(path)})
+        if changed:
+            return None, (f"{spec['inventory']} was selected from other table specs than the current ones "
+                          f"({changed[0]}); rerun the table selection and campaign")
+        frozen_from = native.get("request_inventory") if isinstance(native.get("request_inventory"), dict) else {}
+        if frozen_from.get("specs") != selected_from:
+            return None, f"{files['native']} was frozen from another selection than {spec['inventory']}"
+        claimed = sorted({op for column in set(column_of.values()) for op in tables["claims"].get(column, ())})
+        if one_home != claimed:
+            return None, ("the results' one-home operations are not what the current table specs claim for the "
+                          "inventory's columns; rerun the table campaign")
+    # Rule 7 follows the operation: whatever a current spec column claims has
+    # one home in every mutation witness, whichever results it rests on.
+    one_home = sorted(set(one_home) | {op for operations in tables["claims"].values() for op in operations})
     frozen = [(row["row"], row.get("request_sha256")) for row in native["rows"]]
     if frozen != committed:
         return None, f"{files['native']} rows differ from the committed request inventory {spec['inventory']}"
@@ -1020,11 +1141,13 @@ def _mutation_context(oracle: str, artifact: str, spec: dict, pin: str, files: d
     source_inputs = {path: digest for path, digest in bindings["oracle_sources"].items() if isinstance(path, str)}
     return {"oracle": oracle, "artifact": artifact, "manifest": by_key, "manifest_ids": by_id,
             "results_document": results, "results": outcomes, "rows": rows, "requests": dict(committed),
+            "columns": column_of, "column_parity": parity, "one_home": frozenset(one_home),
             "reach": reach_index, "reach_gaps": "op_row_gaps" in reach, "reach_rows": {},
             "unstable": frozenset(unstable), "campaigns": campaigns, "homes": homes, "home_of": home_of,
             "digests": {"manifest_sha256": loaded["manifest"][0], "results_sha256": loaded["results"][0],
                         "native_sha256": loaded["native"][0], "go_reach_sha256": loaded["reach"][0]},
-            "inputs": {**source_inputs, **{relative: loaded[name][0] for name, relative in files.items()}}}, None
+            "inputs": {**source_inputs, **tables["specs"],
+                       **{relative: loaded[name][0] for name, relative in files.items()}}}, None
 
 
 def _reach_counts(entry: object) -> tuple[int, ...] | None:
@@ -1138,6 +1261,10 @@ def mutation_kill_problem(context: dict, sources: dict | None, operation: str, m
         return f"row {row!r}: recorded request digest differs from the results"
     if context["requests"].get(row) != digest:
         return f"row {row!r}: request differs from the committed inventory"
+    if context["oracle"] in MUTATION_COLUMN_ORACLES:
+        problem = column_parity_problem(context, row)
+        if problem:
+            return problem
     frozen = context["rows"].get(row)
     if frozen is None or frozen[1].get("request_sha256") != digest:
         return f"row {row!r}: not in the frozen native observations"
@@ -1189,6 +1316,28 @@ def mutation_kill_problem(context: dict, sources: dict | None, operation: str, m
     return mutation_site_problem(mutant, operation, sources)
 
 
+def column_parity_problem(context: dict, row: str) -> str | None:
+    """None when every row of the kill row's column matched native in the campaign's base trace.
+
+    The results record each column's row count and base matches; the count
+    must be the committed inventory's rows of that column.
+    """
+    column = context["columns"].get(row)
+    if not isinstance(column, str):
+        return f"row {row!r} names no column in the committed inventory"
+    entry = context["column_parity"].get(column)
+    rows = sum(1 for value in context["columns"].values() if value == column)
+    if (not isinstance(entry, dict) or type(entry.get("rows")) is not int
+            or type(entry.get("base_match")) is not int):
+        return f"row {row!r}: the results record no parity of column {column}"
+    if entry["rows"] != rows:
+        return f"row {row!r}: the results record {entry['rows']} rows of column {column}, the inventory has {rows}"
+    if entry["base_match"] != rows:
+        return (f"row {row!r}: column {column} matched native on {entry['base_match']} of its {rows} rows, so no "
+                "kill on it credits (column parity)")
+    return None
+
+
 def unreached_reason(context: dict, home: dict) -> str:
     """The not_claimed text for a home no traced oracle executes; it names the oracles."""
     return (f"{MUTATION_UNREACHED_PHRASE} {', '.join(context['campaigns'])}: the full traces of these oracles "
@@ -1221,7 +1370,9 @@ def mutation_home_problems(witness: dict, context: dict, sources: dict | None, o
     every oracle campaign of the results. A home with no mutant or unmeasured
     reach keeps the operation pending. The live view also requires excused
     homes' spans to be current and the current marker sites to be exactly the
-    plan's.
+    plan's. An operation a current table spec column claims (the context's
+    one_home) has no excused home, whichever witness claims it: every home
+    must be killed.
     """
     if context["homes"] is None:
         return ["the mutation manifest records no Rust homes, so the several-homes rule cannot be checked"]
@@ -1235,6 +1386,10 @@ def mutation_home_problems(witness: dict, context: dict, sources: dict | None, o
     problems = []
     for home in homes:
         if home["id"] in killed_homes:
+            continue
+        if operation in context["one_home"]:
+            problems.append(f"Rust home {home['id']} is not killed: a table column claims this operation, so it "
+                            "has one home, and an extra marked copy must be reached and killed or lose its marker")
             continue
         reason = not_claimed.get(home["id"]) if isinstance(not_claimed, dict) else None
         if not isinstance(reason, str) or not reason.strip():
@@ -2000,8 +2155,17 @@ def leaf_preparation(scope: dict, cases: dict, step: str = "leaves", *, suppleme
         if case is None or results.get(identity) not in ("native_unavailable", "not_applicable"):
             raise ValueError(f"{identity}: platform witness may only supplement a bound native-unavailable case")
         results[identity] = "match"
+    # Operations an acceptance case of ANY family prepares. A `later_step`
+    # exemption only says another step prepares the operation, so it stands
+    # only while that step's case (or a covering witness, or a reviewed
+    # later-phase destination) actually does.
+    prepared_anywhere: set[str] = set()
     for case in cases.get("cases", []):
-        if case.get("family") not in families or results[case["id"]] not in PREPARING_RESULTS:
+        if results[case["id"]] not in PREPARING_RESULTS:
+            continue
+        if case.get("family") != "pilot":
+            prepared_anywhere.update(case.get("operations", []))
+        if case.get("family") not in families:
             continue
         for operation in case.get("operations", []):
             prepared.setdefault(operation, []).append(case["id"])
@@ -2012,16 +2176,26 @@ def leaf_preparation(scope: dict, cases: dict, step: str = "leaves", *, suppleme
             witnessed.setdefault(operation, []).append(identity)
     exempt = roster_exemptions(step)
     required = [r for r in scope["operations"] if r["go_package"] in STEP_PACKAGES[step]]
+
+    def later_step_unresolved(row: dict) -> bool:
+        entry = exempt.get(row["id"])
+        reviewed = (row.get("basis_kind") == "review" and row.get("disposition") == "later_phase"
+                    and type(row.get("destination_phase")) is int)
+        return bool(entry and entry.get("category") == "later_step" and not reviewed
+                    and row["id"] not in prepared_anywhere and row["id"] not in witnessed)
+
     pending = [
-        {"operation": r["id"], "rust_home": r["rust_home"], "disposition": r["disposition"]}
+        {"operation": r["id"], "rust_home": r["rust_home"], "disposition": r["disposition"],
+         **({"reason": "later_step_unresolved"} if later_step_unresolved(r) else {})}
         for r in required
-        if r["id"] not in prepared and r["id"] not in witnessed and r["id"] not in exempt
+        if r["id"] not in prepared and r["id"] not in witnessed
+        and (r["id"] not in exempt or later_step_unresolved(r))
     ]
     accounted = [r for r in required if r["id"] not in {p["operation"] for p in pending}]
     by_category: dict[str, int] = {}
     for row in required:
         entry = exempt.get(row["id"])
-        if entry and row["id"] not in prepared and row["id"] not in witnessed:
+        if entry and row["id"] not in prepared and row["id"] not in witnessed and not later_step_unresolved(row):
             by_category[entry["category"]] = by_category.get(entry["category"], 0) + 1
     problems = roster_problems(scope, cases, step)
     gap_problems = gap_record_problems({"cases": [
@@ -2054,6 +2228,7 @@ def leaf_preparation(scope: dict, cases: dict, step: str = "leaves", *, suppleme
         ),
         "exempt_operations": sum(by_category.values()),
         "exempt_by_category": dict(sorted(by_category.items())),
+        "later_step_unresolved": sum(1 for row in pending if row.get("reason") == "later_step_unresolved"),
         "pending": pending,
         "roster_problems": problems,
         "gap_problems": gap_problems,
@@ -2063,7 +2238,12 @@ def leaf_preparation(scope: dict, cases: dict, step: str = "leaves", *, suppleme
 
 def build() -> dict:
     rows: list[dict] = []
-    index = workspace_symbol_index()
+    home_crates = phase1_home_crates()
+    index: dict[str, list[str]] = {}
+    elsewhere: dict[str, list[str]] = {}
+    for name, locations in workspace_symbol_index().items():
+        for location in locations:
+            (index if location.split("/")[1] in home_crates else elsewhere).setdefault(name, []).append(location)
     ports = declared_ports()
     homes = annotated_homes()
     gaps = witnessed_gaps()
@@ -2088,7 +2268,7 @@ def build() -> dict:
         mapped = identity not in missing_ids
         linked = case_links.get(identity, [])
         witnessing = gaps.get(identity, [])
-        disposition, basis = classify(entry, symbol, mapped, index, linked, ports, identity)
+        disposition, basis = classify(entry, symbol, mapped, index, linked, ports, identity, elsewhere)
         if witnessing and disposition != "covered":
             disposition = "missing"
             basis = (
@@ -2184,6 +2364,24 @@ def build() -> dict:
     }
 
 
+def scope_drift(committed: dict) -> dict:
+    """The committed scope.json against a rebuild from the current sources.
+
+    `phase1.py inventory --check` and `phase1_producers.py check` fail on
+    drift; the self-tests report it without failing.
+    """
+    built = build()
+    if built == committed:
+        return {"current": True, "changed_count": 0, "changed_operations": [], "changed_fields": []}
+    before = {row["id"]: row for row in committed.get("operations", [])}
+    after = {row["id"]: row for row in built["operations"]}
+    changed = sorted(identity for identity in before.keys() | after.keys()
+                     if before.get(identity) != after.get(identity))
+    return {"current": False, "changed_count": len(changed), "changed_operations": changed[:20],
+            "changed_fields": sorted(key for key in built.keys() | committed.keys()
+                                     if key != "operations" and built.get(key) != committed.get(key))}
+
+
 def verify(scope: dict) -> list[str]:
     problems: list[str] = []
     rows = scope.get("operations", [])
@@ -2232,6 +2430,52 @@ def verify(scope: dict) -> list[str]:
     return problems
 
 
+# The owner's approval of the reviewed later-phase destinations. It covers the
+# exact rows it digests: any added, removed or edited row needs a new approval.
+REVIEW_APPROVAL_FIELDS = ("approved_by", "date", "decision", "rows", "rows_sha256", "scope", "statement")
+REVIEW_APPROVAL_SCOPE = "reviewed_operation_destinations"
+
+
+def review_approval_digest(rows: list[dict]) -> str:
+    """sha256 of the approved rows: canonical JSON (sorted keys) of the rows sorted by operation."""
+    ordered = sorted(rows, key=lambda row: str(row.get("operation")))
+    return hashlib.sha256(json.dumps(ordered, sort_keys=True, separators=(",", ":"),
+                                     ensure_ascii=True).encode()).hexdigest()
+
+
+def review_approval_problems(review: dict, root: Path = ROOT) -> list[str]:
+    """The approval must name its approver, date and decision and digest exactly the current rows."""
+    approval = review.get("approval")
+    if not isinstance(approval, dict):
+        return ["coverage-review.json records no owner approval of its reviewed later-phase destinations"]
+    problems = []
+    if set(approval) != set(REVIEW_APPROVAL_FIELDS):
+        problems.append("coverage-review.json approval must have exactly the fields "
+                        + ", ".join(REVIEW_APPROVAL_FIELDS))
+    for field in ("approved_by", "statement"):
+        if not isinstance(approval.get(field), str) or not approval[field].strip():
+            problems.append(f"coverage-review.json approval records no {field}")
+    if not isinstance(approval.get("date"), str) or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", approval["date"]):
+        problems.append("coverage-review.json approval date is not YYYY-MM-DD")
+    decision = approval.get("decision")
+    if not isinstance(decision, str) or not (root / decision.split("#")[0]).is_file():
+        problems.append("coverage-review.json approval names no recorded decision document")
+    if approval.get("scope") != REVIEW_APPROVAL_SCOPE:
+        problems.append(f"coverage-review.json approval must cover {REVIEW_APPROVAL_SCOPE}")
+    rows = review.get(REVIEW_APPROVAL_SCOPE, [])
+    if approval.get("rows") != len(rows) or approval.get("rows_sha256") != review_approval_digest(rows):
+        problems.append("coverage-review.json approval does not cover exactly the current reviewed destinations; "
+                        "an added, removed or edited row needs a new owner approval")
+    # The review's own authority statement must agree with the approval it
+    # carries: cite it, and never describe the same rows as not owner-approved.
+    authority = review.get("authority")
+    if not isinstance(authority, str) or "`approval`" not in authority:
+        problems.append("coverage-review.json authority does not cite its `approval` block")
+    elif re.search(r"\bnot\b[^.;]*\bowner[- ]approved\b", authority, re.IGNORECASE):
+        problems.append("coverage-review.json authority describes the approved rows as not owner-approved")
+    return problems
+
+
 def reviewed_destinations() -> dict[str, dict]:
     """Apply exact accepted-plan boundaries, never a package/name heuristic.
 
@@ -2273,4 +2517,8 @@ def reviewed_destinations() -> dict[str, dict]:
         raise ValueError("coverage-review.json: duplicate or simultaneously resolved destination")
     if any(identity not in known for identity in unresolved):
         raise ValueError("coverage-review.json: unknown unresolved operation")
+    # Only the owner's approval of exactly these rows makes them destinations.
+    approval = review_approval_problems(review)
+    if approval:
+        raise ValueError("; ".join(approval))
     return {identity: row for identity, row in decisions.items() if "destination_phase" in row}

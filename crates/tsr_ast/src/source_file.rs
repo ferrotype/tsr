@@ -142,6 +142,8 @@ pub struct SourceFileState {
     ecma_line_map: OnceLock<Vec<i32>>,
     node_index: crate::source_cache::SourceNodeIndexCache,
     pub(crate) binding: crate::bind_result::BindCell,
+    /// Go's `SourceFile.data`: per-file values computed once per key.
+    pub data: crate::source_file_tables::SourceFileData,
 }
 
 impl SourceFileState {
@@ -182,6 +184,7 @@ impl SourceFileState {
             ecma_line_map: OnceLock::new(),
             node_index: crate::source_cache::SourceNodeIndexCache::default(),
             binding: crate::bind_result::BindCell::default(),
+            data: crate::source_file_tables::SourceFileData::default(),
         }
     }
 

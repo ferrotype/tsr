@@ -306,3 +306,24 @@ pub fn remove_any_file_extension(path: &[u8]) -> &[u8] {
         remove_extension(path, extension)
     }
 }
+
+/// Go's `PathIsRelative`: ".", "..", or a "./", "../", ".\\" or "..\\" prefix.
+fn path_is_relative(path: &[u8]) -> bool {
+    path == b"."
+        || path == b".."
+        || path.len() >= 2 && path[0] == b'.' && matches!(path[1], b'/' | b'\\')
+        || path.len() >= 3 && path[0] == b'.' && path[1] == b'.' && matches!(path[2], b'/' | b'\\')
+}
+
+/// port: tsc/internal/core/core.go:ShouldRewriteModuleSpecifier
+pub fn should_rewrite_module_specifier(
+    specifier: &[u8],
+    compiler_options: &tsr_core::CompilerOptions,
+) -> bool {
+    compiler_options
+        .rewrite_relative_import_extensions
+        .is_true()
+        && path_is_relative(specifier)
+        && !tsr_core::path::is_declaration_file_name(specifier)
+        && has_ts_file_extension(specifier)
+}

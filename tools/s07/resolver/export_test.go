@@ -300,6 +300,79 @@ func TestS07Resolvers(t *testing.T) {
 	var detachedResult *ast.Symbol
 	detachedPanic := panics(func() { detachedResult = r.Resolve(detached, "x", ast.SymbolFlagsValue, nil, false, true) })
 	emit("heritage/detached", detachedResult == nil, detachedPanic)
+
+	// A module export that is purely an alias is not in scope (nameresolver.go
+	// 131-144): GetDeclarationOfKind finds an ExportSpecifier or NamespaceExport
+	// declaration, also when it is not the first; any other alias declaration
+	// leaves the export resolvable.
+	for i, text := range []string{"let x; export { x as y }; y;", "export * as y from 'm'; y;", "export import y = require('m'); y;", "export import w = require('m'); let x; export { x as y }; y;"} {
+		root = parse(text, false)
+		var declarations []*ast.Node
+		switch i {
+		case 0:
+			declarations = []*ast.Node{find(root, ast.KindExportSpecifier, 0)}
+		case 1:
+			declarations = []*ast.Node{find(root, ast.KindNamespaceExport, 0)}
+		case 2:
+			declarations = []*ast.Node{find(root, ast.KindImportEqualsDeclaration, 0)}
+		default:
+			declarations = []*ast.Node{find(root, ast.KindImportEqualsDeclaration, 0), find(root, ast.KindExportSpecifier, 0)}
+		}
+		alias := sym("y", ast.SymbolFlagsAlias, declarations...)
+		module := sym("\"/resolver\"", ast.SymbolFlagsValueModule, root)
+		module.Exports = ast.SymbolTable{"y": alias}
+		root.DeclarationData().Symbol = module
+		reference = find(root, ast.KindExpressionStatement, 0).Expression()
+		r = NameResolver{CompilerOptions: options}
+		got := r.Resolve(reference, "y", ast.SymbolFlagsAlias, nil, false, true)
+		emit(fmt.Sprintf("alias/%d", i), got == nil, got == alias)
+	}
+	// The locals of a global script are not in scope (IsGlobalSourceFile).
+	root = parse("let x; x;", false)
+	reference = find(root, ast.KindExpressionStatement, 0).Expression()
+	s = sym("x", ast.SymbolFlagsBlockScopedVariable, find(root, ast.KindVariableDeclaration, 0))
+	root.LocalsContainerData().Locals = ast.SymbolTable{"x": s}
+	r = NameResolver{CompilerOptions: options}
+	emit("script/locals", r.Resolve(reference, "x", ast.SymbolFlagsValue, nil, false, true) == nil)
+	// Export-default local symbols: a function declaration without a local
+	// (ExportableBase.ExportableData with a nil LocalSymbol), then a payload that
+	// has no exportable data at all (NodeDefault.ExportableData), then a class
+	// with a local.
+	root = parse("export default function() {} export default 0; export default class C {}", false)
+	function = find(root, ast.KindFunctionDeclaration, 0)
+	assignment := find(root, ast.KindExportAssignment, 0)
+	class = find(root, ast.KindClassDeclaration, 0)
+	classLocal := sym("C", ast.SymbolFlagsClass, class)
+	class.ExportableData().LocalSymbol = classLocal
+	emit("default/nil", GetLocalSymbolForExportDefault(sym("default", ast.SymbolFlagsFunction, function, assignment)) == nil)
+	emit("default/scan", GetLocalSymbolForExportDefault(sym("default", ast.SymbolFlagsFunction, function, assignment, class)) == classLocal)
+	// GetReferencedImportDeclaration: an alias merged with a local value is not a
+	// non-local alias (IsNonLocalAlias); otherwise the declaration is the last
+	// IsAliasSymbolDeclaration match, not the last declaration.
+	root = parse("import {A} from 'm'; let v = 1; A;", false)
+	declaration = find(root, ast.KindImportSpecifier, 0)
+	value = find(root, ast.KindVariableDeclaration, 0)
+	reference = declaration.Name()
+	for i, flags := range []ast.SymbolFlags{ast.SymbolFlagsAlias | ast.SymbolFlagsFunctionScopedVariable, ast.SymbolFlagsAlias} {
+		merged := sym("A", flags, declaration, value)
+		rr := NewReferenceResolver(options, ReferenceResolverHooks{GetResolvedSymbol: func(*ast.Node) *ast.Symbol { return merged }})
+		emit(fmt.Sprintf("import/alias/%d", i), rr.GetReferencedImportDeclaration(reference) == declaration)
+	}
+	// BindSourceFile binds a file once under BindOnce and marks it bound.
+	root = parse("export {}; let x;", false)
+	file := root.AsSourceFile()
+	before := file.IsBound()
+	BindSourceFile(file)
+	first := root.Symbol()
+	BindSourceFile(file)
+	emit("bind/state", before, file.IsBound(), first != nil, len(root.Locals()), root.Symbol() == first, file.SymbolCount)
+	// BindSourceFile's IsBound guard keeps the second call above away from
+	// BindOnce, so enter it directly: on a bound file neither a new callback
+	// nor bindSourceFile runs again, and the module symbol is kept.
+	ran := false
+	file.BindOnce(func() { ran = true })
+	bindSourceFile(file)
+	emit("bind/once", ran, root.Symbol() == first)
 	if err := os.WriteFile(os.Getenv("S07_RESOLVER_OUTPUT"), output.Bytes(), 0600); err != nil {
 		t.Fatal(err)
 	}

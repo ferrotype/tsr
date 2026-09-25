@@ -308,3 +308,68 @@ fn invalid_resolution_kind_preserves_the_native_refusal() {
         Some("Unexpected moduleResolution: -1")
     );
 }
+
+/// One path spelled in two casings on a case-insensitive host: the loader
+/// parses the spelling it reaches first, and collection keeps the spelling the
+/// pin's walk visits first. A file without dependencies is parsed again under
+/// that spelling; one with its own dependencies is an explicit boundary,
+/// because another spelling's dependencies resolve from another spelling.
+#[test]
+fn casing_variants_reparse_leaves_and_refuse_files_with_dependencies() {
+    let request = |dependency: &str| {
+        let hex = |text: &str| {
+            use std::fmt::Write;
+            text.bytes().fold(String::new(), |mut hex, byte| {
+                write!(hex, "{byte:02x}").unwrap();
+                hex
+            })
+        };
+        json!({"id":"casing","cwd":"/src","case_sensitive":false,"roots":["/src/main.ts"],
+            "options":{"noLib":true},
+            "files":{"/src/main.ts":hex("import \"./a\"; import \"./A\";"),"/src/a.ts":hex(dependency),"/src/b.ts":hex("export {};")}})
+    };
+    let program = load(
+        &request("export {};"),
+        &mut FileCache::new(),
+        &Counters::new(),
+    );
+    let names: Vec<_> = program
+        .files()
+        .iter()
+        .map(|file| {
+            file.bound()
+                .view()
+                .source_file()
+                .unwrap()
+                .parse_options()
+                .file_name
+                .as_bytes()
+                .to_vec()
+        })
+        .collect();
+    assert_eq!(names, [b"/src/a.ts".to_vec(), b"/src/main.ts".to_vec()]);
+    // A failing `/// <reference path>` leaves a diagnostic on the first
+    // spelling's parse, which the reparse would orphan. The pin reports it
+    // for every spelling's task, so the file is refused like a dependency.
+    for dependency in [
+        "import \"./b\";",
+        "/// <reference path=\"./missing.ts\" />\nexport {};",
+        "/// <reference path=\"./a.ts\" />\nexport {};",
+    ] {
+        let refused = observation::try_load(
+            &request(dependency),
+            &mut FileCache::new(),
+            &Counters::new(),
+            None,
+        );
+        assert!(
+            matches!(
+                refused,
+                Err(ts_compiler_error::Error::Unsupported(
+                    "file-name casing variant with its own dependencies"
+                ))
+            ),
+            "{dependency}"
+        );
+    }
+}

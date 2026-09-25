@@ -87,6 +87,77 @@ pub fn is_declaration_node(node: &(impl NodeAccess + ?Sized)) -> bool {
             | NodeDataRead::JSDocTypeLiteral(_)
     )
 }
+/// Whether the payload's pinned FlowNodeData is non-nil: it embeds
+/// `FlowNodeBase`. FlowNodeData is a payload interface and open SyntaxKind
+/// values can disagree with the payload, so this follows the generated Go
+/// embedding graph, not kind ranges.
+/// port: tsc/internal/ast/ast.go:Node.FlowNodeData
+pub fn has_flow_node_data(node: &(impl NodeAccess + ?Sized)) -> bool {
+    matches!(
+        node.data(),
+        NodeDataRead::Identifier(_)
+            | NodeDataRead::QualifiedName(_)
+            | NodeDataRead::EmptyStatement(_)
+            | NodeDataRead::IfStatement(_)
+            | NodeDataRead::DoStatement(_)
+            | NodeDataRead::WhileStatement(_)
+            | NodeDataRead::ForStatement(_)
+            | NodeDataRead::ForInOrOfStatement(_)
+            | NodeDataRead::BreakStatement(_)
+            | NodeDataRead::ContinueStatement(_)
+            | NodeDataRead::ReturnStatement(_)
+            | NodeDataRead::WithStatement(_)
+            | NodeDataRead::SwitchStatement(_)
+            | NodeDataRead::ThrowStatement(_)
+            | NodeDataRead::TryStatement(_)
+            | NodeDataRead::DebuggerStatement(_)
+            | NodeDataRead::LabeledStatement(_)
+            | NodeDataRead::ExpressionStatement(_)
+            | NodeDataRead::Block(_)
+            | NodeDataRead::VariableStatement(_)
+            | NodeDataRead::BindingElement(_)
+            | NodeDataRead::MissingDeclaration(_)
+            | NodeDataRead::FunctionDeclaration(_)
+            | NodeDataRead::ClassDeclaration(_)
+            | NodeDataRead::InterfaceDeclaration(_)
+            | NodeDataRead::TypeAliasDeclaration(_)
+            | NodeDataRead::EnumDeclaration(_)
+            | NodeDataRead::ModuleBlock(_)
+            | NodeDataRead::NotEmittedStatement(_)
+            | NodeDataRead::ImportDeclaration(_)
+            | NodeDataRead::ExportAssignment(_)
+            | NodeDataRead::NamespaceExportDeclaration(_)
+            | NodeDataRead::GetAccessorDeclaration(_)
+            | NodeDataRead::SetAccessorDeclaration(_)
+            | NodeDataRead::MethodDeclaration(_)
+            | NodeDataRead::KeywordExpression(_)
+            | NodeDataRead::ArrowFunction(_)
+            | NodeDataRead::FunctionExpression(_)
+            | NodeDataRead::PropertyAccessExpression(_)
+            | NodeDataRead::ElementAccessExpression(_)
+            | NodeDataRead::MetaProperty(_)
+            | NodeDataRead::ModuleDeclaration(_)
+            | NodeDataRead::ImportEqualsDeclaration(_)
+            | NodeDataRead::ExportDeclaration(_)
+    )
+}
+/// Whether the payload's pinned BodyData is non-nil: it embeds `BodyBase`
+/// (directly or through FunctionLikeWithBodyBase). ClassStaticBlockDeclaration
+/// has a `Body` field of its own and is not a member; see `NodeAccess::body`.
+/// port: tsc/internal/ast/ast.go:Node.BodyData
+pub fn has_body_data(node: &(impl NodeAccess + ?Sized)) -> bool {
+    matches!(
+        node.data(),
+        NodeDataRead::FunctionDeclaration(_)
+            | NodeDataRead::ConstructorDeclaration(_)
+            | NodeDataRead::GetAccessorDeclaration(_)
+            | NodeDataRead::SetAccessorDeclaration(_)
+            | NodeDataRead::MethodDeclaration(_)
+            | NodeDataRead::ArrowFunction(_)
+            | NodeDataRead::FunctionExpression(_)
+            | NodeDataRead::ModuleDeclaration(_)
+    )
+}
 /// port: tsc/internal/ast/utilities.go:IsDeclaration
 pub fn is_declaration(node: &(impl NodeAccess + ?Sized)) -> bool {
     if node.kind() == K::TypeParameter {
@@ -770,7 +841,7 @@ pub fn get_leftmost_access_expression(view: AstView<'_>, mut id: NodeId) -> Resu
     Ok(id)
 }
 /// port: tsc/internal/ast/utilities.go:isVariableDeclarationInitializedWithRequireHelper
-fn variable_initialized_with_require(
+pub(crate) fn variable_initialized_with_require(
     view: AstView<'_>,
     id: NodeId,
     allow_accessed: bool,

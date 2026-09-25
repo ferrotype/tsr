@@ -460,6 +460,16 @@ pub fn testing_lib_path() -> std::path::PathBuf {
     std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("bundled/libs")
 }
 
+/// The pinned `fileInfo` a bundled entry reports (embed.go:85, :91, :95 and
+/// the generated `libsEntries`): the name is `""` for the scheme root, `libs`
+/// for the library directory and the bare library name for an asset.
+fn file_info(name: &[u8], directory: bool, size: u64) -> FileInfo {
+    FileInfo {
+        name: JsString::from_bytes(name),
+        ..FileInfo::basic(directory, size)
+    }
+}
+
 impl BundledFs {
     /// port: tsc/internal/bundled/embed.go:wrappedFS.walkDir
     fn walk_bundled(
@@ -470,7 +480,7 @@ impl BundledFs {
         if rest.is_empty() {
             let entry = WalkEntry {
                 name: JsString::from_bytes(b"libs".as_slice()),
-                info: FileInfo::basic(true, 0),
+                info: file_info(b"libs", true, 0),
                 symlink: false,
             };
             match visit(b"bundled:////libs", Some(&entry), None)? {
@@ -485,7 +495,7 @@ impl BundledFs {
                 path.extend_from_slice(name.as_bytes());
                 let entry = WalkEntry {
                     name: JsString::from_bytes(name.as_bytes()),
-                    info: FileInfo::basic(false, bytes.len() as u64),
+                    info: file_info(name.as_bytes(), false, bytes.len() as u64),
                     symlink: false,
                 };
                 // The embedded implementation treats SkipDir on a file as
@@ -517,11 +527,11 @@ impl FileSystem for BundledFs {
     fn stat(&self, path: &[u8]) -> Result<Option<FileInfo>, Error> {
         if let Some(rest) = path.strip_prefix(b"bundled:///") {
             return Ok(if rest == b"libs" || rest.is_empty() {
-                Some(FileInfo::basic(true, 0))
+                Some(file_info(rest, true, 0))
             } else {
-                rest.strip_prefix(b"libs/")
-                    .and_then(library)
-                    .map(|bytes| FileInfo::basic(false, bytes.len() as u64))
+                rest.strip_prefix(b"libs/").and_then(|name| {
+                    library(name).map(|bytes| file_info(name, false, bytes.len() as u64))
+                })
             });
         }
         self.inner.stat(path)
@@ -594,5 +604,48 @@ impl FileSystem for BundledFs {
         } else {
             self.inner.realpath(path)
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use tsr_vfs::{MemoryBuilder, WalkControl};
+
+    fn filesystem() -> BundledFs {
+        BundledFs::new(Arc::new(MemoryBuilder::new(b"/", true).finish()))
+    }
+
+    fn name(info: &FileInfo) -> &[u8] {
+        info.name.as_bytes()
+    }
+
+    #[test]
+    fn stat_reports_the_pinned_entry_names() {
+        let fs = filesystem();
+        let root = fs.stat(b"bundled:///").unwrap().unwrap();
+        assert_eq!((name(&root), root.directory), (b"".as_slice(), true));
+        let libs = fs.stat(b"bundled:///libs").unwrap().unwrap();
+        assert_eq!((name(&libs), libs.directory), (b"libs".as_slice(), true));
+        let lib = fs.stat(b"bundled:///libs/lib.es5.d.ts").unwrap().unwrap();
+        assert_eq!(name(&lib), b"lib.es5.d.ts");
+        assert_eq!(lib.size, library(b"lib.es5.d.ts").unwrap().len() as u64);
+        assert!(!lib.directory);
+    }
+
+    #[test]
+    fn walk_entry_info_carries_the_entry_name() {
+        let fs = filesystem();
+        let mut seen = Vec::new();
+        fs.walk_dir(b"bundled:///", &mut |path, entry, _| {
+            let entry = entry.unwrap();
+            assert_eq!(entry.name.as_bytes(), name(&entry.info), "{path:?}");
+            seen.push(entry.info.name.clone());
+            Ok(WalkControl::Continue)
+        })
+        .unwrap();
+        assert_eq!(seen.len(), LIBRARIES.len() + 1);
+        assert_eq!(seen[0].as_bytes(), b"libs");
+        assert_eq!(seen[1].as_bytes(), LIBRARIES[0].0.as_bytes());
     }
 }

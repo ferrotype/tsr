@@ -108,6 +108,7 @@
       "tests": [
         "tests::actual_go_loader_boundary_observations",
         "tests::actual_go_loader_observations",
+        "tests::casing_variants_reparse_leaves_and_refuse_files_with_dependencies",
         "tests::invalid_resolution_kind_preserves_the_native_refusal",
         "tests::live_filesystem_snapshots_preserve_retained_program_files",
         "tests::resolver_scope_routes_retained_files_and_rejects_foreign_generations",
@@ -121,7 +122,9 @@
       "tests": [
         "boundary_tests::empty_references_and_mappers_preserve_normal_loading",
         "boundary_tests::parsed_enabled_mappers_are_rejected_and_disabled_diagnostics_are_retained",
-        "boundary_tests::parsed_project_references_are_rejected_before_loading_files"
+        "boundary_tests::parsed_project_references_load_the_referenced_configs",
+        "boundary_tests::source_of_project_reference_mode_skips_checking_referenced_sources",
+        "boundary_tests::source_of_project_reference_mode_with_outputs_is_an_explicit_boundary"
       ]
     },
     {

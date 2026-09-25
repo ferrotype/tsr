@@ -1,0 +1,212 @@
+{
+  "columns": [
+    {
+      "evidence": [
+        "internal/ast/utilities.go:3550",
+        "internal/checker/checker.go:10089",
+        "internal/checker/checker.go:30416",
+        "internal/checker/checker.go:30417"
+      ],
+      "id": "ast.Node.Attributes",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/ast.go:Node.Attributes"
+      ],
+      "projection": "[index, reference of the attributes] over JSX opening/self-closing elements and module declarations",
+      "rust": "tsr_ast node_semantics attributes",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:30416",
+        "internal/checker/checker.go:31265",
+        "internal/checker/jsx.go:249",
+        "internal/checker/jsx.go:285"
+      ],
+      "id": "ast.Node.Children",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/ast.go:Node.Children"
+      ],
+      "projection": "[index, references of the children] over JSX elements and fragments",
+      "rust": "tsr_ast node_semantics children_list",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:4432",
+        "internal/ls/completions.go:5962",
+        "internal/ls/hover.go:334",
+        "internal/parser/reparser.go:599"
+      ],
+      "id": "ast.Node.ClassName",
+      "input": "source_jsdoc",
+      "operations": [
+        "tsc/internal/ast/ast.go:Node.ClassName"
+      ],
+      "projection": "[index, reference of the class name] over @augments and @implements tags",
+      "rust": "tsr_ast node_semantics class_name",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ast/utilities.go:3152",
+        "internal/ast/utilities.go:3160",
+        "internal/ast/utilities.go:3166",
+        "internal/ls/hover.go:345"
+      ],
+      "id": "ast.Node.CommentList",
+      "input": "source_jsdoc",
+      "operations": [
+        "tsc/internal/ast/ast.go:Node.CommentList"
+      ],
+      "projection": "[index, references of the comment list] over JSDoc comments and every tag kind",
+      "rust": "tsr_ast node_semantics comment_list",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:2582",
+        "internal/ls/hover.go:314",
+        "internal/ls/hover.go:343"
+      ],
+      "id": "ast.Node.Comments",
+      "input": "source_jsdoc",
+      "operations": [
+        "tsc/internal/ast/ast.go:Node.Comments"
+      ],
+      "projection": "[index, references of the comments] over JSDoc comments and every tag kind",
+      "rust": "tsr_ast node_access comments",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/nodecopy.go:522",
+        "internal/checker/nodecopy.go:527",
+        "internal/ls/completions.go:5955",
+        "internal/parser/reparser.go:105"
+      ],
+      "id": "ast.Node.TypeExpression",
+      "input": "source_jsdoc",
+      "operations": [
+        "tsc/internal/ast/ast.go:Node.TypeExpression"
+      ],
+      "projection": "[index, reference of the type expression] over the JSDoc tags that carry one",
+      "rust": "tsr_ast node_semantics type_expression",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ast/utilities.go:472",
+        "internal/checker/checker.go:3972",
+        "internal/checker/checker.go:3979",
+        "internal/checker/checker.go:4189"
+      ],
+      "id": "ast.Node.Statement",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/ast.go:Node.Statement"
+      ],
+      "projection": "[index, reference of the body statement] over loops, with and labeled statements",
+      "rust": "tsr_ast node_semantics statement",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:25305",
+        "internal/checker/grammarchecks.go:2053",
+        "internal/ls/change/tracker.go:681",
+        "internal/ls/change/tracker.go:687"
+      ],
+      "id": "ast.IsStatement",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:isBlockStatement"
+      ],
+      "projection": "document-order indices of the nodes where IsStatement is true (a Block is one unless it is a function body or a try/catch block)",
+      "rust": "tsr_ast::utilities::is_statement (is_block_statement)",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/api/encoder/encoder.go:506",
+        "internal/ast/deepclone.go:41",
+        "internal/ast/deepclone.go:60",
+        "internal/checker/checker.go:9088"
+      ],
+      "id": "ast.NodeList.HasTrailingComma",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/ast.go:NodeList.HasTrailingComma"
+      ],
+      "projection": "[index, whether the argument/element/property list ends in a comma] over calls, news, array and object literals",
+      "rust": "tsr_ast AstView::list_has_trailing_comma",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/flow.go:1260"
+      ],
+      "id": "ast.FlowSwitchClauseData.IsEmpty",
+      "input": "values",
+      "operations": [
+        "tsc/internal/ast/flow.go:FlowSwitchClauseData.IsEmpty"
+      ],
+      "projection": "IsEmpty per [clause start, clause end] pair",
+      "rust": "tsr_ast::FlowSwitchClauseData::is_empty",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "clauses": [
+              [
+                0,
+                0
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                3,
+                2
+              ],
+              [
+                5,
+                5
+              ],
+              [
+                -1,
+                -1
+              ],
+              [
+                2147483647,
+                -2147483648
+              ],
+              [
+                4294967296,
+                0
+              ],
+              [
+                7,
+                8
+              ]
+            ]
+          },
+          "name": "clauses"
+        }
+      ]
+    }
+  ],
+  "group": "accessors",
+  "version": 1
+}

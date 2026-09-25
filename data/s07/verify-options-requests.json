@@ -2132,5 +2132,261 @@
       "/src/a.ts",
       "/src/a.js"
     ]
+  },
+  {
+    "case_sensitive": true,
+    "cwd": "/",
+    "files": {
+      "/src/a.js": "6c6574206f746865723d323b",
+      "/src/a.ts": "6578706f7274206c65742076616c75653d313b"
+    },
+    "id": "options/extra/jsx-factories-valid/command",
+    "options": {
+      "jsx": 3,
+      "jsxFactory": "React.createElement",
+      "jsxFragmentFactory": "React.Fragment",
+      "noEmit": true,
+      "noLib": true,
+      "target": 99
+    },
+    "roots": [
+      "/src/a.ts",
+      "/src/a.js"
+    ]
+  },
+  {
+    "case_sensitive": true,
+    "config_name": "/tsconfig.json",
+    "config_text": "7b0a202022636f6d70696c65724f7074696f6e73223a207b0a20202020226e6f4c6962223a20747275652c0a20202020226e6f456d6974223a20747275652c0a2020202022746172676574223a2039392c0a20202020226a7378223a20332c0a20202020226a7378466163746f7279223a202252656163742e637265617465456c656d656e74222c0a20202020226a7378467261676d656e74466163746f7279223a202252656163742e467261676d656e74220a20207d0a7d",
+    "cwd": "/",
+    "files": {
+      "/src/a.js": "6c6574206f746865723d323b",
+      "/src/a.ts": "6578706f7274206c65742076616c75653d313b"
+    },
+    "id": "options/extra/jsx-factories-valid/syntax",
+    "options": {
+      "jsx": 3,
+      "jsxFactory": "React.createElement",
+      "jsxFragmentFactory": "React.Fragment",
+      "noEmit": true,
+      "noLib": true,
+      "target": 99
+    },
+    "roots": [
+      "/src/a.ts",
+      "/src/a.js"
+    ]
+  },
+  {
+    "case_sensitive": true,
+    "cwd": "/",
+    "files": {
+      "/src/a.js": "6c6574206f746865723d323b",
+      "/src/a.ts": "6578706f7274206c65742076616c75653d313b"
+    },
+    "id": "options/extra/package-maps-node16/command",
+    "options": {
+      "module": 100,
+      "moduleResolution": 3,
+      "noEmit": true,
+      "noLib": true,
+      "resolvePackageJsonExports": true,
+      "target": 99
+    },
+    "roots": [
+      "/src/a.ts",
+      "/src/a.js"
+    ]
+  },
+  {
+    "case_sensitive": true,
+    "config_name": "/tsconfig.json",
+    "config_text": "7b0a202022636f6d70696c65724f7074696f6e73223a207b0a20202020226e6f4c6962223a20747275652c0a20202020226e6f456d6974223a20747275652c0a2020202022746172676574223a2039392c0a20202020226d6f64756c65223a203130302c0a20202020226d6f64756c655265736f6c7574696f6e223a20332c0a20202020227265736f6c76655061636b6167654a736f6e4578706f727473223a20747275650a20207d0a7d",
+    "cwd": "/",
+    "files": {
+      "/src/a.js": "6c6574206f746865723d323b",
+      "/src/a.ts": "6578706f7274206c65742076616c75653d313b"
+    },
+    "id": "options/extra/package-maps-node16/syntax",
+    "options": {
+      "module": 100,
+      "moduleResolution": 3,
+      "noEmit": true,
+      "noLib": true,
+      "resolvePackageJsonExports": true,
+      "target": 99
+    },
+    "roots": [
+      "/src/a.ts",
+      "/src/a.js"
+    ]
+  },
+  {
+    "case_sensitive": true,
+    "cwd": "/",
+    "files": {
+      "/src/a.js": "6c6574206f746865723d323b",
+      "/src/a.ts": "6578706f7274206c65742076616c75653d313b"
+    },
+    "id": "options/extra/package-maps-nodenext/command",
+    "options": {
+      "customConditions": [
+        "c"
+      ],
+      "module": 199,
+      "moduleResolution": 99,
+      "noEmit": true,
+      "noLib": true,
+      "target": 99
+    },
+    "roots": [
+      "/src/a.ts",
+      "/src/a.js"
+    ]
+  },
+  {
+    "case_sensitive": true,
+    "config_name": "/tsconfig.json",
+    "config_text": "7b0a202022636f6d70696c65724f7074696f6e73223a207b0a20202020226e6f4c6962223a20747275652c0a20202020226e6f456d6974223a20747275652c0a2020202022746172676574223a2039392c0a20202020226d6f64756c65223a203139392c0a20202020226d6f64756c655265736f6c7574696f6e223a2039392c0a2020202022637573746f6d436f6e646974696f6e73223a205b0a2020202020202263220a202020205d0a20207d0a7d",
+    "cwd": "/",
+    "files": {
+      "/src/a.js": "6c6574206f746865723d323b",
+      "/src/a.ts": "6578706f7274206c65742076616c75653d313b"
+    },
+    "id": "options/extra/package-maps-nodenext/syntax",
+    "options": {
+      "customConditions": [
+        "c"
+      ],
+      "module": 199,
+      "moduleResolution": 99,
+      "noEmit": true,
+      "noLib": true,
+      "target": 99
+    },
+    "roots": [
+      "/src/a.ts",
+      "/src/a.js"
+    ]
+  },
+  {
+    "case_sensitive": true,
+    "cwd": "/",
+    "files": {
+      "/src/a.js": "6c6574206f746865723d323b",
+      "/src/a.ts": "6578706f7274206c65742076616c75653d313b"
+    },
+    "id": "options/extra/package-maps-bundler/command",
+    "options": {
+      "module": 99,
+      "moduleResolution": 100,
+      "noEmit": true,
+      "noLib": true,
+      "resolvePackageJsonImports": true,
+      "target": 99
+    },
+    "roots": [
+      "/src/a.ts",
+      "/src/a.js"
+    ]
+  },
+  {
+    "case_sensitive": true,
+    "config_name": "/tsconfig.json",
+    "config_text": "7b0a202022636f6d70696c65724f7074696f6e73223a207b0a20202020226e6f4c6962223a20747275652c0a20202020226e6f456d6974223a20747275652c0a2020202022746172676574223a2039392c0a20202020226d6f64756c65223a2039392c0a20202020226d6f64756c655265736f6c7574696f6e223a203130302c0a20202020227265736f6c76655061636b6167654a736f6e496d706f727473223a20747275650a20207d0a7d",
+    "cwd": "/",
+    "files": {
+      "/src/a.js": "6c6574206f746865723d323b",
+      "/src/a.ts": "6578706f7274206c65742076616c75653d313b"
+    },
+    "id": "options/extra/package-maps-bundler/syntax",
+    "options": {
+      "module": 99,
+      "moduleResolution": 100,
+      "noEmit": true,
+      "noLib": true,
+      "resolvePackageJsonImports": true,
+      "target": 99
+    },
+    "roots": [
+      "/src/a.ts",
+      "/src/a.js"
+    ]
+  },
+  {
+    "case_sensitive": false,
+    "cwd": "/",
+    "files": {
+      "/src/X.js": "6c6574206f746865723d323b",
+      "/src/x.ts": "6578706f7274206c65742076616c75653d313b"
+    },
+    "id": "outputs/case-insensitive-overwrite",
+    "options": {
+      "allowJs": true,
+      "noEmit": false,
+      "noLib": true,
+      "target": 99
+    },
+    "roots": [
+      "/src/x.ts",
+      "/src/X.js"
+    ]
+  },
+  {
+    "case_sensitive": false,
+    "cwd": "/",
+    "files": {
+      "/src/A.tsx": "6578706f7274206c6574206f746865723d323b",
+      "/src/a.ts": "6578706f7274206c65742076616c75653d313b"
+    },
+    "id": "outputs/case-insensitive-collision",
+    "options": {
+      "jsx": 3,
+      "noEmit": false,
+      "noLib": true,
+      "target": 99
+    },
+    "roots": [
+      "/src/a.ts",
+      "/src/A.tsx"
+    ]
+  },
+  {
+    "case_sensitive": true,
+    "cwd": "/src/app",
+    "files": {
+      "/src/app/main.ts": "696d706f72742022706b67223b",
+      "/src/node_modules/pkg/index.ts": "6578706f727420636f6e73742070203d20313b"
+    },
+    "id": "outputs/external-library-not-emitted",
+    "options": {
+      "noEmit": false,
+      "noLib": true,
+      "outDir": "/out",
+      "rootDir": "/src/app",
+      "target": 99
+    },
+    "roots": [
+      "/src/app/main.ts"
+    ]
+  },
+  {
+    "case_sensitive": true,
+    "cwd": "/src/app",
+    "files": {
+      "/src/app/main.ts": "696d706f727420222e2e2f706b67223b",
+      "/src/pkg/index.ts": "6578706f727420636f6e73742070203d20313b"
+    },
+    "id": "outputs/external-library-control",
+    "options": {
+      "noEmit": false,
+      "noLib": true,
+      "outDir": "/out",
+      "rootDir": "/src/app",
+      "target": 99
+    },
+    "roots": [
+      "/src/app/main.ts"
+    ]
   }
 ]

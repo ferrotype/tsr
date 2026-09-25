@@ -1,0 +1,164 @@
+{
+  "columns": [
+    {
+      "evidence": [],
+      "id": "runtime.values",
+      "input": "values",
+      "operations": [],
+      "projection": "the input's value, decoded and returned: Go, Python and Rust must write the same canonical bytes (escapes, key order, integers)",
+      "rust": "tools/phase1/mutation/driver/src/canonical.rs (write)",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "value": [
+              null,
+              true,
+              false,
+              0,
+              -1,
+              9223372036854775807,
+              -9223372036854775808,
+              4294967296,
+              ""
+            ]
+          },
+          "name": "scalars"
+        },
+        {
+          "input": {
+            "value": [
+              "\"\\/\b\f\n\r\t",
+              "\u0000\u0001\u001f\u007f",
+              "caf\u00e9 \u2028\u2029 \ufeff",
+              "\ud83d\ude00 \ud800\udc00",
+              "<&>'"
+            ]
+          },
+          "name": "escapes"
+        },
+        {
+          "input": {
+            "value": {
+              "": 4,
+              "B": 2,
+              "_": 3,
+              "a": [
+                {
+                  "x": [
+                    2,
+                    {
+                      "k": null
+                    }
+                  ],
+                  "y": 1
+                }
+              ],
+              "b": {
+                "a": {},
+                "z": []
+              },
+              "\u00e9": 1
+            }
+          },
+          "name": "objects"
+        }
+      ]
+    },
+    {
+      "evidence": [],
+      "id": "runtime.walk",
+      "input": "source",
+      "operations": [],
+      "projection": "[kind, pos, end, parent reference] of every node of the plain walk (ForEachChild preorder; reparsed nodes included, JSDoc comments not), read in setup; the column only returns them",
+      "rust": "tools/phase1/mutation/driver/src/table/mod.rs Parsed (walk)",
+      "survey": true,
+      "synthetic": [
+        {
+          "input": {
+            "filename": "/table/a.tsx",
+            "script_kind": 4,
+            "source": "\"use strict\";\nconst a = <div>{1}</div>;\nexport default a;\n"
+          },
+          "name": "jsx-and-strict"
+        }
+      ]
+    },
+    {
+      "evidence": [],
+      "id": "runtime.walk_jsdoc",
+      "input": "source_jsdoc",
+      "operations": [],
+      "projection": "[kind, pos, end, parent reference] of every node of the JSDoc walk (the plain walk with each node's own JSDoc comments and their subtrees before its children; a comment a reparsed declaration shares is visited under its parent only), read in setup; the column only returns them",
+      "rust": "tools/phase1/mutation/driver/src/table/mod.rs walk_jsdoc",
+      "survey": true,
+      "synthetic": [
+        {
+          "input": {
+            "filename": "/table/c.js",
+            "script_kind": 1,
+            "source": "/** @typedef {{a: string, b?: number}} T */\n/** @callback CB\n * @param {T} t\n * @returns {void}\n */\n/**\n * @template U\n * @param {U} u - the value\n * @returns {U}\n */\nfunction id(u) { return u; }\n/** @type {T} */\nvar x = /** @type {T} */ ({a: \"\"});\nclass C {\n  /** @deprecated use n */\n  m() {}\n  /** @type {number} */\n  n = 1;\n}\n"
+          },
+          "name": "js-typedef-type-param"
+        },
+        {
+          "input": {
+            "filename": "/table/d.ts",
+            "script_kind": 3,
+            "source": "/** @deprecated use g\n * @see {@link g}\n */\nexport function f(/** a */ a: number) {}\n/** first */ /** second */\ninterface I {\n  /** member */\n  p: string;\n}\nconst y = 1; /** trailing */\n"
+          },
+          "name": "ts-lazy-jsdoc"
+        }
+      ]
+    },
+    {
+      "evidence": [],
+      "id": "runtime.symbols",
+      "input": "bound",
+      "operations": [],
+      "projection": "[node reference, symbol key, symbol flags] of every node whose Node.Symbol is not nil after binding, read in setup; the column only returns them",
+      "rust": "tools/phase1/mutation/driver/src/table/mod.rs Parsed::bind and symbol_key",
+      "survey": true,
+      "synthetic": [
+        {
+          "input": {
+            "filename": "/table/b.ts",
+            "script_kind": 3,
+            "source": "export default class {}\nexport = 1;\nclass C { #p = 1; [Symbol.iterator]() {} }\n"
+          },
+          "name": "internal-names"
+        }
+      ]
+    },
+    {
+      "evidence": [],
+      "id": "runtime.symbols_jsdoc",
+      "input": "bound_jsdoc",
+      "operations": [],
+      "projection": "[node reference, symbol key, symbol flags] of every node whose Node.Symbol is not nil after binding, under the JSDoc walk, read in setup; the column only returns them",
+      "rust": "tools/phase1/mutation/driver/src/table/mod.rs bind_source_jsdoc and symbol_key",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "filename": "/table/c.js",
+            "script_kind": 1,
+            "source": "/** @typedef {{a: string, b?: number}} T */\n/** @callback CB\n * @param {T} t\n * @returns {void}\n */\n/**\n * @template U\n * @param {U} u - the value\n * @returns {U}\n */\nfunction id(u) { return u; }\n/** @type {T} */\nvar x = /** @type {T} */ ({a: \"\"});\nclass C {\n  /** @deprecated use n */\n  m() {}\n  /** @type {number} */\n  n = 1;\n}\n"
+          },
+          "name": "js-typedef-type-param"
+        },
+        {
+          "input": {
+            "filename": "/table/d.ts",
+            "script_kind": 3,
+            "source": "/** @deprecated use g\n * @see {@link g}\n */\nexport function f(/** a */ a: number) {}\n/** first */ /** second */\ninterface I {\n  /** member */\n  p: string;\n}\nconst y = 1; /** trailing */\n"
+          },
+          "name": "ts-lazy-jsdoc"
+        }
+      ]
+    }
+  ],
+  "group": "runtime",
+  "notes": "The harness's own columns: they claim no operation and show that the Go and Rust setups (both document-order walks, binding and symbol keys) agree before any column's value is compared.",
+  "version": 1
+}

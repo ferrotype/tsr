@@ -1,6 +1,0 @@
-# input hex	jsx-child	before	after	start	end	flags
-3c3c20776f72640a207461696c	true	47	29	0	1	0
-3c3c20776f72640a207461696c	false	47	47	0	2	0
-3c20776f7264	true	29	29	0	1	0
-3c3c3d31	true	70	70	0	3	0
-3c3c2f703e	true	47	29	0	1	0

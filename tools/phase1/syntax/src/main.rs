@@ -36,6 +36,7 @@ mod generated_ast;
 mod jobs;
 mod mutation;
 mod parse_outputs;
+mod project_references;
 mod scanner_ast;
 mod schedule;
 
@@ -68,6 +69,7 @@ const GROUPS: &[(&str, GroupHandler)] = &[
     ("evaluator", evaluator::observe),
     ("parseOutputs", parse_outputs::observe),
     ("debug", debug::observe),
+    ("projectReferences", project_references::observe),
 ];
 
 fn observe(request: &Value) -> Map<String, Value> {

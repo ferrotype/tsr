@@ -17,6 +17,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import phase1_mutation_plan as mutation
 import phase1_scope as scope
+import phase1_tables
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -183,6 +184,7 @@ class SiteTests(unittest.TestCase):
         report = json.loads(gzip.decompress((ROOT / mutation.COVERAGE_REPORT).read_bytes()))
         claimed = {op for witness in report.get("witnesses", []) if witness.get("kind") == "mutation_kill"
                    for op in witness["claimed_operations"]}
+        claimed |= set(phase1_tables.claimed_operations(phase1_tables.load_specs(root=ROOT)))
         self.assertEqual(ops, sorted({row["id"] for row in report["operations"]
                                       if row.get("root_cause") in ("operation_witness_missing",
                                                                    "mutation_witness_stale")} | claimed))

@@ -23,6 +23,10 @@ pub struct Diagnostic {
     pub reports_unnecessary: bool,
     pub reports_deprecated: bool,
     pub skipped_on_no_emit: bool,
+    /// Go's `message` when it is an ad hoc message (`NewDiagnosticFromText`).
+    pub ad_hoc_message: Option<Arc<tsr_diagnostics::AdHocMessage>>,
+    /// Go's `repopulateInfo`.
+    pub repopulate_info: Option<Arc<crate::diagnostic_api::RepopulateDiagnosticInfo>>,
 }
 
 impl Diagnostic {
@@ -50,6 +54,8 @@ impl Diagnostic {
             reports_unnecessary: message.reports_unnecessary,
             reports_deprecated: message.reports_deprecated,
             skipped_on_no_emit: false,
+            ad_hoc_message: None,
+            repopulate_info: None,
         }
     }
 
@@ -77,6 +83,8 @@ impl Diagnostic {
             reports_unnecessary: false,
             reports_deprecated: false,
             skipped_on_no_emit: false,
+            ad_hoc_message: None,
+            repopulate_info: None,
         }
     }
 
@@ -106,6 +114,9 @@ impl Diagnostic {
         if self.code == -1 {
             if let Some(message) = self.message {
                 return message.text.as_bytes();
+            }
+            if let Some(message) = &self.ad_hoc_message {
+                return message.text();
             }
         }
         self.message_key.as_bytes()

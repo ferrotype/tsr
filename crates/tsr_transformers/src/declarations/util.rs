@@ -86,7 +86,7 @@ pub(super) fn unwrap_parenthesized_expression(
     Ok(node)
 }
 
-// port: tsc/internal/ast/precedence.go:GetLeftmostExpression
+// Inline copy of `GetLeftmostExpression`; its Phase 1 home is in tsr_ast (table group containers).
 pub(super) fn leftmost_expression(
     view: AstView<'_>,
     mut node: NodeId,

@@ -3003,5 +3003,1521 @@
     "TypeResolutions": [],
     "Diagnostics": null,
     "Trace": null
+  },
+  {
+    "ID": "dynamic-import/esnext",
+    "Files": [
+      {
+        "Name": "/src/dep.ts",
+        "Path": "/src/dep.ts",
+        "SHA256": "5dd25e250435ab2d434e779fa4ece76e13b4f56fd8b3578b6ccac531712bd642",
+        "Bytes": 17,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": false,
+        "Imports": [],
+        "External": true
+      },
+      {
+        "Name": "/src/main.ts",
+        "Path": "/src/main.ts",
+        "SHA256": "6057018ec64256912236d5dc804fb6dcda28d294d693b82f82c031d95c282648",
+        "Bytes": 16,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": false,
+        "Imports": [
+          "./dep"
+        ],
+        "External": false
+      }
+    ],
+    "Missing": null,
+    "Resolutions": [
+      {
+        "File": "/src/main.ts",
+        "Name": "./dep",
+        "Mode": 99,
+        "Result": {
+          "ResolvedFileName": "/src/dep.ts",
+          "OriginalPath": "",
+          "Extension": ".ts",
+          "ResolvedUsingTsExtension": false,
+          "ResolvedUsingExtraExtensions": false,
+          "PackageId": {
+            "Name": "",
+            "SubModuleName": "",
+            "Version": "",
+            "PeerDependencies": ""
+          },
+          "IsExternalLibraryImport": false,
+          "AlternateResult": "",
+          "ResolutionDiagnostics": null
+        }
+      }
+    ],
+    "TypeResolutions": [],
+    "Diagnostics": null,
+    "Trace": null
+  },
+  {
+    "ID": "dynamic-import/preserve",
+    "Files": [
+      {
+        "Name": "/src/dep.ts",
+        "Path": "/src/dep.ts",
+        "SHA256": "5dd25e250435ab2d434e779fa4ece76e13b4f56fd8b3578b6ccac531712bd642",
+        "Bytes": 17,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": false,
+        "Imports": [],
+        "External": true
+      },
+      {
+        "Name": "/src/main.ts",
+        "Path": "/src/main.ts",
+        "SHA256": "6057018ec64256912236d5dc804fb6dcda28d294d693b82f82c031d95c282648",
+        "Bytes": 16,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": false,
+        "Imports": [
+          "./dep"
+        ],
+        "External": false
+      }
+    ],
+    "Missing": null,
+    "Resolutions": [
+      {
+        "File": "/src/main.ts",
+        "Name": "./dep",
+        "Mode": 99,
+        "Result": {
+          "ResolvedFileName": "/src/dep.ts",
+          "OriginalPath": "",
+          "Extension": ".ts",
+          "ResolvedUsingTsExtension": false,
+          "ResolvedUsingExtraExtensions": false,
+          "PackageId": {
+            "Name": "",
+            "SubModuleName": "",
+            "Version": "",
+            "PeerDependencies": ""
+          },
+          "IsExternalLibraryImport": false,
+          "AlternateResult": "",
+          "ResolutionDiagnostics": null
+        }
+      }
+    ],
+    "TypeResolutions": [],
+    "Diagnostics": null,
+    "Trace": null
+  },
+  {
+    "ID": "dynamic-import/commonjs-transform",
+    "Files": [
+      {
+        "Name": "/src/dep.ts",
+        "Path": "/src/dep.ts",
+        "SHA256": "5dd25e250435ab2d434e779fa4ece76e13b4f56fd8b3578b6ccac531712bd642",
+        "Bytes": 17,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": false,
+        "Imports": [],
+        "External": true
+      },
+      {
+        "Name": "/src/main.ts",
+        "Path": "/src/main.ts",
+        "SHA256": "6057018ec64256912236d5dc804fb6dcda28d294d693b82f82c031d95c282648",
+        "Bytes": 16,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": false,
+        "Imports": [
+          "./dep"
+        ],
+        "External": false
+      }
+    ],
+    "Missing": null,
+    "Resolutions": [
+      {
+        "File": "/src/main.ts",
+        "Name": "./dep",
+        "Mode": 1,
+        "Result": {
+          "ResolvedFileName": "/src/dep.ts",
+          "OriginalPath": "",
+          "Extension": ".ts",
+          "ResolvedUsingTsExtension": false,
+          "ResolvedUsingExtraExtensions": false,
+          "PackageId": {
+            "Name": "",
+            "SubModuleName": "",
+            "Version": "",
+            "PeerDependencies": ""
+          },
+          "IsExternalLibraryImport": false,
+          "AlternateResult": "",
+          "ResolutionDiagnostics": null
+        }
+      }
+    ],
+    "TypeResolutions": [],
+    "Diagnostics": null,
+    "Trace": null
+  },
+  {
+    "ID": "dynamic-import/node16",
+    "Files": [
+      {
+        "Name": "/src/main.ts",
+        "Path": "/src/main.ts",
+        "SHA256": "6057018ec64256912236d5dc804fb6dcda28d294d693b82f82c031d95c282648",
+        "Bytes": 16,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": false,
+        "Imports": [
+          "./dep"
+        ],
+        "External": true
+      }
+    ],
+    "Missing": null,
+    "Resolutions": [
+      {
+        "File": "/src/main.ts",
+        "Name": "./dep",
+        "Mode": 99,
+        "Result": {
+          "ResolvedFileName": "",
+          "OriginalPath": "",
+          "Extension": "",
+          "ResolvedUsingTsExtension": false,
+          "ResolvedUsingExtraExtensions": false,
+          "PackageId": {
+            "Name": "",
+            "SubModuleName": "",
+            "Version": "",
+            "PeerDependencies": ""
+          },
+          "IsExternalLibraryImport": false,
+          "AlternateResult": "",
+          "ResolutionDiagnostics": null
+        }
+      }
+    ],
+    "TypeResolutions": [],
+    "Diagnostics": null,
+    "Trace": null
+  },
+  {
+    "ID": "dynamic-import/nodenext",
+    "Files": [
+      {
+        "Name": "/src/dep.ts",
+        "Path": "/src/dep.ts",
+        "SHA256": "5dd25e250435ab2d434e779fa4ece76e13b4f56fd8b3578b6ccac531712bd642",
+        "Bytes": 17,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": false,
+        "Imports": [],
+        "External": true
+      },
+      {
+        "Name": "/src/main.ts",
+        "Path": "/src/main.ts",
+        "SHA256": "8ae44a1456ba91410545f7307dda72ee6b990783a94e3da4ab2d110898bc8f7c",
+        "Bytes": 19,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": false,
+        "Imports": [
+          "./dep.js"
+        ],
+        "External": true
+      }
+    ],
+    "Missing": null,
+    "Resolutions": [
+      {
+        "File": "/src/main.ts",
+        "Name": "./dep.js",
+        "Mode": 99,
+        "Result": {
+          "ResolvedFileName": "/src/dep.ts",
+          "OriginalPath": "",
+          "Extension": ".ts",
+          "ResolvedUsingTsExtension": false,
+          "ResolvedUsingExtraExtensions": false,
+          "PackageId": {
+            "Name": "",
+            "SubModuleName": "",
+            "Version": "",
+            "PeerDependencies": ""
+          },
+          "IsExternalLibraryImport": false,
+          "AlternateResult": "",
+          "ResolutionDiagnostics": null
+        }
+      }
+    ],
+    "TypeResolutions": [],
+    "Diagnostics": null,
+    "Trace": null
+  },
+  {
+    "ID": "dynamic-import/preserve-cts",
+    "Files": [
+      {
+        "Name": "/src/dep.ts",
+        "Path": "/src/dep.ts",
+        "SHA256": "5dd25e250435ab2d434e779fa4ece76e13b4f56fd8b3578b6ccac531712bd642",
+        "Bytes": 17,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": false,
+        "Imports": [],
+        "External": true
+      },
+      {
+        "Name": "/src/main.cts",
+        "Path": "/src/main.cts",
+        "SHA256": "6057018ec64256912236d5dc804fb6dcda28d294d693b82f82c031d95c282648",
+        "Bytes": 16,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": false,
+        "Imports": [
+          "./dep"
+        ],
+        "External": true
+      }
+    ],
+    "Missing": null,
+    "Resolutions": [
+      {
+        "File": "/src/main.cts",
+        "Name": "./dep",
+        "Mode": 99,
+        "Result": {
+          "ResolvedFileName": "/src/dep.ts",
+          "OriginalPath": "",
+          "Extension": ".ts",
+          "ResolvedUsingTsExtension": false,
+          "ResolvedUsingExtraExtensions": false,
+          "PackageId": {
+            "Name": "",
+            "SubModuleName": "",
+            "Version": "",
+            "PeerDependencies": ""
+          },
+          "IsExternalLibraryImport": false,
+          "AlternateResult": "",
+          "ResolutionDiagnostics": null
+        }
+      }
+    ],
+    "TypeResolutions": [],
+    "Diagnostics": null,
+    "Trace": null
+  },
+  {
+    "ID": "module-detection/force-script",
+    "Files": [
+      {
+        "Name": "/src/main.ts",
+        "Path": "/src/main.ts",
+        "SHA256": "aad7378dfeb851703927a534da47d0d02be7f54cf8c1751a37734d515811dafe",
+        "Bytes": 10,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": false,
+        "Imports": [],
+        "External": true
+      }
+    ],
+    "Missing": null,
+    "Resolutions": [],
+    "TypeResolutions": [],
+    "Diagnostics": null,
+    "Trace": null
+  },
+  {
+    "ID": "module-detection/force-declaration",
+    "Files": [
+      {
+        "Name": "/src/types.d.ts",
+        "Path": "/src/types.d.ts",
+        "SHA256": "e1df21441e086f08b3e38d2ca5df156d130ce8d09ad2ed6eb31fe9a88199e86a",
+        "Bytes": 24,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": false,
+        "Imports": [],
+        "External": false
+      },
+      {
+        "Name": "/src/main.ts",
+        "Path": "/src/main.ts",
+        "SHA256": "8820349ad7970ef4eb46ba346f6b10efb270aa19dc462557727dfab07655e01f",
+        "Bytes": 48,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": false,
+        "Imports": [],
+        "External": true
+      }
+    ],
+    "Missing": null,
+    "Resolutions": [],
+    "TypeResolutions": [],
+    "Diagnostics": null,
+    "Trace": null
+  },
+  {
+    "ID": "module-detection/legacy-mts",
+    "Files": [
+      {
+        "Name": "/src/main.mts",
+        "Path": "/src/main.mts",
+        "SHA256": "aad7378dfeb851703927a534da47d0d02be7f54cf8c1751a37734d515811dafe",
+        "Bytes": 10,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 99
+        },
+        "Lib": false,
+        "Imports": [],
+        "External": false
+      }
+    ],
+    "Missing": null,
+    "Resolutions": [],
+    "TypeResolutions": [],
+    "Diagnostics": null,
+    "Trace": null
+  },
+  {
+    "ID": "module-detection/auto-cts",
+    "Files": [
+      {
+        "Name": "/src/main.cts",
+        "Path": "/src/main.cts",
+        "SHA256": "aad7378dfeb851703927a534da47d0d02be7f54cf8c1751a37734d515811dafe",
+        "Bytes": 10,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": false,
+        "Imports": [],
+        "External": true
+      }
+    ],
+    "Missing": null,
+    "Resolutions": [],
+    "TypeResolutions": [],
+    "Diagnostics": null,
+    "Trace": null
+  },
+  {
+    "ID": "module-detection/auto-esm-package",
+    "Files": [
+      {
+        "Name": "/src/main.ts",
+        "Path": "/src/main.ts",
+        "SHA256": "aad7378dfeb851703927a534da47d0d02be7f54cf8c1751a37734d515811dafe",
+        "Bytes": 10,
+        "Meta": {
+          "PackageJsonType": "module",
+          "PackageJsonDirectory": "/src",
+          "ImpliedNodeFormat": 99
+        },
+        "Lib": false,
+        "Imports": [],
+        "External": true
+      }
+    ],
+    "Missing": null,
+    "Resolutions": [],
+    "TypeResolutions": [],
+    "Diagnostics": null,
+    "Trace": null
+  },
+  {
+    "ID": "module-detection/react-jsx-script",
+    "Files": [
+      {
+        "Name": "/src/main.tsx",
+        "Path": "/src/main.tsx",
+        "SHA256": "82ff81002c10f87be52c5c171aac7e346bc154e2407bf35d103d7e139f02b6e0",
+        "Bytes": 15,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": false,
+        "Imports": [],
+        "External": true
+      }
+    ],
+    "Missing": null,
+    "Resolutions": [
+      {
+        "File": "/src/main.tsx",
+        "Name": "react/jsx-runtime",
+        "Mode": 99,
+        "Result": {
+          "ResolvedFileName": "",
+          "OriginalPath": "",
+          "Extension": "",
+          "ResolvedUsingTsExtension": false,
+          "ResolvedUsingExtraExtensions": false,
+          "PackageId": {
+            "Name": "",
+            "SubModuleName": "",
+            "Version": "",
+            "PeerDependencies": ""
+          },
+          "IsExternalLibraryImport": false,
+          "AlternateResult": "",
+          "ResolutionDiagnostics": null
+        }
+      }
+    ],
+    "TypeResolutions": [],
+    "Diagnostics": null,
+    "Trace": null
+  },
+  {
+    "ID": "trace/module",
+    "Files": [
+      {
+        "Name": "/src/dep.ts",
+        "Path": "/src/dep.ts",
+        "SHA256": "5dd25e250435ab2d434e779fa4ece76e13b4f56fd8b3578b6ccac531712bd642",
+        "Bytes": 17,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": false,
+        "Imports": [],
+        "External": true
+      },
+      {
+        "Name": "/src/main.ts",
+        "Path": "/src/main.ts",
+        "SHA256": "0e5b374704ca670dbd66362f8396885b51d65b295e1f05002963c68bef409a5f",
+        "Bytes": 15,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": false,
+        "Imports": [
+          "./dep"
+        ],
+        "External": true
+      }
+    ],
+    "Missing": null,
+    "Resolutions": [
+      {
+        "File": "/src/main.ts",
+        "Name": "./dep",
+        "Mode": 99,
+        "Result": {
+          "ResolvedFileName": "/src/dep.ts",
+          "OriginalPath": "",
+          "Extension": ".ts",
+          "ResolvedUsingTsExtension": false,
+          "ResolvedUsingExtraExtensions": false,
+          "PackageId": {
+            "Name": "",
+            "SubModuleName": "",
+            "Version": "",
+            "PeerDependencies": ""
+          },
+          "IsExternalLibraryImport": false,
+          "AlternateResult": "",
+          "ResolutionDiagnostics": null
+        }
+      }
+    ],
+    "TypeResolutions": [],
+    "Diagnostics": null,
+    "Trace": [
+      "6086:[./dep /src/main.ts]",
+      "6088:[Bundler]",
+      "6402:[CJS 'import', 'types']",
+      "6095:[/src/dep TypeScript, JavaScript, Declaration, JSON]",
+      "6097:[/src/dep.ts]",
+      "6089:[./dep /src/dep.ts]"
+    ]
+  },
+  {
+    "ID": "trace/type-reference",
+    "Files": [
+      {
+        "Name": "/src/node_modules/@types/pkg/index.d.ts",
+        "Path": "/src/node_modules/@types/pkg/index.d.ts",
+        "SHA256": "fedf98f060413a9642da02b0f30bc3e0be7b6ca3f8799949cb89927cccdb3284",
+        "Bytes": 24,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": false,
+        "Imports": [],
+        "External": false
+      },
+      {
+        "Name": "/src/main.ts",
+        "Path": "/src/main.ts",
+        "SHA256": "2decb9423fa146d44d7e56f75a1933d5fe7566f590f17ef313c31498727bbbbb",
+        "Bytes": 30,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": false,
+        "Imports": [],
+        "External": false
+      }
+    ],
+    "Missing": null,
+    "Resolutions": [],
+    "TypeResolutions": [
+      {
+        "File": "/src/main.ts",
+        "Name": "pkg",
+        "Mode": 0,
+        "Result": {
+          "Primary": true,
+          "ResolvedFileName": "/src/node_modules/@types/pkg/index.d.ts",
+          "OriginalPath": "",
+          "PackageId": {
+            "Name": "",
+            "SubModuleName": "",
+            "Version": "",
+            "PeerDependencies": ""
+          },
+          "IsExternalLibraryImport": true,
+          "ResolutionDiagnostics": null
+        }
+      }
+    ],
+    "Diagnostics": null,
+    "Trace": [
+      "6116:[pkg /src/main.ts /src/node_modules/@types,/node_modules/@types]",
+      "6121:[/src/node_modules/@types, /node_modules/@types]",
+      "6096:[/src/node_modules/@types/pkg/package.json]",
+      "6097:[/src/node_modules/@types/pkg/index.d.ts]",
+      "6130:[/src/node_modules/@types/pkg/index.d.ts /src/node_modules/@types/pkg/index.d.ts]",
+      "6119:[pkg /src/node_modules/@types/pkg/index.d.ts true]"
+    ]
+  },
+  {
+    "ID": "trace/lib-replacement",
+    "Files": [
+      {
+        "Name": "/src/node_modules/@typescript/lib-es5/index.d.ts",
+        "Path": "/src/node_modules/@typescript/lib-es5/index.d.ts",
+        "SHA256": "6e75eaeea470f6bdf2845b62b47b42c09987921ff5a4430566dd1536dc1a81b1",
+        "Bytes": 21,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": true,
+        "Imports": [],
+        "External": false
+      },
+      {
+        "Name": "/src/main.ts",
+        "Path": "/src/main.ts",
+        "SHA256": "aad7378dfeb851703927a534da47d0d02be7f54cf8c1751a37734d515811dafe",
+        "Bytes": 10,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": false,
+        "Imports": [],
+        "External": false
+      }
+    ],
+    "Missing": null,
+    "Resolutions": [
+      {
+        "File": "/src/__lib_node_modules_lookup_lib.es5.d.ts__.ts",
+        "Name": "@typescript/lib-es5",
+        "Mode": 1,
+        "Result": {
+          "ResolvedFileName": "/src/node_modules/@typescript/lib-es5/index.d.ts",
+          "OriginalPath": "",
+          "Extension": ".d.ts",
+          "ResolvedUsingTsExtension": false,
+          "ResolvedUsingExtraExtensions": false,
+          "PackageId": {
+            "Name": "@typescript/lib-es5",
+            "SubModuleName": "index.d.ts",
+            "Version": "1.0.0",
+            "PeerDependencies": ""
+          },
+          "IsExternalLibraryImport": true,
+          "AlternateResult": "",
+          "ResolutionDiagnostics": null
+        }
+      }
+    ],
+    "TypeResolutions": [],
+    "Diagnostics": null,
+    "Trace": [
+      "6086:[@typescript/lib-es5 /src/__lib_node_modules_lookup_lib.es5.d.ts__.ts]",
+      "6088:[Bundler]",
+      "6402:[CJS 'require', 'types']",
+      "6096:[/src/package.json]",
+      "6096:[/package.json]",
+      "6098:[@typescript/lib-es5 TypeScript, JavaScript, Declaration, JSON]",
+      "6417:[TypeScript, Declaration]",
+      "6099:[/src/node_modules/@typescript/lib-es5/package.json]",
+      "6096:[/src/node_modules/@typescript/lib-es5.ts]",
+      "6096:[/src/node_modules/@typescript/lib-es5.tsx]",
+      "6096:[/src/node_modules/@typescript/lib-es5.d.ts]",
+      "6100:[typesVersions]",
+      "6100:[typings]",
+      "6101:[types index.d.ts /src/node_modules/@typescript/lib-es5/index.d.ts]",
+      "6097:[/src/node_modules/@typescript/lib-es5/index.d.ts]",
+      "6100:[peerDependencies]",
+      "6130:[/src/node_modules/@typescript/lib-es5/index.d.ts /src/node_modules/@typescript/lib-es5/index.d.ts]",
+      "6218:[@typescript/lib-es5 /src/node_modules/@typescript/lib-es5/index.d.ts @typescript/lib-es5/index.d.ts@1.0.0]"
+    ]
+  },
+  {
+    "ID": "lib-replacement/subpath",
+    "Files": [
+      {
+        "Name": "/src/node_modules/@typescript/lib-dom/iterable.d.ts",
+        "Path": "/src/node_modules/@typescript/lib-dom/iterable.d.ts",
+        "SHA256": "f6caf14b5c12a58f1437630ef9416ba6833d0202be2fb8c3ff6a2a162e9ff04e",
+        "Bytes": 22,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": true,
+        "Imports": [],
+        "External": false
+      },
+      {
+        "Name": "/src/main.ts",
+        "Path": "/src/main.ts",
+        "SHA256": "aad7378dfeb851703927a534da47d0d02be7f54cf8c1751a37734d515811dafe",
+        "Bytes": 10,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": false,
+        "Imports": [],
+        "External": false
+      }
+    ],
+    "Missing": null,
+    "Resolutions": [
+      {
+        "File": "/src/__lib_node_modules_lookup_lib.dom.iterable.d.ts__.ts",
+        "Name": "@typescript/lib-dom/iterable",
+        "Mode": 1,
+        "Result": {
+          "ResolvedFileName": "/src/node_modules/@typescript/lib-dom/iterable.d.ts",
+          "OriginalPath": "",
+          "Extension": ".d.ts",
+          "ResolvedUsingTsExtension": false,
+          "ResolvedUsingExtraExtensions": false,
+          "PackageId": {
+            "Name": "@typescript/lib-dom",
+            "SubModuleName": "iterable.d.ts",
+            "Version": "1.0.0",
+            "PeerDependencies": ""
+          },
+          "IsExternalLibraryImport": true,
+          "AlternateResult": "",
+          "ResolutionDiagnostics": null
+        }
+      }
+    ],
+    "TypeResolutions": [],
+    "Diagnostics": null,
+    "Trace": null
+  },
+  {
+    "ID": "lib-replacement/nested",
+    "Files": [
+      {
+        "Name": "/src/node_modules/@typescript/lib-es2015/symbol-wellknown.d.ts",
+        "Path": "/src/node_modules/@typescript/lib-es2015/symbol-wellknown.d.ts",
+        "SHA256": "adf8824e26132aecfad5ef5f7cd57617adca6b9d577f81abf33b7d7fc0ae2051",
+        "Bytes": 23,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": true,
+        "Imports": [],
+        "External": false
+      },
+      {
+        "Name": "/src/main.ts",
+        "Path": "/src/main.ts",
+        "SHA256": "aad7378dfeb851703927a534da47d0d02be7f54cf8c1751a37734d515811dafe",
+        "Bytes": 10,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": false,
+        "Imports": [],
+        "External": false
+      }
+    ],
+    "Missing": null,
+    "Resolutions": [
+      {
+        "File": "/src/__lib_node_modules_lookup_lib.es2015.symbol.wellknown.d.ts__.ts",
+        "Name": "@typescript/lib-es2015/symbol-wellknown",
+        "Mode": 1,
+        "Result": {
+          "ResolvedFileName": "/src/node_modules/@typescript/lib-es2015/symbol-wellknown.d.ts",
+          "OriginalPath": "",
+          "Extension": ".d.ts",
+          "ResolvedUsingTsExtension": false,
+          "ResolvedUsingExtraExtensions": false,
+          "PackageId": {
+            "Name": "@typescript/lib-es2015",
+            "SubModuleName": "symbol-wellknown.d.ts",
+            "Version": "1.0.0",
+            "PeerDependencies": ""
+          },
+          "IsExternalLibraryImport": true,
+          "AlternateResult": "",
+          "ResolutionDiagnostics": null
+        }
+      }
+    ],
+    "TypeResolutions": [],
+    "Diagnostics": null,
+    "Trace": null
+  },
+  {
+    "ID": "lib-replacement/config-directory",
+    "Files": [
+      {
+        "Name": "/src/cfg/node_modules/@typescript/lib-es5/index.d.ts",
+        "Path": "/src/cfg/node_modules/@typescript/lib-es5/index.d.ts",
+        "SHA256": "6e75eaeea470f6bdf2845b62b47b42c09987921ff5a4430566dd1536dc1a81b1",
+        "Bytes": 21,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": true,
+        "Imports": [],
+        "External": false
+      },
+      {
+        "Name": "/src/main.ts",
+        "Path": "/src/main.ts",
+        "SHA256": "aad7378dfeb851703927a534da47d0d02be7f54cf8c1751a37734d515811dafe",
+        "Bytes": 10,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": false,
+        "Imports": [],
+        "External": false
+      }
+    ],
+    "Missing": null,
+    "Resolutions": [
+      {
+        "File": "/src/cfg/__lib_node_modules_lookup_lib.es5.d.ts__.ts",
+        "Name": "@typescript/lib-es5",
+        "Mode": 1,
+        "Result": {
+          "ResolvedFileName": "/src/cfg/node_modules/@typescript/lib-es5/index.d.ts",
+          "OriginalPath": "",
+          "Extension": ".d.ts",
+          "ResolvedUsingTsExtension": false,
+          "ResolvedUsingExtraExtensions": false,
+          "PackageId": {
+            "Name": "@typescript/lib-es5",
+            "SubModuleName": "index.d.ts",
+            "Version": "1.0.0",
+            "PeerDependencies": ""
+          },
+          "IsExternalLibraryImport": true,
+          "AlternateResult": "",
+          "ResolutionDiagnostics": null
+        }
+      }
+    ],
+    "TypeResolutions": [],
+    "Diagnostics": null,
+    "Trace": null
+  },
+  {
+    "ID": "casing/insensitive-import-variants",
+    "Files": [
+      {
+        "Name": "/src/a.ts",
+        "Path": "/src/a.ts",
+        "SHA256": "2e29cd9a98755c46896f7a2d56524db2d6d96b248e36db46de14c30bf47c8d05",
+        "Bytes": 10,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": false,
+        "Imports": [],
+        "External": true
+      },
+      {
+        "Name": "/src/main.ts",
+        "Path": "/src/main.ts",
+        "SHA256": "773af2d3df87a10610ef3c5c94afe498ce63a21542cd0e1e9ca1def0ea8edc96",
+        "Bytes": 27,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": false,
+        "Imports": [
+          "./a",
+          "./A"
+        ],
+        "External": true
+      }
+    ],
+    "Missing": null,
+    "Resolutions": [
+      {
+        "File": "/src/main.ts",
+        "Name": "./A",
+        "Mode": 99,
+        "Result": {
+          "ResolvedFileName": "/src/A.ts",
+          "OriginalPath": "",
+          "Extension": ".ts",
+          "ResolvedUsingTsExtension": false,
+          "ResolvedUsingExtraExtensions": false,
+          "PackageId": {
+            "Name": "",
+            "SubModuleName": "",
+            "Version": "",
+            "PeerDependencies": ""
+          },
+          "IsExternalLibraryImport": false,
+          "AlternateResult": "",
+          "ResolutionDiagnostics": null
+        }
+      },
+      {
+        "File": "/src/main.ts",
+        "Name": "./a",
+        "Mode": 99,
+        "Result": {
+          "ResolvedFileName": "/src/a.ts",
+          "OriginalPath": "",
+          "Extension": ".ts",
+          "ResolvedUsingTsExtension": false,
+          "ResolvedUsingExtraExtensions": false,
+          "PackageId": {
+            "Name": "",
+            "SubModuleName": "",
+            "Version": "",
+            "PeerDependencies": ""
+          },
+          "IsExternalLibraryImport": false,
+          "AlternateResult": "",
+          "ResolutionDiagnostics": null
+        }
+      }
+    ],
+    "TypeResolutions": [],
+    "Diagnostics": [
+      {
+        "File": "/src/main.ts",
+        "Pos": 21,
+        "End": 26,
+        "Code": 1149,
+        "Category": 1,
+        "Key": "File_name_0_differs_from_already_included_file_name_1_only_in_casing_1149",
+        "Args": [
+          "/src/A.ts",
+          "/src/a.ts"
+        ],
+        "Text": "",
+        "Chain": [
+          {
+            "File": "",
+            "Pos": -1,
+            "End": -1,
+            "Code": 1430,
+            "Category": 3,
+            "Key": "The_file_is_in_the_program_because_Colon_1430",
+            "Args": null,
+            "Text": "",
+            "Chain": [
+              {
+                "File": "",
+                "Pos": -1,
+                "End": -1,
+                "Code": 1393,
+                "Category": 3,
+                "Key": "Imported_via_0_from_file_1_1393",
+                "Args": [
+                  "\"./a\"",
+                  "/src/main.ts"
+                ],
+                "Text": "",
+                "Chain": null,
+                "Related": null
+              },
+              {
+                "File": "",
+                "Pos": -1,
+                "End": -1,
+                "Code": 1393,
+                "Category": 3,
+                "Key": "Imported_via_0_from_file_1_1393",
+                "Args": [
+                  "\"./A\"",
+                  "/src/main.ts"
+                ],
+                "Text": "",
+                "Chain": null,
+                "Related": null
+              }
+            ],
+            "Related": null
+          }
+        ],
+        "Related": [
+          {
+            "File": "/src/main.ts",
+            "Pos": 7,
+            "End": 12,
+            "Code": 1399,
+            "Category": 3,
+            "Key": "File_is_included_via_import_here_1399",
+            "Args": null,
+            "Text": "",
+            "Chain": null,
+            "Related": null
+          }
+        ]
+      }
+    ],
+    "Trace": null
+  },
+  {
+    "ID": "casing/sensitive-distinct-paths",
+    "Files": [
+      {
+        "Name": "/src/a.ts",
+        "Path": "/src/a.ts",
+        "SHA256": "2e29cd9a98755c46896f7a2d56524db2d6d96b248e36db46de14c30bf47c8d05",
+        "Bytes": 10,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": false,
+        "Imports": [],
+        "External": true
+      },
+      {
+        "Name": "/src/A.ts",
+        "Path": "/src/A.ts",
+        "SHA256": "2e29cd9a98755c46896f7a2d56524db2d6d96b248e36db46de14c30bf47c8d05",
+        "Bytes": 10,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": false,
+        "Imports": [],
+        "External": true
+      }
+    ],
+    "Missing": null,
+    "Resolutions": [],
+    "TypeResolutions": [],
+    "Diagnostics": [
+      {
+        "File": "",
+        "Pos": -1,
+        "End": -1,
+        "Code": 1149,
+        "Category": 1,
+        "Key": "File_name_0_differs_from_already_included_file_name_1_only_in_casing_1149",
+        "Args": [
+          "/src/A.ts",
+          "/src/a.ts"
+        ],
+        "Text": "",
+        "Chain": [
+          {
+            "File": "",
+            "Pos": -1,
+            "End": -1,
+            "Code": 1430,
+            "Category": 3,
+            "Key": "The_file_is_in_the_program_because_Colon_1430",
+            "Args": null,
+            "Text": "",
+            "Chain": [
+              {
+                "File": "",
+                "Pos": -1,
+                "End": -1,
+                "Code": 1427,
+                "Category": 3,
+                "Key": "Root_file_specified_for_compilation_1427",
+                "Args": null,
+                "Text": "",
+                "Chain": null,
+                "Related": null
+              },
+              {
+                "File": "",
+                "Pos": -1,
+                "End": -1,
+                "Code": 1427,
+                "Category": 3,
+                "Key": "Root_file_specified_for_compilation_1427",
+                "Args": null,
+                "Text": "",
+                "Chain": null,
+                "Related": null
+              }
+            ],
+            "Related": null
+          }
+        ],
+        "Related": null
+      }
+    ],
+    "Trace": null
+  },
+  {
+    "ID": "lib-reference/unknown",
+    "Files": [
+      {
+        "Name": "/src/main.ts",
+        "Path": "/src/main.ts",
+        "SHA256": "8e220be0bb62b62c1064de982b9851573e51bbd705197736ab145fce37a8b1b5",
+        "Bytes": 72,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": false,
+        "Imports": [],
+        "External": false
+      }
+    ],
+    "Missing": null,
+    "Resolutions": [],
+    "TypeResolutions": [
+      {
+        "File": "/src/main.ts",
+        "Name": "missing",
+        "Mode": 0,
+        "Result": {
+          "Primary": false,
+          "ResolvedFileName": "",
+          "OriginalPath": "",
+          "PackageId": {
+            "Name": "",
+            "SubModuleName": "",
+            "Version": "",
+            "PeerDependencies": ""
+          },
+          "IsExternalLibraryImport": false,
+          "ResolutionDiagnostics": null
+        }
+      }
+    ],
+    "Diagnostics": [
+      {
+        "File": "/src/main.ts",
+        "Pos": 20,
+        "End": 33,
+        "Code": 2727,
+        "Category": 1,
+        "Key": "Cannot_find_lib_definition_for_0_Did_you_mean_1_2727",
+        "Args": [
+          "es2015.promis",
+          "es2015.promise"
+        ],
+        "Text": "",
+        "Chain": null,
+        "Related": null
+      },
+      {
+        "File": "/src/main.ts",
+        "Pos": 60,
+        "End": 67,
+        "Code": 2688,
+        "Category": 1,
+        "Key": "Cannot_find_type_definition_file_for_0_2688",
+        "Args": [
+          "missing"
+        ],
+        "Text": "",
+        "Chain": null,
+        "Related": null
+      }
+    ],
+    "Trace": null
+  },
+  {
+    "ID": "casing/uppercase-extension-root",
+    "Files": [
+      {
+        "Name": "/src/MAIN.TS",
+        "Path": "/src/main.ts",
+        "SHA256": "2bf28849cade87113ec4170ef2bf9ffb1179fc9a276afa675c9de2424349560b",
+        "Bytes": 19,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 0
+        },
+        "Lib": false,
+        "Imports": [],
+        "External": true
+      }
+    ],
+    "Missing": null,
+    "Resolutions": [],
+    "TypeResolutions": [],
+    "Diagnostics": null,
+    "Trace": null
+  },
+  {
+    "ID": "casing/missing-root-variants",
+    "Files": [
+      {
+        "Name": "/src/main.ts",
+        "Path": "/src/main.ts",
+        "SHA256": "2e29cd9a98755c46896f7a2d56524db2d6d96b248e36db46de14c30bf47c8d05",
+        "Bytes": 10,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": false,
+        "Imports": [],
+        "External": true
+      }
+    ],
+    "Missing": [
+      "/src/missing.ts"
+    ],
+    "Resolutions": [],
+    "TypeResolutions": [],
+    "Diagnostics": [
+      {
+        "File": "",
+        "Pos": -1,
+        "End": -1,
+        "Code": 1149,
+        "Category": 1,
+        "Key": "File_name_0_differs_from_already_included_file_name_1_only_in_casing_1149",
+        "Args": [
+          "/src/MISSING.ts",
+          "/src/missing.ts"
+        ],
+        "Text": "",
+        "Chain": [
+          {
+            "File": "",
+            "Pos": -1,
+            "End": -1,
+            "Code": 1430,
+            "Category": 3,
+            "Key": "The_file_is_in_the_program_because_Colon_1430",
+            "Args": null,
+            "Text": "",
+            "Chain": [
+              {
+                "File": "",
+                "Pos": -1,
+                "End": -1,
+                "Code": 1427,
+                "Category": 3,
+                "Key": "Root_file_specified_for_compilation_1427",
+                "Args": null,
+                "Text": "",
+                "Chain": null,
+                "Related": null
+              },
+              {
+                "File": "",
+                "Pos": -1,
+                "End": -1,
+                "Code": 1427,
+                "Category": 3,
+                "Key": "Root_file_specified_for_compilation_1427",
+                "Args": null,
+                "Text": "",
+                "Chain": null,
+                "Related": null
+              }
+            ],
+            "Related": null
+          }
+        ],
+        "Related": null
+      },
+      {
+        "File": "",
+        "Pos": -1,
+        "End": -1,
+        "Code": 6053,
+        "Category": 1,
+        "Key": "File_0_not_found_6053",
+        "Args": [
+          "/src/missing.ts"
+        ],
+        "Text": "",
+        "Chain": [
+          {
+            "File": "",
+            "Pos": -1,
+            "End": -1,
+            "Code": 1430,
+            "Category": 3,
+            "Key": "The_file_is_in_the_program_because_Colon_1430",
+            "Args": null,
+            "Text": "",
+            "Chain": [
+              {
+                "File": "",
+                "Pos": -1,
+                "End": -1,
+                "Code": 1427,
+                "Category": 3,
+                "Key": "Root_file_specified_for_compilation_1427",
+                "Args": null,
+                "Text": "",
+                "Chain": null,
+                "Related": null
+              }
+            ],
+            "Related": null
+          }
+        ],
+        "Related": null
+      }
+    ],
+    "Trace": null
+  },
+  {
+    "ID": "casing/js-root-variants",
+    "Files": [
+      {
+        "Name": "/src/main.ts",
+        "Path": "/src/main.ts",
+        "SHA256": "2e29cd9a98755c46896f7a2d56524db2d6d96b248e36db46de14c30bf47c8d05",
+        "Bytes": 10,
+        "Meta": {
+          "PackageJsonType": "",
+          "PackageJsonDirectory": "",
+          "ImpliedNodeFormat": 1
+        },
+        "Lib": false,
+        "Imports": [],
+        "External": true
+      }
+    ],
+    "Missing": [
+      "/src/a.js"
+    ],
+    "Resolutions": [],
+    "TypeResolutions": [],
+    "Diagnostics": [
+      {
+        "File": "",
+        "Pos": -1,
+        "End": -1,
+        "Code": 1149,
+        "Category": 1,
+        "Key": "File_name_0_differs_from_already_included_file_name_1_only_in_casing_1149",
+        "Args": [
+          "/src/A.js",
+          "/src/a.js"
+        ],
+        "Text": "",
+        "Chain": [
+          {
+            "File": "",
+            "Pos": -1,
+            "End": -1,
+            "Code": 1430,
+            "Category": 3,
+            "Key": "The_file_is_in_the_program_because_Colon_1430",
+            "Args": null,
+            "Text": "",
+            "Chain": [
+              {
+                "File": "",
+                "Pos": -1,
+                "End": -1,
+                "Code": 1427,
+                "Category": 3,
+                "Key": "Root_file_specified_for_compilation_1427",
+                "Args": null,
+                "Text": "",
+                "Chain": null,
+                "Related": null
+              },
+              {
+                "File": "",
+                "Pos": -1,
+                "End": -1,
+                "Code": 1427,
+                "Category": 3,
+                "Key": "Root_file_specified_for_compilation_1427",
+                "Args": null,
+                "Text": "",
+                "Chain": null,
+                "Related": null
+              }
+            ],
+            "Related": null
+          }
+        ],
+        "Related": null
+      },
+      {
+        "File": "",
+        "Pos": -1,
+        "End": -1,
+        "Code": 6504,
+        "Category": 1,
+        "Key": "File_0_is_a_JavaScript_file_Did_you_mean_to_enable_the_allowJs_option_6504",
+        "Args": [
+          "/src/a.js"
+        ],
+        "Text": "",
+        "Chain": [
+          {
+            "File": "",
+            "Pos": -1,
+            "End": -1,
+            "Code": 1430,
+            "Category": 3,
+            "Key": "The_file_is_in_the_program_because_Colon_1430",
+            "Args": null,
+            "Text": "",
+            "Chain": [
+              {
+                "File": "",
+                "Pos": -1,
+                "End": -1,
+                "Code": 1427,
+                "Category": 3,
+                "Key": "Root_file_specified_for_compilation_1427",
+                "Args": null,
+                "Text": "",
+                "Chain": null,
+                "Related": null
+              }
+            ],
+            "Related": null
+          }
+        ],
+        "Related": null
+      }
+    ],
+    "Trace": null
   }
 ]

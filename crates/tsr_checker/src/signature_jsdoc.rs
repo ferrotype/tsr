@@ -266,7 +266,7 @@ impl CheckerState {
         Ok(Some(self.program()?.host.jsdoc(view, source, node)?))
     }
 
-    // port: tsc/internal/ast/utilities.go:GetJSDocDeprecatedTag
+    // Inline copy of `GetJSDocDeprecatedTag`; its Phase 1 home is in tsr_ast (table group targets).
     pub(crate) fn direct_deprecated_tag(&self, node: NodeId) -> Result<Option<NodeId>, Error> {
         if let Some(docs) = self.jsdoc_for_node(node)? {
             for &doc in docs.iter() {
@@ -286,7 +286,7 @@ impl CheckerState {
         }
         Ok(None)
     }
-    // port: tsc/internal/ast/utilities.go:IsDeprecatedDeclarationWithCachedFlags
+    // Inline copy of `IsDeprecatedDeclarationWithCachedFlags`; its Phase 1 home is in tsr_ast (table group targets).
     pub(crate) fn is_deprecated_declaration(&self, node: NodeId) -> Result<bool, Error> {
         if tsr_ast::utilities::get_combined_node_flags(self.ast(node)?, node)?
             & nf::POSSIBLY_CONTAINS_DEPRECATED_TAG
@@ -443,7 +443,7 @@ impl CheckerState {
 }
 
 impl CheckerState {
-    // port: tsc/internal/ast/utilities.go:IsPartOfTypeNode
+    // Inline copy of `IsPartOfTypeNode`; its Phase 1 home is in tsr_ast (table group positions).
     // Identifier and property-access cases have already returned in the caller.
     fn arguments_type_part(&self, node: NodeId) -> Result<bool, Error> {
         let read = self.node(node)?;
@@ -481,7 +481,7 @@ impl CheckerState {
             _ => Ok(false),
         }
     }
-    // port: tsc/internal/ast/utilities.go:isPartOfTypeNodeInParent
+    // Inline copy of `isPartOfTypeNodeInParent`; its Phase 1 home is in tsr_ast (table group positions).
     fn arguments_type_parent(&self, node: NodeId) -> Result<bool, Error> {
         let parent = self
             .ast(node)?
@@ -535,7 +535,7 @@ impl CheckerState {
             _ => Ok(false),
         }
     }
-    // port: tsc/internal/ast/utilities.go:isPartOfTypeExpressionWithTypeArguments
+    // Inline copy of `isPartOfTypeExpressionWithTypeArguments`; its Phase 1 home is in tsr_ast (table group positions).
     fn arguments_type_heritage(&self, node: NodeId) -> Result<bool, Error> {
         let parent = self
             .ast(node)?

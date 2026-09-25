@@ -45,7 +45,7 @@ impl CheckerState {
         Ok(())
     }
 
-    // port: tsc/internal/ast/utilities.go:GetHostSignatureFromJSDoc
+    // Inline copy of `GetHostSignatureFromJSDoc`; its Phase 1 home is in tsr_ast (table group targets).
     pub(crate) fn jsdoc_host_signature(&self, name: NodeId) -> Result<Option<NodeId>, Error> {
         let Some(host) = tsr_ast::utilities_tail::get_js_doc_host(self.ast(name)?, name)? else {
             return Ok(None);

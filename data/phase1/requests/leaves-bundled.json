@@ -290,6 +290,43 @@
       "operation": "tsc/internal/bundled/embed.go:wrappedFS.walkDir",
       "order_sensitive": true,
       "subject": "BundledWalk"
+    },
+    {
+      "actions": [
+        {
+          "op": "stat",
+          "path": "bundled:///"
+        },
+        {
+          "op": "stat",
+          "path": "bundled:///libs"
+        },
+        {
+          "op": "stat",
+          "path": "bundled:///libs/lib.d.ts"
+        },
+        {
+          "op": "stat",
+          "path": "bundled:///libs/lib.es5.d.ts"
+        },
+        {
+          "op": "stat",
+          "path": "bundled:///libs/nope.d.ts"
+        },
+        {
+          "op": "stat",
+          "path": "bundled:///libs/"
+        },
+        {
+          "op": "walk",
+          "root": "bundled:///"
+        }
+      ],
+      "case": "leaves/bundled/file-info-members",
+      "discriminates": "The fileInfo members no other bundled case reads (embed.go:198-224), for the three kinds of entry the wrapper builds. Stat answers bundled:/// with name \"\" and bundled:///libs with name \"libs\", both mode fs.ModeDir, and a library with its bare name, its size and mode 0 (embed.go:89-95); a port that reports an empty name for every entry, a path instead of a base name, or a directory without the ModeDir bit differs. Every entry has the zero ModTime (Unix -62135596800, 0 ns) and a nil Sys; a port that stamps the embedding time or a host timestamp differs. The fs.DirEntry half is asked both ways: a Stat result is itself a DirEntry, so Type returns ModeDir for the two directories and 0 for a library and Info returns the same entry; the walk of bundled:/// first reports libs through the fs.FileInfoToDirEntry wrapper (embed.go:84-86), whose Type reads fileInfo.Mode, and then every library's own fileInfo, whose Type and Info are the pinned methods. A missing library and the libs directory spelled with a trailing slash stay nil.",
+      "operation": "tsc/internal/bundled/embed.go:fileInfo.Mode",
+      "order_sensitive": true,
+      "subject": "BundledFileInfo"
     }
   ],
   "version": 1

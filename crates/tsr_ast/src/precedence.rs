@@ -78,17 +78,23 @@ pub mod operator_precedence_flags {
     pub const OPTIONAL_CHAIN: u32 = 1 << 1;
 }
 
-// port: tsc/internal/ast/precedence.go:getOperator
+/// Go's `getOperator`. The port marker is on the binary test, a site the
+/// mutation splicer can negate (a kind has no replacement value); a negated
+/// test on another node finds no binary payload and falls through.
 fn get_operator(
     view: crate::AstView<'_>,
     node: &crate::NodeRead<'_>,
 ) -> Result<NodeKind, tsr_arena::Error> {
     let data = node.data_source();
-    if let Some(binary) = data.as_binary_expression() {
-        let token = binary
-            .operator_token()
-            .ok_or(tsr_arena::Error::InvalidGraph)?;
-        return Ok(view.node(token)?.kind());
+    let binary = data.as_binary_expression();
+    // port: tsc/internal/ast/precedence.go:getOperator
+    if binary.is_some() {
+        if let Some(binary) = binary {
+            let token = binary
+                .operator_token()
+                .ok_or(tsr_arena::Error::InvalidGraph)?;
+            return Ok(view.node(token)?.kind());
+        }
     }
     if let Some(prefix) = data.as_prefix_unary_expression() {
         return Ok(prefix.operator());
@@ -246,4 +252,87 @@ pub fn get_leftmost_expression(
             None => return Ok(node),
         }
     }
+}
+
+/// Go's `TypePrecedence`.
+pub mod type_precedence {
+    pub const CONDITIONAL: i32 = 0;
+    pub const JSDOC: i32 = 1;
+    pub const FUNCTION: i32 = 2;
+    pub const UNION: i32 = 3;
+    pub const INTERSECTION: i32 = 4;
+    pub const TYPE_OPERATOR: i32 = 5;
+    pub const POSTFIX: i32 = 6;
+    pub const NON_ARRAY: i32 = 7;
+}
+
+/// Panics on a kind the pinned switch does not handle, as Go does.
+/// port: tsc/internal/ast/precedence.go:GetTypeNodePrecedence
+pub fn get_type_node_precedence(
+    view: crate::AstView<'_>,
+    node: crate::NodeId,
+) -> Result<i32, tsr_arena::Error> {
+    use type_precedence as P;
+    use SyntaxKind as K;
+    let read = view.node(node)?;
+    Ok(match read.kind().known() {
+        Some(K::ConditionalType) => P::CONDITIONAL,
+        Some(K::JSDocOptionalType | K::JSDocVariadicType) => P::JSDOC,
+        Some(K::FunctionType | K::ConstructorType) => P::FUNCTION,
+        Some(K::UnionType) => P::UNION,
+        Some(K::IntersectionType) => P::INTERSECTION,
+        Some(K::TypeOperator | K::TypeQuery) => P::TYPE_OPERATOR,
+        Some(K::InferType) => {
+            let parameter = read
+                .data_source()
+                .as_infer_type_node()
+                .ok_or(tsr_arena::Error::InvalidGraph)?
+                .type_parameter()
+                .expect("runtime error: invalid memory address or nil pointer dereference");
+            let constraint = view
+                .node(parameter)?
+                .data_source()
+                .as_type_parameter_declaration()
+                .ok_or(tsr_arena::Error::InvalidGraph)?
+                .constraint();
+            if constraint.is_some() {
+                P::FUNCTION
+            } else {
+                P::TYPE_OPERATOR
+            }
+        }
+        Some(K::IndexedAccessType | K::ArrayType | K::OptionalType) => P::POSTFIX,
+        Some(
+            K::AnyKeyword
+            | K::UnknownKeyword
+            | K::StringKeyword
+            | K::NumberKeyword
+            | K::BigIntKeyword
+            | K::SymbolKeyword
+            | K::BooleanKeyword
+            | K::UndefinedKeyword
+            | K::NeverKeyword
+            | K::ObjectKeyword
+            | K::IntrinsicKeyword
+            | K::VoidKeyword
+            | K::JSDocAllType
+            | K::JSDocNullableType
+            | K::JSDocNonNullableType
+            | K::LiteralType
+            | K::TypePredicate
+            | K::TypeReference
+            | K::TypeLiteral
+            | K::TupleType
+            | K::RestType
+            | K::ParenthesizedType
+            | K::ThisType
+            | K::MappedType
+            | K::NamedTupleMember
+            | K::TemplateLiteralType
+            | K::ImportType
+            | K::PropertyAccessExpression
+            | K::ExpressionWithTypeArguments,
+        ) => P::NON_ARRAY,
+        _ => panic!("unhandled TypeNode: {}", read.kind()),
+    })
 }

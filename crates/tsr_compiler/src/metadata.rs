@@ -1,6 +1,7 @@
 use crate::Error;
+use tsr_ast::utilities_middle::get_pragma_argument;
 use tsr_ast::{
-    AstView, ExternalModuleIndicatorOptions, NodeDataRead, NodeId, SourceFileMetaData,
+    AstView, ExternalModuleIndicatorOptions, NodeDataRead, NodeId, Pragma, SourceFileMetaData,
     SyntaxKind as K,
 };
 use tsr_core::{CompilerOptions, JsxEmit, ModuleDetectionKind, ModuleKind, ModuleResolutionKind};
@@ -40,20 +41,25 @@ pub(crate) fn load(
                 JsString::from_bytes(info.string("type").unwrap_or_default());
         }
     }
-    result.implied_node_format = if has_suffix(name, &[b".mts", b".mjs"]) {
+    result.implied_node_format =
+        implied_node_format_for_file(name, result.package_json_type.as_bytes());
+    Ok(result)
+}
+/// port: tsc/internal/ast/utilities.go:GetImpliedNodeFormatForFile
+fn implied_node_format_for_file(path: &[u8], package_json_type: &[u8]) -> ModuleKind {
+    if has_suffix(path, &[b".d.mts", b".mts", b".mjs"]) {
         ModuleKind::ESNEXT
-    } else if has_suffix(name, &[b".cts", b".cjs"]) {
+    } else if has_suffix(path, &[b".d.cts", b".cts", b".cjs"]) {
         ModuleKind::COMMON_JS
-    } else if has_suffix(name, &[b".ts", b".tsx", b".js", b".jsx"]) {
-        if result.package_json_type.as_bytes() == b"module" {
+    } else if has_suffix(path, &[b".d.ts", b".ts", b".tsx", b".js", b".jsx"]) {
+        if package_json_type == b"module" {
             ModuleKind::ESNEXT
         } else {
             ModuleKind::COMMON_JS
         }
     } else {
         ModuleKind::NONE
-    };
-    Ok(result)
+    }
 }
 /// port: tsc/internal/ast/utilities.go:GetImpliedNodeFormatForEmitWorker
 pub(crate) fn implied_for_emit(
@@ -145,18 +151,11 @@ pub(crate) fn emit_syntax(
         false
     };
     if import_call {
-        // port: tsc/internal/ast/utilities.go:ShouldTransformImportCall
-        let module = options.emit_module_kind();
-        return Ok(
-            if !(ModuleKind::NODE16..=ModuleKind::NODE_NEXT).contains(&module)
-                && module != ModuleKind::PRESERVE
-                && emit < ModuleKind::ES2015
-            {
-                ModuleKind::COMMON_JS
-            } else {
-                ModuleKind::ESNEXT
-            },
-        );
+        return Ok(if should_transform_import_call(options, emit) {
+            ModuleKind::COMMON_JS
+        } else {
+            ModuleKind::ESNEXT
+        });
     }
     Ok(if emit == ModuleKind::COMMON_JS {
         ModuleKind::COMMON_JS
@@ -165,6 +164,20 @@ pub(crate) fn emit_syntax(
     } else {
         ModuleKind::NONE
     })
+}
+/// The pin's file name parameter is unused.
+/// port: tsc/internal/ast/utilities.go:ShouldTransformImportCall
+fn should_transform_import_call(
+    options: &CompilerOptions,
+    implied_node_format_for_emit: ModuleKind,
+) -> bool {
+    let module = options.emit_module_kind();
+    if (ModuleKind::NODE16..=ModuleKind::NODE_NEXT).contains(&module)
+        || module == ModuleKind::PRESERVE
+    {
+        return false;
+    }
+    implied_node_format_for_emit < ModuleKind::ES2015
 }
 /// port: tsc/internal/ast/parseoptions.go:GetExternalModuleIndicatorOptions
 pub(crate) fn indicator(
@@ -182,12 +195,43 @@ pub(crate) fn indicator(
         },
         ModuleDetectionKind::AUTO => ExternalModuleIndicatorOptions {
             jsx: matches!(options.jsx, JsxEmit::REACT_JSX | JsxEmit::REACT_JSX_DEV),
-            force: implied_for_emit(name, options.emit_module_kind(), meta) == ModuleKind::ESNEXT
-                || has_suffix(name, &[b".cjs", b".cts", b".mjs", b".mts"]),
+            force: is_file_forced_to_be_module_by_format(name, options, meta),
         },
         _ => ExternalModuleIndicatorOptions::default(),
     }
 }
+/// Declaration files are excluded by the caller.
+/// port: tsc/internal/ast/parseoptions.go:isFileForcedToBeModuleByFormat
+fn is_file_forced_to_be_module_by_format(
+    name: &[u8],
+    options: &CompilerOptions,
+    meta: &SourceFileMetaData,
+) -> bool {
+    implied_for_emit(name, options.emit_module_kind(), meta) == ModuleKind::ESNEXT
+        || has_suffix(name, &[b".cjs", b".cts", b".mjs", b".mts"])
+}
+/// port: tsc/internal/ast/utilities.go:IsExclusivelyTypeOnlyImportOrExport
+fn is_exclusively_type_only_import_or_export(
+    view: AstView<'_>,
+    node: &tsr_ast::NodeRead<'_>,
+) -> Result<bool, Error> {
+    let clause = match node.data() {
+        NodeDataRead::ExportDeclaration(data) => return Ok(data.is_type_only()),
+        // The data variant covers ImportDeclaration and JSImportDeclaration.
+        NodeDataRead::ImportDeclaration(data) => data.import_clause(),
+        NodeDataRead::JSDocImportTag(data) => data.import_clause(),
+        _ => return Ok(false),
+    };
+    clause.map_or(Ok(false), |clause| Ok(view.node(clause)?.is_type_only()))
+}
+/// port: tsc/internal/compiler/fileloader.go:importSyntaxAffectsModuleResolution
+pub(crate) fn import_syntax_affects_module_resolution(options: &CompilerOptions) -> bool {
+    (ModuleResolutionKind::NODE16..=ModuleResolutionKind::NODE_NEXT)
+        .contains(&options.module_resolution_kind())
+        || options.resolve_package_json_exports()
+        || options.resolve_package_json_imports()
+}
+/// port: tsc/internal/compiler/fileloader.go:getModeForUsageLocation
 pub(crate) fn usage_mode(
     view: AstView<'_>,
     name: &[u8],
@@ -200,79 +244,36 @@ pub(crate) fn usage_mode(
         .parent()
         .ok_or(Error::Unsupported("module specifier without parent"))?;
     let parent_node = view.node(parent)?;
-    let type_only = |id: Option<NodeId>| -> Result<bool, Error> {
-        id.map_or(Ok(false), |id| Ok(view.node(id)?.is_type_only()))
-    };
-    let attributes = match parent_node.data() {
-        NodeDataRead::ImportDeclaration(data) => {
-            if type_only(data.import_clause())? {
-                data.attributes()
-            } else {
-                None
-            }
+    if matches!(
+        parent_node.data(),
+        NodeDataRead::ImportDeclaration(_)
+            | NodeDataRead::ExportDeclaration(_)
+            | NodeDataRead::JSDocImportTag(_)
+    ) && is_exclusively_type_only_import_or_export(view, &parent_node)?
+    {
+        let attributes = match parent_node.data() {
+            NodeDataRead::ImportDeclaration(data) => data.attributes(),
+            NodeDataRead::ExportDeclaration(data) => data.attributes(),
+            NodeDataRead::JSDocImportTag(data) => data.attributes(),
+            _ => None,
+        };
+        if let Some(mode) = resolution_override(view, attributes)? {
+            return Ok(mode);
         }
-        NodeDataRead::ExportDeclaration(data) if data.is_type_only() => data.attributes(),
-        NodeDataRead::JSDocImportTag(data) => {
-            if type_only(data.import_clause())? {
-                data.attributes()
-            } else {
-                None
-            }
-        }
-        NodeDataRead::LiteralTypeNode(_) => {
-            if let Some(grandparent) = parent_node.parent() {
-                if let NodeDataRead::ImportTypeNode(data) = view.node(grandparent)?.data() {
-                    data.attributes()
-                } else {
-                    None
+    }
+    if let NodeDataRead::LiteralTypeNode(_) = parent_node.data() {
+        if let Some(grandparent) = parent_node.parent() {
+            if let NodeDataRead::ImportTypeNode(data) = view.node(grandparent)?.data() {
+                if let Some(mode) = resolution_override(view, data.attributes())? {
+                    return Ok(mode);
                 }
-            } else {
-                None
             }
         }
-        _ => None,
-    };
-    if let Some(mode) = resolution_override(view, attributes)? {
-        return Ok(mode);
     }
-    let resolution = options.module_resolution_kind();
-    if !(ModuleResolutionKind::NODE16..=ModuleResolutionKind::NODE_NEXT).contains(&resolution)
-        && !options.resolve_package_json_exports()
-        && !options.resolve_package_json_imports()
-    {
-        return Ok(ModuleKind::NONE);
+    if import_syntax_affects_module_resolution(options) {
+        return Ok(emit_syntax(view, name, meta, usage, options)?);
     }
-    if tsr_ast::utilities_middle::is_require_call(view, &parent_node, false)?
-        || parent_node.kind() == K::ExternalModuleReference
-    {
-        return Ok(ModuleKind::COMMON_JS);
-    }
-    let implied = implied_for_emit(name, options.emit_module_kind(), meta);
-    let emit = if implied == ModuleKind::NONE {
-        options.emit_module_kind()
-    } else {
-        implied
-    };
-    if parent_node.kind() == K::CallExpression {
-        let module = options.emit_module_kind();
-        return Ok(
-            if !(ModuleKind::NODE16..=ModuleKind::NODE_NEXT).contains(&module)
-                && module != ModuleKind::PRESERVE
-                && emit < ModuleKind::ES2015
-            {
-                ModuleKind::COMMON_JS
-            } else {
-                ModuleKind::ESNEXT
-            },
-        );
-    }
-    Ok(if emit == ModuleKind::COMMON_JS {
-        ModuleKind::COMMON_JS
-    } else if emit.is_non_node_esm() || emit == ModuleKind::PRESERVE {
-        ModuleKind::ESNEXT
-    } else {
-        ModuleKind::NONE
-    })
+    Ok(ModuleKind::NONE)
 }
 fn has_suffix(name: &[u8], suffixes: &[&[u8]]) -> bool {
     suffixes.iter().any(|s| name.ends_with(s))
@@ -293,19 +294,10 @@ pub(crate) fn normal_mode(
     meta: &SourceFileMetaData,
     options: &CompilerOptions,
 ) -> ModuleKind {
-    let resolution = options.module_resolution_kind();
-    if !(ModuleResolutionKind::NODE16..=ModuleResolutionKind::NODE_NEXT).contains(&resolution)
-        && !options.resolve_package_json_exports()
-        && !options.resolve_package_json_imports()
-    {
+    if !import_syntax_affects_module_resolution(options) {
         return ModuleKind::NONE;
     }
-    let implied = implied_for_emit(name, options.emit_module_kind(), meta);
-    let emit = if implied == ModuleKind::NONE {
-        options.emit_module_kind()
-    } else {
-        implied
-    };
+    let emit = emit_format(name, options, meta);
     if emit == ModuleKind::COMMON_JS {
         ModuleKind::COMMON_JS
     } else if emit.is_non_node_esm() || emit == ModuleKind::PRESERVE {
@@ -314,51 +306,66 @@ pub(crate) fn normal_mode(
         ModuleKind::NONE
     }
 }
-pub(crate) fn jsx_runtime_import(
+/// port: tsc/internal/ast/utilities.go:GetJSXImplicitImportBase
+pub(crate) fn jsx_implicit_import_base(
     view: AstView<'_>,
     source: NodeId,
     options: &CompilerOptions,
-) -> Result<Option<JsString>, Error> {
+) -> Result<JsString, Error> {
     let state = view.source_file(source)?;
     let pragmas = state.pragmas()?;
-    let source = pragmas
-        .iter()
-        .rev()
-        .find(|pragma| pragma.name.as_bytes() == b"jsximportsource");
-    let runtime = pragmas
-        .iter()
-        .rev()
-        .find(|pragma| pragma.name.as_bytes() == b"jsxruntime");
-    if pragma_argument(runtime) == b"classic" {
-        return Ok(None);
+    let import_source = pragma_from_source_file(pragmas.iter(), b"jsximportsource");
+    let runtime = pragma_from_source_file(pragmas.iter(), b"jsxruntime");
+    let factory = JsString::from_bytes(b"factory".as_slice());
+    if get_pragma_argument(runtime, &factory) == b"classic" {
+        return Ok(JsString::default());
     }
     if matches!(options.jsx, JsxEmit::REACT_JSX | JsxEmit::REACT_JSX_DEV)
         || !options.jsx_import_source.is_empty()
-        || source.is_some()
-        || pragma_argument(runtime) == b"automatic"
+        || import_source.is_some()
+        || get_pragma_argument(runtime, &factory) == b"automatic"
     {
-        let mut base = pragma_argument(source);
-        if base.is_empty() {
-            base = options.jsx_import_source.as_bytes();
+        let mut result = get_pragma_argument(import_source, &factory);
+        if result.is_empty() {
+            result = options.jsx_import_source.as_bytes();
         }
-        if base.is_empty() {
-            base = b"react";
+        if result.is_empty() {
+            result = b"react";
         }
-        let mut name = base.to_vec();
-        name.extend_from_slice(if options.jsx == JsxEmit::REACT_JSX_DEV {
-            b"/jsx-dev-runtime"
-        } else {
-            b"/jsx-runtime"
-        });
-        return Ok(Some(JsString::from_bytes(name)));
+        return Ok(JsString::from_bytes(result));
     }
-    Ok(None)
+    Ok(JsString::default())
 }
 
-fn pragma_argument(pragma: Option<&tsr_ast::Pragma>) -> &[u8] {
-    pragma
-        .and_then(|p| p.args.get(b"factory".as_slice()))
-        .map_or(b"".as_slice(), |arg| arg.value.as_bytes())
+/// An empty base is no runtime import.
+/// port: tsc/internal/ast/utilities.go:GetJSXRuntimeImport
+pub(crate) fn jsx_runtime_import(base: &[u8], options: &CompilerOptions) -> JsString {
+    if base.is_empty() {
+        return JsString::default();
+    }
+    let mut name = base.to_vec();
+    name.push(b'/');
+    name.extend_from_slice(if options.jsx == JsxEmit::REACT_JSX_DEV {
+        b"jsx-dev-runtime"
+    } else {
+        b"jsx-runtime"
+    });
+    JsString::from_bytes(name)
+}
+
+/// The last pragma of the name wins.
+/// port: tsc/internal/ast/utilities.go:GetPragmaFromSourceFile
+fn pragma_from_source_file<'a>(
+    pragmas: impl IntoIterator<Item = &'a Pragma>,
+    name: &[u8],
+) -> Option<&'a Pragma> {
+    let mut result = None;
+    for pragma in pragmas {
+        if pragma.name.as_bytes() == name {
+            result = Some(pragma);
+        }
+    }
+    result
 }
 
 /// port: tsc/internal/compiler/fileloader.go:getModeForTypeReferenceDirectiveInFile
@@ -374,11 +381,15 @@ pub(crate) fn type_reference_mode(
         #[allow(clippy::cast_possible_truncation)]
         return ModuleKind(mode as i32);
     }
-    if (ModuleResolutionKind::NODE16..=ModuleResolutionKind::NODE_NEXT)
-        .contains(&options.module_resolution_kind())
-        || options.resolve_package_json_exports()
-        || options.resolve_package_json_imports()
-    {
+    default_resolution_mode_for_file(name, meta, options)
+}
+/// port: tsc/internal/compiler/fileloader.go:getDefaultResolutionModeForFile
+pub(crate) fn default_resolution_mode_for_file(
+    name: &[u8],
+    meta: &SourceFileMetaData,
+    options: &CompilerOptions,
+) -> ModuleKind {
+    if import_syntax_affects_module_resolution(options) {
         implied_for_emit(name, options.emit_module_kind(), meta)
     } else {
         ModuleKind::NONE

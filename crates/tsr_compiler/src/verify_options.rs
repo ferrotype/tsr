@@ -629,7 +629,7 @@ pub fn verify_compiler_options(program: &Program) -> Result<OptionVerification, 
             config_path.as_bytes(),
             options.base_url.as_bytes(),
             program.current_directory(),
-            program.host().use_case_sensitive_file_names(),
+            program.use_case_sensitive_file_names(),
         );
         if !(relative.starts_with(b"./") || relative.starts_with(b"../")) {
             relative = [b"./".as_slice(), &relative].concat();
@@ -646,16 +646,9 @@ pub fn verify_compiler_options(program: &Program) -> Result<OptionVerification, 
     };
     removed_options(&mut v, options, &suggestion);
     initial_options(&mut v, options);
-    // The frozen S07 operation boundary rejects project references before
-    // Program construction. No reference verification result is manufactured.
-    let emitted: Vec<_> = program
-        .files()
-        .iter()
-        .map(|file| output::may_emit(file, program).map(|emit| (file, emit)))
-        .collect::<Result<Vec<_>, _>>()?
-        .into_iter()
-        .filter_map(|(file, emit)| emit.then_some(file))
-        .collect();
+    let mut blocked = std::collections::BTreeSet::new();
+    verify_project_references(program, &mut v, &mut blocked);
+    let emitted = source_files_to_emit(program)?;
     let names: Vec<_> = emitted
         .iter()
         .map(|file| {
@@ -667,23 +660,17 @@ pub fn verify_compiler_options(program: &Program) -> Result<OptionVerification, 
         .collect::<Result<Vec<_>, _>>()?;
     let common = output::common_directory(program, &names);
     let mut includes = Vec::new();
-    let to_path = |name: &[u8]| {
-        path::to_path(
-            name,
-            program.current_directory(),
-            program.host().use_case_sensitive_file_names(),
-        )
-    };
     if options.composite.is_true() {
         let roots: std::collections::BTreeSet<_> = program
             .config()
             .root_file_names
             .iter()
-            .map(|name| to_path(name.as_bytes()))
+            .map(|name| program.to_path(name.as_bytes()))
             .collect();
         for file in &emitted {
             let source = file.bound().view().source_file()?;
             if !roots.contains(&source.parse_options().path) {
+                // port: tsc/internal/compiler/includeprocessor.go:includeProcessor.addProcessingDiagnostic
                 includes.push(FileIncludeDiagnostic {file: source.parse_options().path.clone(), message: d::File_0_is_not_listed_within_the_file_list_of_project_1_Projects_must_list_all_files_or_use_an_include_pattern, args: vec![source.parse_options().file_name.clone(),config_path.clone()]});
             }
         }
@@ -709,16 +696,7 @@ pub fn verify_compiler_options(program: &Program) -> Result<OptionVerification, 
         } else {
             return;
         };
-        for name in &names {
-            if !path::contains_path(
-                &root,
-                name.as_bytes(),
-                program.current_directory(),
-                program.host().use_case_sensitive_file_names(),
-            ) {
-                includes.push(FileIncludeDiagnostic {file: to_path(name.as_bytes()), message: d::File_0_is_not_under_rootDir_1_rootDir_is_expected_to_contain_all_source_files, args: vec![name.clone(),JsString::from_bytes(root.as_slice())]});
-            }
-        }
+        check_source_files_belong_to_path(program, &names, &root, includes);
     };
     if needs_common {
         check_common(&mut includes);
@@ -749,8 +727,8 @@ pub fn verify_compiler_options(program: &Program) -> Result<OptionVerification, 
         check_common(&mut includes);
         let previous = output::computed_common_directory(&names, program);
         if !previous.is_empty()
-            && path::canonical(&previous, program.host().use_case_sensitive_file_names())
-                != path::canonical(&common, program.host().use_case_sensitive_file_names())
+            && path::canonical(&previous, program.use_case_sensitive_file_names())
+                != path::canonical(&common, program.use_case_sensitive_file_names())
         {
             let key1: &[u8] = if !options.out_file.is_empty() {
                 b"outFile".as_slice()
@@ -768,7 +746,7 @@ pub fn verify_compiler_options(program: &Program) -> Result<OptionVerification, 
                 options.config_file_path.as_bytes(),
                 &previous,
                 program.current_directory(),
-                program.host().use_case_sensitive_file_names(),
+                program.use_case_sensitive_file_names(),
             );
             let diagnostic = v.option(true,key1,key2,d::The_common_source_directory_of_0_is_1_The_rootDir_setting_must_be_explicitly_set_to_this_or_another_path_to_adjust_your_output_s_file_layout,strings(&[path::base_name(options.config_file_path.as_bytes()),&relative]));
             diagnostic.message_chain.push(Arc::new(Diagnostic::compiler(
@@ -778,14 +756,13 @@ pub fn verify_compiler_options(program: &Program) -> Result<OptionVerification, 
         }
     }
     final_options(&mut v, options);
-    let mut blocked = std::collections::BTreeSet::new();
     if !options.no_emit.is_true() && !options.suppress_output_path_check.is_true() {
         let mut seen = std::collections::BTreeSet::new();
         let mut verify_path = |name: Vec<u8>| {
             if name.is_empty() {
                 return;
             }
-            let canonical = to_path(&name);
+            let canonical = program.to_path(&name);
             if program.file(canonical.as_bytes()).is_some() {
                 let mut diagnostic = Diagnostic::compiler(
                     d::Cannot_write_file_0_because_it_would_overwrite_input_file,
@@ -794,15 +771,26 @@ pub fn verify_compiler_options(program: &Program) -> Result<OptionVerification, 
                 if config_path.is_empty() {
                     diagnostic.message_chain.push(Arc::new(Diagnostic::compiler(d::Adding_a_tsconfig_json_file_will_help_organize_projects_that_contain_both_TypeScript_and_JavaScript_files_Learn_more_at_https_Colon_Slash_Slashaka_ms_Slashtsconfig,vec![])));
                 }
-                blocked.insert(canonical.clone());
-                v.diagnostics.push(diagnostic);
+                block_emitting_of_file(
+                    program,
+                    &mut blocked,
+                    &mut v.diagnostics,
+                    &name,
+                    diagnostic,
+                );
             }
-            if !seen.insert(canonical.clone()) {
-                blocked.insert(canonical);
-                v.diagnostics.push(Diagnostic::compiler(
+            if !seen.insert(canonical) {
+                let diagnostic = Diagnostic::compiler(
                     d::Cannot_write_file_0_because_it_would_be_overwritten_by_multiple_input_files,
-                    vec![JsString::from_bytes(name)],
-                ));
+                    vec![JsString::from_bytes(name.as_slice())],
+                );
+                block_emitting_of_file(
+                    program,
+                    &mut blocked,
+                    &mut v.diagnostics,
+                    &name,
+                    diagnostic,
+                );
             }
         };
         for file in emitted {
@@ -818,7 +806,7 @@ pub fn verify_compiler_options(program: &Program) -> Result<OptionVerification, 
         verify_path(output::build_info_file(
             options,
             program.current_directory(),
-            program.host().use_case_sensitive_file_names(),
+            program.use_case_sensitive_file_names(),
         ));
     }
     Ok(OptionVerification {
@@ -826,6 +814,125 @@ pub fn verify_compiler_options(program: &Program) -> Result<OptionVerification, 
         include_diagnostics: includes,
         blocked_output_paths: blocked,
     })
+}
+
+/// The program's files that emit output.
+/// port: tsc/internal/compiler/program.go:Program.getSourceFilesToEmit
+/// port: tsc/internal/compiler/emitter.go:getSourceFilesToEmit
+fn source_files_to_emit(program: &Program) -> Result<Vec<&Arc<crate::ProgramFile>>, Error> {
+    let mut emitted = Vec::new();
+    for file in program.files() {
+        if crate::output_paths::may_emit(file, program)? {
+            emitted.push(file);
+        }
+    }
+    Ok(emitted)
+}
+
+/// Records whether every emitted source is under `root`; each one that is not
+/// is explained by its include reasons.
+/// port: tsc/internal/compiler/program.go:Program.checkSourceFilesBelongToPath
+fn check_source_files_belong_to_path(
+    program: &Program,
+    names: &[JsString],
+    root: &[u8],
+    includes: &mut Vec<FileIncludeDiagnostic>,
+) -> bool {
+    let mut all_files_belong_to_path = true;
+    for name in names {
+        if !tsr_tspath::contains_path(
+            root,
+            name.as_bytes(),
+            program.current_directory(),
+            program.use_case_sensitive_file_names(),
+        ) {
+            // port: tsc/internal/compiler/includeprocessor.go:includeProcessor.addProcessingDiagnostic
+            includes.push(FileIncludeDiagnostic {
+                file: program.to_path(name.as_bytes()),
+                message: d::File_0_is_not_under_rootDir_1_rootDir_is_expected_to_contain_all_source_files,
+                args: vec![name.clone(), JsString::from_bytes(root)],
+            });
+            all_files_belong_to_path = false;
+        }
+    }
+    all_files_belong_to_path
+}
+
+/// Blocks emit to `emit_file_name` and reports why.
+/// port: tsc/internal/compiler/program.go:Program.blockEmittingOfFile
+fn block_emitting_of_file(
+    program: &Program,
+    blocked: &mut std::collections::BTreeSet<JsString>,
+    diagnostics: &mut Vec<Diagnostic>,
+    emit_file_name: &[u8],
+    diagnostic: Diagnostic,
+) {
+    blocked.insert(program.to_path(emit_file_name));
+    diagnostics.push(diagnostic);
+}
+
+/// Diagnostics sit at the parent's `references` entry, so a nested
+/// reference's diagnostic is in the referencing tsconfig, not the program's.
+/// port: tsc/internal/compiler/program.go:Program.verifyProjectReferences
+fn verify_project_references(
+    program: &Program,
+    v: &mut Verifier<'_>,
+    blocked: &mut std::collections::BTreeSet<JsString>,
+) {
+    let build_info_file_name = if program.options().suppress_output_path_check.is_true() {
+        JsString::default()
+    } else {
+        program.config().build_info_file_name()
+    };
+    program.range_resolved_project_reference(|_, config, parent, index| {
+        let reference = &parent
+            .project_references
+            .as_ref()
+            .expect("a walked reference belongs to its parent's references")[index];
+        let mut create = |message: &'static Message, args: Vec<JsString>| {
+            let diagnostic = tsr_tsoptions::diagnostic_at_reference_syntax(
+                parent,
+                isize::try_from(index).expect("reference index"),
+                message,
+                args.clone(),
+            )
+            .unwrap_or_else(|| Diagnostic::compiler(message, args));
+            v.diagnostics.push(diagnostic);
+        };
+        // !!! Deprecated in 5.0 and removed since 5.5
+        // verifyRemovedProjectReference(ref, parent, index);
+        let Some(config) = config else {
+            create(d::File_0_not_found, vec![reference.path.clone()]);
+            return true;
+        };
+        let reference_options = &config.options;
+        if (!reference_options.composite.is_true() || reference_options.no_emit.is_true())
+            && !parent.root_file_names.is_empty()
+        {
+            if !reference_options.composite.is_true() {
+                create(
+                    d::Referenced_project_0_must_have_setting_composite_Colon_true,
+                    vec![reference.path.clone()],
+                );
+            }
+            if reference_options.no_emit.is_true() {
+                create(
+                    d::Referenced_project_0_may_not_disable_emit,
+                    vec![reference.path.clone()],
+                );
+            }
+        }
+        if !build_info_file_name.is_empty()
+            && build_info_file_name == config.build_info_file_name()
+        {
+            create(
+                d::Cannot_write_file_0_because_it_will_overwrite_tsbuildinfo_file_generated_by_referenced_project_1,
+                vec![build_info_file_name.clone(), reference.path.clone()],
+            );
+            blocked.insert(program.to_path(build_info_file_name.as_bytes()));
+        }
+        true
+    });
 }
 
 // Go encoding/json string output (the baseUrl migration suggestion) replaces
