@@ -1,0 +1,24 @@
+{
+  "columns": [
+    {
+      "evidence": [
+        "internal/checker/checker.go:10240",
+        "internal/checker/checker.go:10271",
+        "internal/checker/checker.go:29040",
+        "internal/transformers/tstransforms/legacydecorators.go:666",
+        "internal/transformers/tstransforms/legacydecorators.go:723"
+      ],
+      "id": "ast.Node.Decorators",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/ast.go:Node.Decorators"
+      ],
+      "projection": "[node reference, [decorator references]] of every node with a nonempty result; callers read only length and elements, so nil and empty are one value",
+      "rust": "tsr_ast node decorators accessor (PB04's port of Node.Decorators)",
+      "survey": true,
+      "synthetic": []
+    }
+  ],
+  "group": "class",
+  "version": 1
+}

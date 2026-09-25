@@ -82,3 +82,14 @@ member/value/2	false	runtime error: invalid memory address or nil pointer derefe
 import/hook-nil	true
 reference/fallback	true
 heritage/detached	true	
+alias/0	true	false
+alias/1	true	false
+alias/2	false	true
+alias/3	true	false
+script/locals	true
+default/nil	true
+default/scan	true
+import/alias/0	false
+import/alias/1	true
+bind/state	false	true	true	1	true	2
+bind/once	false	true

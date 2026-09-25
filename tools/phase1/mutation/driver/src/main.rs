@@ -1,14 +1,15 @@
-//! Phase 1 mutation witnesses: runs the E1, binder and facts oracles in process
-//! with one active mutant at a time.
+//! Phase 1 mutation witnesses: runs the E1, binder, facts and table oracles in
+//! process with one active mutant at a time.
 //!
 //! ```text
-//! phase1_mutation_driver trace --oracle e1|binder|facts --requests FILE --out FILE [--frames FILE] [--dump-dir DIR]
-//! phase1_mutation_driver kill  --oracle e1|binder|facts --requests FILE --base TRACE --dump-dir DIR   < jobs
+//! phase1_mutation_driver trace --oracle e1|binder|facts|table --requests FILE --out FILE [--frames FILE] [--dump-dir DIR]
+//! phase1_mutation_driver kill  --oracle e1|binder|facts|table --requests FILE --base TRACE --dump-dir DIR   < jobs
 //! ```
 //!
 //! Requests are NDJSON lines holding the example request fields plus
 //! `request_sha256`, which is checked against the canonical request bytes. The
-//! facts oracle reads the S06 parse requests. Every row runs on one
+//! facts oracle reads the S06 parse requests; the table oracle reads the
+//! materialized table inventory (`scripts/phase1_tables.py`). Every row runs on one
 //! reserved-stack parser worker, so the parser and binder run inline on the
 //! thread whose mutant switch state records reach. The protocol itself (trace
 //! lines, kill jobs, controls, rechecks) is `jobs.rs`, shared with the
@@ -22,6 +23,7 @@ mod jobs;
 #[cfg(test)]
 mod jobs_tests;
 mod protocol;
+mod table;
 #[cfg(test)]
 mod verbatim;
 
@@ -70,9 +72,14 @@ impl Rows for Driver {
         match self.0 {
             Oracle::E1 | Oracle::Facts => e1::check(&value),
             Oracle::Binder => binder::check(&value),
+            Oracle::Table => table::check(&value),
         }?;
         let id = value["id"].as_str().expect("validated id").to_owned();
-        let source_bytes = value["source_hex"].as_str().map_or(0, |hex| hex.len() / 2);
+        let source_bytes = if self.0 == Oracle::Table {
+            table::size(&value)
+        } else {
+            value["source_hex"].as_str().map_or(0, |hex| hex.len() / 2)
+        };
         Ok(Request {
             index,
             id,
@@ -88,6 +95,7 @@ impl Rows for Driver {
             Oracle::E1 => e1::run(&session, &request.value),
             Oracle::Binder => binder::run(&session, &request.value),
             Oracle::Facts => facts::run(&session, &request.value),
+            Oracle::Table => table::run(&session, &request.value),
         }));
         let mut output = session.finish();
         if let Err(payload) = escaped {
@@ -126,7 +134,7 @@ fn main() -> ExitCode {
 fn run(args: &[String]) -> Result<(), String> {
     let (mode, rest) = args
         .split_first()
-        .ok_or("usage: phase1_mutation_driver trace|kill --oracle e1|binder|facts ...")?;
+        .ok_or("usage: phase1_mutation_driver trace|kill --oracle e1|binder|facts|table ...")?;
     let mut options = jobs::options(
         rest,
         &["oracle", "requests", "out", "frames", "dump-dir", "base"],

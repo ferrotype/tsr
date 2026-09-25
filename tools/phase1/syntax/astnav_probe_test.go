@@ -14,9 +14,11 @@ package astnav
 // which this request first saw that node object, so pointer identity is
 // compared, not just kind and range: GetOrCreateToken must hand back the same
 // token to a repeated question and to a different operation that reaches it,
-// and two distinct nodes with the same range must stay distinct. A recovered
-// panic is ["panic", message], because a panic is the pinned outcome of some
-// FindNextToken questions (tokens.go:682).
+// and two distinct nodes with the same range must stay distinct.
+// `child_of_kind_payload` appends what the node carries beyond that (text,
+// token flags, raw text, template flags), so the payload createToken builds is
+// compared too. A recovered panic is ["panic", message], because a panic is the
+// pinned outcome of some FindNextToken questions (tokens.go:682).
 //
 // Every name is prefixed `phase1` so it cannot collide with a pinned helper.
 
@@ -67,6 +69,34 @@ func (n *phase1Nav) node(node *ast.Node) any {
 		n.ordinals[node] = ordinal
 	}
 	return []any{int(node.Kind), node.Pos(), node.End(), ordinal}
+}
+
+// payload is a node answer followed by what the node carries beyond its kind
+// and range: a name's text; a literal's text and token flags; for a template
+// piece also its raw text and template flags; for JSX text also whether it is
+// only whitespace. A token that GetOrCreateToken makes gets all of these from
+// createToken (ast.go:2935), so `child_of_kind_payload` compares that
+// constructor's output, which a plain node answer cannot see.
+func (n *phase1Nav) payload(node *ast.Node) any {
+	answer := n.node(node)
+	if node == nil {
+		return answer
+	}
+	fields := answer.([]any)
+	switch node.Kind {
+	case ast.KindIdentifier, ast.KindPrivateIdentifier:
+		fields = append(fields, node.Text())
+	case ast.KindNumericLiteral, ast.KindBigIntLiteral, ast.KindStringLiteral, ast.KindRegularExpressionLiteral:
+		data := node.LiteralLikeData()
+		fields = append(fields, data.Text, int(data.TokenFlags))
+	case ast.KindJsxText:
+		data := node.AsJsxText()
+		fields = append(fields, data.Text, int(data.TokenFlags), data.ContainsOnlyTriviaWhiteSpaces)
+	case ast.KindNoSubstitutionTemplateLiteral, ast.KindTemplateHead, ast.KindTemplateMiddle, ast.KindTemplateTail:
+		data := node.TemplateLiteralLikeData()
+		fields = append(fields, data.Text, int(data.TokenFlags), data.RawText, int(data.TemplateFlags))
+	}
+	return fields
 }
 
 // answer runs one question, turning a panic into its pinned message.
@@ -139,7 +169,11 @@ func (n *phase1Nav) action(op string, kinds []string) any {
 		return n.sweep(func(p int) any { return GetStartOfNode(token(p), file, false) })
 	case "start_of_token_with_jsdoc":
 		return n.sweep(func(p int) any { return GetStartOfNode(token(p), file, true) })
-	case "child_of_kind":
+	case "child_of_kind", "child_of_kind_payload":
+		answer := n.node
+		if op == "child_of_kind_payload" {
+			answer = n.payload
+		}
 		rows := []any{}
 		for index, container := range n.preorder() {
 			for _, name := range kinds {
@@ -148,7 +182,7 @@ func (n *phase1Nav) action(op string, kinds []string) any {
 					panic("unknown kind " + name)
 				}
 				rows = append(rows, []any{index, name, phase1Answer(func() any {
-					return n.node(FindChildOfKind(container, kind, file))
+					return answer(FindChildOfKind(container, kind, file))
 				})})
 			}
 		}

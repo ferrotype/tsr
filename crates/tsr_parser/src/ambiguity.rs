@@ -262,7 +262,7 @@ impl<F: ParserFactory> Parser<'_, F> {
                 }
                 _ => return false,
             };
-            if parameters.is_some_and(|list| self.factory.read_list(list).is_missing()) {
+            if self.is_missing_node_list(parameters) {
                 return true;
             }
             node = r#type.expect("parsed function type has return type");

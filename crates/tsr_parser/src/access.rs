@@ -17,7 +17,7 @@ impl<F: ParserFactory> Parser<'_, F> {
             }) {
                 self.source_flags |= node_flags::POSSIBLY_CONTAINS_DYNAMIC_IMPORT;
                 self.parse_keyword_expression()
-            } else if self.look_ahead(|p| p.next_token() == SyntaxKind::DotToken) {
+            } else if self.look_ahead(Self::next_token_is_dot) {
                 self.next_token();
                 self.next_token();
                 let name = self.parse_identifier_name();
@@ -224,6 +224,10 @@ impl<F: ParserFactory> Parser<'_, F> {
         self.token == SyntaxKind::QuestionDotToken
             && self
                 .look_ahead(Self::next_token_is_identifier_or_keyword_or_open_bracket_or_template)
+    }
+    /// port: tsc/internal/parser/parser.go:Parser.nextTokenIsDot
+    pub(crate) fn next_token_is_dot(&mut self) -> bool {
+        self.next_token() == SyntaxKind::DotToken
     }
     /// port: tsc/internal/parser/parser.go:Parser.nextTokenIsIdentifierOrKeywordOrOpenBracketOrTemplate
     pub(crate) fn next_token_is_identifier_or_keyword_or_open_bracket_or_template(

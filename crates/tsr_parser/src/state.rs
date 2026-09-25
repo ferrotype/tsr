@@ -294,7 +294,7 @@ impl<'src, F: ParserFactory> Parser<'src, F> {
                 .read_nodes(nodes)
                 .iter()
                 .flatten()
-                .any(|id| self.factory.node(id).kind() == SyntaxKind::AsyncKeyword)
+                .any(|id| self.is_async_modifier(id))
         })
     }
     /// port: tsc/internal/parser/parser.go:Parser.finishNode

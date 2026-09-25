@@ -1,0 +1,21 @@
+{
+  "columns": [
+    {
+      "evidence": [
+        "internal/checker/grammarchecks.go:727"
+      ],
+      "id": "binder.FindUseStrictPrologue",
+      "input": "source",
+      "operations": [
+        "tsc/internal/binder/binder.go:FindUseStrictPrologue",
+        "tsc/internal/binder/binder.go:isUseStrictPrologueDirective"
+      ],
+      "projection": "[container reference, result reference] for every statement container (Node.CanHaveStatements, taken in setup with its statements) whose result is not nil",
+      "rust": "tsr_binder::find_use_strict_prologue",
+      "survey": true,
+      "synthetic": []
+    }
+  ],
+  "group": "containers",
+  "version": 1
+}

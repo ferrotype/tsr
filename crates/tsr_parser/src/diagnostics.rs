@@ -25,14 +25,12 @@ impl<'src, F: ParserFactory> Parser<'src, F> {
                     }
                 })
                 .collect();
-            append_error(
+            scan_error(
                 &mut self.diagnostics,
                 &mut self.has_parse_error,
-                TextRange::new(
-                    diagnostic.start,
-                    diagnostic.start.wrapping_add(diagnostic.length),
-                ),
                 diagnostic.message,
+                diagnostic.start,
+                diagnostic.length,
                 args,
             );
         }
@@ -213,6 +211,26 @@ fn get_space_suggestion(text: &[u8]) -> Option<JsString> {
         }
     }
     None
+}
+
+/// The scanner's error callback. Scanner diagnostics are buffered and drained
+/// after each scanner operation, so this takes the two parser fields it writes.
+/// port: tsc/internal/parser/parser.go:Parser.scanError
+fn scan_error(
+    diagnostics: &mut Vec<Diagnostic>,
+    has_parse_error: &mut bool,
+    message: &'static Message,
+    pos: i64,
+    length: i64,
+    args: Vec<JsString>,
+) {
+    append_error(
+        diagnostics,
+        has_parse_error,
+        TextRange::new(pos, pos.wrapping_add(length)),
+        message,
+        args,
+    );
 }
 
 fn append_error(

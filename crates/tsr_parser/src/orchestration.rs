@@ -179,6 +179,8 @@ impl Parser<'_, AstBuilder> {
     }
     // The Go finish path creates a new map after both initial parse and optional
     // await reparse. Only the final root escapes, so publish its final map once.
+    /// port: tsc/internal/ast/ast.go:SourceFile.SetJSDocCache
+    /// port: tsc/internal/parser/parser.go:Parser.createJSDocCache
     fn seed_final_jsdoc_cache(&mut self, source: NodeId) {
         let mut entries = HashMap::new();
         for info in std::mem::take(&mut self.jsdoc_infos) {

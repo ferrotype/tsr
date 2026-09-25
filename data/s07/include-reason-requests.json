@@ -771,5 +771,353 @@
         "/src/dep.ts"
       ]
     }
+  },
+  {
+    "case_sensitive": false,
+    "cwd": "/src",
+    "files": {
+      "/src/a.ts": "6578706f7274207b7d3b",
+      "/src/main.ts": "696d706f727420222e2f61223b20696d706f727420222e2f41223b"
+    },
+    "id": "casing/insensitive-import-variants",
+    "options": {
+      "noLib": true,
+      "target": 99
+    },
+    "queries": [
+      {
+        "Path": "/src/a.ts"
+      }
+    ],
+    "roots": [
+      "/src/main.ts"
+    ]
+  },
+  {
+    "case_sensitive": false,
+    "cwd": "/src",
+    "files": {
+      "/src/a.ts": "6578706f7274207b7d3b",
+      "/src/main.ts": "696d706f727420222e2f61223b"
+    },
+    "id": "casing/root-after-import",
+    "options": {
+      "noLib": true,
+      "target": 99
+    },
+    "queries": [
+      {
+        "Path": "/src/a.ts"
+      }
+    ],
+    "roots": [
+      "/src/main.ts",
+      "/src/A.ts"
+    ]
+  },
+  {
+    "case_sensitive": false,
+    "cwd": "/src",
+    "files": {
+      "/src/a.ts": "6578706f7274207b7d3b",
+      "/src/main.ts": "696d706f727420222e2f61223b20696d706f727420222e2f41223b"
+    },
+    "id": "casing/force-consistent-false",
+    "options": {
+      "forceConsistentCasingInFileNames": false,
+      "noLib": true,
+      "target": 99
+    },
+    "queries": [
+      {
+        "Path": "/src/a.ts"
+      }
+    ],
+    "roots": [
+      "/src/main.ts"
+    ]
+  },
+  {
+    "case_sensitive": true,
+    "cwd": "/src",
+    "files": {
+      "/src/A.ts": "6578706f7274207b7d3b",
+      "/src/a.ts": "6578706f7274207b7d3b"
+    },
+    "id": "casing/sensitive-distinct-paths",
+    "options": {
+      "noLib": true,
+      "target": 99
+    },
+    "queries": [
+      {
+        "Path": "/src/a.ts"
+      },
+      {
+        "Path": "/src/A.ts"
+      }
+    ],
+    "roots": [
+      "/src/a.ts",
+      "/src/A.ts"
+    ]
+  },
+  {
+    "case_sensitive": false,
+    "cwd": "/src",
+    "files": {
+      "/src/a.ts": "6578706f7274207b7d3b"
+    },
+    "id": "casing/duplicate-root-variants",
+    "options": {
+      "noLib": true,
+      "target": 99
+    },
+    "queries": [
+      {
+        "Path": "/src/a.ts"
+      }
+    ],
+    "roots": [
+      "/src/a.ts",
+      "/src/A.ts",
+      "/src/A.ts"
+    ]
+  },
+  {
+    "case_sensitive": false,
+    "cwd": "/src",
+    "files": {
+      "/src/main.ts": "6578706f7274207b7d3b"
+    },
+    "id": "casing/missing-root-variants",
+    "options": {
+      "noLib": true,
+      "target": 99
+    },
+    "queries": [
+      {
+        "Path": "/src/missing.ts"
+      }
+    ],
+    "roots": [
+      "/src/main.ts",
+      "/src/missing.ts",
+      "/src/MISSING.ts"
+    ]
+  },
+  {
+    "case_sensitive": false,
+    "cwd": "/src",
+    "files": {
+      "/src/a.js": "6578706f7274207b7d3b",
+      "/src/main.ts": "6578706f7274207b7d3b"
+    },
+    "id": "casing/js-root-variants",
+    "options": {
+      "noLib": true,
+      "target": 99
+    },
+    "queries": [
+      {
+        "Path": "/src/a.js"
+      }
+    ],
+    "roots": [
+      "/src/main.ts",
+      "/src/a.js",
+      "/src/A.js"
+    ]
+  },
+  {
+    "case_sensitive": true,
+    "cwd": "/src",
+    "files": {
+      "/src/main.ts": "2f2f2f203c7265666572656e6365206c69623d226573323031352e70726f6d697322202f3e0a"
+    },
+    "id": "lib-reference/unknown-suggestion",
+    "options": {
+      "lib": [],
+      "noLib": false,
+      "target": 99
+    },
+    "queries": [
+      {
+        "Path": "/src/main.ts"
+      }
+    ],
+    "roots": [
+      "/src/main.ts"
+    ]
+  },
+  {
+    "case_sensitive": true,
+    "cwd": "/src",
+    "files": {
+      "/src/main.ts": "2f2f2f203c7265666572656e6365206c69623d226e6f7468696e672d6c696b652d7468697322202f3e0a"
+    },
+    "id": "lib-reference/unknown-no-suggestion",
+    "options": {
+      "lib": [],
+      "noLib": false,
+      "target": 99
+    },
+    "queries": [
+      {
+        "Path": "/src/main.ts"
+      }
+    ],
+    "roots": [
+      "/src/main.ts"
+    ]
+  },
+  {
+    "case_sensitive": true,
+    "cwd": "/src",
+    "files": {
+      "/src/main.ts": "2f2f2f203c7265666572656e6365206c69623d224c49422e4553323031352e50524f4d49532e442e545322202f3e0a"
+    },
+    "id": "lib-reference/unknown-file-name",
+    "options": {
+      "lib": [],
+      "noLib": false,
+      "target": 99
+    },
+    "queries": [
+      {
+        "Path": "/src/main.ts"
+      }
+    ],
+    "roots": [
+      "/src/main.ts"
+    ]
+  },
+  {
+    "case_sensitive": true,
+    "cwd": "/src",
+    "files": {
+      "/src/main.ts": "2f2f2f203c7265666572656e6365206c69623d227a7a7a22202f3e0a2f2f2f203c7265666572656e63652074797065733d226d697373696e6722202f3e0a"
+    },
+    "id": "diagnostics/file-unsorted",
+    "options": {
+      "lib": [],
+      "noLib": false,
+      "target": 99,
+      "types": []
+    },
+    "queries": [
+      {
+        "Path": "/src/main.ts"
+      }
+    ],
+    "roots": [
+      "/src/main.ts"
+    ]
+  },
+  {
+    "case_sensitive": true,
+    "cwd": "/src",
+    "files": {
+      "/src/a.ts": "6578706f7274207b7d3b",
+      "/src/z.ts": "6578706f7274207b7d3b"
+    },
+    "id": "diagnostics/globals-unsorted",
+    "options": {
+      "noLib": true,
+      "rootDir": "/other",
+      "target": 99
+    },
+    "queries": [
+      {
+        "Path": "/src/z.ts"
+      }
+    ],
+    "roots": [
+      "/src/z.ts",
+      "/src/a.ts"
+    ]
+  },
+  {
+    "case_sensitive": true,
+    "cwd": "/src",
+    "files": {
+      "/src/main.ts": "696d706f7274202273656c66223b",
+      "/src/other.ts": "696d706f7274202273656c66223b",
+      "/src/package.json": "7b226e616d65223a2273656c66222c226578706f727473223a222e2f646973742f6d61696e2e6a73227d"
+    },
+    "id": "diagnostics/duplicate-resolution-diagnostic",
+    "options": {
+      "noLib": true,
+      "outDir": "dist",
+      "target": 99
+    },
+    "queries": [
+      {
+        "Path": "/src/main.ts"
+      }
+    ],
+    "roots": [
+      "/src/main.ts",
+      "/src/other.ts"
+    ]
+  },
+  {
+    "case_sensitive": false,
+    "config_name": "/src/tsconfig.json",
+    "config_text": "7b22636f6d70696c65724f7074696f6e73223a207b226c6962223a205b22657335225d2c7d2c202266696c6573223a205b7d",
+    "cwd": "/src",
+    "files": {
+      "/src/dep.ts": "6578706f7274207b7d3b",
+      "/src/main.ts": "696d706f727420222e2f446570223b"
+    },
+    "id": "accessors/config-and-files",
+    "options": {
+      "lib": [
+        "lib.es5.d.ts"
+      ],
+      "noLib": false,
+      "target": 99
+    },
+    "queries": [
+      {
+        "Path": "/src/dep.ts"
+      }
+    ],
+    "roots": [
+      "/src/main.ts"
+    ],
+    "source_file_queries": [
+      "/src/main.ts",
+      "main.ts",
+      "/SRC/DEP.TS",
+      "./dep.ts",
+      "/src/missing.ts",
+      "bundled:///libs/lib.es5.d.ts"
+    ],
+    "specs": {}
+  },
+  {
+    "case_sensitive": true,
+    "cwd": "/src",
+    "files": {
+      "/src/main.ts": "6578706f7274207b7d3b"
+    },
+    "id": "accessors/no-config",
+    "options": {
+      "noLib": true,
+      "target": 99
+    },
+    "queries": [
+      {
+        "Path": "/src/main.ts"
+      }
+    ],
+    "roots": [
+      "/src/main.ts"
+    ],
+    "source_file_queries": [
+      "/src/main.ts",
+      "/src/Main.ts"
+    ]
   }
 ]

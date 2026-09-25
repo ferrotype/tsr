@@ -75,6 +75,7 @@ const GREATER_THAN: Ordering = Ordering::Greater;
 
 /// `core.BinarySearchUniqueFunc`. The comparer has side effects in these
 /// searches, so the probe order is part of the contract.
+// port: tsc/internal/core/binarysearch.go:BinarySearchUniqueFunc
 fn binary_search_unique(
     len: usize,
     mut compare: impl FnMut(usize) -> Result<Ordering, Error>,
@@ -272,6 +273,46 @@ impl<'a, 'p> Navigator<'a, 'p> {
                 })
             })
             .collect()
+    }
+
+    /// Calls `visit` with the node's JSDoc, then with its children in
+    /// `ForEachChild` order, a list one node at a time and without the
+    /// single-comment filter of the navigation visitor. Stops at the first
+    /// call that returns true, and returns whether one did.
+    // port: tsc/internal/ast/utilities.go:ForEachChildAndJSDoc
+    fn for_each_child_and_jsdoc(
+        &mut self,
+        node: NodeId,
+        mut visit: impl FnMut(&mut Self, NodeId) -> Result<bool, Error>,
+    ) -> Result<bool, Error> {
+        for doc in self.jsdoc_of(node)? {
+            if visit(self, doc)? {
+                return Ok(true);
+            }
+        }
+        // Enumerating the children reads the tree only, so collecting them
+        // before the first call is not observable.
+        let mut collect = Collect {
+            view: self.view,
+            out: Vec::new(),
+            error: None,
+        };
+        let _ = self.node(node)?.for_each_child(&mut collect);
+        if let Some(error) = collect.error {
+            return Err(error.into());
+        }
+        for child in collect.out {
+            let members = match child {
+                Visit::Node(child) => vec![child],
+                Visit::List(list) => self.list_nodes(list)?,
+            };
+            for member in members {
+                if visit(self, member)? {
+                    return Ok(true);
+                }
+            }
+        }
+        Ok(false)
     }
 
     // port: tsc/internal/astnav/tokens.go:GetStartOfNode
@@ -876,50 +917,38 @@ impl<'a, 'p> Navigator<'a, 'p> {
         kind: K,
     ) -> Result<Option<NodeId>, Error> {
         let mut last_node_pos = self.pos(containing)?;
-        // `ForEachChildAndJSDoc`: JSDoc first, then the children, with a list
-        // visited one node at a time and the single-comment filter not applied.
-        let mut children: Vec<NodeId> = self.jsdoc_of(containing)?;
-        let mut collect = Collect {
-            view: self.view,
-            out: Vec::new(),
-            error: None,
-        };
-        let _ = self.node(containing)?.for_each_child(&mut collect);
-        if let Some(error) = collect.error {
-            return Err(error.into());
-        }
-        for visit in collect.out {
-            match visit {
-                Visit::Node(node) => children.push(node),
-                Visit::List(list) => children.extend(self.list_nodes(list)?),
-            }
-        }
         let view = self.view;
         let file = view.source_file(self.source)?;
         let mut scanner = tsr_scanner::get_scanner_for_source_file(&file, last_node_pos);
-        for node in children {
-            if self.reparsed(node)? {
-                continue;
+        let mut found_child = None;
+        self.for_each_child_and_jsdoc(containing, |navigator, node| {
+            if navigator.reparsed(node)? {
+                return Ok(false);
             }
             // The tokens that precede this child.
             let mut start_pos = last_node_pos;
-            let node_pos = self.pos(node)?;
+            let node_pos = navigator.pos(node)?;
             while start_pos < node_pos {
                 let (token, token_end) = (scanner.token(), scanner.token_end());
                 if token == kind {
                     let (full_start, flags) = (scanner.token_full_start(), scanner.token_flags());
-                    return self
-                        .token(token, full_start, token_end, containing, flags)
-                        .map(Some);
+                    found_child =
+                        Some(navigator.token(token, full_start, token_end, containing, flags)?);
+                    return Ok(true);
                 }
                 start_pos = token_end;
                 scanner.scan();
             }
-            if self.node(node)?.kind() == kind {
-                return Ok(Some(node));
+            if navigator.node(node)?.kind() == kind {
+                found_child = Some(node);
+                return Ok(true);
             }
-            last_node_pos = self.end(node)?;
+            last_node_pos = navigator.end(node)?;
             scanner.reset_pos(last_node_pos);
+            Ok(false)
+        })?;
+        if found_child.is_some() {
+            return Ok(found_child);
         }
         // The tokens after the last child.
         let mut start_pos = last_node_pos;

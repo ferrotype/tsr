@@ -63,6 +63,47 @@ def fixtures():
         row=add('config/'+name,{'/src/main.ts':'import "./dep";', '/src/dep.ts':'export {};'},['/src/main.ts','/src/dep.ts'],['/src/dep.ts'])
         text=json.dumps(config) if config is not None else '{"files": ["other.ts"], "files": ["./dep.ts"]}'
         row.update(config_name='/src/tsconfig.json',config_text=text.encode().hex(),specs=specs)
+    # File-name casing: two spellings of one path on a case-insensitive host,
+    # the "already included" wording (a root after a referencing import), the
+    # option that disables it, two paths differing only in case on a
+    # case-sensitive host, duplicate root spellings whose two diagnostics
+    # are equal (the collection keeps one), and two spellings of a root that
+    # fails to load (missing, or JavaScript without allowJs), whose failure
+    # is reported once, for the spelling collected first.
+    row=add('casing/insensitive-import-variants', {'/src/main.ts':'import "./a"; import "./A";', '/src/a.ts':'export {};'}, ['/src/main.ts'], ['/src/a.ts'])
+    row['case_sensitive']=False
+    row=add('casing/root-after-import', {'/src/main.ts':'import "./a";', '/src/a.ts':'export {};'}, ['/src/main.ts','/src/A.ts'], ['/src/a.ts'])
+    row['case_sensitive']=False
+    row=add('casing/force-consistent-false', {'/src/main.ts':'import "./a"; import "./A";', '/src/a.ts':'export {};'}, ['/src/main.ts'], ['/src/a.ts'], forceConsistentCasingInFileNames=False)
+    row['case_sensitive']=False
+    add('casing/sensitive-distinct-paths', {'/src/a.ts':'export {};', '/src/A.ts':'export {};'}, ['/src/a.ts','/src/A.ts'], ['/src/a.ts','/src/A.ts'])
+    row=add('casing/duplicate-root-variants', {'/src/a.ts':'export {};'}, ['/src/a.ts','/src/A.ts','/src/A.ts'], ['/src/a.ts'])
+    row['case_sensitive']=False
+    row=add('casing/missing-root-variants', {'/src/main.ts':'export {};'}, ['/src/main.ts','/src/missing.ts','/src/MISSING.ts'], ['/src/missing.ts'])
+    row['case_sensitive']=False
+    row=add('casing/js-root-variants', {'/src/main.ts':'export {};', '/src/a.js':'export {};'}, ['/src/main.ts','/src/a.js','/src/A.js'], ['/src/a.js'])
+    row['case_sensitive']=False
+    # Unknown `/// <reference lib>` names: a spelling suggestion, none, and a
+    # file-name spelling that is lowercased and trimmed before the suggestion.
+    for name,text in [('unknown-suggestion','/// <reference lib="es2015.promis" />\n'),('unknown-no-suggestion','/// <reference lib="nothing-like-this" />\n'),('unknown-file-name','/// <reference lib="LIB.ES2015.PROMIS.D.TS" />\n')]:
+        row=add('lib-reference/'+name, {'/src/main.ts':text}, ['/src/main.ts'], ['/src/main.ts'], lib=[])
+        row['options']['noLib']=False
+    # One file's processing diagnostics arrive out of position order (type
+    # references are resolved before library references); global diagnostics
+    # arrive out of message order.
+    row=add('diagnostics/file-unsorted', {'/src/main.ts':'/// <reference lib="zzz" />\n/// <reference types="missing" />\n'}, ['/src/main.ts'], ['/src/main.ts'], lib=[], types=[])
+    row['options']['noLib']=False
+    add('diagnostics/globals-unsorted', {'/src/z.ts':'export {};', '/src/a.ts':'export {};'}, ['/src/z.ts','/src/a.ts'], ['/src/z.ts'], rootDir='/other')
+    add('diagnostics/duplicate-resolution-diagnostic', {'/src/main.ts':'import "self";', '/src/other.ts':'import "self";', '/src/package.json':'{"name":"self","exports":"./dist/main.js"}'}, ['/src/main.ts','/src/other.ts'], ['/src/main.ts'], outDir='dist')
+    # Program accessors: configuration parsing diagnostics, source files by
+    # name (relative, other casing, missing) and default-library membership.
+    row=add('accessors/config-and-files', {'/src/main.ts':'import "./Dep";', '/src/dep.ts':'export {};'}, ['/src/main.ts'], ['/src/dep.ts'], lib=['lib.es5.d.ts'])
+    row['options']['noLib']=False
+    row['case_sensitive']=False
+    row.update(config_name='/src/tsconfig.json',config_text=b'{"compilerOptions": {"lib": ["es5"],}, "files": [}'.hex(),specs={},
+               source_file_queries=['/src/main.ts','main.ts','/SRC/DEP.TS','./dep.ts','/src/missing.ts','bundled:///libs/lib.es5.d.ts'])
+    row=add('accessors/no-config', {'/src/main.ts':'export {};'}, ['/src/main.ts'], ['/src/main.ts'])
+    row['source_file_queries']=['/src/main.ts','/src/Main.ts']
     return rows
 
 

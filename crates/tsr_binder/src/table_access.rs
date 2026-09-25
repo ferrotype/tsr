@@ -89,6 +89,8 @@ impl<'scope> Binder<'_, 'scope, '_> {
         };
         previous.map(|entry| entry.map(|id| self.binding_symbol(id)))
     }
+    // port: tsc/internal/ast/utilities.go:GetSymbolTable
+    // port: tsc/internal/ast/utilities.go:GetExports
     pub(crate) fn ensure_binding_exports(
         &mut self,
         symbol: BindingSymbol<'scope>,
@@ -100,6 +102,8 @@ impl<'scope> Binder<'_, 'scope, '_> {
         self.set_binding_symbol_exports(symbol, Some(table));
         table
     }
+    // port: tsc/internal/ast/utilities.go:GetSymbolTable
+    // port: tsc/internal/ast/utilities.go:GetMembers
     pub(crate) fn ensure_binding_members(
         &mut self,
         symbol: BindingSymbol<'scope>,
@@ -122,6 +126,8 @@ impl<'scope> Binder<'_, 'scope, '_> {
             BindingNode::Checked(id) => tsr_ast::is_locals_container(&self.n(id)),
         }
     }
+    // port: tsc/internal/ast/utilities.go:GetSymbolTable
+    // port: tsc/internal/ast/utilities.go:GetLocals
     pub(crate) fn ensure_binding_locals(
         &mut self,
         node: BindingNode<'scope>,

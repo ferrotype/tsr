@@ -1,0 +1,457 @@
+{
+  "columns": [
+    {
+      "evidence": [
+        "internal/tsoptions/parsedcommandline.go:419",
+        "internal/execute/watcher.go:396",
+        "internal/project/configfileregistrybuilder.go:607"
+      ],
+      "id": "tsoptions.ParsedCommandLine.PossiblyMatchesDirectoryName",
+      "input": "config",
+      "operations": [
+        "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.PossiblyMatchesDirectoryName"
+      ],
+      "projection": "one bool per directory path of args, on the parsed tsconfig (wildcard directories computed in setup)",
+      "rust": "tsr_tsoptions::ParsedCommandLine::possibly_matches_directory_name (parsed_commandline_ext.rs)",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "args": [
+              "/p",
+              "/p/src",
+              "/p/src/deep",
+              "/p/src/deep/x/y",
+              "/p/lib",
+              "/p/lib/sub",
+              "/p/other",
+              "/p/Other",
+              "/p/tests",
+              "/p/srcx",
+              "/q",
+              "/",
+              "/p/src/",
+              ""
+            ],
+            "caseSensitive": true,
+            "currentDirectory": "/p",
+            "files": {
+              "/p/Other/d.ts": "",
+              "/p/lib/c.ts": "",
+              "/p/src/a.ts": "",
+              "/p/src/deep/b.ts": "",
+              "/p/tests/e.ts": ""
+            },
+            "jsonText": "{}"
+          },
+          "name": "default/cs"
+        },
+        {
+          "input": {
+            "args": [
+              "/p",
+              "/p/src",
+              "/p/src/deep",
+              "/p/src/deep/x/y",
+              "/p/lib",
+              "/p/lib/sub",
+              "/p/other",
+              "/p/Other",
+              "/p/tests",
+              "/p/srcx",
+              "/q",
+              "/",
+              "/p/src/",
+              ""
+            ],
+            "caseSensitive": false,
+            "currentDirectory": "/p",
+            "files": {
+              "/p/Other/d.ts": "",
+              "/p/lib/c.ts": "",
+              "/p/src/a.ts": "",
+              "/p/src/deep/b.ts": "",
+              "/p/tests/e.ts": ""
+            },
+            "jsonText": "{}"
+          },
+          "name": "default/ci"
+        },
+        {
+          "input": {
+            "args": [
+              "/p",
+              "/p/src",
+              "/p/src/deep",
+              "/p/src/deep/x/y",
+              "/p/lib",
+              "/p/lib/sub",
+              "/p/other",
+              "/p/Other",
+              "/p/tests",
+              "/p/srcx",
+              "/q",
+              "/",
+              "/p/src/",
+              ""
+            ],
+            "caseSensitive": true,
+            "currentDirectory": "/p",
+            "files": {
+              "/p/Other/d.ts": "",
+              "/p/lib/c.ts": "",
+              "/p/src/a.ts": "",
+              "/p/src/deep/b.ts": "",
+              "/p/tests/e.ts": ""
+            },
+            "jsonText": "{\"include\":[\"src/**/*\"]}"
+          },
+          "name": "include-recursive/cs"
+        },
+        {
+          "input": {
+            "args": [
+              "/p",
+              "/p/src",
+              "/p/src/deep",
+              "/p/src/deep/x/y",
+              "/p/lib",
+              "/p/lib/sub",
+              "/p/other",
+              "/p/Other",
+              "/p/tests",
+              "/p/srcx",
+              "/q",
+              "/",
+              "/p/src/",
+              ""
+            ],
+            "caseSensitive": false,
+            "currentDirectory": "/p",
+            "files": {
+              "/p/Other/d.ts": "",
+              "/p/lib/c.ts": "",
+              "/p/src/a.ts": "",
+              "/p/src/deep/b.ts": "",
+              "/p/tests/e.ts": ""
+            },
+            "jsonText": "{\"include\":[\"src/**/*\"]}"
+          },
+          "name": "include-recursive/ci"
+        },
+        {
+          "input": {
+            "args": [
+              "/p",
+              "/p/src",
+              "/p/src/deep",
+              "/p/src/deep/x/y",
+              "/p/lib",
+              "/p/lib/sub",
+              "/p/other",
+              "/p/Other",
+              "/p/tests",
+              "/p/srcx",
+              "/q",
+              "/",
+              "/p/src/",
+              ""
+            ],
+            "caseSensitive": true,
+            "currentDirectory": "/p",
+            "files": {
+              "/p/Other/d.ts": "",
+              "/p/lib/c.ts": "",
+              "/p/src/a.ts": "",
+              "/p/src/deep/b.ts": "",
+              "/p/tests/e.ts": ""
+            },
+            "jsonText": "{\"include\":[\"src/*\",\"lib/*.ts\"]}"
+          },
+          "name": "include-flat/cs"
+        },
+        {
+          "input": {
+            "args": [
+              "/p",
+              "/p/src",
+              "/p/src/deep",
+              "/p/src/deep/x/y",
+              "/p/lib",
+              "/p/lib/sub",
+              "/p/other",
+              "/p/Other",
+              "/p/tests",
+              "/p/srcx",
+              "/q",
+              "/",
+              "/p/src/",
+              ""
+            ],
+            "caseSensitive": false,
+            "currentDirectory": "/p",
+            "files": {
+              "/p/Other/d.ts": "",
+              "/p/lib/c.ts": "",
+              "/p/src/a.ts": "",
+              "/p/src/deep/b.ts": "",
+              "/p/tests/e.ts": ""
+            },
+            "jsonText": "{\"include\":[\"src/*\",\"lib/*.ts\"]}"
+          },
+          "name": "include-flat/ci"
+        },
+        {
+          "input": {
+            "args": [
+              "/p",
+              "/p/src",
+              "/p/src/deep",
+              "/p/src/deep/x/y",
+              "/p/lib",
+              "/p/lib/sub",
+              "/p/other",
+              "/p/Other",
+              "/p/tests",
+              "/p/srcx",
+              "/q",
+              "/",
+              "/p/src/",
+              ""
+            ],
+            "caseSensitive": true,
+            "currentDirectory": "/p",
+            "files": {
+              "/p/Other/d.ts": "",
+              "/p/lib/c.ts": "",
+              "/p/src/a.ts": "",
+              "/p/src/deep/b.ts": "",
+              "/p/tests/e.ts": ""
+            },
+            "jsonText": "{\"include\":[\"src/**/*\",\"lib/*\",\"Other/**/*\"],\"exclude\":[\"src/deep\"]}"
+          },
+          "name": "include-mixed-exclude/cs"
+        },
+        {
+          "input": {
+            "args": [
+              "/p",
+              "/p/src",
+              "/p/src/deep",
+              "/p/src/deep/x/y",
+              "/p/lib",
+              "/p/lib/sub",
+              "/p/other",
+              "/p/Other",
+              "/p/tests",
+              "/p/srcx",
+              "/q",
+              "/",
+              "/p/src/",
+              ""
+            ],
+            "caseSensitive": false,
+            "currentDirectory": "/p",
+            "files": {
+              "/p/Other/d.ts": "",
+              "/p/lib/c.ts": "",
+              "/p/src/a.ts": "",
+              "/p/src/deep/b.ts": "",
+              "/p/tests/e.ts": ""
+            },
+            "jsonText": "{\"include\":[\"src/**/*\",\"lib/*\",\"Other/**/*\"],\"exclude\":[\"src/deep\"]}"
+          },
+          "name": "include-mixed-exclude/ci"
+        },
+        {
+          "input": {
+            "args": [
+              "/p",
+              "/p/src",
+              "/p/src/deep",
+              "/p/src/deep/x/y",
+              "/p/lib",
+              "/p/lib/sub",
+              "/p/other",
+              "/p/Other",
+              "/p/tests",
+              "/p/srcx",
+              "/q",
+              "/",
+              "/p/src/",
+              ""
+            ],
+            "caseSensitive": true,
+            "currentDirectory": "/p",
+            "files": {
+              "/p/Other/d.ts": "",
+              "/p/lib/c.ts": "",
+              "/p/src/a.ts": "",
+              "/p/src/deep/b.ts": "",
+              "/p/tests/e.ts": ""
+            },
+            "jsonText": "{\"files\":[\"src/a.ts\"]}"
+          },
+          "name": "files-only/cs"
+        },
+        {
+          "input": {
+            "args": [
+              "/p",
+              "/p/src",
+              "/p/src/deep",
+              "/p/src/deep/x/y",
+              "/p/lib",
+              "/p/lib/sub",
+              "/p/other",
+              "/p/Other",
+              "/p/tests",
+              "/p/srcx",
+              "/q",
+              "/",
+              "/p/src/",
+              ""
+            ],
+            "caseSensitive": false,
+            "currentDirectory": "/p",
+            "files": {
+              "/p/Other/d.ts": "",
+              "/p/lib/c.ts": "",
+              "/p/src/a.ts": "",
+              "/p/src/deep/b.ts": "",
+              "/p/tests/e.ts": ""
+            },
+            "jsonText": "{\"files\":[\"src/a.ts\"]}"
+          },
+          "name": "files-only/ci"
+        },
+        {
+          "input": {
+            "args": [
+              "/p",
+              "/p/src",
+              "/p/src/deep",
+              "/p/src/deep/x/y",
+              "/p/lib",
+              "/p/lib/sub",
+              "/p/other",
+              "/p/Other",
+              "/p/tests",
+              "/p/srcx",
+              "/q",
+              "/",
+              "/p/src/",
+              ""
+            ],
+            "caseSensitive": true,
+            "currentDirectory": "/p",
+            "files": {
+              "/p/Other/d.ts": "",
+              "/p/lib/c.ts": "",
+              "/p/src/a.ts": "",
+              "/p/src/deep/b.ts": "",
+              "/p/tests/e.ts": ""
+            },
+            "jsonText": "{\"files\":[\"lib/c.ts\"],\"include\":[\"tests/**/*\"]}"
+          },
+          "name": "files-and-include/cs"
+        },
+        {
+          "input": {
+            "args": [
+              "/p",
+              "/p/src",
+              "/p/src/deep",
+              "/p/src/deep/x/y",
+              "/p/lib",
+              "/p/lib/sub",
+              "/p/other",
+              "/p/Other",
+              "/p/tests",
+              "/p/srcx",
+              "/q",
+              "/",
+              "/p/src/",
+              ""
+            ],
+            "caseSensitive": false,
+            "currentDirectory": "/p",
+            "files": {
+              "/p/Other/d.ts": "",
+              "/p/lib/c.ts": "",
+              "/p/src/a.ts": "",
+              "/p/src/deep/b.ts": "",
+              "/p/tests/e.ts": ""
+            },
+            "jsonText": "{\"files\":[\"lib/c.ts\"],\"include\":[\"tests/**/*\"]}"
+          },
+          "name": "files-and-include/ci"
+        },
+        {
+          "input": {
+            "args": [
+              "/p",
+              "/p/src",
+              "/p/src/deep",
+              "/p/src/deep/x/y",
+              "/p/lib",
+              "/p/lib/sub",
+              "/p/other",
+              "/p/Other",
+              "/p/tests",
+              "/p/srcx",
+              "/q",
+              "/",
+              "/p/src/",
+              ""
+            ],
+            "caseSensitive": true,
+            "currentDirectory": "/p",
+            "files": {
+              "/p/Other/d.ts": "",
+              "/p/lib/c.ts": "",
+              "/p/src/a.ts": "",
+              "/p/src/deep/b.ts": "",
+              "/p/tests/e.ts": ""
+            },
+            "jsonText": "{\"include\":[\"../q/**/*\"]}"
+          },
+          "name": "outside/cs"
+        },
+        {
+          "input": {
+            "args": [
+              "/p",
+              "/p/src",
+              "/p/src/deep",
+              "/p/src/deep/x/y",
+              "/p/lib",
+              "/p/lib/sub",
+              "/p/other",
+              "/p/Other",
+              "/p/tests",
+              "/p/srcx",
+              "/q",
+              "/",
+              "/p/src/",
+              ""
+            ],
+            "caseSensitive": false,
+            "currentDirectory": "/p",
+            "files": {
+              "/p/Other/d.ts": "",
+              "/p/lib/c.ts": "",
+              "/p/src/a.ts": "",
+              "/p/src/deep/b.ts": "",
+              "/p/tests/e.ts": ""
+            },
+            "jsonText": "{\"include\":[\"../q/**/*\"]}"
+          },
+          "name": "outside/ci"
+        }
+      ]
+    }
+  ],
+  "group": "tsoptions",
+  "version": 1
+}

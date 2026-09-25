@@ -520,6 +520,62 @@
       },
       "scope": null,
       "subject": "bindDiagnostics"
+    },
+    {
+      "case": "syntax/diagnostics/import-chain-single-threaded",
+      "discriminates": "Roots z then a, where z imports b and b imports c, and every file has one parse error. The loader's single-threaded work group (fileloader.go:169, filesparser.go:264-278) is handed the two roots and must also run the tasks that parsing z and then b queue from inside a running task; a group that drains only what was queued before RunAndWait, or that drops or repeats a task, loses c or b from the file list or duplicates a diagnostic. GetSyntacticDiagnostics then collects all four files through a second single-threaded group (program.go:659) and sorts by file name. The file list records the load order and the diagnostics record that every task ran exactly once; the LIFO order of pop is not observable, because the parallel twin must give the same bytes.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics",
+      "order_sensitive": true,
+      "program": {
+        "case_sensitive": true,
+        "cwd": "/",
+        "files": {
+          "/a.ts": "let a = ;\n",
+          "/b.ts": "import { c } from \"./c\";\nexport const b = c;\nlet y = ;\n",
+          "/c.ts": "export const c = 1;\nlet w = ;\n",
+          "/z.ts": "import { b } from \"./b\";\nlet z = b;\nlet x = ;\n"
+        },
+        "options": {
+          "noEmit": true,
+          "noLib": true
+        },
+        "roots": [
+          "/z.ts",
+          "/a.ts"
+        ],
+        "single_threaded": true
+      },
+      "scope": null,
+      "subject": "syntacticDiagnostics"
+    },
+    {
+      "case": "syntax/diagnostics/import-chain-parallel",
+      "discriminates": "The same program built with single_threaded false, so the pinned loader uses core.NewWorkGroup(false): parallelWorkGroup.Queue starts every parse task on its own goroutine, including the ones queued from inside the running z and b tasks, and RunAndWait returns only when all of them are done. Its observation must equal the single-threaded twin byte for byte and the Rust sequential loader must match both, which makes the scheduling independence of the program result evidence rather than an assumption. A Queue that ran only the root tasks, or a RunAndWait that returned before the nested tasks finished, loses b or c.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics",
+      "order_sensitive": true,
+      "program": {
+        "case_sensitive": true,
+        "cwd": "/",
+        "files": {
+          "/a.ts": "let a = ;\n",
+          "/b.ts": "import { c } from \"./c\";\nexport const b = c;\nlet y = ;\n",
+          "/c.ts": "export const c = 1;\nlet w = ;\n",
+          "/z.ts": "import { b } from \"./b\";\nlet z = b;\nlet x = ;\n"
+        },
+        "options": {
+          "noEmit": true,
+          "noLib": true
+        },
+        "roots": [
+          "/z.ts",
+          "/a.ts"
+        ],
+        "single_threaded": false
+      },
+      "scope": null,
+      "subject": "syntacticDiagnostics"
     }
   ]
 }

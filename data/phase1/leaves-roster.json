@@ -1,36 +1,6 @@
 {
   "exemptions": [
     {
-      "category": "later_step",
-      "evidence": "These five exist to satisfy io/fs.FileInfo and fs.DirEntry, which upstream/tsc/internal/vfs/vfs.go:68 aliases as vfs.FileInfo. The only non-test readers of those members are the VFS layer itself -- upstream/tsc/internal/vfs/internal/internal.go:96 and :107 read Mode, upstream/tsc/internal/vfs/vfstest/vfstest.go:451 and :482 read Sys. crates/tsr_vfs/src/lib.rs:64-67 models FileInfo as { directory, size } only, so which of the remaining members the Rust trait must carry is a capability-matrix decision, which F2a's first task is to make. The two members the port does model, IsDir and Size, are covered here by leaves/bundled/wrapper-read-paths, and Name is reached by the walk case, so neither is exempted.",
-      "operation": "tsc/internal/bundled/embed.go:fileInfo.Info",
-      "owner": "F2a, which owns the filesystem capability matrix these io/fs obligations belong to"
-    },
-    {
-      "category": "later_step",
-      "evidence": "These five exist to satisfy io/fs.FileInfo and fs.DirEntry, which upstream/tsc/internal/vfs/vfs.go:68 aliases as vfs.FileInfo. The only non-test readers of those members are the VFS layer itself -- upstream/tsc/internal/vfs/internal/internal.go:96 and :107 read Mode, upstream/tsc/internal/vfs/vfstest/vfstest.go:451 and :482 read Sys. crates/tsr_vfs/src/lib.rs:64-67 models FileInfo as { directory, size } only, so which of the remaining members the Rust trait must carry is a capability-matrix decision, which F2a's first task is to make. The two members the port does model, IsDir and Size, are covered here by leaves/bundled/wrapper-read-paths, and Name is reached by the walk case, so neither is exempted. ModTime is in the same set; the only non-test reader of a vfs FileInfo's ModTime is the VFS layer itself. (A search for the bare member name also matches upstream/tsc/internal/diagnostics/generate.go:274, which sets a gzip.Writer's ModTime field and is unrelated.)",
-      "operation": "tsc/internal/bundled/embed.go:fileInfo.ModTime",
-      "owner": "F2a, which owns the filesystem capability matrix these io/fs obligations belong to"
-    },
-    {
-      "category": "later_step",
-      "evidence": "These five exist to satisfy io/fs.FileInfo and fs.DirEntry, which upstream/tsc/internal/vfs/vfs.go:68 aliases as vfs.FileInfo. The only non-test readers of those members are the VFS layer itself -- upstream/tsc/internal/vfs/internal/internal.go:96 and :107 read Mode, upstream/tsc/internal/vfs/vfstest/vfstest.go:451 and :482 read Sys. crates/tsr_vfs/src/lib.rs:64-67 models FileInfo as { directory, size } only, so which of the remaining members the Rust trait must carry is a capability-matrix decision, which F2a's first task is to make. The two members the port does model, IsDir and Size, are covered here by leaves/bundled/wrapper-read-paths, and Name is reached by the walk case, so neither is exempted.",
-      "operation": "tsc/internal/bundled/embed.go:fileInfo.Mode",
-      "owner": "F2a, which owns the filesystem capability matrix these io/fs obligations belong to"
-    },
-    {
-      "category": "later_step",
-      "evidence": "These five exist to satisfy io/fs.FileInfo and fs.DirEntry, which upstream/tsc/internal/vfs/vfs.go:68 aliases as vfs.FileInfo. The only non-test readers of those members are the VFS layer itself -- upstream/tsc/internal/vfs/internal/internal.go:96 and :107 read Mode, upstream/tsc/internal/vfs/vfstest/vfstest.go:451 and :482 read Sys. crates/tsr_vfs/src/lib.rs:64-67 models FileInfo as { directory, size } only, so which of the remaining members the Rust trait must carry is a capability-matrix decision, which F2a's first task is to make. The two members the port does model, IsDir and Size, are covered here by leaves/bundled/wrapper-read-paths, and Name is reached by the walk case, so neither is exempted.",
-      "operation": "tsc/internal/bundled/embed.go:fileInfo.Sys",
-      "owner": "F2a, which owns the filesystem capability matrix these io/fs obligations belong to"
-    },
-    {
-      "category": "later_step",
-      "evidence": "These five exist to satisfy io/fs.FileInfo and fs.DirEntry, which upstream/tsc/internal/vfs/vfs.go:68 aliases as vfs.FileInfo. The only non-test readers of those members are the VFS layer itself -- upstream/tsc/internal/vfs/internal/internal.go:96 and :107 read Mode, upstream/tsc/internal/vfs/vfstest/vfstest.go:451 and :482 read Sys. crates/tsr_vfs/src/lib.rs:64-67 models FileInfo as { directory, size } only, so which of the remaining members the Rust trait must carry is a capability-matrix decision, which F2a's first task is to make. The two members the port does model, IsDir and Size, are covered here by leaves/bundled/wrapper-read-paths, and Name is reached by the walk case, so neither is exempted.",
-      "operation": "tsc/internal/bundled/embed.go:fileInfo.Type",
-      "owner": "F2a, which owns the filesystem capability matrix these io/fs obligations belong to"
-    },
-    {
       "category": "build_tooling",
       "evidence": "upstream/tsc/internal/bundled/generate.go:44-82, in the \"//go:build ignore\" file (generate.go:1). It emits the //go:embed directives (line 58: 'code.WriteString(\"//go:embed libs/\" + lib + \"\\n\")'), the embeddedContents map (line 64) and libsEntries (line 70), then writeCode(\"embed_generated.go\", ...) at line 81. It runs only under `go generate`. || RUST: Rust needs no emitter: crates/tsr_bundled/src/lib.rs:8 embeds each asset directly with include_bytes!(\"../bundled/libs/lib.d.ts\"), and the map role of embeddedContents is taken by library() at lib.rs:438-442 (binary_search_by over LIBRARIES) while libsEntries' role is taken by BundledFs::entries at lib.rs:495-511. scripts/package_assets.py:74-77 re-derives the include list from lib.rs and raises \"bundled include inventory differs from pinned upstream\" if it is not exactly the pinned set.",
       "operation": "tsc/internal/bundled/generate.go:generateEmbedded",
@@ -463,10 +433,10 @@
       "owner": "F2a (internal/vfs/osvfs), the only non-test caller"
     },
     {
-      "category": "later_step",
-      "evidence": "`grep -rn core.NewLimitedSemaphore --include=*.go upstream/tsc` outside internal/core matches internal/vfs/osvfs and nothing else. The filesystem step prepares that package and its concurrency limit, so it owns whatever of the semaphore is observable through it.",
+      "category": "unused_at_pin",
+      "evidence": "Reproduce: rg -n 'TryAcquire|core\\.Semaphore\\b' upstream/tsc --glob '*.go'. The only interface satisfaction is the compile-time assertion var _ Semaphore = (*LimitedSemaphore)(nil) at semaphore.go:22. UnlimitedSemaphore.TryAcquire is already exempt as go_runtime in leaves-roster.json.",
       "operation": "tsc/internal/core/semaphore.go:LimitedSemaphore.TryAcquire",
-      "owner": "F2a (internal/vfs/osvfs), the only non-test caller"
+      "owner": "nobody at this pin; the first caller a later pin adds fixes the contract"
     },
     {
       "category": "later_step",
@@ -619,22 +589,22 @@
       "owner": "xtask/src/gen/diagnostics.rs::emit, driven by xtask/src/gen/mod.rs::outputs; the pinned-side input is produced by scripts/s03.py:261-262."
     },
     {
-      "category": "later_step",
-      "evidence": "upstream/tsc/internal/diagnostics/generate.go:176 `func generateLocalizations(knownKeys map[string]bool, locDir string) *bytes.Buffer`. It globs the pinned LCL tree (:201), writes one gzip file per locale (:280-283 `os.WriteFile(outputPath, compressed.Bytes(), 0o644)`), and emits loc_generated.go's `var matcher = language.NewMatcher(...)` (:299), `var localeFuncs = []func() map[Key]string{` (:308), `loadLocaleData` (:318) and the `//go:embed loc/%s` vars (:334-339). main writes the result at generate.go:129. Build time only: generate.go:1 `//go:build ignore`, :3 `package main`. || RUST: Absent, and recorded as absent. crates/tsr_diagnostics/src/ contains only lib.rs and generated.rs \u2014 there is no localize.rs, no matcher, no embedded locale data, and no gzip/locale table anywhere in the crate. data/phase1/locale-assets.json `generator_extension_status` states `\"state\": \"absent\"`, `\"lands_in\": \"F1b\"`, `\"today\": \"xtask/src/gen/diagnostics.rs generates the English message identities only (crates/tsr_diagnostics/src/generated.rs); it emits no locale tables, no matcher and no selection code.\"` \u2014 consistent with what I read in xtask/src/gen/diagnostics.rs, whose only output path is crates/tsr_diagnostics/src/generated.rs (:95). || ADVERSARIAL RULING: The category fails its own definition. scripts/phase1_scope.py:439 defines build_tooling as 'runs at build time and never in a compile; the port generates the same artifact elsewhere' \u2014 and the claim's own evidence proves the second half false: data/phase1/locale-assets.json `generator_extension_status` records `\"state\": \"absent\"`, `\"lands_in\": \"F1b\"`, and 'xtask/src/gen/diagnostics.rs ... emits n",
+      "category": "build_tooling",
+      "evidence": "Sibling functions of the same file (convertPropertyName, generateDiagnostics, readRawMessages) are already build_tooling in leaves-roster.json. The roster entry's own owner text for main already names the xtask gen driver and scripts/s03.py prepare(). The later_step owner for generateLocalizations/readLocalizedMessages cited data/phase1/locale-assets.json generator_extension_status {state: absent\u2026",
       "operation": "tsc/internal/diagnostics/generate.go:generateLocalizations",
-      "owner": "xtask/src/gen/diagnostics.rs, whose localization extension is recorded as landing in F1b (data/phase1/locale-assets.json `generator_extension` / `generator_extension_status`). The runtime consequence of its absence is already frozen as F1a gaps rather than hidden: leaves/diagnostics/localize-table-coverage, localize-shipped-tables, localize-fallback-choice and localize-cache-repeat all carry `last_result: \"not_implemented\"` in data/phase1/cases.json, and tools/phase1/leaves/src/diagnostics.rs's `diagnostics.table` MISSING row names the missing table set explicitly."
+      "owner": "tools/s03/diagnostics-export_test.go exportLocales + xtask/src/gen/diagnostics.rs; cargo xtask gen --verify checks drift"
     },
     {
-      "category": "later_step",
-      "evidence": "upstream/tsc/internal/diagnostics/generate.go:71 `func main()`, in a file headed `//go:build ignore` (:1) and `package main` (:3). Its whole body is generator plumbing: `flag.String(\"diagnostics\", ...)`/`flag.String(\"loc\", ...)`/`flag.String(\"locdir\", ...)` (:74-76), `readRawMessages` (:81,:88), `generateDiagnostics` (:106), `format.Source` (:108), `os.WriteFile(*diagnosticsOutput, ...)` (:116) and `os.WriteFile(*locOutput, ...)` (:129). It is reached only through the `//go:generate go run generate.go -diagnostics ./diagnostics_generated.go -loc ./loc_generated.go -locdir ./loc` directive at diagnostics.go:16. || RUST: No crates/ counterpart, and none should exist. The entry-point counterpart is the xtask generation driver: xtask/src/gen/mod.rs:80 `fn outputs(root: &Path, stage: &Path, pin: &str)`, which reads each staged export and dispatches at :86 `\"diagnostics\" => diagnostics::emit(&value, pin)?`, then rustfmts and writes the files. ts-rust never runs generate.go's `main`: the export adapter calls the two helper functions directly (tools/s03/diagnostics-export_test.go:36-38, :46) after scripts/s03.py:262 compiles generate.go beside it. || ADVERSARIAL RULING: The owner is overstated: it covers only half of what main produces. main writes two artifacts \u2014 diagnostics_generated.go at generate.go:117 and loc_generated.go at :131 (plus the loc/*.json.gz tree) \u2014 and neither named owner produces the second. xtask/src/gen/mod.rs:79-86 dispatches to diagnostics::emit whose only output path is crates/tsr_diagnostics/src/generated.rs (xtask/src/gen/diagnostics.rs",
+      "category": "build_tooling",
+      "evidence": "Sibling functions of the same file (convertPropertyName, generateDiagnostics, readRawMessages) are already build_tooling in leaves-roster.json. The roster entry's own owner text for main already names the xtask gen driver and scripts/s03.py prepare(). The later_step owner for generateLocalizations/readLocalizedMessages cited data/phase1/locale-assets.json generator_extension_status {state: absent\u2026",
       "operation": "tsc/internal/diagnostics/generate.go:main",
-      "owner": "xtask/src/gen/mod.rs::outputs (the `cargo xtask gen` driver) on the Rust side; scripts/s03.py `prepare()` on the pinned side."
+      "owner": "tools/s03/diagnostics-export_test.go exportLocales + xtask/src/gen/diagnostics.rs; cargo xtask gen --verify checks drift"
     },
     {
-      "category": "later_step",
-      "evidence": "upstream/tsc/internal/diagnostics/generate.go:364 `func readLocalizedMessages(p string) (map[string]string, string)`. It opens an LCL file, `xml.NewDecoder(file).Decode(&lcx)` (:371), walks the nested `Item` structure and strips the leading semicolon from each ItemId (:383 `itemId := strings.TrimPrefix(item.ItemId, \";\")`), preferring `item.Str.Tgt.Val` over `item.Str.Val` (:387-391). Its only caller is generateLocalizations at generate.go:222 `localizedMessages, tgtCul := readLocalizedMessages(localeFile)`. Build time only (generate.go:1 `//go:build ignore`). || RUST: Absent. There is no XML or .lcl reader in the Rust port: crates/tsr_diagnostics/src/ holds only lib.rs and generated.rs, and a repo-wide grep for `quick-xml`/`roxmltree`/`lcl` over crates/ returns only incidental substring hits in generated AST tables, formatter rules and two bundled lib.d.ts files \u2014 no XML parser dependency and no localization input reader. data/phase1/locale-assets.json `generator_extension_status.state` is `\"absent\"` and `rust_status.planned_homes` lists `crates/tsr_diagnostics/src/localize.rs (absent)`. || ADVERSARIAL RULING: Same failure as generateLocalizations, and the claim concedes the disqualifying fact: 'Absent. There is no XML or .lcl reader in the Rust port.' build_tooling requires that 'the port generates the same artifact elsewhere' (scripts/phase1_scope.py:439); nothing does. The contract is real and must be reproduced by the named later step, not waived: generate.go:364-406 walks the nested LCX/RootItem/St",
+      "category": "build_tooling",
+      "evidence": "Sibling functions of the same file (convertPropertyName, generateDiagnostics, readRawMessages) are already build_tooling in leaves-roster.json. The roster entry's own owner text for main already names the xtask gen driver and scripts/s03.py prepare(). The later_step owner for generateLocalizations/readLocalizedMessages cited data/phase1/locale-assets.json generator_extension_status {state: absent\u2026",
       "operation": "tsc/internal/diagnostics/generate.go:readLocalizedMessages",
-      "owner": "Same owner as generateLocalizations, whose only caller it is: xtask/src/gen/diagnostics.rs's localization extension, recorded as landing in F1b (data/phase1/locale-assets.json). The pinned LCL tree is inventoried instead at data/phase1/locale-assets.json (13 tables with source, hash and key count)."
+      "owner": "tools/s03/diagnostics-export_test.go exportLocales + xtask/src/gen/diagnostics.rs; cargo xtask gen --verify checks drift"
     },
     {
       "category": "build_tooling",

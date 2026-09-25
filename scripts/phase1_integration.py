@@ -59,12 +59,14 @@ RUST_WITNESS_TESTS = {
     "witness/nativepath-raw-eintr-retry": (
         ["cargo", "test", "--locked", "-p", "tsr_vfs", "--lib", "os::native::tests::interrupted_syscalls_retry_but_other_and_wrapped_errors_return_once", "--", "--exact"],
         ["os::native::tests::interrupted_syscalls_retry_but_other_and_wrapped_errors_return_once"]),
-    "f5b/native-navigation-rescan": (
-        ["cargo", "test", "--locked", "-p", "tsr_astnav", "--lib", "tests::jsx_shift_rescan_matches_the_pinned_private_operation", "--", "--exact"],
-        ["tests::jsx_shift_rescan_matches_the_pinned_private_operation"]),
     "witness/s08-p5-errors-rust": (
         ["cargo", "test", "--locked", "-p", "tsr_compiler", "--test", "diagnostic_writer", "native_plain_pretty_and_error_baseline_bytes_match", "--", "--exact"],
         ["native_plain_pretty_and_error_baseline_bytes_match"]),
+    # Every Kind from -1 through KindCount+1, frozen from the pinned parser
+    # package by tools/phase1/parser-tokens/observe.py.
+    "witness/parser-keyword-or-punctuation": (
+        ["cargo", "test", "--locked", "-p", "tsr_parser", "--lib", "tokens::tests::keyword_or_punctuation_matches_the_pinned_kind_table", "--", "--exact"],
+        ["tokens::tests::keyword_or_punctuation_matches_the_pinned_kind_table"]),
 }
 
 
@@ -392,7 +394,10 @@ RECEIPT_INPUTS = {
                              "rustfmt.toml", "PORTS.toml"),
                    "crate_manifests": True},
     "rust-witnesses": {"packages": tuple(sorted({command[command.index("-p") + 1]
-                                                 for command, _ in RUST_WITNESS_TESTS.values()}))},
+                                                 for command, _ in RUST_WITNESS_TESTS.values()})),
+                       # The keyword table's pinned-Go overlay, requests and frozen
+                       # rows: the tsr_parser table is generated from them.
+                       "directories": ("tools/phase1/parser-tokens",)},
     "localized-config-diagnostics": {"packages": ("tsr_compiler",), "families": ("config",)},
     "installed-generated-assets": {"files": ("tools/packaging/packages.json", "tools/packaging/consumer.rs",
                                              "tools/s10/toolchains.json", "LICENSE", "NOTICE",

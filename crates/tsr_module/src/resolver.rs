@@ -669,7 +669,7 @@ impl Resolver {
                 } else {
                     &selected[candidate.len() + 1..]
                 };
-                trace!(self,diagnostics::X_package_json_has_a_typesVersions_entry_0_that_matches_compiler_version_1_looking_for_a_pattern_to_match_module_name_2,version,b"7.1.0-dev",module_name);
+                trace!(self,diagnostics::X_package_json_has_a_typesVersions_entry_0_that_matches_compiler_version_1_looking_for_a_pattern_to_match_module_name_2,version,tsr_core::version(),module_name);
                 if let Some(result) = self.paths_using(
                     module_name,
                     candidate,

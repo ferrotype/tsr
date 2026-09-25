@@ -29,16 +29,8 @@ impl ProgramCheckerHost {
         &self.program
     }
 
-    fn to_path(&self, file_name: &[u8]) -> tsr_jsstring::JsString {
-        path::to_path(
-            file_name,
-            self.program.current_directory(),
-            self.program.host().use_case_sensitive_file_names(),
-        )
-    }
-
     fn file(&self, file_name: &[u8]) -> Option<&ProgramFile> {
-        self.program.file(self.to_path(file_name).as_bytes())
+        self.program.source_file(file_name)
     }
 
     fn required_file(&self, file_name: &[u8]) -> Result<&ProgramFile, Error> {
@@ -75,12 +67,10 @@ impl ProgramCheckerHost {
 }
 
 impl CheckerHost for ProgramCheckerHost {
-    // port: tsc/internal/compiler/program.go:Program.Options
     fn options(&self) -> &CompilerOptions {
         self.program.options()
     }
 
-    // port: tsc/internal/compiler/program.go:Program.SourceFiles
     fn source_file_count(&self) -> usize {
         self.program.files().len()
     }
@@ -94,7 +84,6 @@ impl CheckerHost for ProgramCheckerHost {
         self.program.host().file_exists(file_name)
     }
 
-    // port: tsc/internal/compiler/program.go:Program.GetSourceFile
     fn get_source_file(&self, file_name: &[u8]) -> Option<&CompletedFile> {
         self.file(file_name).map(ProgramFile::bound)
     }
@@ -138,15 +127,13 @@ impl CheckerHost for ProgramCheckerHost {
         )?)
     }
 
-    // port: tsc/internal/compiler/program.go:Program.GetImpliedNodeFormatForEmit
     fn get_implied_node_format_for_emit(&self, file_name: &[u8]) -> Result<ModuleKind, Error> {
         let file = self.required_file(file_name)?;
         let source = file.bound().view().source_file()?;
-        Ok(metadata::implied_for_emit(
-            source.parse_options().file_name.as_bytes(),
-            self.file_options(file)?.emit_module_kind(),
-            self.file_metadata(file)?,
-        ))
+        let parse = source.parse_options();
+        Ok(self
+            .program
+            .implied_node_format_for_emit(parse.path.as_bytes(), parse.file_name.as_bytes()))
     }
 
     // port: tsc/internal/compiler/program.go:Program.GetModeForUsageLocation
@@ -189,28 +176,17 @@ impl CheckerHost for ProgramCheckerHost {
         ))
     }
 
-    // port: tsc/internal/compiler/fileloader.go:getDefaultResolutionModeForFile
     fn get_default_resolution_mode_for_file(
         &self,
         file_name: &[u8],
     ) -> Result<ResolutionMode, Error> {
         let file = self.required_file(file_name)?;
-        let options = self.file_options(file)?;
-        let resolution = options.module_resolution_kind();
-        if (tsr_core::ModuleResolutionKind::NODE16..=tsr_core::ModuleResolutionKind::NODE_NEXT)
-            .contains(&resolution)
-            || options.resolve_package_json_exports()
-            || options.resolve_package_json_imports()
-        {
-            let source = file.bound().view().source_file()?;
-            Ok(metadata::implied_for_emit(
-                source.parse_options().file_name.as_bytes(),
-                options.emit_module_kind(),
-                self.file_metadata(file)?,
-            ))
-        } else {
-            Ok(ModuleKind::NONE)
-        }
+        let source = file.bound().view().source_file()?;
+        Ok(metadata::default_resolution_mode_for_file(
+            source.parse_options().file_name.as_bytes(),
+            self.file_metadata(file)?,
+            self.file_options(file)?,
+        ))
     }
 
     // port: tsc/internal/compiler/program.go:Program.GetResolvedModule
@@ -290,7 +266,6 @@ impl CheckerHost for ProgramCheckerHost {
         )?)
     }
 
-    // port: tsc/internal/compiler/program.go:Program.IsSourceFileDefaultLibrary
     fn is_source_file_default_library(&self, path: &[u8]) -> bool {
         self.program.is_lib(path)
     }
@@ -317,7 +292,7 @@ impl CheckerHost for ProgramCheckerHost {
     ) -> Result<Option<&ParsedCommandLine>, Error> {
         Ok(self
             .program
-            .project_reference_from_output_dts(self.to_path(path).as_bytes()))
+            .project_reference_from_output_dts(self.program.to_path(path).as_bytes()))
     }
 
     // port: tsc/internal/compiler/program.go:Program.GetProjectReferenceFromSource
@@ -327,7 +302,7 @@ impl CheckerHost for ProgramCheckerHost {
     ) -> Result<Option<&ParsedCommandLine>, Error> {
         Ok(self
             .program
-            .project_reference_from_source(self.to_path(path).as_bytes()))
+            .project_reference_from_source(self.program.to_path(path).as_bytes()))
     }
 
     fn get_module_specifier_paths(
@@ -406,14 +381,12 @@ impl CheckerHost for ProgramCheckerHost {
         }
     }
 
-    // port: tsc/internal/compiler/program.go:Program.GetCurrentDirectory
     fn get_current_directory(&self) -> &[u8] {
         self.program.current_directory()
     }
 
-    // port: tsc/internal/compiler/program.go:Program.UseCaseSensitiveFileNames
     fn use_case_sensitive_file_names(&self) -> bool {
-        self.program.host().use_case_sensitive_file_names()
+        self.program.use_case_sensitive_file_names()
     }
 }
 

@@ -129,6 +129,12 @@ impl<'scope> Binder<'_, 'scope, '_> {
         let symbol = symbol.map(|symbol| self.symbol_id(symbol));
         self.set_node_symbol(node, symbol);
     }
+    // The binder's only local-symbol write (declare_module_member, as
+    // binder.go:413 writes through ExportableData). A node it never writes
+    // reads back None, where Node.LocalSymbol reads nil; that nil is also what
+    // NodeDefault.ExportableData gives every payload without ExportableBase.
+    // port: tsc/internal/ast/ast.go:Node.ExportableData
+    // port: tsc/internal/ast/ast.go:ExportableBase.ExportableData
     pub(crate) fn set_binding_node_local_symbol(
         &mut self,
         node: BindingNode<'scope>,

@@ -46,6 +46,7 @@ impl<'scope> Binder<'_, 'scope, '_> {
     }
     // port: tsc/internal/binder/binder.go:Binder.addDiagnostic
     pub fn add_diagnostic(&mut self, diagnostic: Diagnostic) {
+        // port: tsc/internal/ast/ast.go:SourceFile.SetBindDiagnostics
         self.builder.diagnostics_mut().push(diagnostic);
     }
     // port: tsc/internal/binder/binder.go:Binder.checkContextualIdentifier

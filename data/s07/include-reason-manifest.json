@@ -1,17 +1,17 @@
 {
   "adapters": {
-    "tools/s07/include-reason/export_test.go": "365f69826ca1b29515b0860016e2bc20f612df81b8ca650b70d34b5fdf435f96",
+    "tools/s07/include-reason/export_test.go": "6da1ca7fbd012dba72e64a290f47760cc2b613ffb3184e81b38f7ef83c278924",
     "tools/s07/include-reason/specs_bridge.go": "7812a8a2c1db03517aed83307cb3d636f71925d05181c8394441414d666e6b89",
     "tools/s07/program/export_test.go": "881a36d2094efca8752e49067f039afdd89be3ae0b8443f488b612ae0c00dbc8"
   },
   "merge_observations_sha256": "f9ecb76ef7882b417d40a49a3b754c1aa4f49ee9c21f66d1dfbbc71eb9bb02e4",
   "merge_requests_sha256": "8f40dac0ac75750d8e7adaf617fa50337b730950ee79fbf1f6fa9d50681244e8",
   "merge_rows": 4,
-  "observations_sha256": "21916ad453e81a16f9245a97f400355dfa24ca398b0cc4dee3ec8bf85c387c29",
+  "observations_sha256": "b0ed19ebd64ab6ec06bb3f5976f6a37cb7270f0a87ef790fae48863e146a613c",
   "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
-  "queries": 37,
-  "requests_sha256": "f680945057fec092b0f1aba3afdd4bd55481eb730b857a13f3f1bb63eb5b88f3",
-  "rows": 30,
+  "queries": 53,
+  "requests_sha256": "3f909b5b8d865c9b55ac85fbd64960b6c76f03fddaa593c597b3aecc8a067a56",
+  "rows": 45,
   "scope": "Actual pinned inclusion helpers; config matching metadata and duplicate reason identities are explicitly constructed, not config-parser evidence.",
   "sources": {
     "tsc/internal/ast/diagnostic.go": "e7a3a521d0991a4880220d8114be20c411ddb9645ae11d4e1673bf1ab9889f38",

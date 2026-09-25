@@ -5,7 +5,7 @@ edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 publish = false
-description = "Phase 1 mutation witnesses: runs the E1 and binder oracles in process with one active mutant at a time"
+description = "Phase 1 mutation witnesses: runs the E1, binder, facts and table oracles in process with one active mutant at a time"
 
 # The observers are the S06 E1 and S07 binder example observers, reused verbatim
 # (see src/e1.rs and src/binder.rs), so this crate needs their dependency set.
@@ -23,6 +23,14 @@ tsr_core = { version = "0.1.0", path = "../../../../crates/tsr_core" }
 tsr_encoder = { version = "0.1.0", path = "../../../../crates/tsr_encoder" }
 tsr_jsstring = { version = "0.1.0", path = "../../../../crates/tsr_jsstring" }
 tsr_parser = { version = "0.1.0", path = "../../../../crates/tsr_parser" }
+# The operation-table columns (src/table): the crates the table groups port
+# into and the setups they share (tsoptions configs over a memory file system).
+tsr_diagnostics = { version = "0.1.0", path = "../../../../crates/tsr_diagnostics" }
+tsr_locale = { version = "0.1.0", path = "../../../../crates/tsr_locale" }
+tsr_scanner = { version = "0.1.0", path = "../../../../crates/tsr_scanner" }
+tsr_tsoptions = { version = "0.1.0", path = "../../../../crates/tsr_tsoptions" }
+tsr_tspath = { version = "0.1.0", path = "../../../../crates/tsr_tspath" }
+tsr_vfs = { version = "0.1.0", path = "../../../../crates/tsr_vfs" }
 
 [lints]
 workspace = true

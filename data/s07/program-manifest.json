@@ -1,8 +1,8 @@
 {
   "adapter_sha256": "881a36d2094efca8752e49067f039afdd89be3ae0b8443f488b612ae0c00dbc8",
-  "observations_sha256": "41f920f6a7acc168a643771ad1f44c0a0957fbc63895f66deee747dc897e8e60",
-  "requests_sha256": "932fe5b441ac5af0a63da7a78293c60cd1ce1df86950faea119ad3ce02b1e12b",
-  "rows": 48,
+  "observations_sha256": "b4232adf36054ba190f4dd588d05b3c4282ec6a47286ce49db8d7d1de110cb97",
+  "requests_sha256": "fca826f79efec1d57f42b62f8930ed1677b86376750ca26273ca89ef2fbf5135",
+  "rows": 72,
   "source_sha256": {
     "tsc/internal/compiler/checkerpool.go": "149ee8eec37c7eade3fbdeabcca6489b23d3e100da91e06f2754231afc52c018",
     "tsc/internal/compiler/emitHost.go": "8124a823366537c972bd93c36fc58afb47aa71c003193f8cf78cd5b32c46e882",

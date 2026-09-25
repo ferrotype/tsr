@@ -345,7 +345,7 @@ pub fn global_typings_cache_location() -> Vec<u8> {
             } else {
                 b"typescript"
             },
-            b"7.1",
+            tsr_core::version_major_minor().as_bytes(),
         ],
     )
 }

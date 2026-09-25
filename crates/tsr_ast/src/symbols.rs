@@ -252,21 +252,21 @@ pub fn is_ambient_module_symbol_name(name: &[u8]) -> bool {
 pub use crate::symbol_tables::{
     SymbolTable, SymbolTableId, SymbolTableMut, SymbolTableRead, SymbolTables,
 };
-// port: tsc/internal/ast/utilities.go:GetSymbolTable
+// The binder allocates its tables through `ensure_binding_*` in tsr_binder,
+// which carry the GetSymbolTable/GetMembers/GetExports markers; these
+// storage-level helpers have no production caller.
 pub fn get_symbol_table<'a>(
     tables: &'a mut SymbolTables,
     id: &mut Option<SymbolTableId>,
 ) -> Result<SymbolTableMut<'a>, Error> {
     tables.get_or_create(id)
 }
-// port: tsc/internal/ast/utilities.go:GetMembers
 pub fn get_members<'a>(
     symbol: &mut Symbol,
     tables: &'a mut SymbolTables,
 ) -> Result<SymbolTableMut<'a>, Error> {
     get_symbol_table(tables, &mut symbol.members)
 }
-// port: tsc/internal/ast/utilities.go:GetExports
 pub fn get_exports<'a>(
     symbol: &mut Symbol,
     tables: &'a mut SymbolTables,

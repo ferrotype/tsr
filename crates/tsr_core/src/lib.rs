@@ -219,3 +219,16 @@ mod ranges;
 pub mod slices;
 
 pub mod semaphore;
+
+// Phase 1 operation-table groups core and concurrency
+// (docs/PHASE1-mutation-witnesses.md, section 9).
+pub mod bfs;
+pub mod context;
+pub mod linkstore;
+pub mod slices_ext;
+pub mod stack;
+pub mod text_change_ext;
+pub mod workgroup;
+
+mod version;
+pub use version::{version, version_major_minor};

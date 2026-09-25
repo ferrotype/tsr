@@ -1,0 +1,24 @@
+{
+  "columns": [
+    {
+      "evidence": [
+        "internal/checker/checker.go:16778",
+        "internal/checker/checker.go:32131",
+        "internal/checker/nodecopy.go:373",
+        "internal/ast/utilities.go:1320",
+        "internal/ast/utilities.go:4534"
+      ],
+      "id": "ast.IsDeclarationName",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsDeclarationName"
+      ],
+      "projection": "document-order indices of the nodes where IsDeclarationName is true (every other node is false)",
+      "rust": "tsr_ast::utilities_positions::is_declaration_name",
+      "survey": true,
+      "synthetic": []
+    }
+  ],
+  "group": "positions",
+  "version": 1
+}

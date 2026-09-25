@@ -24,6 +24,7 @@ import phase1_coverage as coverage  # noqa: E402
 import phase1_integration as integration  # noqa: E402
 import phase1_producers as producers  # noqa: E402
 import phase1_scope as scope  # noqa: E402
+import phase1_tables  # noqa: E402
 
 PIN = "0" * 40
 OP_A = "tsc/internal/parser/parser.go:Parser.parseA"
@@ -136,6 +137,8 @@ class Campaign:
         self.homes = True
         self.bindings = {oracle: bindings(oracle) for oracle in ORACLES}
         self.headers = {oracle: {} for oracle in ORACLES}
+        # oracle -> extra native-freeze header fields.
+        self.native_headers: dict[str, dict] = {oracle: {} for oracle in ORACLES}
         self.reach = {oracle: {OP_A: [0, 1], OP_B: [1], OP_C: [2], OP_D: [0], OP_ARM: [3], OP_E: [2], OP_F: [1],
                                OP_POOL: [0, 1]} for oracle in ORACLES}
         self.write_sources(FAKE_SOURCE, OTHER_SOURCE)
@@ -174,6 +177,17 @@ class Campaign:
         path = self.root / relative
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(data)
+
+    def write_specs(self, claims: dict[str, list[str]], extra: dict | None = None) -> dict[str, str]:
+        """Table specs with every `claims` column (and its operations) in one group; their digests."""
+        specs = {}
+        for group in phase1_tables.GROUPS:
+            relative = f"{phase1_tables.SPEC_DIRECTORY}/{group}.json"
+            columns = [{"id": column, "operations": ops} for column, ops in claims.items()] if group == "class" else []
+            data = json.dumps({"columns": columns, **(extra or {})}).encode()
+            self.write(relative, data)
+            specs[relative] = sha(data)
+        return specs
 
     def write_sources(self, fake: str, other: str) -> None:
         self.write(FAKE, fake.encode())
@@ -266,7 +280,7 @@ class Campaign:
 
     def native(self, oracle: str) -> dict:
         return {"version": 1, "oracle": oracle, "pin": PIN, "go_version": "go1.27.1", "stages": list(STAGES[oracle]),
-                "oracle_sources": self.bindings[oracle]["oracle_sources"],
+                "oracle_sources": self.bindings[oracle]["oracle_sources"], **self.native_headers[oracle],
                 "rows": [{"row": row, "request_sha256": request(row),
                           "outcomes": dict.fromkeys(STAGES[oracle], "ok"), "digests": digests(oracle, row)}
                          for row in self.rows]}
@@ -611,7 +625,7 @@ TABLE = copy.deepcopy(scope.MUTATION_ORACLES)
 
 class OracleTableTests(unittest.TestCase):
     def test_every_oracle_names_a_committed_inventory_of_unique_rows(self):
-        self.assertEqual(sorted(TABLE), ["binder", "e1", "facts", "syntax"])
+        self.assertEqual(sorted(TABLE), ["binder", "e1", "facts", "syntax", "table"])
         for oracle, spec in TABLE.items():
             with self.subTest(oracle=oracle):
                 inventory = json.loads((ROOT / spec["inventory"]).read_text())
@@ -626,6 +640,208 @@ class OracleTableTests(unittest.TestCase):
         self.assertEqual([row["id"] for row in schedule["rows"] if row["load"] == "loaded"],
                          json.loads((ROOT / "data/phase1/syntax-cases.json").read_text()))
         self.assertEqual(TABLE["facts"], TABLE["e1"])
+        # The table inventory names each row's column; the column rules read it.
+        self.assertEqual(TABLE["table"]["column"], "column")
+        inventory = json.loads((ROOT / TABLE["table"]["inventory"]).read_text())
+        self.assertTrue(all(isinstance(row.get("column"), str) for row in inventory["requests"]))
+        self.assertEqual(scope.MUTATION_COLUMN_ORACLES, ("table",))
+        self.assertFalse(hasattr(scope, "MUTATION_ONE_HOME_ORACLES"), "rule 7 follows the operation, not the oracle")
+
+
+class TableRuleTests(MutationFixture):
+    """The operation-table rules, with the fixture's e1 oracle standing in for the table oracle.
+
+    Column parity: a kill on a row of column C credits only while every
+    inventory row of C matched native in the campaign's base trace, as the
+    results record it. One home: no home of a claimed operation is excused.
+    """
+
+    COLUMNS = {"r0": "c0", "r1": "c1", "r2": "c2", "r3": "c3"}
+
+    def setUp(self):
+        super().setUp()
+        for patcher in (patch.dict(scope.MUTATION_ORACLES["e1"], column="column"),
+                        patch.object(scope, "MUTATION_COLUMN_ORACLES", ("e1",))):
+            patcher.start()
+            self.addCleanup(patcher.stop)
+
+    def columns(self, parity=None, inventory=None, claims=None):
+        """A campaign of the columns: specs whose columns claim `claims` (default: nothing), the column
+        inventory and native freeze selected from them, and results carrying `parity` (default: every
+        column at parity) with the claims of the inventory's columns as their one-home operations."""
+        column_of = self.COLUMNS if inventory is None else inventory
+        names = sorted(set(column_of.values()) - {None})
+        claims = {column: [] for column in names} if claims is None else claims
+        specs = self.campaign.write_specs(claims)
+        self.campaign.native_headers["e1"] = {"request_inventory": {"specs": specs}}
+        self.campaign.write_all()
+        self.select(specs, column_of)
+        if parity is None:
+            parity = {column: {"rows": 1, "base_match": 1, "mismatched": []} for column in names}
+        results = self.campaign.results()
+        results["columns"] = {"e1": parity}
+        results["one_home_operations"] = sorted({op for column in names for op in claims.get(column, ())})
+        self.campaign.write(scope.MUTATION_RESULTS, gzip.compress(json.dumps(results).encode(), mtime=0))
+
+    def select(self, specs, column_of=None):
+        """The column inventory, as selected from `specs`."""
+        column_of = self.COLUMNS if column_of is None else column_of
+        self.campaign.write("inventory/e1.json", json.dumps({"version": 1, "specs": specs, "requests": [
+            {"id": row, "request_sha256": request(row), "column": column_of[row]} for row in self.campaign.rows]}).encode())
+
+    def test_a_kill_credits_only_on_a_column_at_parity(self):
+        self.columns()
+        witness = self.bound()
+        broken = {column: {"rows": 1, "base_match": 1, "mismatched": []} for column in ("c0", "c2", "c3")}
+        broken["c1"] = {"rows": 1, "base_match": 0, "mismatched": ["r1"]}
+        self.columns(broken)
+        state = self.campaign.state(self.campaign.reforged(witness))
+        self.assertEqual(state["state"], "bound", state)
+        # kS (OP_B) and kF (OP_F) were killed on r1, the only row of c1.
+        self.assertEqual(sorted(state["stale_operations"]), sorted([OP_B, OP_F]))
+        self.assertIn("column parity", state["stale_operations"][OP_B])
+        self.assertEqual(state["operations"], sorted({OP_A, OP_D, OP_ARM, OP_E}))
+        with self.assertRaisesRegex(ValueError, "column parity"):
+            self.campaign.record(self.campaign.declaration([OP_B], ["kS"]))
+
+    def test_parity_must_cover_the_inventory_rows_of_the_column(self):
+        self.columns()
+        witness = self.bound()
+        # Two inventory rows of c1, the results count one: the parity is of another inventory.
+        self.columns(inventory={**self.COLUMNS, "r2": "c1"})
+        state = self.campaign.state(self.campaign.reforged(witness))
+        self.assertIn("the results record 1 rows of column c1, the inventory has 2",
+                      state["stale_operations"][OP_B])
+        # No recorded parity at all: nothing on the column credits.
+        self.columns({})
+        state = self.campaign.state(self.campaign.reforged(witness))
+        self.assertEqual(state["operations"], [])
+        self.assertIn("record no parity of column c0", state["stale_operations"][OP_A])
+
+    def test_a_row_without_a_column_never_credits(self):
+        self.columns(inventory={**self.COLUMNS, "r0": None})
+        with self.assertRaisesRegex(ValueError, "names no column"):
+            self.campaign.record(self.campaign.declaration([OP_A], ["kA"]))
+
+    def one_home(self, operations, columns=True):
+        """Rewrite the results with `operations` as the table columns' claims."""
+        results = self.campaign.results()
+        if columns:
+            results["columns"] = {"e1": {column: {"rows": 1, "base_match": 1, "mismatched": []}
+                                         for column in sorted(set(self.COLUMNS.values()))}}
+        if operations is not None:
+            results["one_home_operations"] = operations
+        self.campaign.write(scope.MUTATION_RESULTS, gzip.compress(json.dumps(results).encode(), mtime=0))
+
+    def test_one_home_follows_the_column_claims_not_the_oracle(self):
+        """Rule 7 binds exactly the operations the results say a column claims.
+
+        OP_D's second home (d_two) and OP_E's statement home are unreached
+        copies. Only OP_D is column-claimed: its copy is never excused, while
+        OP_E, which this column oracle's witness credits through a callee,
+        keeps the ordinary excusal (the results do the same).
+        """
+        self.columns()
+        witness = self.bound()
+        self.columns(claims={"c0": [OP_D], "c1": [], "c2": [], "c3": []})
+        state = self.campaign.state(self.campaign.reforged(witness))
+        self.assertEqual(sorted(state["stale_operations"]), [OP_D])
+        self.assertIn("has one home", state["stale_operations"][OP_D])
+        self.assertEqual(state["operations"], sorted({OP_A, OP_B, OP_ARM, OP_E, OP_F}))
+        declared, unclaimed = scope.declare_mutation_witness("e1", scope.MUTATION_RESULTS, self.root)
+        self.assertNotIn(OP_D, declared["operations"])
+        self.assertIn(OP_E, declared["operations"])
+        self.assertIn("has one home", unclaimed[OP_D])
+        self.assertEqual(set(declared["not_claimed"]), {home for home in excuses(self.campaign) if "helper" in home})
+
+    def campaign_from(self, frozen, selected, one_home):
+        """Rewrite the native freeze as taken from `frozen` specs, the inventory as selected from
+        `selected` ones, and results over them whose rule-7 set is `one_home`."""
+        self.campaign.native_headers["e1"] = {"request_inventory": {"specs": frozen}}
+        self.campaign.write_all()
+        self.select(selected)
+        results = self.campaign.results()
+        results["columns"] = {"e1": {column: {"rows": 1, "base_match": 1, "mismatched": []}
+                                     for column in sorted(set(self.COLUMNS.values()))}}
+        results["one_home_operations"] = one_home
+        self.campaign.write(scope.MUTATION_RESULTS, gzip.compress(json.dumps(results).encode(), mtime=0))
+
+    def test_a_spec_edit_stales_the_column_witness_until_the_campaign_reruns(self):
+        """The column witness is bound to the specs its inventory was selected from."""
+        self.columns()
+        witness = self.bound()
+        # A column now claims OP_D, whose d_two copy the recorded campaign excused.
+        claims = {"c0": [OP_D], "c1": [], "c2": [], "c3": []}
+        edited = self.campaign.write_specs(claims)
+        self.assert_whole_witness_stale(witness, "selected from other table specs")
+        # Re-selected and re-frozen, but rule 7 was applied to the claims before the edit.
+        self.campaign_from(edited, edited, [])
+        self.assert_whole_witness_stale(witness, "one-home operations are not what the current table specs claim")
+        # A freeze taken from another selection than the committed inventory's.
+        self.campaign_from({}, edited, [OP_D])
+        self.assert_whole_witness_stale(witness, "frozen from another selection")
+        # The rerun campaign binds again, with OP_D's copy no longer excused.
+        self.campaign_from(edited, edited, [OP_D])
+        state = self.campaign.state(self.campaign.reforged(witness))
+        self.assertEqual(state["state"], "bound", state)
+        self.assertIn("has one home", state["stale_operations"][OP_D])
+        # A spec edit that leaves every claim alone still stales it.
+        self.campaign.write_specs(claims, {"notes": "edited"})
+        self.assert_whole_witness_stale(witness, "selected from other table specs")
+
+    def test_one_home_results_are_well_formed(self):
+        self.columns()
+        witness = self.bound()
+        for value, text in ((["b", "a"], "one-home operations malformed"), ([1], "one-home operations malformed"),
+                            (None, "column parity but no one-home operations")):
+            with self.subTest(value=value):
+                self.one_home(value)
+                state = self.campaign.state(self.campaign.reforged(witness))
+                self.assertEqual(state["state"], "stale", state)
+                self.assertIn(text, state["reason"])
+
+
+class OneHomeAcrossWitnessesTests(MutationFixture):
+    """A column-claimed operation has one home in every witness that claims it."""
+
+    def test_another_oracles_witness_cannot_excuse_a_copy_of_a_column_claimed_operation(self):
+        witness = self.bound()
+        results = self.campaign.results()
+        results["one_home_operations"] = [OP_D]
+        self.campaign.write(scope.MUTATION_RESULTS, gzip.compress(json.dumps(results).encode(), mtime=0))
+        state = self.campaign.state(self.campaign.reforged(witness))
+        self.assertEqual(sorted(state["stale_operations"]), [OP_D])
+        self.assertIn("a table column claims this operation", state["stale_operations"][OP_D])
+        self.assertIn(OP_E, state["operations"])
+        declared, unclaimed = scope.declare_mutation_witness("e1", scope.MUTATION_RESULTS, self.root)
+        self.assertNotIn(OP_D, declared["operations"])
+        self.assertIn("has one home", unclaimed[OP_D])
+        # Without a table campaign in the results no operation has one home.
+        del results["one_home_operations"]
+        self.campaign.write(scope.MUTATION_RESULTS, gzip.compress(json.dumps(results).encode(), mtime=0))
+        self.assertEqual(self.campaign.state(self.campaign.reforged(witness))["operations"], sorted(ALL_OPS))
+
+    def test_a_current_spec_claim_denies_the_excuse_whatever_the_results_say(self):
+        """Rule 7 reads the current specs: a column that starts claiming an operation after the
+        campaign stales the other witnesses' excused copies of it at once."""
+        witness = self.bound()
+        self.assertNotIn("one_home_operations", self.campaign.results())
+        specs = self.campaign.write_specs({"c0": [OP_D]})
+        state = self.campaign.state(self.campaign.reforged(witness))
+        self.assertEqual(sorted(state["stale_operations"]), [OP_D])
+        self.assertIn("a table column claims this operation", state["stale_operations"][OP_D])
+        self.assertEqual(state["inputs"].keys() & specs.keys(), specs.keys(), "the witness binds the specs it read")
+        declared, unclaimed = scope.declare_mutation_witness("e1", scope.MUTATION_RESULTS, self.root)
+        self.assertNotIn(OP_D, declared["operations"])
+        self.assertIn("has one home", unclaimed[OP_D])
+        # Specs that cannot be read leave rule 7 undecidable: nothing is credited.
+        self.campaign.write(f"{phase1_tables.SPEC_DIRECTORY}/core.json", b"{")
+        self.assert_whole_witness_stale(witness, "table spec data/phase1/tables/core.json is unreadable")
+        self.campaign.write(f"{phase1_tables.SPEC_DIRECTORY}/core.json",
+                            json.dumps({"columns": [{"id": "c0", "operations": []}]}).encode())
+        self.assert_whole_witness_stale(witness, "malformed or duplicated column")
+        (self.root / phase1_tables.SPEC_DIRECTORY / "core.json").unlink()
+        self.assert_whole_witness_stale(witness, "core.json is unreadable")
 
 
 class GoBindingTests(MutationFixture):

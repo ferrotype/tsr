@@ -39,9 +39,13 @@ impl Snapshot {
             files: BTreeMap::new(),
         };
         let mut locations = LocationIndex::new();
-        // The loader-only observation API remains unchanged. Its records are
-        // retained here alongside the verifier's later source processing writes.
-        for diagnostic in program.loader_include_diagnostics()? {
+        // The collection receives each processing diagnostic in the order
+        // collection made it, then the loader's other include diagnostics,
+        // then the verifier's later source processing writes.
+        for diagnostic in program.processing_include_diagnostics()? {
+            result.add(diagnostic, program, &file_name, &mut locations)?;
+        }
+        for diagnostic in program.loader_resolution_diagnostics() {
             result.add(diagnostic.clone(), program, &file_name, &mut locations)?;
         }
         for request in &program.option_verification().include_diagnostics {
@@ -57,7 +61,9 @@ impl Snapshot {
                 &mut locations,
             )?;
         }
+        // port: tsc/internal/ast/diagnostic.go:DiagnosticsCollection.getGlobalDiagnosticsLocked
         sort(&mut result.globals, &file_name)?;
+        // port: tsc/internal/ast/diagnostic.go:DiagnosticsCollection.getDiagnosticsForFileLocked
         for diagnostics in result.files.values_mut() {
             sort(diagnostics, &file_name)?;
         }
@@ -96,6 +102,7 @@ impl Snapshot {
         // CompareDiagnostics can equate diagnostics with different chain codes.
         // Check the complete location collision group, including non-adjacent
         // equal records, before the source's stable sort.
+        // port: tsc/internal/ast/diagnostic.go:getDiagnosticLocationKey
         let collisions = locations
             .entry((
                 path,
@@ -246,6 +253,7 @@ impl Program {
     }
 
     /// Raw include collection globals, before Program's direct diagnostics.
+    /// port: tsc/internal/ast/diagnostic.go:DiagnosticsCollection.GetGlobalDiagnostics
     pub fn global_include_diagnostics(&self) -> Result<&[Diagnostic], Error> {
         Ok(&self.diagnostic_snapshot.get(self)?.globals)
     }

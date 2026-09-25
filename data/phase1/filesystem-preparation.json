@@ -1,5 +1,5 @@
 {
-  "accounted_operations": 315,
+  "accounted_operations": 314,
   "complete": false,
   "exempt_by_category": {
     "build_variant": 5,
@@ -23,10 +23,17 @@
       "rust_home": [
         "crates/tsr_vfs/src/os/native.rs"
       ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/vfs/osvfs/os.go:GetGlobalTypingsCacheLocation",
+      "rust_home": [
+        "crates/tsr_vfs/src/os/mod.rs"
+      ]
     }
   ],
   "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
-  "prepared_operations": 299,
+  "prepared_operations": 298,
   "roster_problems": [],
   "step": "filesystem",
   "total_operations": 316,

@@ -3,8 +3,8 @@
     "tools/s07/program/export_test.go": "881a36d2094efca8752e49067f039afdd89be3ae0b8443f488b612ae0c00dbc8",
     "tools/s07/verify-options/export_test.go": "3de618cc161bcecee4fad9d38cf42cd8fdd001d0e6354da203dfd5c05f7590f7"
   },
-  "observations_sha256": "8f212d48995d85cda3c3f8df5142c4b3a701e6de71d8f303c0823805d8a2423b",
+  "observations_sha256": "14a9315484fce50cbadfaa7f6100dd724ae9c43bf526add543b0179ba71291cf",
   "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
-  "requests_sha256": "94b5036d769415ec1d8a83d3a290ea908d98e5ec3af5837b7fa31a42f2ecc412",
+  "requests_sha256": "c1fdf3d9c7f8c3208f863ba5dccf40e8328b6861c58ef9501e5e90ec703ecbca",
   "source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0"
 }

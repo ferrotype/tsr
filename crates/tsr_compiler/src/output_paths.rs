@@ -19,7 +19,7 @@ pub(crate) fn computed_common_directory(files: &[JsString], program: &Program) -
     separator(computed_common(
         files,
         program.current_directory(),
-        program.host().use_case_sensitive_file_names(),
+        program.use_case_sensitive_file_names(),
     ))
 }
 /// Path-only half of GetCommonSourceDirectory; option verification supplies the
@@ -34,7 +34,7 @@ pub(crate) fn common_directory(program: &Program, files: &[JsString]) -> Vec<u8>
         computed_common(
             files,
             program.current_directory(),
-            program.host().use_case_sensitive_file_names(),
+            program.use_case_sensitive_file_names(),
         )
     })
 }
@@ -46,12 +46,9 @@ pub(crate) fn source_in_new_directory(
     common: &[u8],
 ) -> Vec<u8> {
     let absolute = path::absolute(file, program.current_directory());
-    let rest = path::trim_file_path_prefix(
-        &absolute,
-        common,
-        program.host().use_case_sensitive_file_names(),
-    )
-    .unwrap_or(&absolute);
+    let rest =
+        path::trim_file_path_prefix(&absolute, common, program.use_case_sensitive_file_names())
+            .unwrap_or(&absolute);
     path::combine(new_dir, &[rest])
 }
 /// port: tsc/internal/compiler/emitter.go:sourceFileMayBeEmitted
@@ -104,7 +101,7 @@ pub(crate) fn may_emit_with_force_dts(
             source.parse_options().file_name.as_bytes(),
             &output,
             program.current_directory(),
-            program.host().use_case_sensitive_file_names(),
+            program.use_case_sensitive_file_names(),
         )
         .is_eq()
         {
@@ -157,7 +154,7 @@ pub(crate) fn output_names(
             name,
             &own,
             program.current_directory(),
-            program.host().use_case_sensitive_file_names(),
+            program.use_case_sensitive_file_names(),
         )
         .is_eq();
     let mut result = [Vec::new(), Vec::new(), Vec::new(), Vec::new()];
@@ -200,7 +197,7 @@ pub(crate) fn module_specifier_output_name(
             program.options(),
             common,
             program.current_directory(),
-            program.host().use_case_sensitive_file_names(),
+            program.use_case_sensitive_file_names(),
             &[],
         );
     }
@@ -215,7 +212,7 @@ pub(crate) fn module_specifier_output_name(
                 common,
                 file,
                 program.current_directory(),
-                program.host().use_case_sensitive_file_names(),
+                program.use_case_sensitive_file_names(),
             )],
         )
     };

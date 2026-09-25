@@ -145,15 +145,14 @@ mod tests {
     use super::*;
 
     #[test]
-    fn wrapper_gap_names_the_absent_walk_not_the_existing_constructor() {
+    fn wrapper_dispatch_is_observed_through_the_production_walk() {
+        // F2b ported wrappedFS.WalkDir, so the wrapper row is no longer a gap.
         let row = observe(
             &json!({"case":"identity-control", "subject":"BundledWrapper",
             "operation":"tsc/internal/bundled/embed.go:wrapFS"}),
         );
-        assert_eq!(
-            row["missing_operation"]["operation"],
-            "tsc/internal/bundled/embed.go:wrappedFS.WalkDir"
-        );
+        assert_eq!(row["result"], "observed", "{row:?}");
+        assert!(row.get("missing_operation").is_none(), "{row:?}");
     }
 
     #[test]

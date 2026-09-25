@@ -397,7 +397,13 @@ class ReviewedDestinationTests(unittest.TestCase):
                    if case["id"].startswith("syntax/project-references/")
                    for operation in case["operations"]}
         self.assertLessEqual(loading, claimed)
-        self.assertEqual(len(claimed), 23)
+        # The 23 reference-loading operations, plus the symlinked-output helpers
+        # the js-import case witnesses on the same load path.
+        helpers = {"tsc/internal/ast/utilities.go:NewHasFileName",
+                   "tsc/internal/ast/utilities.go:hasFileNameImpl.FileName",
+                   "tsc/internal/ast/utilities.go:hasFileNameImpl.Path"}
+        self.assertLessEqual(helpers, claimed)
+        self.assertEqual(len(claimed - helpers), 23)
         # The editor host and the checker accessors keep their destinations.
         self.assertEqual(decisions["tsc/internal/compiler/projectreferencedtsfakinghost.go:newProjectReferenceDtsFakingHost"]["destination_phase"], 5)
         self.assertEqual(decisions["tsc/internal/compiler/program.go:Program.GetParseFileRedirect"]["destination_phase"], 2)

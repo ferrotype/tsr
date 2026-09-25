@@ -1030,6 +1030,104 @@
       "operation": "tsc/internal/astnav/tokens.go:FindChildOfKind",
       "order_sensitive": true,
       "subject": "astnav"
+    },
+    {
+      "actions": [
+        {
+          "op": "token_at"
+        },
+        {
+          "op": "touching_property_name"
+        },
+        {
+          "op": "touching_token"
+        },
+        {
+          "op": "preceding"
+        },
+        {
+          "op": "preceding_exclude_jsdoc"
+        },
+        {
+          "op": "next_in_file"
+        },
+        {
+          "op": "next_in_parent"
+        },
+        {
+          "op": "start_of_token"
+        },
+        {
+          "op": "start_of_token_with_jsdoc"
+        },
+        {
+          "op": "token_at_repeat"
+        },
+        {
+          "kinds": [
+            "KindOpenParenToken",
+            "KindCloseParenToken",
+            "KindOpenBracketToken",
+            "KindCloseBracketToken",
+            "KindOpenBraceToken",
+            "KindCloseBraceToken",
+            "KindCommaToken",
+            "KindSemicolonToken",
+            "KindDotToken",
+            "KindEqualsGreaterThanToken",
+            "KindColonToken",
+            "KindLessThanToken",
+            "KindGreaterThanToken",
+            "KindEqualsToken",
+            "KindQuestionToken",
+            "KindIdentifier"
+          ],
+          "op": "child_of_kind"
+        },
+        {
+          "op": "visit_nodes"
+        }
+      ],
+      "case": "syntax/astnav/jsx-child-shift-gap-scan",
+      "discriminates": "Both arms of shouldRescanLessThanLessThanToken at both production call sites. JSX-child arm: each `<` of `<<` in `<div><<</div>`, `<>{1}<<</>` and `<a><<b/></a>` opens an error-recovery JsxSelfClosingElement (IsJsxChild true) whose other children are zero-width, so the `<` is not a node and navigation scans it; the scanner reads `<<` and scanNavigationToken's rescan arm (tokens.go:18, reached by no other astnav request) turns it into a width-1 LessThanToken. That is the pinned answer of getTokenAtPosition's gap scan (tokens.go:240) at 15, 16, 40, 41 and 60, where an unrescanned `<<` overruns the element and the element itself is returned, and of findRightmostValidToken (tokens.go:564, :582) at 16, 17, 41, 42 and 61, where it would be the width-2 LessThanLessThanToken. Non-JSX arm: in `type F = A<<T>() => T>;` and `let g = f<<T>(x: T) => T>(y);` navigation scans the type-argument `<` inside a TypeReference and a CallExpression (IsJsxChild false) and the scanner reads `<<`, which must stay unrescanned: the gap scan's `<<` overruns the next child, so token_at and touching_token at 81 and 104 are the TypeReference 79..93 and the CallExpression 102..123, and preceding at 82 and 105 is the width-2 `<<` 81..83 and 104..106. A predicate that ignores the containing node (or a call site that passes a JSX child for every node) answers a width-1 `<` at those four positions. jsx-less-than-less-than only has `<<` operator nodes and never scans a `<<`.",
+      "file": {
+        "name": "/a.tsx",
+        "script_kind": 4,
+        "text": "const a = <div><<</div>;\nconst b = <>{1}<<</>;\nconst c = <a><<b/></a>;\ntype F = A<<T>() => T>;\nlet g = f<<T>(x: T) => T>(y);\n"
+      },
+      "host_applicability": "any",
+      "operation": "tsc/internal/astnav/tokens.go:shouldRescanLessThanLessThanToken",
+      "order_sensitive": true,
+      "subject": "astnav"
+    },
+    {
+      "actions": [
+        {
+          "kinds": [
+            "KindIdentifier",
+            "KindPrivateIdentifier",
+            "KindNumericLiteral",
+            "KindBigIntLiteral",
+            "KindStringLiteral",
+            "KindNoSubstitutionTemplateLiteral",
+            "KindTemplateHead",
+            "KindOpenParenToken",
+            "KindCommaToken"
+          ],
+          "op": "child_of_kind_payload"
+        }
+      ],
+      "case": "syntax/astnav/created-token-payloads",
+      "discriminates": "The payload createToken (ast.go:2935) builds, for every arm navigation reaches. FindChildOfKind tests the scanner's current token before it scans again after a child (tokens.go:747-768), so after a child whose first token is a literal or a name the next gap creates a token of that kind from the stale scanner state: `f(\\n  <literal> + b, c)` creates a StringLiteral (single quote, hex, unicode and extended escapes), NumericLiteral (hex specifier; separator and exponent), BigIntLiteral, NoSubstitutionTemplateLiteral and TemplateHead spanning the literal and its leading newline, `(f)(\\n  g.h, c)` an Identifier, `f(\\n  #p in o, c)` a PrivateIdentifier, and the trailing-token loop (tokens.go:778-790) a zero-width token of the same kind with the same stale flags; the `h${b}t` line also desynchronizes the scan into an unterminated NoSubstitutionTemplateLiteral that runs to the end of the file. child_of_kind_payload appends each answer's text, token flags, raw text and template flags. A created token's text is the raw source slice from its full start, trivia included (the parser's own literal nodes, which the same rows also return, carry cooked text); its flags are the scanner's flags under the constructor's mask, so the PrecedingLineBreak every stale literal carries is dropped and the escape, quote, specifier, exponent, separator and unterminated bits are kept; a template piece has token flags 0 and an empty raw text. A Rust create_token that drops the mask, blanks or trims the text, fills the raw text or the token flags of a template piece, or builds the wrong payload for an arm differs here and in no other astnav request. Pinned -cover: createToken's NumericLiteral, BigIntLiteral, StringLiteral, NoSubstitutionTemplateLiteral, TemplateHead, Identifier, PrivateIdentifier and default arms execute here; its JsxText, RegularExpressionLiteral, TemplateMiddle and TemplateTail arms execute in no astnav request.",
+      "file": {
+        "name": "/a.ts",
+        "script_kind": 3,
+        "text": "f(\n  '\\x41\\u0041\\u{41}' + b, c);\nf(\n  0x1F + b, c);\nf(\n  1_0e3 + b, c);\nf(\n  0x1Fn + b, c);\nf(\n  `\\x41\\u{41}` + b, c);\nf(\n  `h\\u{41}${b}t` + b, c);\n(f)(\n  g.h, c);\nclass C { #p = 1; m(o: any) { f(\n  #p in o, c); } }\n"
+      },
+      "host_applicability": "any",
+      "operation": "tsc/internal/ast/ast.go:createToken",
+      "order_sensitive": true,
+      "subject": "astnav"
     }
   ]
 }

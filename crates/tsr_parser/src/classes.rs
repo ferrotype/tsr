@@ -9,12 +9,28 @@ impl<F: ParserFactory> Parser<'_, F> {
     /// Read actual modifiers for source operations that use core.Some, rather
     /// than the separately cached ModifierFlags field.
     pub(crate) fn has_modifier_kind(&self, list: Option<NodeListId>, kind: K) -> bool {
+        self.some_modifier(list, |p, node| p.factory.node(node).kind() == kind)
+    }
+    /// `modifiers != nil && core.Some(modifiers.Nodes, predicate)`.
+    pub(crate) fn some_modifier(
+        &self,
+        list: Option<NodeListId>,
+        predicate: impl Fn(&Self, NodeId) -> bool,
+    ) -> bool {
         list.is_some_and(|list| {
             self.factory
                 .read_nodes(self.factory.read_list(list).nodes())
                 .iter()
-                .any(|node| self.factory.node(node.expect("parser modifier")).kind() == kind)
+                .any(|node| predicate(self, node.expect("parser modifier")))
         })
+    }
+    /// port: tsc/internal/parser/parser.go:isExportModifier
+    pub(crate) fn is_export_modifier(&self, modifier: NodeId) -> bool {
+        self.factory.node(modifier).kind() == K::ExportKeyword
+    }
+    /// port: tsc/internal/parser/parser.go:isAsyncModifier
+    pub(crate) fn is_async_modifier(&self, modifier: NodeId) -> bool {
+        self.factory.node(modifier).kind() == K::AsyncKeyword
     }
     pub(crate) fn mark_modifiers_ambient(&mut self, list: NodeListId) {
         let nodes = self.factory.read_list(list).nodes();
@@ -64,7 +80,7 @@ impl<F: ParserFactory> Parser<'_, F> {
                 & ((1 << ParsingContext::BlockStatements as u8)
                     | (1 << ParsingContext::SwitchClauseStatements as u8))
                 == 0
-            && self.has_modifier_kind(modifiers, K::ExportKeyword)
+            && self.some_modifier(modifiers, Self::is_export_modifier)
         {
             self.set_context_flags(node_flags::AWAIT_CONTEXT, true);
         }
@@ -165,9 +181,7 @@ impl<F: ParserFactory> Parser<'_, F> {
         let kind = self.token;
         self.next_token();
         let types = self.parse_delimited_list(ParsingContext::HeritageClauseElement, |p| {
-            if is_interface && kind == K::ExtendsKeyword
-                || !is_interface && kind == K::ImplementsKeyword
-            {
+            if is_type_heritage_clause(is_interface, kind) {
                 p.parse_type_heritage_clause_element()
             } else {
                 p.parse_expression_with_type_arguments()
@@ -305,7 +319,7 @@ impl<F: ParserFactory> Parser<'_, F> {
             )
         {
             let saved = self.context_flags;
-            if self.has_modifier_kind(modifiers, K::DeclareKeyword) {
+            if self.some_modifier(modifiers, Self::is_declare_modifier) {
                 self.mark_modifiers_ambient(modifiers.expect("declare modifier"));
                 self.set_context_flags(node_flags::AMBIENT, true);
             }
@@ -530,4 +544,11 @@ impl<F: ParserFactory> Parser<'_, F> {
         }
         self.parse_error_for_missing_semicolon_after(name);
     }
+}
+
+/// Interfaces extend types and classes implement them; both parse type
+/// references rather than expressions.
+/// port: tsc/internal/parser/parser.go:isTypeHeritageClause
+fn is_type_heritage_clause(is_interface: bool, token: K) -> bool {
+    is_interface && token == K::ExtendsKeyword || !is_interface && token == K::ImplementsKeyword
 }

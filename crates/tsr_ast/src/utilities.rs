@@ -1230,6 +1230,7 @@ pub fn is_type_node_kind(kind: NodeKind) -> bool {
         )
     ) || kind.raw() >= K::TypePredicate as i16 && kind.raw() <= K::ImportType as i16
 }
+/// port: tsc/internal/ast/utilities.go:HasModifier
 /// port: tsc/internal/ast/utilities.go:HasSyntacticModifier
 pub fn has_syntactic_modifier(view: AstView<'_>, node: NodeId, flags: u32) -> Result<bool, Error> {
     crate::declaration_helpers::has_modifier(&view, node, flags)
@@ -1325,9 +1326,10 @@ pub fn is_signed_numeric_literal(view: AstView<'_>, node: NodeId) -> Result<bool
 pub fn is_optional_chain(node: &(impl NodeAccess + ?Sized)) -> bool {
     crate::syntax_helpers::is_optional_chain(node)
 }
-/// port: tsc/internal/ast/utilities.go:getQuestionDotToken
+/// The binder's optional-chain path reaches the shared port through the
+/// storage-generic helper, which carries the operation's marker.
 pub fn get_question_dot_token(node: &(impl NodeAccess + ?Sized)) -> Option<NodeId> {
-    node.question_dot_token()
+    crate::syntax_helpers::get_question_dot_token(node)
 }
 /// port: tsc/internal/ast/utilities.go:IsOptionalChainRoot
 pub fn is_optional_chain_root(node: &(impl NodeAccess + ?Sized)) -> bool {

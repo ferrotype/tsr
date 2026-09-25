@@ -6672,10 +6672,12 @@
       "native_authority": "tools/phase1/config/module_probe_test.go against the pinned internal/module package",
       "operation_actions": {
         "versioned_types_key": [
+          "tsc/internal/core/version.go:Version",
           "tsc/internal/module/util.go:IsApplicableVersionedTypesKey"
         ]
       },
       "operations": [
+        "tsc/internal/core/version.go:Version",
         "tsc/internal/module/util.go:IsApplicableVersionedTypesKey"
       ],
       "result_evidence": {
@@ -6976,6 +6978,7 @@
       "native_authority": "tools/phase1/config/module_probe_test.go against the pinned internal/module package",
       "operation_actions": {
         "resolve": [
+          "tsc/internal/core/version.go:Version",
           "tsc/internal/module/resolver.go:resolutionState.getPackageFile",
           "tsc/internal/module/resolver.go:resolutionState.getPackageJSONPathField",
           "tsc/internal/module/resolver.go:resolutionState.getPackageJsonInfo",
@@ -6991,6 +6994,7 @@
         ]
       },
       "operations": [
+        "tsc/internal/core/version.go:Version",
         "tsc/internal/module/resolver.go:resolutionState.getPackageFile",
         "tsc/internal/module/resolver.go:resolutionState.getPackageJSONPathField",
         "tsc/internal/module/resolver.go:resolutionState.getPackageJsonInfo",
@@ -7021,6 +7025,7 @@
       "native_authority": "tools/phase1/config/module_probe_test.go against the pinned internal/module package",
       "operation_actions": {
         "resolve": [
+          "tsc/internal/core/version.go:Version",
           "tsc/internal/module/resolver.go:resolutionState.getPackageJsonInfo",
           "tsc/internal/module/resolver.go:resolutionState.loadModuleFromNearestNodeModulesDirectory",
           "tsc/internal/module/resolver.go:resolutionState.loadModuleFromSpecificNodeModulesDirectory",
@@ -7032,6 +7037,7 @@
         ]
       },
       "operations": [
+        "tsc/internal/core/version.go:Version",
         "tsc/internal/module/resolver.go:resolutionState.getPackageJsonInfo",
         "tsc/internal/module/resolver.go:resolutionState.loadModuleFromNearestNodeModulesDirectory",
         "tsc/internal/module/resolver.go:resolutionState.loadModuleFromSpecificNodeModulesDirectory",
@@ -8394,6 +8400,7 @@
           "tsc/internal/packagejson/cache.go:VersionPaths.Exists"
         ],
         "get_version_paths_traced": [
+          "tsc/internal/core/version.go:VersionMajorMinor",
           "tsc/internal/packagejson/cache.go:PackageJson.GetVersionPaths",
           "tsc/internal/packagejson/cache.go:VersionPaths.Exists",
           "tsc/internal/packagejson/jsonvalue.go:JSONValueType.String"
@@ -8401,6 +8408,7 @@
         "load": []
       },
       "operations": [
+        "tsc/internal/core/version.go:VersionMajorMinor",
         "tsc/internal/packagejson/cache.go:PackageJson.GetVersionPaths",
         "tsc/internal/packagejson/cache.go:VersionPaths.Exists",
         "tsc/internal/packagejson/jsonvalue.go:JSONValueType.String"
@@ -22696,10 +22704,12 @@
           "tsc/internal/vfs/osvfs/os.go:GetGlobalTypingsCacheLocation"
         ],
         "version_tail": [
+          "tsc/internal/core/version.go:VersionMajorMinor",
           "tsc/internal/vfs/osvfs/os.go:GetGlobalTypingsCacheLocation"
         ]
       },
       "operations": [
+        "tsc/internal/core/version.go:VersionMajorMinor",
         "tsc/internal/vfs/osvfs/os.go:GetGlobalTypingsCacheLocation"
       ],
       "result_evidence": {
@@ -39265,13 +39275,15 @@
           "tsc/internal/astnav/tokens.go:GetStartOfNode"
         ],
         "token_at": [
-          "tsc/internal/astnav/tokens.go:GetTokenAtPosition"
+          "tsc/internal/astnav/tokens.go:GetTokenAtPosition",
+          "tsc/internal/core/binarysearch.go:BinarySearchUniqueFunc"
         ],
         "token_at_repeat": [
           "tsc/internal/astnav/tokens.go:GetTokenAtPosition"
         ],
         "touching_property_name": [
-          "tsc/internal/astnav/tokens.go:GetTouchingPropertyName"
+          "tsc/internal/astnav/tokens.go:GetTouchingPropertyName",
+          "tsc/internal/core/binarysearch.go:BinarySearchUniqueFunc"
         ],
         "touching_token": [
           "tsc/internal/astnav/tokens.go:GetTouchingToken"
@@ -39289,7 +39301,8 @@
         "tsc/internal/astnav/tokens.go:GetTokenAtPosition",
         "tsc/internal/astnav/tokens.go:GetTouchingPropertyName",
         "tsc/internal/astnav/tokens.go:GetTouchingToken",
-        "tsc/internal/astnav/tokens.go:VisitEachChildAndJSDoc"
+        "tsc/internal/astnav/tokens.go:VisitEachChildAndJSDoc",
+        "tsc/internal/core/binarysearch.go:BinarySearchUniqueFunc"
       ],
       "request_sha256": "c6f6d6336a472c8ccbe96fcf9774d52577558064ef8a4899f62531fd5b1c19ca",
       "result_evidence": {
@@ -39358,6 +39371,9 @@
       "native_authority": "tools/phase1/syntax/astnav_probe_test.go in the pinned astnav package, over a file parsed by the pinned parser",
       "operation_actions": {
         "child_of_kind": [
+          "tsc/internal/ast/ast.go:SourceFile.GetOrCreateToken",
+          "tsc/internal/ast/ast.go:createToken",
+          "tsc/internal/ast/utilities.go:ForEachChildAndJSDoc",
           "tsc/internal/astnav/tokens.go:FindChildOfKind"
         ],
         "visit_nodes": [
@@ -39365,6 +39381,9 @@
         ]
       },
       "operations": [
+        "tsc/internal/ast/ast.go:SourceFile.GetOrCreateToken",
+        "tsc/internal/ast/ast.go:createToken",
+        "tsc/internal/ast/utilities.go:ForEachChildAndJSDoc",
         "tsc/internal/astnav/tokens.go:FindChildOfKind",
         "tsc/internal/astnav/tokens.go:VisitEachChildAndJSDoc"
       ],
@@ -39387,6 +39406,7 @@
       "native_authority": "tools/phase1/syntax/astnav_probe_test.go in the pinned astnav package, over a file parsed by the pinned parser",
       "operation_actions": {
         "child_of_kind": [
+          "tsc/internal/ast/utilities.go:ForEachChildAndJSDoc",
           "tsc/internal/astnav/tokens.go:FindChildOfKind"
         ],
         "next_in_file": [
@@ -39425,6 +39445,7 @@
         ]
       },
       "operations": [
+        "tsc/internal/ast/utilities.go:ForEachChildAndJSDoc",
         "tsc/internal/astnav/tokens.go:FindChildOfKind",
         "tsc/internal/astnav/tokens.go:FindNextToken",
         "tsc/internal/astnav/tokens.go:FindPrecedingToken",
@@ -39446,14 +39467,14 @@
       }
     },
     {
-      "expected_contract": "JSX expression and shift sources swept through the public navigation operations; the specialized rescan branch remains unverified.",
+      "expected_contract": "JSX expression and shift sources swept through the public navigation operations. Every shift here is the operator token of a binary expression, so navigation never scans a `<<`; both arms of the rescan predicate are witnessed by syntax/astnav/jsx-child-shift-gap-scan.",
       "family": "syntax",
       "host_applicability": "any",
       "id": "syntax/astnav/jsx-less-than-less-than",
       "last_result": "match",
       "native_authority": "tools/phase1/syntax/astnav_probe_test.go in the pinned astnav package, over a file parsed by the pinned parser",
       "not_claimed": {
-        "tsc/internal/astnav/tokens.go:shouldRescanLessThanLessThanToken": "The request contains shifts and JSX, but no independently established true rescan-arm observation; source syntax alone does not establish the containing-node kind used by the scanner."
+        "tsc/internal/astnav/tokens.go:shouldRescanLessThanLessThanToken": "Entered here only with a non-shift token (pinned -cover: tokens.go:18 is not executed, and no `<<` is ever scanned), which cannot tell a constant-false predicate apart; both arms (JSX child and non-JSX containing node) are claimed by syntax/astnav/jsx-child-shift-gap-scan."
       },
       "operation_actions": {
         "child_of_kind": [
@@ -39525,7 +39546,8 @@
           "tsc/internal/astnav/tokens.go:FindChildOfKind"
         ],
         "next_in_file": [
-          "tsc/internal/astnav/tokens.go:FindNextToken"
+          "tsc/internal/astnav/tokens.go:FindNextToken",
+          "tsc/internal/core/binarysearch.go:BinarySearchUniqueFunc"
         ],
         "next_in_parent": [
           "tsc/internal/astnav/tokens.go:FindNextToken"
@@ -39543,13 +39565,15 @@
           "tsc/internal/astnav/tokens.go:GetStartOfNode"
         ],
         "token_at": [
-          "tsc/internal/astnav/tokens.go:GetTokenAtPosition"
+          "tsc/internal/astnav/tokens.go:GetTokenAtPosition",
+          "tsc/internal/core/binarysearch.go:BinarySearchUniqueFunc"
         ],
         "token_at_repeat": [
           "tsc/internal/astnav/tokens.go:GetTokenAtPosition"
         ],
         "touching_property_name": [
-          "tsc/internal/astnav/tokens.go:GetTouchingPropertyName"
+          "tsc/internal/astnav/tokens.go:GetTouchingPropertyName",
+          "tsc/internal/core/binarysearch.go:BinarySearchUniqueFunc"
         ],
         "touching_token": [
           "tsc/internal/astnav/tokens.go:GetTouchingToken"
@@ -39567,7 +39591,8 @@
         "tsc/internal/astnav/tokens.go:GetTokenAtPosition",
         "tsc/internal/astnav/tokens.go:GetTouchingPropertyName",
         "tsc/internal/astnav/tokens.go:GetTouchingToken",
-        "tsc/internal/astnav/tokens.go:VisitEachChildAndJSDoc"
+        "tsc/internal/astnav/tokens.go:VisitEachChildAndJSDoc",
+        "tsc/internal/core/binarysearch.go:BinarySearchUniqueFunc"
       ],
       "request_sha256": "37268ddf7549f500437c13e54cf6fef7718e6eb683c62f34d979ab4750010fdb",
       "result_evidence": {
@@ -39746,7 +39771,8 @@
           "tsc/internal/astnav/tokens.go:FindChildOfKind"
         ],
         "next_in_file": [
-          "tsc/internal/astnav/tokens.go:FindNextToken"
+          "tsc/internal/astnav/tokens.go:FindNextToken",
+          "tsc/internal/core/binarysearch.go:BinarySearchUniqueFunc"
         ],
         "next_in_parent": [
           "tsc/internal/astnav/tokens.go:FindNextToken"
@@ -39767,13 +39793,15 @@
           "tsc/internal/astnav/tokens.go:GetTokenAtPosition",
           "tsc/internal/astnav/tokens.go:getPosition",
           "tsc/internal/astnav/tokens.go:getTokenAtPosition",
-          "tsc/internal/astnav/tokens.go:shouldSkipChild"
+          "tsc/internal/astnav/tokens.go:shouldSkipChild",
+          "tsc/internal/core/binarysearch.go:BinarySearchUniqueFunc"
         ],
         "token_at_repeat": [
           "tsc/internal/astnav/tokens.go:GetTokenAtPosition"
         ],
         "touching_property_name": [
-          "tsc/internal/astnav/tokens.go:GetTouchingPropertyName"
+          "tsc/internal/astnav/tokens.go:GetTouchingPropertyName",
+          "tsc/internal/core/binarysearch.go:BinarySearchUniqueFunc"
         ],
         "touching_token": [
           "tsc/internal/astnav/tokens.go:GetTouchingToken",
@@ -39796,7 +39824,8 @@
         "tsc/internal/astnav/tokens.go:VisitEachChildAndJSDoc",
         "tsc/internal/astnav/tokens.go:getPosition",
         "tsc/internal/astnav/tokens.go:getTokenAtPosition",
-        "tsc/internal/astnav/tokens.go:shouldSkipChild"
+        "tsc/internal/astnav/tokens.go:shouldSkipChild",
+        "tsc/internal/core/binarysearch.go:BinarySearchUniqueFunc"
       ],
       "request_sha256": "63a06082f45d6310b828b41fc45b3f384816c95abde286f174c2b93e01bafd2b",
       "result_evidence": {
@@ -39946,6 +39975,8 @@
       "native_authority": "tools/phase1/syntax/astnav_probe_test.go in the pinned astnav package, over a file parsed by the pinned parser",
       "operation_actions": {
         "child_of_kind": [
+          "tsc/internal/ast/ast.go:SourceFile.GetOrCreateToken",
+          "tsc/internal/ast/ast.go:createToken",
           "tsc/internal/astnav/tokens.go:FindChildOfKind"
         ],
         "next_in_file": [
@@ -39967,9 +39998,12 @@
           "tsc/internal/astnav/tokens.go:GetStartOfNode"
         ],
         "token_at": [
+          "tsc/internal/ast/ast.go:SourceFile.GetOrCreateToken",
+          "tsc/internal/ast/ast.go:createToken",
           "tsc/internal/astnav/tokens.go:GetTokenAtPosition"
         ],
         "token_at_repeat": [
+          "tsc/internal/ast/ast.go:SourceFile.GetOrCreateToken",
           "tsc/internal/astnav/tokens.go:GetTokenAtPosition"
         ],
         "touching_property_name": [
@@ -39983,6 +40017,8 @@
         ]
       },
       "operations": [
+        "tsc/internal/ast/ast.go:SourceFile.GetOrCreateToken",
+        "tsc/internal/ast/ast.go:createToken",
         "tsc/internal/astnav/tokens.go:FindChildOfKind",
         "tsc/internal/astnav/tokens.go:FindNextToken",
         "tsc/internal/astnav/tokens.go:FindPrecedingToken",
@@ -40024,7 +40060,8 @@
           "tsc/internal/astnav/tokens.go:FindPrecedingToken",
           "tsc/internal/astnav/tokens.go:findRightmostValidToken",
           "tsc/internal/astnav/tokens.go:isValidPrecedingNode",
-          "tsc/internal/astnav/tokens.go:scanNavigationToken"
+          "tsc/internal/astnav/tokens.go:scanNavigationToken",
+          "tsc/internal/core/binarysearch.go:BinarySearchUniqueFunc"
         ],
         "preceding_exclude_jsdoc": [
           "tsc/internal/astnav/tokens.go:FindPrecedingTokenEx"
@@ -40036,7 +40073,8 @@
           "tsc/internal/astnav/tokens.go:GetStartOfNode"
         ],
         "token_at": [
-          "tsc/internal/astnav/tokens.go:GetTokenAtPosition"
+          "tsc/internal/astnav/tokens.go:GetTokenAtPosition",
+          "tsc/internal/core/binarysearch.go:BinarySearchUniqueFunc"
         ],
         "token_at_repeat": [
           "tsc/internal/astnav/tokens.go:GetTokenAtPosition"
@@ -40063,7 +40101,8 @@
         "tsc/internal/astnav/tokens.go:VisitEachChildAndJSDoc",
         "tsc/internal/astnav/tokens.go:findRightmostValidToken",
         "tsc/internal/astnav/tokens.go:isValidPrecedingNode",
-        "tsc/internal/astnav/tokens.go:scanNavigationToken"
+        "tsc/internal/astnav/tokens.go:scanNavigationToken",
+        "tsc/internal/core/binarysearch.go:BinarySearchUniqueFunc"
       ],
       "request_sha256": "b40bb40647a102caecbda893e46f529aba662ab7ccd72e54b0fdb2a1d50c9ade",
       "result_evidence": {
@@ -40628,12 +40667,20 @@
       "operation_actions": {
         "tsc/internal/compiler/program.go:Program.GetBindDiagnostics": [
           "tsc/internal/compiler/program.go:Program.GetBindDiagnostics",
-          "tsc/internal/compiler/program.go:Program.collectDiagnostics"
+          "tsc/internal/compiler/program.go:Program.collectDiagnostics",
+          "tsc/internal/core/workgroup.go:NewWorkGroup",
+          "tsc/internal/core/workgroup.go:singleThreadedWorkGroup.Queue",
+          "tsc/internal/core/workgroup.go:singleThreadedWorkGroup.RunAndWait",
+          "tsc/internal/core/workgroup.go:singleThreadedWorkGroup.pop"
         ]
       },
       "operations": [
         "tsc/internal/compiler/program.go:Program.GetBindDiagnostics",
-        "tsc/internal/compiler/program.go:Program.collectDiagnostics"
+        "tsc/internal/compiler/program.go:Program.collectDiagnostics",
+        "tsc/internal/core/workgroup.go:NewWorkGroup",
+        "tsc/internal/core/workgroup.go:singleThreadedWorkGroup.Queue",
+        "tsc/internal/core/workgroup.go:singleThreadedWorkGroup.RunAndWait",
+        "tsc/internal/core/workgroup.go:singleThreadedWorkGroup.pop"
       ],
       "request_sha256": "c01194420bcad6372e55148af395c7d63d41f72531b99e8e5283f1a1b8b72484",
       "result_evidence": {
@@ -40977,7 +41024,11 @@
           "tsc/internal/compiler/program.go:Program.collectDiagnostics",
           "tsc/internal/compiler/program.go:Program.collectDiagnosticsFromFiles",
           "tsc/internal/compiler/program.go:SortAndDeduplicateDiagnostics",
-          "tsc/internal/compiler/program.go:filterAndSortDiagnostics"
+          "tsc/internal/compiler/program.go:filterAndSortDiagnostics",
+          "tsc/internal/core/workgroup.go:NewWorkGroup",
+          "tsc/internal/core/workgroup.go:singleThreadedWorkGroup.Queue",
+          "tsc/internal/core/workgroup.go:singleThreadedWorkGroup.RunAndWait",
+          "tsc/internal/core/workgroup.go:singleThreadedWorkGroup.pop"
         ]
       },
       "operations": [
@@ -40985,7 +41036,11 @@
         "tsc/internal/compiler/program.go:Program.collectDiagnostics",
         "tsc/internal/compiler/program.go:Program.collectDiagnosticsFromFiles",
         "tsc/internal/compiler/program.go:SortAndDeduplicateDiagnostics",
-        "tsc/internal/compiler/program.go:filterAndSortDiagnostics"
+        "tsc/internal/compiler/program.go:filterAndSortDiagnostics",
+        "tsc/internal/core/workgroup.go:NewWorkGroup",
+        "tsc/internal/core/workgroup.go:singleThreadedWorkGroup.Queue",
+        "tsc/internal/core/workgroup.go:singleThreadedWorkGroup.RunAndWait",
+        "tsc/internal/core/workgroup.go:singleThreadedWorkGroup.pop"
       ],
       "request_sha256": "be4575be32fd60ce55358a4fad0bbc9801e6a7cee8cb2f0cfccb1b99af24557d",
       "result_evidence": {
@@ -91037,6 +91092,8 @@
           "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker"
         ],
         "load": [
+          "tsc/internal/ast/utilities.go:NewHasFileName",
+          "tsc/internal/ast/utilities.go:hasFileNameImpl.Path",
           "tsc/internal/compiler/filesparser.go:parseTask.redirect",
           "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
           "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource",
@@ -91047,6 +91104,8 @@
         ]
       },
       "operations": [
+        "tsc/internal/ast/utilities.go:NewHasFileName",
+        "tsc/internal/ast/utilities.go:hasFileNameImpl.Path",
         "tsc/internal/compiler/filesparser.go:parseTask.redirect",
         "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
         "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
@@ -92147,6 +92206,234 @@
         "request_sha256": "a6ffe8386a2cb6a24edd02be1b2608a41bd4f5e7727a6fa23b23a37ae96d0350",
         "result": "match"
       }
+    },
+    {
+      "expected_contract": "With preserveSymlinks and a project reference, a JavaScript import found in node_modules (js-pkg/index.js) is a symlink to the reference's output declaration file lib/a.d.ts. Its redirect check builds a HasFileName carrier from the resolved file name and its path (ast.NewHasFileName); getSourceToDtsIfSymlink reads the carrier's file name, which contains /node_modules/, realpaths it to lib/a.d.ts, and finds the reference output. The import therefore has a redirect, is not JavaScript, and enters the program at maxNodeModuleJsDepth 0 instead of being elided.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/project-references/js-import-symlinked-to-reference-output",
+      "native_authority": "tools/phase1/syntax/project_references_probe_test.go in the pinned compiler package: tsoptions.GetParsedCommandLineOfConfigFile, then processAllProgramFiles for load, NewProgram for Program.RangeResolvedProjectReference (graph), the verifier's raw writes and Program.GetProgramDiagnostics (verify)",
+      "operation_actions": {
+        "graph": [],
+        "load": [
+          "tsc/internal/ast/utilities.go:NewHasFileName",
+          "tsc/internal/ast/utilities.go:hasFileNameImpl.FileName"
+        ],
+        "verify": []
+      },
+      "operations": [
+        "tsc/internal/ast/utilities.go:NewHasFileName",
+        "tsc/internal/ast/utilities.go:hasFileNameImpl.FileName"
+      ],
+      "request_sha256": "080905da8d9177248052dd49150da550c9577496e3cc102160b47453e8bfb21c"
+    },
+    {
+      "expected_contract": "Every fs.FileInfo and fs.DirEntry member of the three kinds of bundled entry, read from Stat and from a walk of bundled:///: the name the wrapper gives each entry (\"\", \"libs\" or the bare library name), size, directory flag, mode (fs.ModeDir or 0), the zero modification time, a nil Sys, the DirEntry type bits and the entry Info returns. Missing and trailing-slash paths stay nil. The Rust side reads the same values from BundledFs::stat and the walk entries' FileInfo; the port has no DirEntry type, so Type is the type bits of that FileInfo's mode and Info is the FileInfo itself.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/bundled/file-info-members",
+      "native_authority": "tools/phase1/leaves/bundled_probe_test.go::phase1FileInfo",
+      "operation_actions": {
+        "stat": [
+          "tsc/internal/bundled/embed.go:fileInfo.Info",
+          "tsc/internal/bundled/embed.go:fileInfo.IsDir",
+          "tsc/internal/bundled/embed.go:fileInfo.ModTime",
+          "tsc/internal/bundled/embed.go:fileInfo.Mode",
+          "tsc/internal/bundled/embed.go:fileInfo.Name",
+          "tsc/internal/bundled/embed.go:fileInfo.Size",
+          "tsc/internal/bundled/embed.go:fileInfo.Sys",
+          "tsc/internal/bundled/embed.go:fileInfo.Type",
+          "tsc/internal/bundled/embed.go:splitPath",
+          "tsc/internal/bundled/embed.go:wrappedFS.Stat"
+        ],
+        "walk": [
+          "tsc/internal/bundled/embed.go:fileInfo.Info",
+          "tsc/internal/bundled/embed.go:fileInfo.IsDir",
+          "tsc/internal/bundled/embed.go:fileInfo.ModTime",
+          "tsc/internal/bundled/embed.go:fileInfo.Mode",
+          "tsc/internal/bundled/embed.go:fileInfo.Name",
+          "tsc/internal/bundled/embed.go:fileInfo.Size",
+          "tsc/internal/bundled/embed.go:fileInfo.Sys",
+          "tsc/internal/bundled/embed.go:fileInfo.Type",
+          "tsc/internal/bundled/embed.go:splitPath",
+          "tsc/internal/bundled/embed.go:wrappedFS.WalkDir",
+          "tsc/internal/bundled/embed.go:wrappedFS.walkDir"
+        ]
+      },
+      "operations": [
+        "tsc/internal/bundled/embed.go:fileInfo.Info",
+        "tsc/internal/bundled/embed.go:fileInfo.IsDir",
+        "tsc/internal/bundled/embed.go:fileInfo.ModTime",
+        "tsc/internal/bundled/embed.go:fileInfo.Mode",
+        "tsc/internal/bundled/embed.go:fileInfo.Name",
+        "tsc/internal/bundled/embed.go:fileInfo.Size",
+        "tsc/internal/bundled/embed.go:fileInfo.Sys",
+        "tsc/internal/bundled/embed.go:fileInfo.Type",
+        "tsc/internal/bundled/embed.go:splitPath",
+        "tsc/internal/bundled/embed.go:wrappedFS.Stat",
+        "tsc/internal/bundled/embed.go:wrappedFS.WalkDir",
+        "tsc/internal/bundled/embed.go:wrappedFS.walkDir"
+      ]
+    },
+    {
+      "expected_contract": "Roots z then a with z -> b -> c imports and one parse error per file: the single-threaded loader group runs the root tasks and the tasks queued from inside them exactly once, the file list keeps the pinned load order, and the whole-program list is sorted by file name. NewWorkGroup's choice of group is checked by a probe guard, not by the compared bytes: the probe fails unless the program is single-threaded and core.NewWorkGroup(true) builds a *core.singleThreadedWorkGroup. The LIFO order of singleThreadedWorkGroup.pop is not claimed as observable: the parallel twin gives the same bytes.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/diagnostics/import-chain-single-threaded",
+      "native_authority": "tools/phase1/syntax/diagnostics_probe_test.go in the pinned compiler package: NewProgram with the requested work-group mode, then Program.GetSyntacticDiagnostics and the production diagnosticwriter",
+      "operation_actions": {
+        "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics": [
+          "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics",
+          "tsc/internal/compiler/program.go:Program.collectDiagnostics",
+          "tsc/internal/compiler/program.go:Program.collectDiagnosticsFromFiles",
+          "tsc/internal/compiler/program.go:SortAndDeduplicateDiagnostics",
+          "tsc/internal/compiler/program.go:filterAndSortDiagnostics",
+          "tsc/internal/core/workgroup.go:NewWorkGroup",
+          "tsc/internal/core/workgroup.go:singleThreadedWorkGroup.Queue",
+          "tsc/internal/core/workgroup.go:singleThreadedWorkGroup.RunAndWait",
+          "tsc/internal/core/workgroup.go:singleThreadedWorkGroup.pop"
+        ]
+      },
+      "operations": [
+        "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics",
+        "tsc/internal/compiler/program.go:Program.collectDiagnostics",
+        "tsc/internal/compiler/program.go:Program.collectDiagnosticsFromFiles",
+        "tsc/internal/compiler/program.go:SortAndDeduplicateDiagnostics",
+        "tsc/internal/compiler/program.go:filterAndSortDiagnostics",
+        "tsc/internal/core/workgroup.go:NewWorkGroup",
+        "tsc/internal/core/workgroup.go:singleThreadedWorkGroup.Queue",
+        "tsc/internal/core/workgroup.go:singleThreadedWorkGroup.RunAndWait",
+        "tsc/internal/core/workgroup.go:singleThreadedWorkGroup.pop"
+      ],
+      "request_sha256": "bfb865eb3564dfe2aa3748a2ad934d37bc66081e9cb6aef6eca7c9b366a77217"
+    },
+    {
+      "expected_contract": "The same program under the pinned parallel work groups (single_threaded false): every nested parse task runs before RunAndWait returns, and the observation equals the single-threaded twin byte for byte. Because the bytes are equal, the probe guards the mode: it fails unless the program is not single-threaded and core.NewWorkGroup(false) builds a *core.parallelWorkGroup, so a match shows that NewWorkGroup chose the parallel groups. The Rust sequential loader matches both.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/diagnostics/import-chain-parallel",
+      "native_authority": "tools/phase1/syntax/diagnostics_probe_test.go in the pinned compiler package: NewProgram with the requested work-group mode, then Program.GetSyntacticDiagnostics and the production diagnosticwriter",
+      "operation_actions": {
+        "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics": [
+          "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics",
+          "tsc/internal/compiler/program.go:Program.collectDiagnostics",
+          "tsc/internal/compiler/program.go:Program.collectDiagnosticsFromFiles",
+          "tsc/internal/compiler/program.go:SortAndDeduplicateDiagnostics",
+          "tsc/internal/compiler/program.go:filterAndSortDiagnostics",
+          "tsc/internal/core/workgroup.go:NewWorkGroup",
+          "tsc/internal/core/workgroup.go:parallelWorkGroup.Queue",
+          "tsc/internal/core/workgroup.go:parallelWorkGroup.RunAndWait"
+        ]
+      },
+      "operations": [
+        "tsc/internal/compiler/program.go:Program.GetSyntacticDiagnostics",
+        "tsc/internal/compiler/program.go:Program.collectDiagnostics",
+        "tsc/internal/compiler/program.go:Program.collectDiagnosticsFromFiles",
+        "tsc/internal/compiler/program.go:SortAndDeduplicateDiagnostics",
+        "tsc/internal/compiler/program.go:filterAndSortDiagnostics",
+        "tsc/internal/core/workgroup.go:NewWorkGroup",
+        "tsc/internal/core/workgroup.go:parallelWorkGroup.Queue",
+        "tsc/internal/core/workgroup.go:parallelWorkGroup.RunAndWait"
+      ],
+      "request_sha256": "f45d2d4f705b31dfb41a307753c0cd06a58c98e62488a5939d61369ce009d4ad"
+    },
+    {
+      "expected_contract": "A `<<` scanned by navigation is rescanned as `<` exactly when its containing node is a JSX child (tokens.go:11-20): getTokenAtPosition's gap scan and findRightmostValidToken both return the width-1 LessThanToken at each `<` of the error-recovery self-closing elements, and both keep the width-2 LessThanLessThanToken for the type-argument `<<` under a TypeReference and a CallExpression (token_at is the containing node at 81 and 104, preceding is the `<<` at 82 and 105).",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/astnav/jsx-child-shift-gap-scan",
+      "native_authority": "tools/phase1/syntax/astnav_probe_test.go in the pinned astnav package, over a file parsed by the pinned parser",
+      "operation_actions": {
+        "child_of_kind": [
+          "tsc/internal/astnav/tokens.go:FindChildOfKind"
+        ],
+        "next_in_file": [
+          "tsc/internal/astnav/tokens.go:FindNextToken"
+        ],
+        "next_in_parent": [
+          "tsc/internal/astnav/tokens.go:FindNextToken"
+        ],
+        "preceding": [
+          "tsc/internal/astnav/tokens.go:FindPrecedingToken",
+          "tsc/internal/astnav/tokens.go:findRightmostValidToken",
+          "tsc/internal/astnav/tokens.go:scanNavigationToken",
+          "tsc/internal/astnav/tokens.go:shouldRescanLessThanLessThanToken"
+        ],
+        "preceding_exclude_jsdoc": [
+          "tsc/internal/astnav/tokens.go:FindPrecedingTokenEx",
+          "tsc/internal/astnav/tokens.go:findRightmostValidToken",
+          "tsc/internal/astnav/tokens.go:scanNavigationToken",
+          "tsc/internal/astnav/tokens.go:shouldRescanLessThanLessThanToken"
+        ],
+        "start_of_token": [
+          "tsc/internal/astnav/tokens.go:GetStartOfNode"
+        ],
+        "start_of_token_with_jsdoc": [
+          "tsc/internal/astnav/tokens.go:GetStartOfNode"
+        ],
+        "token_at": [
+          "tsc/internal/ast/ast.go:SourceFile.GetOrCreateToken",
+          "tsc/internal/ast/ast.go:createToken",
+          "tsc/internal/astnav/tokens.go:GetTokenAtPosition",
+          "tsc/internal/astnav/tokens.go:getTokenAtPosition",
+          "tsc/internal/astnav/tokens.go:scanNavigationToken",
+          "tsc/internal/astnav/tokens.go:shouldRescanLessThanLessThanToken"
+        ],
+        "token_at_repeat": [
+          "tsc/internal/ast/ast.go:SourceFile.GetOrCreateToken",
+          "tsc/internal/astnav/tokens.go:GetTokenAtPosition"
+        ],
+        "touching_property_name": [
+          "tsc/internal/astnav/tokens.go:GetTouchingPropertyName"
+        ],
+        "touching_token": [
+          "tsc/internal/astnav/tokens.go:GetTouchingToken",
+          "tsc/internal/astnav/tokens.go:getTokenAtPosition",
+          "tsc/internal/astnav/tokens.go:scanNavigationToken",
+          "tsc/internal/astnav/tokens.go:shouldRescanLessThanLessThanToken"
+        ],
+        "visit_nodes": [
+          "tsc/internal/astnav/tokens.go:VisitEachChildAndJSDoc"
+        ]
+      },
+      "operations": [
+        "tsc/internal/ast/ast.go:SourceFile.GetOrCreateToken",
+        "tsc/internal/ast/ast.go:createToken",
+        "tsc/internal/astnav/tokens.go:FindChildOfKind",
+        "tsc/internal/astnav/tokens.go:FindNextToken",
+        "tsc/internal/astnav/tokens.go:FindPrecedingToken",
+        "tsc/internal/astnav/tokens.go:FindPrecedingTokenEx",
+        "tsc/internal/astnav/tokens.go:GetStartOfNode",
+        "tsc/internal/astnav/tokens.go:GetTokenAtPosition",
+        "tsc/internal/astnav/tokens.go:GetTouchingPropertyName",
+        "tsc/internal/astnav/tokens.go:GetTouchingToken",
+        "tsc/internal/astnav/tokens.go:VisitEachChildAndJSDoc",
+        "tsc/internal/astnav/tokens.go:findRightmostValidToken",
+        "tsc/internal/astnav/tokens.go:getTokenAtPosition",
+        "tsc/internal/astnav/tokens.go:scanNavigationToken",
+        "tsc/internal/astnav/tokens.go:shouldRescanLessThanLessThanToken"
+      ],
+      "request_sha256": "4a96d602119fc976e969fdc20175324772049052af4abcd7c63d2f01da5c1f9e"
+    },
+    {
+      "expected_contract": "Every createToken arm that navigation reaches builds the pinned payload. FindChildOfKind's stale-scanner tokens after a literal- or name-led child are created as StringLiteral, NumericLiteral, BigIntLiteral, NoSubstitutionTemplateLiteral, TemplateHead, Identifier and PrivateIdentifier tokens whose text is the raw source slice from the token's full start (leading newline included), whose token or template flags are the scanner's flags under the constructor's mask (PrecedingLineBreak dropped; escape, quote, specifier, exponent, separator and unterminated bits kept), and, for a template piece, whose token flags are 0 and raw text is empty; punctuation tokens carry no payload. Each child_of_kind_payload answer is [kind, pos, end, ordinal] followed by that payload. createToken's JsxText, RegularExpressionLiteral, TemplateMiddle and TemplateTail arms run in no astnav request (pinned -cover over all of them): navigation scans with Scan(), which returns none of those kinds, and with the JSX `<<` rescan, which in every input tried starts at the `<` because whitespace and comments in JSX children parse as JsxText nodes. A mutant confined to those arms is not reached by any navigation case.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/astnav/created-token-payloads",
+      "native_authority": "tools/phase1/syntax/astnav_probe_test.go in the pinned astnav package, over a file parsed by the pinned parser",
+      "operation_actions": {
+        "child_of_kind_payload": [
+          "tsc/internal/ast/ast.go:SourceFile.GetOrCreateToken",
+          "tsc/internal/ast/ast.go:createToken",
+          "tsc/internal/astnav/tokens.go:FindChildOfKind"
+        ]
+      },
+      "operations": [
+        "tsc/internal/ast/ast.go:SourceFile.GetOrCreateToken",
+        "tsc/internal/ast/ast.go:createToken",
+        "tsc/internal/astnav/tokens.go:FindChildOfKind"
+      ],
+      "request_sha256": "ac26f8222d736a838ea4b45bb2969d01ee2c3bb6d002773636021b3825949ce4"
     }
   ],
   "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
@@ -93565,25 +93852,44 @@
       "id": "witness/s07-include-reasons-rust",
       "kind": "rust_gated",
       "operations": [
+        "tsc/internal/ast/diagnostic.go:DiagnosticsCollection.Add",
+        "tsc/internal/ast/diagnostic.go:DiagnosticsCollection.GetDiagnosticsForFile",
+        "tsc/internal/ast/diagnostic.go:DiagnosticsCollection.GetGlobalDiagnostics",
+        "tsc/internal/ast/diagnostic.go:DiagnosticsCollection.getDiagnosticsForFileLocked",
+        "tsc/internal/ast/diagnostic.go:DiagnosticsCollection.getGlobalDiagnosticsLocked",
+        "tsc/internal/ast/diagnostic.go:NewCompilerDiagnostic",
+        "tsc/internal/ast/diagnostic.go:getDiagnosticLocationKey",
         "tsc/internal/compiler/fileInclude.go:FileIncludeReason.computeDiagnostic",
         "tsc/internal/compiler/fileInclude.go:FileIncludeReason.computeReferenceFileDiagnostic",
         "tsc/internal/compiler/fileInclude.go:FileIncludeReason.toDiagnostic",
         "tsc/internal/compiler/fileInclude.go:FileIncludeReason.toRelatedInfo",
         "tsc/internal/compiler/fileInclude.go:referenceFileLocation.diagnosticAt",
+        "tsc/internal/compiler/filesparser.go:filesParser.addIncludeReason",
+        "tsc/internal/compiler/includeprocessor.go:includeProcessor.addProcessingDiagnostic",
+        "tsc/internal/compiler/includeprocessor.go:includeProcessor.addProcessingDiagnosticsForFileCasing",
         "tsc/internal/compiler/includeprocessor.go:includeProcessor.explainRedirectAndImpliedFormat",
         "tsc/internal/compiler/includeprocessor.go:includeProcessor.getCompilerOptionsObjectLiteralSyntax",
         "tsc/internal/compiler/includeprocessor.go:includeProcessor.getDiagnostics",
         "tsc/internal/compiler/includeprocessor.go:includeProcessor.getReferenceLocation",
         "tsc/internal/compiler/includeprocessor.go:includeProcessor.getRelatedInfo",
         "tsc/internal/compiler/processingDiagnostic.go:processingDiagnostic.createDiagnosticExplainingFile",
+        "tsc/internal/compiler/processingDiagnostic.go:processingDiagnostic.toDiagnostic",
         "tsc/internal/compiler/program.go:Program.CommonSourceDirectory",
+        "tsc/internal/compiler/program.go:Program.GetConfigFileParsingDiagnostics",
+        "tsc/internal/compiler/program.go:Program.GetCurrentDirectory",
+        "tsc/internal/compiler/program.go:Program.GetImpliedNodeFormatForEmit",
         "tsc/internal/compiler/program.go:Program.GetProgramDiagnostics",
+        "tsc/internal/compiler/program.go:Program.GetResolvedModuleFromModuleSpecifier",
+        "tsc/internal/compiler/program.go:Program.GetSourceFile",
+        "tsc/internal/compiler/program.go:Program.IsSourceFileDefaultLibrary",
+        "tsc/internal/compiler/program.go:Program.Program",
+        "tsc/internal/compiler/program.go:Program.checkSourceFilesBelongToPath",
         "tsc/internal/compiler/program.go:SortAndDeduplicateDiagnostics",
         "tsc/internal/compiler/program.go:compactAndMergeRelatedInfos"
       ],
       "producer": "tools/s07/include-reason/export_test.go",
-      "rust_gate": "crates/tsr_compiler/src/include_reason_tests.rs:99 independently_observed_go_include_explanations and crates/tsr_compiler/src/program_diagnostics.rs:316 independently_observed_go_related_merge_and_sort_ties (`cargo test -p tsr_compiler --lib include_reason::tests program_diagnostics::tests`)",
-      "witnesses": "30 include-reason rows with 37 queries and 4 related-information merge rows. The adapter builds some processing diagnostics itself, so this witnesses how they render and merge, not whether the loader creates them."
+      "rust_gate": "crates/tsr_compiler/src/include_reason_tests.rs:140 independently_observed_go_include_explanations and crates/tsr_compiler/src/program_diagnostics.rs:318 independently_observed_go_related_merge_and_sort_ties (`cargo test -p tsr_compiler --lib include_reason::tests program_diagnostics::tests`)",
+      "witnesses": "45 include-reason rows with 53 queries and 4 related-information merge rows. The adapter builds some processing diagnostics itself, so for those rows this witnesses how they render and merge. The loader's own processing diagnostics are compared through the include collection: file-name casing (casing/*: two spellings on a case-insensitive host with the 'File name ... differs' and 'Already included file name ...' wordings, forceConsistentCasingInFileNames false, two paths differing only in case on a case-sensitive host, duplicate root spellings whose equal diagnostics the collection keeps once, and two spellings of a root that fails to load (casing/missing-root-variants: 6053; casing/js-root-variants: 6504 without allowJs), whose failure is reported once, for the spelling collected first, next to the casing diagnostic), unknown library references (lib-reference/*: a spelling suggestion, none, and a file-name spelling lowercased and trimmed), a file's diagnostics arriving out of position order and global diagnostics out of message order (diagnostics/*), one resolution diagnostic reached from two files, and the rootDir/composite explanations. accessors/* read Program.GetConfigFileParsingDiagnostics (a tsconfig with syntax errors), Program.GetSourceFile by absolute, relative, other-casing and missing names, and Program.IsSourceFileDefaultLibrary over Program.Program().SourceFiles(). Every reason that names a file carries a `relative` explanation built from Program.GetCurrentDirectory (cwd /src), for example singleton-import's import of ./dep from main.ts, so a wrong current directory changes those rows."
     },
     {
       "artifact": "data/s07/module-trace-observations.json",
@@ -93638,7 +93944,7 @@
         "tsc/internal/tsoptions/parsedcommandline.go:NewParsedCommandLine"
       ],
       "producer": "scripts/s07_program.py and scripts/s07_verify_options.py (`go test ./internal/compiler` through copied adapters)",
-      "rust_gate": "crates/tsr_compiler/src/tests.rs:15 `actual_go_loader_observations` and crates/tsr_compiler/tests/verify_options.rs:7 `option_diagnostics_locations_paths_and_output_conflicts_match_go` both run under `cargo test -p tsr_compiler` and both construct the config through tsr_tsoptions::ParsedCommandLine::new before asserting their rows (48 and 103 respectively)",
+      "rust_gate": "crates/tsr_compiler/src/tests.rs:15 `actual_go_loader_observations` and crates/tsr_compiler/tests/verify_options.rs:7 `option_diagnostics_locations_paths_and_output_conflicts_match_go` both run under `cargo test -p tsr_compiler` and both construct the config through tsr_tsoptions::ParsedCommandLine::new before asserting their rows (72 and 115 respectively)",
       "witnesses": "The construction of a ParsedCommandLine from options and roots, which both adapters do unconditionally before doing anything else: Go at tools/s07/program/export_test.go:168 and tools/s07/verify-options/export_test.go:11, Rust at tools/s07/program/rust_observation.rs:56. SCOPE: only the construction is claimed. Everything these two datasets go on to compare -- the loader closure, include reasons, option diagnostics -- belongs to internal/compiler, which is not F3a's package and whose Phase 1 boundary F4a decides."
     },
     {
@@ -93764,12 +94070,13 @@
       "id": "witness/s07-program-loader-rust",
       "kind": "rust_gated",
       "not_claimed": {
-        "compilerHost.Trace": "every trace in the 48 rows is empty",
-        "fileLoader.isSupportedExtension": "only ever returns true, one direction of change",
-        "filesParser.addIncludeReason": "fileIncludeReasons is never read because diag.file is empty",
-        "filesParser/parseTask internals": "no Rust counterpart: the Rust loader is structured differently, so only the outcome is witnessed"
+        "fileLoader.isSupportedExtension": "only ever returns true on these rows, one direction of change; its Rust home is witnessed by mutation",
+        "filesParser.addIncludeReason": "claimed by witness/s07-include-reasons-rust, whose rows read the include reasons",
+        "filesParser/parseTask/fileLoader internals": "each has a single-operation Rust home in crates/tsr_compiler/src/loader.rs and is witnessed by mutation (mutation/syntax); these rows compare only the loader's outcome"
       },
       "operations": [
+        "tsc/internal/ast/parseoptions.go:GetExternalModuleIndicatorOptions",
+        "tsc/internal/ast/utilities.go:ShouldTransformImportCall",
         "tsc/internal/compiler/fileInclude.go:FileIncludeReason.computeDiagnostic",
         "tsc/internal/compiler/fileInclude.go:FileIncludeReason.getReferencedLocation",
         "tsc/internal/compiler/fileInclude.go:FileIncludeReason.toDiagnostic",
@@ -93783,11 +94090,12 @@
         "tsc/internal/compiler/fileloader.go:getModeForTypeReferenceDirectiveInFile",
         "tsc/internal/compiler/fileloader.go:getModeForUsageLocation",
         "tsc/internal/compiler/fileloader.go:processAllProgramFiles",
+        "tsc/internal/compiler/host.go:compilerHost.Trace",
         "tsc/internal/compiler/program.go:Program.GetSourceFileMetaData"
       ],
       "producer": "tools/s07/program/export_test.go through scripts/s07_program.py (processAllProgramFiles and the include processor's diagnostics, without NewProgram)",
       "rust_gate": "crates/tsr_compiler/src/tests.rs:15 actual_go_loader_observations (`cargo test -p tsr_compiler --lib tests::actual_go_loader_observations`) asserts each whole row; also enumerated in data/s07/program-helper-tests.json",
-      "witnesses": "48 loader rows: files, metadata, imports, resolutions, type resolutions, missing files and include diagnostics (6053, 2688, 2209). The Rust loader is a reimplementation compared as a whole, so beyond the entry point only operations with a Rust port that runs on this path are claimed."
+      "witnesses": "72 loader rows: files, metadata, imports, module-ness, resolutions, type resolutions, missing files, include diagnostics (6053, 6504, 2688, 2209, 1149, 2727) and resolution traces. dynamic-import/* resolve import() under module esnext, preserve and a transforming CommonJS module, and in a CommonJS-format file under module node16 (`./dep`, which ESM resolution leaves unresolved), nodenext (`./dep.js`) and preserve (a .cts importer). In those last three the emit format is CommonJS, so only ShouldTransformImportCall's Node16..NodeNext/Preserve early return gives the ESNext mode (99) Go records; without it the mode is CommonJS (1). module-detection/* cover moduleDetection force (a script and a declaration file), legacy .mts, auto .cts, an ESM package format and react-jsx tags (GetExternalModuleIndicatorOptions; its declaration-file arm is not distinguishable by module-ness, because a declaration file is never forced to be a module). trace/* record module, type-reference and library-replacement traces in callback order (compilerHost.Trace). casing/missing-root-variants and casing/js-root-variants give a root that fails to load (missing, or JavaScript without allowJs) two spellings on a case-insensitive host: the failure is reported once, for the first spelling, which is also the missing file, and the second spelling adds 1149. lib-replacement/* cover replacement package names with a subpath, a nested name and resolution from the configuration directory. The Rust loader is a reimplementation compared as a whole, so beyond the entry point only operations with a Rust port that runs on this path are claimed."
     },
     {
       "artifact": "data/s07/resolver-observations.json",
@@ -93795,11 +94103,37 @@
       "id": "witness/s07-resolver-audited-helper-paths",
       "kind": "rust_gated",
       "operation_actions": {
+        "alias/0": [
+          "tsc/internal/ast/utilities.go:GetDeclarationOfKind"
+        ],
+        "alias/1": [
+          "tsc/internal/ast/utilities.go:GetDeclarationOfKind"
+        ],
+        "alias/2": [
+          "tsc/internal/ast/utilities.go:GetDeclarationOfKind"
+        ],
+        "alias/3": [
+          "tsc/internal/ast/utilities.go:GetDeclarationOfKind"
+        ],
         "arguments": [
           "tsc/internal/binder/nameresolver.go:NameResolver.argumentsSymbol"
         ],
+        "bind/once": [
+          "tsc/internal/ast/ast.go:SourceFile.BindOnce"
+        ],
+        "bind/state": [
+          "tsc/internal/ast/ast.go:SourceFile.BindOnce",
+          "tsc/internal/ast/ast.go:SourceFile.IsBound"
+        ],
         "default": [
+          "tsc/internal/ast/ast.go:Node.LocalSymbol",
           "tsc/internal/binder/nameresolver.go:isExportDefaultSymbol"
+        ],
+        "default/nil": [
+          "tsc/internal/ast/ast.go:Node.LocalSymbol"
+        ],
+        "default/scan": [
+          "tsc/internal/ast/ast.go:Node.LocalSymbol"
         ],
         "export/container/0": [
           "tsc/internal/binder/referenceresolver.go:referenceResolver.getParentOfSymbol",
@@ -93844,6 +94178,8 @@
           "tsc/internal/binder/nameresolver.go:NameResolver.lookup"
         ],
         "import/0": [
+          "tsc/internal/ast/utilities.go:IsAliasSymbolDeclaration",
+          "tsc/internal/ast/utilities.go:IsNonLocalAlias",
           "tsc/internal/binder/referenceresolver.go:referenceResolver.getDeclarationOfAliasSymbol",
           "tsc/internal/binder/referenceresolver.go:referenceResolver.isTypeOnlyAliasDeclaration"
         ],
@@ -93863,14 +94199,25 @@
           "tsc/internal/binder/referenceresolver.go:referenceResolver.getDeclarationOfAliasSymbol",
           "tsc/internal/binder/referenceresolver.go:referenceResolver.isTypeOnlyAliasDeclaration"
         ],
+        "import/alias/0": [
+          "tsc/internal/ast/utilities.go:IsNonLocalAlias"
+        ],
+        "import/alias/1": [
+          "tsc/internal/ast/utilities.go:IsAliasSymbolDeclaration",
+          "tsc/internal/ast/utilities.go:IsNonLocalAlias"
+        ],
         "import/hook-nil": [
           "tsc/internal/binder/referenceresolver.go:referenceResolver.getDeclarationOfAliasSymbol",
           "tsc/internal/binder/referenceresolver.go:referenceResolver.isTypeOnlyAliasDeclaration"
         ],
         "lexical/0": [
+          "tsc/internal/ast/ast.go:Node.Locals",
+          "tsc/internal/ast/utilities.go:IsGlobalSourceFile",
           "tsc/internal/binder/nameresolver.go:isSelfReferenceLocation"
         ],
         "lexical/1": [
+          "tsc/internal/ast/ast.go:Node.Locals",
+          "tsc/internal/ast/utilities.go:IsGlobalSourceFile",
           "tsc/internal/binder/nameresolver.go:isSelfReferenceLocation"
         ],
         "member/value/0": [
@@ -94023,12 +94370,24 @@
         "scope/8/9": [
           "tsc/internal/binder/nameresolver.go:NameResolver.requiresScopeChangeWorker"
         ],
+        "script/locals": [
+          "tsc/internal/ast/ast.go:Node.Locals",
+          "tsc/internal/ast/utilities.go:IsGlobalSourceFile"
+        ],
         "static/type": [
           "tsc/internal/binder/nameresolver.go:NameResolver.error",
           "tsc/internal/binder/nameresolver.go:NameResolver.getSymbolOfDeclaration"
         ]
       },
       "operations": [
+        "tsc/internal/ast/ast.go:Node.LocalSymbol",
+        "tsc/internal/ast/ast.go:Node.Locals",
+        "tsc/internal/ast/ast.go:SourceFile.BindOnce",
+        "tsc/internal/ast/ast.go:SourceFile.IsBound",
+        "tsc/internal/ast/utilities.go:GetDeclarationOfKind",
+        "tsc/internal/ast/utilities.go:IsAliasSymbolDeclaration",
+        "tsc/internal/ast/utilities.go:IsGlobalSourceFile",
+        "tsc/internal/ast/utilities.go:IsNonLocalAlias",
         "tsc/internal/binder/nameresolver.go:NameResolver.argumentsSymbol",
         "tsc/internal/binder/nameresolver.go:NameResolver.error",
         "tsc/internal/binder/nameresolver.go:NameResolver.getSymbolOfDeclaration",
@@ -94047,7 +94406,7 @@
       ],
       "producer": "binder and workspace",
       "rust_gate": "cargo test -p tsr_binder --lib name_resolver::tests (also enumerated by data/s07/helper-tests.json in cargo xtask run binder)",
-      "witnesses": "F5b source audit of the necessary internal call paths behind exact frozen row labels. Covers scope-target transitions; lookup callback order; one transient arguments symbol with flags/name and retained identity; TS2302; local default export; self-reference callback suppression; reference hook fallback/merge order; type-only import filtering; missing hooks versus hooks returning nil. docs/PHASE1-F5b-binder-coverage.md gives each row and observable discriminator. No additional resolver operation is inferred from the full corpus."
+      "witnesses": "F5b source audit of the necessary internal call paths behind exact frozen row labels. Covers scope-target transitions; lookup callback order; one transient arguments symbol with flags/name and retained identity; TS2302; local default export; self-reference callback suppression; reference hook fallback/merge order; type-only import filtering; missing hooks versus hooks returning nil. docs/PHASE1-F5b-binder-coverage.md gives each row and observable discriminator. No additional resolver operation is inferred from the full corpus. Phase 1 closure rows (PB19), each with its discriminator: alias/0-3, a module export that is purely an alias is out of scope only when it has an ExportSpecifier or NamespaceExport declaration, also in second position (GetDeclarationOfKind returning nil, or the first declaration, flips a row); script/locals with lexical/0-1, IsGlobalSourceFile true for a script, whose locals are skipped, and false for a module, whose locals (Node.Locals) resolve the name; default, default/nil and default/scan, Node.LocalSymbol over a declaration with a nil local, an ExportAssignment with no local (the nil NodeDefault.ExportableData arm runs there but is not claimed: no row can tell nil from an empty ExportableBase, so that operation is an equivalent_rust roster entry) and a class with a local; import/0 and import/alias/0-1, IsNonLocalAlias false for an alias merged with a value and true otherwise, and IsAliasSymbolDeclaration skipping a later non-alias declaration; bind/state, SourceFile.IsBound false before and true after BindSourceFile, which also discriminates BindOnce's isBound store; bind/once, SourceFile.BindOnce entered directly on the bound file (BindSourceFile's IsBound guard keeps a second BindSourceFile away from it): neither a new callback nor bindSourceFile runs again and the module symbol is kept (a BindOnce without its sync.Once flips it to true/false). Go coverage of the adapter enters every claimed function; the rows are asserted by the pinned_* tests and resolver_ids_are_checked_against_the_retained_host."
     },
     {
       "artifact": "data/s07/resolver-observations.json",
@@ -94071,7 +94430,7 @@
       ],
       "producer": "tools/s07/resolver/export_test.go in package binder",
       "rust_gate": "the seven pinned_* tests in crates/tsr_binder/src/resolver_tests.rs, mounted as name_resolver::tests (`cargo test -p tsr_binder --lib name_resolver::tests`); `cargo test -p tsr_binder` (CI 'Binder, program and configuration contracts')",
-      "witnesses": "84 rows in 20 label families over name and reference resolution. Only the directly called entry points are claimed: rows are looked up by label with no completeness check, and per-branch execution of the one-hop helpers is unverified."
+      "witnesses": "95 rows in 27 label families over name and reference resolution and two binding-state rows. Only the directly called entry points are claimed: rows are looked up by label with no completeness check, and per-branch execution of the one-hop helpers is unverified."
     },
     {
       "artifact": "data/s07/scanner-helper-observations.tsv",
@@ -94158,19 +94517,28 @@
       "id": "witness/s07-verify-options-rust",
       "kind": "rust_gated",
       "not_claimed": {
-        "blockEmittingOfFile, getSourceFilesToEmit": "no Rust port annotation",
-        "moduleResolutionSupportsPackageJsonExportsAndImports": "runs in 2 rows, true both times",
         "verifyProjectReferences": "only the no-reference form runs"
       },
       "operations": [
+        "tsc/internal/compiler/emitter.go:getSourceFilesToEmit",
         "tsc/internal/compiler/emitter.go:sourceFileMayBeEmitted",
+        "tsc/internal/compiler/program.go:Program.Host",
+        "tsc/internal/compiler/program.go:Program.IsSourceFileFromExternalLibrary",
+        "tsc/internal/compiler/program.go:Program.Options",
+        "tsc/internal/compiler/program.go:Program.SourceFiles",
+        "tsc/internal/compiler/program.go:Program.UseCaseSensitiveFileNames",
+        "tsc/internal/compiler/program.go:Program.blockEmittingOfFile",
+        "tsc/internal/compiler/program.go:Program.getSourceFilesToEmit",
+        "tsc/internal/compiler/program.go:Program.toPath",
         "tsc/internal/compiler/program.go:Program.verifyCompilerOptions",
         "tsc/internal/compiler/program.go:emitModuleKindIsNonNodeESM",
-        "tsc/internal/compiler/program.go:hasZeroOrOneAsteriskCharacter"
+        "tsc/internal/compiler/program.go:hasZeroOrOneAsteriskCharacter",
+        "tsc/internal/compiler/program.go:moduleResolutionSupportsPackageJsonExportsAndImports",
+        "tsc/internal/parser/parser.go:ParseIsolatedEntityName"
       ],
       "producer": "tools/s07/verify-options/export_test.go (processAllProgramFiles, then verifyCompilerOptions)",
       "rust_gate": "crates/tsr_compiler/tests/verify_options.rs:7 option_diagnostics_locations_paths_and_output_conflicts_match_go (`cargo test -p tsr_compiler --test verify_options`)",
-      "witnesses": "103 rows observing 28 option-verification codes, their locations, output-path conflicts and blocked outputs."
+      "witnesses": "115 rows observing 28 option-verification codes, their locations, output-path conflicts and blocked outputs. options/extra/* add valid jsxFactory/jsxFragmentFactory values (the entity-name parse succeeds) and package maps under node16, nodenext and bundler, where moduleResolutionSupportsPackageJsonExportsAndImports returns true and no 5098 is reported, so these rows kill a `return false` change. Its false direction is unreachable at the pin: GetModuleResolutionKind maps Unknown, Classic and Node10 to Node16, NodeNext or Bundler (core/compileroptions.go:223-237), so options/37 (moduleResolution classic with both package-map flags and customConditions) also evaluates true and reports only 5108, and a `return true` change is equivalent. outputs/* add a case-insensitive host where an output overwrites an input spelled in another case and two outputs differ only in case (Program.toPath, UseCaseSensitiveFileNames and Host decide both 5055/5056 and the blocked paths), and a TypeScript dependency found in node_modules that is not emitted (IsSourceFileFromExternalLibrary; its control reports the rootDir explanation)."
     },
     {
       "artifact": "data/s08/p5/errors/observations.json",
@@ -94192,20 +94560,6 @@
       "producer": "scripts/s08_p5_errors.py (`tools/s08/p5/error_oracle_test.go` against the pinned diagnosticwriter)",
       "rust_gate": "crates/tsr_compiler/tests/diagnostic_writer.rs:10 `native_plain_pretty_and_error_baseline_bytes_match` runs under `cargo test -p tsr_compiler --test diagnostic_writer` and asserts the whole case object equal for all 24 cases, covering all five outputs (plain_hex, pretty_hex, summary_hex, errors_plain, errors_pretty)",
       "witnesses": "24 synthetic cases over the pinned formatter: all four categories, global and file errors, message chains, related information, zero-width and multiline ranges, CRLF/CR-only/Unicode separators, astral characters, custom sources, relative paths and the library-location regexp. Every claimed operation was checked against the pinned body AND against the frozen bytes for evidence its branch is actually taken, not merely that it sits on the path. Three operations were deliberately EXCLUDED after that check: `WrapASTDiagnostics` and `ToDiagnostics` are a Go-only wrapper layer (Rust passes `&[&Diagnostic]` straight in, so nothing on the Rust side corresponds), and `CompareASTDiagnostics` is skipped by Rust, which sorts with `tsr_ast::compare_diagnostics`, a port of the different `ast/diagnostic.go:CompareDiagnostics`. Asymmetries that remain inside the claimed set: `WriteFormatDiagnostics` and `FormatDiagnosticsWithColorAndContext` are one Rust function taking a `pretty` flag, as are `WriteErrorSummaryText` and `getErrorSummary`; `WriteLocation` takes an injected writer in Go and selects internally in Rust; `writeCodeSnippet` takes a length in Go and an end in Rust, and Rust adds two bounds guards the pin does not have, which NO fixture reaches. The content-mapper span-translation arms of `ASTDiagnostic.File` and `resolve` are not reached by any of the 24, because the oracle's source files carry no mapper info; Rust refuses that path rather than implementing it."
-    },
-    {
-      "artifact": "tools/phase1/syntax/astnav-rescan/native-observations.json",
-      "id": "f5b/native-navigation-rescan",
-      "kind": "rust_gated",
-      "notes": "docs/PHASE1-F5b-navigation-coverage.md",
-      "operations": [
-        "tsc/internal/astnav/tokens.go:shouldRescanLessThanLessThanToken",
-        "tsc/internal/astnav/tokens.go:scanNavigationToken"
-      ],
-      "producer": "workspace tests",
-      "reproduce": "PATH=/Users/cristian/.local/share/mise/installs/go/1.27.1/bin:$PATH python3 scripts/phase1_navigation_rescan.py --output target/phase1-navigation-review",
-      "rust_gate": "cargo test -p tsr_astnav --lib tests::jsx_shift_rescan_matches_the_pinned_private_operation -- --exact",
-      "witnesses": "Five direct pinned-Go private helper observations: << with JSX and ordinary containing nodes, non-shift <, <<=, and closing-tag text. Rust unit reads exactly the native-derived TSV and compares before/after kinds, start/end and flags; Python fixture check authenticates pin, probe, requests, raw output and TSV. Both true rescan and false arms are observed."
     },
     {
       "artifact": "data/s07/program-boundary-observations.json",
@@ -207664,6 +208018,19 @@
       ],
       "oracle": "syntax",
       "witnesses": "Mutation kills on the frozen syntax oracle. For each claimed operation, a mutant of every Rust home a traced Phase 1 oracle executes (in production or observation stages) changes a compared stage on a frozen row where the unmutated Rust equals the frozen native observation and the pinned Go operation was entered; for a replacement that allocates, the mutant also differs from its paired control in a stage where it differs from native. A whole-program (syntax) kill never credits a site that carries markers for several operations. Survivors, crashes and timeouts confer nothing and are kept in the results artifact; they are never equivalent_rust claims."
+    },
+    {
+      "artifact": "tools/phase1/parser-tokens/native-observations.json",
+      "freshness": "gated on every `cargo test -p tsr_parser` and by RUST_WITNESS_TESTS (scripts/phase1_integration.py), whose rust-witnesses receipt also binds tools/phase1/parser-tokens/** (RECEIPT_INPUTS; foundations ledger line in phaseB/PB19/patches/registration/status-runs.toml.diff). scripts/tests/test_phase1_parser_tokens.py checks native-provenance.json (pin, overlay, request and output hashes) against the frozen rows and requires the Rust table to equal observe.py's rendering of those rows byte for byte; the reproduce command re-runs the pinned Go and must match both",
+      "id": "witness/parser-keyword-or-punctuation",
+      "kind": "rust_gated",
+      "operations": [
+        "tsc/internal/parser/utilities.go:isKeywordOrPunctuation"
+      ],
+      "producer": "tools/phase1/parser-tokens/export_test.go, an access-only overlay in the pinned parser package",
+      "reproduce": "PATH=/Users/cristian/.local/share/mise/installs/go/1.27.1/bin:$PATH python3 tools/phase1/parser-tokens/observe.py --output target/phase1-parser-tokens-review",
+      "rust_gate": "cargo test -p tsr_parser --lib tokens::tests::keyword_or_punctuation_matches_the_pinned_kind_table -- --exact",
+      "witnesses": "Every Kind from -1 through KindCount+1 (354 values, KindCount 351): the pinned parser package's isKeywordOrPunctuation against tsr_parser's is_keyword_or_punctuation for every SyntaxKind (146 true). The Go Kind names pin the numbering the Rust enum shares; Kind(-1), KindCount and Kind(352) have no SyntaxKind and are false at the pin. The pinned callers are assertion guards passed keyword or punctuation constants (parser.go:967, 1047, 4757), so no parse observes the result and a mutation of it can only crash."
     }
   ]
 }

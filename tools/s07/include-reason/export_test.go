@@ -29,6 +29,7 @@ type s07IncludeRequest struct {
 		Preferred        *int
 		AugmentationFrom string
 	} `json:"queries"`
+	SourceFileQueries []string `json:"source_file_queries"`
 }
 type s07IncludeDiag struct {
 	File           string
@@ -159,7 +160,30 @@ func TestS07IncludeReasons(t *testing.T) {
 				byFile[string(file.Path())] = values
 			}
 		}
-		rows = append(rows, map[string]any{"id": r.ID, "queries": observations, "program": globals, "include_globals": includeGlobals, "include_files": byFile})
+		row := map[string]any{"id": r.ID, "queries": observations, "program": globals, "include_globals": includeGlobals, "include_files": byFile}
+		if r.SourceFileQueries != nil {
+			// Program accessors on the loaded program: its configuration's parsing
+			// diagnostics, source files looked up by name, and default-library
+			// membership of every file it lists.
+			parsing := []s07IncludeDiag{}
+			for _, d := range p.GetConfigFileParsingDiagnostics() {
+				parsing = append(parsing, s07IncludeDiagnostic(d))
+			}
+			sourceFiles := []map[string]any{}
+			for _, name := range r.SourceFileQueries {
+				found := ""
+				if file := p.GetSourceFile(name); file != nil {
+					found = file.FileName()
+				}
+				sourceFiles = append(sourceFiles, map[string]any{"query": name, "file": found})
+			}
+			files := []map[string]any{}
+			for _, file := range p.Program().SourceFiles() {
+				files = append(files, map[string]any{"path": string(file.Path()), "default_library": p.IsSourceFileDefaultLibrary(file.Path())})
+			}
+			row["program_accessors"] = map[string]any{"config_file_parsing_diagnostics": parsing, "source_files": sourceFiles, "files": files}
+		}
+		rows = append(rows, row)
 	}
 	data, e := json.MarshalIndent(rows, "", "  ")
 	if e != nil {

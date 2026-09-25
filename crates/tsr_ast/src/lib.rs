@@ -57,7 +57,8 @@ pub use node_mut::NodeMut;
 mod node_read;
 mod node_read_generated;
 mod node_text;
-mod precedence;
+// Public for the Phase 1 operation tables: TC5 ports into it (section 9).
+pub mod precedence;
 mod runtime_generated;
 mod runtime_id;
 mod source_cache;
@@ -376,5 +377,14 @@ pub mod utilities;
 pub mod utilities_tail;
 
 pub mod utilities_middle;
+
+// Phase 1 operation-table groups (docs/PHASE1-mutation-witnesses.md, section 9).
+pub mod diagnostic_api;
+pub mod source_file_tables;
+pub mod utilities_class;
+pub mod utilities_containers;
+pub mod utilities_modules;
+pub mod utilities_positions;
+pub mod utilities_targets;
 
 pub mod span_map;

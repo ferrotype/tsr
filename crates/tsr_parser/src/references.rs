@@ -2,7 +2,7 @@ use crate::{Parser, ParserFactory};
 use std::ops::ControlFlow;
 use tsr_ast::{
     modifier_flags, node_flags, subtree_flags, AstBuilder, ChildVisitor, Factory, JsString, NodeId,
-    NodeListId, NodeSlice, RuntimeFactory, SyntaxKind as K,
+    NodeListId, NodeSlice, RuntimeFactory, SourceFileState, SourceNodeSlice, SyntaxKind as K,
 };
 use tsr_core::{ScriptKind, Tristate};
 
@@ -40,11 +40,15 @@ impl Parser<'_, AstBuilder> {
         }
         let opts = file.parse_options().external_module_indicator_options;
         if opts.jsx {
-            if let Some(node) = self.walk_tree_for_jsx_tags(root) {
+            if let Some(node) = self.is_file_module_from_using_jsx_tag(root) {
                 return Some(node);
             }
         }
         opts.force.then_some(root)
+    }
+    /// port: tsc/internal/ast/parseoptions.go:isFileModuleFromUsingJSXTag
+    fn is_file_module_from_using_jsx_tag(&self, root: NodeId) -> Option<NodeId> {
+        self.walk_tree_for_jsx_tags(root)
     }
     /// port: tsc/internal/ast/parseoptions.go:isFileProbablyExternalModule
     fn is_file_probably_external_module(&self, root: NodeId) -> Option<NodeId> {
@@ -121,23 +125,10 @@ impl Parser<'_, AstBuilder> {
         if flags & (node_flags::POSSIBLY_CONTAINS_DYNAMIC_IMPORT | node_flags::JAVA_SCRIPT_FILE)
             != 0
         {
-            let javascript = flags & node_flags::JAVA_SCRIPT_FILE != 0;
-            let mut start = 0;
-            while let Some((index, size)) = find_import_or_require(self.source_text, start) {
-                let node = self.get_node_at_position(root, index as i64, javascript);
-                let argument = if javascript && self.is_require_call(node) {
-                    self.first_call_argument(node)
-                } else if self.is_import_call(node) {
-                    self.first_call_argument(node)
-                        .filter(|&id| self.is_string_literal_like(id))
-                } else {
-                    self.literal_import_type_argument(node)
-                };
-                if let Some(argument) = argument {
-                    collected.imports.push(Some(argument));
-                }
-                start = index + size;
-            }
+            self.for_each_dynamic_import_or_require_call(root, true, true, |_, argument| {
+                collected.imports.push(Some(argument));
+                false
+            });
         }
         let imports = if collected.imports.is_empty() {
             tsr_ast::SourceNodeSlice::empty()
@@ -161,9 +152,47 @@ impl Parser<'_, AstBuilder> {
                 .expect("owned ambient names")
         };
         let file = self.factory.source_file_mut(root).expect("source metadata");
-        file.imports = imports;
+        set_imports_of_source_file(file, imports);
         file.module_augmentations = augmentations;
         file.ambient_module_names = ambient_names;
+    }
+    /// Scans the text for `import`/`require` and reports each dynamic import,
+    /// require call and literal import type with its module specifier, in text
+    /// order, until the callback returns true.
+    /// port: tsc/internal/ast/utilities.go:ForEachDynamicImportOrRequireCall
+    fn for_each_dynamic_import_or_require_call(
+        &self,
+        root: NodeId,
+        include_type_space_imports: bool,
+        require_string_literal_like_argument: bool,
+        mut callback: impl FnMut(NodeId, NodeId) -> bool,
+    ) -> bool {
+        let javascript = self.factory.node(root).flags() & node_flags::JAVA_SCRIPT_FILE != 0;
+        let mut start = 0;
+        while let Some((index, size)) = find_import_or_require(self.source_text, start) {
+            let node = self.get_node_at_position(
+                root,
+                index as i64,
+                javascript && include_type_space_imports,
+            );
+            let argument =
+                if javascript && self.is_require_call(node, require_string_literal_like_argument) {
+                    self.first_call_argument(node)
+                } else if self.is_import_call(node) {
+                    self.first_call_argument(node).filter(|&id| {
+                        !require_string_literal_like_argument || self.is_string_literal_like(id)
+                    })
+                } else if include_type_space_imports {
+                    self.literal_import_type_argument(node)
+                } else {
+                    None
+                };
+            if argument.is_some_and(|argument| callback(node, argument)) {
+                return true;
+            }
+            start = index + size;
+        }
+        false
     }
     /// port: tsc/internal/parser/references.go:collectModuleReferences
     fn collect_module_references(
@@ -461,7 +490,7 @@ impl<F: ParserFactory> Parser<'_, F> {
                 .flatten()
         })
     }
-    fn is_require_call(&self, node: NodeId) -> bool {
+    fn is_require_call(&self, node: NodeId, require_string_literal_like_argument: bool) -> bool {
         let node = self.factory.node(node);
         if node.kind() != K::CallExpression {
             return false;
@@ -485,12 +514,13 @@ impl<F: ParserFactory> Parser<'_, F> {
             self.factory.read_list(list).nodes()
         });
         nodes.len() == 1
-            && self.is_string_literal_like(
-                self.factory
-                    .read_nodes(nodes)
-                    .at(0)
-                    .expect("parsed argument"),
-            )
+            && (!require_string_literal_like_argument
+                || self.is_string_literal_like(
+                    self.factory
+                        .read_nodes(nodes)
+                        .at(0)
+                        .expect("parsed argument"),
+                ))
     }
     /// port: tsc/internal/ast/utilities.go:IsImportCall
     fn is_import_call(&self, node: NodeId) -> bool {
@@ -518,6 +548,9 @@ impl<F: ParserFactory> Parser<'_, F> {
                         == b"defer"
             }
     }
+    /// The literal of an import type whose argument is a string literal type:
+    /// the node test and the specifier the pinned caller reads from it.
+    /// port: tsc/internal/ast/utilities.go:IsLiteralImportTypeNode
     fn literal_import_type_argument(&self, node: NodeId) -> Option<NodeId> {
         let node = self.factory.node(node);
         if node.kind() != K::ImportType {
@@ -539,6 +572,12 @@ impl<F: ParserFactory> Parser<'_, F> {
             .literal()
             .filter(|&literal| self.factory.node(literal).kind() == K::StringLiteral)
     }
+}
+
+/// Parser-only setter for the source file's module specifiers.
+/// port: tsc/internal/ast/utilities.go:SetImportsOfSourceFile
+fn set_imports_of_source_file(file: &mut SourceFileState, imports: SourceNodeSlice) {
+    file.imports = imports;
 }
 
 /// port: tsc/internal/ast/utilities.go:findImportOrRequire

@@ -1085,6 +1085,42 @@
         "symlinks": {},
         "use_source_of_project_reference": false
       }
+    },
+    {
+      "actions": [
+        {
+          "op": "load"
+        },
+        {
+          "op": "graph"
+        },
+        {
+          "op": "verify"
+        }
+      ],
+      "case": "syntax/project-references/js-import-symlinked-to-reference-output",
+      "discriminates": "With preserveSymlinks and a project reference, a JavaScript import found in node_modules is a symlink to the reference's output declaration file. The redirect check realpaths the resolved file name (it contains /node_modules/), finds the reference output and makes a redirect, so the import is not JavaScript and enters the program at maxNodeModuleJsDepth 0. An empty or wrong file name finds no output, and the import is elided.",
+      "host_applicability": "any",
+      "operation": "tsc/internal/ast/utilities.go:hasFileNameImpl.FileName",
+      "order_sensitive": true,
+      "subject": "projectReferences",
+      "workspace": {
+        "case_sensitive": true,
+        "cwd": "/repo",
+        "files": {
+          "/repo/lib/a.d.ts": "export declare const a: number;",
+          "/repo/lib/a.ts": "export const a = 1;",
+          "/repo/lib/tsconfig.json": "{\"compilerOptions\":{\"composite\":true}}",
+          "/repo/main.ts": "import { a } from \"js-pkg\";",
+          "/repo/tsconfig.json": "{\"compilerOptions\":{\"allowJs\":true,\"preserveSymlinks\":true},\"files\":[\"main.ts\"],\"references\":[{\"path\":\"./lib\"}]}"
+        },
+        "project": "tsconfig.json",
+        "suppress_output_path_check": false,
+        "symlinks": {
+          "/repo/node_modules/js-pkg/index.js": "/repo/lib/a.d.ts"
+        },
+        "use_source_of_project_reference": false
+      }
     }
   ]
 }

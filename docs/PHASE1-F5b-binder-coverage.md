@@ -13,8 +13,8 @@ unused or equate an unverified implementation by name.
 
 ## Resolver helper paths: 15 operations
 
-The exact native results are the 84 rows of
-`data/s07/resolver-observations.tsv`; its manifest authenticates the pinned
+The exact native results are rows of `data/s07/resolver-observations.tsv`
+(84 when this audit was made, 95 after the Phase 1 closure rows below); its manifest authenticates the pinned
 sources, adapter and observation bytes. The native adapter is
 `tools/s07/resolver/export_test.go`. The matching Rust tests are in
 `crates/tsr_binder/src/resolver_tests.rs` and compare each requested label with
@@ -41,6 +41,25 @@ The Rust homes are `name_resolver.rs` and `reference_resolver.rs`. The
 these new links: the nonpanic rows already discriminate the relevant paths.
 The seven existing resolver tests do not have an all-row consumption assertion;
 this audit only names rows actually looked up by those tests.
+
+### Phase 1 closure rows (PB19): 8 more operations
+
+Eleven rows added to the same adapter and re-frozen with
+`python3 scripts/s07_resolver.py`, plus claims on four existing rows, link
+eight more operations to `witness/s07-resolver-audited-helper-paths` (23 in
+all). Their prefix is `tsc/internal/ast/`. The Rust rows are in the existing
+`pinned_*` tests and `resolver_ids_are_checked_against_the_retained_host`.
+
+| Exact TSV rows | Newly linked operations | Discriminator and necessary path |
+| --- | --- | --- |
+| `alias/0` through `alias/3` | `utilities.go:GetDeclarationOfKind` | A module export that is purely an alias is out of scope only when it has an `ExportSpecifier` or `NamespaceExport` declaration (nameresolver.go 131-144), also when that declaration is second (`alias/3`); an import-equals alias stays resolvable (`alias/2`). A helper returning nil, or the first declaration, flips a row. |
+| `script/locals`, `lexical/0`, `lexical/1` | `ast.go:Node.Locals`, `utilities.go:IsGlobalSourceFile` | A script's locals are skipped (`script/locals` resolves nothing); a module's locals resolve the name (`lexical/*`). |
+| `default`, `default/nil`, `default/scan` | `ast.go:Node.LocalSymbol` | A function declaration with a nil local, an `ExportAssignment` with no local, then a class whose local is returned. The `ExportAssignment` runs the nil `NodeDefault.ExportableData` arm, but no row can tell nil from an empty `ExportableBase` (a pinned-Go overlay returning `&ExportableBase{}` leaves every row unchanged), so that operation is an `equivalent_rust` syntax-roster entry and is not claimed here. |
+| `import/0`, `import/alias/0`, `import/alias/1` | `utilities.go:IsNonLocalAlias`, `utilities.go:IsAliasSymbolDeclaration` | An alias merged with a local value is not a non-local alias (`import/alias/0` false); otherwise the declaration is the last `IsAliasSymbolDeclaration` match, not the last declaration (`import/alias/1` true). |
+| `bind/state` | `ast.go:SourceFile.IsBound`, `ast.go:SourceFile.BindOnce` | `IsBound` is false before and true after `BindSourceFile`, which sets the module symbol, one local and symbol count 2; a second `BindSourceFile` keeps the symbol. Dropping BindOnce's `isBound` store flips the second column. |
+| `bind/once` | `ast.go:SourceFile.BindOnce` | `BindSourceFile`'s `IsBound` guard keeps the second call above away from `BindOnce`, so this row enters it directly on the bound file: a new callback does not run and `bindSourceFile` keeps the module symbol (`false true`). A `BindOnce` without its `sync.Once` gives `true false`. |
+
+Go coverage of the adapter (`go test -cover`) enters every linked function.
 
 ## Supplemental diagnostics: 12 operations
 
@@ -138,7 +157,7 @@ edges and counters; it does not require another full corpus run.
 ## Validation
 
 All exact TSV row labels cited by the new resolver witness exist in the frozen
-84-row observation and are reached by the named Rust test loops. The native
+observation (84 rows then, 95 now) and are reached by the named Rust test loops. The native
 adapter invokes the original resolver on deliberately constructed symbol
 graphs. The existing binder report records all seven resolver tests passing and
 all 18 supplemental requests matching. Its six diagnostic records and generated

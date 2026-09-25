@@ -1,12 +1,13 @@
 //! The observers' `Session`, digesting per stage instead of printing.
 //!
-//! The E1, binder and facts observers call `observe`, `stage` and `failure`
+//! The E1, binder, facts and table observers call `observe`, `stage` and `failure`
 //! exactly as the example session of `crates/tsr_encoder/examples/support/
 //! protocol.rs` expects. This session keeps the same frame sequence (and can
 //! capture the frame bytes the example would print), digests each stage the way
 //! the Python evidence comparators do, and switches the mutant stage through
-//! `jobs::enter`: `parse`, `bind`, `repeat_bind` and `subtree_facts` run as
-//! production, everything else observes.
+//! `jobs::enter`: `parse`, `bind`, `repeat_bind`, `subtree_facts` and a table
+//! row's `column` run as production, everything else (a table row's `setup`
+//! included) observes.
 
 use crate::canonical;
 use crate::jobs::{enter, lower_hex, panic_message, RowOutput, Stage};
@@ -30,6 +31,8 @@ pub enum Oracle {
     Binder,
     /// Per-node subtree facts after a parse of the S06 primary requests.
     Facts,
+    /// Operation tables: one `(column, input)` pair per row (`table/mod.rs`).
+    Table,
 }
 
 impl Oracle {
@@ -38,6 +41,7 @@ impl Oracle {
             "e1" => Ok(Self::E1),
             "binder" => Ok(Self::Binder),
             "facts" => Ok(Self::Facts),
+            "table" => Ok(Self::Table),
             _ => Err(format!("unknown oracle {name:?}")),
         }
     }
@@ -47,6 +51,7 @@ impl Oracle {
             Self::E1 => "e1",
             Self::Binder => "binder",
             Self::Facts => "facts",
+            Self::Table => "table",
         }
     }
 
@@ -55,6 +60,7 @@ impl Oracle {
         match self {
             Self::E1 | Self::Facts => "parse",
             Self::Binder => "bind",
+            Self::Table => "table",
         }
     }
 
@@ -76,6 +82,7 @@ impl Oracle {
                 "repeated_graph",
             ],
             Self::Facts => &["parse", "subtree_facts"],
+            Self::Table => &["setup", "column"],
         }
     }
 
@@ -90,6 +97,7 @@ impl Oracle {
             ],
             Self::Binder => &["parsed_graph", "bound_graph", "repeated_graph"],
             Self::Facts => &["subtree_facts"],
+            Self::Table => &["column"],
         }
     }
 
@@ -103,7 +111,10 @@ impl Oracle {
 
 /// Stages that run production code; mutants of every crate are live there.
 pub fn is_production(stage: &str) -> bool {
-    matches!(stage, "parse" | "bind" | "repeat_bind" | "subtree_facts")
+    matches!(
+        stage,
+        "parse" | "bind" | "repeat_bind" | "subtree_facts" | "column"
+    )
 }
 
 struct Fragment {
@@ -262,7 +273,10 @@ impl State {
         value["id"] = self.id.clone().into();
         value["version"] = 1.into();
         match serde_json::to_vec(&value) {
-            Ok(bytes) if bytes.len() <= MAX_RESPONSE || self.oracle == Oracle::Facts => {
+            Ok(bytes)
+                if bytes.len() <= MAX_RESPONSE
+                    || matches!(self.oracle, Oracle::Facts | Oracle::Table) =>
+            {
                 frames.extend_from_slice(&bytes);
                 frames.push(b'\n');
             }
@@ -280,7 +294,8 @@ impl State {
     /// E1 `canonical({"kind","value"}) + "\n"`; binder, per graph record with
     /// fragments reassembled, `canonical([kind, comparable(value)]) + "\n"`;
     /// facts, the stage's single observation `canonical(value)` (the list of
-    /// `[kind, subtree facts]` in document order), with no newline.
+    /// `[kind, subtree facts]` in document order), with no newline; table, the
+    /// column stage's single value `canonical(value)`, with no newline.
     fn digest(&mut self, stage: &str, kind: &str, value: &Value) {
         if self.oracle == Oracle::Binder && kind == "fragment" {
             match self.fragment_part(value) {
@@ -304,13 +319,13 @@ impl State {
         let written = match self.oracle {
             Oracle::E1 => canonical::write_observation(&mut self.scratch, kind, value),
             Oracle::Binder => canonical::write_graph_record(&mut self.scratch, kind, value),
-            Oracle::Facts => canonical::write(&mut self.scratch, value, false),
+            Oracle::Facts | Oracle::Table => canonical::write(&mut self.scratch, value, false),
         };
         if let Err(error) = written {
             self.error.get_or_insert(error.to_string());
             return;
         }
-        if self.oracle != Oracle::Facts {
+        if !matches!(self.oracle, Oracle::Facts | Oracle::Table) {
             self.scratch.push(b'\n');
         }
         self.digests

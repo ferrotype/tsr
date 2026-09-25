@@ -1,22 +1,21 @@
 {
-  "accounted_operations": 392,
+  "accounted_operations": 396,
   "complete": false,
   "exempt_by_category": {
-    "build_tooling": 8,
+    "build_tooling": 11,
     "build_variant": 2,
     "equivalent_rust": 8,
     "generated_assertion": 6,
     "go_runtime": 12,
-    "unused_at_pin": 4
+    "unused_at_pin": 5
   },
-  "exempt_operations": 40,
+  "exempt_operations": 44,
   "gap_problems": [],
-  "later_step_unresolved": 68,
+  "later_step_unresolved": 59,
   "pending": [
     {
       "disposition": "missing",
       "operation": "tsc/internal/bundled/embed.go:fileInfo.Info",
-      "reason": "later_step_unresolved",
       "rust_home": [
         "crates/tsr_bundled/src/lib.rs"
       ]
@@ -24,7 +23,6 @@
     {
       "disposition": "missing",
       "operation": "tsc/internal/bundled/embed.go:fileInfo.ModTime",
-      "reason": "later_step_unresolved",
       "rust_home": [
         "crates/tsr_bundled/src/lib.rs"
       ]
@@ -32,7 +30,6 @@
     {
       "disposition": "missing",
       "operation": "tsc/internal/bundled/embed.go:fileInfo.Mode",
-      "reason": "later_step_unresolved",
       "rust_home": [
         "crates/tsr_bundled/src/lib.rs"
       ]
@@ -40,7 +37,6 @@
     {
       "disposition": "missing",
       "operation": "tsc/internal/bundled/embed.go:fileInfo.Sys",
-      "reason": "later_step_unresolved",
       "rust_home": [
         "crates/tsr_bundled/src/lib.rs"
       ]
@@ -48,7 +44,6 @@
     {
       "disposition": "missing",
       "operation": "tsc/internal/bundled/embed.go:fileInfo.Type",
-      "reason": "later_step_unresolved",
       "rust_home": [
         "crates/tsr_bundled/src/lib.rs"
       ]
@@ -90,7 +85,7 @@
       "rust_home": []
     },
     {
-      "disposition": "missing",
+      "disposition": "implemented_untested",
       "operation": "tsc/internal/core/binarysearch.go:BinarySearchUniqueFunc",
       "reason": "later_step_unresolved",
       "rust_home": []
@@ -273,7 +268,7 @@
       ]
     },
     {
-      "disposition": "missing",
+      "disposition": "implemented_untested",
       "operation": "tsc/internal/core/core.go:Splice",
       "reason": "later_step_unresolved",
       "rust_home": [
@@ -353,14 +348,6 @@
       ]
     },
     {
-      "disposition": "missing",
-      "operation": "tsc/internal/core/semaphore.go:LimitedSemaphore.TryAcquire",
-      "reason": "later_step_unresolved",
-      "rust_home": [
-        "crates/tsr_core/src/semaphore.rs"
-      ]
-    },
-    {
       "disposition": "implemented_untested",
       "operation": "tsc/internal/core/semaphore.go:NewLimitedSemaphore",
       "reason": "later_step_unresolved",
@@ -415,13 +402,13 @@
       "rust_home": []
     },
     {
-      "disposition": "missing",
+      "disposition": "implemented_untested",
       "operation": "tsc/internal/core/version.go:Version",
       "reason": "later_step_unresolved",
       "rust_home": []
     },
     {
-      "disposition": "missing",
+      "disposition": "implemented_untested",
       "operation": "tsc/internal/core/version.go:VersionMajorMinor",
       "reason": "later_step_unresolved",
       "rust_home": []
@@ -477,24 +464,6 @@
     {
       "disposition": "missing",
       "operation": "tsc/internal/core/workgroup.go:singleThreadedWorkGroup.pop",
-      "reason": "later_step_unresolved",
-      "rust_home": []
-    },
-    {
-      "disposition": "later_phase",
-      "operation": "tsc/internal/diagnostics/generate.go:generateLocalizations",
-      "reason": "later_step_unresolved",
-      "rust_home": []
-    },
-    {
-      "disposition": "later_phase",
-      "operation": "tsc/internal/diagnostics/generate.go:main",
-      "reason": "later_step_unresolved",
-      "rust_home": []
-    },
-    {
-      "disposition": "later_phase",
-      "operation": "tsc/internal/diagnostics/generate.go:readLocalizedMessages",
       "reason": "later_step_unresolved",
       "rust_home": []
     }

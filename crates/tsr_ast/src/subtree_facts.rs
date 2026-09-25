@@ -56,7 +56,6 @@ impl AstView<'_> {
     pub fn subtree_facts(self, id: NodeId) -> SubtreeFacts {
         Facts { view: self }.facts(id)
     }
-    // port: tsc/internal/ast/ast.go:Node.propagateSubtreeFacts
     pub fn propagate_subtree_facts(self, id: Option<NodeId>) -> SubtreeFacts {
         Facts { view: self }.propagate_node(id)
     }
@@ -107,6 +106,7 @@ impl Facts<'_> {
             .expect("subtree node")
             .kind()
     }
+    // port: tsc/internal/ast/utilities.go:IsThisIdentifier
     fn is_this_identifier(&self, id: NodeId) -> bool {
         let node = self.view.node(id).expect("subtree identifier");
         if node.kind() != SyntaxKind::Identifier {
@@ -764,9 +764,24 @@ fn async_facts(modifiers: u32, generator: bool) -> u32 {
 
 impl SubtreeContext for Facts<'_> {
     // port: tsc/internal/ast/subtreefacts.go:propagateSubtreeFacts
-    #[allow(clippy::match_same_arms)] // Equal current masks remain distinct source overrides.
     fn propagate_node(&mut self, id: Option<NodeId>) -> u32 {
         let Some(id) = id else { return NONE };
+        self.propagate_present(id)
+    }
+    fn propagate_list(&mut self, id: Option<NodeListId>) -> u32 {
+        self.list_with(id, Self::propagate_node)
+    }
+    // port: tsc/internal/ast/subtreefacts.go:propagateModifierListSubtreeFacts
+    fn propagate_modifiers(&mut self, id: Option<NodeListId>) -> u32 {
+        self.propagate_list(id)
+    }
+}
+impl Facts<'_> {
+    /// The per-payload dispatch of a present node; `propagate_node` keeps the
+    /// package-level nil check.
+    // port: tsc/internal/ast/ast.go:Node.propagateSubtreeFacts
+    #[allow(clippy::match_same_arms)] // Equal current masks remain distinct source overrides.
+    fn propagate_present(&mut self, id: NodeId) -> u32 {
         let view = self.view;
         let node = view.node(id).expect("subtree propagated node");
         if node.data().is_type_syntax() {
@@ -826,13 +841,6 @@ impl SubtreeContext for Facts<'_> {
             D::TypeAssertion(_) => facts & !COMPUTED,
             _ => propagate_default(facts),
         }
-    }
-    fn propagate_list(&mut self, id: Option<NodeListId>) -> u32 {
-        self.list_with(id, Self::propagate_node)
-    }
-    // port: tsc/internal/ast/subtreefacts.go:propagateModifierListSubtreeFacts
-    fn propagate_modifiers(&mut self, id: Option<NodeListId>) -> u32 {
-        self.propagate_list(id)
     }
 }
 // port: tsc/internal/ast/ast.go:NodeDefault.propagateSubtreeFacts

@@ -510,6 +510,37 @@ fn pinned_default_export_class_type_and_parameter_cache() {
             hooks.trace.join(",")
         );
     }
+    // A declaration with exportable data but no local, one whose payload has
+    // none (the nil NodeDefault.ExportableData arm), then a local that is found.
+    let (host, (nil, scan, local)) = Host::fixture(
+        "export default function() {} export default 0; export default class C {}",
+        false,
+        |b| {
+            let function = find(b.view(), b.source(), K::FunctionDeclaration, 0);
+            let assignment = find(b.view(), b.source(), K::ExportAssignment, 0);
+            let class = find(b.view(), b.source(), K::ClassDeclaration, 0);
+            let local = symbol(b, "C", flags::CLASS, &[class]);
+            b.binding_mut(class).unwrap().local_symbol = Some(local);
+            let nil = symbol(b, "default", flags::FUNCTION, &[function, assignment]);
+            let scan = symbol(
+                b,
+                "default",
+                flags::FUNCTION,
+                &[function, assignment, class],
+            );
+            (nil, scan, local)
+        },
+    );
+    obs!(
+        "default/nil",
+        get_local_symbol_for_export_default(&host, Some(nil))
+            .unwrap()
+            .is_none()
+    );
+    obs!(
+        "default/scan",
+        get_local_symbol_for_export_default(&host, Some(scan)).unwrap() == Some(local)
+    );
 }
 struct RefTrace {
     symbol: SymbolId,
@@ -641,6 +672,32 @@ fn pinned_reference_alias_filtering_hook_order_and_names() {
             String::from_utf8_lossy(nil.as_bytes())
         );
     }
+    // An alias merged with a local value is not a non-local alias; otherwise the
+    // import declaration is the last alias declaration, not the last declaration.
+    struct Resolved(SymbolId);
+    impl ReferenceResolverHooks for Resolved {
+        fn get_resolved_symbol(&mut self, _: NodeId) -> Result<Hook<Option<SymbolId>>, Error> {
+            Ok(Hook::Value(Some(self.0)))
+        }
+    }
+    let (mut host, (declaration, symbols)) =
+        Host::fixture("import {A} from 'm'; let v = 1; A;", false, |b| {
+            let declaration = find(b.view(), b.source(), K::ImportSpecifier, 0);
+            let value = find(b.view(), b.source(), K::VariableDeclaration, 0);
+            let symbols = [flags::ALIAS | flags::FUNCTION_SCOPED_VARIABLE, flags::ALIAS]
+                .map(|flags| self::symbol(b, "A", flags, &[declaration, value]));
+            (declaration, symbols)
+        });
+    let reference = host.node(declaration).unwrap().name().unwrap();
+    for (i, symbol) in symbols.into_iter().enumerate() {
+        obs!(
+            &format!("import/alias/{i}"),
+            ReferenceResolver::new(options())
+                .get_referenced_import_declaration(&mut host, &mut Resolved(symbol), reference)
+                .unwrap()
+                == Some(declaration)
+        );
+    }
 }
 
 #[test]
@@ -670,6 +727,60 @@ fn resolver_ids_are_checked_against_the_retained_host() {
         .get_element_access_expression_name(&mut NoReferenceResolverHooks, None)
         .unwrap()
         .is_empty());
+    // The retained host's file binds once: unbound after parsing, bound with its
+    // module symbol, locals and symbol count, and unchanged by a second bind.
+    let counters = Counters::new();
+    let parsed = tsr_parser::parse_source_file_with_counters(
+        SourceText::from_loaded_bytes(b"export {}; let x;".as_slice()),
+        ScriptKind::TS,
+        SourceFileParseOptions {
+            file_name: JsString::from_bytes(b"/resolver.ts".as_slice()),
+            ..Default::default()
+        },
+        &counters,
+    );
+    let source = parsed.root();
+    let file = parsed.publish_unbound();
+    let before = file.is_bound(source).unwrap();
+    let bound = crate::bind_source_file(&file, source).unwrap();
+    let view = bound.view();
+    let binding = view.node_binding(source).unwrap().unwrap_or_default();
+    let locals = binding
+        .locals
+        .map_or(0, |table| view.result().tables().get(table).unwrap().len());
+    let again = crate::bind_source_file(&file, source).unwrap();
+    let repeated = again
+        .view()
+        .node_binding(source)
+        .unwrap()
+        .unwrap_or_default();
+    obs!(
+        "bind/state",
+        before,
+        file.is_bound(source).unwrap(),
+        binding.symbol.is_some(),
+        locals,
+        repeated.symbol == binding.symbol,
+        view.result().symbol_count()
+    );
+    // bind_source_file's is_bound guard keeps the second call above away from
+    // bind_with, so enter it directly: on a bound file neither a new
+    // initializer nor the binding worker runs again, and the symbol is kept.
+    let mut ran = false;
+    file.bind_with(source, |_| {
+        ran = true;
+        Ok(())
+    })
+    .unwrap();
+    crate::bind_source_file_worker(&file, source).unwrap();
+    let kept = file
+        .bound_view(source)
+        .unwrap()
+        .unwrap()
+        .node_binding(source)
+        .unwrap()
+        .unwrap_or_default();
+    obs!("bind/once", ran, kept.symbol == binding.symbol);
 }
 
 #[test]
@@ -740,6 +851,93 @@ fn pinned_lexical_self_reference_and_deferred_callback_payloads() {
             hooks.0.join(",")
         );
     }
+    // A module export that is purely an alias with an ExportSpecifier or
+    // NamespaceExport declaration, in any position, is not in scope.
+    for (i, (text, kinds)) in [
+        (
+            "let x; export { x as y }; y;",
+            [K::ExportSpecifier].as_slice(),
+        ),
+        (
+            "export * as y from 'm'; y;",
+            [K::NamespaceExport].as_slice(),
+        ),
+        (
+            "export import y = require('m'); y;",
+            [K::ImportEqualsDeclaration].as_slice(),
+        ),
+        (
+            "export import w = require('m'); let x; export { x as y }; y;",
+            [K::ImportEqualsDeclaration, K::ExportSpecifier].as_slice(),
+        ),
+    ]
+    .into_iter()
+    .enumerate()
+    {
+        let (mut host, alias) = Host::fixture(text, false, |b| {
+            let declarations: Vec<NodeId> = kinds
+                .iter()
+                .map(|&kind| find(b.view(), b.source(), kind, 0))
+                .collect();
+            let alias = symbol(b, "y", flags::ALIAS, &declarations);
+            let source = b.source();
+            let module = symbol(b, "\"/resolver\"", flags::VALUE_MODULE, &[source]);
+            let table = b.tables_mut().alloc(
+                [(JsString::from_bytes(b"y".as_slice()), Some(alias))]
+                    .into_iter()
+                    .collect(),
+            );
+            b.symbols_mut().get_mut(module).unwrap().exports = Some(table);
+            b.binding_mut(source).unwrap().symbol = Some(module);
+            alias
+        });
+        let statement = host.find(K::ExpressionStatement, 0);
+        let reference = host.node(statement).unwrap().expression().unwrap();
+        let got = NameResolver::new(options())
+            .resolve(
+                &mut host,
+                &mut NoNameResolverHooks,
+                Some(reference),
+                b"y",
+                flags::ALIAS,
+                None,
+                false,
+                true,
+            )
+            .unwrap();
+        obs!(&format!("alias/{i}"), got.is_none(), got == Some(alias));
+    }
+    // The locals of a global script are not in scope.
+    let mut host = Host::fixture("let x; x;", false, |b| {
+        let value = find(b.view(), b.source(), K::VariableDeclaration, 0);
+        let x = symbol(b, "x", flags::BLOCK_SCOPED_VARIABLE, &[value]);
+        let table = b.tables_mut().alloc(
+            [(JsString::from_bytes(b"x".as_slice()), Some(x))]
+                .into_iter()
+                .collect(),
+        );
+        let source = b.source();
+        b.binding_mut(source).unwrap().locals = Some(table);
+    })
+    .0;
+    let statement = host.find(K::ExpressionStatement, 0);
+    let reference = host.node(statement).unwrap().expression().unwrap();
+    obs!(
+        "script/locals",
+        NameResolver::new(options())
+            .resolve(
+                &mut host,
+                &mut NoNameResolverHooks,
+                Some(reference),
+                b"x",
+                flags::VALUE,
+                None,
+                false,
+                true,
+            )
+            .unwrap()
+            .is_none()
+    );
 }
 
 #[test]

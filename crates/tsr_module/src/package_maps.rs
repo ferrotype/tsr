@@ -623,7 +623,7 @@ impl Resolver {
                 let versions = self.version_paths(info);
                 if let Some(paths) = versions.paths() {
                     let version = versions.version;
-                    trace!(self,diagnostics::X_package_json_has_a_typesVersions_entry_0_that_matches_compiler_version_1_looking_for_a_pattern_to_match_module_name_2,version,b"7.1.0-dev",rest);
+                    trace!(self,diagnostics::X_package_json_has_a_typesVersions_entry_0_that_matches_compiler_version_1_looking_for_a_pattern_to_match_module_name_2,version,tsr_core::version(),rest);
                     if let Some(result) = self.paths_using(
                         rest,
                         &directory,
@@ -709,7 +709,7 @@ fn compare_pattern_keys(a: &[u8], b: &[u8]) -> std::cmp::Ordering {
 
 fn compiler_version() -> &'static tsr_semver::Version {
     static VERSION: std::sync::OnceLock<tsr_semver::Version> = std::sync::OnceLock::new();
-    VERSION.get_or_init(|| tsr_semver::Version::must_parse(b"7.1.0-dev"))
+    VERSION.get_or_init(|| tsr_semver::Version::must_parse(tsr_core::version().as_bytes()))
 }
 /// port: tsc/internal/module/util.go:IsApplicableVersionedTypesKey
 pub fn is_applicable_versioned_types_key(key: &[u8]) -> bool {
@@ -793,7 +793,7 @@ impl PackageJson {
                 }
                 result.version=JsString::from_bytes(version.as_bytes());return result;
             }
-            emit(diagnostics::X_package_json_does_not_have_a_typesVersions_entry_that_matches_version_0,vec!["7.1".into()]);
+            emit(diagnostics::X_package_json_does_not_have_a_typesVersions_entry_that_matches_version_0,vec![tsr_core::version_major_minor().into()]);
             result
         });
         for message in &selected.traces {
