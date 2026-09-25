@@ -269,7 +269,10 @@ Known limitations:
   only; today two mutants are like this and both are unreached.
 - The manifest's `root_tree` cannot equal the tree that contains the manifest, so
   `schemata` and `confirm` report "sources changed since planning"; every span is
-  verified instead.
+  verified instead. `confirm` finds each span again through its markers: a span
+  that only moved (code inserted above it) is spliced at its current lines and
+  listed under `moved` in the receipt; a span whose text changed is `stale`, its
+  pairs fail, and only a new campaign can re-witness its operations.
 - Build the driver and `phase1_syntax` with separate cargo invocations when
   reproducing binary digests; one combined build unifies features differently.
 - About 18 predicate mutants per oracle still hang on every candidate row; their

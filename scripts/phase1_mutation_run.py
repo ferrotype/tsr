@@ -1423,17 +1423,25 @@ def confirm(results_path, plan=None, *, root=ROOT, ws=None, drivers=None, reques
     excused = sorted({key for op in document["operations"].values() for home in op.get("homes", ())
                       if home.get("excused") for key in home["mutants"]})
     stale = set()
+    moved = {}
     drivers = dict(drivers or {})
     with _stdout_to_stderr():
         if ws is None:
             import phase1_mutation_plan as plan_module
-            stale = {key for key, mutant in planned.items() if not plan_module.span_intact(root, mutant)}
+            for key, mutant in planned.items():
+                shift = plan_module.span_shift(root, mutant)
+                if shift is None:
+                    stale.add(key)
+                elif shift:
+                    moved[key] = plan_module.relocated(mutant, shift)
             splice = plan
-            if stale:
-                # Every other mutant keeps its campaign id; stale ones cannot be spliced.
+            if stale or moved:
+                # Every other mutant keeps its campaign id; stale ones cannot be
+                # spliced, and a span that only moved is spliced where it is now.
                 splice = out / "plan-confirm.json"
                 splice.write_bytes(canonical({**plan_document, "mutants": [
-                    mutant for mutant in plan_document["mutants"] if mutant["key"] not in stale]}) + b"\n")
+                    moved.get(mutant["key"], mutant) for mutant in plan_document["mutants"]
+                    if mutant["key"] not in stale]}) + b"\n")
             ws = plan_module.schemata(root, splice, Path(splice_ws) if splice_ws else TARGET / "ws-confirm")
         ws = Path(ws)
         for name in sorted({package(oracle) for oracle in oracles}):
@@ -1591,6 +1599,7 @@ def confirm(results_path, plan=None, *, root=ROOT, ws=None, drivers=None, reques
         "drivers": {name: file_sha256(path) for name, path in sorted(drivers.items())}, "ws": ws_identity(ws),
         "native_sha256": {oracle: document["inputs"]["oracles"][oracle]["native_sha256"] for oracle in oracles},
         "oracles": oracles, "killed_mutants": len(killed), "stale": sorted(stale & {m["key"] for m in killed}),
+        "moved": sorted(set(moved) & {m["key"] for m in killed}),
         "pairs_total": len(pairs), "confirmed": reproduced, "pairs": pairs,
         "base_rows": base_rows, "base_native": base_native,
         "excused_mutants": len(excused), "excused_stale": excused_stale,
