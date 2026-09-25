@@ -1,0 +1,6 @@
+{
+ "reason": "crates/tsr_checker/tests/c1_contracts.rs does not exist yet; record with scripts/phase2_producers.py observe --witness c1-contracts",
+ "state": "unobserved",
+ "version": 1,
+ "witness": "c1-contracts"
+}
