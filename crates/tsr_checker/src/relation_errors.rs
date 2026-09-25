@@ -211,7 +211,34 @@ impl Relater<'_> {
                 self.report_error(message, vec![target, name]);
             }
         }
-        self.report_relation_error(source, target, head)
+        self.report_relation_error(source, target, head)?;
+        // An unconstrained type-parameter source gets the note that an
+        // `extends` constraint might be needed, when constraining it to the
+        // target would not be circular.
+        let source_symbol = self.checker.types.get(source)?.symbol;
+        if let Some(symbol) = source_symbol.filter(|_| source_flags & tf::TYPE_PARAMETER != 0) {
+            let declaration = self.checker.symbol_declarations(symbol)?.first().flatten();
+            if let Some(declaration) = declaration {
+                if self.checker.constraint_of_type_parameter(source)?.is_none() {
+                    let synthetic = self.checker.clone_type_parameter(source)?;
+                    let mapper = self.checker.new_type_mapper(&[source], &[synthetic])?;
+                    let constraint = self.checker.instantiate_type(target, Some(mapper))?;
+                    self.checker.types.type_parameter_mut(synthetic)?.constraint = Some(constraint);
+                    if self.checker.has_non_circular_base_constraint(synthetic)? {
+                        let text = self
+                            .checker
+                            .type_to_string(target, crate::type_display::DEFAULT_FLAGS)?;
+                        let related = self.checker.diagnostic_for_node(
+                            Some(declaration),
+                            messages::This_type_parameter_might_need_an_extends_0_constraint,
+                            vec![text],
+                        )?;
+                        self.errors.related.push(Arc::new(related));
+                    }
+                }
+            }
+        }
+        Ok(())
     }
 
     // port: tsc/internal/checker/relater.go:Relater.reportRelationError
