@@ -976,12 +976,13 @@
   },
   {
    "bucket": "failed: checker_error",
-   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26: the checker_error is closed by getDefaultFromTypeParameter's guard (the inference over a permissive wildcard has no default); the remaining difference is a TS4025 declaration-emit diagnostic, which is C5's",
    "go": "tsc/internal/checker/checker.go:Checker.instantiateSignature",
    "id": "compiler/declarationEmitExpandoArrowFunctionParameter.ts#configuration=0",
    "item": "C1.3",
    "mechanism": "after the empty-candidate fix (2c87ef7) the checker stops with 'unexpected Intrinsic type in type_parameter': signature_inference_candidates reads a type-parameter default from an inference whose type parameter is an intrinsic (trace: relater compare_signatures -> contextual_signature_instantiation -> inferred_type -> resolved_type_parameter_default); whether the instantiated signature carries non-parameters in type_parameters (C1.3) or the inference context does (C2) is not yet traced",
-   "status": "candidate"
+   "owner": "C5",
+   "status": "returned"
   },
   {
    "bucket": "failed: checker_error",
@@ -994,30 +995,30 @@
   },
   {
    "bucket": "failed: checker_error",
-   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26: closed by getDefaultFromTypeParameter's guard: an inference over a type that is not a type parameter (the wildcard of a permissive instantiation of a hoisted generic signature) has no default; structured diff matches the pin",
    "go": "tsc/internal/checker/checker.go:Checker.instantiateSignature",
    "id": "compiler/genericCallInferenceConditionalType1.ts#configuration=0",
    "item": "C1.3",
    "mechanism": "after the empty-candidate fix (2c87ef7) the checker stops with 'unexpected Intrinsic type in type_parameter': signature_inference_candidates reads a type-parameter default from an inference whose type parameter is an intrinsic (trace: relater compare_signatures -> contextual_signature_instantiation -> inferred_type -> resolved_type_parameter_default); whether the instantiated signature carries non-parameters in type_parameters (C1.3) or the inference context does (C2) is not yet traced",
-   "status": "candidate"
+   "status": "claimed"
   },
   {
    "bucket": "failed: checker_error",
-   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26: closed by getDefaultFromTypeParameter's guard; structured diff matches the pin",
    "go": "tsc/internal/checker/checker.go:Checker.instantiateSignature",
    "id": "compiler/genericCallInferenceConditionalType2.ts#configuration=0",
    "item": "C1.3",
    "mechanism": "after the empty-candidate fix (2c87ef7) the checker stops with 'unexpected Intrinsic type in type_parameter': signature_inference_candidates reads a type-parameter default from an inference whose type parameter is an intrinsic (trace: relater compare_signatures -> contextual_signature_instantiation -> inferred_type -> resolved_type_parameter_default); whether the instantiated signature carries non-parameters in type_parameters (C1.3) or the inference context does (C2) is not yet traced",
-   "status": "candidate"
+   "status": "claimed"
   },
   {
    "bucket": "failed: checker_error",
-   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26: closed by getDefaultFromTypeParameter's guard; structured diff matches the pin",
    "go": "tsc/internal/checker/checker.go:Checker.instantiateSignature",
    "id": "compiler/genericCallInferenceInConditionalTypes1.ts#configuration=0",
    "item": "C1.3",
    "mechanism": "after the empty-candidate fix (2c87ef7) the checker stops with 'unexpected Intrinsic type in type_parameter': signature_inference_candidates reads a type-parameter default from an inference whose type parameter is an intrinsic (trace: relater compare_signatures -> contextual_signature_instantiation -> inferred_type -> resolved_type_parameter_default); whether the instantiated signature carries non-parameters in type_parameters (C1.3) or the inference context does (C2) is not yet traced",
-   "status": "candidate"
+   "status": "claimed"
   },
   {
    "bucket": "failed: checker_error",
@@ -1103,12 +1104,13 @@
   },
   {
    "bucket": "emit order: native pre/post-emit sets differ",
-   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26: the checker path is the pin's: the pin's pre-emit diagnostics put TS2615 at the `Child<ListWidget>` type reference exactly like the port (pre_diagnostics pos 1621); the error baseline is the post-emit program's, where Program.Emit's import-elision transformer (EmitResolver.MarkLinkedReferencesRecursively -> markLinkedReferences -> checkExpressionCached(x)) resolves x's type before the semantic check, so the pin reports at `x` (1705); matching needs the harness's emit-before-check order, which is C5's (traced 2026-09-26 with a stack print in the pin's getTypeOfMappedSymbol)",
    "go": "tsc/internal/checker/checker.go:Checker.getResolvedBaseConstraint",
    "id": "conformance/types/mapped/recursiveMappedTypes.ts#configuration=0",
    "item": "C1.5",
    "mechanism": "TS2615 (circular reference) is reported at another node; mapped types are involved, so the trace decides between C1.5 and C2",
-   "status": "candidate"
+   "owner": "C5",
+   "status": "returned"
   },
   {
    "bucket": "diagnostics: TS2322",

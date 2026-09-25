@@ -70,7 +70,13 @@ impl CheckerState {
         if self.inference_context(context)?.flags & inference::NO_DEFAULT != 0 {
             return Ok((Some(self.builtins.silent_never_type), None));
         }
-        let default = self.resolved_type_parameter_default(info.parameter)?;
+        // getDefaultFromTypeParameter: an inference over a type that is not a
+        // type parameter (a wildcard from a permissive instantiation) has none.
+        let default = if self.types.flags(info.parameter)? & tf::TYPE_PARAMETER != 0 {
+            self.resolved_type_parameter_default(info.parameter)?
+        } else {
+            self.builtins.no_constraint_type
+        };
         if default == self.builtins.no_constraint_type
             || default == self.builtins.circular_constraint_type
         {
