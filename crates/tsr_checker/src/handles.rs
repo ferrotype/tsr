@@ -523,6 +523,19 @@ impl Operation<'_> {
         Ok(self.state().types.get(id)?.symbol)
     }
 
+    /// The checker's interned union types (`Checker.unionTypes` values), in
+    /// cache order; the runner's union-ordering check does not depend on it.
+    // port: tsc/internal/checker/checker.go:Checker.UnionTypes
+    pub fn union_types(&self) -> Vec<TypeRef> {
+        self.state()
+            .types
+            .caches
+            .union_types
+            .values()
+            .map(|id| self.type_ref(*id))
+            .collect()
+    }
+
     /// Constituents of a union or intersection, in stored order.
     pub fn constituents(&self, t: TypeRef) -> Result<Vec<TypeRef>, Error> {
         let id = self.check_type(t)?;

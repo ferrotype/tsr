@@ -1,0 +1,1595 @@
+{
+ "comparison": {
+  "native_observation_sha256": "1b5356b425ad95a3e5e2a0bb29d42534e8d9d4a6159649f063f3317084a0e276",
+  "rust_capture_sha256": "37fba879efd84ffe4a9bb112f06cf84d735da420d168ec4f2d9fc5358673fe6d"
+ },
+ "declaration_audit": {
+  "examples": {
+   "different": [
+    "compiler/arrayFakeFlatNoCrashInferenceDeclarations.ts#configuration=0",
+    "compiler/correlatedUnions.ts#configuration=0",
+    "compiler/declarationEmitArrowFunctionNoRenaming.ts#configuration=0",
+    "compiler/declarationEmitBindingPatternWithReservedWord.ts#configuration=0",
+    "compiler/declarationEmitConstObjectLiteralGenericMethod1.ts#configuration=0"
+   ],
+   "failed: panic": [
+    "compiler/declarationEmitAugmentationUsesCorrectSourceFile.ts#configuration=0",
+    "conformance/types/tuple/restTupleElements1.ts#configuration=0",
+    "conformance/types/tuple/variadicTuples2.ts#configuration=0"
+   ],
+   "not loaded: unsupported": [
+    "compiler/contentMapperDeclarationEmit.ts#configuration=0",
+    "compiler/contentMapperDeclarationEmitFailure.ts#configuration=0",
+    "compiler/contentMapperSupplementalModule.ts#configuration=0"
+   ],
+   "unsupported: checkExpressionWorker": [
+    "compiler/discriminatedUnionJsxElement.tsx#configuration=0",
+    "compiler/jsDeclarationsExpandoInternal.tsx#configuration=0",
+    "compiler/jsxDeclarationsWithEsModuleInteropNoCrash.tsx#configuration=0",
+    "conformance/jsdoc/declarations/jsDeclarationsNonIdentifierInferredNames.ts#configuration=0",
+    "conformance/jsdoc/declarations/jsDeclarationsReactComponents.ts#configuration=0"
+   ],
+   "unsupported: conditionalTypeToTypeNode: shadowed distribution parameter": [
+    "compiler/declarationEmitInlinedDistributiveConditional.ts#configuration=0"
+   ],
+   "unsupported: extractRedundantTemplateLiterals": [
+    "compiler/declarationEmitMappedTypePreservesTypeParameterConstraint.ts#configuration=0"
+   ],
+   "unsupported: node builder synthetic property elision comments": [
+    "compiler/declarationEmitPrivatePromiseLikeInterface.ts#configuration=0",
+    "compiler/hugeDeclarationOutputGetsTruncatedWithError.ts#configuration=0"
+   ],
+   "unsupported: someSymbolTableInScope: reparsed module": [
+    "conformance/jsdoc/declarations/jsDeclarationsImportAliasExposedWithinNamespace.ts#configuration=0",
+    "conformance/jsdoc/declarations/jsDeclarationsImportAliasExposedWithinNamespaceCjs.ts#configuration=0"
+   ]
+  },
+  "native_requests": 1754,
+  "outcomes": {
+   "different": 67,
+   "failed: panic": 3,
+   "not loaded: unsupported": 3,
+   "unsupported: checkExpressionWorker": 6,
+   "unsupported: conditionalTypeToTypeNode: shadowed distribution parameter": 1,
+   "unsupported: extractRedundantTemplateLiterals": 1,
+   "unsupported: node builder synthetic property elision comments": 2,
+   "unsupported: someSymbolTableInScope: reparsed module": 2,
+   "working": 1669
+  },
+  "rule": "working paths keep their results; only a missing transform or emit-resolver operation becomes a blocker, under its Phase 3 or Phase 2 owner"
+ },
+ "entries": [
+  {
+   "checkpoints": {
+    "C2": 1,
+    "C4": 439
+   },
+   "domains": {
+    "display": 431,
+    "errors": 440,
+    "symbols": 431,
+    "types": 431
+   },
+   "evidence": [
+    {
+     "case": "cases/00374",
+     "observation": "unsupported: checkExpressionWorker",
+     "variant": "compiler/asyncJsxArgumentsAttributeName.ts#configuration=0"
+    },
+    {
+     "case": "cases/00515",
+     "observation": "unsupported: checkExpressionWorker",
+     "variant": "compiler/booleanLiteralsContextuallyTypedFromUnion.tsx#configuration=0"
+    },
+    {
+     "case": "cases/00554",
+     "observation": "unsupported: checkExpressionWorker",
+     "variant": "compiler/callsOnComplexSignatures.tsx#configuration=0"
+    },
+    {
+     "case": "cases/00638",
+     "observation": "unsupported: checkExpressionWorker",
+     "variant": "compiler/checkJsxNotSetError.ts#configuration=0"
+    },
+    {
+     "case": "cases/00992",
+     "observation": "unsupported: checkExpressionWorker",
+     "variant": "compiler/commentsOnJSXExpressionsArePreserved.tsx#configuration=0"
+    }
+   ],
+   "id": "B01",
+   "kind": "unsupported",
+   "missing_operation": "checkExpressionWorker",
+   "owner": "C2/C4",
+   "variants": [
+    "compiler/asyncJsxArgumentsAttributeName.ts#configuration=0",
+    "compiler/booleanLiteralsContextuallyTypedFromUnion.tsx#configuration=0",
+    "compiler/callsOnComplexSignatures.tsx#configuration=0",
+    "compiler/checkJsxNotSetError.ts#configuration=0",
+    "compiler/commentsOnJSXExpressionsArePreserved.tsx#configuration=0",
+    "compiler/commentsOnJSXExpressionsArePreserved.tsx#configuration=1",
+    "compiler/commentsOnJSXExpressionsArePreserved.tsx#configuration=12",
+    "compiler/commentsOnJSXExpressionsArePreserved.tsx#configuration=13",
+    "compiler/commentsOnJSXExpressionsArePreserved.tsx#configuration=14",
+    "compiler/commentsOnJSXExpressionsArePreserved.tsx#configuration=18",
+    "compiler/commentsOnJSXExpressionsArePreserved.tsx#configuration=19",
+    "compiler/commentsOnJSXExpressionsArePreserved.tsx#configuration=2",
+    "compiler/commentsOnJSXExpressionsArePreserved.tsx#configuration=20",
+    "compiler/commentsOnJSXExpressionsArePreserved.tsx#configuration=6",
+    "compiler/commentsOnJSXExpressionsArePreserved.tsx#configuration=7",
+    "compiler/commentsOnJSXExpressionsArePreserved.tsx#configuration=8",
+    "compiler/conflictMarkerTrivia3.tsx#configuration=0",
+    "compiler/contextualTypingOfOptionalMembers.tsx#configuration=0",
+    "compiler/contextuallyTypedJsxAttribute.ts#configuration=0",
+    "compiler/contextuallyTypedJsxAttribute2.tsx#configuration=0",
+    "compiler/contextuallyTypedJsxChildren.tsx#configuration=0",
+    "compiler/contextuallyTypedJsxChildren2.tsx#configuration=0",
+    "compiler/discriminatedUnionJsxElement.tsx#configuration=0",
+    "compiler/doubleUnderscoreReactNamespace.ts#configuration=0",
+    "compiler/emitReactJsxSelfClosingElement.tsx#configuration=0",
+    "compiler/errorSpanForUnclosedJsxTag.tsx#configuration=0",
+    "compiler/excessiveStackDepthFlatArray.ts#configuration=0",
+    "compiler/expandoContextualTypes.tsx#configuration=0",
+    "compiler/genericInferenceDefaultTypeParameterJsxReact.tsx#configuration=0",
+    "compiler/ignoredJsxAttributes.tsx#configuration=0",
+    "compiler/importHelpersInTsx.tsx#configuration=0",
+    "compiler/jsDeclarationsExpandoInternal.tsx#configuration=0",
+    "compiler/jsExportsImportedIntoTsxLosesTypeInfo.tsx#configuration=0",
+    "compiler/jsFileCompilationTypeArgumentSyntaxOfCall.ts#configuration=0",
+    "compiler/jsFileCompilationTypeAssertions.ts#configuration=0",
+    "compiler/jsxAttributeMissingInitializer.tsx#configuration=0",
+    "compiler/jsxAttributeValueBinaryExpression.tsx#configuration=0",
+    "compiler/jsxAttributeWithoutExpressionReact.tsx#configuration=0",
+    "compiler/jsxCallElaborationCheckNoCrash1.tsx#configuration=0",
+    "compiler/jsxCallbackWithDestructuring.tsx#configuration=0",
+    "compiler/jsxChildWrongType.tsx#configuration=0",
+    "compiler/jsxChildrenArrayWrongType.tsx#configuration=0",
+    "compiler/jsxChildrenGenericContextualTypes.tsx#configuration=0",
+    "compiler/jsxChildrenIndividualErrorElaborations.tsx#configuration=0",
+    "compiler/jsxChildrenSingleChildConfusableWithMultipleChildrenNoError.tsx#configuration=0",
+    "compiler/jsxChildrenWrongType.tsx#configuration=0",
+    "compiler/jsxClassAttributeResolution.tsx#configuration=0",
+    "compiler/jsxComplexSignatureHasApplicabilityError.tsx#configuration=0",
+    "compiler/jsxComponentTypeErrors.tsx#configuration=0",
+    "compiler/jsxContainsOnlyTriviaWhiteSpacesNotCountedAsChild.tsx#configuration=0",
+    "compiler/jsxDeclarationsWithEsModuleInteropNoCrash.tsx#configuration=0",
+    "compiler/jsxElementClassTooManyParams.tsx#configuration=0",
+    "compiler/jsxElementType.tsx#configuration=0",
+    "compiler/jsxElementTypeLiteral.tsx#configuration=0",
+    "compiler/jsxElementTypeLiteralWithGeneric.tsx#configuration=0",
+    "compiler/jsxElementTypeUnexpectedType.tsx#configuration=0",
+    "compiler/jsxElementsAsIdentifierNames.tsx#configuration=0",
+    "compiler/jsxEmitAttributeWithPreserve.tsx#configuration=0",
+    "compiler/jsxEmitWithAttributes.ts#configuration=0",
+    "compiler/jsxEmptyExpressionNotCountedAsChild.tsx#configuration=0",
+    "compiler/jsxEmptyExpressionNotCountedAsChild.tsx#configuration=1",
+    "compiler/jsxEmptyExpressionNotCountedAsChild.tsx#configuration=2",
+    "compiler/jsxEmptyExpressionNotCountedAsChild2.tsx#configuration=0",
+    "compiler/jsxEntityDecoderAfterNonEntityAmpersand.tsx#configuration=0",
+    "compiler/jsxExcessPropsAndAssignability.tsx#configuration=0",
+    "compiler/jsxFactoryAndJsxFragmentFactory.tsx#configuration=0",
+    "compiler/jsxFactoryAndJsxFragmentFactoryErrorNotIdentifier.tsx#configuration=0",
+    "compiler/jsxFactoryAndJsxFragmentFactoryNull.tsx#configuration=0",
+    "compiler/jsxFactoryAndReactNamespace.ts#configuration=0",
+    "compiler/jsxFactoryButNoJsxFragmentFactory.tsx#configuration=0",
+    "compiler/jsxFactoryIdentifier.ts#configuration=0",
+    "compiler/jsxFactoryIdentifierAsParameter.ts#configuration=0",
+    "compiler/jsxFactoryIdentifierWithAbsentParameter.ts#configuration=0",
+    "compiler/jsxFactoryMissingErrorInsideAClass.ts#configuration=0",
+    "compiler/jsxFactoryNotIdentifierOrQualifiedName.ts#configuration=0",
+    "compiler/jsxFactoryNotIdentifierOrQualifiedName2.ts#configuration=0",
+    "compiler/jsxFactoryQualifiedName.ts#configuration=0",
+    "compiler/jsxFactoryQualifiedNameResolutionError.ts#configuration=0",
+    "compiler/jsxFactoryQualifiedNameWithEs5.ts#configuration=0",
+    "compiler/jsxFragReactReferenceErrors.tsx#configuration=0",
+    "compiler/jsxFragReactReferenceErrors.tsx#configuration=1",
+    "compiler/jsxFragmentAndFactoryUsedOnFragmentUse.tsx#configuration=0",
+    "compiler/jsxFragmentFactoryNoUnusedLocals.tsx#configuration=0",
+    "compiler/jsxFragmentFactoryReference.tsx#configuration=0",
+    "compiler/jsxFragmentFactoryReference.tsx#configuration=1",
+    "compiler/jsxFragmentFactoryReference.tsx#configuration=2",
+    "compiler/jsxFragmentFactoryReference.tsx#configuration=3",
+    "compiler/jsxFragmentFactoryReference.tsx#configuration=4",
+    "compiler/jsxFragmentWrongType.tsx#configuration=0",
+    "compiler/jsxFunctionTypeChildren.tsx#configuration=0",
+    "compiler/jsxFunctionTypeChildren_promoted.tsx#configuration=0",
+    "compiler/jsxGenericComponentWithSpreadingResultOfGenericFunction.tsx#configuration=0",
+    "compiler/jsxHasLiteralType.tsx#configuration=0",
+    "compiler/jsxHash.tsx#configuration=0",
+    "compiler/jsxHexEntityUppercaseMarker.tsx#configuration=0",
+    "compiler/jsxImportForSideEffectsNonExtantNoError.tsx#configuration=0",
+    "compiler/jsxImportInAttribute.tsx#configuration=0",
+    "compiler/jsxImportSourceCheckJs.ts#configuration=0",
+    "compiler/jsxImportSourceNonPragmaComment.tsx#configuration=0",
+    "compiler/jsxInExtendsClause.tsx#configuration=0",
+    "compiler/jsxInferenceProducesLiteralAsExpected.tsx#configuration=0",
+    "compiler/jsxIntrinsicDeclaredUsingTemplateLiteralTypeSignatures.tsx#configuration=0",
+    "compiler/jsxIntrinsicElementsCompatability.tsx#configuration=0",
+    "compiler/jsxIntrinsicElementsExtendsRecord.tsx#configuration=0",
+    "compiler/jsxIntrinsicElementsTypeArgumentErrorSkipsTrivia.tsx#configuration=0",
+    "compiler/jsxIntrinsicElementsTypeArgumentErrors.tsx#configuration=0",
+    "compiler/jsxIntrinsicUnions.tsx#configuration=0",
+    "compiler/jsxIssuesErrorWhenTagExpectsTooManyArguments.tsx#configuration=0",
+    "compiler/jsxLibraryManagedAttributesUnexpectedType.tsx#configuration=0",
+    "compiler/jsxLibraryManagedAttributesUnusedGeneric.tsx#configuration=0",
+    "compiler/jsxLocalNamespaceIndexSignatureNoCrash.tsx#configuration=0",
+    "compiler/jsxMultilineAttributeStringValues.tsx#configuration=0",
+    "compiler/jsxMultilineAttributeStringValues2.tsx#configuration=0",
+    "compiler/jsxMultilineAttributeValuesReact.tsx#configuration=0",
+    "compiler/jsxNamespaceElementChildrenAttributeIgnoredWhenReactJsx.tsx#configuration=0",
+    "compiler/jsxNamespaceElementChildrenAttributeIgnoredWhenReactJsx.tsx#configuration=1",
+    "compiler/jsxNamespaceGlobalReexport.tsx#configuration=0",
+    "compiler/jsxNamespaceGlobalReexportMissingAliasTarget.tsx#configuration=0",
+    "compiler/jsxNamespaceImplicitImportJSXNamespace.tsx#configuration=0",
+    "compiler/jsxNamespaceImplicitImportJSXNamespaceFromConfigPickedOverGlobalOne.tsx#configuration=0",
+    "compiler/jsxNamespaceImplicitImportJSXNamespaceFromConfigPickedOverGlobalOne.tsx#configuration=1",
+    "compiler/jsxNamespaceImplicitImportJSXNamespaceFromPragmaPickedOverGlobalOne.tsx#configuration=0",
+    "compiler/jsxNamespaceNoElementChildrenAttributeReactJsx.tsx#configuration=0",
+    "compiler/jsxNamespaceNoElementChildrenAttributeReactJsx.tsx#configuration=1",
+    "compiler/jsxNamespacePrefixInName.tsx#configuration=0",
+    "compiler/jsxNamespacePrefixInNameReact.tsx#configuration=0",
+    "compiler/jsxNamespacePrefixIntrinsics.tsx#configuration=0",
+    "compiler/jsxNamespaceReexports.tsx#configuration=0",
+    "compiler/jsxNamespacedNameNotComparedToNonMatchingIndexSignature.tsx#configuration=0",
+    "compiler/jsxNestedIndentation.tsx#configuration=0",
+    "compiler/jsxNestedWithinTernaryParsesCorrectly.tsx#configuration=0",
+    "compiler/jsxNumericEntityLoneSurrogate.tsx#configuration=0",
+    "compiler/jsxPartialSpread.tsx#configuration=0",
+    "compiler/jsxPragmaAfterTags.tsx#configuration=0",
+    "compiler/jsxPragmaAfterTokenSameLine.tsx#configuration=0",
+    "compiler/jsxPreserveWithJsInput.ts#configuration=0",
+    "compiler/jsxPropsAsIdentifierNames.tsx#configuration=0",
+    "compiler/jsxRuntimePragma.ts#configuration=0",
+    "compiler/jsxRuntimePragma.ts#configuration=1",
+    "compiler/jsxRuntimePragma.ts#configuration=2",
+    "compiler/jsxRuntimePragma.ts#configuration=3",
+    "compiler/jsxSpreadFirstUnionNoErrors.tsx#configuration=0",
+    "compiler/jsxSpreadTag.ts#configuration=0",
+    "compiler/jsxSpreadTag.ts#configuration=1",
+    "compiler/jsxSpreadWithAssertion.tsx#configuration=0",
+    "compiler/jsxTernaryWithObjectInAttribute.tsx#configuration=0",
+    "compiler/jsxUnicodeEscapeSequence.tsx#configuration=0",
+    "compiler/jsxViaImport.2.tsx#configuration=0",
+    "compiler/jsxViaImport.tsx#configuration=0",
+    "compiler/keywordInJsxIdentifier.tsx#configuration=0",
+    "compiler/manyCompilerErrorsInTheTwoFiles.ts#configuration=0",
+    "compiler/modulePreserve3.ts#configuration=0",
+    "compiler/parseJsxElementInUnaryExpressionNoCrash1.ts#configuration=0",
+    "compiler/parseJsxElementInUnaryExpressionNoCrash2.ts#configuration=0",
+    "compiler/parseJsxElementInUnaryExpressionNoCrash3.ts#configuration=0",
+    "compiler/parseJsxExtends1.ts#configuration=0",
+    "compiler/parseJsxExtends2.ts#configuration=0",
+    "compiler/parseUnaryExpressionNoTypeAssertionInJsx1.ts#configuration=0",
+    "compiler/parseUnaryExpressionNoTypeAssertionInJsx2.ts#configuration=0",
+    "compiler/parseUnaryExpressionNoTypeAssertionInJsx3.ts#configuration=0",
+    "compiler/parseUnaryExpressionNoTypeAssertionInJsx4.ts#configuration=0",
+    "compiler/privateNameJsx.tsx#configuration=0",
+    "compiler/quickIntersectionCheckCorrectlyCachesErrors.ts#configuration=0",
+    "compiler/reactDefaultPropsInferenceSuccess.tsx#configuration=0",
+    "compiler/reactHOCSpreadprops.tsx#configuration=0",
+    "compiler/reactImportDropped.ts#configuration=0",
+    "compiler/reactImportUnusedInNewJSXEmit.tsx#configuration=0",
+    "compiler/reactImportUnusedInNewJSXEmit.tsx#configuration=1",
+    "compiler/reactJsxReactResolvedNodeNext.tsx#configuration=0",
+    "compiler/reactJsxReactResolvedNodeNextEsm.tsx#configuration=0",
+    "compiler/reactNamespaceImportPresevation.tsx#configuration=0",
+    "compiler/reactNamespaceInvalidInput.tsx#configuration=0",
+    "compiler/reactNamespaceJSXEmit.tsx#configuration=0",
+    "compiler/reactNamespaceMissingDeclaration.tsx#configuration=0",
+    "compiler/reactReadonlyHOCAssignabilityReal.tsx#configuration=0",
+    "compiler/reactSFCAndFunctionResolvable.tsx#configuration=0",
+    "compiler/reactTagNameComponentWithPropsNoOOM.tsx#configuration=0",
+    "compiler/reactTagNameComponentWithPropsNoOOM2.tsx#configuration=0",
+    "compiler/returnTypePredicateIsInstantiateInContextOfTarget.tsx#configuration=0",
+    "compiler/spellingSuggestionJSXAttribute.tsx#configuration=0",
+    "compiler/spreadIntersectionJsx.tsx#configuration=0",
+    "compiler/tsxAttributeQuickinfoTypesSameAsObjectLiteral.tsx#configuration=0",
+    "compiler/tsxAttributesHasInferrableIndex.tsx#configuration=0",
+    "compiler/tsxDeepAttributeAssignabilityError.tsx#configuration=0",
+    "compiler/tsxDiscriminantPropertyInference.tsx#configuration=0",
+    "compiler/tsxFragmentChildrenCheck.ts#configuration=0",
+    "compiler/tsxInferenceShouldNotYieldAnyOnUnions.tsx#configuration=0",
+    "compiler/tsxInvokeComponentType.tsx#configuration=0",
+    "compiler/tsxNoTypeAnnotatedSFC.tsx#configuration=0",
+    "compiler/tsxNotUsingApparentTypeOfSFC.tsx#configuration=0",
+    "compiler/tsxReactPropsInferenceSucceedsOnIntersections.tsx#configuration=0",
+    "compiler/tsxResolveExternalModuleExportsTypes.ts#configuration=0",
+    "compiler/tsxSpreadDoesNotReportExcessProps.tsx#configuration=0",
+    "compiler/tsxStatelessComponentDefaultProps.tsx#configuration=0",
+    "compiler/tsxTypeArgumentPartialDefinitionStillErrors.ts#configuration=0",
+    "compiler/tsxUnionMemberChecksFilterDataProps.tsx#configuration=0",
+    "compiler/tsxUnionSpread.tsx#configuration=0",
+    "compiler/typeInferenceWithExcessPropertiesJsx.tsx#configuration=0",
+    "compiler/unionReductionWithStringMappingAndIdenticalBaseTypeExistsNoCrash.tsx#configuration=0",
+    "compiler/unusedImports13.ts#configuration=0",
+    "compiler/unusedImports14.ts#configuration=0",
+    "compiler/unusedImports15.ts#configuration=0",
+    "compiler/unusedImports16.ts#configuration=0",
+    "compiler/useBeforeDeclaration_jsx.tsx#configuration=0",
+    "compiler/verbatimModuleSyntaxReactReference.ts#configuration=0",
+    "conformance/controlFlow/controlFlowOptionalChain3.tsx#configuration=0",
+    "conformance/decorators/invalid/decoratorOnArrowFunction.ts#configuration=0",
+    "conformance/decorators/invalid/decoratorOnFunctionExpression.ts#configuration=0",
+    "conformance/directives/multiline.tsx#configuration=0",
+    "conformance/jsdoc/declarations/jsDeclarationsNonIdentifierInferredNames.ts#configuration=0",
+    "conformance/jsdoc/declarations/jsDeclarationsReactComponents.ts#configuration=0",
+    "conformance/jsx/checkJsxChildrenCanBeTupleType.tsx#configuration=0",
+    "conformance/jsx/checkJsxChildrenProperty1.tsx#configuration=0",
+    "conformance/jsx/checkJsxChildrenProperty10.tsx#configuration=0",
+    "conformance/jsx/checkJsxChildrenProperty11.tsx#configuration=0",
+    "conformance/jsx/checkJsxChildrenProperty12.tsx#configuration=0",
+    "conformance/jsx/checkJsxChildrenProperty13.tsx#configuration=0",
+    "conformance/jsx/checkJsxChildrenProperty14.tsx#configuration=0",
+    "conformance/jsx/checkJsxChildrenProperty15.tsx#configuration=0",
+    "conformance/jsx/checkJsxChildrenProperty16.tsx#configuration=0",
+    "conformance/jsx/checkJsxChildrenProperty2.tsx#configuration=0",
+    "conformance/jsx/checkJsxChildrenProperty3.tsx#configuration=0",
+    "conformance/jsx/checkJsxChildrenProperty4.tsx#configuration=0",
+    "conformance/jsx/checkJsxChildrenProperty5.tsx#configuration=0",
+    "conformance/jsx/checkJsxChildrenProperty6.tsx#configuration=0",
+    "conformance/jsx/checkJsxChildrenProperty7.tsx#configuration=0",
+    "conformance/jsx/checkJsxChildrenProperty8.tsx#configuration=0",
+    "conformance/jsx/checkJsxChildrenProperty9.tsx#configuration=0",
+    "conformance/jsx/checkJsxGenericTagHasCorrectInferences.tsx#configuration=0",
+    "conformance/jsx/checkJsxIntersectionElementPropsType.tsx#configuration=0",
+    "conformance/jsx/checkJsxNamespaceNamesQuestionableForms.tsx#configuration=0",
+    "conformance/jsx/checkJsxSubtleSkipContextSensitiveBug.tsx#configuration=0",
+    "conformance/jsx/checkJsxUnionSFXContextualTypeInferredCorrectly.tsx#configuration=0",
+    "conformance/jsx/commentEmittingInPreserveJsx1.tsx#configuration=0",
+    "conformance/jsx/correctlyMarkAliasAsReferences1.tsx#configuration=0",
+    "conformance/jsx/correctlyMarkAliasAsReferences2.tsx#configuration=0",
+    "conformance/jsx/correctlyMarkAliasAsReferences3.tsx#configuration=0",
+    "conformance/jsx/correctlyMarkAliasAsReferences4.tsx#configuration=0",
+    "conformance/jsx/inline/inlineJsxAndJsxFragPragma.tsx#configuration=0",
+    "conformance/jsx/inline/inlineJsxAndJsxFragPragmaOverridesCompilerOptions.tsx#configuration=0",
+    "conformance/jsx/inline/inlineJsxFactoryDeclarations.tsx#configuration=0",
+    "conformance/jsx/inline/inlineJsxFactoryDeclarationsLocalTypes.tsx#configuration=0",
+    "conformance/jsx/inline/inlineJsxFactoryLocalTypeGlobalFallback.tsx#configuration=0",
+    "conformance/jsx/inline/inlineJsxFactoryOverridesCompilerOption.tsx#configuration=0",
+    "conformance/jsx/inline/inlineJsxFactoryWithFragmentIsError.tsx#configuration=0",
+    "conformance/jsx/jsxAndTypeAssertion.tsx#configuration=0",
+    "conformance/jsx/jsxAttributeInitializer.ts#configuration=0",
+    "conformance/jsx/jsxAttributeInitializer.ts#configuration=1",
+    "conformance/jsx/jsxCheckJsxNoTypeArgumentsAllowed.tsx#configuration=0",
+    "conformance/jsx/jsxEsprimaFbTestSuite.tsx#configuration=0",
+    "conformance/jsx/jsxInvalidEsprimaTestSuite.tsx#configuration=0",
+    "conformance/jsx/jsxParsingError1.tsx#configuration=0",
+    "conformance/jsx/jsxParsingError2.tsx#configuration=0",
+    "conformance/jsx/jsxParsingError3.tsx#configuration=0",
+    "conformance/jsx/jsxParsingError4.tsx#configuration=0",
+    "conformance/jsx/jsxParsingError4.tsx#configuration=1",
+    "conformance/jsx/jsxParsingErrorImmediateSpreadInAttributeValue.tsx#configuration=0",
+    "conformance/jsx/jsxReactTestSuite.tsx#configuration=0",
+    "conformance/jsx/jsxSpreadOverwritesAttributeStrict.tsx#configuration=0",
+    "conformance/jsx/jsxUnclosedParserRecovery.ts#configuration=0",
+    "conformance/jsx/jsxs/jsxJsxsCjsTransformChildren.tsx#configuration=0",
+    "conformance/jsx/jsxs/jsxJsxsCjsTransformChildren.tsx#configuration=1",
+    "conformance/jsx/jsxs/jsxJsxsCjsTransformCustomImport.tsx#configuration=0",
+    "conformance/jsx/jsxs/jsxJsxsCjsTransformCustomImport.tsx#configuration=1",
+    "conformance/jsx/jsxs/jsxJsxsCjsTransformCustomImportPragma.tsx#configuration=0",
+    "conformance/jsx/jsxs/jsxJsxsCjsTransformCustomImportPragma.tsx#configuration=1",
+    "conformance/jsx/jsxs/jsxJsxsCjsTransformKeyProp.tsx#configuration=0",
+    "conformance/jsx/jsxs/jsxJsxsCjsTransformKeyProp.tsx#configuration=1",
+    "conformance/jsx/jsxs/jsxJsxsCjsTransformKeyPropCustomImport.tsx#configuration=0",
+    "conformance/jsx/jsxs/jsxJsxsCjsTransformKeyPropCustomImport.tsx#configuration=1",
+    "conformance/jsx/jsxs/jsxJsxsCjsTransformKeyPropCustomImportPragma.tsx#configuration=0",
+    "conformance/jsx/jsxs/jsxJsxsCjsTransformKeyPropCustomImportPragma.tsx#configuration=1",
+    "conformance/jsx/jsxs/jsxJsxsCjsTransformNestedSelfClosingChild.tsx#configuration=0",
+    "conformance/jsx/jsxs/jsxJsxsCjsTransformNestedSelfClosingChild.tsx#configuration=1",
+    "conformance/jsx/jsxs/jsxJsxsCjsTransformSubstitutesNames.tsx#configuration=0",
+    "conformance/jsx/jsxs/jsxJsxsCjsTransformSubstitutesNames.tsx#configuration=1",
+    "conformance/jsx/jsxs/jsxJsxsCjsTransformSubstitutesNamesFragment.tsx#configuration=0",
+    "conformance/jsx/jsxs/jsxJsxsCjsTransformSubstitutesNamesFragment.tsx#configuration=1",
+    "conformance/jsx/tsxAttributeErrors.tsx#configuration=0",
+    "conformance/jsx/tsxAttributeInvalidNames.tsx#configuration=0",
+    "conformance/jsx/tsxAttributeResolution1.tsx#configuration=0",
+    "conformance/jsx/tsxAttributeResolution10.tsx#configuration=0",
+    "conformance/jsx/tsxAttributeResolution11.tsx#configuration=0",
+    "conformance/jsx/tsxAttributeResolution12.tsx#configuration=0",
+    "conformance/jsx/tsxAttributeResolution13.tsx#configuration=0",
+    "conformance/jsx/tsxAttributeResolution14.tsx#configuration=0",
+    "conformance/jsx/tsxAttributeResolution15.tsx#configuration=0",
+    "conformance/jsx/tsxAttributeResolution16.tsx#configuration=0",
+    "conformance/jsx/tsxAttributeResolution2.tsx#configuration=0",
+    "conformance/jsx/tsxAttributeResolution3.tsx#configuration=0",
+    "conformance/jsx/tsxAttributeResolution4.tsx#configuration=0",
+    "conformance/jsx/tsxAttributeResolution5.tsx#configuration=0",
+    "conformance/jsx/tsxAttributeResolution6.tsx#configuration=0",
+    "conformance/jsx/tsxAttributeResolution7.tsx#configuration=0",
+    "conformance/jsx/tsxAttributeResolution8.tsx#configuration=0",
+    "conformance/jsx/tsxAttributeResolution9.tsx#configuration=0",
+    "conformance/jsx/tsxCorrectlyParseLessThanComparison1.tsx#configuration=0",
+    "conformance/jsx/tsxDefaultAttributesResolution1.tsx#configuration=0",
+    "conformance/jsx/tsxDefaultAttributesResolution2.tsx#configuration=0",
+    "conformance/jsx/tsxDefaultAttributesResolution3.tsx#configuration=0",
+    "conformance/jsx/tsxDynamicTagName1.tsx#configuration=0",
+    "conformance/jsx/tsxDynamicTagName2.tsx#configuration=0",
+    "conformance/jsx/tsxDynamicTagName3.tsx#configuration=0",
+    "conformance/jsx/tsxDynamicTagName4.tsx#configuration=0",
+    "conformance/jsx/tsxDynamicTagName5.tsx#configuration=0",
+    "conformance/jsx/tsxDynamicTagName6.tsx#configuration=0",
+    "conformance/jsx/tsxDynamicTagName7.tsx#configuration=0",
+    "conformance/jsx/tsxDynamicTagName8.tsx#configuration=0",
+    "conformance/jsx/tsxDynamicTagName9.tsx#configuration=0",
+    "conformance/jsx/tsxElementResolution.tsx#configuration=0",
+    "conformance/jsx/tsxElementResolution1.tsx#configuration=0",
+    "conformance/jsx/tsxElementResolution10.tsx#configuration=0",
+    "conformance/jsx/tsxElementResolution11.tsx#configuration=0",
+    "conformance/jsx/tsxElementResolution12.tsx#configuration=0",
+    "conformance/jsx/tsxElementResolution13.tsx#configuration=0",
+    "conformance/jsx/tsxElementResolution14.tsx#configuration=0",
+    "conformance/jsx/tsxElementResolution15.tsx#configuration=0",
+    "conformance/jsx/tsxElementResolution16.tsx#configuration=0",
+    "conformance/jsx/tsxElementResolution17.tsx#configuration=0",
+    "conformance/jsx/tsxElementResolution18.tsx#configuration=0",
+    "conformance/jsx/tsxElementResolution19.tsx#configuration=0",
+    "conformance/jsx/tsxElementResolution2.tsx#configuration=0",
+    "conformance/jsx/tsxElementResolution3.tsx#configuration=0",
+    "conformance/jsx/tsxElementResolution4.tsx#configuration=0",
+    "conformance/jsx/tsxElementResolution5.tsx#configuration=0",
+    "conformance/jsx/tsxElementResolution6.tsx#configuration=0",
+    "conformance/jsx/tsxElementResolution7.tsx#configuration=0",
+    "conformance/jsx/tsxElementResolution8.tsx#configuration=0",
+    "conformance/jsx/tsxElementResolution9.tsx#configuration=0",
+    "conformance/jsx/tsxEmit1.tsx#configuration=0",
+    "conformance/jsx/tsxEmit2.tsx#configuration=0",
+    "conformance/jsx/tsxEmit3.tsx#configuration=0",
+    "conformance/jsx/tsxEmitSpreadAttribute.ts#configuration=0",
+    "conformance/jsx/tsxEmitSpreadAttribute.ts#configuration=1",
+    "conformance/jsx/tsxEmitSpreadAttribute.ts#configuration=2",
+    "conformance/jsx/tsxErrorRecovery1.tsx#configuration=0",
+    "conformance/jsx/tsxErrorRecovery2.tsx#configuration=0",
+    "conformance/jsx/tsxErrorRecovery3.tsx#configuration=0",
+    "conformance/jsx/tsxExternalModuleEmit1.tsx#configuration=0",
+    "conformance/jsx/tsxExternalModuleEmit2.tsx#configuration=0",
+    "conformance/jsx/tsxFragmentErrors.tsx#configuration=0",
+    "conformance/jsx/tsxFragmentPreserveEmit.tsx#configuration=0",
+    "conformance/jsx/tsxFragmentReactEmit.tsx#configuration=0",
+    "conformance/jsx/tsxGenericArrowFunctionParsing.tsx#configuration=0",
+    "conformance/jsx/tsxGenericAttributesType1.tsx#configuration=0",
+    "conformance/jsx/tsxGenericAttributesType2.tsx#configuration=0",
+    "conformance/jsx/tsxGenericAttributesType3.tsx#configuration=0",
+    "conformance/jsx/tsxGenericAttributesType4.tsx#configuration=0",
+    "conformance/jsx/tsxGenericAttributesType5.tsx#configuration=0",
+    "conformance/jsx/tsxGenericAttributesType6.tsx#configuration=0",
+    "conformance/jsx/tsxGenericAttributesType7.tsx#configuration=0",
+    "conformance/jsx/tsxGenericAttributesType8.tsx#configuration=0",
+    "conformance/jsx/tsxGenericAttributesType9.tsx#configuration=0",
+    "conformance/jsx/tsxInArrowFunction.tsx#configuration=0",
+    "conformance/jsx/tsxIntrinsicAttributeErrors.tsx#configuration=0",
+    "conformance/jsx/tsxLibraryManagedAttributes.tsx#configuration=0",
+    "conformance/jsx/tsxNamespacedAttributeName1.tsx#configuration=0",
+    "conformance/jsx/tsxNamespacedAttributeName2.tsx#configuration=0",
+    "conformance/jsx/tsxNamespacedTagName1.tsx#configuration=0",
+    "conformance/jsx/tsxNamespacedTagName2.tsx#configuration=0",
+    "conformance/jsx/tsxNoJsx.tsx#configuration=0",
+    "conformance/jsx/tsxOpeningClosingNames.tsx#configuration=0",
+    "conformance/jsx/tsxParseTests1.tsx#configuration=0",
+    "conformance/jsx/tsxParseTests2.tsx#configuration=0",
+    "conformance/jsx/tsxPreserveEmit2.tsx#configuration=0",
+    "conformance/jsx/tsxReactComponentWithDefaultTypeParameter1.tsx#configuration=0",
+    "conformance/jsx/tsxReactComponentWithDefaultTypeParameter2.tsx#configuration=0",
+    "conformance/jsx/tsxReactComponentWithDefaultTypeParameter3.tsx#configuration=0",
+    "conformance/jsx/tsxReactEmit1.tsx#configuration=0",
+    "conformance/jsx/tsxReactEmit2.tsx#configuration=0",
+    "conformance/jsx/tsxReactEmit3.tsx#configuration=0",
+    "conformance/jsx/tsxReactEmit4.tsx#configuration=0",
+    "conformance/jsx/tsxReactEmit5.tsx#configuration=0",
+    "conformance/jsx/tsxReactEmit6.tsx#configuration=0",
+    "conformance/jsx/tsxReactEmit7.tsx#configuration=0",
+    "conformance/jsx/tsxReactEmit8.tsx#configuration=0",
+    "conformance/jsx/tsxReactEmit8.tsx#configuration=1",
+    "conformance/jsx/tsxReactEmitEntities.tsx#configuration=0",
+    "conformance/jsx/tsxReactEmitNesting.tsx#configuration=0",
+    "conformance/jsx/tsxReactEmitSpreadAttribute.ts#configuration=0",
+    "conformance/jsx/tsxReactEmitSpreadAttribute.ts#configuration=1",
+    "conformance/jsx/tsxReactEmitSpreadAttribute.ts#configuration=2",
+    "conformance/jsx/tsxReactEmitWhitespace.tsx#configuration=0",
+    "conformance/jsx/tsxReactEmitWhitespace2.tsx#configuration=0",
+    "conformance/jsx/tsxSfcReturnNull.tsx#configuration=0",
+    "conformance/jsx/tsxSfcReturnNullStrictNullChecks.tsx#configuration=0",
+    "conformance/jsx/tsxSfcReturnUndefinedStrictNullChecks.tsx#configuration=0",
+    "conformance/jsx/tsxSpreadAttributesResolution1.tsx#configuration=0",
+    "conformance/jsx/tsxSpreadAttributesResolution10.tsx#configuration=0",
+    "conformance/jsx/tsxSpreadAttributesResolution11.tsx#configuration=0",
+    "conformance/jsx/tsxSpreadAttributesResolution12.tsx#configuration=0",
+    "conformance/jsx/tsxSpreadAttributesResolution13.tsx#configuration=0",
+    "conformance/jsx/tsxSpreadAttributesResolution14.tsx#configuration=0",
+    "conformance/jsx/tsxSpreadAttributesResolution15.tsx#configuration=0",
+    "conformance/jsx/tsxSpreadAttributesResolution16.tsx#configuration=0",
+    "conformance/jsx/tsxSpreadAttributesResolution17.tsx#configuration=0",
+    "conformance/jsx/tsxSpreadAttributesResolution2.tsx#configuration=0",
+    "conformance/jsx/tsxSpreadAttributesResolution3.tsx#configuration=0",
+    "conformance/jsx/tsxSpreadAttributesResolution4.tsx#configuration=0",
+    "conformance/jsx/tsxSpreadAttributesResolution5.tsx#configuration=0",
+    "conformance/jsx/tsxSpreadAttributesResolution6.tsx#configuration=0",
+    "conformance/jsx/tsxSpreadAttributesResolution7.tsx#configuration=0",
+    "conformance/jsx/tsxSpreadAttributesResolution8.tsx#configuration=0",
+    "conformance/jsx/tsxSpreadAttributesResolution9.tsx#configuration=0",
+    "conformance/jsx/tsxSpreadChildren.tsx#configuration=0",
+    "conformance/jsx/tsxSpreadChildrenInvalidType.tsx#configuration=0",
+    "conformance/jsx/tsxSpreadChildrenInvalidType.tsx#configuration=2",
+    "conformance/jsx/tsxSpreadInvalidType.tsx#configuration=0",
+    "conformance/jsx/tsxStatelessFunctionComponentOverload1.tsx#configuration=0",
+    "conformance/jsx/tsxStatelessFunctionComponentOverload2.tsx#configuration=0",
+    "conformance/jsx/tsxStatelessFunctionComponentOverload3.tsx#configuration=0",
+    "conformance/jsx/tsxStatelessFunctionComponentOverload4.tsx#configuration=0",
+    "conformance/jsx/tsxStatelessFunctionComponentOverload5.tsx#configuration=0",
+    "conformance/jsx/tsxStatelessFunctionComponentOverload6.tsx#configuration=0",
+    "conformance/jsx/tsxStatelessFunctionComponentWithDefaultTypeParameter1.tsx#configuration=0",
+    "conformance/jsx/tsxStatelessFunctionComponentWithDefaultTypeParameter2.tsx#configuration=0",
+    "conformance/jsx/tsxStatelessFunctionComponents1.tsx#configuration=0",
+    "conformance/jsx/tsxStatelessFunctionComponents2.tsx#configuration=0",
+    "conformance/jsx/tsxStatelessFunctionComponents3.tsx#configuration=0",
+    "conformance/jsx/tsxStatelessFunctionComponentsWithTypeArguments1.tsx#configuration=0",
+    "conformance/jsx/tsxStatelessFunctionComponentsWithTypeArguments2.tsx#configuration=0",
+    "conformance/jsx/tsxStatelessFunctionComponentsWithTypeArguments3.tsx#configuration=0",
+    "conformance/jsx/tsxStatelessFunctionComponentsWithTypeArguments4.tsx#configuration=0",
+    "conformance/jsx/tsxStatelessFunctionComponentsWithTypeArguments5.tsx#configuration=0",
+    "conformance/jsx/tsxTypeArgumentResolution.tsx#configuration=0",
+    "conformance/jsx/tsxTypeArgumentsJsxPreserveOutput.tsx#configuration=0",
+    "conformance/jsx/tsxTypeErrors.tsx#configuration=0",
+    "conformance/jsx/tsxUnionElementType1.tsx#configuration=0",
+    "conformance/jsx/tsxUnionElementType2.tsx#configuration=0",
+    "conformance/jsx/tsxUnionElementType3.tsx#configuration=0",
+    "conformance/jsx/tsxUnionElementType4.tsx#configuration=0",
+    "conformance/jsx/tsxUnionElementType5.tsx#configuration=0",
+    "conformance/jsx/tsxUnionElementType6.tsx#configuration=0",
+    "conformance/jsx/tsxUnionTypeComponent1.tsx#configuration=0",
+    "conformance/jsx/tsxUnionTypeComponent2.tsx#configuration=0",
+    "conformance/jsx/unicodeEscapesInJsxtags.tsx#configuration=0",
+    "conformance/types/contextualTypes/jsxAttributes/contextuallyTypedStringLiteralsInJsxAttributes01.tsx#configuration=0",
+    "conformance/types/contextualTypes/jsxAttributes/contextuallyTypedStringLiteralsInJsxAttributes02.tsx#configuration=0",
+    "conformance/types/import/importWithTypeArguments.ts#configuration=0",
+    "conformance/types/typeRelationships/typeInference/intraExpressionInferencesJsx.tsx#configuration=0"
+   ]
+  },
+  {
+   "checkpoints": {
+    "C4": 284
+   },
+   "domains": {
+    "display": 95,
+    "errors": 284,
+    "symbols": 95,
+    "types": 95
+   },
+   "evidence": [
+    {
+     "case": "cases/00711",
+     "observation": "unsupported: checkClassLikeDeclaration: decorators",
+     "variant": "compiler/classExpressionWithDecorator1.ts#configuration=0"
+    },
+    {
+     "case": "cases/00950",
+     "observation": "unsupported: checkClassLikeDeclaration: decorators",
+     "variant": "compiler/commentOnDecoratedClassDeclaration.ts#configuration=0"
+    },
+    {
+     "case": "cases/01863",
+     "observation": "unsupported: checkClassLikeDeclaration: decorators",
+     "variant": "compiler/decoratedClassWithStaticAccessor.ts#configuration=0"
+    },
+    {
+     "case": "cases/01864",
+     "observation": "unsupported: checkClassLikeDeclaration: decorators",
+     "variant": "compiler/decoratorInJsFile.ts#configuration=0"
+    },
+    {
+     "case": "cases/01865",
+     "observation": "unsupported: checkClassLikeDeclaration: decorators",
+     "variant": "compiler/decoratorInJsFile1.ts#configuration=0"
+    }
+   ],
+   "id": "B02",
+   "kind": "unsupported",
+   "missing_operation": "checkClassLikeDeclaration: decorators",
+   "owner": "C4",
+   "variants": [
+    "compiler/classExpressionWithDecorator1.ts#configuration=0",
+    "compiler/commentOnDecoratedClassDeclaration.ts#configuration=0",
+    "compiler/decoratedClassWithStaticAccessor.ts#configuration=0",
+    "compiler/decoratorInJsFile.ts#configuration=0",
+    "compiler/decoratorInJsFile1.ts#configuration=0",
+    "compiler/decoratorMetadataRestParameterWithImportedType.ts#configuration=0",
+    "compiler/decoratorMetadataTypeOnlyExport.ts#configuration=0",
+    "compiler/decoratorMetadataWithImportDeclarationNameCollision.ts#configuration=0",
+    "compiler/decoratorMetadataWithImportDeclarationNameCollision2.ts#configuration=0",
+    "compiler/decoratorMetadataWithImportDeclarationNameCollision3.ts#configuration=0",
+    "compiler/decoratorMetadataWithImportDeclarationNameCollision4.ts#configuration=0",
+    "compiler/decoratorMetadataWithImportDeclarationNameCollision5.ts#configuration=0",
+    "compiler/decoratorMetadataWithImportDeclarationNameCollision6.ts#configuration=0",
+    "compiler/decoratorMetadataWithImportDeclarationNameCollision7.ts#configuration=0",
+    "compiler/decoratorMetadataWithImportDeclarationNameCollision8.ts#configuration=0",
+    "compiler/decoratorReferences.ts#configuration=0",
+    "compiler/decoratorUsedBeforeDeclaration.ts#configuration=0",
+    "compiler/defaultKeywordWithoutExport1.ts#configuration=0",
+    "compiler/emitDecoratorMetadata_object.ts#configuration=0",
+    "compiler/emitDecoratorMetadata_restArgs.ts#configuration=0",
+    "compiler/emitHelpersWithLocalCollisions.ts#configuration=0",
+    "compiler/emitHelpersWithLocalCollisions.ts#configuration=1",
+    "compiler/emitHelpersWithLocalCollisions.ts#configuration=2",
+    "compiler/emitHelpersWithLocalCollisions.ts#configuration=3",
+    "compiler/emitHelpersWithLocalCollisions.ts#configuration=4",
+    "compiler/emitHelpersWithLocalCollisions.ts#configuration=5",
+    "compiler/emitHelpersWithLocalCollisions.ts#configuration=6",
+    "compiler/emitHelpersWithLocalCollisions.ts#configuration=7",
+    "compiler/emitHelpersWithLocalCollisions.ts#configuration=8",
+    "compiler/emitHelpersWithLocalCollisions.ts#configuration=9",
+    "compiler/esDecoratorsPropertyAccessSameNameAsClass.ts#configuration=0",
+    "compiler/importHelpers.ts#configuration=0",
+    "compiler/importHelpersES6.ts#configuration=0",
+    "compiler/importHelpersInIsolatedModules.ts#configuration=0",
+    "compiler/importHelpersWithLocalCollisions.ts#configuration=0",
+    "compiler/importHelpersWithLocalCollisions.ts#configuration=1",
+    "compiler/importHelpersWithOriginalSourceFileCollision.ts#configuration=0",
+    "compiler/jsFileCompilationDecoratorSyntax.ts#configuration=0",
+    "compiler/legacyDecoratorClassWithoutModifiers.ts#configuration=0",
+    "compiler/legacyDecoratorsEnumAccessSameNameAsClass.ts#configuration=0",
+    "compiler/modulePreserveImportHelpers.ts#configuration=0",
+    "compiler/noEmitHelpers2.ts#configuration=0",
+    "compiler/potentiallyUncalledDecorators.ts#configuration=0",
+    "compiler/sourceMapValidationDecorators.ts#configuration=0",
+    "compiler/staticInitializersAndLegacyClassDecorators.ts#configuration=0",
+    "compiler/tslibReExportHelpers.ts#configuration=0",
+    "compiler/useBeforeDeclaration_classDecorators.1.ts#configuration=0",
+    "compiler/useBeforeDeclaration_classDecorators.2.ts#configuration=0",
+    "compiler/useBeforeDeclaration_classDecorators.2.ts#configuration=1",
+    "conformance/classes/constructorDeclarations/superCalls/derivedClassSuperProperties.ts#configuration=0",
+    "conformance/classes/members/instanceAndStaticMembers/typeOfThisInStaticMembers10.ts#configuration=0",
+    "conformance/classes/members/instanceAndStaticMembers/typeOfThisInStaticMembers10.ts#configuration=2",
+    "conformance/classes/members/instanceAndStaticMembers/typeOfThisInStaticMembers10.ts#configuration=3",
+    "conformance/classes/members/instanceAndStaticMembers/typeOfThisInStaticMembers11.ts#configuration=0",
+    "conformance/classes/members/instanceAndStaticMembers/typeOfThisInStaticMembers11.ts#configuration=2",
+    "conformance/classes/members/instanceAndStaticMembers/typeOfThisInStaticMembers11.ts#configuration=3",
+    "conformance/decorators/class/constructableDecoratorOnClass01.ts#configuration=0",
+    "conformance/decorators/class/constructor/decoratorOnClassConstructor4.ts#configuration=0",
+    "conformance/decorators/class/decoratedBlockScopedClass1.ts#configuration=0",
+    "conformance/decorators/class/decoratedBlockScopedClass2.ts#configuration=0",
+    "conformance/decorators/class/decoratedBlockScopedClass3.ts#configuration=0",
+    "conformance/decorators/class/decoratedClassExportsCommonJS1.ts#configuration=0",
+    "conformance/decorators/class/decoratedClassExportsCommonJS2.ts#configuration=0",
+    "conformance/decorators/class/decoratedClassFromExternalModule.ts#configuration=0",
+    "conformance/decorators/class/decoratorOnClass1.ts#configuration=0",
+    "conformance/decorators/class/decoratorOnClass2.ts#configuration=0",
+    "conformance/decorators/class/decoratorOnClass3.ts#configuration=0",
+    "conformance/decorators/class/decoratorOnClass4.ts#configuration=0",
+    "conformance/decorators/class/decoratorOnClass5.ts#configuration=0",
+    "conformance/decorators/class/decoratorOnClass8.ts#configuration=0",
+    "conformance/decorators/class/decoratorOnClass9.ts#configuration=0",
+    "conformance/decorators/decoratorCallGeneric.ts#configuration=0",
+    "conformance/decorators/decoratorMetadata.ts#configuration=0",
+    "conformance/decorators/decoratorMetadataWithTypeOnlyImport.ts#configuration=0",
+    "conformance/decorators/legacyDecorators-contextualTypes.ts#configuration=0",
+    "conformance/es6/decorators/class/decoratorOnClass1.es6.ts#configuration=0",
+    "conformance/es6/decorators/class/decoratorOnClass2.es6.ts#configuration=0",
+    "conformance/es6/decorators/class/decoratorOnClass3.es6.ts#configuration=0",
+    "conformance/es6/decorators/class/decoratorOnClass4.es6.ts#configuration=0",
+    "conformance/es6/decorators/class/decoratorOnClass5.es6.ts#configuration=0",
+    "conformance/es6/decorators/class/decoratorOnClass6.es6.ts#configuration=0",
+    "conformance/es6/decorators/class/decoratorOnClass7.es6.ts#configuration=0",
+    "conformance/es6/decorators/class/decoratorOnClass8.es6.ts#configuration=0",
+    "conformance/es6/moduleExportsCommonjs/decoratedDefaultExportsGetExportedCommonjs.ts#configuration=0",
+    "conformance/es6/yieldExpressions/generatorTypeCheck39.ts#configuration=0",
+    "conformance/es6/yieldExpressions/generatorTypeCheck61.ts#configuration=0",
+    "conformance/esDecorators/classDeclaration/accessors/esDecorators-classDeclaration-accessors-staticPrivate.ts#configuration=0",
+    "conformance/esDecorators/classDeclaration/accessors/esDecorators-classDeclaration-accessors-staticPrivate.ts#configuration=1",
+    "conformance/esDecorators/classDeclaration/accessors/esDecorators-classDeclaration-accessors-staticPrivate.ts#configuration=2",
+    "conformance/esDecorators/classDeclaration/classSuper/esDecorators-classDeclaration-classSuper.1.ts#configuration=0",
+    "conformance/esDecorators/classDeclaration/classSuper/esDecorators-classDeclaration-classSuper.2.ts#configuration=0",
+    "conformance/esDecorators/classDeclaration/classSuper/esDecorators-classDeclaration-classSuper.3.ts#configuration=0",
+    "conformance/esDecorators/classDeclaration/classSuper/esDecorators-classDeclaration-classSuper.4.ts#configuration=0",
+    "conformance/esDecorators/classDeclaration/classSuper/esDecorators-classDeclaration-classSuper.5.ts#configuration=0",
+    "conformance/esDecorators/classDeclaration/classSuper/esDecorators-classDeclaration-classSuper.6.ts#configuration=0",
+    "conformance/esDecorators/classDeclaration/classThisReference/esDecorators-classDeclaration-classThisReference.es5.ts#configuration=0",
+    "conformance/esDecorators/classDeclaration/classThisReference/esDecorators-classDeclaration-classThisReference.ts#configuration=0",
+    "conformance/esDecorators/classDeclaration/classThisReference/esDecorators-classDeclaration-classThisReference.ts#configuration=1",
+    "conformance/esDecorators/classDeclaration/classThisReference/esDecorators-classDeclaration-classThisReference.ts#configuration=2",
+    "conformance/esDecorators/classDeclaration/esDecorators-classDeclaration-commentPreservation.ts#configuration=0",
+    "conformance/esDecorators/classDeclaration/esDecorators-classDeclaration-commentPreservation.ts#configuration=1",
+    "conformance/esDecorators/classDeclaration/esDecorators-classDeclaration-commentPreservation.ts#configuration=2",
+    "conformance/esDecorators/classDeclaration/esDecorators-classDeclaration-commentPreservation.ts#configuration=3",
+    "conformance/esDecorators/classDeclaration/esDecorators-classDeclaration-commentPreservation.ts#configuration=4",
+    "conformance/esDecorators/classDeclaration/esDecorators-classDeclaration-commentPreservation.ts#configuration=5",
+    "conformance/esDecorators/classDeclaration/esDecorators-classDeclaration-commonjs-classNamespaceMerge.ts#configuration=0",
+    "conformance/esDecorators/classDeclaration/esDecorators-classDeclaration-commonjs.ts#configuration=0",
+    "conformance/esDecorators/classDeclaration/esDecorators-classDeclaration-exportModifier.2.ts#configuration=0",
+    "conformance/esDecorators/classDeclaration/esDecorators-classDeclaration-exportModifier.ts#configuration=0",
+    "conformance/esDecorators/classDeclaration/esDecorators-classDeclaration-multipleDecorators.ts#configuration=0",
+    "conformance/esDecorators/classDeclaration/esDecorators-classDeclaration-multipleDecorators.ts#configuration=1",
+    "conformance/esDecorators/classDeclaration/esDecorators-classDeclaration-multipleDecorators.ts#configuration=3",
+    "conformance/esDecorators/classDeclaration/esDecorators-classDeclaration-outerThisReference.ts#configuration=0",
+    "conformance/esDecorators/classDeclaration/esDecorators-classDeclaration-outerThisReference.ts#configuration=1",
+    "conformance/esDecorators/classDeclaration/esDecorators-classDeclaration-outerThisReference.ts#configuration=2",
+    "conformance/esDecorators/classDeclaration/esDecorators-classDeclaration-outerThisReference.ts#configuration=3",
+    "conformance/esDecorators/classDeclaration/esDecorators-classDeclaration-setFunctionName.ts#configuration=0",
+    "conformance/esDecorators/classDeclaration/esDecorators-classDeclaration-setFunctionName.ts#configuration=1",
+    "conformance/esDecorators/classDeclaration/esDecorators-classDeclaration-setFunctionName.ts#configuration=3",
+    "conformance/esDecorators/classDeclaration/esDecorators-classDeclaration-simpleTransformation.ts#configuration=0",
+    "conformance/esDecorators/classDeclaration/esDecorators-classDeclaration-simpleTransformation.ts#configuration=1",
+    "conformance/esDecorators/classDeclaration/esDecorators-classDeclaration-simpleTransformation.ts#configuration=3",
+    "conformance/esDecorators/classDeclaration/esDecorators-classDeclaration-sourceMap.ts#configuration=0",
+    "conformance/esDecorators/classDeclaration/esDecorators-classDeclaration-sourceMap.ts#configuration=1",
+    "conformance/esDecorators/classDeclaration/esDecorators-classDeclaration-sourceMap.ts#configuration=2",
+    "conformance/esDecorators/classDeclaration/fields/esDecorators-classDeclaration-fields-staticAccessor.ts#configuration=0",
+    "conformance/esDecorators/classDeclaration/fields/esDecorators-classDeclaration-fields-staticAccessor.ts#configuration=1",
+    "conformance/esDecorators/classDeclaration/fields/esDecorators-classDeclaration-fields-staticAccessor.ts#configuration=2",
+    "conformance/esDecorators/classDeclaration/fields/esDecorators-classDeclaration-fields-staticPrivate.ts#configuration=0",
+    "conformance/esDecorators/classDeclaration/fields/esDecorators-classDeclaration-fields-staticPrivate.ts#configuration=1",
+    "conformance/esDecorators/classDeclaration/fields/esDecorators-classDeclaration-fields-staticPrivate.ts#configuration=2",
+    "conformance/esDecorators/classDeclaration/fields/esDecorators-classDeclaration-fields-staticPrivateAccessor.ts#configuration=0",
+    "conformance/esDecorators/classDeclaration/fields/esDecorators-classDeclaration-fields-staticPrivateAccessor.ts#configuration=1",
+    "conformance/esDecorators/classDeclaration/fields/esDecorators-classDeclaration-fields-staticPrivateAccessor.ts#configuration=2",
+    "conformance/esDecorators/classDeclaration/methods/esDecorators-classDeclaration-methods-staticPrivate.ts#configuration=0",
+    "conformance/esDecorators/classDeclaration/methods/esDecorators-classDeclaration-methods-staticPrivate.ts#configuration=1",
+    "conformance/esDecorators/classDeclaration/methods/esDecorators-classDeclaration-methods-staticPrivate.ts#configuration=2",
+    "conformance/esDecorators/classExpression/classSuper/esDecorators-classExpression-classSuper.1.ts#configuration=0",
+    "conformance/esDecorators/classExpression/classSuper/esDecorators-classExpression-classSuper.2.ts#configuration=0",
+    "conformance/esDecorators/classExpression/classSuper/esDecorators-classExpression-classSuper.3.ts#configuration=0",
+    "conformance/esDecorators/classExpression/classSuper/esDecorators-classExpression-classSuper.4.ts#configuration=0",
+    "conformance/esDecorators/classExpression/classSuper/esDecorators-classExpression-classSuper.5.ts#configuration=0",
+    "conformance/esDecorators/classExpression/classSuper/esDecorators-classExpression-classSuper.6.ts#configuration=0",
+    "conformance/esDecorators/classExpression/esDecorators-classExpression-commentPreservation.ts#configuration=0",
+    "conformance/esDecorators/classExpression/esDecorators-classExpression-commentPreservation.ts#configuration=1",
+    "conformance/esDecorators/classExpression/esDecorators-classExpression-commentPreservation.ts#configuration=2",
+    "conformance/esDecorators/classExpression/namedEvaluation/esDecorators-classExpression-namedEvaluation.1.ts#configuration=0",
+    "conformance/esDecorators/classExpression/namedEvaluation/esDecorators-classExpression-namedEvaluation.10.ts#configuration=0",
+    "conformance/esDecorators/classExpression/namedEvaluation/esDecorators-classExpression-namedEvaluation.11.ts#configuration=0",
+    "conformance/esDecorators/classExpression/namedEvaluation/esDecorators-classExpression-namedEvaluation.2.ts#configuration=0",
+    "conformance/esDecorators/classExpression/namedEvaluation/esDecorators-classExpression-namedEvaluation.3.ts#configuration=0",
+    "conformance/esDecorators/classExpression/namedEvaluation/esDecorators-classExpression-namedEvaluation.4.ts#configuration=0",
+    "conformance/esDecorators/classExpression/namedEvaluation/esDecorators-classExpression-namedEvaluation.5.ts#configuration=0",
+    "conformance/esDecorators/classExpression/namedEvaluation/esDecorators-classExpression-namedEvaluation.6.ts#configuration=0",
+    "conformance/esDecorators/classExpression/namedEvaluation/esDecorators-classExpression-namedEvaluation.7.ts#configuration=0",
+    "conformance/esDecorators/classExpression/namedEvaluation/esDecorators-classExpression-namedEvaluation.8.ts#configuration=0",
+    "conformance/esDecorators/classExpression/namedEvaluation/esDecorators-classExpression-namedEvaluation.9.ts#configuration=0",
+    "conformance/esDecorators/esDecorators-arguments.ts#configuration=0",
+    "conformance/esDecorators/esDecorators-contextualTypes.ts#configuration=0",
+    "conformance/esDecorators/esDecorators-decoratorExpression.1.ts#configuration=0",
+    "conformance/esDecorators/esDecorators-decoratorExpression.1.ts#configuration=1",
+    "conformance/esDecorators/esDecorators-decoratorExpression.2.ts#configuration=0",
+    "conformance/esDecorators/esDecorators-decoratorExpression.2.ts#configuration=1",
+    "conformance/esDecorators/esDecorators-emitDecoratorMetadata.ts#configuration=0",
+    "conformance/esDecorators/esDecorators-emitDecoratorMetadata.ts#configuration=1",
+    "conformance/esDecorators/esDecorators-emitDecoratorMetadata.ts#configuration=3",
+    "conformance/esDecorators/esDecorators-privateFieldAccess.ts#configuration=0",
+    "conformance/esDecorators/metadata/esDecoratorsMetadata1.ts#configuration=0",
+    "conformance/esDecorators/metadata/esDecoratorsMetadata1.ts#configuration=1",
+    "conformance/esDecorators/metadata/esDecoratorsMetadata2.ts#configuration=0",
+    "conformance/esDecorators/metadata/esDecoratorsMetadata2.ts#configuration=1",
+    "conformance/esDecorators/metadata/esDecoratorsMetadata3.ts#configuration=0",
+    "conformance/esDecorators/metadata/esDecoratorsMetadata3.ts#configuration=1",
+    "conformance/esDecorators/metadata/esDecoratorsMetadata4.ts#configuration=0",
+    "conformance/esDecorators/metadata/esDecoratorsMetadata4.ts#configuration=1",
+    "conformance/externalModules/es6/es6modulekindWithES5Target.ts#configuration=0",
+    "conformance/externalModules/es6/es6modulekindWithES5Target11.ts#configuration=0",
+    "conformance/externalModules/es6/es6modulekindWithES5Target3.ts#configuration=0",
+    "conformance/externalModules/esnext/esnextmodulekindWithES5Target.ts#configuration=0",
+    "conformance/externalModules/esnext/esnextmodulekindWithES5Target11.ts#configuration=0",
+    "conformance/externalModules/esnext/esnextmodulekindWithES5Target3.ts#configuration=0",
+    "conformance/externalModules/topLevelAwait.1.ts#configuration=0",
+    "conformance/externalModules/topLevelAwait.1.ts#configuration=1",
+    "conformance/externalModules/topLevelAwait.1.ts#configuration=2",
+    "conformance/externalModules/topLevelAwait.1.ts#configuration=3",
+    "conformance/externalModules/topLevelAwaitErrors.1.ts#configuration=0",
+    "conformance/externalModules/topLevelAwaitErrors.1.ts#configuration=1",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsNamedEvaluationDecoratorsAndClassFields.ts#configuration=0",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.1.ts#configuration=0",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.1.ts#configuration=2",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.1.ts#configuration=3",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.1.ts#configuration=5",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.10.ts#configuration=0",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.10.ts#configuration=2",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.10.ts#configuration=3",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.10.ts#configuration=5",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.11.ts#configuration=0",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.11.ts#configuration=2",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.11.ts#configuration=3",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.11.ts#configuration=5",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.12.ts#configuration=0",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.12.ts#configuration=2",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.12.ts#configuration=3",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.12.ts#configuration=5",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.2.ts#configuration=0",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.2.ts#configuration=2",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.2.ts#configuration=3",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.2.ts#configuration=5",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.3.ts#configuration=0",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.3.ts#configuration=2",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.3.ts#configuration=3",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.3.ts#configuration=5",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.4.ts#configuration=0",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.4.ts#configuration=2",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.4.ts#configuration=3",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.4.ts#configuration=5",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.5.ts#configuration=0",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.5.ts#configuration=2",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.5.ts#configuration=3",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.5.ts#configuration=5",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.6.ts#configuration=0",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.6.ts#configuration=2",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.6.ts#configuration=3",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.6.ts#configuration=5",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.7.ts#configuration=0",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.7.ts#configuration=2",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.7.ts#configuration=3",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.7.ts#configuration=5",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.8.ts#configuration=0",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.8.ts#configuration=2",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.8.ts#configuration=3",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.8.ts#configuration=5",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.9.ts#configuration=0",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.9.ts#configuration=2",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.9.ts#configuration=3",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithESClassDecorators.9.ts#configuration=5",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.1.ts#configuration=0",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.1.ts#configuration=2",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.1.ts#configuration=3",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.1.ts#configuration=5",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.10.ts#configuration=0",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.10.ts#configuration=2",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.10.ts#configuration=3",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.10.ts#configuration=5",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.11.ts#configuration=0",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.11.ts#configuration=2",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.11.ts#configuration=3",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.11.ts#configuration=5",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.12.ts#configuration=0",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.12.ts#configuration=2",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.12.ts#configuration=3",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.12.ts#configuration=5",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.2.ts#configuration=0",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.2.ts#configuration=2",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.2.ts#configuration=3",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.2.ts#configuration=5",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.3.ts#configuration=0",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.3.ts#configuration=2",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.3.ts#configuration=3",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.3.ts#configuration=5",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.4.ts#configuration=0",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.4.ts#configuration=2",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.4.ts#configuration=3",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.4.ts#configuration=5",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.5.ts#configuration=0",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.5.ts#configuration=2",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.5.ts#configuration=3",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.5.ts#configuration=5",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.6.ts#configuration=0",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.6.ts#configuration=2",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.6.ts#configuration=3",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.6.ts#configuration=5",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.7.ts#configuration=0",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.7.ts#configuration=2",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.7.ts#configuration=3",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.7.ts#configuration=5",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.8.ts#configuration=0",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.8.ts#configuration=2",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.8.ts#configuration=3",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.8.ts#configuration=5",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.9.ts#configuration=0",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.9.ts#configuration=2",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.9.ts#configuration=3",
+    "conformance/statements/VariableStatements/usingDeclarations/usingDeclarationsWithLegacyClassDecorators.9.ts#configuration=5"
+   ]
+  },
+  {
+   "checkpoints": {
+    "C2": 36
+   },
+   "domains": {
+    "display": 36,
+    "errors": 3,
+    "symbols": 36,
+    "types": 36
+   },
+   "evidence": [
+    {
+     "case": "cases/00141",
+     "observation": "unsupported: typeReferenceToTypeNode: applied outer arguments",
+     "variant": "compiler/anonClassDeclarationEmitIsAnon.ts#configuration=0"
+    },
+    {
+     "case": "cases/00443",
+     "observation": "unsupported: typeReferenceToTypeNode: applied outer arguments",
+     "variant": "compiler/baseConstraintOfDecorator.ts#configuration=0"
+    },
+    {
+     "case": "cases/00444",
+     "observation": "unsupported: typeReferenceToTypeNode: applied outer arguments",
+     "variant": "compiler/baseExpressionTypeParameters.ts#configuration=0"
+    },
+    {
+     "case": "cases/00678",
+     "observation": "unsupported: typeReferenceToTypeNode: applied outer arguments",
+     "variant": "compiler/circularTypeArgumentsLocalAndOuterNoCrash1.ts#configuration=0"
+    },
+    {
+     "case": "cases/01665",
+     "observation": "unsupported: typeReferenceToTypeNode: applied outer arguments",
+     "variant": "compiler/declarationEmitGenericTypeParamerSerialization3.ts#configuration=0"
+    }
+   ],
+   "id": "B03",
+   "kind": "unsupported",
+   "missing_operation": "typeReferenceToTypeNode: applied outer arguments",
+   "owner": "C2",
+   "variants": [
+    "compiler/anonClassDeclarationEmitIsAnon.ts#configuration=0",
+    "compiler/baseConstraintOfDecorator.ts#configuration=0",
+    "compiler/baseExpressionTypeParameters.ts#configuration=0",
+    "compiler/circularTypeArgumentsLocalAndOuterNoCrash1.ts#configuration=0",
+    "compiler/declarationEmitGenericTypeParamerSerialization3.ts#configuration=0",
+    "compiler/declarationEmitLocalClassDeclarationMixin.ts#configuration=0",
+    "compiler/declarationEmitPrivateNameCausesError.ts#configuration=0",
+    "compiler/declarationNoDanglingGenerics.ts#configuration=0",
+    "compiler/doubleMixinConditionalTypeBaseClassWorks.ts#configuration=0",
+    "compiler/emitClassExpressionInDeclarationFile.ts#configuration=0",
+    "compiler/emitClassExpressionInDeclarationFile2.ts#configuration=0",
+    "compiler/exportClassExtendingIntersection.ts#configuration=0",
+    "compiler/mixinIntersectionIsValidbaseType.ts#configuration=0",
+    "compiler/mixinOverMappedTypeNoCrash.ts#configuration=0",
+    "compiler/mixinPrivateAndProtected.ts#configuration=0",
+    "compiler/mixingApparentTypeOverrides.ts#configuration=0",
+    "compiler/noCrashOnMixin.ts#configuration=0",
+    "compiler/noCrashOnMixin2.ts#configuration=0",
+    "compiler/noCrashOnMixin2_promoted.ts#configuration=0",
+    "compiler/overrideBaseIntersectionMethod.ts#configuration=0",
+    "compiler/typeAliasFunctionTypeSharedSymbol.ts#configuration=0",
+    "conformance/classes/classExpressions/genericClassExpressionInFunction.ts#configuration=0",
+    "conformance/classes/mixinAbstractClasses.2.ts#configuration=0",
+    "conformance/classes/mixinAbstractClasses.ts#configuration=0",
+    "conformance/classes/mixinAbstractClassesReturnTypeInference.ts#configuration=0",
+    "conformance/classes/mixinAccessors1.ts#configuration=0",
+    "conformance/classes/mixinAccessors2.ts#configuration=0",
+    "conformance/classes/mixinAccessors3.ts#configuration=0",
+    "conformance/classes/mixinAccessors4.ts#configuration=0",
+    "conformance/classes/mixinClassesAnnotated.ts#configuration=0",
+    "conformance/classes/mixinClassesAnonymous.ts#configuration=0",
+    "conformance/classes/propertyMemberDeclarations/accessorsOverrideProperty9.ts#configuration=0",
+    "conformance/declarationEmit/anonymousClassAccessorsDeclarationEmit1.ts#configuration=0",
+    "conformance/es6/classExpressions/typeArgumentInferenceWithClassExpression2.ts#configuration=0",
+    "conformance/types/localTypes/localTypes3.ts#configuration=0",
+    "conformance/types/localTypes/localTypes5.ts#configuration=0"
+   ]
+  },
+  {
+   "checkpoints": {
+    "C2": 30
+   },
+   "domains": {
+    "display": 30,
+    "errors": 30,
+    "symbols": 30,
+    "types": 30
+   },
+   "evidence": [
+    {
+     "case": "cases/00475",
+     "observation": "unsupported: extractRedundantTemplateLiterals",
+     "variant": "compiler/bindingPatternCannotBeOnlyInferenceSource.ts#configuration=0"
+    },
+    {
+     "case": "cases/00676",
+     "observation": "unsupported: extractRedundantTemplateLiterals",
+     "variant": "compiler/circularReferenceInReturnType2.ts#configuration=0"
+    },
+    {
+     "case": "cases/01095",
+     "observation": "unsupported: extractRedundantTemplateLiterals",
+     "variant": "compiler/conditionalTypeContextualTypeSimplificationsSuceeds.ts#configuration=0"
+    },
+    {
+     "case": "cases/01238",
+     "observation": "unsupported: extractRedundantTemplateLiterals",
+     "variant": "compiler/contextualPropertyOfGenericMappedType.ts#configuration=0"
+    },
+    {
+     "case": "cases/01266",
+     "observation": "unsupported: extractRedundantTemplateLiterals",
+     "variant": "compiler/contextualTypeFunctionObjectPropertyIntersection.ts#configuration=0"
+    }
+   ],
+   "id": "B04",
+   "kind": "unsupported",
+   "missing_operation": "extractRedundantTemplateLiterals",
+   "owner": "C2",
+   "variants": [
+    "compiler/bindingPatternCannotBeOnlyInferenceSource.ts#configuration=0",
+    "compiler/circularReferenceInReturnType2.ts#configuration=0",
+    "compiler/conditionalTypeContextualTypeSimplificationsSuceeds.ts#configuration=0",
+    "compiler/contextualPropertyOfGenericMappedType.ts#configuration=0",
+    "compiler/contextualTypeFunctionObjectPropertyIntersection.ts#configuration=0",
+    "compiler/contravariantOnlyInferenceFromAnnotatedFunction.ts#configuration=0",
+    "compiler/contravariantOnlyInferenceFromAnnotatedFunctionJs.ts#configuration=0",
+    "compiler/declarationEmitMappedTypePreservesTypeParameterConstraint.ts#configuration=0",
+    "compiler/deeplyNestedMappedTypes.ts#configuration=0",
+    "compiler/definiteAssignmentOfDestructuredVariable.ts#configuration=0",
+    "compiler/excessivelyDeepConditionalTypes.ts#configuration=0",
+    "compiler/homomorphicMappedTypeWithNonHomomorphicInstantiationSpreadable1.ts#configuration=0",
+    "compiler/indexingTypesWithNever.ts#configuration=0",
+    "compiler/inferenceExactOptionalProperties2.ts#configuration=0",
+    "compiler/inferenceUnionOfObjectsMappedContextualType.ts#configuration=0",
+    "compiler/infiniteConstraints.ts#configuration=0",
+    "compiler/intersectionReductionGenericStringLikeType.ts#configuration=0",
+    "compiler/pickOfLargeObjectUnionWorks.ts#configuration=0",
+    "compiler/ramdaToolsNoInfinite2.ts#configuration=0",
+    "compiler/reverseMappedTypeContextualTypesPerElementOfTupleConstraint.ts#configuration=0",
+    "compiler/reverseMappedTypeInferenceWidening2.ts#configuration=0",
+    "compiler/reverseMappedTypePrimitiveConstraintProperty.ts#configuration=0",
+    "compiler/varianceComputationNoCrash.ts#configuration=0",
+    "conformance/types/conditional/conditionalTypes1.ts#configuration=0",
+    "conformance/types/conditional/inferTypes1.ts#configuration=0",
+    "conformance/types/intersection/intersectionAsWeakTypeSource.ts#configuration=0",
+    "conformance/types/keyof/keyofAndIndexedAccessErrors.ts#configuration=0",
+    "conformance/types/literal/stringMappingReduction.ts#configuration=0",
+    "conformance/types/literal/templateLiteralTypesPatterns.ts#configuration=0",
+    "conformance/types/typeParameters/typeParameterLists/typeParameterConstModifiers.ts#configuration=0"
+   ]
+  },
+  {
+   "checkpoints": {
+    "C4": 25
+   },
+   "domains": {
+    "display": 19,
+    "errors": 25,
+    "symbols": 19,
+    "types": 19
+   },
+   "evidence": [
+    {
+     "case": "cases/01867",
+     "observation": "unsupported: checkDecorators: parameter or binding",
+     "variant": "compiler/decoratorMetadataElidedImport.ts#configuration=0"
+    },
+    {
+     "case": "cases/01868",
+     "observation": "unsupported: checkDecorators: parameter or binding",
+     "variant": "compiler/decoratorMetadataElidedImport.ts#configuration=1"
+    },
+    {
+     "case": "cases/01891",
+     "observation": "unsupported: checkDecorators: parameter or binding",
+     "variant": "compiler/decoratorReferenceOnOtherProperty.ts#configuration=0"
+    },
+    {
+     "case": "cases/02203",
+     "observation": "unsupported: checkDecorators: parameter or binding",
+     "variant": "compiler/emitDecoratorMetadataParamDecoratorNoModifiers.ts#configuration=0"
+    },
+    {
+     "case": "cases/02579",
+     "observation": "unsupported: checkDecorators: parameter or binding",
+     "variant": "compiler/experimentalDecoratorMetadataUnresolvedTypeObjectInEmit.ts#configuration=0"
+    }
+   ],
+   "id": "B05",
+   "kind": "unsupported",
+   "missing_operation": "checkDecorators: parameter or binding",
+   "owner": "C4",
+   "variants": [
+    "compiler/decoratorMetadataElidedImport.ts#configuration=0",
+    "compiler/decoratorMetadataElidedImport.ts#configuration=1",
+    "compiler/decoratorReferenceOnOtherProperty.ts#configuration=0",
+    "compiler/emitDecoratorMetadataParamDecoratorNoModifiers.ts#configuration=0",
+    "compiler/experimentalDecoratorMetadataUnresolvedTypeObjectInEmit.ts#configuration=0",
+    "compiler/parameterDecoratorInJsFile.ts#configuration=1",
+    "compiler/parameterDecoratorsEmitCrash.ts#configuration=0",
+    "conformance/decorators/class/constructor/decoratorOnClassConstructor2.ts#configuration=0",
+    "conformance/decorators/class/constructor/decoratorOnClassConstructor3.ts#configuration=0",
+    "conformance/decorators/class/constructor/parameter/decoratorOnClassConstructorParameter1.ts#configuration=0",
+    "conformance/decorators/class/constructor/parameter/decoratorOnClassConstructorParameter4.ts#configuration=0",
+    "conformance/decorators/class/constructor/parameter/decoratorOnClassConstructorParameter5.ts#configuration=0",
+    "conformance/decorators/class/method/decoratorOnClassMethod19.ts#configuration=0",
+    "conformance/decorators/class/method/decoratorOnClassMethod19.ts#configuration=1",
+    "conformance/decorators/class/method/decoratorOnClassMethod19.ts#configuration=2",
+    "conformance/decorators/class/method/parameter/decoratorOnClassMethodParameter1.ts#configuration=0",
+    "conformance/decorators/class/method/parameter/decoratorOnClassMethodParameter2.ts#configuration=0",
+    "conformance/decorators/class/method/parameter/decoratorOnClassMethodParameter3.ts#configuration=0",
+    "conformance/decorators/class/method/parameter/decoratorOnClassMethodThisParameter.ts#configuration=0",
+    "conformance/decorators/invalid/decoratorOnFunctionParameter.ts#configuration=0",
+    "conformance/es6/decorators/class/method/parameter/decoratorOnClassMethodParameter1.es6.ts#configuration=0",
+    "conformance/esDecorators/classDeclaration/esDecorators-classDeclaration-parameterDecorators.ts#configuration=0",
+    "conformance/esDecorators/classDeclaration/esDecorators-classDeclaration-parameterDecorators.ts#configuration=1",
+    "conformance/esDecorators/classDeclaration/esDecorators-classDeclaration-parameterDecorators.ts#configuration=3",
+    "conformance/types/thisType/thisTypeInFunctionsNegative.ts#configuration=0"
+   ]
+  },
+  {
+   "checkpoints": {
+    "C3": 15
+   },
+   "domains": {
+    "display": 10,
+    "errors": 15,
+    "parent_pointers": 15,
+    "symbols": 10,
+    "types": 10,
+    "union_ordering": 15
+   },
+   "evidence": [
+    {
+     "case": "cases/01211",
+     "observation": "unsupported: content-mapper execution",
+     "variant": "compiler/contentMapperAliasDiagnostic.ts#configuration=0"
+    },
+    {
+     "case": "cases/01212",
+     "observation": "unsupported: content-mapper execution",
+     "variant": "compiler/contentMapperDeclarationEmit.ts#configuration=0"
+    },
+    {
+     "case": "cases/01213",
+     "observation": "unsupported: content-mapper execution",
+     "variant": "compiler/contentMapperDeclarationEmitFailure.ts#configuration=0"
+    },
+    {
+     "case": "cases/01214",
+     "observation": "unsupported: content-mapper execution",
+     "variant": "compiler/contentMapperDiagnosticDirectives.ts#configuration=0"
+    },
+    {
+     "case": "cases/01215",
+     "observation": "unsupported: content-mapper execution",
+     "variant": "compiler/contentMapperDiagnostics.ts#configuration=0"
+    }
+   ],
+   "id": "B06",
+   "kind": "unsupported",
+   "missing_operation": "content-mapper execution",
+   "owner": "Phase 5 (content-mapper execution)",
+   "variants": [
+    "compiler/contentMapperAliasDiagnostic.ts#configuration=0",
+    "compiler/contentMapperDeclarationEmit.ts#configuration=0",
+    "compiler/contentMapperDeclarationEmitFailure.ts#configuration=0",
+    "compiler/contentMapperDiagnosticDirectives.ts#configuration=0",
+    "compiler/contentMapperDiagnostics.ts#configuration=0",
+    "compiler/contentMapperInvalidDiagnosticDirectives.ts#configuration=0",
+    "compiler/contentMapperInvalidExtension.ts#configuration=0",
+    "compiler/contentMapperPerFileExtension.ts#configuration=0",
+    "compiler/contentMapperSupplementalDiagnostics.ts#configuration=0",
+    "compiler/contentMapperSupplementalFileCollision.ts#configuration=0",
+    "compiler/contentMapperSupplementalGlobals.ts#configuration=0",
+    "compiler/contentMapperSupplementalModule.ts#configuration=0",
+    "compiler/contentMapperSymlink.ts#configuration=0",
+    "compiler/contentMapperSynthesizedUnusedDiagnostics.ts#configuration=0",
+    "compiler/contentMapperTransform.ts#configuration=0"
+   ]
+  },
+  {
+   "checkpoints": {
+    "C2": 7
+   },
+   "domains": {
+    "display": 7,
+    "errors": 7,
+    "symbols": 7,
+    "types": 7
+   },
+   "evidence": [
+    {
+     "case": "cases/03542",
+     "observation": "unsupported: addIntraExpressionInferenceSite: array element",
+     "variant": "compiler/inferringAnyFunctionType1.ts#configuration=0"
+    },
+    {
+     "case": "cases/03543",
+     "observation": "unsupported: addIntraExpressionInferenceSite: array element",
+     "variant": "compiler/inferringAnyFunctionType2.ts#configuration=0"
+    },
+    {
+     "case": "cases/04309",
+     "observation": "unsupported: addIntraExpressionInferenceSite: array element",
+     "variant": "compiler/mappedTypeRecursiveInference2.ts#configuration=0"
+    },
+    {
+     "case": "cases/05669",
+     "observation": "unsupported: addIntraExpressionInferenceSite: array element",
+     "variant": "compiler/reverseMappedIntersectionInference2.ts#configuration=0"
+    },
+    {
+     "case": "cases/05670",
+     "observation": "unsupported: addIntraExpressionInferenceSite: array element",
+     "variant": "compiler/reverseMappedPartiallyInferableTypes.ts#configuration=0"
+    }
+   ],
+   "id": "B07",
+   "kind": "unsupported",
+   "missing_operation": "addIntraExpressionInferenceSite: array element",
+   "owner": "C2",
+   "variants": [
+    "compiler/inferringAnyFunctionType1.ts#configuration=0",
+    "compiler/inferringAnyFunctionType2.ts#configuration=0",
+    "compiler/mappedTypeRecursiveInference2.ts#configuration=0",
+    "compiler/reverseMappedIntersectionInference2.ts#configuration=0",
+    "compiler/reverseMappedPartiallyInferableTypes.ts#configuration=0",
+    "compiler/tupleTypes.ts#configuration=0",
+    "conformance/types/typeRelationships/typeInference/intraExpressionInferences.ts#configuration=0"
+   ]
+  },
+  {
+   "checkpoints": {
+    "C2": 5
+   },
+   "domains": {
+    "display": 5,
+    "errors": 1,
+    "symbols": 5,
+    "types": 5
+   },
+   "evidence": [
+    {
+     "case": "cases/00213",
+     "observation": "unsupported: conditionalTypeToTypeNode: shadowed distribution parameter",
+     "variant": "compiler/arrayFakeFlatNoCrashInferenceDeclarations.ts#configuration=0"
+    },
+    {
+     "case": "cases/01686",
+     "observation": "unsupported: conditionalTypeToTypeNode: shadowed distribution parameter",
+     "variant": "compiler/declarationEmitInlinedDistributiveConditional.ts#configuration=0"
+    },
+    {
+     "case": "cases/05468",
+     "observation": "unsupported: conditionalTypeToTypeNode: shadowed distribution parameter",
+     "variant": "compiler/recursiveConditionalCrash1.ts#configuration=0"
+    },
+    {
+     "case": "cases/05469",
+     "observation": "unsupported: conditionalTypeToTypeNode: shadowed distribution parameter",
+     "variant": "compiler/recursiveConditionalCrash2.ts#configuration=0"
+    },
+    {
+     "case": "cases/05470",
+     "observation": "unsupported: conditionalTypeToTypeNode: shadowed distribution parameter",
+     "variant": "compiler/recursiveConditionalCrash3.ts#configuration=0"
+    }
+   ],
+   "id": "B08",
+   "kind": "unsupported",
+   "missing_operation": "conditionalTypeToTypeNode: shadowed distribution parameter",
+   "owner": "C2",
+   "variants": [
+    "compiler/arrayFakeFlatNoCrashInferenceDeclarations.ts#configuration=0",
+    "compiler/declarationEmitInlinedDistributiveConditional.ts#configuration=0",
+    "compiler/recursiveConditionalCrash1.ts#configuration=0",
+    "compiler/recursiveConditionalCrash2.ts#configuration=0",
+    "compiler/recursiveConditionalCrash3.ts#configuration=0"
+   ]
+  },
+  {
+   "checkpoints": {
+    "C2": 3
+   },
+   "domains": {
+    "errors": 3
+   },
+   "evidence": [
+    {
+     "observation": "native pre-emit and post-emit structured diagnostic sets differ; the baseline is the post-emit set",
+     "variant": "compiler/incorrectRecursiveMappedTypeConstraint.ts#configuration=0"
+    },
+    {
+     "observation": "native pre-emit and post-emit structured diagnostic sets differ; the baseline is the post-emit set",
+     "variant": "compiler/typeParameterWithInvalidConstraintType.ts#configuration=0"
+    },
+    {
+     "observation": "native pre-emit and post-emit structured diagnostic sets differ; the baseline is the post-emit set",
+     "variant": "conformance/types/mapped/recursiveMappedTypes.ts#configuration=0"
+    }
+   ],
+   "id": "B09",
+   "kind": "emit_order",
+   "missing_operation": "checking in the post-emit program order: the native harness emits before collecting diagnostics, and these variants' diagnostics depend on that order",
+   "owner": "C5 emit resolver, with Phase 3 emit (joint)",
+   "variants": [
+    "compiler/incorrectRecursiveMappedTypeConstraint.ts#configuration=0",
+    "compiler/typeParameterWithInvalidConstraintType.ts#configuration=0",
+    "conformance/types/mapped/recursiveMappedTypes.ts#configuration=0"
+   ]
+  },
+  {
+   "checkpoints": {
+    "C2": 3
+   },
+   "domains": {
+    "display": 3,
+    "errors": 3,
+    "symbols": 3,
+    "types": 3
+   },
+   "evidence": [
+    {
+     "case": "cases/04940",
+     "observation": "unsupported: Expression_produces_a_union_type_that_is_too_complex_to_represent",
+     "variant": "compiler/normalizedIntersectionTooComplex.ts#configuration=0"
+    },
+    {
+     "case": "cases/06148",
+     "observation": "unsupported: Expression_produces_a_union_type_that_is_too_complex_to_represent",
+     "variant": "compiler/templateLiteralTypeTooComplex.ts#configuration=0"
+    },
+    {
+     "case": "cases/12697",
+     "observation": "unsupported: Expression_produces_a_union_type_that_is_too_complex_to_represent",
+     "variant": "conformance/types/literal/templateLiteralTypes1.ts#configuration=0"
+    }
+   ],
+   "id": "B10",
+   "kind": "unsupported",
+   "missing_operation": "Expression_produces_a_union_type_that_is_too_complex_to_represent",
+   "owner": "C2",
+   "variants": [
+    "compiler/normalizedIntersectionTooComplex.ts#configuration=0",
+    "compiler/templateLiteralTypeTooComplex.ts#configuration=0",
+    "conformance/types/literal/templateLiteralTypes1.ts#configuration=0"
+   ]
+  },
+  {
+   "checkpoints": {
+    "C2": 3
+   },
+   "domains": {
+    "display": 3,
+    "errors": 3,
+    "symbols": 3,
+    "types": 3
+   },
+   "evidence": [
+    {
+     "case": "cases/10294",
+     "observation": "unsupported: getTypeFromImportTypeNode: CommonJS typedef export lookup",
+     "variant": "conformance/jsdoc/enumTagImported.ts#configuration=0"
+    },
+    {
+     "case": "cases/10367",
+     "observation": "unsupported: getTypeFromImportTypeNode: CommonJS typedef export lookup",
+     "variant": "conformance/jsdoc/jsdocImportTypeReferenceToStringLiteral.ts#configuration=0"
+    },
+    {
+     "case": "cases/12109",
+     "observation": "unsupported: getTypeFromImportTypeNode: CommonJS typedef export lookup",
+     "variant": "conformance/salsa/moduleExportAssignment7.ts#configuration=0"
+    }
+   ],
+   "id": "B11",
+   "kind": "unsupported",
+   "missing_operation": "getTypeFromImportTypeNode: CommonJS typedef export lookup",
+   "owner": "C2",
+   "variants": [
+    "conformance/jsdoc/enumTagImported.ts#configuration=0",
+    "conformance/jsdoc/jsdocImportTypeReferenceToStringLiteral.ts#configuration=0",
+    "conformance/salsa/moduleExportAssignment7.ts#configuration=0"
+   ]
+  },
+  {
+   "checkpoints": {
+    "C4": 2
+   },
+   "domains": {
+    "display": 2,
+    "symbols": 2,
+    "types": 2
+   },
+   "evidence": [
+    {
+     "case": "cases/07774",
+     "observation": "unsupported: getContextualType: decorator/JSX context",
+     "variant": "conformance/decorators/class/decoratorChecksFunctionBodies.ts#configuration=0"
+    },
+    {
+     "case": "cases/09246",
+     "observation": "unsupported: getContextualType: decorator/JSX context",
+     "variant": "conformance/esDecorators/esDecorators-contextualTypes.2.ts#configuration=0"
+    }
+   ],
+   "id": "B12",
+   "kind": "unsupported",
+   "missing_operation": "getContextualType: decorator/JSX context",
+   "owner": "C4",
+   "variants": [
+    "conformance/decorators/class/decoratorChecksFunctionBodies.ts#configuration=0",
+    "conformance/esDecorators/esDecorators-contextualTypes.2.ts#configuration=0"
+   ]
+  },
+  {
+   "checkpoints": {
+    "C2": 2
+   },
+   "domains": {
+    "display": 2,
+    "symbols": 2,
+    "types": 2
+   },
+   "evidence": [
+    {
+     "case": "cases/01453",
+     "observation": "unsupported: node builder synthetic elision comments",
+     "variant": "compiler/crossProductUnionIntersectionRepeatedPropDeclarationsNoOOM1.ts#configuration=0"
+    },
+    {
+     "case": "cases/04748",
+     "observation": "unsupported: node builder synthetic elision comments",
+     "variant": "compiler/nestedSpreadsAndWidening.ts#configuration=0"
+    }
+   ],
+   "id": "B13",
+   "kind": "unsupported",
+   "missing_operation": "node builder synthetic elision comments",
+   "owner": "C2",
+   "variants": [
+    "compiler/crossProductUnionIntersectionRepeatedPropDeclarationsNoOOM1.ts#configuration=0",
+    "compiler/nestedSpreadsAndWidening.ts#configuration=0"
+   ]
+  },
+  {
+   "checkpoints": {
+    "C2": 2
+   },
+   "domains": {
+    "display": 1,
+    "errors": 2,
+    "symbols": 1,
+    "types": 1
+   },
+   "evidence": [
+    {
+     "case": "cases/01755",
+     "observation": "unsupported: node builder synthetic property elision comments",
+     "variant": "compiler/declarationEmitPrivatePromiseLikeInterface.ts#configuration=0"
+    },
+    {
+     "case": "cases/03213",
+     "observation": "unsupported: node builder synthetic property elision comments",
+     "variant": "compiler/hugeDeclarationOutputGetsTruncatedWithError.ts#configuration=0"
+    }
+   ],
+   "id": "B14",
+   "kind": "unsupported",
+   "missing_operation": "node builder synthetic property elision comments",
+   "owner": "C2",
+   "variants": [
+    "compiler/declarationEmitPrivatePromiseLikeInterface.ts#configuration=0",
+    "compiler/hugeDeclarationOutputGetsTruncatedWithError.ts#configuration=0"
+   ]
+  },
+  {
+   "checkpoints": {
+    "C2": 2
+   },
+   "domains": {
+    "display": 2,
+    "errors": 2,
+    "symbols": 2,
+    "types": 2
+   },
+   "evidence": [
+    {
+     "case": "cases/10251",
+     "observation": "unsupported: someSymbolTableInScope: reparsed module",
+     "variant": "conformance/jsdoc/declarations/jsDeclarationsImportAliasExposedWithinNamespace.ts#configuration=0"
+    },
+    {
+     "case": "cases/10252",
+     "observation": "unsupported: someSymbolTableInScope: reparsed module",
+     "variant": "conformance/jsdoc/declarations/jsDeclarationsImportAliasExposedWithinNamespaceCjs.ts#configuration=0"
+    }
+   ],
+   "id": "B15",
+   "kind": "unsupported",
+   "missing_operation": "someSymbolTableInScope: reparsed module",
+   "owner": "C2",
+   "variants": [
+    "conformance/jsdoc/declarations/jsDeclarationsImportAliasExposedWithinNamespace.ts#configuration=0",
+    "conformance/jsdoc/declarations/jsDeclarationsImportAliasExposedWithinNamespaceCjs.ts#configuration=0"
+   ]
+  },
+  {
+   "checkpoints": {
+    "C2": 1
+   },
+   "domains": {
+    "display": 1,
+    "errors": 1,
+    "symbols": 1,
+    "types": 1
+   },
+   "evidence": [
+    {
+     "case": "cases/09537",
+     "observation": "unsupported: checkIfTypePredicateVariableIsDeclaredInBindingPattern",
+     "variant": "conformance/expressions/typeGuards/typeGuardFunctionErrors.ts#configuration=0"
+    }
+   ],
+   "id": "B16",
+   "kind": "unsupported",
+   "missing_operation": "checkIfTypePredicateVariableIsDeclaredInBindingPattern",
+   "owner": "C2",
+   "variants": [
+    "conformance/expressions/typeGuards/typeGuardFunctionErrors.ts#configuration=0"
+   ]
+  },
+  {
+   "checkpoints": {
+    "C4": 1
+   },
+   "domains": {
+    "display": 1,
+    "errors": 1,
+    "symbols": 1,
+    "types": 1
+   },
+   "evidence": [
+    {
+     "case": "cases/07177",
+     "observation": "unsupported: checkSourceElementWorker: statement/type family",
+     "variant": "conformance/classes/classStaticBlock/classStaticBlock19.ts#configuration=0"
+    }
+   ],
+   "id": "B17",
+   "kind": "unsupported",
+   "missing_operation": "checkSourceElementWorker: statement/type family",
+   "owner": "C4",
+   "variants": [
+    "conformance/classes/classStaticBlock/classStaticBlock19.ts#configuration=0"
+   ]
+  },
+  {
+   "checkpoints": {
+    "C2": 1
+   },
+   "domains": {
+    "display": 1,
+    "errors": 1,
+    "symbols": 1,
+    "types": 1
+   },
+   "evidence": [
+    {
+     "case": "cases/05037",
+     "observation": "unsupported: reportOperatorError: awaited operand suggestions",
+     "variant": "compiler/operationsAvailableOnPromisedType.ts#configuration=0"
+    }
+   ],
+   "id": "B18",
+   "kind": "unsupported",
+   "missing_operation": "reportOperatorError: awaited operand suggestions",
+   "owner": "C2",
+   "variants": [
+    "compiler/operationsAvailableOnPromisedType.ts#configuration=0"
+   ]
+  }
+ ],
+ "module_resolution": "owner decision 2026-09-25: Phase 2 owns the module-resolution sub-test and its gate (run.checker.trace_parity); C7 requires the 148 .trace.json baselines to pass subject to approved divergences. Phase 1 remains responsible for the resolver implementation: a trace difference is a foundation defect to fix, not a Phase 2 checker gap.",
+ "phase1_contracts": [
+  {
+   "closed_by": [
+    "#55 (ported reference loading)",
+    "#56 (last Phase 1 operations)"
+   ],
+   "contract": "program loading including project references",
+   "state": "no open item"
+  },
+  {
+   "closed_by": [
+    "#49",
+    "#50 (F3b completion)",
+    "#55"
+   ],
+   "contract": "options, configuration and module resolution",
+   "state": "no open item"
+  },
+  {
+   "closed_by": [
+    "#51 (F4a syntax schedule)",
+    "#53 (F5b integration)",
+    "#55"
+   ],
+   "contract": "binder and bound-file ownership",
+   "state": "no open item"
+  }
+ ],
+ "phase1_pending": "Phase 1 coverage keeps four pending entries after #56: the Linux nativepath.Realpath host capture and fresh mutation evidence for WithFileNames, ThrottleGroup.Go and ThrottleGroup.Wait. C0 consumes none of them.",
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "scope": "Dependencies that withhold Phase 2 observations, each with the execution evidence that establishes it. A blocker explains a difference and never reclassifies it.",
+ "version": 1
+}
