@@ -311,7 +311,7 @@ authority; the counts are the current `status/unmapped-functions.json` state.
 
 - Exists: the assets of section 2 (relation fixtures, ownership schedules, E2
   recursion tests, 44 direct tests).
-- Build: `crates/tsr_checker/tests/c1_contracts.rs`, one test per contract,
+- Build: `crates/tsr_compiler/tests/c1_contracts.rs`, one test per contract,
   each over production entry points with a pinned Go counterpart named in its
   doc comment:
   1. lazy resolution enters a cycle: the guard marks the cycle, the entity gets
@@ -333,7 +333,7 @@ authority; the counts are the current `status/unmapped-functions.json` state.
      succeeds;
   8. the five relation modes over the 21 fixtures, first, repeated and
      reversed, in debug and release.
-- Exit: `cargo test -p tsr_checker --test c1_contracts` in debug and release;
+- Exit: `cargo test -p tsr_compiler --features relation-probe --test c1_contracts` in debug and release;
   the receipt is recorded by the producer (C1.10).
 
 ### C1.9 Inherited Phase 1 items
@@ -432,7 +432,7 @@ python3 scripts/phase2_corpus.py run --native target/phase2/native --output targ
 python3 scripts/phase2_compare.py report --native target/phase2/native --rust target/phase2/rust --previous target/phase2/rust-c0/comparison.json --record
 python3 scripts/phase2_blockers.py build --native target/phase2/native --rust target/phase2/rust --record
 python3 scripts/phase2_audit.py check --groups c1
-cargo test -p tsr_checker --test c1_contracts && cargo test -p tsr_checker --test c1_contracts --release
+cargo test -p tsr_compiler --features relation-probe --test c1_contracts && cargo test -p tsr_compiler --features relation-probe --test c1_contracts --release
 python3 scripts/phase2_producers.py observe --witness c1-contracts           # the receipt, with source binding
 python3 scripts/phase2_producers.py checker            # c1_open 0, c1_regressions 0, c1_failures 0, c1_audit_complete, c1_contracts, c1_complete
 python3 scripts/s08_relater.py build  --output target/s08/relater-c1

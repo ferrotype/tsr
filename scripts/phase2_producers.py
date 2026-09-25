@@ -75,8 +75,10 @@ BASELINE = phase2_compare.BASELINE
 RECEIPTS = ROOT / "data/phase2/receipts"
 WITNESSES = {
     "c1-contracts": {
-        "commands": [["cargo", "test", "-p", "tsr_checker", "--test", "c1_contracts", "--locked"],
-                     ["cargo", "test", "-p", "tsr_checker", "--test", "c1_contracts", "--locked", "--release"]],
+        # The contracts drive production entry points over loaded programs, so
+        # the test lives with the program loader (tsr_compiler).
+        "commands": [["cargo", "test", "-p", "tsr_compiler", "--features", "relation-probe", "--test", "c1_contracts", "--locked"],
+                     ["cargo", "test", "-p", "tsr_compiler", "--features", "relation-probe", "--test", "c1_contracts", "--locked", "--release"]],
         # Everything whose change can alter the contract tests' outcome.
         "sources": ["crates/tsr_checker", "crates/tsr_arena", "crates/tsr_ast", "crates/tsr_binder",
                     "crates/tsr_compiler", "crates/tsr_core", "crates/tsr_diagnostics", "Cargo.lock",
