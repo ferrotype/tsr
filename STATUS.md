@@ -393,6 +393,7 @@ Exit checks:
 - [ ] `run.checker.errors_parity == 1` (unknown metric)
 - [ ] `run.checker.types_parity == 1` (unknown metric)
 - [ ] `run.checker.symbols_parity == 1` (unknown metric)
+- [ ] `run.checker.display_parity == 1` (unknown metric)
 - [ ] `run.checker.trace_parity == 1` (unknown metric)
 - [ ] `run.checker.ordering == 1` (unknown metric)
 - [ ] `run.checker.parent_pointers == 1` (unknown metric)

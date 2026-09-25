@@ -18,6 +18,7 @@ exit = [
   "run.checker.errors_parity == 1",
   "run.checker.types_parity == 1",
   "run.checker.symbols_parity == 1",
+  "run.checker.display_parity == 1",
   "run.checker.trace_parity == 1",
   "run.checker.ordering == 1",
   "run.checker.parent_pointers == 1",

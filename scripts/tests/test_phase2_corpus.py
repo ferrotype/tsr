@@ -1,17 +1,14 @@
-"""Phase 2 C0.3 harness validation over a small capture cut from the recorded run.
-
-The mini capture keeps three real completed cases (an S08 control that matches,
-a production panic and a content-mapper refusal) and rebinds their completion
-records to its own capture metadata, so every identity check can be exercised
-without rerunning the corpus. Skipped when target/phase2/rust is absent.
-"""
+"""C0 replay and schema regressions using committed, small real observations."""
 import copy
+import fnmatch
 import json
 from pathlib import Path
 import shutil
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
+import tomllib
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
@@ -20,29 +17,10 @@ import phase2_corpus as corpus  # noqa: E402
 import s08_p4 as p4  # noqa: E402
 from s08_oracle import digest  # noqa: E402
 
-RUST = ROOT / "target/phase2/rust"
-NATIVE = ROOT / "target/phase2/native"
-CONTROL = "compiler/2dArrays.ts#configuration=0"
-PANIC = "compiler/sliceTupleTypeOutOfBounds.ts#configuration=0"
-MAPPER = "compiler/contentMapperInvalidExtension.ts#configuration=0"
-# S08 acceptance variants that matched in S08 and exercise errors, declaration
-# emit, suggestions, JS and multi-file programs.
-S08_CONTROLS = (
-    "compiler/2dArrays.ts#configuration=0",
-    "compiler/ClassDeclaration14.ts#configuration=0",
-    "compiler/accessorDeclarationEmitVisibilityErrors.ts#configuration=0",
-    "compiler/unusedLocalsAndParameters.ts#configuration=0",
-    "conformance/salsa/moduleExportAlias.ts#configuration=0",
-)
+from phase2_fixtures import build_capture, load, CONTROL, PANIC, MAPPER, S08_CONTROLS  # noqa: E402
 
 
-@unittest.skipUnless((RUST / "capture.json").exists(), "no recorded Rust capture")
 class HarnessValidation(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.requests = json.loads((RUST / "requests.json").read_bytes())
-        cls.index = {request["id"]: i for i, request in enumerate(cls.requests)}
-
     def setUp(self):
         self.directory = Path(tempfile.mkdtemp(prefix="phase2-corpus-"))
         self.addCleanup(shutil.rmtree, self.directory)
@@ -51,26 +29,8 @@ class HarnessValidation(unittest.TestCase):
     def build(self, ids):
         if (self.directory / "cases").exists():
             shutil.rmtree(self.directory / "cases")
-        metadata = p4.read(RUST / "capture.json")
-        requests = [self.requests[self.index[vid]] for vid in ids]
-        metadata = dict(metadata, requests_sha256=digest(p4.canonical(requests) + b"\n"))
-        for name in ("requests.json", "capture.json"):
-            (self.directory / name).unlink(missing_ok=True)
-        p4.write_new(self.directory / "requests.json", requests)
-        p4.write_new(self.directory / "capture.json", metadata)
-        for link in ("source-snapshot", "executable"):
-            target = self.directory / link
-            if not target.exists():
-                target.symlink_to(RUST / link)
-        (self.directory / "cases").mkdir()
-        for position, vid in enumerate(ids):
-            source = RUST / "cases" / f"{self.index[vid]:05d}"
-            destination = self.directory / "cases" / f"{position:05d}"
-            shutil.copytree(source, destination)
-            envelope = p4.read(destination / "result.json")
-            envelope["capture_sha256"] = digest(p4.canonical(metadata) + b"\n")
-            (destination / "result.json").write_bytes(p4.canonical(envelope) + b"\n")
-        self.metadata = metadata
+        # Duplicate identities are deliberately constructed by one rejection test.
+        self.metadata = build_capture(self.directory, ids, selection=corpus.selection())
 
     def envelope(self, position):
         return p4.read(self.directory / "cases" / f"{position:05d}" / "result.json")
@@ -169,18 +129,145 @@ class HarnessValidation(unittest.TestCase):
         self.assertEqual(result["trace"]["category"], "disabled")
 
     def test_resume_requires_identical_inputs(self):
-        with self.assertRaisesRegex(ValueError, "identical native capture"):
-            corpus.run(NATIVE, self.directory, 1, self.metadata["timeout_seconds"] + 5, resume=True, limit=3)
+        requests = p4.read(self.directory / "requests.json")
+        with patch.object(corpus, "requests", return_value=({"observation_sha256": "fixture"}, requests, [])):
+            (self.directory / "report.json").write_text("{}")
+            with self.assertRaisesRegex(ValueError, "identical native capture"):
+                corpus.run(self.directory, self.directory, 1, self.metadata["timeout_seconds"] + 5, resume=True)
+
+    def test_panic_completion_must_equal_raw_observation(self):
+        envelope = self.envelope(1)
+        envelope["row"]["fatal"]["reason"] = "forged reason"
+        self.write_envelope(1, envelope)
+        with self.assertRaisesRegex(ValueError, "differs from its raw observation"):
+            corpus.replay(self.directory)
+
+    def test_raw_artifact_obligations_cannot_be_removed(self):
+        for position in (0, 1, 2):
+            original = self.envelope(position)
+            for missing in ("stdout", "stderr", "observation.json", "all"):
+                with self.subTest(position=position, missing=missing):
+                    envelope = copy.deepcopy(original)
+                    if missing == "all":
+                        envelope["artifacts"] = {}
+                    else:
+                        del envelope["artifacts"][missing]
+                    self.write_envelope(position, envelope)
+                    with self.assertRaisesRegex(ValueError, "missing or extra raw case artifact"):
+                        corpus.replay(self.directory)
+                    self.write_envelope(position, original)
+
+    def test_child_completion_requires_an_observation_even_if_file_and_hash_are_deleted(self):
+        envelope = self.envelope(1)
+        del envelope["artifacts"]["observation.json"]
+        (self.directory / "cases/00001/observation.json").unlink()
+        self.write_envelope(1, envelope)
+        with self.assertRaisesRegex(ValueError, "missing or extra raw case artifact"):
+            corpus.replay(self.directory)
+
+    def test_runner_timeout_can_retain_an_incomplete_child_observation(self):
+        envelope = self.envelope(1)
+        envelope["row"] = p4.fatal(p4.read(self.directory / "requests.json")[1], "timeout", "variant exceeded 60 seconds")
+        self.write_envelope(1, envelope)
+        result = corpus.replay(self.directory)
+        self.assertEqual(result["production_failures"][0]["attribution"], "deadline")
 
 
-@unittest.skipUnless((RUST / "comparison.json").exists(), "no comparison of the recorded run")
+class SubtestSchema(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.record = load()["records"][CONTROL]
+
+    def validate(self, name, value, *, trace=False):
+        request = copy.deepcopy(self.record["request"])
+        if trace:
+            request["loading"]["options"]["traceResolution"] = True
+        row = copy.deepcopy(self.record["envelope"]["row"])
+        row["phase2"][name] = value
+        return corpus.validate_row(request, row)
+
+    def test_bad_counts_cannot_be_classified_as_matches(self):
+        for name, fields in (("union_ordering", ("checkers", "unions", "inconsistent")),
+                             ("parent_pointers", ("files", "nodes"))):
+            original = self.record["envelope"]["row"]["phase2"][name]
+            for field in fields:
+                for invalid in (-1, False, 0.5, "1", None):
+                    with self.subTest(name=name, field=field, invalid=invalid):
+                        value = dict(original, **{field: invalid})
+                        with self.assertRaisesRegex(ValueError, "nonnegative integers"):
+                            self.validate(name, value)
+            with self.assertRaises(ValueError):
+                self.validate(name, dict(original, extra=0))
+            for field in fields:
+                value = dict(original)
+                del value[field]
+                with self.assertRaises(ValueError):
+                    self.validate(name, value)
+        for checkers in (0, 2):
+            with self.assertRaisesRegex(ValueError, "exactly one checker"):
+                self.validate("union_ordering", {"state": "executed", "checkers": checkers, "unions": 0,
+                                                 "inconsistent": 0})
+
+    def test_parent_failure_and_failure_records_are_typed(self):
+        original = self.record["envelope"]["row"]["phase2"]["parent_pointers"]
+        for invalid in (False, 0, {}, []):
+            with self.assertRaisesRegex(ValueError, "string or null"):
+                self.validate("parent_pointers", dict(original, failure=invalid))
+        self.validate("parent_pointers", dict(original, failure="wrong parent"))
+        for name, kind in (("union_ordering", "checker_error"), ("parent_pointers", "compiler_error")):
+            self.validate(name, {"state": "failed", "class": kind, "reason": "production error"})
+            self.validate(name, {"state": "failed", "class": "panic", "reason": "boom", "location": None})
+            for value in ([], {"state": "failed", "class": "invented", "reason": "x"},
+                          {"state": "failed", "class": kind},
+                          {"state": "failed", "class": "panic", "reason": "x"},
+                          {"state": "failed", "class": kind, "reason": "x", "extra": 0}):
+                with self.subTest(name=name, value=value), self.assertRaises(ValueError):
+                    self.validate(name, value)
+
+    def test_trace_payload_matches_its_state(self):
+        for value in ({"state": "disabled", "text_hex": "61"}, {"state": "no_content", "text_hex": "61"},
+                      {"state": "content"}, {"state": "content", "text_hex": ""},
+                      {"state": "content", "text_hex": "AA"}, {"state": "content", "text_hex": "61 62"},
+                      {"state": "content", "text_hex": False}):
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                self.validate("trace", value, trace=value["state"] != "disabled")
+        self.validate("trace", {"state": "content", "text_hex": "6162"}, trace=True)
+        self.validate("trace", {"state": "no_content"}, trace=True)
+        self.validate("trace", {"state": "failed", "class": "panic", "reason": "boom", "location": None}, trace=True)
+
+
+class BuildInputs(unittest.TestCase):
+    def test_build_inputs_invalidate_capture_and_are_in_the_ledger(self):
+        inputs = ("rust-toolchain.toml", ".cargo/config.toml", "crates/tsr_bundled/bundled/libs/lib.d.ts")
+        before = corpus.sources()
+        ledger = tomllib.loads((ROOT / "status/runs.toml").read_text())["checker"]["sources"]
+        original = Path.read_bytes
+        for name in inputs:
+            with self.subTest(name=name):
+                self.assertIn(name, before)
+                self.assertTrue(any(fnmatch.fnmatchcase(name, pattern) for pattern in ledger), name)
+                def changed(path):
+                    raw = original(path)
+                    return raw + b"changed" if path == ROOT / name else raw
+                with patch.object(Path, "read_bytes", changed):
+                    after = corpus.sources()
+                self.assertNotEqual(before[name], after[name])
+                self.assertEqual({key for key in before if before[key] != after[key]}, {name})
+
+    def test_display_is_a_required_acceptance_exit(self):
+        sprint = tomllib.loads((ROOT / "sprints/P2B.toml").read_text())
+        self.assertIn("run.checker.display_parity == 1", sprint["exit"])
+
+
 class S08Controls(unittest.TestCase):
     def test_reused_adapter_matches_its_s08_controls(self):
-        rows = {row["id"]: row for row in json.loads((RUST / "comparison.json").read_bytes())["rows"]}
+        records = load()["records"]
         for vid in S08_CONTROLS:
             with self.subTest(vid):
-                self.assertEqual(rows[vid]["s08"], "acceptance")
-                self.assertTrue(all(o in ("match", "disabled") for o in rows[vid]["outcomes"].values()), rows[vid])
+                record = records[vid]
+                corpus.validate_row(record["request"], record["envelope"]["row"])
+                result = compare.compare_row(record["native"], record["envelope"]["row"], None)
+                self.assertTrue(all(o["category"] in ("match", "disabled") for o in result.values()), result)
 
 
 if __name__ == "__main__":

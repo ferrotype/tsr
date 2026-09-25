@@ -13,7 +13,7 @@ protocol violation or a panic located in the adapter is a harness error: it
 invalidates the run instead of becoming a compiler failure. A production panic,
 a deadline or a named refusal (`Error::Unsupported`) is a measured gap.
 
-    run    --native DIR --output DIR [--jobs N] [--timeout S] [--resume] [--limit N]
+    run    --native DIR --output DIR [--sample] [--case ID ...] [--resume]
     replay --output DIR        # recompute categories from the raw outputs
 """
 from __future__ import annotations
@@ -45,7 +45,8 @@ SUBTESTS = ("trace", "union_ordering", "parent_pointers")
 # (p4.sources), the P5 adapter and the Phase 2 sub-tests. Requests and the
 # native capture are bound by digest in capture.json, and validation reruns
 # with the current code at every replay, so scripts cannot stale a capture.
-SOURCE_PATTERNS = ("tools/phase2/**/*.rs", "tools/s08/p5/**/*")
+SOURCE_PATTERNS = ("tools/phase2/**/*.rs", "tools/s08/p5/**/*", "rust-toolchain.toml",
+                   ".cargo/**/*", "crates/tsr_bundled/bundled/**/*")
 
 
 def sources():
@@ -66,7 +67,47 @@ def loading_requests():
     return {probe["id"]: probe["request"] for probe in probes}
 
 
-def requests(native_dir, limit=None):
+def selection(sample=False, cases=(), limit=None):
+    if type(sample) is not bool or not isinstance(cases, (list, tuple)) or any(type(case) is not str for case in cases):
+        raise ValueError("invalid capture selection")
+    if len(set(cases)) != len(cases):
+        raise ValueError("duplicate --case identity")
+    if limit is not None and (type(limit) is not int or limit <= 0 or sample or cases):
+        raise ValueError("--limit must be positive and cannot be combined with --sample or --case")
+    return {"sample": sample, "cases": list(cases), "limit": limit}
+
+
+def capture_selection(metadata):
+    value = metadata.get("selection")
+    if value is None:
+        if metadata.get("partial", False):
+            raise ValueError("partial capture has no authenticated selection")
+        return selection()  # Original full C0 capture, before subset support.
+    if not isinstance(value, dict) or set(value) != {"sample", "cases", "limit"}:
+        raise ValueError("invalid capture selection")
+    selected = selection(**value)
+    partial = selected != selection()
+    if type(metadata.get("partial")) is not bool or metadata["partial"] != partial:
+        raise ValueError("capture selection disagrees with partial flag")
+    return selected
+
+
+def select_rows(rows, *, sample=False, cases=(), limit=None):
+    selection(sample, cases, limit)
+    wanted = set(cases)
+    if wanted - {row["id"] for row in rows}:
+        raise ValueError("unknown or non-executed --case identity")
+    if limit is not None:
+        return rows[:limit]
+    if sample or cases:
+        selected = [row for row in rows if row["id"] in wanted or (sample and row["sample"])]
+        if not selected:
+            raise ValueError("empty capture selection")
+        return selected
+    return rows
+
+
+def requests(native_dir, limit=None, *, sample=False, cases=()):
     directory, report, observed = phase2_native.load_capture(native_dir)
     phase2_native.current(report)
     if not (directory / "verified.json").exists():
@@ -75,9 +116,12 @@ def requests(native_dir, limit=None):
     rows = phase2_inventory.executed(document)
     if [row["id"] for row in rows] != [row["id"] for row in observed]:
         raise ValueError("native capture does not follow the executed inventory")
+    selected = {row["id"] for row in select_rows(rows, sample=sample, cases=cases, limit=limit)}
     loading = loading_requests()
-    result = []
+    result, selected_native = [], []
     for row, native in zip(rows, observed, strict=True):
+        if row["id"] not in selected:
+            continue
         request = loading[row["id"]]
         if digest(p4.canonical(request) + b"\n") != row["loading_request_sha256"]:
             raise ValueError("loading request differs from the inventory: " + row["id"])
@@ -96,9 +140,8 @@ def requests(native_dir, limit=None):
                 entry["baseline_inputs"] = native["baseline_inputs"]
                 entry["baseline_header"] = native["baseline_header"]
         result.append(entry)
-    if limit is not None:
-        result, observed = result[:limit], observed[:limit]
-    return report, result, observed
+        selected_native.append(native)
+    return report, result, selected_native
 
 
 def validate_row(request, row):
@@ -113,6 +156,8 @@ def validate_row(request, row):
         # deadline, exit and protocol rows (s08_p4.fatal) never do.
         if ("panic_location" in extra) != (base["fatal"]["class"] == "panic"):
             raise ValueError("fatal observation has a missing or spurious panic location")
+        if extra.get("panic_location") is not None and not isinstance(extra["panic_location"], str):
+            raise ValueError("invalid panic location")
         return row
     if "panic_location" in extra:
         raise ValueError("completed observation carries a panic location")
@@ -126,17 +171,42 @@ def validate_row(request, row):
     if set(subtests) != set(SUBTESTS):
         raise ValueError("missing or extra sub-test observation")
     for name, value in subtests.items():
+        if not isinstance(value, dict):
+            raise ValueError("sub-test observation is not an object: " + name)
         state = value.get("state")
         if state == "failed":
-            if not isinstance(value.get("class"), str) or not isinstance(value.get("reason"), str):
-                raise ValueError("sub-test failure lacks class and reason: " + name)
+            expected = {"state", "class", "reason"}
+            allowed = {"union_ordering": "checker_error", "parent_pointers": "compiler_error"}
+            if value.get("class") == "panic":
+                expected.add("location")
+                if value.get("location") is not None and not isinstance(value["location"], str):
+                    raise ValueError("invalid sub-test panic location: " + name)
+            elif value.get("class") != allowed.get(name) or name not in allowed:
+                raise ValueError("unknown sub-test failure class: " + name)
+            if set(value) != expected or not isinstance(value.get("reason"), str):
+                raise ValueError("malformed sub-test failure: " + name)
         elif name == "trace":
             if state not in ("content", "no_content", "disabled"):
                 raise ValueError("unknown trace outcome")
+            expected = {"state", "text_hex"} if state == "content" else {"state"}
+            if set(value) != expected:
+                raise ValueError("malformed trace observation")
             if state == "content":
-                p5.hex_bytes(value["text_hex"])
-        elif state != "executed":
-            raise ValueError("unknown sub-test outcome: " + name)
+                text = value["text_hex"]
+                if not isinstance(text, str) or not text:
+                    raise ValueError("trace content must be nonempty canonical hex")
+                p5.hex_bytes(text)
+        else:
+            counts = ("checkers", "unions", "inconsistent") if name == "union_ordering" else ("files", "nodes")
+            expected = {"state", *counts} | ({"failure"} if name == "parent_pointers" else set())
+            if state != "executed" or set(value) != expected:
+                raise ValueError("malformed executed sub-test: " + name)
+            if any(type(value[key]) is not int or value[key] < 0 for key in counts):
+                raise ValueError("sub-test counts must be nonnegative integers: " + name)
+            if name == "union_ordering" and value["checkers"] != 1:
+                raise ValueError("C0 union ordering must execute exactly one checker")
+            if name == "parent_pointers" and value["failure"] is not None and not isinstance(value["failure"], str):
+                raise ValueError("parent-pointer failure must be a string or null")
     enabled = request["loading"]["options"].get("traceResolution") is True
     if (subtests["trace"]["state"] == "disabled") != (not enabled):
         raise ValueError("trace enablement differs from traceResolution")
@@ -200,9 +270,10 @@ def attribute(row, stderr):
     return "harness", f"unattributed {fatal['class']}: {fatal['reason']}"
 
 
-def run(native_dir, output, jobs, timeout, resume=False, limit=None):
+def run(native_dir, output, jobs, timeout, resume=False, limit=None, *, sample=False, cases=()):
     output = Path(output).resolve()
-    report, request_rows, _ = requests(native_dir, limit)
+    selected = selection(sample, cases, limit)
+    report, request_rows, _ = requests(native_dir, limit, sample=sample, cases=cases)
     native_meta = {"directory": str(Path(native_dir).resolve()), "report_sha256":
                    digest((Path(native_dir) / "report.json").read_bytes()),
                    "observation_sha256": report["observation_sha256"]}
@@ -211,6 +282,7 @@ def run(native_dir, output, jobs, timeout, resume=False, limit=None):
             raise ValueError("existing capture requires --resume")
         metadata = p4.read(output / "capture.json")
         if (metadata["timeout_seconds"] != timeout or metadata["native"] != native_meta
+                or capture_selection(metadata) != selected
                 or metadata["requests_sha256"] != digest(p4.canonical(request_rows) + b"\n")):
             raise ValueError("resume requires the identical native capture, requests and timeout")
     else:
@@ -221,7 +293,8 @@ def run(native_dir, output, jobs, timeout, resume=False, limit=None):
         record["source_snapshot"] = str(output / "source-snapshot")
         p4.atomic(output / "build/build.json", record)
         metadata = {"version": 1, "requests_sha256": digest(p4.canonical(request_rows) + b"\n"), "build": record,
-                    "timeout_seconds": timeout, "native": native_meta, "partial": limit is not None,
+                    "timeout_seconds": timeout, "native": native_meta, "partial": selected != selection(),
+                    "selection": selected,
                     "inventory_sha256": digest(phase2_inventory.INVENTORY.read_bytes())}
         shutil.copy2(record["binary"], output / "executable")
         p4.write_new(output / "requests.json", request_rows)
@@ -258,6 +331,7 @@ def run(native_dir, output, jobs, timeout, resume=False, limit=None):
 def replay(output):
     output = Path(output).resolve()
     metadata = p4.read(output / "capture.json")
+    selected = capture_selection(metadata)
     p4.verify_source_snapshot(output / "source-snapshot", metadata["build"]["sources"])
     raw = (output / "requests.json").read_bytes()
     if digest(raw) != metadata["requests_sha256"]:
@@ -279,11 +353,18 @@ def replay(output):
         if (envelope.get("request_sha256") != digest(p4.canonical(request) + b"\n")
                 or envelope.get("capture_sha256") != digest(p4.canonical(metadata) + b"\n")):
             raise ValueError("completion belongs to a different request or capture: " + request["id"])
-        for name, expected in envelope["artifacts"].items():
+        artifacts = envelope.get("artifacts")
+        expected_names = {"stdout", "stderr"}
+        row = envelope["row"]
+        child_record = "fatal" not in row or row["fatal"]["class"] == "panic"
+        if child_record or (path.parent / "observation.json").exists():
+            expected_names.add("observation.json")
+        if not isinstance(artifacts, dict) or set(artifacts) != expected_names:
+            raise ValueError("missing or extra raw case artifact: " + request["id"])
+        for name, expected in artifacts.items():
             if name not in ("stdout", "stderr", "observation.json") or digest((path.parent / name).read_bytes()) != expected:
                 raise ValueError("raw case artifact changed: " + request["id"])
-        row = envelope["row"]
-        if ("observation.json" in envelope["artifacts"] and "fatal" not in row
+        if (child_record
                 and p4.read(path.parent / "observation.json") != row):
             raise ValueError("completion differs from its raw observation: " + request["id"])
         if "fatal" not in row or row["fatal"]["class"] != "harness_protocol":
@@ -299,8 +380,9 @@ def replay(output):
         rows.append(row)
     states = Counter("fatal:" + row["fatal"]["class"] if "fatal" in row else "completed" for row in rows)
     summary = {"requested": len(request_rows), "observed": len(rows), "states": dict(sorted(states.items())),
-               "harness_errors": len(harness), "partial": metadata.get("partial", False)}
+               "harness_errors": len(harness), "partial": selected != selection()}
     result = {"version": 1, "summary": summary, "harness_errors": harness, "production_failures": attributed,
+              "selection": selected,
               "capture_sha256": digest(p4.canonical(metadata) + b"\n"),
               "source_stable": sources() == metadata["build"]["sources"]}
     p4.atomic(output / "replayed.json", result)
@@ -316,6 +398,8 @@ def main():
     sub.add_argument("--jobs", type=int, default=max(1, (os.cpu_count() or 2) - 2))
     sub.add_argument("--timeout", type=float, default=60)
     sub.add_argument("--resume", action="store_true")
+    sub.add_argument("--sample", action="store_true", help="the frozen 300-variant intermediate sample; informational")
+    sub.add_argument("--case", action="append", default=[], help="executed variant ID; repeatable, additive to --sample")
     sub.add_argument("--limit", type=int, help="development smoke over the first N rows; never recorded")
     sub = commands.add_parser("replay")
     sub.add_argument("--output", type=Path, required=True)
@@ -323,7 +407,7 @@ def main():
     if args.command == "run":
         if not math.isfinite(args.timeout) or args.timeout <= 0:
             parser.error("--timeout must be positive and finite")
-        run(args.native, args.output, args.jobs, args.timeout, args.resume, args.limit)
+        run(args.native, args.output, args.jobs, args.timeout, args.resume, args.limit, sample=args.sample, cases=args.case)
     else:
         print(json.dumps(replay(args.output)["summary"], sort_keys=True))
 

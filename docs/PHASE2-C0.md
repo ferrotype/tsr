@@ -22,6 +22,15 @@ union-ordering sub-test needs.
 | Rust definitions of the three owned sub-tests (C0.7) | `tools/phase2/subtests.rs`, 9 direct tests |
 | Cost of one full run measured, run policy set (C0.8) | below |
 
+The tables and gap counts below describe the initial C0 capture. The review
+fixes expanded the Rust build fingerprint to include `rust-toolchain.toml`,
+`.cargo/` configuration and bundled library bytes. That capture did not record
+those inputs, so it is now historical: replay preserves its observations but
+reports `source_stable: false`, and the producer withholds acceptance metrics.
+A new Rust capture, comparison and blocker record are required before recording
+`checker`; the native contract is unchanged. No full corpus was rerun for these
+harness fixes, and no new input hashes were attached to the old capture.
+
 ## Owner decisions (2026-09-25)
 
 1. **Module-resolution sub-test.** Phase 2 owns it and its gate,
@@ -150,7 +159,13 @@ Harness defects are separate from compiler outcomes:
 - an injected adapter panic becomes a harness error, not a gap, and a real
   production panic stays a measured failure;
 - resume requires identical inputs;
-- five named S08 controls still match.
+- five named S08 controls are compared again from committed raw observations;
+- panic completions must equal their raw observation, and stdout/stderr plus
+  every present observation must carry a hash;
+- sub-test counts reject negative numbers, booleans and missing fields, and
+  trace/failure records have state-specific schemas;
+- the tests use seven small recorded fixtures, with no `target/` dependency or
+  capture-dependent skip.
 
 Result: 13,432 rows, 0 harness errors, 13,426 completed and 6 production
 failures. A second run from identical sources reproduced every row
@@ -309,6 +324,30 @@ intermediate checkpoints run the recorded 300-variant sample plus targeted
 cases (about 10 s of Rust time), and full runs are C0's gap map and C7's
 acceptance.
 
+## Intermediate runs
+
+Use the frozen sample plus repeatable named targets; their union runs in
+inventory order. `--case` alone selects just the named executed variants.
+Duplicate or unknown targets, including informational variants, are rejected.
+
+```sh
+python3 scripts/phase2_corpus.py run --native target/phase2/native \
+  --output target/phase2/c1-sample --sample \
+  --case 'compiler/sliceTupleTypeOutOfBounds.ts#configuration=0'
+python3 scripts/phase2_compare.py report --native target/phase2/native \
+  --rust target/phase2/c1-sample
+```
+
+Selection is bound into capture metadata and completion hashes. `--resume`
+requires that same selection, native capture, requests and deadline. Reports
+include only selected native/Rust rows and say `partial: true`; they cannot be
+recorded with `--record`, replace the full blocker register, or emit acceptance
+metrics through the producer. `--limit N` remains a separate prefix smoke test
+and cannot be combined with `--sample` or `--case`.
+
+The Phase 2 exit now explicitly includes `run.checker.display_parity == 1`,
+alongside errors, types and symbols.
+
 ## Reproduction
 
 ```sh
@@ -321,7 +360,7 @@ python3 scripts/phase2_corpus.py run --native target/phase2/native --output targ
 python3 scripts/phase2_compare.py report --native target/phase2/native --rust target/phase2/rust --record
 python3 scripts/phase2_blockers.py build --native target/phase2/native --rust target/phase2/rust --record
 python3 scripts/phase2_producers.py checker
-python3 -m pytest scripts/tests/test_phase2_inventory.py scripts/tests/test_phase2_compare.py scripts/tests/test_phase2_corpus.py -q
+python3 -m pytest scripts/tests/test_phase2_*.py -q
 cargo test -p tsr_compiler --test phase2_subtests
 cargo xtask validate && cargo xtask check P2A
 ```

@@ -79,6 +79,8 @@ def rust_declarations(row):
 
 def build(native_dir, rust_dir, record=False):
     comparison = json.loads((Path(rust_dir) / "comparison.json").read_bytes())
+    if comparison.get("partial", False):
+        raise ValueError("the acceptance blocker register requires a full comparison, not an informational sample")
     _, native_report, native_rows = phase2_native.load_capture(native_dir)
     phase2_native.current(native_report)
     if comparison["native_observation_sha256"] != native_report["observation_sha256"]:
@@ -181,6 +183,8 @@ def withheld(comparison):
 
 def complete(register, comparison):
     """Every withheld observation is explained by an entry naming its operation."""
+    if comparison.get("partial", False):
+        return False
     named = {(entry["missing_operation"], vid) for entry in register["entries"] if entry["kind"] == "unsupported"
              for vid in entry["variants"]}
     return withheld(comparison) <= named and all(entry["evidence"] for entry in register["entries"])

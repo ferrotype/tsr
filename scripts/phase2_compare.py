@@ -294,11 +294,20 @@ def report(native_dir, rust_dir, previous=None, record=False):
     native_dir, native_report, native_rows = phase2_native.load_capture(native_dir)
     phase2_native.current(native_report)
     replayed, requests, rust_rows, harness, attributions = load_rust(rust_dir)
-    if replayed["summary"]["partial"]:
-        raise ValueError("a --limit Rust run is never reported")
-    inventory_rows = phase2_inventory.executed()
-    if not ([r["id"] for r in inventory_rows] == [r["id"] for r in native_rows]
-            == [r["id"] for r in requests] == [r["id"] for r in rust_rows]):
+    partial = replayed["summary"]["partial"]
+    if record and partial:
+        raise ValueError("a partial Rust run is informational and cannot be recorded as acceptance")
+    all_inventory = phase2_inventory.executed()
+    if [r["id"] for r in all_inventory] != [r["id"] for r in native_rows]:
+        raise ValueError("native rows differ from the full executed inventory")
+    metadata = p4.read(Path(rust_dir) / "capture.json")
+    if (metadata["inventory_sha256"] != digest(phase2_inventory.INVENTORY.read_bytes())
+            or metadata["native"]["observation_sha256"] != native_report["observation_sha256"]):
+        raise ValueError("Rust capture belongs to a different inventory or native capture")
+    inventory_rows = phase2_corpus.select_rows(all_inventory, **replayed["selection"])
+    wanted = {row["id"] for row in inventory_rows}
+    native_rows = [row for row in native_rows if row["id"] in wanted]
+    if not ([r["id"] for r in inventory_rows] == [r["id"] for r in requests] == [r["id"] for r in rust_rows]):
         raise ValueError("inventory, native and Rust rows are missing, extra or reordered")
     earlier = strict_json_loads(Path(previous).read_bytes()) if previous else None
     rows, categories = [], {domain: Counter() for domain in DOMAINS}
@@ -350,6 +359,7 @@ def report(native_dir, rust_dir, previous=None, record=False):
         "native_observation_sha256": native_report["observation_sha256"],
         "rust_capture_sha256": replayed["capture_sha256"], "rust_source_stable": replayed["source_stable"],
         "inventory_sha256": digest(phase2_inventory.INVENTORY.read_bytes()),
+        "partial": partial, "selection": replayed["selection"],
         "executed": len(rows), "harness_errors": len(harness),
         "categories": {d: dict(sorted(categories[d].items())) for d in DOMAINS},
         "all_domains_match": sum(all(o in ("match", "disabled") for o in row["outcomes"].values()) for row in executed),
@@ -375,7 +385,7 @@ def report(native_dir, rust_dir, previous=None, record=False):
         if not replayed["source_stable"]:
             raise ValueError("record requires a Rust capture of the current sources")
         RECORD.write_bytes(json.dumps(summary, indent=1, sort_keys=True).encode() + b"\n")
-    brief = {k: summary[k] for k in ("executed", "harness_errors", "all_domains_match", "categories")}
+    brief = {k: summary[k] for k in ("partial", "executed", "harness_errors", "all_domains_match", "categories")}
     brief["regression_all_domains_match"] = summary["regression_subset"]["all_domains_match"]
     brief["buckets"] = len(summary["buckets"])
     print(json.dumps(brief, sort_keys=True, indent=1))

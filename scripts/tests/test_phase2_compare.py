@@ -1,5 +1,4 @@
 """Phase 2 C0.4: every domain lands in exactly one category, from evidence only."""
-import json
 from pathlib import Path
 import sys
 import unittest
@@ -7,8 +6,6 @@ import unittest
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
 import phase2_compare as compare  # noqa: E402
-
-RUST = ROOT / "target/phase2/rust"
 
 
 def native(**overrides):
@@ -116,32 +113,6 @@ class Categorization(unittest.TestCase):
         self.assertEqual(compare.owner({"checkpoint": "regression"}, {}, "diagnostics: TS2322"), "C1")
 
 
-@unittest.skipUnless((RUST / "comparison.json").exists(), "no comparison of the recorded run")
-class RecordedComparison(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.comparison = json.loads((RUST / "comparison.json").read_bytes())
-
-    def test_every_row_is_categorized_and_every_gap_has_one_bucket_and_owner(self):
-        rows = self.comparison["rows"]
-        self.assertEqual(len(rows), self.comparison["executed"])
-        for row in rows:
-            self.assertNotIn("harness_error", row)
-            self.assertEqual(set(row["outcomes"]), set(compare.DOMAINS))
-            self.assertTrue(set(row["outcomes"].values()) <= set(compare.CATEGORIES))
-            if any(o not in ("match", "disabled") for o in row["outcomes"].values()):
-                self.assertIsInstance(row["bucket"], str)
-                self.assertIsInstance(row["owner"], str)
-            for domain, detail in row.get("details", {}).items():
-                if detail["category"] == "unsupported":
-                    self.assertTrue(detail["operation"], (row["id"], domain))
-                    self.assertNotEqual(detail["operation"], "P5 native baseline walker/display schedule")
-
-    def test_record_is_the_current_summary(self):
-        if not compare.RECORD.exists():
-            self.skipTest("first comparison not recorded")
-        summary = {k: v for k, v in self.comparison.items() if k != "rows"}
-        self.assertEqual(json.loads(compare.RECORD.read_bytes()), summary)
 
 
 if __name__ == "__main__":

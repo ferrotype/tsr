@@ -100,6 +100,9 @@ def checker(native=NATIVE, rust=RUST):
     except (OSError, ValueError, KeyError) as error:
         print("Rust capture unavailable: " + str(error), file=sys.stderr)
         return {"metrics": metrics}
+    if not metrics["harness_valid"]:
+        print("Rust capture is partial, stale or invalid; acceptance metrics withheld", file=sys.stderr)
+        return {"metrics": metrics}
     try:
         comparison = quietly(phase2_compare.report, native, rust)
     except (OSError, ValueError, KeyError) as error:
@@ -124,11 +127,6 @@ def checker(native=NATIVE, rust=RUST):
         metrics["blockers_named"] = register == committed and phase2_blockers.complete(register, comparison)
     except (OSError, ValueError, KeyError) as error:
         print("blocker register unavailable: " + str(error), file=sys.stderr)
-    if not metrics["harness_valid"]:
-        # A run with harness defects can describe progress but never certify it.
-        kept = {key: metrics[key] for key in ("inventory_frozen", "native_verified")}
-        metrics = {key: (False if isinstance(value, bool) else value) for key, value in metrics.items()}
-        metrics.update(kept)
     print("checker evidence: " + canonical({"native": report["observation_sha256"],
                                              "rust": comparison["rust_capture_sha256"]}).decode(), file=sys.stderr)
     return {"metrics": {k: v for k, v in metrics.items() if v is not None}}
