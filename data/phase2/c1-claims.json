@@ -926,8 +926,8 @@
    "go": "tsc/internal/checker/checker.go:Checker.getGlobalSymbol",
    "id": "compiler/awaitedTypeNoLib.ts#configuration=0",
    "item": "C1.2",
-   "mechanism": "with no lib, the pin reports 'Cannot find global type Awaited' (TS2318) and the consequent TS2345; the Rust global lookup stays silent",
-   "status": "claimed"
+   "mechanism": "with no lib, the pin reports 'Cannot find global type Awaited' (TS2318) and the consequent TS2345; the Rust global lookup stays silent; traced further: the ten noLib global lookups do report, only the Awaited lookup does not, so the reporting resolver (getGlobalAwaitedSymbol via tryCreateAwaitedType) is never reached where the pin reaches it; the awaited-type path (getAwaitedTypeNoAliasEx, isAwaitedTypeNeeded) reads the same as the pin, so the divergence sits upstream (promised type or generic-object flags) and needs a step trace",
+   "status": "candidate"
   },
   {
    "bucket": "panic: tsr_checker::relater_tuples",
