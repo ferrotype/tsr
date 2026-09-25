@@ -18,7 +18,7 @@ class GeneratedAstFixtureTests(unittest.TestCase):
         for name, source in GEN.outputs().items():
             self.assertEqual((BASE / name).read_text(), source, name)
         document = GEN.document()
-        self.assertEqual(len(document["requests"]), 1026)
+        self.assertEqual(len(document["requests"]), 1029)
         self.assertTrue(all("expected" not in row for row in document["requests"]))
 
     def test_every_pinned_predicate_has_an_exact_native_and_rust_dispatch(self):
