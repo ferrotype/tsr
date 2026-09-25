@@ -206,6 +206,11 @@ impl CheckerState {
         self.constraint_from_type_parameter(ty)
     }
 
+    // port: tsc/internal/checker/checker.go:Checker.getBaseConstraintOrType
+    pub(crate) fn base_constraint_or_type(&mut self, ty: TypeId) -> Result<TypeId, Error> {
+        Ok(self.base_constraint_of_type(ty)?.unwrap_or(ty))
+    }
+
     // port: tsc/internal/checker/checker.go:Checker.getBaseConstraintOfType
     pub(crate) fn base_constraint_of_type(&mut self, ty: TypeId) -> Result<Option<TypeId>, Error> {
         if self.types.flags(ty)?

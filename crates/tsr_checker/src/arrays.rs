@@ -85,6 +85,31 @@ impl CheckerState {
             || self.query.global_types.get("ReadonlyArray") == Some(&target))
     }
 
+    // port: tsc/internal/checker/checker.go:Checker.isReadonlyArrayType
+    pub(crate) fn is_readonly_array_type(&self, ty: TypeId) -> Result<bool, Error> {
+        if self.types.get(ty)?.object_flags & of::REFERENCE == 0 {
+            return Ok(false);
+        }
+        Ok(self.query.global_types.get("ReadonlyArray") == Some(&self.types.target(ty)?))
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.isMutableArrayOrTuple
+    pub(crate) fn is_mutable_array_or_tuple(&self, ty: TypeId) -> Result<bool, Error> {
+        if self.is_array_type(ty)? {
+            return Ok(!self.is_readonly_array_type(ty)?);
+        }
+        if self.is_tuple_type(ty)? {
+            return Ok(!self.types.tuple(self.types.target(ty)?)?.readonly);
+        }
+        Ok(false)
+    }
+
+    // port: tsc/internal/checker/checker.go:isSingleElementGenericTupleType
+    pub(crate) fn is_single_element_generic_tuple_type(&self, ty: TypeId) -> Result<bool, Error> {
+        Ok(self.is_generic_tuple_type(ty)?
+            && self.types.tuple(self.types.target(ty)?)?.element_infos.len() == 1)
+    }
+
     // port: tsc/internal/checker/checker.go:Checker.isArrayLikeType
     pub(crate) fn is_array_like_type(&mut self, ty: TypeId) -> Result<bool, Error> {
         if self.is_array_type(ty)? {

@@ -948,10 +948,10 @@
   {
    "bucket": "panic: tsr_checker::relater_tuples",
    "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
-   "go": "tsc/internal/checker/relater.go:Relater.isRelatedTo",
+   "go": "tsc/internal/checker/relater.go:Relater.structuredTypeRelatedToWorker",
    "id": "conformance/types/tuple/variadicTuples2.ts#configuration=0",
-   "item": "C1.4",
-   "mechanism": "relater_tuples.rs:130 indexes the target element infos at a position past the target arity when the source has more fixed elements than the target's rest position allows (index out of bounds, len 2 index 2)",
+   "item": "C1.6",
+   "mechanism": "relater_tuples.rs:130 indexes the target element infos at a position past the target arity when the source has more fixed elements than the target's rest position allows (index out of bounds, len 2 index 2); after the arity fix the row differed by a TS2345 ([...T] not assignable to T): the single-element generic tuple rules of structuredTypeRelatedToWorker (isSingleElementGenericTupleType, isMutableArrayOrTuple) were missing",
    "status": "claimed"
   },
   {

@@ -232,6 +232,42 @@ impl Relater<'_> {
                 }
             }
         }
+        // For a generic type T and a type U that is assignable to T, [...U] is
+        // assignable to T, U is assignable to readonly [...T], and U is
+        // assignable to [...T] when U is constrained to a mutable array or tuple.
+        if self.checker.is_single_element_generic_tuple_type(source)?
+            && !self
+                .checker
+                .types
+                .tuple(self.checker.types.target(source)?)?
+                .readonly
+        {
+            let element = self.checker.get_type_arguments(source)?[0];
+            let result = self.related(element, target, SOURCE, 0)?;
+            if result != tr::FALSE {
+                return Ok(result);
+            }
+        }
+        if self.checker.is_single_element_generic_tuple_type(target)? {
+            let readonly = self
+                .checker
+                .types
+                .tuple(self.checker.types.target(target)?)?
+                .readonly;
+            let mutable_source = if readonly {
+                true
+            } else {
+                let constraint = self.checker.base_constraint_or_type(source)?;
+                self.checker.is_mutable_array_or_tuple(constraint)?
+            };
+            if mutable_source {
+                let element = self.checker.get_type_arguments(target)?[0];
+                let result = self.related(source, element, TARGET, 0)?;
+                if result != tr::FALSE {
+                    return Ok(result);
+                }
+            }
+        }
         if t & tf::INDEXED_ACCESS != 0 {
             let target_data = *self.checker.types.indexed_access(target)?;
             if s & tf::INDEXED_ACCESS != 0 {
