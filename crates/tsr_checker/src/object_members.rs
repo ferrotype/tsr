@@ -98,6 +98,7 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.instantiateIndexInfo
+    // port: tsc/internal/checker/checker.go:Checker.instantiateIndexInfos
     fn instantiate_index_infos(
         &mut self,
         indexes: &[IndexInfoId],
@@ -338,6 +339,7 @@ impl CheckerState {
         self.set_structured_type_members(ty, members, &calls, &constructs, &indexes)
     }
 
+    // port: tsc/internal/checker/checker.go:Checker.getSignaturesOfType
     pub(crate) fn signatures_of_type(
         &mut self,
         ty: TypeId,

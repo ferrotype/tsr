@@ -1,5 +1,40 @@
 {
  "dispositions": {
+  "tsc/internal/checker/checker.go:Checker.createCanonicalSignature": {
+   "disposition": "gap",
+   "item": "C1.3",
+   "reason": "canonical signatures (type parameters replaced by their defaults or unknown) have no Rust site"
+  },
+  "tsc/internal/checker/checker.go:Checker.createUnionSignature": {
+   "disposition": "equivalent",
+   "reason": "union_signatures clones the signature and attaches the composite inline",
+   "rust": "crates/tsr_checker/src/compound_signatures.rs:174"
+  },
+  "tsc/internal/checker/checker.go:Checker.expandSignatureParametersWithTupleMembers": {
+   "disposition": "equivalent",
+   "reason": "expanded_signature_parameters expands the rest tuple as the pin does",
+   "rust": "crates/tsr_checker/src/signature_parameters.rs:628"
+  },
+  "tsc/internal/checker/checker.go:Checker.findIndexInfo": {
+   "disposition": "equivalent",
+   "reason": "the key search of index_info_of_type",
+   "rust": "crates/tsr_checker/src/object_members.rs:398"
+  },
+  "tsc/internal/checker/checker.go:Checker.getApplicableIndexInfo": {
+   "disposition": "equivalent",
+   "reason": "applicable_index_info over index_infos_of_type",
+   "rust": "crates/tsr_checker/src/indexes.rs:585"
+  },
+  "tsc/internal/checker/checker.go:Checker.getApplicableIndexInfoForName": {
+   "disposition": "equivalent",
+   "reason": "callers pass the string literal or es-symbol key to applicable_index_info",
+   "rust": "crates/tsr_checker/src/indexes.rs:585"
+  },
+  "tsc/internal/checker/checker.go:Checker.getApplicableIndexInfos": {
+   "disposition": "equivalent",
+   "reason": "callers filter index infos with applicable_index_type",
+   "rust": "crates/tsr_checker/src/indexes.rs:563"
+  },
   "tsc/internal/checker/checker.go:Checker.getArrayOrTupleTargetType": {
    "disposition": "gap",
    "item": "C1.4",
@@ -10,15 +45,80 @@
    "item": "C1.4",
    "reason": "base type of a union of literals (with its cache); the Rust site is not identified by name yet"
   },
+  "tsc/internal/checker/checker.go:Checker.getCanonicalSignature": {
+   "disposition": "gap",
+   "item": "C1.3",
+   "reason": "canonical signature cache"
+  },
+  "tsc/internal/checker/checker.go:Checker.getIndexInfoWithReadonly": {
+   "disposition": "gap",
+   "item": "C1.3",
+   "reason": "index info copy with another readonly flag"
+  },
+  "tsc/internal/checker/checker.go:Checker.getIndexInfosOfStructuredType": {
+   "disposition": "equivalent",
+   "reason": "index_infos_of_type reads the resolved members' index infos",
+   "rust": "crates/tsr_checker/src/indexes.rs:283"
+  },
+  "tsc/internal/checker/checker.go:Checker.getIndexInfosOfSymbol": {
+   "disposition": "equivalent",
+   "reason": "index_infos_of_symbol takes the index symbol through the members table before the index-symbol worker",
+   "rust": "crates/tsr_checker/src/late_indexes.rs:9"
+  },
+  "tsc/internal/checker/checker.go:Checker.getIndexSymbol": {
+   "disposition": "equivalent",
+   "reason": "member_symbol(members, names::INDEX)",
+   "rust": "crates/tsr_checker/src/object_members.rs:89"
+  },
+  "tsc/internal/checker/checker.go:Checker.getIndexTypeOfType": {
+   "disposition": "equivalent",
+   "reason": "callers read value_type of index_info_of_type",
+   "rust": "crates/tsr_checker/src/object_members.rs:398"
+  },
+  "tsc/internal/checker/checker.go:Checker.getIndexTypeOfTypeEx": {
+   "disposition": "equivalent",
+   "reason": "the default is applied by the callers of index_info_of_type",
+   "rust": "crates/tsr_checker/src/object_members.rs:398"
+  },
+  "tsc/internal/checker/checker.go:Checker.getIntersectedSignatures": {
+   "disposition": "gap",
+   "item": "C1.3",
+   "reason": "noImplicitAny combined signature of an intersection's signatures"
+  },
   "tsc/internal/checker/checker.go:Checker.getNormalizedTupleType": {
    "disposition": "equivalent",
    "reason": "normalize_tuple normalizes variadic elements for both the constructor and the relation-time normalization",
    "rust": "crates/tsr_checker/src/arrays.rs:344"
   },
+  "tsc/internal/checker/checker.go:Checker.getPropertyNameFromIndex": {
+   "disposition": "equivalent",
+   "reason": "index_property_name",
+   "rust": "crates/tsr_checker/src/indexes.rs:495"
+  },
+  "tsc/internal/checker/checker.go:Checker.getRestTypeOfSignature": {
+   "disposition": "equivalent",
+   "reason": "rest_parameter_type with the any fallback at the call sites",
+   "rust": "crates/tsr_checker/src/signature_parameters.rs:126"
+  },
   "tsc/internal/checker/checker.go:Checker.getRestTypeOfTupleType": {
    "disposition": "equivalent",
    "reason": "slice_tuple takes the slice from fixed_length inline, which is the pin's definition",
    "rust": "crates/tsr_checker/src/infer_tuples.rs:184"
+  },
+  "tsc/internal/checker/checker.go:Checker.getReturnTypeOfFullSignature": {
+   "disposition": "equivalent",
+   "reason": "signature_of_full_signature followed by return_type_of_signature",
+   "rust": "crates/tsr_checker/src/source_signatures.rs:651"
+  },
+  "tsc/internal/checker/checker.go:Checker.getReturnTypeOfSingleNonGenericSignature": {
+   "disposition": "equivalent",
+   "reason": "call_single_signature and its return type, with the type-parameter test at the call sites",
+   "rust": "crates/tsr_checker/src/source_signatures.rs:14"
+  },
+  "tsc/internal/checker/checker.go:Checker.getSignaturesOfStructuredType": {
+   "disposition": "equivalent",
+   "reason": "signatures_of_type resolves the structured members and selects the call or construct half inline",
+   "rust": "crates/tsr_checker/src/object_members.rs:341"
   },
   "tsc/internal/checker/checker.go:Checker.getTypeFromLiteralTypeNode": {
    "disposition": "gap",
@@ -39,6 +139,26 @@
    "disposition": "gap",
    "item": "C1.4",
    "reason": "widened literal type of an initializer; the Rust site is not identified by name yet"
+  },
+  "tsc/internal/checker/checker.go:Checker.hasLateBindableIndexSignature": {
+   "disposition": "equivalent",
+   "reason": "late_bind_index_signature tests the declaration name inline",
+   "rust": "crates/tsr_checker/src/late_members.rs:260"
+  },
+  "tsc/internal/checker/checker.go:Checker.hasSignatureWithArityGreaterThan": {
+   "disposition": "gap",
+   "item": "C1.3",
+   "reason": "arity test over a symbol's signatures"
+  },
+  "tsc/internal/checker/checker.go:Checker.hasSignatures": {
+   "disposition": "equivalent",
+   "reason": "signatures_of_type non-empty for either kind at the call sites",
+   "rust": "crates/tsr_checker/src/object_members.rs:341"
+  },
+  "tsc/internal/checker/checker.go:Checker.instantiateSignatures": {
+   "disposition": "equivalent",
+   "reason": "the signature list is instantiated inline in resolve_object_type_members",
+   "rust": "crates/tsr_checker/src/object_members.rs:126"
   },
   "tsc/internal/checker/checker.go:Checker.isArrayOrTupleLikeType": {
    "disposition": "gap",
@@ -70,10 +190,25 @@
    "item": "C1.4",
    "reason": "empty literal test; the Rust site is not identified by name yet"
   },
+  "tsc/internal/checker/checker.go:Checker.isLateBindableIndexSignature": {
+   "disposition": "equivalent",
+   "reason": "inline in late_bind_index_signature through late_name",
+   "rust": "crates/tsr_checker/src/late_members.rs:260"
+  },
   "tsc/internal/checker/checker.go:Checker.isReadonlyArraySymbol": {
    "disposition": "equivalent",
    "reason": "the symbol test is done through the global ReadonlyArray target at the call sites",
    "rust": "crates/tsr_checker/src/arrays.rs:89"
+  },
+  "tsc/internal/checker/checker.go:Checker.isSimpleTupleType": {
+   "disposition": "equivalent",
+   "reason": "simple_tuple_arity returns the arity of a simple tuple node, None otherwise",
+   "rust": "crates/tsr_checker/src/conditional.rs:438"
+  },
+  "tsc/internal/checker/checker.go:Checker.isTypeUsableAsIndexSignatureDeclaration": {
+   "disposition": "equivalent",
+   "reason": "the assignability to string | number | symbol is tested inline",
+   "rust": "crates/tsr_checker/src/late_members.rs:260"
   },
   "tsc/internal/checker/checker.go:Checker.newUniqueESSymbolType": {
    "disposition": "gap",
@@ -85,6 +220,31 @@
    "item": "C1.4",
    "reason": "bigint literal parsing; the Rust site is not identified by name yet"
   },
+  "tsc/internal/checker/checker.go:Checker.resolveSignature": {
+   "disposition": "gap",
+   "item": "C1.3",
+   "reason": "the by-node-kind dispatch to call, new, tagged template, decorator, JSX and instantiation-expression resolution is not found by name; the individual resolvers exist"
+  },
+  "tsc/internal/checker/checker.go:Checker.resolveTypeReferenceMembers": {
+   "disposition": "equivalent",
+   "reason": "resolve_object_type_members pads the reference's type arguments inline",
+   "rust": "crates/tsr_checker/src/object_members.rs:126"
+  },
+  "tsc/internal/checker/checker.go:Checker.transformTypeOfMembers": {
+   "disposition": "gap",
+   "item": "C1.3",
+   "reason": "member type transformation for spread/omit"
+  },
+  "tsc/internal/checker/checker.go:Checker.typeHasCallOrConstructSignatures": {
+   "disposition": "equivalent",
+   "reason": "resolve_type_members' signatures non-empty at the call sites",
+   "rust": "crates/tsr_checker/src/object_members.rs:15"
+  },
+  "tsc/internal/checker/checker.go:findIndexInfo": {
+   "disposition": "equivalent",
+   "reason": "the key search of index_info_of_type",
+   "rust": "crates/tsr_checker/src/object_members.rs:398"
+  },
   "tsc/internal/checker/checker.go:getBigIntLiteralValue": {
    "disposition": "equivalent",
    "reason": "LiteralData.value holds the bigint value",
@@ -94,6 +254,11 @@
    "disposition": "equivalent",
    "reason": "LiteralData.value holds the boolean value",
    "rust": "crates/tsr_checker/src/types.rs:167"
+  },
+  "tsc/internal/checker/checker.go:getNameFromIndexInfo": {
+   "disposition": "later",
+   "owner": "C5",
+   "reason": "index parameter names are node-builder output"
   },
   "tsc/internal/checker/checker.go:getNumberLiteralValue": {
    "disposition": "equivalent",
@@ -124,6 +289,21 @@
    "disposition": "gap",
    "item": "C1.4",
    "reason": "unary tuple node test; the Rust site is not identified by name yet"
+  },
+  "tsc/internal/checker/checker.go:signatureHasLiteralTypes": {
+   "disposition": "equivalent",
+   "reason": "a flags test on HAS_LITERAL_TYPES",
+   "rust": "crates/tsr_checker/src/signatures.rs:31"
+  },
+  "tsc/internal/checker/checker.go:signatureHasRestParameter": {
+   "disposition": "equivalent",
+   "reason": "a flags test on HAS_REST_PARAMETER",
+   "rust": "crates/tsr_checker/src/signatures.rs:31"
+  },
+  "tsc/internal/checker/checker.go:someSignature": {
+   "disposition": "equivalent",
+   "reason": "composite signatures are searched inline where the pin calls someSignature",
+   "rust": "crates/tsr_checker/src/compound_signatures.rs:94"
   },
   "tsc/internal/checker/relater.go:Checker.checkTypeAssignableToAndOptionallyElaborate": {
    "disposition": "gap",
