@@ -1,0 +1,40 @@
+# Phase 2, stage A: the checker acceptance contract (C0). Preparation only;
+# no Rust parity is claimed. docs/PHASE2-C0-plan.md defines the work.
+#
+# The `checker` producer (scripts/phase2_producers.py) replays the recorded
+# native and Rust captures and emits:
+#   run.checker.inventory_frozen, run.checker.native_verified,
+#   run.checker.harness_valid, run.checker.result_recorded,
+#   run.checker.blockers_named, run.checker.unsupported_required,
+#   run.checker.errors_parity, types_parity, symbols_parity, display_parity,
+#   run.checker.trace_parity, run.checker.ordering, run.checker.parent_pointers,
+#   run.checker.regression_parity (the S08 acceptance variants the runner executes).
+#
+# The parity ratios describe the gap map; PLAN's Phase 2 gate binds them at C7
+# (sprint P2B). No threshold is introduced here. The E2 producer and its
+# metrics are untouched; S08's record stays history.
+id = "P2A"
+title = "Phase 2 stage A: the full checker acceptance contract"
+goal = "The Phase 2 denominator is frozen, the native checker contract is captured and verified, one complete Rust run is recorded with every row categorized and harness-valid, and every withheld observation is a named blocker."
+# No blanket Phase 1 flag: C0 consumes named Phase 1 contracts, recorded in
+# data/phase2/blockers.json (PLAN section 9, dependency rule).
+exit = [
+  "run.checker.inventory_frozen == true",
+  "run.checker.native_verified == true",
+  "run.checker.harness_valid == true",
+  "run.checker.result_recorded == true",
+  "run.checker.blockers_named == true",
+]
+
+[[item]]
+id = "P2A-C0"
+title = "C0: inventory, native contract, categorized Rust run, blockers and wiring"
+kind = "task"
+required = true
+done_when = [
+  "run.checker.inventory_frozen == true",
+  "run.checker.native_verified == true",
+  "run.checker.harness_valid == true",
+  "run.checker.result_recorded == true",
+  "run.checker.blockers_named == true",
+]
