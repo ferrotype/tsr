@@ -20,6 +20,7 @@ recorded by the owner through `cargo xtask run checker`:
 | Exit condition | Measured by |
 | --- | --- |
 | Existing cases preserved: the S08 regression subset still matches completely | `run.checker.regression_parity == 1` (9,367 of 9,367) |
+| Every other case C0 already matched is preserved too: no previously matching domain of any executed row becomes a non-match | `run.checker.c1_regressions == 0` against the authenticated C1-start row report `data/phase2/c1-baseline.json.gz` |
 | Every C1-attributed row of section 3 matches in every domain | `run.checker.c1_open == 0` over `data/phase2/c1-claims.json` |
 | No production panic, stack overflow or unnamed error in a foundation module | `run.checker.c1_failures == 0` |
 | The foundation function groups of section 4 are audited: each pinned function is mapped, disposed as equivalent, or handed to a named later checkpoint; none is an unexplained gap | `run.checker.c1_audit_complete == true` over `data/phase2/c1-audit.json` |
@@ -101,15 +102,25 @@ authority; the counts are the current `status/unmapped-functions.json` state.
 ### C1.0 Refresh the gap map at the C1 head
 
 - Exists: the C0 scripts and the historical capture.
-- Build: nothing. Run the full contract once at the branch point:
-  `phase2_native.py capture` and `verify` (unchanged native contract, 42 s plus
-  52 s), `phase2_corpus.py run` (about 5 minutes), `phase2_compare.py report
-  --previous <C0 comparison> --record`, `phase2_blockers.py build --record`.
-  The owner records `cargo xtask run checker` on the designated host; that
-  recording is also what C0 still owes.
-- Exit: `harness_valid`, 0 harness errors; the report's `changed_observations`
-  against the C0 comparison is reviewed and every change explained by a commit
-  since `bf2013e`.
+- Build: `phase2_compare.py baseline`, which writes
+  `data/phase2/c1-baseline.json.gz`: every executed row's outcome and digest
+  per domain, bound to the native observation digest, the inventory digest and
+  the Rust capture identity it came from. It is the authority for
+  `c1_regressions` (C1.10); a row report edited by hand no longer matches the
+  capture it names. Run the full contract once at the branch point:
+  `phase2_native.py verify` (unchanged native contract, 52 s),
+  `phase2_corpus.py run` (about 5 minutes), `phase2_compare.py report
+  --previous target/phase2/rust/comparison.json` (the C0 row report; the
+  committed `first-comparison.json` is a summary without rows), then
+  `baseline`. The owner records `cargo xtask run checker` on the designated
+  host; that recording is also what C0 still owes.
+- Done on 2026-09-25 at the plan's branch point: 13,432 rows, 0 harness
+  errors, 12,308 matching in every domain, regression 9,367 of 9,367, the same
+  74 buckets with the same counts as C0 and 0 changed observations; the
+  capture is `target/phase2/c1-base`, source-stable at that head.
+- Exit: `harness_valid`, 0 harness errors; `changed_observations` against the
+  C0 comparison reviewed and every change explained by a commit since
+  `bf2013e`; the baseline file committed.
 
 ### C1.1 Foundation audit and attribution
 
@@ -203,10 +214,12 @@ authority; the counts are the current `status/unmapped-functions.json` state.
   `parseBigIntLiteralType`, `getWidenedLiteralTypeForInitializer`,
   `getUniqueLiteralTypeForTypeParameter`, `isConstEnumSymbol` and
   `getBigIntLiteralValue`; and the unreached refusals `getWidenedLiteralType:
-  enum`, `fresh non-string literal type`, `getTupleElementLabel: binding
-  pattern`, `typeToTypeNode: computed enum` and `AnyToString: computed enum
-  value`, each either implemented or reached by a direct native case that
-  shows the refusal is outside the pinned corpus.
+  enum`, `getTupleElementLabel: binding pattern`, `typeToTypeNode: computed
+  enum` and `AnyToString: computed enum value`, each either implemented or
+  reached by a direct native case that shows the refusal is outside the pinned
+  corpus. `fresh non-string literal type` is not a production gap: its only
+  site is `storage_pilot.rs:109`, the deliberately restricted S08 storage
+  probe, and the audit classifies it as a harness boundary.
 - Exit: the two panic buckets match; no refusal in these modules is unreached
   by a case.
 
@@ -221,12 +234,28 @@ authority; the counts are the current `status/unmapped-functions.json` state.
   unmapped `hasNonCircularBaseConstraint`, `getBaseConstraintOrType`,
   `getConstraintOfIndexedAccess`, `getConstraintFromIndexedAccess`,
   `mayResolveTypeAlias`, `isResolvedByTypeAlias` and
-  `getTypeParametersForTypeAndSymbol`. Depth and complexity limits follow the
-  pin's counters exactly; a Rust growth guard reports the pin's diagnostic,
-  never a different one, and never a silent truncation.
+  `getTypeParametersForTypeAndSymbol`. Three different mechanisms are kept
+  apart, each with its own witness in C1.8:
+  1. *Stack growth* (ADR 0011, `stacker::maybe_grow`): a successful growth
+     continues checking and returns the ordinary result; it is not a failure
+     and produces no diagnostic; the checker stays reusable afterwards.
+  2. *Semantic limits*, each with the pin's exact result: the relater's
+     100-level backstop returns `TernaryMaybe` with no diagnostic
+     (`relater.go:3133`); `isDeeplyNestedType` likewise yields `Maybe`; the
+     instantiation limit (`instantiationDepth == 100` or `instantiationCount
+     >= 5_000_000`, `checker.go:22452`) reports
+     `Type_instantiation_is_excessively_deep_and_possibly_infinite` at the
+     current node and returns the error type; `Excessive_complexity_comparing_
+     types_0_and_1` is reported where `relater.go:381` and `:3108` report it.
+     The union-size limit (`Expression_produces_a_union_type_that_is_too_
+     complex_to_represent`, blocker B10) stays with C2.
+  3. *Panic retirement* (ADR 0012): only an actually caught panic retires the
+     generation; deep but valid checking never does.
+  A Rust limit never reports a diagnostic the pin does not, and never turns
+  valid deep checking into a failure.
 - Exit: the claimed rows match; the deep-recursion cases run on the E2 small
-  stacks in debug and release; a constructed unbounded constraint terminates
-  with the pin's diagnostic.
+  stacks in debug and release with the pin's results; a constructed unbounded
+  constraint ends exactly as the pin ends it.
 
 ### C1.6 Relations in all five modes and comparison diagnostics
 
@@ -294,10 +323,15 @@ authority; the counts are the current `status/unmapped-functions.json` state.
      relation in another mode is not answered from the first mode's cache;
   4. merges across the four schedules give distinct checker-local symbols and
      unchanged source graphs (delegates to `s08_ownership.py`'s program);
-  5. a growth guard hit inside a relation or resolution unwinds, retires the
+  5. a relation or resolution deep enough to grow the stack completes with
+     the ordinary result on the E2 small stacks, and the same checker answers
+     a later query;
+  6. each semantic limit of C1.5 produces the pin's exact result and
+     diagnostic, compared with a native observation of the same program;
+  7. an injected panic inside a relation or resolution unwinds, retires the
      generation as ADR 0012 requires, and a fresh checker on the same program
      succeeds;
-  6. the five relation modes over the 21 fixtures, first, repeated and
+  8. the five relation modes over the 21 fixtures, first, repeated and
      reversed, in debug and release.
 - Exit: `cargo test -p tsr_checker --test c1_contracts` in debug and release;
   the receipt is recorded by the producer (C1.10).
@@ -325,17 +359,34 @@ not, so C1 does:
 - Exists: `scripts/phase2_producers.py` emitting the C0 metrics and the
   parity ratios; `sprints/P2B.toml` with `P2B-C1` waiting on
   `run.checker.c1_complete`.
-- Build: the producer reads `data/phase2/c1-claims.json` and
-  `data/phase2/c1-audit.json` alongside the recorded capture and emits
-  `c1_open` (claimed rows not matching in every domain), `c1_failures`
-  (failed rows whose panic module or error site is a foundation module),
-  `c1_audit_complete`, `c1_contracts` (from a recorded receipt of C1.8, in the
-  Phase 1 `observe --witness` pattern) and `c1_complete`. A sample run cannot
-  feed these: they come only from a recorded full capture, as C0's run policy
-  says. `P2B-C1.done_when` stays `run.checker.c1_complete == true`.
-- Exit: `cargo xtask validate`; `phase2_producers.py checker` emits the five
-  metrics; a test in `scripts/tests/test_phase2_producers.py` shows that a
-  claimed row that differs keeps `c1_complete` false.
+- Build: the producer reads `data/phase2/c1-claims.json`,
+  `data/phase2/c1-audit.json`, `data/phase2/c1-baseline.json.gz` and the
+  contracts receipt alongside the recorded capture and emits `c1_open`
+  (claimed rows not matching in every domain), `c1_regressions` (rows with a
+  domain that matched in the baseline and does not match now, over the full
+  denominator; the baseline must name the same native observation and
+  inventory digests as the run), `c1_failures` (failed rows whose panic module
+  or error site is a foundation module), `c1_audit_complete`, `c1_contracts`
+  and `c1_complete`. `phase2_compare.py report` also gains a `regressions`
+  list next to `changed_observations`, which today records only rows that
+  stayed different with a changed digest; both are kept. The receipt comes
+  from `phase2_producers.py observe --witness c1-contracts`, in the Phase 1
+  pattern: it records the command, exit code, output digests and the source
+  inputs of the test crate, so an edit to a contract test after the recording
+  stales it. All four new authorities are added to `[checker]` `inputs` in
+  `status/runs.toml`, which lists files by name, so editing any of them
+  invalidates the recorded result; the producer keeps one capture identity:
+  the exit run writes `target/phase2/rust` (the C0 capture moves to
+  `target/phase2/rust-c0`), and the producer, the ledger command and the
+  recording all read that path. A sample run cannot feed these metrics: they
+  come only from a recorded full capture, as C0's run policy says.
+  `P2B-C1.done_when` stays `run.checker.c1_complete == true`.
+- Exit: `cargo xtask validate`; `phase2_producers.py checker` emits the six
+  metrics; tests in `scripts/tests/test_phase2_producers.py` show that a
+  claimed row that differs keeps `c1_complete` false, that an unclaimed
+  non-S08 row regressing from match to different makes `c1_regressions`
+  nonzero, and that changing each of the four new inputs invalidates the
+  recorded result.
 
 ## 5. Dependencies and owners
 
@@ -366,8 +417,9 @@ not, so C1 does:
 Intermediate runs use the recorded 300-variant sample plus the claimed rows
 (`--sample --case ...`, about 10 s of Rust time). Full runs are C1.0, the exit,
 and whenever a relation-cache or resolution-guard change is broad enough that a
-sampled regression cannot bound it. A previously matching row that changes its
-observation is inspected even when it still matches (`--previous`).
+sampled regression cannot bound it. Changes inside already-differing rows are
+inspected through `--previous`, and match-to-non-match transitions through the
+baseline; a row is never trusted because its category did not move.
 
 ## 7. Executable exit checks
 
@@ -375,19 +427,24 @@ observation is inspected even when it still matches (`--previous`).
 export PATH="$(mise where go)/bin:$PATH"
 python3 scripts/phase2_inventory.py check
 python3 scripts/phase2_native.py verify --capture target/phase2/native
-python3 scripts/phase2_corpus.py run --native target/phase2/native --output target/phase2/c1-exit
-python3 scripts/phase2_compare.py report --native target/phase2/native --rust target/phase2/c1-exit --previous data/phase2/first-comparison.json --record
-python3 scripts/phase2_blockers.py build --native target/phase2/native --rust target/phase2/c1-exit --record
+mv target/phase2/rust target/phase2/rust-c0                                  # once; the producer reads target/phase2/rust
+python3 scripts/phase2_corpus.py run --native target/phase2/native --output target/phase2/rust
+python3 scripts/phase2_compare.py report --native target/phase2/native --rust target/phase2/rust --previous target/phase2/rust-c0/comparison.json --record
+python3 scripts/phase2_blockers.py build --native target/phase2/native --rust target/phase2/rust --record
 python3 scripts/phase2_audit.py check --groups c1
-python3 scripts/phase2_producers.py checker            # c1_open 0, c1_failures 0, c1_audit_complete, c1_contracts, c1_complete
-python3 scripts/s08_relater.py parity --output target/s08/relater-c1   # 105/105, all_cases_match true, both implementations
 cargo test -p tsr_checker --test c1_contracts && cargo test -p tsr_checker --test c1_contracts --release
+python3 scripts/phase2_producers.py observe --witness c1-contracts           # the receipt, with source binding
+python3 scripts/phase2_producers.py checker            # c1_open 0, c1_regressions 0, c1_failures 0, c1_audit_complete, c1_contracts, c1_complete
+python3 scripts/s08_relater.py build  --output target/s08/relater-c1
+python3 scripts/s08_relater.py parity --output target/s08/relater-c1         # 105/105, all_cases_match true, both implementations
 python3 -m pytest scripts/tests/test_phase2_*.py -q
 python3 scripts/checks.py fmt && python3 scripts/checks.py clippy
-cargo xtask validate && cargo xtask check P2B
+cargo xtask validate && cargo xtask check P2B                                 # reports P2B-C1 done; the sprint stays open until C7
 ```
 
 `cargo xtask run checker` and `cargo xtask status --record` are the owner's.
+`check P2B` cannot pass before C7 by construction; the C1 assertion is the
+`P2B-C1` line of its report and the six metrics above.
 
 ## 8. Evidence reuse rules
 
@@ -395,6 +452,9 @@ cargo xtask validate && cargo xtask check P2B
   no oracle source. A Rust capture is reused only when `replay` accepts it
   against the captured executable; every production commit stales it, which is
   why intermediate work runs the sample.
+- The C1-start baseline is reused only while it names the current native
+  observation and inventory digests; a new native contract needs a new
+  baseline, taken before any production change.
 - Claims are per row and per cause. A row C1 fixes stays owned by its
   checkpoint in the inventory; the claims file is the only record of C1's
   share, and the producer counts from it.
