@@ -9171,6 +9171,1425 @@
           "name": "len4"
         }
       ]
+    },
+    {
+      "evidence": [
+        "internal/ls/completions.go:1164",
+        "internal/ls/completions.go:1628",
+        "internal/ls/completions.go:1711",
+        "internal/ls/completions.go:3396",
+        "internal/ls/completions.go:3398"
+      ],
+      "id": "core.CheckEachDefined",
+      "input": "values",
+      "operations": [
+        "tsc/internal/core/core.go:CheckEachDefined"
+      ],
+      "projection": "the returned slice of each list without nil elements (a nil element panics with the message, which no caller relies on)",
+      "rust": "tsr_core::slices_ext::check_each_defined",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "lists": [
+              [
+                1,
+                2,
+                3
+              ],
+              [
+                7
+              ],
+              []
+            ]
+          },
+          "name": "lists"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/project/configfileregistrybuilder.go:428",
+        "internal/project/configfileregistrybuilder.go:519",
+        "internal/project/configfileregistrybuilder.go:522",
+        "internal/project/configfileregistrybuilder.go:531"
+      ],
+      "id": "core.CopyMapInto",
+      "input": "values",
+      "operations": [
+        "tsc/internal/core/core.go:CopyMapInto"
+      ],
+      "projection": "[[key hex, value], ...] by key of each case's result, with a nil or given destination",
+      "rust": "tsr_core::slices_ext::copy_map_into",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "cases": [
+              {
+                "m2": {
+                  "a": 1,
+                  "b": 2
+                },
+                "nil": true
+              },
+              {
+                "dst": {
+                  "a": 5,
+                  "c": 3
+                },
+                "m2": {
+                  "a": 1,
+                  "b": 2
+                }
+              },
+              {
+                "dst": {},
+                "m2": {}
+              },
+              {
+                "dst": {
+                  "x": 1
+                },
+                "m2": {}
+              }
+            ]
+          },
+          "name": "maps"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/api/session.go:3845",
+        "internal/core/core.go:774",
+        "internal/execute/watchmanager/watchmanager.go:234",
+        "internal/ls/autoimport/registry.go:591",
+        "internal/ls/autoimport/registry.go:650",
+        "internal/project/session.go:1594"
+      ],
+      "id": "core.DiffMaps",
+      "input": "values",
+      "operations": [
+        "tsc/internal/core/core.go:DiffMaps",
+        "tsc/internal/core/core.go:DiffMapsFunc"
+      ],
+      "projection": "each case's callback events sorted by their canonical encoding (Go ranges over maps in random order); a case gives only the callbacks it names, never onChanged without onRemoved where a key was removed (a nil onRemoved panics)",
+      "rust": "tsr_core::slices_ext::diff_maps",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "cases": [
+              {
+                "added": true,
+                "changed": true,
+                "m1": {
+                  "a": 1,
+                  "b": 2,
+                  "c": 3
+                },
+                "m2": {
+                  "b": 2,
+                  "c": 13,
+                  "d": 5
+                },
+                "removed": true
+              },
+              {
+                "added": true,
+                "m1": {
+                  "a": 1
+                },
+                "m2": {
+                  "a": 1,
+                  "b": 2
+                }
+              },
+              {
+                "changed": true,
+                "m1": {
+                  "a": 1,
+                  "b": 2
+                },
+                "m2": {
+                  "a": 11,
+                  "b": 2
+                }
+              },
+              {
+                "m1": {
+                  "a": 1,
+                  "b": 2
+                },
+                "m2": {
+                  "b": 3
+                },
+                "removed": true
+              },
+              {
+                "m1": {
+                  "a": 1
+                },
+                "m2": {
+                  "b": 2
+                }
+              },
+              {
+                "added": true,
+                "changed": true,
+                "m1": null,
+                "m2": {
+                  "x": 1
+                },
+                "removed": true
+              }
+            ]
+          },
+          "name": "maps"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/core/core.go:774",
+        "internal/execute/watchmanager/watchmanager.go:234",
+        "internal/ls/autoimport/registry.go:591",
+        "internal/ls/autoimport/registry.go:650",
+        "internal/project/session.go:1594"
+      ],
+      "id": "core.DiffMapsFunc",
+      "input": "values",
+      "operations": [
+        "tsc/internal/core/core.go:DiffMapsFunc"
+      ],
+      "projection": "as core.DiffMaps with equality modulo 10",
+      "rust": "tsr_core::slices_ext::diff_maps_func",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "cases": [
+              {
+                "added": true,
+                "changed": true,
+                "m1": {
+                  "a": 1,
+                  "b": 2,
+                  "c": 3
+                },
+                "m2": {
+                  "b": 2,
+                  "c": 13,
+                  "d": 5
+                },
+                "removed": true
+              },
+              {
+                "added": true,
+                "m1": {
+                  "a": 1
+                },
+                "m2": {
+                  "a": 1,
+                  "b": 2
+                }
+              },
+              {
+                "changed": true,
+                "m1": {
+                  "a": 1,
+                  "b": 2
+                },
+                "m2": {
+                  "a": 11,
+                  "b": 2
+                }
+              },
+              {
+                "m1": {
+                  "a": 1,
+                  "b": 2
+                },
+                "m2": {
+                  "b": 3
+                },
+                "removed": true
+              },
+              {
+                "m1": {
+                  "a": 1
+                },
+                "m2": {
+                  "b": 2
+                }
+              },
+              {
+                "added": true,
+                "changed": true,
+                "m1": null,
+                "m2": {
+                  "x": 1
+                },
+                "removed": true
+              }
+            ]
+          },
+          "name": "maps"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:3071",
+        "internal/checker/checker.go:9955"
+      ],
+      "id": "core.ElementOrNil",
+      "input": "values",
+      "operations": [
+        "tsc/internal/core/core.go:ElementOrNil"
+      ],
+      "projection": "the element or zero of each case (nonnegative indices)",
+      "rust": "tsr_core::slices_ext::element_or_nil",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "cases": [
+              {
+                "index": 0,
+                "slice": [
+                  4,
+                  5,
+                  6
+                ]
+              },
+              {
+                "index": 2,
+                "slice": [
+                  4,
+                  5,
+                  6
+                ]
+              }
+            ]
+          },
+          "name": "in-range"
+        },
+        {
+          "input": {
+            "cases": [
+              {
+                "index": 3,
+                "slice": [
+                  4,
+                  5,
+                  6
+                ]
+              },
+              {
+                "index": 0,
+                "slice": []
+              },
+              {
+                "index": 7,
+                "slice": [
+                  9
+                ]
+              }
+            ]
+          },
+          "name": "past-end"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:18287",
+        "internal/checker/checker.go:22513",
+        "internal/fourslash/baselineutil.go:104"
+      ],
+      "id": "core.FindLastIndex",
+      "input": "values",
+      "operations": [
+        "tsc/internal/core/core.go:FindLastIndex"
+      ],
+      "projection": "the last index greater than the threshold, or -1, per case",
+      "rust": "tsr_core::slices_ext::find_last_index",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "cases": [
+              {
+                "slice": [
+                  1,
+                  5,
+                  2,
+                  7,
+                  3
+                ],
+                "threshold": 4
+              },
+              {
+                "slice": [
+                  1,
+                  2
+                ],
+                "threshold": 9
+              },
+              {
+                "slice": [],
+                "threshold": 0
+              },
+              {
+                "slice": [
+                  9,
+                  1
+                ],
+                "threshold": 0
+              }
+            ]
+          },
+          "name": "cases"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:21453",
+        "internal/checker/checker.go:22363",
+        "internal/checker/nodebuilderimpl.go:983",
+        "internal/checker/nodebuilderimpl.go:1257",
+        "internal/checker/symbolaccessibility.go:852"
+      ],
+      "id": "core.FirstNonNil",
+      "input": "values",
+      "operations": [
+        "tsc/internal/core/core.go:FirstNonNil"
+      ],
+      "projection": "the first nonzero value minus the offset, or zero, per case",
+      "rust": "tsr_core::slices_ext::first_non_nil",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "cases": [
+              {
+                "offset": 3,
+                "slice": [
+                  3,
+                  3,
+                  4,
+                  5
+                ]
+              },
+              {
+                "offset": 2,
+                "slice": [
+                  2,
+                  2
+                ]
+              },
+              {
+                "offset": 0,
+                "slice": []
+              },
+              {
+                "offset": 0,
+                "slice": [
+                  1
+                ]
+              }
+            ]
+          },
+          "name": "cases"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/ls/autoimport/extract.go:379",
+        "internal/ls/autoimport/view.go:203",
+        "internal/project/projectcollectionbuilder.go:340"
+      ],
+      "id": "core.FirstNonZero",
+      "input": "values",
+      "operations": [
+        "tsc/internal/core/core.go:FirstNonZero"
+      ],
+      "projection": "the first nonzero value, or zero, per list",
+      "rust": "tsr_core::slices_ext::first_non_zero",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "lists": [
+              [
+                0,
+                0,
+                3,
+                4
+              ],
+              [
+                0
+              ],
+              [],
+              [
+                5,
+                0
+              ],
+              [
+                -1
+              ]
+            ]
+          },
+          "name": "lists"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/execute/build/buildtask.go:295",
+        "internal/lsp/progress.go:174",
+        "internal/lsp/progress.go:187"
+      ],
+      "id": "core.FirstOrNilSeq",
+      "input": "values",
+      "operations": [
+        "tsc/internal/core/core.go:FirstOrNilSeq"
+      ],
+      "projection": "the first value, or zero, of each (possibly nil) sequence",
+      "rust": "tsr_core::slices_ext::first_or_nil_seq",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "cases": [
+              {
+                "seq": [
+                  7,
+                  8
+                ]
+              },
+              {
+                "seq": []
+              },
+              {
+                "nil": true
+              },
+              {
+                "seq": [
+                  0,
+                  9
+                ]
+              }
+            ]
+          },
+          "name": "cases"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:27604"
+      ],
+      "id": "core.GetSpellingSuggestionWithMaxCandidateCount",
+      "input": "values",
+      "operations": [
+        "tsc/internal/core/core.go:GetSpellingSuggestionWithMaxCandidateCount"
+      ],
+      "projection": "hex of the suggestion (empty for none) per case, candidates compared with strings.Compare",
+      "rust": "tsr_scanner::get_spelling_suggestion",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "cases": [
+              {
+                "candidates": [
+                  "length",
+                  "width",
+                  "height"
+                ],
+                "max": 0,
+                "name": "lenght"
+              },
+              {
+                "candidates": [
+                  "bar",
+                  "baz"
+                ],
+                "max": 0,
+                "name": "foo"
+              },
+              {
+                "candidates": [
+                  "color",
+                  "colors",
+                  "cooler"
+                ],
+                "max": 2,
+                "name": "colour"
+              },
+              {
+                "candidates": [
+                  "color",
+                  "colors",
+                  "cooler"
+                ],
+                "max": 1,
+                "name": "colour"
+              },
+              {
+                "candidates": [
+                  "abc",
+                  "abd"
+                ],
+                "max": 0,
+                "name": "ab"
+              }
+            ]
+          },
+          "name": "cases"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/modulespecifiers/specifiers.go:804",
+        "internal/modulespecifiers/util.go:295"
+      ],
+      "id": "core.IndexAfter",
+      "input": "values",
+      "operations": [
+        "tsc/internal/core/core.go:IndexAfter"
+      ],
+      "projection": "the match index at or after start, or -1, per case (start within the string)",
+      "rust": "tsr_core::slices_ext::index_after",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "cases": [
+              {
+                "pattern": "bc",
+                "s": "abcabc",
+                "start": 0
+              },
+              {
+                "pattern": "bc",
+                "s": "abcabc",
+                "start": 2
+              },
+              {
+                "pattern": "zz",
+                "s": "abcabc",
+                "start": 1
+              },
+              {
+                "pattern": "",
+                "s": "abc",
+                "start": 3
+              },
+              {
+                "pattern": "a",
+                "s": "aaa",
+                "start": 1
+              }
+            ]
+          },
+          "name": "cases"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:6594",
+        "internal/checker/checker.go:9759",
+        "internal/checker/checker.go:9767",
+        "internal/checker/checker.go:9779",
+        "internal/checker/checker.go:9781"
+      ],
+      "id": "core.MapNonNil",
+      "input": "values",
+      "operations": [
+        "tsc/internal/core/core.go:MapNonNil"
+      ],
+      "projection": "the nonzero values minus the offset, per case",
+      "rust": "tsr_core::slices_ext::map_non_nil",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "cases": [
+              {
+                "offset": 2,
+                "slice": [
+                  1,
+                  2,
+                  3,
+                  2
+                ]
+              },
+              {
+                "offset": 0,
+                "slice": []
+              },
+              {
+                "offset": 5,
+                "slice": [
+                  5
+                ]
+              }
+            ]
+          },
+          "name": "cases"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/ls/autoimport/view.go:250"
+      ],
+      "id": "core.MinAllFunc",
+      "input": "values",
+      "operations": [
+        "tsc/internal/core/core.go:MinAllFunc"
+      ],
+      "projection": "the minimal values modulo 10 in order, per list",
+      "rust": "tsr_core::slices_ext::min_all_func",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "lists": [
+              [
+                13,
+                21,
+                3,
+                31,
+                43
+              ],
+              [
+                5
+              ],
+              [],
+              [
+                10,
+                20,
+                1
+              ]
+            ]
+          },
+          "name": "lists"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/ls/completions.go:5819"
+      ],
+      "id": "core.Or",
+      "input": "values",
+      "operations": [
+        "tsc/internal/core/core.go:Or"
+      ],
+      "projection": "the combined predicate on each input, per case of named predicates",
+      "rust": "tsr_core::slices_ext::Or::call",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "cases": [
+              {
+                "inputs": [
+                  2,
+                  3,
+                  -3,
+                  -4
+                ],
+                "predicates": [
+                  "even",
+                  "negative"
+                ]
+              },
+              {
+                "inputs": [
+                  1
+                ],
+                "predicates": []
+              },
+              {
+                "inputs": [
+                  100,
+                  101
+                ],
+                "predicates": [
+                  "big"
+                ]
+              }
+            ]
+          },
+          "name": "cases"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:23662",
+        "internal/checker/checker.go:29504"
+      ],
+      "id": "core.ReplaceElement",
+      "input": "values",
+      "operations": [
+        "tsc/internal/core/core.go:ReplaceElement"
+      ],
+      "projection": "the copy with the element replaced, per case (in-range indices)",
+      "rust": "tsr_core::slices_ext::replace_element",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "cases": [
+              {
+                "i": 0,
+                "slice": [
+                  1,
+                  2,
+                  3
+                ],
+                "t": 9
+              },
+              {
+                "i": 2,
+                "slice": [
+                  1,
+                  2,
+                  3
+                ],
+                "t": -1
+              },
+              {
+                "i": 0,
+                "slice": [
+                  4
+                ],
+                "t": 4
+              }
+            ]
+          },
+          "name": "cases"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/checker/nodebuilderimpl.go:3081"
+      ],
+      "id": "core.SameMapIndex",
+      "input": "values",
+      "operations": [
+        "tsc/internal/core/core.go:SameMapIndex"
+      ],
+      "projection": "[result, whether it is the input slice itself] per case, f adding the index to multiples of the divisor",
+      "rust": "tsr_core::slices_ext::same_map_index",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "cases": [
+              {
+                "divisor": 2,
+                "slice": [
+                  1,
+                  2,
+                  3,
+                  4
+                ]
+              },
+              {
+                "divisor": 2,
+                "slice": [
+                  1,
+                  3,
+                  5
+                ]
+              },
+              {
+                "divisor": 1,
+                "slice": []
+              },
+              {
+                "divisor": 7,
+                "slice": [
+                  0,
+                  7
+                ]
+              }
+            ]
+          },
+          "name": "cases"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:15504",
+        "internal/transformers/moduletransforms/utilities.go:23"
+      ],
+      "id": "core.ShouldRewriteModuleSpecifier",
+      "input": "values",
+      "operations": [
+        "tsc/internal/core/core.go:ShouldRewriteModuleSpecifier"
+      ],
+      "projection": "the result per specifier under rewriteRelativeImportExtensions of the case",
+      "rust": "tsr_tspath::should_rewrite_module_specifier",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "cases": [
+              {
+                "rewrite": 2,
+                "specifier": "./a.ts"
+              },
+              {
+                "rewrite": 1,
+                "specifier": "./a.ts"
+              },
+              {
+                "rewrite": 2,
+                "specifier": "./a.d.ts"
+              },
+              {
+                "rewrite": 2,
+                "specifier": "a.ts"
+              },
+              {
+                "rewrite": 2,
+                "specifier": "../b.tsx"
+              },
+              {
+                "rewrite": 2,
+                "specifier": "./c.js"
+              },
+              {
+                "rewrite": 2,
+                "specifier": "."
+              },
+              {
+                "rewrite": 2,
+                "specifier": ".\\d.mts"
+              }
+            ]
+          },
+          "name": "cases"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/ls/autoimport/registry.go:106",
+        "internal/ls/autoimport/registry.go:396"
+      ],
+      "id": "core.UnorderedEqual",
+      "input": "values",
+      "operations": [
+        "tsc/internal/core/core.go:UnorderedEqual"
+      ],
+      "projection": "the result per pair",
+      "rust": "tsr_core::slices_ext::unordered_equal",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "pairs": [
+              [
+                [
+                  1,
+                  2,
+                  2
+                ],
+                [
+                  2,
+                  1,
+                  2
+                ]
+              ],
+              [
+                [
+                  1,
+                  2
+                ],
+                [
+                  1,
+                  1
+                ]
+              ],
+              [
+                [],
+                []
+              ],
+              [
+                [
+                  1
+                ],
+                [
+                  1,
+                  2
+                ]
+              ],
+              [
+                [
+                  3,
+                  3
+                ],
+                [
+                  3,
+                  4
+                ]
+              ]
+            ]
+          },
+          "name": "pairs"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/ast/utilities.go:900",
+        "internal/binder/binder.go:112",
+        "internal/checker/checker.go:1201",
+        "internal/checker/checker.go:1216",
+        "internal/checker/checker.go:1354",
+        "internal/api/session.go:1130"
+      ],
+      "id": "core.LinkStore",
+      "input": "values",
+      "operations": [
+        "tsc/internal/core/linkstore.go:LinkStore.Get",
+        "tsc/internal/core/linkstore.go:LinkStore.Has",
+        "tsc/internal/core/linkstore.go:LinkStore.TryGet"
+      ],
+      "projection": "each operation's result on one store: get the value before setting it, has, try_get the value or null",
+      "rust": "tsr_core::linkstore::LinkStore",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "ops": [
+              {
+                "key": "a",
+                "op": "has"
+              },
+              {
+                "key": "a",
+                "op": "try_get"
+              },
+              {
+                "key": "a",
+                "op": "get",
+                "value": 5
+              },
+              {
+                "key": "a",
+                "op": "has"
+              },
+              {
+                "key": "a",
+                "op": "try_get"
+              },
+              {
+                "key": "a",
+                "op": "get",
+                "value": 7
+              },
+              {
+                "key": "b",
+                "op": "get",
+                "value": 1
+              },
+              {
+                "key": "a",
+                "op": "try_get"
+              },
+              {
+                "key": "c",
+                "op": "has"
+              }
+            ]
+          },
+          "name": "ops"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/ast/utilities.go:900",
+        "internal/binder/binder.go:112",
+        "internal/checker/checker.go:1201",
+        "internal/checker/checker.go:1216",
+        "internal/checker/checker.go:1354",
+        "internal/api/session.go:1130"
+      ],
+      "id": "core.PagedLinkStore",
+      "input": "values",
+      "operations": [
+        "tsc/internal/core/linkstore.go:PagedLinkStore.Get",
+        "tsc/internal/core/linkstore.go:PagedLinkStore.Has",
+        "tsc/internal/core/linkstore.go:PagedLinkStore.TryGet"
+      ],
+      "projection": "as core.LinkStore, over keys in the page list and the page map",
+      "rust": "tsr_core::linkstore::PagedLinkStore",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "ops": [
+              {
+                "key": 0,
+                "op": "has"
+              },
+              {
+                "key": 0,
+                "op": "get",
+                "value": 3
+              },
+              {
+                "key": 0,
+                "op": "has"
+              },
+              {
+                "key": 255,
+                "op": "has"
+              },
+              {
+                "key": 255,
+                "op": "try_get"
+              },
+              {
+                "key": 256,
+                "op": "get",
+                "value": 4
+              },
+              {
+                "key": 256,
+                "op": "try_get"
+              },
+              {
+                "key": 70000,
+                "op": "get",
+                "value": 5
+              },
+              {
+                "key": 70001,
+                "op": "has"
+              },
+              {
+                "key": 16777216,
+                "op": "get",
+                "value": 6
+              },
+              {
+                "key": 16777216,
+                "op": "try_get"
+              },
+              {
+                "key": 16777471,
+                "op": "has"
+              },
+              {
+                "key": 1099511627776,
+                "op": "try_get"
+              },
+              {
+                "key": 0,
+                "op": "get",
+                "value": 9
+              },
+              {
+                "key": 0,
+                "op": "try_get"
+              }
+            ]
+          },
+          "name": "ops"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/project/ata/discovertypings.go:73"
+      ],
+      "id": "core.NonRelativeModuleNameForTypingCache",
+      "input": "values",
+      "operations": [
+        "tsc/internal/core/nodemodules.go:NonRelativeModuleNameForTypingCache"
+      ],
+      "projection": "hex of the result per name",
+      "rust": "tsr_core::node_modules::non_relative_module_name_for_typing_cache",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "names": [
+              "fs",
+              "node:fs",
+              "node:test",
+              "test",
+              "lodash",
+              "path/posix",
+              "node:sqlite",
+              "sqlite"
+            ]
+          },
+          "name": "names"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/api/encoder/stringtable.go:48",
+        "internal/api/encoder/stringtable.go:63",
+        "internal/api/encoder/stringtable.go:67",
+        "internal/api/proto.go:1611",
+        "internal/api/proto.go:1612",
+        "internal/printer/emitcontext.go:167"
+      ],
+      "id": "core.Stack",
+      "input": "values",
+      "operations": [
+        "tsc/internal/core/stack.go:Stack.Len",
+        "tsc/internal/core/stack.go:Stack.Peek",
+        "tsc/internal/core/stack.go:Stack.Pop",
+        "tsc/internal/core/stack.go:Stack.Push"
+      ],
+      "projection": "each operation's result on one stack (pop and peek only when it is nonempty)",
+      "rust": "tsr_core::stack::Stack",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "ops": [
+              {
+                "op": "len"
+              },
+              {
+                "op": "push",
+                "value": 1
+              },
+              {
+                "op": "push",
+                "value": 2
+              },
+              {
+                "op": "peek"
+              },
+              {
+                "op": "len"
+              },
+              {
+                "op": "pop"
+              },
+              {
+                "op": "peek"
+              },
+              {
+                "op": "push",
+                "value": 3
+              },
+              {
+                "op": "pop"
+              },
+              {
+                "op": "pop"
+              },
+              {
+                "op": "len"
+              }
+            ]
+          },
+          "name": "ops"
+        },
+        {
+          "input": {
+            "ops": [
+              {
+                "op": "push",
+                "value": 1
+              },
+              {
+                "op": "len"
+              },
+              {
+                "op": "push",
+                "value": 2
+              },
+              {
+                "op": "len"
+              }
+            ]
+          },
+          "name": "push-len"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/api/session.go:3090",
+        "internal/execute/tsc.go:82",
+        "internal/ls/change/trackerimpl.go:224",
+        "internal/ls/completions.go:6793",
+        "internal/ls/completions.go:6829",
+        "internal/fourslash/fourslash.go:117"
+      ],
+      "id": "core.ApplyBulkEdits",
+      "input": "values",
+      "operations": [
+        "tsc/internal/core/textchange.go:ApplyBulkEdits",
+        "tsc/internal/core/textchange.go:TextChange.ApplyTo"
+      ],
+      "projection": "[ApplyBulkEdits hex, [ApplyTo hex per edit]] per case of sorted, nonoverlapping edits",
+      "rust": "tsr_core::apply_bulk_edits",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "cases": [
+              {
+                "edits": [
+                  {
+                    "end": 5,
+                    "pos": 0,
+                    "text": "HELLO"
+                  },
+                  {
+                    "end": 11,
+                    "pos": 6,
+                    "text": "there"
+                  }
+                ],
+                "text": "hello world"
+              },
+              {
+                "edits": [],
+                "text": "abc"
+              },
+              {
+                "edits": [
+                  {
+                    "end": 1,
+                    "pos": 1,
+                    "text": "X"
+                  }
+                ],
+                "text": "abc"
+              },
+              {
+                "edits": [
+                  {
+                    "end": 2,
+                    "pos": 0,
+                    "text": ""
+                  },
+                  {
+                    "end": 4,
+                    "pos": 2,
+                    "text": "Z"
+                  }
+                ],
+                "text": "abcdef"
+              }
+            ]
+          },
+          "name": "cases"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/execute/incremental/programtosnapshot.go:111",
+        "internal/ls/autoimport/registry.go:849",
+        "internal/ls/autoimport/registry.go:1024",
+        "internal/project/ata/ata.go:28",
+        "internal/project/ata/ata.go:30"
+      ],
+      "id": "core.TypeAcquisition.Equals",
+      "input": "values",
+      "operations": [
+        "tsc/internal/core/typeacquisition.go:TypeAcquisition.Equals"
+      ],
+      "projection": "[a equals b, a equals itself, a equals nil, nil equals nil] per pair",
+      "rust": "tsr_tsoptions::TypeAcquisition::equals",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "pairs": [
+              [
+                {
+                  "disable": 0,
+                  "enable": 2,
+                  "exclude": [],
+                  "include": [
+                    "a"
+                  ]
+                },
+                {
+                  "disable": 0,
+                  "enable": 2,
+                  "exclude": null,
+                  "include": [
+                    "a"
+                  ]
+                }
+              ],
+              [
+                {
+                  "disable": 0,
+                  "enable": 1
+                },
+                {
+                  "disable": 0,
+                  "enable": 2
+                }
+              ],
+              [
+                {
+                  "disable": 2,
+                  "enable": 0,
+                  "include": [
+                    "a",
+                    "b"
+                  ]
+                },
+                {
+                  "disable": 2,
+                  "enable": 0,
+                  "include": [
+                    "b",
+                    "a"
+                  ]
+                }
+              ],
+              [
+                {
+                  "disable": 1,
+                  "enable": 0,
+                  "nil_include": true
+                },
+                {
+                  "disable": 1,
+                  "enable": 0,
+                  "include": []
+                }
+              ]
+            ]
+          },
+          "name": "pairs"
+        }
+      ]
     }
   ],
   "group": "core",

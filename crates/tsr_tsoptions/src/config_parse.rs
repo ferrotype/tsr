@@ -21,6 +21,26 @@ pub struct TypeAcquisition {
     pub disable_filename_based_type_acquisition: Tristate,
 }
 impl TypeAcquisition {
+    /// Go compares pointers first: two nil options are equal, one nil one is
+    /// not.
+    /// port: tsc/internal/core/typeacquisition.go:TypeAcquisition.Equals
+    pub fn equals(this: Option<&Self>, other: Option<&Self>) -> bool {
+        match (this, other) {
+            (Some(this), Some(other)) if std::ptr::eq(this, other) => true,
+            (None, None) => true,
+            (None, _) | (_, None) => false,
+            (Some(this), Some(other)) => {
+                // slices.Equal: a nil list equals an empty one.
+                let list = |list: &Option<Vec<JsString>>| list.as_deref().unwrap_or(&[]).to_vec();
+                this.enable == other.enable
+                    && list(&this.include) == list(&other.include)
+                    && list(&this.exclude) == list(&other.exclude)
+                    && this.disable_filename_based_type_acquisition
+                        == other.disable_filename_based_type_acquisition
+            }
+        }
+    }
+
     /// port: tsc/internal/tsoptions/parsinghelpers.go:ParseTypeAcquisition
     pub fn parse_option(&mut self, key: &[u8], value: &ConfigValue) {
         if value.is_null() {

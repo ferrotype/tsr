@@ -225,6 +225,7 @@ pub mod semaphore;
 pub mod bfs;
 pub mod context;
 pub mod linkstore;
+pub mod node_modules;
 pub mod slices_ext;
 pub mod stack;
 pub mod text_change_ext;

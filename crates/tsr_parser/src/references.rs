@@ -608,71 +608,10 @@ fn is_external_module_name_relative(name: &[u8]) -> bool {
         || tsr_core::path::encoded_root_length(name) > 0
 }
 
-// Exact membership of core/nodemodules.go:UnprefixedNodeCoreModules at the source pin.
 fn unprefixed_node_core_module(name: &[u8]) -> bool {
-    matches!(
-        name,
-        b"assert"
-            | b"assert/strict"
-            | b"async_hooks"
-            | b"buffer"
-            | b"child_process"
-            | b"cluster"
-            | b"console"
-            | b"constants"
-            | b"crypto"
-            | b"dgram"
-            | b"diagnostics_channel"
-            | b"dns"
-            | b"dns/promises"
-            | b"domain"
-            | b"events"
-            | b"fs"
-            | b"fs/promises"
-            | b"http"
-            | b"http2"
-            | b"https"
-            | b"inspector"
-            | b"inspector/promises"
-            | b"module"
-            | b"net"
-            | b"os"
-            | b"path"
-            | b"path/posix"
-            | b"path/win32"
-            | b"perf_hooks"
-            | b"process"
-            | b"punycode"
-            | b"querystring"
-            | b"readline"
-            | b"readline/promises"
-            | b"repl"
-            | b"stream"
-            | b"stream/consumers"
-            | b"stream/promises"
-            | b"stream/web"
-            | b"string_decoder"
-            | b"sys"
-            | b"timers"
-            | b"timers/promises"
-            | b"tls"
-            | b"trace_events"
-            | b"tty"
-            | b"url"
-            | b"util"
-            | b"util/types"
-            | b"v8"
-            | b"vm"
-            | b"wasi"
-            | b"worker_threads"
-            | b"zlib"
-    )
+    tsr_core::node_modules::unprefixed_node_core_module(name)
 }
 
-// Exact membership of core/nodemodules.go:ExclusivelyPrefixedNodeCoreModules at the source pin.
 fn exclusively_prefixed_node_core_module(name: &[u8]) -> bool {
-    matches!(
-        name,
-        b"node:quic" | b"node:sea" | b"node:sqlite" | b"node:test" | b"node:test/reporters"
-    )
+    tsr_core::node_modules::exclusively_prefixed_node_core_module(name)
 }

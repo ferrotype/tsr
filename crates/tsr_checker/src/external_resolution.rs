@@ -556,7 +556,7 @@ impl CheckerState {
             && !self.is_literal_import_type_node(location)?
             && !self.is_part_of_type_only_import_or_export_declaration(location)?
         {
-            // port: tsc/internal/core/core.go:ShouldRewriteModuleSpecifier
+            // Inline copy of `ShouldRewriteModuleSpecifier`; its Phase 1 home is in tsr_ast (table group core).
             let should_rewrite =
                 specifier_is_relative(name.as_bytes()) && has_ts_file_extension(name.as_bytes());
             let host = self.program()?.host.clone();
