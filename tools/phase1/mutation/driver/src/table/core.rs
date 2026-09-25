@@ -286,22 +286,21 @@ fn diff_events(case: &MapCase, func: bool) -> Result<Value, String> {
     let mut on_added = |key: &String, value: &i64| {
         events
             .borrow_mut()
-            .push(json!(["added", hex(key.as_bytes()), value]))
+            .push(json!(["added", hex(key.as_bytes()), value]));
     };
     let mut on_removed = |key: &String, value: &i64| {
         events
             .borrow_mut()
-            .push(json!(["removed", hex(key.as_bytes()), value]))
+            .push(json!(["removed", hex(key.as_bytes()), value]));
     };
     let mut on_changed = |key: &String, v1: &i64, v2: &i64| {
         events
             .borrow_mut()
             .push(json!(["changed", hex(key.as_bytes()), v1, v2]));
     };
-    let added: Option<&mut dyn FnMut(&String, &i64)> = case.added.then_some(&mut on_added as _);
-    let removed: Option<&mut dyn FnMut(&String, &i64)> =
-        case.removed.then_some(&mut on_removed as _);
-    let changed: Option<&mut dyn FnMut(&String, &i64, &i64)> =
+    let added: slices::OnEntry<'_, String, i64> = case.added.then_some(&mut on_added as _);
+    let removed: slices::OnEntry<'_, String, i64> = case.removed.then_some(&mut on_removed as _);
+    let changed: slices::OnChanged<'_, String, i64, i64> =
         case.changed.then_some(&mut on_changed as _);
     if func {
         slices::diff_maps_func(m1, m2, |v1, v2| v1 % 10 == v2 % 10, added, removed, changed);

@@ -66,10 +66,13 @@ impl<K: Eq + Hash> VisitedSet<K> {
     }
 }
 
+/// Go's `PreprocessLevel` callback.
+pub type PreprocessLevel<'a, K, N> = &'a dyn Fn(&mut BreadthFirstSearchLevel<'_, K, N>);
+
 /// Go's `BreadthFirstSearchOptions`.
 pub struct BreadthFirstSearchOptions<'a, K, N> {
     pub visited: Option<Arc<VisitedSet<K>>>,
-    pub preprocess_level: Option<&'a dyn Fn(&mut BreadthFirstSearchLevel<'_, K, N>)>,
+    pub preprocess_level: Option<PreprocessLevel<'a, K, N>>,
 }
 
 impl<K, N> Default for BreadthFirstSearchOptions<'_, K, N> {
@@ -111,16 +114,17 @@ pub fn breadth_first_search_parallel<N: Clone + Eq + Hash + Send + Sync>(
         start,
         neighbors,
         visit,
-        BreadthFirstSearchOptions::default(),
+        &BreadthFirstSearchOptions::default(),
         &|node: &N| node.clone(),
     )
 }
 
-fn create_path<N: Clone>(mut job: Option<Arc<Job<N>>>) -> Vec<N> {
+fn create_path<N: Clone>(job: Option<&Job<N>>) -> Vec<N> {
     let mut path = Vec::new();
+    let mut job = job;
     while let Some(current) = job {
         path.push(current.node.clone());
-        job = current.parent.clone();
+        job = current.parent.as_deref();
     }
     path
 }
@@ -142,7 +146,7 @@ pub fn breadth_first_search_parallel_ex<
     start: N,
     neighbors: &(dyn Fn(&N) -> Vec<N> + Sync),
     visit: &(dyn Fn(&N) -> (bool, bool) + Sync),
-    options: BreadthFirstSearchOptions<'_, K, N>,
+    options: &BreadthFirstSearchOptions<'_, K, N>,
     get_key: &(dyn Fn(&N) -> K + Sync),
 ) -> (bool, Vec<N>) {
     let visited = options.visited.clone().unwrap_or_default();
@@ -262,12 +266,12 @@ pub fn breadth_first_search_parallel_ex<
         let result = process_level(&mut level, &fallback);
         // port: tsc/internal/core/bfs.go:BreadthFirstSearchParallelEx
         if result.stop {
-            return (true, create_path(result.job));
+            return (true, create_path(result.job.as_deref()));
         }
         if result.job.is_some() && fallback.is_none() {
             fallback = result.job;
         }
         level = result.next;
     }
-    (false, create_path(fallback))
+    (false, create_path(fallback.as_deref()))
 }

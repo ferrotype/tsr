@@ -24,9 +24,7 @@ impl<T> Stack<T> {
     /// port: tsc/internal/core/stack.go:Stack.Peek
     fn peek_index(&self) -> usize {
         let l = self.data.len();
-        if l == 0 {
-            panic!("stack is empty");
-        }
+        assert!(l != 0, "stack is empty");
         l - 1
     }
 
@@ -40,9 +38,7 @@ impl<T> Stack<T> {
     /// port: tsc/internal/core/stack.go:Stack.Pop
     fn pop_index(&self) -> usize {
         let l = self.data.len();
-        if l == 0 {
-            panic!("stack is empty");
-        }
+        assert!(l != 0, "stack is empty");
         l - 1
     }
 

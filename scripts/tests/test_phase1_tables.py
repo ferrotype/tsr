@@ -178,7 +178,8 @@ class SelectionTests(unittest.TestCase):
         self.assertEqual(set(document["specs"]), {"data/phase1/tables/positions.json", "data/phase1/tables/core.json"})
         self.assertEqual(document["selection"]["groups"]["positions"]["columns"]["ast.IsDeclarationName"],
                          {"classes": 2, "survey_rows": 1, "synthetic_rows": 0})
-        self.assertEqual(document["selection"]["groups"]["positions"]["survey_sha256"], "digest-ast.IsDeclarationName")
+        surveyed = [column["id"] for column in specs["positions"]["columns"] if column["survey"]]
+        self.assertEqual(document["selection"]["groups"]["positions"]["survey_sha256"], "digest-" + ",".join(surveyed))
         self.assertEqual(document["selection"]["groups"]["core"]["survey_sha256"], None)
         self.assertEqual(self.select(s06), document, "selection is deterministic")
         self.assertEqual(tables.inventory_bytes(document), tables.inventory_bytes(self.select(s06)))

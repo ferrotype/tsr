@@ -84,11 +84,11 @@ impl Graph {
         self.edges.get(node).cloned().unwrap_or_default()
     }
 
-    fn key(&self, node: &String) -> String {
+    fn key(&self, node: &str) -> String {
         if self.key_len > 0 && node.len() > self.key_len {
             node[..self.key_len].to_owned()
         } else {
-            node.clone()
+            node.to_owned()
         }
     }
 }
@@ -226,7 +226,7 @@ pub fn build(column: &str, input: &Value) -> Option<Result<Column, String>> {
                     graph.start.clone(),
                     &|node| graph.neighbors(node),
                     &|node| graph.visit(node),
-                    options,
+                    &options,
                     &|node| graph.key(node),
                 );
                 let mut value = bfs_value(result);

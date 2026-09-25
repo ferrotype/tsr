@@ -496,19 +496,19 @@ class ScopeDriftTests(unittest.TestCase):
             print(f"scope.json drift (informational): {drift}", file=sys.stderr)
 
     def test_a_bare_name_outside_the_phase1_homes_is_not_evidence(self):
-        operation = "tsc/internal/ast/ast.go:GetDeclarationFromName"
+        operation = "tsc/internal/ast/utilities.go:IsVoidZero"
         self.assertEqual(self.rows(self.built)[operation]["disposition"], "missing")
         self.assertNotIn("tsr_format", scope.phase1_home_crates())
-        changed = self.build_with_appended("crates/tsr_format/src/lib.rs", "\nfn get_declaration_from_name() {}\n")
+        changed = self.build_with_appended("crates/tsr_format/src/lib.rs", "\nfn is_void_zero() {}\n")
         self.assertEqual(self.rows(changed)[operation]["disposition"], "missing")
         self.assertIn("only outside the Phase 1 home crates", self.rows(changed)[operation]["basis"])
         self.assertEqual({key: row["disposition"] for key, row in self.rows(changed).items()},
                          {key: row["disposition"] for key, row in self.rows(self.built).items()})
 
     def test_a_bare_name_in_a_phase1_home_and_a_port_marker_still_count(self):
-        operation = "tsc/internal/ast/ast.go:GetDeclarationFromName"
+        operation = "tsc/internal/ast/utilities.go:IsVoidZero"
         self.assertIn("tsr_ast", scope.phase1_home_crates())
-        named = self.build_with_appended("crates/tsr_ast/src/utilities.rs", "\nfn get_declaration_from_name() {}\n")
+        named = self.build_with_appended("crates/tsr_ast/src/utilities.rs", "\nfn is_void_zero() {}\n")
         self.assertEqual(self.rows(named)[operation]["disposition"], "implemented_untested")
         marked = self.build_with_appended("crates/tsr_ast/src/utilities.rs",
                                           f"\n/// port: {operation}\npub fn declaration_of_name_probe() {{}}\n")
@@ -861,9 +861,11 @@ class CoverageLinkTests(unittest.TestCase):
         # A mapped operation whose file carries producer metrics but which has
         # no case link is untested, not covered. (An *unmapped* operation in
         # such a file stays `missing`; the metrics say nothing about it either.)
+        # A reviewed equivalent_rust entry is the roster's answer, not a metric's.
         rows = [
             r for r in self.scope["operations"]
             if r.get("ledger_verification") and not r["cases"] and r["mapped_in_ledger"]
+            and r["disposition"] != "equivalent_rust"
         ]
         for row in rows:
             self.assertEqual(row["disposition"], "implemented_untested", row["id"])
@@ -2008,7 +2010,8 @@ class RosterLedgerTests(unittest.TestCase):
         # reason (never on that roster) rather than for the contradiction.
         leaf = {row["id"] for row in self.scope["operations"]
                 if row["go_package"] in scope.LEAF_PACKAGES}
-        covered = next(o for o in scope.cases_by_operation() if o in leaf)
+        covered = next(o for o, ids in scope.cases_by_operation().items()
+                       if o in leaf and any(case.startswith("leaves/") for case in ids))
         problems = self.forge([{
             "operation": covered, "category": "equivalent_rust",
             "owner": "Iterator::filter", "evidence": "upstream/... :1",

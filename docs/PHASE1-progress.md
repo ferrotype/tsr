@@ -3023,3 +3023,40 @@ field and all 68 trace entries. Three native module-trace regressions also cover
 actual entry-versus-index selection, cold/warm caches and directory imports
 without `typesVersions`. The original full 10,727/10,728 result is historical;
 this bounded fix does not re-label it as a fresh full pass.
+
+## Phase 1 closure (2026-09-25)
+
+Pending operations fell from 566 at the start of phase B to **20**
+(`python3 scripts/phase1_coverage.py report`; no coverage problems). How:
+
+- **Ports and the table oracle.** 250 operations, most with callers only in
+  later phases, were ported where Rust lacked them and tabulated in 11 table
+  groups (198 columns, 8,490 rows, every column at native parity); see
+  [PHASE1-mutation-witnesses.md](PHASE1-mutation-witnesses.md) section 9.
+- **One consolidated mutation campaign** over five oracles (e1, binder, facts,
+  syntax, table): 1,094 of 1,112 planned operations killed, and `confirm` replays
+  all 9,860 recorded kill pairs against the final sources. The splicer gained a
+  `skip_statement` operator for unit statements, and markers on unmutable sites
+  moved to the statements that do the operation's work.
+- **Case claims.** The generated-AST cases now claim the shared runtime they
+  enter (the factory, counters, positions, child-visit helpers, `cloneNode`,
+  `updateNode` on each changed update, the visitor roles); the bind, line-map
+  and JSDoc-cache cases claim their `SourceFile` accessors; three new
+  parse-output cases witness `@import` reparsing, backtick-quoted `@param`
+  names and multi-line pragma line ends. All five families were recaptured
+  and recorded; natives were refrozen.
+- **equivalent_rust**, per the owner's 2026-09-25 decision, for 23
+  accessor-style operations (payload assertions, default arms, a struct-literal
+  constructor, a `Vec` push), each citing its caller-level witness.
+
+What remains (20):
+
+| Operations | Why | What would close it |
+| --- | --- | --- |
+| `NodeFactory.NewSyntheticExpression`, `UpdateSyntheticExpression`, `SyntheticExpression.Clone`, `.VisitEachChild` | deferred by design: the payload's `Type` belongs to the checker | an owner decision: an opaque type slot now, or a reviewed checker destination |
+| `SourceFile.ForEachChild`, `SourceFile.VisitEachChild`, `NodeVisitor.VisitSourceFile`, `visitToken`, `visitTopLevelStatements`, `liftToBlock`, `ModifierList.Clone` | no Phase 1 oracle walks or visits a whole `SourceFile` or clones a modifier list | generated-special SourceFile visit and clone actions |
+| `GetPragmaArgument`, `GetPragmaFromSourceFile`, `GetEmitModuleFormatOfFileWorker` | reached, but no oracle output observes their result (mutants survive) | a table column (the last two live in `tsr_compiler`) |
+| `Binder.bindSourceFileAsExternalModule`, `fileLoader.resolveTripleslashPathReference` | their only mutants crash downstream, and a crash is never a kill | a value-changing mutation site |
+| `fileLoader.resolveLibrary` | no sound operator for its return type; the `libReplacement` path is not exercised | a case with `libReplacement` |
+| `NewLimitedSemaphore`, `LimitedSemaphore.Acquire` | still a `later_step` roster exemption | a leaves case over the semaphore's bounds |
+| `nativepath.Realpath` | a Linux-only case | the Linux CI host capture |

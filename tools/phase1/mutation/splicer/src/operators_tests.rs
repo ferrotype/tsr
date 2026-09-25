@@ -448,10 +448,18 @@ fn arms_and_statements() {
         .filter(|stmt| stmt.start.0 == 3)
         .map(|stmt| names(&for_stmt(stmt)).join(","))
         .collect();
-    // `if`, its `return;`, the `let .. = if`, the two branch tails, `w();`.
+    // `if`, its `return;` (a skipped jump would fall through), the `let .. =
+    // if`, the two branch tails, `w();` (skipped).
     assert_eq!(
         stmts,
-        ["negate_condition", "", "negate_condition", "", "", ""]
+        [
+            "negate_condition",
+            "",
+            "negate_condition",
+            "",
+            "",
+            "skip_statement"
+        ]
     );
 }
 

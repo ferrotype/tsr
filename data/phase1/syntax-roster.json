@@ -13,6 +13,12 @@
       "owner": "enum-match arm of tsr_ast node_semantics.rs modifiers() / node_accessors.rs MutableNode::set_modifiers (exact Go payload set)"
     },
     {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: enum-match arms of the ClassDeclaration and ClassExpression payloads in tsr_ast node_semantics.rs (members, heritage_clauses, type_parameters) (node_semantics.rs:688-724 `Some(SyntaxKind::ClassExpression) => $field!(self, ClassExpression, ...)`: the class-like payload is the enum variant itself). Caller-level witness (cited, not claimed): witness/s06-accessor-observations-rust Members/HeritageClauses/TypeParameters rows on the ClassDeclaration and ClassExpression constructors. Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:ClassLikeBase.ClassLikeData",
+      "owner": "enum-match arms of the ClassDeclaration and ClassExpression payloads in tsr_ast node_semantics.rs (members, heritage_clauses, type_parameters)"
+    },
+    {
       "category": "unused_at_pin",
       "evidence": "ast.go:1797. Both embedders (ClassDeclaration, ClassExpression) declare their own generated Name() (ast_generated.go), so Go method resolution never selects ClassLikeBase.Name for any of the 194 concrete nodeData types (scratch go/ast resolver); go/types finds 0 static selections of it (ClassLikeData() results are only used for .Members/.HeritageClauses). Go reach 0 in all four indexes.",
       "operation": "tsc/internal/ast/ast.go:ClassLikeBase.Name",
@@ -38,6 +44,12 @@
     },
     {
       "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: enum-match arm reading the literal payload's token_flags/text in tsr_ast utilities_middle.rs (utilities_middle.rs:355-361 `NodeDataRead::StringLiteral(data) => data.token_flags()` (and Numeric, BigInt, RegularExpression)). Caller-level witness (cited, not claimed): witness/s06-ast-utilities-middle-rust IsUnterminatedLiteral rows. Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:LiteralLikeNodeBase.LiteralLikeData",
+      "owner": "enum-match arm reading the literal payload's token_flags/text in tsr_ast utilities_middle.rs"
+    },
+    {
+      "category": "equivalent_rust",
       "evidence": "Replacement mechanism: enum-match arm of tsr_ast node_semantics.rs modifiers() / node_accessors.rs MutableNode::set_modifiers (exact Go payload set) (node_semantics.rs:903-936 shape_reads modifiers() arms (33 payloads = Go ModifiersBase 24 + NamedMemberBase 9)). Caller-level witness (cited, not claimed): witness/s06-accessor-observations-rust SetModifiers rows (set a public modifier, ModifierFlags reads it back through Node.Modifiers; 35 value:1 vs 157 value:0). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
       "operation": "tsc/internal/ast/ast.go:ModifiersBase.Modifiers",
       "owner": "enum-match arm of tsr_ast node_semantics.rs modifiers() / node_accessors.rs MutableNode::set_modifiers (exact Go payload set)"
@@ -56,9 +68,27 @@
     },
     {
       "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: generated enum-match arm of declaration_name_generated for the NamedMemberBase payloads (node_read_generated.rs:30963 declaration_name_generated `Self::PropertyDeclaration(data) => data.name()` (and the other member payloads)). Caller-level witness (cited, not claimed): witness/s06-accessor-observations-rust Name rows on the member constructors. Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:NamedMemberBase.Name",
+      "owner": "generated enum-match arm of declaration_name_generated for the NamedMemberBase payloads"
+    },
+    {
+      "category": "equivalent_rust",
       "evidence": "Replacement mechanism: enum-match arm of tsr_ast node_semantics.rs modifiers() / node_accessors.rs MutableNode::set_modifiers (exact Go payload set) (node_accessors.rs set_modifiers arms for the 9 NamedMemberBase payloads). Caller-level witness (cited, not claimed): witness/s06-accessor-observations-rust SetModifiers rows (set a public modifier, ModifierFlags reads it back through Node.Modifiers; 35 value:1 vs 157 value:0). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
       "operation": "tsc/internal/ast/ast.go:NamedMemberBase.setModifiers",
       "owner": "enum-match arm of tsr_ast node_semantics.rs modifiers() / node_accessors.rs MutableNode::set_modifiers (exact Go payload set)"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: the FlowData::ReduceLabel enum variant (a Go type assertion becomes a match) (flow.rs:64 `ReduceLabel(FlowReduceLabelData)`). Caller-level witness (cited, not claimed): witness/s07-binder-corpus flow edges (reduce-label nodes of try/finally). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:Node.AsFlowReduceLabelData",
+      "owner": "the FlowData::ReduceLabel enum variant (a Go type assertion becomes a match)"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: the FlowData::SwitchClause enum variant (flow.rs:63 `SwitchClause(FlowSwitchClauseData)`). Caller-level witness (cited, not claimed): witness/s07-binder-corpus flow edges (switch-clause nodes). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:Node.AsFlowSwitchClauseData",
+      "owner": "the FlowData::SwitchClause enum variant"
     },
     {
       "category": "equivalent_rust",
@@ -73,6 +103,12 @@
       "owner": "a Rust NodeId is Copy and passed directly; identity (precedent: leaves-roster core.go:Identity)"
     },
     {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: the same enum-match arms (Rust has no ClassLikeBase indirection: the variant is the class-like payload) (node_semantics.rs:688-724 ClassDeclaration/ClassExpression arms). Caller-level witness (cited, not claimed): witness/s06-accessor-observations-rust Members/HeritageClauses rows (values on the two class constructors, nil on the other 190). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:Node.ClassLikeData",
+      "owner": "the same enum-match arms (Rust has no ClassLikeBase indirection: the variant is the class-like payload)"
+    },
+    {
       "category": "unused_at_pin",
       "evidence": "ast.go:1158-1170. go/types reference scan of upstream/tsc ./... including tests: 0 selections of (*ast.Node).Contains (all textual `.Contains(` hits are strings/slices/sets/other types). Go reach 0.",
       "operation": "tsc/internal/ast/ast.go:Node.Contains",
@@ -80,9 +116,45 @@
     },
     {
       "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: function_fields shape-table arm in tsr_ast node_semantics.rs:955 (exact Go payload set) (node_semantics.rs:955 function_fields arms for the FunctionLikeBase payloads). Caller-level witness (cited, not claimed): witness/s06-accessor-observations-rust ParameterList/TypeParameterList/Type rows (values on the function-like constructors). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:Node.FunctionLikeData",
+      "owner": "function_fields shape-table arm in tsr_ast node_semantics.rs:955 (exact Go payload set)"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: a kind comparison, the same body as the generated IsJSDoc predicate (runtime_generated.rs:2758 is_js_doc (`kind == SyntaxKind::JSDoc`)). Caller-level witness (cited, not claimed): syntax/generated-predicate/IsJSDoc (every declared kind). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:Node.IsJSDoc",
+      "owner": "a kind comparison, the same body as the generated IsJSDoc predicate"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: a Go range-over-func adapter over ForEachChild; Rust callers use for_each_child with ControlFlow::Break for the early stop (runtime_generated.rs:3566 for_each_child_generated (ControlFlow<()>)). Caller-level witness (cited, not claimed): syntax/generated-shape/*/ children-stop actions (full order and early stop). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:Node.IterChildren",
+      "owner": "a Go range-over-func adapter over ForEachChild; Rust callers use for_each_child with ControlFlow::Break for the early stop"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: the same enum match over the five LiteralLike payloads (utilities_middle.rs:355-361). Caller-level witness (cited, not claimed): witness/s06-ast-utilities-middle-rust IsUnterminatedLiteral rows. Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:Node.LiteralLikeData",
+      "owner": "the same enum match over the five LiteralLike payloads"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: the same enum match over the four template payloads (utilities_middle.rs:370-373). Caller-level witness (cited, not claimed): witness/s06-ast-utilities-middle-rust IsUnterminatedLiteral rows on template literals. Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:Node.TemplateLiteralLikeData",
+      "owner": "the same enum match over the four template payloads"
+    },
+    {
+      "category": "equivalent_rust",
       "evidence": "Replacement mechanism: header and payload share one Node record addressed by NodeId; no upcast (crates/tsr_ast/src/factory.rs:90 AstBuilder::new_node_before_hook -> Node::from_factory_parts (header and payload stored under one NodeId)). Caller-level witness (cited, not claimed): syntax/generated-ast|generated-shape|generated-special cases (tools/phase1/syntax/ast-generated) 'new' and 'cast' actions (1,026/1,026 match). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
       "operation": "tsc/internal/ast/ast.go:NodeDefault.AsNode",
       "owner": "header and payload share one Node record addressed by NodeId; no upcast"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: the default arm of the same enum matches (`_ => None`) (node_semantics.rs member/heritage accessors' default arms). Caller-level witness (cited, not claimed): witness/s06-accessor-observations-rust Members/HeritageClauses rows on the 190 non-class constructors. Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:NodeDefault.ClassLikeData",
+      "owner": "the default arm of the same enum matches (`_ => None`)"
     },
     {
       "category": "unused_at_pin",
@@ -98,15 +170,45 @@
     },
     {
       "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: the default arm of the generated child walk (runtime_generated.rs:4412 `_ => ControlFlow::Continue(())`). Caller-level witness (cited, not claimed): witness/s06-e1-parse-corpus whole-tree child walks over every token leaf. Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:NodeDefault.ForEachChild",
+      "owner": "the default arm of the generated child walk"
+    },
+    {
+      "category": "equivalent_rust",
       "evidence": "Replacement mechanism: function_fields shape-table arm in tsr_ast node_semantics.rs:955 (exact Go payload set; default arm reproduces Go's nil dereference message) (function_fields `$shape!` default -> None, then .expect(Go's nil-dereference message)). Caller-level witness (cited, not claimed): witness/s06-accessor-observations-rust ParameterList/TypeParameterList/Type/SetType rows (values on the 14 function-like constructors, Go's nil-dereference on the other 178). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
       "operation": "tsc/internal/ast/ast.go:NodeDefault.FunctionLikeData",
       "owner": "function_fields shape-table arm in tsr_ast node_semantics.rs:955 (exact Go payload set; default arm reproduces Go's nil dereference message)"
     },
     {
       "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: the match's default arm, which reproduces Go's nil dereference as a panic (utilities_middle.rs:361 `_ => panic!(\"LiteralLike payload\")`). Caller-level witness (cited, not claimed): witness/s06-ast-utilities-middle-rust IsUnterminatedLiteral rows. Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:NodeDefault.LiteralLikeData",
+      "owner": "the match's default arm, which reproduces Go's nil dereference as a panic"
+    },
+    {
+      "category": "equivalent_rust",
       "evidence": "Replacement mechanism: enum-match arm of tsr_ast node_semantics.rs modifiers() / node_accessors.rs MutableNode::set_modifiers (exact Go payload set) (node_semantics.rs modifiers(): the $shape! default (None) for the 161 other payloads). Caller-level witness (cited, not claimed): witness/s06-accessor-observations-rust SetModifiers rows (set a public modifier, ModifierFlags reads it back through Node.Modifiers; 35 value:1 vs 157 value:0). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
       "operation": "tsc/internal/ast/ast.go:NodeDefault.Modifiers",
       "owner": "enum-match arm of tsr_ast node_semantics.rs modifiers() / node_accessors.rs MutableNode::set_modifiers (exact Go payload set)"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: the default arm of the generated declaration-name match (node_read_generated.rs:31006 declaration_name_generated `_ => None`). Caller-level witness (cited, not claimed): witness/s06-accessor-observations-rust Name rows on the constructors without a name (nil). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:NodeDefault.Name",
+      "owner": "the default arm of the generated declaration-name match"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: the match's default arm (panic, as Go's nil dereference) (utilities_middle.rs:375 `_ => panic!(\"TemplateLiteralLike payload\")`). Caller-level witness (cited, not claimed): witness/s06-ast-utilities-middle-rust IsUnterminatedLiteral rows. Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:NodeDefault.TemplateLiteralLikeData",
+      "owner": "the match's default arm (panic, as Go's nil dereference)"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: the default arm of the generated visitor dispatch (transform_generated.rs:2880 `_ => return original_id`). Caller-level witness (cited, not claimed): witness/s06-factory-fixtures-rust visitor scenarios over leaf tokens. Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:NodeDefault.VisitEachChild",
+      "owner": "the default arm of the generated visitor dispatch"
     },
     {
       "category": "equivalent_rust",
@@ -127,6 +229,12 @@
       "owner": "struct literal CommentRange { loc, kind, has_trailing_new_line } (tsr_scanner trivia.rs:334)"
     },
     {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: an alias of NewToken: Factory::new_modifier builds the same token payload (factory.rs:36 `self.new_token_data(kind, crate::TokenData {})`). Caller-level witness (cited, not claimed): witness/s06-e1-parse-corpus modifier tokens in the encoded tree. Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:NodeFactory.NewModifier",
+      "owner": "an alias of NewToken: Factory::new_modifier builds the same token payload"
+    },
+    {
       "category": "go_runtime",
       "evidence": "ast.go:3183: resets the factory's arenas keeping hooks and counts. Only caller checker/nodebuilder.go (phase 2). Go reach 0.",
       "operation": "tsc/internal/ast/ast.go:NodeFactory.ReleaseArenas",
@@ -143,6 +251,18 @@
       "evidence": "Replacement mechanism: static linkage: tsr_parser lazy_jsdoc.rs is called directly; no package-init hook (none needed: crates/tsr_parser/src/lazy_jsdoc.rs implements Node.JSDoc inside the parser crate). Caller-level witness (cited, not claimed): syntax/parse-outputs/lazy-jsdoc-in-typescript (lazy JSDoc parsed on demand, identical nodes on repeat). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
       "operation": "tsc/internal/ast/ast.go:SetParseJSDocForNode",
       "owner": "static linkage: tsr_parser lazy_jsdoc.rs is called directly; no package-init hook"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: the NoSubstitutionTemplateLiteral arm of the same match (utilities_middle.rs:360). Caller-level witness (cited, not claimed): witness/s06-ast-utilities-middle-rust IsUnterminatedLiteral rows on template literals. Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:TemplateLiteralLikeNodeBase.LiteralLikeData",
+      "owner": "the NoSubstitutionTemplateLiteral arm of the same match"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: enum-match arms reading template_flags for the four template payloads (utilities_middle.rs:370-373 `NodeDataRead::TemplateHead(data) => data.template_flags()` (and NoSubstitutionTemplateLiteral, Middle, Tail)). Caller-level witness (cited, not claimed): witness/s06-ast-utilities-middle-rust IsUnterminatedLiteral rows on template literals. Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/ast.go:TemplateLiteralLikeNodeBase.TemplateLiteralLikeData",
+      "owner": "enum-match arms reading template_flags for the four template payloads"
     },
     {
       "category": "equivalent_rust",
@@ -353,6 +473,12 @@
       "evidence": "utilities.go:871-897: the function exists to build one pooled closure (\"Consolidate state into one allocation. Similar to https://go.dev/cl/552375\") for sync.Pool.New; its only caller is the pool at :873, and SetParentInChildren (:899-903) Gets/Puts it. Which rows enter it depends on pool history, not input. The recursion it closes over is SetParentInChildren's caller-visible contract, already wi\u2026",
       "operation": "tsc/internal/ast/utilities.go:newParentInChildrenSetter",
       "owner": "SetParentInChildren (tsr_ast/src/clone.rs:120), witnessed by mutation/binder and mutation/e1; Rust has no sync.Pool here"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: a Vec push (Go's append onto the virtual ancestor stack) (binder_helpers.rs:976 push_ancestor `result.push(id)`). Caller-level witness (cited, not claimed): witness/s07-ast-helpers-rust module-instance-state rows module/5 and module/6 (the alias-order ancestor fallback). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/ast/utilities.go:pushAncestor",
+      "owner": "a Vec push (Go's append onto the virtual ancestor stack)"
     },
     {
       "category": "unused_at_pin",
@@ -1769,6 +1895,12 @@
       "evidence": "Called only from newParser (pool New) to allocate the setParentFromContext visitor once per pooled parser (parser.go:146-151); putParser preserves it across reuse. The closure's behavior (n.Parent = p.currentParent) runs inside overrideParentInImmediateChildren (parser.go:5971-5975), which is covered. Pool operation, unstable in go-reach.",
       "operation": "tsc/internal/parser/parser.go:Parser.initializeClosures",
       "owner": "none needed; the closure body's effect is ported by Parser.overrideParentInImmediateChildren (crates/tsr_parser/src/state.rs, covered by mutation/binder and mutation/e1)"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "Replacement mechanism: a struct literal snapshot of the parser state (state.rs:154-165 `ParserState { scanner_state: self.scanner.mark(), .. }`). Caller-level witness (cited, not claimed): witness/s06-e1-parse-corpus speculative parses (lookahead and tryParse rewind through mark). Owner decision 2026-09-25: equivalent_rust accepted for accessor-style operations.",
+      "operation": "tsc/internal/parser/parser.go:Parser.mark",
+      "owner": "a struct literal snapshot of the parser state"
     },
     {
       "category": "unused_at_pin",

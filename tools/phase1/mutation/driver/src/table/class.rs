@@ -25,6 +25,7 @@ pub const COLUMNS: &[&str] = &[
     "ast.GetHeritageClauseElementName",
     "ast.GetFirstConstructorWithBody",
     "ast.GetThisParameter",
+    "ast.HasModifier",
     "ast.HasAbstractModifier",
     "ast.HasAmbientModifier",
     "ast.IsClassOrTypeElement",
@@ -217,6 +218,15 @@ pub fn build(column: &str, input: &Value) -> Option<Result<Column, String>> {
                 ref_of(parsed, class::get_this_parameter(view, node).map_err(text)?)
             })
         }
+        "ast.HasModifier" => node_map("source", input, all, |_, view, node| {
+            let mut out = Vec::new();
+            for (index, mask) in has_modifier_masks().into_iter().enumerate() {
+                if tsr_ast::utilities::has_syntactic_modifier(view, node, mask).map_err(text)? {
+                    out.push(json!(index));
+                }
+            }
+            Ok(Value::Array(out))
+        }),
         "ast.HasAbstractModifier" => node_predicate("source", input, all, |_, view, node| {
             class::has_abstract_modifier(view, node)
         }),
@@ -455,4 +465,17 @@ fn replaced(parsed: &Parsed, node: NodeId, result: NodeId) -> Result<Value, Stri
         .map(|child| parsed.node_ref(Some(child)))
         .collect::<Result<Vec<_>, _>>()?;
     Ok(json!([kind, refs]))
+}
+
+/// Go's `hasModifierMasks`: each syntactic and JSDoc-only flag alone, then
+/// three unions.
+fn has_modifier_masks() -> Vec<u32> {
+    use tsr_ast::modifier_flags as m;
+    let mut masks: Vec<u32> = (0..=16).map(|bit| 1 << bit).collect();
+    masks.extend([
+        m::EXPORT | m::DEFAULT,
+        m::PUBLIC | m::PRIVATE | m::PROTECTED,
+        m::SYNTACTIC_MODIFIERS,
+    ]);
+    masks
 }

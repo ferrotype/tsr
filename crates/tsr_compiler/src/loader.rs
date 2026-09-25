@@ -802,7 +802,7 @@ impl<'a> Loader<'a> {
     /// The collectFiles walk: package identity redirects happen before the
     /// subtree walk, postorder source publication after it. Parsing and
     /// collection have separate ownership: unselected duplicate files are dropped.
-    /// port: tsc/internal/compiler/filesparser.go:filesParser.getProcessedFiles
+    /// This is filesParser.getProcessedFiles; its walk is the loop over the roots.
     fn collect_files(&mut self) -> Collected {
         let mut files: BTreeMap<JsString, Arc<ProgramFile>> = std::mem::take(&mut self.files)
             .into_iter()
@@ -849,6 +849,7 @@ impl<'a> Loader<'a> {
             processing: Vec::new(),
             renamed: Vec::new(),
         };
+        // port: tsc/internal/compiler/filesparser.go:filesParser.getProcessedFiles
         for root in &self.roots {
             collector.visit(root);
         }

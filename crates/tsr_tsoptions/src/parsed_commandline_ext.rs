@@ -174,6 +174,7 @@ impl ParsedCommandLine {
     /// Go's `WithFileNames`: a copy with other file names (nil for none);
     /// the caches and specs are shared as Go shares their pointers.
     /// port: tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.WithFileNames
+    #[must_use]
     pub fn with_file_names(&self, file_names: Option<Vec<JsString>>) -> Self {
         let mut copy = self.clone();
         copy.root_file_names = file_names.unwrap_or_default();

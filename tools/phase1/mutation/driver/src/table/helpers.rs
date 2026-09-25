@@ -19,7 +19,8 @@ pub fn parsed_for(kind: &str, input: &Value) -> Result<Parsed, String> {
     }
 }
 
-/// Admits every node (Go's `All`).
+/// Admits every node (Go's `All`). A `Filter`, so it returns a `Result`.
+#[allow(clippy::unnecessary_wraps)]
 pub fn all(_: AstView<'_>, _: NodeId) -> Result<bool, Error> {
     Ok(true)
 }

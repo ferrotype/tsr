@@ -66,7 +66,7 @@ DEFAULT_WS = ROOT / "target/phase1-mutation/ws-table"
 # The groups: the harness's own (runtime) and the nine stage-2 groups, each
 # with its spec, its Go column file and its Rust column module.
 GROUPS = ("runtime", "class", "modules", "positions", "targets", "containers", "diagnostics", "core",
-          "concurrency", "tsoptions")
+          "concurrency", "tsoptions", "accessors")
 # The parsed kinds (S06 parse inputs, which may be surveyed): source and bound
 # take the plain walk, source_jsdoc and bound_jsdoc the JSDoc-inclusive one.
 SURVEYED_KINDS = ("source", "bound", "source_jsdoc", "bound_jsdoc")

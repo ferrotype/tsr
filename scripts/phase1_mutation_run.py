@@ -587,7 +587,10 @@ def mutant_jobs(mutant, candidate_rows, rows, reach, max_kills, max_rows=0):
         groups = [candidate_rows] if candidate_rows else []
     else:
         groups = [[index for index in candidate_rows if index in reach.get(op, ())] for op in ops]
-        groups = [group for group in groups if group]
+        # Operations Go entered on the same rows share one job: two identical
+        # jobs would dump the same (mutant, row) files, and crediting the first
+        # removes the second's.
+        groups = [group for position, group in enumerate(groups) if group and group not in groups[:position]]
     jobs = []
     for group in groups:
         job = {"mutant": mutant["id"], "rows": [rows[index]["row"] for index in group[:max_rows or None]],

@@ -35,15 +35,18 @@ pub fn splice<T: Clone>(s1: &[T], start: i64, delete_count: i64, items: &[T]) ->
 
 use std::borrow::Cow;
 use std::collections::HashMap;
-use std::hash::Hash;
+use std::hash::{BuildHasher, Hash};
+
+/// A `DiffMaps` callback over one side's entries (Go's nil func is `None`).
+pub type OnEntry<'a, K, V> = Option<&'a mut dyn FnMut(&K, &V)>;
+/// A `DiffMaps` callback over a changed key's two values.
+pub type OnChanged<'a, K, V1, V2> = Option<&'a mut dyn FnMut(&K, &V1, &V2)>;
 
 /// Go's `[]*S` with nil elements as `None`; a nil element panics with `msg`.
 /// port: tsc/internal/core/core.go:CheckEachDefined
 pub fn check_each_defined<'a, S>(s: &'a [Option<S>], msg: &str) -> &'a [Option<S>] {
     for value in s {
-        if value.is_none() {
-            panic!("{msg}");
-        }
+        assert!(value.is_some(), "{msg}");
     }
     s
 }
@@ -51,10 +54,10 @@ pub fn check_each_defined<'a, S>(s: &'a [Option<S>], msg: &str) -> &'a [Option<S
 /// Go's `CopyMapInto`: a nil `dst` is a clone of `src`, else `src` is copied
 /// into `dst`. The port marker is on the nil test, a site the mutation splicer
 /// can negate (a map has no replacement value).
-pub fn copy_map_into<K: Clone + Eq + Hash, V: Clone>(
-    dst: Option<HashMap<K, V>>,
-    src: &HashMap<K, V>,
-) -> HashMap<K, V> {
+pub fn copy_map_into<K: Clone + Eq + Hash, V: Clone, S: BuildHasher + Clone + Default>(
+    dst: Option<HashMap<K, V, S>>,
+    src: &HashMap<K, V, S>,
+) -> HashMap<K, V, S> {
     // port: tsc/internal/core/core.go:CopyMapInto
     if dst.is_none() {
         return src.clone();
@@ -70,12 +73,12 @@ fn comparable_values_equal<V: PartialEq>(left: &V, right: &V) -> bool {
 }
 
 /// port: tsc/internal/core/core.go:DiffMaps
-pub fn diff_maps<K: Eq + Hash, V: PartialEq>(
-    m1: &HashMap<K, V>,
-    m2: &HashMap<K, V>,
-    on_added: Option<&mut dyn FnMut(&K, &V)>,
-    on_removed: Option<&mut dyn FnMut(&K, &V)>,
-    on_changed: Option<&mut dyn FnMut(&K, &V, &V)>,
+pub fn diff_maps<K: Eq + Hash, V: PartialEq, S1: BuildHasher, S2: BuildHasher>(
+    m1: &HashMap<K, V, S1>,
+    m2: &HashMap<K, V, S2>,
+    on_added: OnEntry<'_, K, V>,
+    on_removed: OnEntry<'_, K, V>,
+    on_changed: OnChanged<'_, K, V, V>,
 ) {
     diff_maps_func(
         m1,
@@ -91,13 +94,13 @@ pub fn diff_maps<K: Eq + Hash, V: PartialEq>(
 /// contract. A nil `onRemoved` panics when a key was removed and `onChanged`
 /// is not nil.
 /// port: tsc/internal/core/core.go:DiffMapsFunc
-pub fn diff_maps_func<K: Eq + Hash, V1, V2>(
-    m1: &HashMap<K, V1>,
-    m2: &HashMap<K, V2>,
+pub fn diff_maps_func<K: Eq + Hash, V1, V2, S1: BuildHasher, S2: BuildHasher>(
+    m1: &HashMap<K, V1, S1>,
+    m2: &HashMap<K, V2, S2>,
     equal_values: fn(&V1, &V2) -> bool,
-    on_added: Option<&mut dyn FnMut(&K, &V2)>,
-    on_removed: Option<&mut dyn FnMut(&K, &V1)>,
-    on_changed: Option<&mut dyn FnMut(&K, &V1, &V2)>,
+    on_added: OnEntry<'_, K, V2>,
+    on_removed: OnEntry<'_, K, V1>,
+    on_changed: OnChanged<'_, K, V1, V2>,
 ) {
     if let Some(on_added) = on_added {
         for (key, v2) in m2 {

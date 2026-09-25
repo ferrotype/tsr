@@ -103,6 +103,11 @@ pub enum StmtKind {
     LetIf {
         cond: (Pos, Pos),
     },
+    /// `EXPR;`, a unit statement: a call, assignment or macro whose value is
+    /// discarded, or a loop.
+    Unit {
+        span: (Pos, Pos),
+    },
     Other(&'static str),
 }
 
@@ -668,6 +673,16 @@ impl<'ast> Visit<'ast> for Indexer {
                     },
                     _ => StmtKind::Other("let"),
                 },
+                // A jump skipped would fall through to code typed for its
+                // absence.
+                Stmt::Expr(Expr::Return(_) | Expr::Break(_) | Expr::Continue(_), _) => {
+                    StmtKind::Other("expression")
+                }
+                Stmt::Expr(Expr::ForLoop(_) | Expr::While(_), _) | Stmt::Expr(_, Some(_)) => {
+                    StmtKind::Unit {
+                        span: (pos(span.start()), pos(span.end())),
+                    }
+                }
                 Stmt::Expr(..) => StmtKind::Other("expression"),
                 Stmt::Macro(_) => StmtKind::Other("macro"),
                 Stmt::Item(_) => StmtKind::Other("item"),

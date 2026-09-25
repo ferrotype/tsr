@@ -125,8 +125,12 @@ lists or tokens, result wrappers that run the body first and then replace the
 result (`None`, a missing node or list, `Some(missing)` only when the real result
 was present, a token scanner that also sets the parser token); same-typed
 parameter returns; skipped unit bodies; `0`/`1`/`!0` integers; flag and variant
-flips; empty collections and ranges. Functions whose simple mutants would recurse
-or hang get wrappers or no operator and are reported as `unsupported`.
+flips; empty collections and ranges. A marker on a statement mutates that
+statement: a plain `if` (or `let x = if ..`) negates its condition, and a unit
+statement (`expr;`, a `for` or `while` loop) is skipped. A `return`, `break` or
+`continue` is never skipped, since the code after it is typed for its absence.
+Functions whose simple mutants would recurse or hang get wrappers or no operator
+and are reported as `unsupported`.
 
 ## 5. Go reach
 
@@ -213,18 +217,19 @@ skipped mutant carries `skipped_by`. No operation loses a witness this way.
 
 ## 8. Results and what remains
 
-Witnessed: **782**, per witness e1 499, binder 685, facts 536, syntax 4 (only
-that oracle: binder 192, facts 87, e1 6, syntax 4). By Go file: `parser.go` 389 of
-397, `binder.go` 140 of 144, `ast.go` 110 of 139, `ast/utilities.go` 58 of 130,
-`jsdoc.go` 42 of 42, `reparser.go` 13 of 13, `subtreefacts.go` 7 of 7.
+Phase 1 closure campaign (2026-09-25), five oracles over one manifest of 1,112
+operations (1,917 mutants, 276 controls): **1,094 killed**. Per witness:
+e1 516, binder 711, facts 546, syntax 27, table 283 (an operation may be
+killed by several). By Go file: `parser.go` 400 of 401, `ast/utilities.go`
+196 of 200, `ast/ast.go` 150 of 153, `binder.go` 145 of 146, `jsdoc.go` 42 of
+42, `reparser.go` 13 of 13, `core/core.go` 19 of 19. The table oracle's 11
+groups hold 198 columns over 8,490 rows, every column at native parity.
 
-Not witnessed: 165. They are 123 not reached (mostly never entered by Go on any
-existing input; a few entered in Go but not through the marked Rust home), 30
-unsupported (no marker, or no sound operator for the return type), 6 crash, 5
-survived and 1 timeout. They stay `operation_witness_missing` until they have
-another witness, new inputs or a reviewed destination. Unrelated to this work
-and unchanged: 302 `implementation_unverified`, 92 `later_step_unresolved` and
-23 `compiler_destination_unreviewed`.
+Not killed: 18 operations: 6 unsupported (no marker or no sound operator for
+the return type), 7 not reached, 3 survived, 2 crash only. Those not witnessed
+another way stay pending (see the Phase 1 closure report); with the case
+families recorded and the equivalent_rust roster entries, Phase 1 coverage has
+20 pending operations.
 
 Known limitations:
 
@@ -308,8 +313,8 @@ are the five of section 1 plus column parity and one home (rules 6 and 7).
 The groups are `runtime` (the harness's own columns, which claim no operation:
 the canonical encoding, both walks and the symbol keys under each, so a
 differing column is the column's difference and not the harness's), `class`, `modules`,
-`positions`, `targets`, `containers`, `diagnostics`, `core`, `concurrency` and
-`tsoptions`. Every `.go` file of `tools/phase1/tables/go` is a driver source, so
+`positions`, `targets`, `containers`, `diagnostics`, `core`, `concurrency`,
+`tsoptions` and `accessors`. Every `.go` file of `tools/phase1/tables/go` is a driver source, so
 a new column file needs no registration; the native freeze binds all of them
 and the bridges (`oracle_sources`).
 

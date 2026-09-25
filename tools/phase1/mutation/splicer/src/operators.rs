@@ -82,6 +82,8 @@ pub enum Shape {
     Arm(String),
     /// `if hit(ID) != (COND) { .. }`.
     Negate,
+    /// `if !hit(ID) { STMT }`: the statement does not run.
+    Skip,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -786,6 +788,15 @@ pub fn for_stmt(stmt: &StmtInfo) -> Choice {
             operators: vec![Operator {
                 name: "negate_condition".to_owned(),
                 shape: Shape::Negate,
+                allocates: false,
+            }],
+            notes: Vec::new(),
+        },
+        StmtKind::Unit { .. } => Choice {
+            category: "unit".to_owned(),
+            operators: vec![Operator {
+                name: "skip_statement".to_owned(),
+                shape: Shape::Skip,
                 allocates: false,
             }],
             notes: Vec::new(),

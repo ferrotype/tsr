@@ -2,11 +2,13 @@
 //! Go: `tools/phase1/tables/go/positions_columns.go`; spec:
 //! `data/phase1/tables/positions.json`.
 use super::helpers::{all, int, node_map, node_predicate, ref_of};
-use super::{text, Column, Parsed};
+use super::{decode, text, Column, Parsed};
+use crate::protocol::unhex;
 use serde_json::{json, Value};
 use tsr_arena::Error;
 use tsr_ast::utilities_positions as positions;
 use tsr_ast::{AstView, NodeId, SyntaxKind as K};
+use tsr_jsstring::PositionMap;
 
 pub const COLUMNS: &[&str] = &[
     "ast.IsDeclarationName",
@@ -30,7 +32,14 @@ pub const COLUMNS: &[&str] = &[
     "ast.IsTypeDeclarationName",
     "ast.SkipTypeParentheses",
     "ast.TryGetPropertyNameOfBindingOrAssignmentElement",
+    "ast.ComputePositionMap",
 ];
+
+#[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct Texts {
+    texts_hex: Vec<String>,
+}
 
 pub fn build(column: &str, input: &Value) -> Option<Result<Column, String>> {
     Some(match column {
@@ -141,6 +150,7 @@ pub fn build(column: &str, input: &Value) -> Option<Result<Column, String>> {
                 ref_of(parsed, name)
             })
         }
+        "ast.ComputePositionMap" => compute_position_map(input),
         _ => return None,
     })
 }
@@ -211,4 +221,24 @@ fn write_access_decided(parsed: &Parsed, view: AstView<'_>, node: NodeId) -> Res
                 | K::JSDocParameterTag
         )
     ))
+}
+
+/// Go's `ast.ComputePositionMap` column.
+fn compute_position_map(input: &Value) -> Result<Column, String> {
+    let texts: Texts = decode(input)?;
+    Ok(Box::new(move || {
+        let mut out = Vec::new();
+        for raw in &texts.texts_hex {
+            let text = unhex(&json!(raw))?;
+            let map = PositionMap::new(&text);
+            let last = isize::try_from(text.len()).map_err(|error| error.to_string())? + 1;
+            let (mut to_utf16, mut to_utf8) = (Vec::new(), Vec::new());
+            for offset in -1..=last {
+                to_utf16.push(json!(map.utf8_to_utf16(offset)));
+                to_utf8.push(json!(map.utf16_to_utf8(offset)));
+            }
+            out.push(json!([map.is_ascii_only(), to_utf16, to_utf8]));
+        }
+        Ok(Value::Array(out))
+    }))
 }

@@ -89,7 +89,8 @@ pub(crate) struct ParserState<'src> {
 }
 
 impl<'src, F: ParserFactory> Parser<'src, F> {
-    /// port: tsc/internal/parser/parser.go:Parser.initializeState
+    /// Parser.initializeState on a fresh parser (the pin's pool reuse has no
+    /// Rust counterpart).
     pub(crate) fn new(
         opts: SourceFileParseOptions,
         source: &'src SourceText,
@@ -115,6 +116,7 @@ impl<'src, F: ParserFactory> Parser<'src, F> {
         let mut scanner = Scanner::new();
         scanner.set_text(source.as_bytes());
         scanner.buffer_diagnostics();
+        // port: tsc/internal/parser/parser.go:Parser.initializeState
         scanner.set_language_variant(language_variant);
         Self {
             scanner,

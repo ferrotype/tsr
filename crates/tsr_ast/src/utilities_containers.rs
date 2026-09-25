@@ -48,21 +48,16 @@ pub fn get_function_flags(view: AstView<'_>, node: Option<NodeId>) -> Result<u32
         _ => return Ok(F::INVALID),
     };
     let mut flags = F::NORMAL;
-    match read.kind().known() {
-        Some(
-            K::FunctionDeclaration
-            | K::FunctionExpression
-            | K::MethodDeclaration
-            | K::ArrowFunction,
-        ) => {
-            if asterisk.is_some() {
-                flags |= F::GENERATOR;
-            }
-            if crate::utilities::has_syntactic_modifier(view, node, modifier_flags::ASYNC)? {
-                flags |= F::ASYNC;
-            }
+    if let Some(
+        K::FunctionDeclaration | K::FunctionExpression | K::MethodDeclaration | K::ArrowFunction,
+    ) = read.kind().known()
+    {
+        if asterisk.is_some() {
+            flags |= F::GENERATOR;
         }
-        _ => {}
+        if crate::utilities::has_syntactic_modifier(view, node, modifier_flags::ASYNC)? {
+            flags |= F::ASYNC;
+        }
     }
     if read.body().is_none() {
         flags |= F::INVALID;

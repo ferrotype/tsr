@@ -358,6 +358,42 @@
       "rust": "tsr_ast::utilities_positions::try_get_property_name_of_binding_or_assignment_element",
       "survey": true,
       "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ast/ast.go:2890",
+        "internal/contentmapper/hostimpl.go:1329",
+        "internal/contentmapper/hostimpl.go:1354",
+        "internal/api/session.go:605"
+      ],
+      "id": "ast.ComputePositionMap",
+      "input": "values",
+      "operations": [
+        "tsc/internal/ast/positionmap.go:ComputePositionMap",
+        "tsc/internal/ast/positionmap.go:PositionMap.UTF16ToUTF8"
+      ],
+      "projection": "per text: [IsAsciiOnly, UTF8ToUTF16 and UTF16ToUTF8 of every offset from -1 to len+1]",
+      "rust": "tsr_jsstring::PositionMap::new",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "texts_hex": [
+              "",
+              "616263",
+              "c3a9",
+              "61e282ac62",
+              "f09f988078",
+              "78f09f9880c3a9e282ac79",
+              "61ff62",
+              "eda0807a",
+              "6ce280a86d0d0a6e",
+              "6162f09f9880"
+            ]
+          },
+          "name": "texts"
+        }
+      ]
     }
   ],
   "group": "positions",

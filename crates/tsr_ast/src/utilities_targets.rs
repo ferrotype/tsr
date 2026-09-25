@@ -181,11 +181,9 @@ pub fn get_type_annotation_node(view: AstView<'_>, node: NodeId) -> Result<Optio
             | K::JSDocPropertyTag
             | K::JSDocNullableType
             | K::JSDocNonNullableType
-            | K::JSDocOptionalType,
-        ) => read.type_node(),
-        // The kinds whose data embeds FunctionLikeBase.
-        Some(
-            K::GetAccessor
+            | K::JSDocOptionalType
+            // The kinds whose data embeds FunctionLikeBase.
+            | K::GetAccessor
             | K::SetAccessor
             | K::ArrowFunction
             | K::CallSignature

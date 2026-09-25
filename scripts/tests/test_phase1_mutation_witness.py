@@ -2136,9 +2136,10 @@ class HarnessJoinTests(MutationFixture):
             return coverage.build()
 
     def real_pending_operation(self):
+        """A real witness-missing operation, a parser one while any remains."""
         report = coverage.build()
-        return next(row["id"] for row in report["gaps"] if row["root_cause"] == "operation_witness_missing"
-                    and row["id"].startswith("tsc/internal/parser/parser.go:"))
+        pending = [row["id"] for row in report["gaps"] if row["root_cause"] == "operation_witness_missing"]
+        return next((op for op in pending if op.startswith("tsc/internal/parser/parser.go:")), pending[0])
 
     def retarget(self, operation):
         """Point the fixture's OP_A home at a real pending scope operation."""

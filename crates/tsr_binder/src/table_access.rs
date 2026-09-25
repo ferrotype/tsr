@@ -89,8 +89,7 @@ impl<'scope> Binder<'_, 'scope, '_> {
         };
         previous.map(|entry| entry.map(|id| self.binding_symbol(id)))
     }
-    // port: tsc/internal/ast/utilities.go:GetSymbolTable
-    // port: tsc/internal/ast/utilities.go:GetExports
+    /// GetExports: the symbol's exports, created and stored on first use.
     pub(crate) fn ensure_binding_exports(
         &mut self,
         symbol: BindingSymbol<'scope>,
@@ -99,11 +98,11 @@ impl<'scope> Binder<'_, 'scope, '_> {
             return self.binding_table(table);
         }
         let table = self.new_binding_table();
+        // port: tsc/internal/ast/utilities.go:GetExports
         self.set_binding_symbol_exports(symbol, Some(table));
         table
     }
-    // port: tsc/internal/ast/utilities.go:GetSymbolTable
-    // port: tsc/internal/ast/utilities.go:GetMembers
+    /// GetMembers: the symbol's members, created and stored on first use.
     pub(crate) fn ensure_binding_members(
         &mut self,
         symbol: BindingSymbol<'scope>,
@@ -112,6 +111,7 @@ impl<'scope> Binder<'_, 'scope, '_> {
             return self.binding_table(table);
         }
         let table = self.new_binding_table();
+        // port: tsc/internal/ast/utilities.go:GetMembers
         self.set_binding_symbol_members(symbol, Some(table));
         table
     }
@@ -126,8 +126,8 @@ impl<'scope> Binder<'_, 'scope, '_> {
             BindingNode::Checked(id) => tsr_ast::is_locals_container(&self.n(id)),
         }
     }
-    // port: tsc/internal/ast/utilities.go:GetSymbolTable
-    // port: tsc/internal/ast/utilities.go:GetLocals
+    /// GetLocals: the container's locals, created and stored on first use
+    /// (GetSymbolTable's get-or-create).
     pub(crate) fn ensure_binding_locals(
         &mut self,
         node: BindingNode<'scope>,
@@ -166,6 +166,8 @@ impl<'scope> Binder<'_, 'scope, '_> {
             };
             local.set_locals(node, Some(table));
         } else {
+            // port: tsc/internal/ast/utilities.go:GetSymbolTable
+            // port: tsc/internal/ast/utilities.go:GetLocals
             self.set_node_locals(self.node_id(node), Some(self.table_id(table)));
         }
         table

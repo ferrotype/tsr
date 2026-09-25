@@ -90,6 +90,17 @@ var replaceModifiersKinds = Kinds(ast.KindTypeParameter, ast.KindParameter, ast.
 	ast.KindImportEqualsDeclaration, ast.KindImportDeclaration, ast.KindExportAssignment,
 	ast.KindExportDeclaration)
 
+// hasModifierMasks are the HasModifier column's masks: each syntactic and
+// JSDoc-only flag alone, then three unions.
+var hasModifierMasks = func() []ast.ModifierFlags {
+	masks := []ast.ModifierFlags{}
+	for bit := 0; bit <= 16; bit++ {
+		masks = append(masks, ast.ModifierFlags(1)<<bit)
+	}
+	return append(masks, ast.ModifierFlagsExport|ast.ModifierFlagsDefault,
+		ast.ModifierFlagsPublic|ast.ModifierFlagsPrivate|ast.ModifierFlagsProtected, ast.ModifierFlagsSyntacticModifiers)
+}()
+
 func init() {
 	Register("class",
 		// ast/ast.go:Node.Decorators over every node: [index, [decorator
@@ -202,6 +213,17 @@ func init() {
 			func(p *Parsed, node *ast.Node) any { return RefOf(p, ast.GetFirstConstructorWithBody(node)) }),
 		NodeMap("ast.GetThisParameter", "source", functionLikeData,
 			func(p *Parsed, node *ast.Node) any { return RefOf(p, ast.GetThisParameter(node)) }),
+		// The indices of hasModifierMasks whose flags HasModifier finds.
+		NodeMap("ast.HasModifier", "source", All,
+			func(_ *Parsed, node *ast.Node) any {
+				out := []any{}
+				for i, mask := range hasModifierMasks {
+					if ast.HasModifier(node, mask) {
+						out = append(out, Scalar(i))
+					}
+				}
+				return out
+			}),
 		NodePredicate("ast.HasAbstractModifier", "source", All,
 			func(_ *Parsed, node *ast.Node) bool { return ast.HasAbstractModifier(node) }),
 		NodePredicate("ast.HasAmbientModifier", "source", All,

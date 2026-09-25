@@ -29,6 +29,7 @@ use tsr_ast::{
 };
 use tsr_jsstring::SourceText;
 
+mod accessors;
 mod class;
 mod concurrency;
 mod containers;
@@ -91,6 +92,10 @@ const GROUPS: &[Group] = &[
     Group {
         columns: tsoptions::COLUMNS,
         build: tsoptions::build,
+    },
+    Group {
+        columns: accessors::COLUMNS,
+        build: accessors::build,
     },
 ];
 

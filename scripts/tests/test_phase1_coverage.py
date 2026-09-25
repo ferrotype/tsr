@@ -309,7 +309,11 @@ class LaterStepResolutionTests(unittest.TestCase):
         pending, report = self.pending(self.scope, self.cases)
         self.assertEqual(pending[self.operation].get("reason"), "later_step_unresolved")
         self.assertFalse(report["complete"])
-        self.assertNotIn("later_step", report["exempt_by_category"])
+        # Only the transfers another step's case answers count as exempt.
+        answered = [operation for operation, entry in scope.roster_exemptions("leaves").items()
+                    if entry["category"] == "later_step" and operation not in pending]
+        self.assertNotIn(self.operation, answered)
+        self.assertEqual(report["exempt_by_category"].get("later_step", 0), len(answered))
         self.assertEqual(self.gaps(self.cases).get(self.operation), "later_step_unresolved")
 
     def test_a_preparing_case_of_the_owning_step_answers_it(self):

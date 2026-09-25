@@ -204,6 +204,63 @@
       "operation": "tsc/internal/ast/ast.go:Node.JSDoc",
       "order_sensitive": true,
       "subject": "parseOutputs"
+    },
+    {
+      "actions": [
+        {
+          "op": "side_fields"
+        }
+      ],
+      "case": "syntax/parse-outputs/jsdoc-import-tags",
+      "discriminates": "@import tags in a .js file are reparsed into JS import declarations (reparser.go:130, NewJSImportDeclaration): named, namespace and default clauses, with the deep-cloned clause, specifier and attributes stored as reparsed clones.",
+      "file": {
+        "name": "/a.js",
+        "script_kind": 1,
+        "text": "/** @import { A, B as C } from \"./a\" */\n/** @import * as NS from \"./ns\" */\n/** @import D from \"./d\" with { type: \"json\" } */\n/** @type {A} */\nlet a;\n"
+      },
+      "host_applicability": "any",
+      "operation": "tsc/internal/parser/parser.go:Parser.finishSourceFile",
+      "order_sensitive": true,
+      "subject": "parseOutputs"
+    },
+    {
+      "actions": [
+        {
+          "op": "lazy_jsdoc"
+        },
+        {
+          "op": "side_fields"
+        }
+      ],
+      "case": "syntax/parse-outputs/jsdoc-backtick-param",
+      "discriminates": "A markdown-quoted @param name: parseBracketNameInPropertyAndParamTag consumes the closing backtick with parseExpectedTokenJSDoc (jsdoc.go:803); when it is missing the tag's name, comment ranges and JSDoc diagnostics change.",
+      "file": {
+        "name": "/a.ts",
+        "script_kind": 3,
+        "text": "/**\n * @param `x` the x\n * @param `y the y\n * @param [`z`] the z\n */\nfunction f(x: number, y: number, z?: number) {}\n"
+      },
+      "host_applicability": "any",
+      "operation": "tsc/internal/parser/parser.go:Parser.parseExpectedTokenJSDoc",
+      "order_sensitive": true,
+      "subject": "parseOutputs"
+    },
+    {
+      "actions": [
+        {
+          "op": "side_fields"
+        }
+      ],
+      "case": "syntax/parse-outputs/pragmas-multiline",
+      "discriminates": "In a multi-line comment only the first @-token of a line can be a pragma (lineEndPos, parser.go:6600): an @jsx after @author on one line is skipped, while pragmas after a \\r\\n and after a U+2028 break, following a multi-byte character, are found.",
+      "file": {
+        "name": "/a.tsx",
+        "script_kind": 4,
+        "text": "/**\n * @author someone @jsx wrong\n * @jsx h\r\n * \u00e9 @jsxFrag Frag\u2028 @jsxRuntime classic\n * @jsxImportSource preact */\nlet x = 1;\n"
+      },
+      "host_applicability": "any",
+      "operation": "tsc/internal/parser/parser.go:lineEndPos",
+      "order_sensitive": true,
+      "subject": "parseOutputs"
     }
   ]
 }

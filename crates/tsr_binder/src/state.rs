@@ -186,8 +186,8 @@ impl<'build, 'scope, 'ast> Binder<'build, 'scope, 'ast> {
             .table_mut(table)
             .expect("binder symbol table belongs to result")
     }
-    // port: tsc/internal/ast/utilities.go:GetSymbolTable
-    // port: tsc/internal/ast/utilities.go:GetLocals
+    /// GetLocals on a checked node; the binder's own scopes go through
+    /// `ensure_binding_locals`.
     pub fn ensure_locals(&mut self, node: NodeId) -> SymbolTableId {
         if let Some(table) = self.locals(node) {
             return table;

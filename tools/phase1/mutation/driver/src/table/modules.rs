@@ -328,10 +328,10 @@ fn stable_symbol_name(name: &[u8]) -> Vec<u8> {
 }
 
 /// Go's `symbolOf`: the bound node's symbol, if any.
-fn symbol_of<'p>(
-    parsed: &'p Parsed,
+fn symbol_of(
+    parsed: &Parsed,
     node: NodeId,
-) -> Result<Option<(tsr_ast::BoundView<'p>, SymbolId)>, String> {
+) -> Result<Option<(tsr_ast::BoundView<'_>, SymbolId)>, String> {
     let bound = parsed.bound().ok_or("the input is not bound")?;
     Ok(bound
         .node_binding(node)

@@ -281,7 +281,7 @@ pub fn get_type_node_precedence(
         Some(K::FunctionType | K::ConstructorType) => P::FUNCTION,
         Some(K::UnionType) => P::UNION,
         Some(K::IntersectionType) => P::INTERSECTION,
-        Some(K::TypeOperator) => P::TYPE_OPERATOR,
+        Some(K::TypeOperator | K::TypeQuery) => P::TYPE_OPERATOR,
         Some(K::InferType) => {
             let parameter = read
                 .data_source()
@@ -302,7 +302,6 @@ pub fn get_type_node_precedence(
             }
         }
         Some(K::IndexedAccessType | K::ArrayType | K::OptionalType) => P::POSTFIX,
-        Some(K::TypeQuery) => P::TYPE_OPERATOR,
         Some(
             K::AnyKeyword
             | K::UnknownKeyword

@@ -832,6 +832,9 @@ class SharedSiteTests(unittest.TestCase):
         jobs = run.mutant_jobs(shared, [0, 1, 2, 3, 4], rows, reach, 3)
         self.assertEqual([job["rows"] for job in jobs], [["r0", "r1", "r2", "r3"], ["r4"]],
                          "op/b's only row is not left behind op/a's first three kills")
+        twins = mutant(12, ["op/a", "op/c"], "f::twins")
+        self.assertEqual([job["rows"] for job in run.mutant_jobs(twins, [0, 1], rows, {"op/a": {0, 1}, "op/c": {0, 1}}, 3)],
+                         [["r0", "r1"]], "operations entered on the same rows share one job, so no dump is written twice")
         single = mutant(10, ["op/a"], "f::single", control=11)
         self.assertEqual(run.mutant_jobs(single, [2, 0], rows, reach, 3),
                          [{"mutant": 10, "rows": ["r2", "r0"], "max_kills": 3, "control": 11}])

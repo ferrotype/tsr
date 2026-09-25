@@ -126,5 +126,23 @@ func init() {
 			func(p *Parsed, node *ast.Node) any {
 				return RefOf(p, ast.TryGetPropertyNameOfBindingOrAssignmentElement(node))
 			}),
+		// Per text: [IsAsciiOnly, UTF8ToUTF16 of every offset from -1 to
+		// len+1, UTF16ToUTF8 of the same offsets].
+		typedValuesColumn("ast.ComputePositionMap", func(in struct {
+			Texts []string `json:"texts_hex"`
+		}) any {
+			out := []any{}
+			for _, raw := range in.Texts {
+				text := unhexText(raw)
+				pm := ast.ComputePositionMap(text)
+				toUTF16, toUTF8 := []any{}, []any{}
+				for offset := -1; offset <= len(text)+1; offset++ {
+					toUTF16 = append(toUTF16, Scalar(pm.UTF8ToUTF16(offset)))
+					toUTF8 = append(toUTF8, Scalar(pm.UTF16ToUTF8(offset)))
+				}
+				out = append(out, []any{pm.IsAsciiOnly(), toUTF16, toUTF8})
+			}
+			return out
+		}),
 	)
 }

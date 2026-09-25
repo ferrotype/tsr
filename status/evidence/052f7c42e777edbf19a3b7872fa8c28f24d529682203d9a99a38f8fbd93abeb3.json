@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "run_id": "foundations",
+  "recorded_at": 1790330649,
+  "context": {
+    "revision": "b6dc8736dbc20b03c510bf7e96d618d8642be552",
+    "source_sha256": "edb8d8e0c59d03edc3f9757cd7b1e7123976963ab95e06cdce9168371e0191d4",
+    "upstream_pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+    "environment": {
+      "CARGO_BUILD_TARGET": "",
+      "CARGO_ENCODED_RUSTFLAGS": "",
+      "CARGO_HOME": "/Users/cristian/.cargo",
+      "CGO_ENABLED": "",
+      "GOARCH": "",
+      "GOFLAGS": "",
+      "GOOS": "",
+      "RUSTC_WRAPPER": "",
+      "RUSTFLAGS": "",
+      "RUSTUP_HOME": "/Users/cristian/.rustup",
+      "RUSTUP_TOOLCHAIN": "1.97.1-aarch64-apple-darwin",
+      "S04_CACHE_HOME": "",
+      "S04_RUSTUP_HOME": ""
+    },
+    "host": "macos-aarch64",
+    "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n"
+  },
+  "spec_sha256": "95f854ece2277ba96b9a3e5b41ecb2dba29423ee1569684f2df22c07313ac238",
+  "inputs": {
+    ".gitmodules": "7f9e8e0a446a547c56d8444637b3ee73064ce52055bc3c983c05eb13f4331bdd",
+    "data/s04/toolchains.toml": "f7f747f45b0570c179771ba0e01e37a3fc3c1ca7e98dbf042b7eabf6d9f9c0be",
+    "data/upstream.json": "9f3a288befbb79b1dcd59c2fd0d87fd2cddf120563f8b4c129ce88e3c3957af9"
+  },
+  "command": [
+    "python3",
+    "scripts/phase1_producers.py",
+    "foundations"
+  ],
+  "target": "host",
+  "config": "Phase 1 independently authenticated leaves, filesystem and syntax-utility families plus exact cross-family integration witnesses; grouped source closure; missing coverage and production failures remain separate from harness health; replay only, no implicit corpus or timing capture",
+  "host": "macos-aarch64",
+  "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n",
+  "exit_code": 0,
+  "stdout": "{\"metrics\": {\"filesystem_complete\": false, \"filesystem_prepared\": false, \"harness_pass\": true, \"integration_complete\": false, \"integration_prepared\": false, \"inventory_complete\": true, \"leaves_complete\": false, \"leaves_prepared\": false, \"mutation_witnesses_complete\": false, \"rust_witnesses_complete\": false, \"utilities_complete\": false, \"utilities_prepared\": false}}\n",
+  "stderr": "{\"captures\": {\"config\": \"453e53c438ee16bf5f150fc85b4f4a618d74ec58a77c4606ced02e487bb4d3b7\", \"filesystem\": \"728fb80e86c4ed946ca22c443de143e584f7492bf37bab91e9423672fcce9c5d\", \"leaves\": \"9c810c0f6f5fef4801a4463c9a2daae372fb6af011544605e6a6a3de977b0d43\", \"syntax\": \"21af672093d91433d0465b792a00b48de372e6bfb2f06774de25fe7e8dcd37be\"}, \"phase1_report\": \"target/phase1-producers/foundations-28b76a2888a943c37c8456879292e9babd2fe78927ec7063313ed826f89fca78.json\", \"sha256\": \"28b76a2888a943c37c8456879292e9babd2fe78927ec7063313ed826f89fca78\", \"unavailable\": {}}\n",
+  "stdout_sha256": "1b86ca11093c5afc66a2b0e794beac00b0bed91aff304c5bcf30802a4d7c11cf",
+  "stderr_sha256": "94ea4da61d0c300845d275557d6666a0be5b3eacc7b05741aeb8063f665632d6",
+  "valid_capture": true
+}

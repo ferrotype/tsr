@@ -9,7 +9,7 @@ use tsr_diagnostics as diagnostics;
 mod tests;
 
 impl<F: ParserFactory> Parser<'_, F> {
-    /// port: tsc/internal/parser/parser.go:Parser.parseListIndex
+    /// Parser.parseListIndex.
     pub(crate) fn parse_list_index(
         &mut self,
         kind: ParsingContext,
@@ -20,6 +20,7 @@ impl<F: ParserFactory> Parser<'_, F> {
         let mut outer_reparse_list = std::mem::take(&mut self.reparse_list);
         let mut list = self.factory.start_list_buffer();
         while !self.is_list_terminator(kind) {
+            // port: tsc/internal/parser/parser.go:Parser.parseListIndex
             if self.is_list_element(kind, false) {
                 let element = parse_element(self, list.len());
                 for reparsed in self.reparse_list.drain(..) {

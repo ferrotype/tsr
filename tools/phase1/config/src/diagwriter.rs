@@ -133,6 +133,8 @@ fn build(spec: &Value, files: &Files) -> Result<Diagnostic, String> {
             reports_unnecessary: false,
             reports_deprecated: false,
             skipped_on_no_emit: false,
+            ad_hoc_message: None,
+            repopulate_info: None,
         }
     } else {
         // The counterpart of ast.NewExternalDiagnostic (ast/diagnostic.go:247).

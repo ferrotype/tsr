@@ -66,8 +66,8 @@ impl<V> Default for PagedLinkStore<V> {
     }
 }
 
-fn new_page<V: Default>() -> Page<V> {
-    Box::new(std::array::from_fn(|_| V::default()))
+fn new_page<V: Default>() -> [V; PAGE_SIZE] {
+    std::array::from_fn(|_| V::default())
 }
 
 impl<V: Default> PagedLinkStore<V> {
@@ -87,16 +87,16 @@ impl<V: Default> PagedLinkStore<V> {
             return match entry {
                 std::collections::hash_map::Entry::Occupied(page) => &mut page.into_mut()[slot],
                 std::collections::hash_map::Entry::Vacant(vacant) => {
-                    &mut vacant.insert(new_page())[slot]
+                    &mut vacant.insert(Box::new(new_page()))[slot]
                 }
             };
         };
         let missing = page.is_none();
         // port: tsc/internal/core/linkstore.go:PagedLinkStore.Get
         if missing {
-            *page = Some(new_page());
+            *page = Some(Box::new(new_page()));
         }
-        &mut page.get_or_insert_with(new_page)[slot]
+        &mut page.get_or_insert_with(|| Box::new(new_page()))[slot]
     }
 
     /// port: tsc/internal/core/linkstore.go:PagedLinkStore.Has

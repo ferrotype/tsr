@@ -314,6 +314,24 @@
     },
     {
       "evidence": [
+        "internal/checker/utilities.go:68",
+        "internal/checker/utilities.go:343",
+        "internal/checker/checker.go:6985",
+        "internal/checker/checker.go:7288",
+        "internal/pseudochecker/lookup.go:107"
+      ],
+      "id": "ast.HasModifier",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:HasModifier"
+      ],
+      "projection": "[index, indices of the masks it finds] for every node: each syntactic and JSDoc-only flag alone, then Export|Default, Public|Private|Protected and SyntacticModifiers",
+      "rust": "tsr_ast::utilities::has_syntactic_modifier",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
         "internal/ast/utilities.go:4311",
         "internal/checker/checker.go:4782",
         "internal/checker/checker.go:4807",
