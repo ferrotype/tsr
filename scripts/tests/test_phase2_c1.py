@@ -119,6 +119,16 @@ class ExitMetrics(unittest.TestCase):
             self.assertFalse(found["c1_complete"], missing)
         self.assertFalse(self.metrics(rows, regression_parity=0.999)["c1_complete"])
 
+    def test_a_blocked_claim_names_a_registered_blocker_and_carries_no_weight(self):
+        self.claims["rows"].append({"id": "plain", "status": "blocked", "blocker": "B09"})
+        rows = [row("s08", checkpoint="regression", s08="acceptance"), row("plain", errors="different"),
+                row("claimed"), row("panicked")]
+        self.baseline["rows"][1] = row("plain", errors="different")
+        found = self.metrics(rows, blockers={"entries": [{"id": "B09"}]})
+        self.assertEqual((found["c1_open"], found["c1_regressions"]), (0, 0))
+        with self.assertRaisesRegex(ValueError, "no registered blocker"):
+            self.metrics(rows, blockers={"entries": []})
+
     def test_a_claim_must_name_an_executed_variant(self):
         self.claims["rows"].append({"id": "ghost", "status": "claimed"})
         with self.assertRaisesRegex(ValueError, "unknown executed variant"):

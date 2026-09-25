@@ -818,22 +818,24 @@
    "status": "claimed"
   },
   {
+   "blocker": "B09",
    "bucket": "emit order: native pre/post-emit sets differ",
-   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; after the TS2751 fix (341f3a3) the structured set equals the native pre-emit set and the baseline is the post-emit set, which B09 withholds",
    "go": "tsc/internal/checker/checker.go:Checker.getResolvedBaseConstraint",
    "id": "compiler/incorrectRecursiveMappedTypeConstraint.ts#configuration=0",
    "item": "C1.5",
    "mechanism": "the related information 'Circularity originates in type at this location' (TS2751) on 'Type parameter has a circular constraint' is never attached; constraints.rs reports the error without the currentNode-relative related entry",
-   "status": "claimed"
+   "status": "blocked"
   },
   {
+   "blocker": "B09",
    "bucket": "emit order: native pre/post-emit sets differ",
-   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; after the TS2751 fix (341f3a3) the structured set equals the native pre-emit set and the baseline is the post-emit set, which B09 withholds",
    "go": "tsc/internal/checker/checker.go:Checker.getResolvedBaseConstraint",
    "id": "compiler/typeParameterWithInvalidConstraintType.ts#configuration=0",
    "item": "C1.5",
    "mechanism": "the related information 'Circularity originates in type at this location' (TS2751) on 'Type parameter has a circular constraint' is never attached; constraints.rs reports the error without the currentNode-relative related entry",
-   "status": "claimed"
+   "status": "blocked"
   },
   {
    "bucket": "diagnostics: TS2314",
@@ -1241,6 +1243,6 @@
    "status": "candidate"
   }
  ],
- "scope": "C1 claims causes inside rows another checkpoint owns (docs/PHASE2-C1-plan.md, section 3). A row counts only with status claimed, after its reproduction named a foundation function; candidate rows are the C0 buckets the plan lists and carry no metric weight.",
+ "scope": "C1 claims causes inside rows another checkpoint owns (docs/PHASE2-C1-plan.md, section 3). A row counts only with status claimed, after its reproduction named a foundation function; candidate rows are the C0 buckets the plan lists and carry no metric weight. A row with status blocked names the blocker (data/phase2/blockers.json) that withholds its observation after the foundation cause is fixed; it carries no metric weight either.",
  "version": 1
 }

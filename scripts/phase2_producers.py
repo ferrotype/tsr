@@ -132,8 +132,13 @@ def receipt_current(identity, path=None):
     return record["source_inputs"] == source_inputs(WITNESSES[identity]["sources"])
 
 
-def c1_metrics(comparison, claims, audit_ok, baseline, contracts_ok, regression_parity):
-    """The C1 exit metrics from a full comparison and the four authorities."""
+def c1_metrics(comparison, claims, audit_ok, baseline, contracts_ok, regression_parity, blockers=None):
+    """The C1 exit metrics from a full comparison and the four authorities.
+
+    A claim counts only with status `claimed`; `candidate` rows await their
+    trace and `blocked` rows name the registered blocker that withholds them
+    after the foundation cause is fixed.
+    """
     rows = {row["id"]: row for row in comparison["rows"] if "outcomes" in row}
     metrics = {}
     if baseline is not None:
@@ -143,6 +148,10 @@ def c1_metrics(comparison, claims, audit_ok, baseline, contracts_ok, regression_
         unknown = [vid for vid in claimed if vid not in rows]
         if unknown:
             raise ValueError(f"claim names an unknown executed variant: {unknown[0]}")
+        known_blockers = {entry["id"] for entry in (blockers or {}).get("entries", [])}
+        for entry in claims.get("rows", []):
+            if entry.get("status") == "blocked" and entry.get("blocker") not in known_blockers:
+                raise ValueError(f"blocked claim {entry['id']} names no registered blocker")
         metrics["c1_open"] = sum(any(o not in MATCHED for o in rows[vid]["outcomes"].values()) for vid in claimed)
         modules = tuple(f"panic: tsr_checker::{name}" for name in claims.get("foundation_modules", []))
         failed = [row for row in rows.values() if "failed" in row["outcomes"].values()]
@@ -234,8 +243,10 @@ def checker(native=NATIVE, rust=RUST):
         claims = strict_json_loads(CLAIMS.read_bytes()) if CLAIMS.is_file() else None
         audit_ok = phase2_audit.complete(phase2_audit.load(AUDIT)) if AUDIT.is_file() else None
         baseline = phase2_compare.load_baseline(BASELINE) if BASELINE.is_file() else None
+        blockers = (strict_json_loads(phase2_blockers.REGISTER.read_bytes())
+                    if phase2_blockers.REGISTER.exists() else None)
         metrics.update(c1_metrics(comparison, claims, audit_ok, baseline, receipt_current("c1-contracts"),
-                                  metrics["regression_parity"]))
+                                  metrics["regression_parity"], blockers))
     except (OSError, ValueError, KeyError) as error:
         print("C1 metrics unavailable: " + str(error), file=sys.stderr)
         metrics["c1_complete"] = False
