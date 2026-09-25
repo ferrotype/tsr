@@ -609,6 +609,7 @@ impl CheckerState {
         Ok(false)
     }
 
+    // port: tsc/internal/checker/relater.go:hasMatchingRecursionIdentity
     fn has_recursion_identity(
         &self,
         ty: TypeId,
@@ -638,6 +639,7 @@ impl Relater<'_> {
             .expect("active or inference-retained frame")
     }
     // port: tsc/internal/checker/relater.go:Relater.isRelatedToEx
+    // port: tsc/internal/checker/relater.go:Relater.isRelatedTo
     pub(crate) fn related(
         &mut self,
         source: TypeId,
@@ -661,6 +663,7 @@ impl Relater<'_> {
         })
     }
 
+    // port: tsc/internal/checker/relater.go:Relater.isRelatedToWorker
     fn related_worker(
         &mut self,
         mut source: TypeId,
@@ -762,6 +765,7 @@ impl Relater<'_> {
         Ok(result)
     }
 
+    // port: tsc/internal/checker/relater.go:Relater.isRelatedToSimple
     fn simple_related(&mut self, source: TypeId, target: TypeId) -> Result<Ternary, Error> {
         let reverse = self.kind == RelationKind::Comparable
             && self.checker.types.flags(target)? & tf::NEVER == 0
@@ -949,6 +953,7 @@ impl Relater<'_> {
         result
     }
 
+    // port: tsc/internal/checker/relater.go:Relater.resetMaybeStack
     fn reset_maybe(&mut self, start: usize, succeeded: bool, propagating: u32) {
         let frame_index = self.frame.index(0).expect("allocated relation frame");
         let relations = &mut self.checker.relations;

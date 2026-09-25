@@ -49,6 +49,7 @@ impl Relater<'_> {
         })
     }
 
+    // port: tsc/internal/checker/relater.go:createDiagnosticChainFromErrorChain
     pub(crate) fn error_diagnostic(
         &self,
         node: Option<NodeId>,
@@ -73,6 +74,7 @@ impl Relater<'_> {
         Ok(result)
     }
 
+    // port: tsc/internal/checker/relater.go:Relater.getChainMessage
     pub(crate) fn chain_message(&self, offset: usize) -> Option<&'static Message> {
         self.errors
             .chain
@@ -534,6 +536,7 @@ fn is_conversion_or_interface_implementation_message(message: &'static Message) 
     .any(|candidate| candidate.code == message.code)
 }
 
+// port: tsc/internal/checker/relater.go:getPropertyNameArg
 fn property_name(name: &[u8]) -> Vec<u8> {
     if matches!(name.first(), Some(b'"' | b'\'' | b'`')) {
         let mut result = vec![b'['];

@@ -857,21 +857,23 @@
   },
   {
    "bucket": "diagnostics: TS2352",
-   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; the comparable carve-out (842bfaa) did not change this row: the assertion relates two intersections of an instantiation-expression alias (typeof Err<U>), so the cause is C2's instantiation-expression typing",
    "go": "tsc/internal/checker/relater.go:Checker.checkTypeComparableTo",
    "id": "compiler/aliasInstantiationExpressionGenericIntersectionNoCrash1.ts#configuration=0",
    "item": "C1.6",
    "mechanism": "type assertions between type parameters, aliases or intersections do not report 'Conversion of type may be a mistake' (TS2352): the comparable relation answers true where the pin answers false",
-   "status": "claimed"
+   "owner": "C2",
+   "status": "returned"
   },
   {
    "bucket": "diagnostics: TS2352",
-   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; the comparable carve-out (842bfaa) did not change this row: the assertion relates two intersections of an instantiation-expression alias (typeof Err<U>), so the cause is C2's instantiation-expression typing",
    "go": "tsc/internal/checker/relater.go:Checker.checkTypeComparableTo",
    "id": "compiler/aliasInstantiationExpressionGenericIntersectionNoCrash2.ts#configuration=0",
    "item": "C1.6",
    "mechanism": "type assertions between type parameters, aliases or intersections do not report 'Conversion of type may be a mistake' (TS2352): the comparable relation answers true where the pin answers false",
-   "status": "claimed"
+   "owner": "C2",
+   "status": "returned"
   },
   {
    "bucket": "diagnostics: TS2352",
@@ -975,11 +977,11 @@
   {
    "bucket": "failed: checker_error",
    "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
-   "go": "tsc/internal/checker/checker.go:Checker.resolveSignature",
+   "go": "tsc/internal/checker/checker.go:Checker.instantiateSignature",
    "id": "compiler/declarationEmitExpandoArrowFunctionParameter.ts#configuration=0",
    "item": "C1.3",
-   "mechanism": "the checker stops with Error::MissingLink('failed signatures') (call_failure.rs:173) while merging an interface with non-generic type arguments, so diagnostics never complete",
-   "status": "claimed"
+   "mechanism": "after the empty-candidate fix (2c87ef7) the checker stops with 'unexpected Intrinsic type in type_parameter': signature_inference_candidates reads a type-parameter default from an inference whose type parameter is an intrinsic (trace: relater compare_signatures -> contextual_signature_instantiation -> inferred_type -> resolved_type_parameter_default); whether the instantiated signature carries non-parameters in type_parameters (C1.3) or the inference context does (C2) is not yet traced",
+   "status": "candidate"
   },
   {
    "bucket": "failed: checker_error",
@@ -993,29 +995,29 @@
   {
    "bucket": "failed: checker_error",
    "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
-   "go": "tsc/internal/checker/checker.go:Checker.resolveSignature",
+   "go": "tsc/internal/checker/checker.go:Checker.instantiateSignature",
    "id": "compiler/genericCallInferenceConditionalType1.ts#configuration=0",
    "item": "C1.3",
-   "mechanism": "the checker stops with Error::MissingLink('failed signatures') (call_failure.rs:173) while merging an interface with non-generic type arguments, so diagnostics never complete",
-   "status": "claimed"
+   "mechanism": "after the empty-candidate fix (2c87ef7) the checker stops with 'unexpected Intrinsic type in type_parameter': signature_inference_candidates reads a type-parameter default from an inference whose type parameter is an intrinsic (trace: relater compare_signatures -> contextual_signature_instantiation -> inferred_type -> resolved_type_parameter_default); whether the instantiated signature carries non-parameters in type_parameters (C1.3) or the inference context does (C2) is not yet traced",
+   "status": "candidate"
   },
   {
    "bucket": "failed: checker_error",
    "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
-   "go": "tsc/internal/checker/checker.go:Checker.resolveSignature",
+   "go": "tsc/internal/checker/checker.go:Checker.instantiateSignature",
    "id": "compiler/genericCallInferenceConditionalType2.ts#configuration=0",
    "item": "C1.3",
-   "mechanism": "the checker stops with Error::MissingLink('failed signatures') (call_failure.rs:173) while merging an interface with non-generic type arguments, so diagnostics never complete",
-   "status": "claimed"
+   "mechanism": "after the empty-candidate fix (2c87ef7) the checker stops with 'unexpected Intrinsic type in type_parameter': signature_inference_candidates reads a type-parameter default from an inference whose type parameter is an intrinsic (trace: relater compare_signatures -> contextual_signature_instantiation -> inferred_type -> resolved_type_parameter_default); whether the instantiated signature carries non-parameters in type_parameters (C1.3) or the inference context does (C2) is not yet traced",
+   "status": "candidate"
   },
   {
    "bucket": "failed: checker_error",
    "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
-   "go": "tsc/internal/checker/checker.go:Checker.resolveSignature",
+   "go": "tsc/internal/checker/checker.go:Checker.instantiateSignature",
    "id": "compiler/genericCallInferenceInConditionalTypes1.ts#configuration=0",
    "item": "C1.3",
-   "mechanism": "the checker stops with Error::MissingLink('failed signatures') (call_failure.rs:173) while merging an interface with non-generic type arguments, so diagnostics never complete",
-   "status": "claimed"
+   "mechanism": "after the empty-candidate fix (2c87ef7) the checker stops with 'unexpected Intrinsic type in type_parameter': signature_inference_candidates reads a type-parameter default from an inference whose type parameter is an intrinsic (trace: relater compare_signatures -> contextual_signature_instantiation -> inferred_type -> resolved_type_parameter_default); whether the instantiated signature carries non-parameters in type_parameters (C1.3) or the inference context does (C2) is not yet traced",
+   "status": "candidate"
   },
   {
    "bucket": "failed: checker_error",
@@ -1083,11 +1085,11 @@
   {
    "bucket": "failed: checker_error",
    "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
-   "go": "tsc/internal/checker/checker.go:Checker.resolveSignature",
+   "go": "tsc/internal/checker/checker.go:Checker.mergeSymbol",
    "id": "compiler/thislessFunctionsNotContextSensitive1.ts#configuration=0",
-   "item": "C1.3",
-   "mechanism": "the checker stops with Error::MissingLink('failed signatures') (call_failure.rs:173) while merging an interface with non-generic type arguments, so diagnostics never complete",
-   "status": "claimed"
+   "item": "C1.2",
+   "mechanism": "after 2c87ef7 the checker stops with the arena error 'lazy roots must belong to the current transaction' (tsr_arena lazy.rs publish), the same defect as packageDeduplicationDuplicateGlobals; trace pending",
+   "status": "candidate"
   },
   {
    "bucket": "failed: walker_error",
@@ -1243,6 +1245,6 @@
    "status": "candidate"
   }
  ],
- "scope": "C1 claims causes inside rows another checkpoint owns (docs/PHASE2-C1-plan.md, section 3). A row counts only with status claimed, after its reproduction named a foundation function; candidate rows are the C0 buckets the plan lists and carry no metric weight. A row with status blocked names the blocker (data/phase2/blockers.json) that withholds its observation after the foundation cause is fixed; it carries no metric weight either.",
+ "scope": "C1 claims causes inside rows another checkpoint owns (docs/PHASE2-C1-plan.md, section 3). A row counts only with status claimed, after its reproduction named a foundation function; candidate rows are the C0 buckets the plan lists and carry no metric weight. A row with status blocked names the blocker (data/phase2/blockers.json) that withholds its observation after the foundation cause is fixed; it carries no metric weight either. A row with status returned went back to its owner after its reproduction named a non-foundation cause; it carries no metric weight.",
  "version": 1
 }

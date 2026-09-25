@@ -150,6 +150,7 @@ impl SignatureStore {
         Ok(id)
     }
 
+    // port: tsc/internal/checker/relater.go:Checker.newTypePredicate
     pub(crate) fn new_type_predicate(
         &mut self,
         predicate: TypePredicate,

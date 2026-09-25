@@ -161,6 +161,7 @@ impl Relater<'_> {
         self.properties_related_except(source, target, optional_only, intersection, &[])
     }
 
+    // port: tsc/internal/checker/relater.go:excludeProperties
     pub(crate) fn properties_related_except(
         &mut self,
         source: TypeId,

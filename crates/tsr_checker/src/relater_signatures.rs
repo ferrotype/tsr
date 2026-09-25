@@ -477,6 +477,7 @@ impl Relater<'_> {
         Ok(related)
     }
 
+    // port: tsc/internal/checker/relater.go:Relater.signaturesIdenticalTo
     pub(crate) fn signatures_identical(
         &mut self,
         source: SignatureId,
