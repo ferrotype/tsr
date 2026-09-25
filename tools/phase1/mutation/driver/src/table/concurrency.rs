@@ -1,13 +1,15 @@
 //! Group `concurrency`: core concurrency, request context, BFS.
 //! Go: `tools/phase1/tables/go/concurrency_columns.go`; spec:
 //! `data/phase1/tables/concurrency.json`.
-use super::{decode, Column};
+use super::helpers::typed;
+use super::{panic_value, text, Column};
 use crate::protocol::hex;
 use serde::Deserialize;
 use serde_json::{json, Value};
 use std::collections::HashMap;
 use std::sync::atomic::{AtomicI64, Ordering};
 use std::sync::{Arc, Mutex};
+use std::time::Duration;
 use tsr_core::bfs::{self, BreadthFirstSearchLevel, BreadthFirstSearchOptions, VisitedSet};
 use tsr_core::context::{CheckerLifetime, RequestContext};
 
@@ -16,16 +18,8 @@ pub const COLUMNS: &[&str] = &[
     "core.BreadthFirstSearchParallel",
     "core.BreadthFirstSearchParallelEx",
     "core.ThrottleGroup",
+    "core.LimitedSemaphore",
 ];
-
-/// Go's `typedValuesColumn`.
-fn typed<I: serde::de::DeserializeOwned + 'static>(
-    input: &Value,
-    f: fn(&I) -> Result<Value, String>,
-) -> Result<Column, String> {
-    let input: I = decode(input)?;
-    Ok(Box::new(move || f(&input)))
-}
 
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -118,6 +112,19 @@ struct ThrottleCase {
 #[serde(deny_unknown_fields)]
 struct ThrottleCases {
     cases: Vec<ThrottleCase>,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct SemaphoreCase {
+    limit: i64,
+    jobs: Vec<i64>,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct SemaphoreCases {
+    cases: Vec<SemaphoreCase>,
 }
 
 /// Go's `bfsValue`.
@@ -275,6 +282,46 @@ pub fn build(column: &str, input: &Value) -> Option<Result<Column, String>> {
                     failure,
                     most.load(Ordering::SeqCst) <= limit
                 ]));
+            }
+            Ok(Value::Array(out))
+        }),
+        "core.LimitedSemaphore" => typed::<SemaphoreCases>(input, |input| {
+            let mut out = Vec::new();
+            for case in &input.cases {
+                // Go's constructor panics on a non-positive limit, and so does
+                // the port's assertion; the declared class is the value.
+                if case.limit <= 0 {
+                    return Ok(panic_value("message:maxConcurrency must be positive"));
+                }
+                let limit = usize::try_from(case.limit).map_err(text)?;
+                let semaphore = tsr_core::semaphore::LimitedSemaphore::new(limit);
+                let values = Mutex::new(Vec::new());
+                let (running, most) = (AtomicI64::new(0), AtomicI64::new(0));
+                std::thread::scope(|scope| {
+                    for &job in &case.jobs {
+                        let (values, running, most, semaphore) =
+                            (&values, &running, &most, &semaphore);
+                        scope.spawn(move || {
+                            let permit = semaphore.acquire();
+                            let now = running.fetch_add(1, Ordering::SeqCst) + 1;
+                            most.fetch_max(now, Ordering::SeqCst);
+                            values
+                                .lock()
+                                .unwrap_or_else(std::sync::PoisonError::into_inner)
+                                .push(job);
+                            // Hold the permit long enough for the other jobs
+                            // to contend for it, so an unbounded semaphore shows.
+                            std::thread::sleep(Duration::from_millis(10));
+                            running.fetch_sub(1, Ordering::SeqCst);
+                            drop(permit);
+                        });
+                    }
+                });
+                let mut values = values
+                    .into_inner()
+                    .unwrap_or_else(std::sync::PoisonError::into_inner);
+                values.sort_unstable();
+                out.push(json!([values, most.load(Ordering::SeqCst) <= case.limit]));
             }
             Ok(Value::Array(out))
         }),

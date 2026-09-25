@@ -1068,16 +1068,22 @@ impl<'a> Loader<'a> {
         };
         Ok(Err(failure))
     }
-    /// port: tsc/internal/compiler/fileloader.go:fileLoader.resolveLibrary
+    /// `resolveLibrary`; the marker is on its statement site.
     fn resolve_library(
         &mut self,
         library_name: &[u8],
         resolve_from: &[u8],
     ) -> Result<(ResolvedModule, Vec<tsr_module::DiagAndArgs>), Error> {
-        let resolution = self
-            .resolver
-            .resolve(library_name, resolve_from, ModuleKind::COMMON_JS)?
-            .clone();
+        let mut resolution = ResolvedModule::default();
+        // `p.resolver.ResolveModuleName(libraryName, resolveFrom, CommonJS, nil)`:
+        // the skip-statement site leaves the library unresolved, so the bundled
+        // file stays in the program instead of the package's replacement.
+        // port: tsc/internal/compiler/fileloader.go:fileLoader.resolveLibrary
+        resolution.clone_from(self.resolver.resolve(
+            library_name,
+            resolve_from,
+            ModuleKind::COMMON_JS,
+        )?);
         Ok((resolution, self.resolver.take_trace()))
     }
     /// port: tsc/internal/compiler/fileloader.go:fileLoader.pathForLibFile
@@ -1331,15 +1337,24 @@ impl<'a> Loader<'a> {
         )?))
     }
     /// A `/// <reference path>`: its absolute file name, or the diagnostic's
-    /// message and arguments.
-    /// port: tsc/internal/compiler/fileloader.go:fileLoader.resolveTripleslashPathReference
+    /// message and arguments (`resolveTripleslashPathReference`; the marker is
+    /// on its statement site).
     fn resolve_tripleslash_path_reference(
         &mut self,
         module_name: &[u8],
         containing_file: &[u8],
         source: &ProgramFile,
     ) -> Result<Result<Vec<u8>, ReferenceFailure>, Error> {
-        let target = path::absolute(module_name, &path::directory(containing_file));
+        let base_path = path::directory(containing_file);
+        let mut referenced = std::borrow::Cow::Borrowed(module_name);
+        // `if !IsRootedDiskPath(moduleName) { referencedFileName = CombinePaths(basePath, moduleName) }`:
+        // the negated-condition site leaves a relative reference uncombined, so
+        // the referenced file is reported missing instead of loaded.
+        // port: tsc/internal/compiler/fileloader.go:fileLoader.resolveTripleslashPathReference
+        if !path::is_rooted_disk_path(module_name) {
+            referenced = std::borrow::Cow::Owned(path::combine(&base_path, &[module_name]));
+        }
+        let target = tsr_core::path::normalize(&referenced).into_owned();
         self.file_reference(&target, module_name, Some(source))
     }
     /// port: tsc/internal/compiler/fileloader.go:fileLoader.resolveTypeReferenceDirectives

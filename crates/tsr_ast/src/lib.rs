@@ -107,7 +107,9 @@ pub use precedence::{
 pub use runtime_generated::*;
 pub use runtime_id::{existing_runtime_node_id, runtime_node_id};
 pub use source_file::*;
-pub use source_metadata::SourceFileMetaData;
+pub use source_metadata::{
+    emit_module_format_of_file, implied_node_format_for_emit, SourceFileMetaData,
+};
 pub use storage::{
     AstBuilder, AstBundle, AstFile, AstTransaction, AstView, ParsedFile, RetainedNode,
 };
@@ -330,8 +332,13 @@ impl tsr_arena::NodeParentRecord for Node {
 }
 
 impl SourceFileData {
+    /// The hand-written walk of `ast.go`: the statements, then the end-of-file
+    /// token. The statement walk is the skip-statement site: a mutant leaves a
+    /// file's children unvisited on every bound or indexed row.
+    // port: tsc/internal/ast/ast.go:SourceFile.ForEachChild
     pub fn for_each_child(&self, visitor: &mut impl ChildVisitor) -> ControlFlow<()> {
         if let Some(statements) = self.statements {
+            // port: tsc/internal/ast/ast.go:SourceFile.ForEachChild
             visitor.visit_list(statements)?;
         }
         if let Some(token) = self.end_of_file_token {

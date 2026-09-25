@@ -492,6 +492,87 @@
           "name": "cases"
         }
       ]
+    },
+    {
+      "evidence": [
+        "internal/vfs/osvfs/os.go:24",
+        "internal/vfs/osvfs/os.go:26",
+        "internal/vfs/osvfs/os.go:28",
+        "internal/vfs/osvfs/os.go:95",
+        "internal/vfs/osvfs/os.go:100"
+      ],
+      "id": "core.LimitedSemaphore",
+      "input": "values",
+      "operations": [
+        "tsc/internal/core/semaphore.go:NewLimitedSemaphore",
+        "tsc/internal/core/semaphore.go:LimitedSemaphore.Acquire"
+      ],
+      "panic_contract": [
+        "message:maxConcurrency must be positive"
+      ],
+      "projection": "[the jobs' values sorted, whether no more jobs than the limit held a permit at once] per case: every job acquires, records its concurrency, holds the permit for 10 ms so the others contend for it, and releases; the sorted values are scheduling-free, and the bound is what the operations establish; a non-positive limit is the constructor's declared panic",
+      "rust": "tsr_core::semaphore::LimitedSemaphore",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "cases": [
+              {
+                "jobs": [
+                  1,
+                  2,
+                  3
+                ],
+                "limit": 1
+              },
+              {
+                "jobs": [
+                  5,
+                  4
+                ],
+                "limit": 3
+              },
+              {
+                "jobs": [],
+                "limit": 2
+              },
+              {
+                "jobs": [
+                  7,
+                  8,
+                  9,
+                  10,
+                  11
+                ],
+                "limit": 4
+              },
+              {
+                "jobs": [
+                  6,
+                  6,
+                  6,
+                  6
+                ],
+                "limit": 2
+              }
+            ]
+          },
+          "name": "cases"
+        },
+        {
+          "input": {
+            "cases": [
+              {
+                "jobs": [
+                  1
+                ],
+                "limit": 0
+              }
+            ]
+          },
+          "name": "non-positive"
+        }
+      ]
     }
   ],
   "group": "concurrency",

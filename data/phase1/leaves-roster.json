@@ -199,22 +199,10 @@
       "owner": "xtask/src/gen (the Rust tables are regenerated from the pin, which is the same guarantee)"
     },
     {
-      "category": "later_step",
-      "evidence": "`grep -rn core.NewLimitedSemaphore --include=*.go upstream/tsc` outside internal/core matches internal/vfs/osvfs and nothing else. The filesystem step prepares that package and its concurrency limit, so it owns whatever of the semaphore is observable through it.",
-      "operation": "tsc/internal/core/semaphore.go:LimitedSemaphore.Acquire",
-      "owner": "F2a (internal/vfs/osvfs), the only non-test caller"
-    },
-    {
       "category": "unused_at_pin",
       "evidence": "Reproduce: rg -n 'TryAcquire|core\\.Semaphore\\b' upstream/tsc --glob '*.go'. The only interface satisfaction is the compile-time assertion var _ Semaphore = (*LimitedSemaphore)(nil) at semaphore.go:22. UnlimitedSemaphore.TryAcquire is already exempt as go_runtime in leaves-roster.json.",
       "operation": "tsc/internal/core/semaphore.go:LimitedSemaphore.TryAcquire",
       "owner": "nobody at this pin; the first caller a later pin adds fixes the contract"
-    },
-    {
-      "category": "later_step",
-      "evidence": "`grep -rn core.NewLimitedSemaphore --include=*.go upstream/tsc` outside internal/core matches internal/vfs/osvfs and nothing else. The filesystem step prepares that package and its concurrency limit, so it owns whatever of the semaphore is observable through it.",
-      "operation": "tsc/internal/core/semaphore.go:NewLimitedSemaphore",
-      "owner": "F2a (internal/vfs/osvfs), the only non-test caller"
     },
     {
       "category": "go_runtime",

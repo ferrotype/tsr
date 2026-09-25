@@ -1,7 +1,9 @@
 use crate::Error;
-use tsr_ast::utilities_middle::get_pragma_argument;
+use tsr_ast::utilities_middle::{
+    get_pragma_argument, get_pragma_from_source_file as pragma_from_source_file,
+};
 use tsr_ast::{
-    AstView, ExternalModuleIndicatorOptions, NodeDataRead, NodeId, Pragma, SourceFileMetaData,
+    AstView, ExternalModuleIndicatorOptions, NodeDataRead, NodeId, SourceFileMetaData,
     SyntaxKind as K,
 };
 use tsr_core::{CompilerOptions, JsxEmit, ModuleDetectionKind, ModuleKind, ModuleResolutionKind};
@@ -61,42 +63,9 @@ fn implied_node_format_for_file(path: &[u8], package_json_type: &[u8]) -> Module
         ModuleKind::NONE
     }
 }
-/// port: tsc/internal/ast/utilities.go:GetImpliedNodeFormatForEmitWorker
-pub(crate) fn implied_for_emit(
-    name: &[u8],
-    emit: ModuleKind,
-    meta: &SourceFileMetaData,
-) -> ModuleKind {
-    if (ModuleKind::NODE16..=ModuleKind::NODE_NEXT).contains(&emit) {
-        return meta.implied_node_format;
-    }
-    if meta.implied_node_format == ModuleKind::COMMON_JS
-        && (meta.package_json_type.as_bytes() == b"commonjs"
-            || has_suffix(name, &[b".cjs", b".cts"]))
-    {
-        return ModuleKind::COMMON_JS;
-    }
-    if meta.implied_node_format == ModuleKind::ESNEXT
-        && (meta.package_json_type.as_bytes() == b"module" || has_suffix(name, &[b".mjs", b".mts"]))
-    {
-        return ModuleKind::ESNEXT;
-    }
-    ModuleKind::NONE
-}
-
-/// port: tsc/internal/ast/utilities.go:GetEmitModuleFormatOfFileWorker
-pub(crate) fn emit_format(
-    name: &[u8],
-    options: &CompilerOptions,
-    meta: &SourceFileMetaData,
-) -> ModuleKind {
-    let implied = implied_for_emit(name, options.emit_module_kind(), meta);
-    if implied == ModuleKind::NONE {
-        options.emit_module_kind()
-    } else {
-        implied
-    }
-}
+pub(crate) use tsr_ast::{
+    emit_module_format_of_file as emit_format, implied_node_format_for_emit as implied_for_emit,
+};
 
 /// This describes emitted syntax, independent of resolution-mode attributes and
 /// the module resolver's mode selection.
@@ -351,21 +320,6 @@ pub(crate) fn jsx_runtime_import(base: &[u8], options: &CompilerOptions) -> JsSt
         b"jsx-runtime"
     });
     JsString::from_bytes(name)
-}
-
-/// The last pragma of the name wins.
-/// port: tsc/internal/ast/utilities.go:GetPragmaFromSourceFile
-fn pragma_from_source_file<'a>(
-    pragmas: impl IntoIterator<Item = &'a Pragma>,
-    name: &[u8],
-) -> Option<&'a Pragma> {
-    let mut result = None;
-    for pragma in pragmas {
-        if pragma.name.as_bytes() == name {
-            result = Some(pragma);
-        }
-    }
-    result
 }
 
 /// port: tsc/internal/compiler/fileloader.go:getModeForTypeReferenceDirectiveInFile

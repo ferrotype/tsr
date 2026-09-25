@@ -5,6 +5,9 @@
 package main
 
 import (
+	"encoding/json"
+	"maps"
+	"slices"
 	"strings"
 
 	"github.com/microsoft/TypeScript/tsc/internal/ast"
@@ -182,5 +185,115 @@ func init() {
 			func(_ *Parsed, node *ast.Node) bool {
 				return ast.IsVariableDeclarationInitializedToBareOrAccessedRequire(node)
 			}),
+		// The last pragma of each name the parser records, in pragmaNames
+		// order: its arguments as [[name hex, value hex], ...] sorted by name,
+		// or null when the file has no pragma of that name.
+		Column{
+			ID:    "ast.GetPragmaFromSourceFile",
+			Input: "source",
+			Build: func(raw json.RawMessage) (func() any, error) {
+				p, err := ParseSource(raw)
+				if err != nil {
+					return nil, err
+				}
+				return func() any {
+					out := []any{}
+					for _, name := range pragmaNames {
+						out = append(out, pragmaArgs(ast.GetPragmaFromSourceFile(p.File, name)))
+					}
+					return out
+				}, nil
+			},
+			Survey: func(p *Parsed) []string { return pragmaClasses(p, false) },
+		},
+		// For each pragma of the file in order, [name hex, [the argument value
+		// hex for each name in pragmaArguments order]], then the same values
+		// for a nil pragma.
+		Column{
+			ID:    "ast.GetPragmaArgument",
+			Input: "source",
+			Build: func(raw json.RawMessage) (func() any, error) {
+				p, err := ParseSource(raw)
+				if err != nil {
+					return nil, err
+				}
+				return func() any {
+					out := []any{}
+					for i := range p.File.Pragmas {
+						pragma := &p.File.Pragmas[i]
+						out = append(out, []any{Hex(pragma.Name), pragmaValues(pragma)})
+					}
+					out = append(out, []any{nil, pragmaValues(nil)})
+					return out
+				}, nil
+			},
+			Survey: func(p *Parsed) []string { return pragmaClasses(p, true) },
+		},
+		// The emit module format of constructed file names, module options and
+		// metadata: the module kind per case.
+		typedValuesColumn("ast.GetEmitModuleFormatOfFileWorker", func(in struct {
+			Cases []struct {
+				FileName          string `json:"file_name"`
+				Module            int    `json:"module"`
+				ImpliedNodeFormat int    `json:"implied_node_format"`
+				PackageJsonType   string `json:"package_json_type"`
+			} `json:"cases"`
+		}) any {
+			out := []any{}
+			for _, c := range in.Cases {
+				options := &core.CompilerOptions{Module: core.ModuleKind(c.Module)}
+				meta := ast.SourceFileMetaData{PackageJsonType: c.PackageJsonType, ImpliedNodeFormat: core.ResolutionMode(c.ImpliedNodeFormat)}
+				out = append(out, Scalar(int(ast.GetEmitModuleFormatOfFileWorker(c.FileName, options, meta))))
+			}
+			return out
+		}),
 	)
+}
+
+// The pragma names the pinned parser records (parser.go, processPragmasIntoFields)
+// and the argument names those pragmas carry.
+var pragmaNames = []string{"reference", "amd-dependency", "amd-module", "ts-check", "ts-nocheck", "jsx", "jsxfrag", "jsximportsource", "jsxruntime"}
+
+var pragmaArguments = []string{"path", "types", "lib", "no-default-lib", "resolution-mode", "preserve", "name", "factory"}
+
+// pragmaArgs projects a pragma as its arguments sorted by name, or nil.
+func pragmaArgs(pragma *ast.Pragma) any {
+	if pragma == nil {
+		return nil
+	}
+	out := []any{}
+	for _, name := range slices.Sorted(maps.Keys(pragma.Args)) {
+		out = append(out, []any{Hex(name), Hex(pragma.Args[name].Value)})
+	}
+	return out
+}
+
+// pragmaValues is GetPragmaArgument over every argument name, in order.
+func pragmaValues(pragma *ast.Pragma) any {
+	out := []any{}
+	for _, name := range pragmaArguments {
+		out = append(out, Hex(ast.GetPragmaArgument(pragma, name)))
+	}
+	return out
+}
+
+// pragmaClasses are the survey classes of the pragma columns: the pragma names
+// present (n:<name>) or, with arguments, the (name, argument) pairs present
+// (a:<name>/<argument>); "0" for a file without pragmas.
+func pragmaClasses(p *Parsed, arguments bool) []string {
+	classes := []string{}
+	for i := range p.File.Pragmas {
+		pragma := &p.File.Pragmas[i]
+		if !arguments {
+			classes = append(classes, "n:"+pragma.Name)
+			continue
+		}
+		for _, name := range slices.Sorted(maps.Keys(pragma.Args)) {
+			classes = append(classes, "a:"+pragma.Name+"/"+name)
+		}
+	}
+	if len(classes) == 0 {
+		classes = append(classes, "0")
+	}
+	return classes
 }
