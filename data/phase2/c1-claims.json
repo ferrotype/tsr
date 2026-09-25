@@ -922,12 +922,12 @@
   },
   {
    "bucket": "diagnostics: TS2318",
-   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
-   "go": "tsc/internal/checker/checker.go:Checker.getGlobalSymbol",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26: traced with prints in the pin's harness (narrowTypeByInstanceof, getNarrowedTypeWorker, computeBaseConstraint) and the port's debug build; structured diff matches the pin after resolved_base_constraint computes over simplified_type",
+   "go": "tsc/internal/checker/checker.go:Checker.getResolvedBaseConstraint",
    "id": "compiler/awaitedTypeNoLib.ts#configuration=0",
-   "item": "C1.2",
-   "mechanism": "with no lib, the pin reports 'Cannot find global type Awaited' (TS2318) and the consequent TS2345; the Rust global lookup stays silent; traced further: the ten noLib global lookups do report, only the Awaited lookup does not, so the reporting resolver (getGlobalAwaitedSymbol via tryCreateAwaitedType) is never reached where the pin reaches it; the awaited-type path (getAwaitedTypeNoAliasEx, isAwaitedTypeNeeded) reads the same as the pin, so the divergence sits upstream (promised type or generic-object flags) and needs a step trace",
-   "status": "candidate"
+   "item": "C1.5",
+   "mechanism": "the pin resolves a type's base constraint over its simplified type: the inner conditional `TResult extends PromiseLike<unknown> ? never : TResult` with the unresolved (any-like) PromiseLike simplifies to never, so NotPromise<TResult>'s base constraint is Thenable<unknown> and `result instanceof Thenable` keeps NotPromise<TResult> in the narrowed union; the port computed the constraint of the unsimplified conditional (nil), narrowed the union to Thenable<NotPromise<TResult>> and never reached the call-resolution error whose missing-await note performs the reporting Awaited lookup (TS2318) and the TS2345 chain",
+   "status": "claimed"
   },
   {
    "bucket": "panic: tsr_checker::relater_tuples",

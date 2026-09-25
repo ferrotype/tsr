@@ -274,7 +274,12 @@ impl CheckerState {
                 return Ok(None);
             }
             stack.push(identity);
-            let result = self.compute_base_constraint(ty, stack);
+            // The pin computes over the simplified type: a conditional of the
+            // form `T extends U ? never : T` with an any-like extends type is
+            // `never` here, which decides the base constraint of a union that
+            // contains it.
+            let simplified = self.simplified_type(ty, false)?;
+            let result = self.compute_base_constraint(simplified, stack);
             stack.pop();
             result
         })();
