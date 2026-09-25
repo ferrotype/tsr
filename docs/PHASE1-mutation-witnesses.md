@@ -231,7 +231,37 @@ another way stay pending (see the Phase 1 closure report); with the case
 families recorded and the equivalent_rust roster entries, Phase 1 coverage has
 20 pending operations.
 
+Remaining-operations campaign (2026-09-25, after the closure merge), the same
+five oracles over one manifest of 1,104 operations (1,910 mutants, 276
+controls): **1,102 killed**. Per witness: e1 516, binder 712, facts 546,
+syntax 28, table 289. The table oracle's 11 groups hold 202 columns over 8,506
+rows, every column at native parity; the four new columns are
+`core.LimitedSemaphore` (concurrency), `ast.GetPragmaFromSourceFile`,
+`ast.GetPragmaArgument` and `ast.GetEmitModuleFormatOfFileWorker` (modules).
+`confirm` reproduces all 9,876 recorded kill pairs. Not killed: `NewThrottleGroup`
+(returns `Self`, no operator; `equivalent_rust` in the report) and
+`nativepath.Realpath` (Linux only). Sites the closure could not kill moved to
+statements: the binder's module-name quote (`bindSourceFileAsExternalModule`),
+the rooted-path branch (`resolveTripleslashPathReference`), the library
+resolution call (`resolveLibrary`), the semaphore's bound and its wait loop
+(`NewLimitedSemaphore`, `LimitedSemaphore.Acquire`, whose constructor is no
+longer `const` so that the switch can run; the VFS statics use `LazyLock`).
+With the recaptured syntax family (SourceFile walk and visitor actions, a
+`ModifierList` special, `liftToBlock` claimed by the embedded-statement shapes)
+and the four SyntheticExpression operations as a reviewed Phase 2 destination,
+Phase 1 coverage has one pending operation, `Realpath`, until a Linux host
+capture of this source closure is replayed.
+
 Known limitations:
+
+- A plan change costs a full campaign. `kill` takes `--mutants` and
+  `--skip-killed`, but `results` merges only kill files of one plan, so a new
+  or moved site re-plans the manifest and re-kills every oracle (about 35
+  minutes of machine time on 2026-09-25). Merging a partial rerun into the
+  recorded results (carrying unchanged mutants' kills whose spans and reach
+  still bind) and freezing only the rows of changed columns are the missing
+  pieces; until they exist, an increment must be batched, not run per
+  operation.
 
 - A site's operation set, which decides `hit_parser` and the syntax
   multi-operation rule, includes only operations in the plan. A site that also

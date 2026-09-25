@@ -1,10 +1,10 @@
 {
   "counts": {
-    "covered": 4222,
+    "covered": 4237,
     "equivalent_rust": 92,
-    "implemented_untested": 207,
-    "later_phase": 223,
-    "missing": 51
+    "implemented_untested": 189,
+    "later_phase": 227,
+    "missing": 50
   },
   "dispositions": [
     "covered",
@@ -5734,9 +5734,13 @@
       "annotated_home": [
         "crates/tsr_ast/src/visitor.rs"
       ],
-      "basis": "ledger maps the symbol and its source file carries 6 file-level producer metric(s), which do not witness this operation individually",
+      "basis": "witnessed by 3 exact link(s): syntax/generated-special/ModifierList/empty, syntax/generated-special/ModifierList/nil, syntax/generated-special/ModifierList/nodes",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "syntax/generated-special/ModifierList/empty",
+        "syntax/generated-special/ModifierList/nil",
+        "syntax/generated-special/ModifierList/nodes"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/core",
@@ -5752,7 +5756,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/ast",
       "go_source": "tsc/internal/ast/ast.go",
       "id": "tsc/internal/ast/ast.go:ModifierList.Clone",
@@ -5772,7 +5776,7 @@
       "membership_reason": "AST utilities, owners and lazy storage",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -13523,7 +13527,7 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "witnessed by 686 exact link(s): syntax/generated-ast/Block/0-empty-0, syntax/generated-ast/Block/0-nil-0, syntax/generated-ast/Block/0-nil-element-0",
+      "basis": "witnessed by 690 exact link(s): syntax/generated-ast/Block/0-empty-0, syntax/generated-ast/Block/0-nil-0, syntax/generated-ast/Block/0-nil-element-0",
       "basis_kind": "rule",
       "cases": [
         "syntax/generated-ast/Block/0-empty-0",
@@ -14211,7 +14215,11 @@
         "syntax/generated-shape/YieldExpression/empty",
         "syntax/generated-shape/YieldExpression/nil",
         "syntax/generated-shape/YieldExpression/nil-element",
-        "syntax/generated-shape/YieldExpression/nodes"
+        "syntax/generated-shape/YieldExpression/nodes",
+        "syntax/generated-special/SourceFile/empty",
+        "syntax/generated-special/SourceFile/nil",
+        "syntax/generated-special/SourceFile/nil-element",
+        "syntax/generated-special/SourceFile/nodes"
       ],
       "depends_on": [
         "internal/collections",
@@ -15700,9 +15708,12 @@
       "annotated_home": [
         "crates/tsr_ast/src/visitor.rs"
       ],
-      "basis": "witnessed by 1 exact link(s): witness/s06-accessor-observations-rust",
+      "basis": "witnessed by 4 exact link(s): syntax/generated-special/ModifierList/empty, syntax/generated-special/ModifierList/nil, syntax/generated-special/ModifierList/nodes",
       "basis_kind": "rule",
       "cases": [
+        "syntax/generated-special/ModifierList/empty",
+        "syntax/generated-special/ModifierList/nil",
+        "syntax/generated-special/ModifierList/nodes",
         "witness/s06-accessor-observations-rust"
       ],
       "depends_on": [
@@ -20994,10 +21005,17 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_ast/src/lib.rs"
+      ],
+      "basis": "witnessed by 4 exact link(s): syntax/generated-special/SourceFile/empty, syntax/generated-special/SourceFile/nil, syntax/generated-special/SourceFile/nil-element",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "syntax/generated-special/SourceFile/empty",
+        "syntax/generated-special/SourceFile/nil",
+        "syntax/generated-special/SourceFile/nil-element",
+        "syntax/generated-special/SourceFile/nodes"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/core",
@@ -21013,7 +21031,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/ast",
       "go_source": "tsc/internal/ast/ast.go",
       "id": "tsc/internal/ast/ast.go:SourceFile.ForEachChild",
@@ -21028,12 +21046,12 @@
         "run.e3.ast_runtime == true",
         "run.e1.ast_utilities == true"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "AST utilities, owners and lazy storage",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -22735,9 +22753,14 @@
       "annotated_home": [
         "crates/tsr_ast/src/visitor.rs"
       ],
-      "basis": "ledger maps the symbol and its source file carries 6 file-level producer metric(s), which do not witness this operation individually",
+      "basis": "witnessed by 4 exact link(s): syntax/generated-special/SourceFile/empty, syntax/generated-special/SourceFile/nil, syntax/generated-special/SourceFile/nil-element",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "syntax/generated-special/SourceFile/empty",
+        "syntax/generated-special/SourceFile/nil",
+        "syntax/generated-special/SourceFile/nil-element",
+        "syntax/generated-special/SourceFile/nodes"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/core",
@@ -22753,7 +22776,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/ast",
       "go_source": "tsc/internal/ast/ast.go",
       "id": "tsc/internal/ast/ast.go:SourceFile.VisitEachChild",
@@ -22773,7 +22796,7 @@
       "membership_reason": "AST utilities, owners and lazy storage",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -27012,7 +27035,7 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "witnessed by 598 exact link(s): syntax/generated-ast/JSDocParameterOrPropertyTag/0-empty-0, syntax/generated-ast/JSDocParameterOrPropertyTag/0-empty-1, syntax/generated-ast/JSDocParameterOrPropertyTag/0-nil-0",
+      "basis": "witnessed by 602 exact link(s): syntax/generated-ast/JSDocParameterOrPropertyTag/0-empty-0, syntax/generated-ast/JSDocParameterOrPropertyTag/0-empty-1, syntax/generated-ast/JSDocParameterOrPropertyTag/0-nil-0",
       "basis_kind": "rule",
       "cases": [
         "syntax/generated-ast/JSDocParameterOrPropertyTag/0-empty-0",
@@ -27612,7 +27635,11 @@
         "syntax/generated-shape/YieldExpression/empty",
         "syntax/generated-shape/YieldExpression/nil",
         "syntax/generated-shape/YieldExpression/nil-element",
-        "syntax/generated-shape/YieldExpression/nodes"
+        "syntax/generated-shape/YieldExpression/nodes",
+        "syntax/generated-special/SourceFile/empty",
+        "syntax/generated-special/SourceFile/nil",
+        "syntax/generated-special/SourceFile/nil-element",
+        "syntax/generated-special/SourceFile/nodes"
       ],
       "depends_on": [
         "internal/collections",
@@ -27931,7 +27958,7 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "witnessed by 312 exact link(s): syntax/generated-ast/Block/0-empty-0, syntax/generated-ast/Block/0-nil-0, syntax/generated-ast/Block/0-nil-element-0",
+      "basis": "witnessed by 316 exact link(s): syntax/generated-ast/Block/0-empty-0, syntax/generated-ast/Block/0-nil-0, syntax/generated-ast/Block/0-nil-element-0",
       "basis_kind": "rule",
       "cases": [
         "syntax/generated-ast/Block/0-empty-0",
@@ -28245,7 +28272,11 @@
         "syntax/generated-shape/VariableDeclarationList/empty",
         "syntax/generated-shape/VariableDeclarationList/nil",
         "syntax/generated-shape/VariableDeclarationList/nil-element",
-        "syntax/generated-shape/VariableDeclarationList/nodes"
+        "syntax/generated-shape/VariableDeclarationList/nodes",
+        "syntax/generated-special/SourceFile/empty",
+        "syntax/generated-special/SourceFile/nil",
+        "syntax/generated-special/SourceFile/nil-element",
+        "syntax/generated-special/SourceFile/nodes"
       ],
       "depends_on": [
         "internal/collections",
@@ -28302,7 +28333,7 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "witnessed by 290 exact link(s): syntax/generated-ast/Block/0-empty-0, syntax/generated-ast/Block/0-nil-element-0, syntax/generated-ast/Block/0-nodes-0",
+      "basis": "witnessed by 293 exact link(s): syntax/generated-ast/Block/0-empty-0, syntax/generated-ast/Block/0-nil-element-0, syntax/generated-ast/Block/0-nodes-0",
       "basis_kind": "rule",
       "cases": [
         "syntax/generated-ast/Block/0-empty-0",
@@ -28594,7 +28625,10 @@
         "syntax/generated-shape/VariableDeclarationList/nodes",
         "syntax/generated-shape/VariableStatement/empty",
         "syntax/generated-shape/VariableStatement/nil-element",
-        "syntax/generated-shape/VariableStatement/nodes"
+        "syntax/generated-shape/VariableStatement/nodes",
+        "syntax/generated-special/SourceFile/empty",
+        "syntax/generated-special/SourceFile/nil-element",
+        "syntax/generated-special/SourceFile/nodes"
       ],
       "depends_on": [
         "internal/collections",
@@ -76582,7 +76616,7 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "witnessed by 686 exact link(s): syntax/generated-ast/Block/0-empty-0, syntax/generated-ast/Block/0-nil-0, syntax/generated-ast/Block/0-nil-element-0",
+      "basis": "witnessed by 690 exact link(s): syntax/generated-ast/Block/0-empty-0, syntax/generated-ast/Block/0-nil-0, syntax/generated-ast/Block/0-nil-element-0",
       "basis_kind": "rule",
       "cases": [
         "syntax/generated-ast/Block/0-empty-0",
@@ -77270,7 +77304,11 @@
         "syntax/generated-shape/YieldExpression/empty",
         "syntax/generated-shape/YieldExpression/nil",
         "syntax/generated-shape/YieldExpression/nil-element",
-        "syntax/generated-shape/YieldExpression/nodes"
+        "syntax/generated-shape/YieldExpression/nodes",
+        "syntax/generated-special/SourceFile/empty",
+        "syntax/generated-special/SourceFile/nil",
+        "syntax/generated-special/SourceFile/nil-element",
+        "syntax/generated-special/SourceFile/nodes"
       ],
       "depends_on": [
         "internal/collections",
@@ -86779,8 +86817,8 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "ledger maps the symbol and its source file carries 4 file-level producer metric(s), which do not witness this operation individually",
-      "basis_kind": "rule",
+      "basis": "A node the checker creates for its own Type payload: its factory, update, clone and visitor are checker services, and an opaque Phase 1 payload would witness nothing the checker's own path does not. Definition: upstream/tsc/internal/ast/ast_generated.go:6270-6276 (NewSyntheticExpression), 6278-6283 (UpdateSyntheticExpression), 6289-6291 (SyntheticExpression.VisitEachChild), 6293-6295 (SyntheticExpression.Clone). The payload's Type is `any` for a checker *Type. The only pinned production constructor is Checker.createSyntheticExpression (upstream/tsc/internal/checker/checker.go:30467), which the Rust checker already implements over its TypeId slot (crates/tsr_checker/src/destructuring_assignments.rs:392); the other constructor is the API decoder (upstream/tsc/internal/api/encoder/decoder_generated.go:856), Phase 6. The generated-AST family keeps its cast and child-traversal case (syntax/generated-special/SyntheticExpression) without claiming these four.",
+      "basis_kind": "review",
       "cases": [],
       "depends_on": [
         "internal/collections",
@@ -86796,8 +86834,8 @@
         "internal/tspath",
         "internal/vfs/osvfs"
       ],
-      "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "destination_phase": 2,
+      "disposition": "later_phase",
       "go_package": "internal/ast",
       "go_source": "tsc/internal/ast/ast_generated.go",
       "id": "tsc/internal/ast/ast_generated.go:NodeFactory.NewSyntheticExpression",
@@ -86814,8 +86852,8 @@
       "membership": "full",
       "membership_reason": "AST utilities, owners and lazy storage",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "Phase 2 by the owner's 2026-09-25 decision, recorded in coverage-review.json",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -96740,8 +96778,8 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "ledger maps the symbol and its source file carries 4 file-level producer metric(s), which do not witness this operation individually",
-      "basis_kind": "rule",
+      "basis": "A node the checker creates for its own Type payload: its factory, update, clone and visitor are checker services, and an opaque Phase 1 payload would witness nothing the checker's own path does not. Definition: upstream/tsc/internal/ast/ast_generated.go:6270-6276 (NewSyntheticExpression), 6278-6283 (UpdateSyntheticExpression), 6289-6291 (SyntheticExpression.VisitEachChild), 6293-6295 (SyntheticExpression.Clone). The payload's Type is `any` for a checker *Type. The only pinned production constructor is Checker.createSyntheticExpression (upstream/tsc/internal/checker/checker.go:30467), which the Rust checker already implements over its TypeId slot (crates/tsr_checker/src/destructuring_assignments.rs:392); the other constructor is the API decoder (upstream/tsc/internal/api/encoder/decoder_generated.go:856), Phase 6. The generated-AST family keeps its cast and child-traversal case (syntax/generated-special/SyntheticExpression) without claiming these four.",
+      "basis_kind": "review",
       "cases": [],
       "depends_on": [
         "internal/collections",
@@ -96757,8 +96795,8 @@
         "internal/tspath",
         "internal/vfs/osvfs"
       ],
-      "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "destination_phase": 2,
+      "disposition": "later_phase",
       "go_package": "internal/ast",
       "go_source": "tsc/internal/ast/ast_generated.go",
       "id": "tsc/internal/ast/ast_generated.go:NodeFactory.UpdateSyntheticExpression",
@@ -96775,8 +96813,8 @@
       "membership": "full",
       "membership_reason": "AST utilities, owners and lazy storage",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "Phase 2 by the owner's 2026-09-25 decision, recorded in coverage-review.json",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -103588,8 +103626,8 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "ledger maps the symbol and its source file carries 4 file-level producer metric(s), which do not witness this operation individually",
-      "basis_kind": "rule",
+      "basis": "A node the checker creates for its own Type payload: its factory, update, clone and visitor are checker services, and an opaque Phase 1 payload would witness nothing the checker's own path does not. Definition: upstream/tsc/internal/ast/ast_generated.go:6270-6276 (NewSyntheticExpression), 6278-6283 (UpdateSyntheticExpression), 6289-6291 (SyntheticExpression.VisitEachChild), 6293-6295 (SyntheticExpression.Clone). The payload's Type is `any` for a checker *Type. The only pinned production constructor is Checker.createSyntheticExpression (upstream/tsc/internal/checker/checker.go:30467), which the Rust checker already implements over its TypeId slot (crates/tsr_checker/src/destructuring_assignments.rs:392); the other constructor is the API decoder (upstream/tsc/internal/api/encoder/decoder_generated.go:856), Phase 6. The generated-AST family keeps its cast and child-traversal case (syntax/generated-special/SyntheticExpression) without claiming these four.",
+      "basis_kind": "review",
       "cases": [],
       "depends_on": [
         "internal/collections",
@@ -103605,8 +103643,8 @@
         "internal/tspath",
         "internal/vfs/osvfs"
       ],
-      "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "destination_phase": 2,
+      "disposition": "later_phase",
       "go_package": "internal/ast",
       "go_source": "tsc/internal/ast/ast_generated.go",
       "id": "tsc/internal/ast/ast_generated.go:SyntheticExpression.Clone",
@@ -103623,8 +103661,8 @@
       "membership": "full",
       "membership_reason": "AST utilities, owners and lazy storage",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "Phase 2 by the owner's 2026-09-25 decision, recorded in coverage-review.json",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -103699,8 +103737,8 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "ledger maps the symbol and its source file carries 4 file-level producer metric(s), which do not witness this operation individually",
-      "basis_kind": "rule",
+      "basis": "A node the checker creates for its own Type payload: its factory, update, clone and visitor are checker services, and an opaque Phase 1 payload would witness nothing the checker's own path does not. Definition: upstream/tsc/internal/ast/ast_generated.go:6270-6276 (NewSyntheticExpression), 6278-6283 (UpdateSyntheticExpression), 6289-6291 (SyntheticExpression.VisitEachChild), 6293-6295 (SyntheticExpression.Clone). The payload's Type is `any` for a checker *Type. The only pinned production constructor is Checker.createSyntheticExpression (upstream/tsc/internal/checker/checker.go:30467), which the Rust checker already implements over its TypeId slot (crates/tsr_checker/src/destructuring_assignments.rs:392); the other constructor is the API decoder (upstream/tsc/internal/api/encoder/decoder_generated.go:856), Phase 6. The generated-AST family keeps its cast and child-traversal case (syntax/generated-special/SyntheticExpression) without claiming these four.",
+      "basis_kind": "review",
       "cases": [],
       "depends_on": [
         "internal/collections",
@@ -103716,8 +103754,8 @@
         "internal/tspath",
         "internal/vfs/osvfs"
       ],
-      "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "destination_phase": 2,
+      "disposition": "later_phase",
       "go_package": "internal/ast",
       "go_source": "tsc/internal/ast/ast_generated.go",
       "id": "tsc/internal/ast/ast_generated.go:SyntheticExpression.VisitEachChild",
@@ -103734,8 +103772,8 @@
       "membership": "full",
       "membership_reason": "AST utilities, owners and lazy storage",
       "roster": {
-        "owner": null,
-        "state": "pending",
+        "owner": "Phase 2 by the owner's 2026-09-25 decision, recorded in coverage-review.json",
+        "state": "exempt:later_step",
         "step": "syntax"
       },
       "rust_home": [
@@ -116794,11 +116832,13 @@
     {
       "actual_home": null,
       "annotated_home": [
-        "crates/tsr_compiler/src/metadata.rs"
+        "crates/tsr_ast/src/source_metadata.rs"
       ],
-      "basis": "ledger maps the symbol and its source file carries 5 file-level producer metric(s), which do not witness this operation individually",
+      "basis": "witnessed by 1 exact link(s): mutation/table",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "mutation/table"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/core",
@@ -116814,7 +116854,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/ast",
       "go_source": "tsc/internal/ast/utilities.go",
       "id": "tsc/internal/ast/utilities.go:GetEmitModuleFormatOfFileWorker",
@@ -116833,7 +116873,7 @@
       "membership_reason": "AST utilities, owners and lazy storage",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -117756,12 +117796,12 @@
     {
       "actual_home": null,
       "annotated_home": [
-        "crates/tsr_compiler/src/metadata.rs"
+        "crates/tsr_ast/src/source_metadata.rs"
       ],
-      "basis": "witnessed by 1 exact link(s): mutation/syntax",
+      "basis": "witnessed by 1 exact link(s): mutation/table",
       "basis_kind": "rule",
       "cases": [
-        "mutation/syntax"
+        "mutation/table"
       ],
       "depends_on": [
         "internal/collections",
@@ -119408,9 +119448,11 @@
       "annotated_home": [
         "crates/tsr_ast/src/utilities_middle.rs"
       ],
-      "basis": "ledger maps the symbol and its source file carries 5 file-level producer metric(s), which do not witness this operation individually",
+      "basis": "witnessed by 1 exact link(s): mutation/table",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "mutation/table"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/core",
@@ -119426,7 +119468,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/ast",
       "go_source": "tsc/internal/ast/utilities.go",
       "id": "tsc/internal/ast/utilities.go:GetPragmaArgument",
@@ -119445,7 +119487,7 @@
       "membership_reason": "AST utilities, owners and lazy storage",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -119473,11 +119515,13 @@
     {
       "actual_home": null,
       "annotated_home": [
-        "crates/tsr_compiler/src/metadata.rs"
+        "crates/tsr_ast/src/utilities_middle.rs"
       ],
-      "basis": "ledger maps the symbol and its source file carries 5 file-level producer metric(s), which do not witness this operation individually",
+      "basis": "witnessed by 1 exact link(s): mutation/table",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "mutation/table"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/core",
@@ -119493,7 +119537,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/ast",
       "go_source": "tsc/internal/ast/utilities.go",
       "id": "tsc/internal/ast/utilities.go:GetPragmaFromSourceFile",
@@ -119512,7 +119556,7 @@
       "membership_reason": "AST utilities, owners and lazy storage",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -138060,12 +138104,15 @@
       "annotated_home": [
         "crates/tsr_ast/src/visitor.rs"
       ],
-      "basis": "witnessed by 3 exact link(s): mutation/binder, mutation/e1, mutation/facts",
+      "basis": "witnessed by 6 exact link(s): mutation/binder, mutation/e1, mutation/facts",
       "basis_kind": "rule",
       "cases": [
         "mutation/binder",
         "mutation/e1",
-        "mutation/facts"
+        "mutation/facts",
+        "syntax/generated-special/ModifierList/empty",
+        "syntax/generated-special/ModifierList/nil",
+        "syntax/generated-special/ModifierList/nodes"
       ],
       "depends_on": [
         "internal/collections",
@@ -143137,9 +143184,30 @@
       "annotated_home": [
         "crates/tsr_ast/src/visitor.rs"
       ],
-      "basis": "witnessed by 1 exact link(s): witness/s06-factory-fixtures-rust",
+      "basis": "witnessed by 22 exact link(s): syntax/generated-shape/DoStatement/empty, syntax/generated-shape/DoStatement/nil-element, syntax/generated-shape/DoStatement/nodes",
       "basis_kind": "rule",
       "cases": [
+        "syntax/generated-shape/DoStatement/empty",
+        "syntax/generated-shape/DoStatement/nil-element",
+        "syntax/generated-shape/DoStatement/nodes",
+        "syntax/generated-shape/ForInOrOfStatement/empty",
+        "syntax/generated-shape/ForInOrOfStatement/nil-element",
+        "syntax/generated-shape/ForInOrOfStatement/nodes",
+        "syntax/generated-shape/ForStatement/empty",
+        "syntax/generated-shape/ForStatement/nil-element",
+        "syntax/generated-shape/ForStatement/nodes",
+        "syntax/generated-shape/IfStatement/empty",
+        "syntax/generated-shape/IfStatement/nil-element",
+        "syntax/generated-shape/IfStatement/nodes",
+        "syntax/generated-shape/LabeledStatement/empty",
+        "syntax/generated-shape/LabeledStatement/nil-element",
+        "syntax/generated-shape/LabeledStatement/nodes",
+        "syntax/generated-shape/WhileStatement/empty",
+        "syntax/generated-shape/WhileStatement/nil-element",
+        "syntax/generated-shape/WhileStatement/nodes",
+        "syntax/generated-shape/WithStatement/empty",
+        "syntax/generated-shape/WithStatement/nil-element",
+        "syntax/generated-shape/WithStatement/nodes",
         "witness/s06-factory-fixtures-rust"
       ],
       "depends_on": [
@@ -143395,9 +143463,14 @@
       "annotated_home": [
         "crates/tsr_ast/src/visitor.rs"
       ],
-      "basis": "ledger maps the symbol and its source file carries 4 file-level producer metric(s), which do not witness this operation individually",
+      "basis": "witnessed by 4 exact link(s): syntax/generated-special/SourceFile/empty, syntax/generated-special/SourceFile/nil, syntax/generated-special/SourceFile/nil-element",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "syntax/generated-special/SourceFile/empty",
+        "syntax/generated-special/SourceFile/nil",
+        "syntax/generated-special/SourceFile/nil-element",
+        "syntax/generated-special/SourceFile/nodes"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/core",
@@ -143413,7 +143486,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/ast",
       "go_source": "tsc/internal/ast/visitor.go",
       "id": "tsc/internal/ast/visitor.go:NodeVisitor.VisitSourceFile",
@@ -143431,7 +143504,7 @@
       "membership_reason": "AST utilities, owners and lazy storage",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -143444,9 +143517,31 @@
       "annotated_home": [
         "crates/tsr_ast/src/visitor.rs"
       ],
-      "basis": "ledger maps the symbol and its source file carries 4 file-level producer metric(s), which do not witness this operation individually",
+      "basis": "witnessed by 21 exact link(s): syntax/generated-shape/DoStatement/empty, syntax/generated-shape/DoStatement/nil-element, syntax/generated-shape/DoStatement/nodes",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "syntax/generated-shape/DoStatement/empty",
+        "syntax/generated-shape/DoStatement/nil-element",
+        "syntax/generated-shape/DoStatement/nodes",
+        "syntax/generated-shape/ForInOrOfStatement/empty",
+        "syntax/generated-shape/ForInOrOfStatement/nil-element",
+        "syntax/generated-shape/ForInOrOfStatement/nodes",
+        "syntax/generated-shape/ForStatement/empty",
+        "syntax/generated-shape/ForStatement/nil-element",
+        "syntax/generated-shape/ForStatement/nodes",
+        "syntax/generated-shape/IfStatement/empty",
+        "syntax/generated-shape/IfStatement/nil-element",
+        "syntax/generated-shape/IfStatement/nodes",
+        "syntax/generated-shape/LabeledStatement/empty",
+        "syntax/generated-shape/LabeledStatement/nil-element",
+        "syntax/generated-shape/LabeledStatement/nodes",
+        "syntax/generated-shape/WhileStatement/empty",
+        "syntax/generated-shape/WhileStatement/nil-element",
+        "syntax/generated-shape/WhileStatement/nodes",
+        "syntax/generated-shape/WithStatement/empty",
+        "syntax/generated-shape/WithStatement/nil-element",
+        "syntax/generated-shape/WithStatement/nodes"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/core",
@@ -143462,7 +143557,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/ast",
       "go_source": "tsc/internal/ast/visitor.go",
       "id": "tsc/internal/ast/visitor.go:NodeVisitor.liftToBlock",
@@ -143480,7 +143575,7 @@
       "membership_reason": "AST utilities, owners and lazy storage",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -143952,9 +144047,14 @@
       "annotated_home": [
         "crates/tsr_ast/src/visitor.rs"
       ],
-      "basis": "ledger maps the symbol and its source file carries 4 file-level producer metric(s), which do not witness this operation individually",
+      "basis": "witnessed by 4 exact link(s): syntax/generated-special/SourceFile/empty, syntax/generated-special/SourceFile/nil, syntax/generated-special/SourceFile/nil-element",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "syntax/generated-special/SourceFile/empty",
+        "syntax/generated-special/SourceFile/nil",
+        "syntax/generated-special/SourceFile/nil-element",
+        "syntax/generated-special/SourceFile/nodes"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/core",
@@ -143970,7 +144070,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/ast",
       "go_source": "tsc/internal/ast/visitor.go",
       "id": "tsc/internal/ast/visitor.go:NodeVisitor.visitToken",
@@ -143988,7 +144088,7 @@
       "membership_reason": "AST utilities, owners and lazy storage",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -144001,9 +144101,14 @@
       "annotated_home": [
         "crates/tsr_ast/src/visitor.rs"
       ],
-      "basis": "ledger maps the symbol and its source file carries 4 file-level producer metric(s), which do not witness this operation individually",
+      "basis": "witnessed by 4 exact link(s): syntax/generated-special/SourceFile/empty, syntax/generated-special/SourceFile/nil, syntax/generated-special/SourceFile/nil-element",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "syntax/generated-special/SourceFile/empty",
+        "syntax/generated-special/SourceFile/nil",
+        "syntax/generated-special/SourceFile/nil-element",
+        "syntax/generated-special/SourceFile/nodes"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/core",
@@ -144019,7 +144124,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/ast",
       "go_source": "tsc/internal/ast/visitor.go",
       "id": "tsc/internal/ast/visitor.go:NodeVisitor.visitTopLevelStatements",
@@ -144037,7 +144142,7 @@
       "membership_reason": "AST utilities, owners and lazy storage",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -148960,12 +149065,12 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [
-        "crates/tsr_binder/src/modules.rs"
-      ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "annotated_home": [],
+      "basis": "witnessed by 1 exact link(s): mutation/binder",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "mutation/binder"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/collections",
@@ -148979,7 +149084,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/binder",
       "go_source": "tsc/internal/binder/binder.go",
       "id": "tsc/internal/binder/binder.go:Binder.bindSourceFileAsExternalModule",
@@ -148992,7 +149097,7 @@
       "membership_reason": "file-owned binding",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -166468,12 +166573,12 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [
-        "crates/tsr_compiler/src/loader.rs"
-      ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "annotated_home": [],
+      "basis": "witnessed by 1 exact link(s): mutation/syntax",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "mutation/syntax"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/binder",
@@ -166513,7 +166618,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/fileloader.go",
       "id": "tsc/internal/compiler/fileloader.go:fileLoader.resolveLibrary",
@@ -166526,7 +166631,7 @@
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -166537,12 +166642,12 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [
-        "crates/tsr_compiler/src/loader.rs"
-      ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "annotated_home": [],
+      "basis": "witnessed by 1 exact link(s): mutation/syntax",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "mutation/syntax"
+      ],
       "depends_on": [
         "internal/ast",
         "internal/binder",
@@ -166582,7 +166687,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/fileloader.go",
       "id": "tsc/internal/compiler/fileloader.go:fileLoader.resolveTripleslashPathReference",
@@ -166595,7 +166700,7 @@
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -188473,12 +188578,12 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [
-        "crates/tsr_core/src/semaphore.rs"
-      ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "annotated_home": [],
+      "basis": "witnessed by 1 exact link(s): mutation/table",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "mutation/table"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/debug",
@@ -188487,7 +188592,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/semaphore.go",
       "id": "tsc/internal/core/semaphore.go:LimitedSemaphore.Acquire",
@@ -188499,8 +188604,8 @@
       "membership": "full",
       "membership_reason": "core helpers and option semantics",
       "roster": {
-        "owner": "F2a (internal/vfs/osvfs), the only non-test caller",
-        "state": "exempt:later_step",
+        "owner": null,
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [
@@ -188545,12 +188650,12 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [
-        "crates/tsr_core/src/semaphore.rs"
-      ],
-      "basis": "ledger maps the symbol but records no verification link",
+      "annotated_home": [],
+      "basis": "witnessed by 1 exact link(s): mutation/table",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "mutation/table"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/debug",
@@ -188559,7 +188664,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/semaphore.go",
       "id": "tsc/internal/core/semaphore.go:NewLimitedSemaphore",
@@ -188571,8 +188676,8 @@
       "membership": "full",
       "membership_reason": "core helpers and option semantics",
       "roster": {
-        "owner": "F2a (internal/vfs/osvfs), the only non-test caller",
-        "state": "exempt:later_step",
+        "owner": null,
+        "state": "prepared",
         "step": "leaves"
       },
       "rust_home": [

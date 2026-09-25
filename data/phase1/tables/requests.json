@@ -18887,6 +18887,3131 @@
    "s06": "compiler/assertionFunctionWildcardImport1.ts/unit/1/config/0"
   },
   {
+   "column": "ast.GetPragmaFromSourceFile",
+   "group": "modules",
+   "id": "ast.GetPragmaFromSourceFile@s06:compiler/tsCheckPreservedAfterReference.ts/unit/0/config/0",
+   "request_sha256": "5274995f18cd0e500ced8a4d79c099c4205430ccf784a07fe80fa36bcbe7912d",
+   "s06": "compiler/tsCheckPreservedAfterReference.ts/unit/0/config/0"
+  },
+  {
+   "column": "ast.GetPragmaFromSourceFile",
+   "group": "modules",
+   "id": "ast.GetPragmaFromSourceFile@s06:conformance/jsx/inline/inlineJsxAndJsxFragPragma.tsx/unit/6/config/0",
+   "request_sha256": "43410d819f7b28b3991187ed3d9b14acfb18b5fbaa7b884d170d05a3d3eec95f",
+   "s06": "conformance/jsx/inline/inlineJsxAndJsxFragPragma.tsx/unit/6/config/0"
+  },
+  {
+   "column": "ast.GetPragmaFromSourceFile",
+   "group": "modules",
+   "id": "ast.GetPragmaFromSourceFile@s06:compiler/augmentExportEquals2.ts/unit/2/config/0",
+   "request_sha256": "55e84a688d0115244e4e5661b01ea0f284d09d4106576711a5221f80c2f8a87d",
+   "s06": "compiler/augmentExportEquals2.ts/unit/2/config/0"
+  },
+  {
+   "column": "ast.GetPragmaFromSourceFile",
+   "group": "modules",
+   "id": "ast.GetPragmaFromSourceFile@s06:compiler/checkJsFiles5.ts/unit/0/config/0",
+   "request_sha256": "70750cedcf5a5bcf42d056430233f17b3f3de9e38ecfedc53374b1c4b37545a7",
+   "s06": "compiler/checkJsFiles5.ts/unit/0/config/0"
+  },
+  {
+   "column": "ast.GetPragmaFromSourceFile",
+   "group": "modules",
+   "id": "ast.GetPragmaFromSourceFile@s06:compiler/jsxNamespaceImplicitImportJSXNamespaceFromPragmaPickedOverGlobalOne.tsx/unit/3/config/0",
+   "request_sha256": "065e1bd7a4a05c01c8121f92c01a4e8925d61a054e75a53fd512947169ae63aa",
+   "s06": "compiler/jsxNamespaceImplicitImportJSXNamespaceFromPragmaPickedOverGlobalOne.tsx/unit/3/config/0"
+  },
+  {
+   "column": "ast.GetPragmaFromSourceFile",
+   "group": "modules",
+   "id": "ast.GetPragmaFromSourceFile@s06:compiler/jsxRuntimePragma.ts/unit/1/config/0",
+   "request_sha256": "a159df48736ad1908c4c1e762b230e2886837ad181e5c9738bc587945ad01917",
+   "s06": "compiler/jsxRuntimePragma.ts/unit/1/config/0"
+  },
+  {
+   "column": "ast.GetPragmaArgument",
+   "group": "modules",
+   "id": "ast.GetPragmaArgument@s06:compiler/typeReferenceDirectives4.ts/unit/2/config/0",
+   "request_sha256": "9790530a19d8988abcec081dbb45fdd5bd80f74d27a8ed8a01e7d360333b5c46",
+   "s06": "compiler/typeReferenceDirectives4.ts/unit/2/config/0"
+  },
+  {
+   "column": "ast.GetPragmaArgument",
+   "group": "modules",
+   "id": "ast.GetPragmaArgument@s06:conformance/jsx/inline/inlineJsxAndJsxFragPragma.tsx/unit/6/config/0",
+   "request_sha256": "40579940e40747e03d2783ff9cbba3ddc902636c1a8a955383689a98a2cdfbab",
+   "s06": "conformance/jsx/inline/inlineJsxAndJsxFragPragma.tsx/unit/6/config/0"
+  },
+  {
+   "column": "ast.GetPragmaArgument",
+   "group": "modules",
+   "id": "ast.GetPragmaArgument@s06:compiler/augmentExportEquals2.ts/unit/2/config/0",
+   "request_sha256": "8d0bd6d069697435b9249924d6a0041802d09adcd5c15c241f8040bd9a00b9e9",
+   "s06": "compiler/augmentExportEquals2.ts/unit/2/config/0"
+  },
+  {
+   "column": "ast.GetPragmaArgument",
+   "group": "modules",
+   "id": "ast.GetPragmaArgument@s06:compiler/tsCheckPreservedAfterReference.ts/unit/0/config/0",
+   "request_sha256": "ea916a49c51574a51077849c452c306b206b552cae5bc15a6af20dfeaf0a47ff",
+   "s06": "compiler/tsCheckPreservedAfterReference.ts/unit/0/config/0"
+  },
+  {
+   "column": "ast.GetPragmaArgument",
+   "group": "modules",
+   "id": "ast.GetPragmaArgument@s06:conformance/moduleResolution/resolutionModeTripleSlash3.ts/unit/4/config/0",
+   "request_sha256": "88fbba07cd6ac27665e147d4a03332144addc3649754465f74b4a448dda15750",
+   "s06": "conformance/moduleResolution/resolutionModeTripleSlash3.ts/unit/4/config/0"
+  },
+  {
+   "column": "ast.GetPragmaArgument",
+   "group": "modules",
+   "id": "ast.GetPragmaArgument@s06:compiler/jsxNamespaceImplicitImportJSXNamespaceFromPragmaPickedOverGlobalOne.tsx/unit/3/config/0",
+   "request_sha256": "9e0ad643f01ed49176104934bb35cf5104db4d08636ffaee5a13a726c773421d",
+   "s06": "compiler/jsxNamespaceImplicitImportJSXNamespaceFromPragmaPickedOverGlobalOne.tsx/unit/3/config/0"
+  },
+  {
+   "column": "ast.GetPragmaArgument",
+   "group": "modules",
+   "id": "ast.GetPragmaArgument@s06:compiler/jsxRuntimePragma.ts/unit/1/config/0",
+   "request_sha256": "e9fb31a5e9f3d7c759c574dc5e99e16a7d106ada515790ce162a081ef24cdbbf",
+   "s06": "compiler/jsxRuntimePragma.ts/unit/1/config/0"
+  },
+  {
+   "column": "ast.GetEmitModuleFormatOfFileWorker",
+   "group": "modules",
+   "id": "ast.GetEmitModuleFormatOfFileWorker@grid",
+   "input": {
+    "cases": [
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 0,
+      "module": 0,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 0,
+      "module": 0,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 0,
+      "module": 0,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 1,
+      "module": 0,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 1,
+      "module": 0,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 1,
+      "module": 0,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 99,
+      "module": 0,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 99,
+      "module": 0,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 99,
+      "module": 0,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 0,
+      "module": 1,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 0,
+      "module": 1,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 0,
+      "module": 1,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 1,
+      "module": 1,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 1,
+      "module": 1,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 1,
+      "module": 1,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 99,
+      "module": 1,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 99,
+      "module": 1,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 99,
+      "module": 1,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 0,
+      "module": 5,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 0,
+      "module": 5,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 0,
+      "module": 5,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 1,
+      "module": 5,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 1,
+      "module": 5,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 1,
+      "module": 5,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 99,
+      "module": 5,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 99,
+      "module": 5,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 99,
+      "module": 5,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 0,
+      "module": 99,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 0,
+      "module": 99,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 0,
+      "module": 99,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 1,
+      "module": 99,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 1,
+      "module": 99,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 1,
+      "module": 99,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 99,
+      "module": 99,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 99,
+      "module": 99,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 99,
+      "module": 99,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 0,
+      "module": 100,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 0,
+      "module": 100,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 0,
+      "module": 100,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 1,
+      "module": 100,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 1,
+      "module": 100,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 1,
+      "module": 100,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 99,
+      "module": 100,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 99,
+      "module": 100,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 99,
+      "module": 100,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 0,
+      "module": 199,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 0,
+      "module": 199,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 0,
+      "module": 199,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 1,
+      "module": 199,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 1,
+      "module": 199,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 1,
+      "module": 199,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 99,
+      "module": 199,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 99,
+      "module": 199,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 99,
+      "module": 199,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 0,
+      "module": 200,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 0,
+      "module": 200,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 0,
+      "module": 200,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 1,
+      "module": 200,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 1,
+      "module": 200,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 1,
+      "module": 200,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 99,
+      "module": 200,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 99,
+      "module": 200,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.ts",
+      "implied_node_format": 99,
+      "module": 200,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 0,
+      "module": 0,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 0,
+      "module": 0,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 0,
+      "module": 0,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 1,
+      "module": 0,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 1,
+      "module": 0,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 1,
+      "module": 0,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 99,
+      "module": 0,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 99,
+      "module": 0,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 99,
+      "module": 0,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 0,
+      "module": 1,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 0,
+      "module": 1,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 0,
+      "module": 1,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 1,
+      "module": 1,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 1,
+      "module": 1,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 1,
+      "module": 1,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 99,
+      "module": 1,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 99,
+      "module": 1,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 99,
+      "module": 1,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 0,
+      "module": 5,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 0,
+      "module": 5,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 0,
+      "module": 5,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 1,
+      "module": 5,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 1,
+      "module": 5,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 1,
+      "module": 5,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 99,
+      "module": 5,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 99,
+      "module": 5,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 99,
+      "module": 5,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 0,
+      "module": 99,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 0,
+      "module": 99,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 0,
+      "module": 99,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 1,
+      "module": 99,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 1,
+      "module": 99,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 1,
+      "module": 99,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 99,
+      "module": 99,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 99,
+      "module": 99,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 99,
+      "module": 99,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 0,
+      "module": 100,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 0,
+      "module": 100,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 0,
+      "module": 100,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 1,
+      "module": 100,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 1,
+      "module": 100,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 1,
+      "module": 100,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 99,
+      "module": 100,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 99,
+      "module": 100,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 99,
+      "module": 100,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 0,
+      "module": 199,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 0,
+      "module": 199,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 0,
+      "module": 199,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 1,
+      "module": 199,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 1,
+      "module": 199,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 1,
+      "module": 199,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 99,
+      "module": 199,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 99,
+      "module": 199,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 99,
+      "module": 199,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 0,
+      "module": 200,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 0,
+      "module": 200,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 0,
+      "module": 200,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 1,
+      "module": 200,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 1,
+      "module": 200,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 1,
+      "module": 200,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 99,
+      "module": 200,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 99,
+      "module": 200,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.mts",
+      "implied_node_format": 99,
+      "module": 200,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 0,
+      "module": 0,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 0,
+      "module": 0,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 0,
+      "module": 0,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 1,
+      "module": 0,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 1,
+      "module": 0,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 1,
+      "module": 0,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 99,
+      "module": 0,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 99,
+      "module": 0,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 99,
+      "module": 0,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 0,
+      "module": 1,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 0,
+      "module": 1,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 0,
+      "module": 1,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 1,
+      "module": 1,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 1,
+      "module": 1,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 1,
+      "module": 1,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 99,
+      "module": 1,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 99,
+      "module": 1,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 99,
+      "module": 1,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 0,
+      "module": 5,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 0,
+      "module": 5,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 0,
+      "module": 5,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 1,
+      "module": 5,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 1,
+      "module": 5,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 1,
+      "module": 5,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 99,
+      "module": 5,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 99,
+      "module": 5,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 99,
+      "module": 5,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 0,
+      "module": 99,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 0,
+      "module": 99,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 0,
+      "module": 99,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 1,
+      "module": 99,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 1,
+      "module": 99,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 1,
+      "module": 99,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 99,
+      "module": 99,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 99,
+      "module": 99,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 99,
+      "module": 99,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 0,
+      "module": 100,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 0,
+      "module": 100,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 0,
+      "module": 100,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 1,
+      "module": 100,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 1,
+      "module": 100,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 1,
+      "module": 100,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 99,
+      "module": 100,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 99,
+      "module": 100,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 99,
+      "module": 100,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 0,
+      "module": 199,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 0,
+      "module": 199,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 0,
+      "module": 199,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 1,
+      "module": 199,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 1,
+      "module": 199,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 1,
+      "module": 199,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 99,
+      "module": 199,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 99,
+      "module": 199,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 99,
+      "module": 199,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 0,
+      "module": 200,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 0,
+      "module": 200,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 0,
+      "module": 200,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 1,
+      "module": 200,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 1,
+      "module": 200,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 1,
+      "module": 200,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 99,
+      "module": 200,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 99,
+      "module": 200,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.cts",
+      "implied_node_format": 99,
+      "module": 200,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 0,
+      "module": 0,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 0,
+      "module": 0,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 0,
+      "module": 0,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 1,
+      "module": 0,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 1,
+      "module": 0,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 1,
+      "module": 0,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 99,
+      "module": 0,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 99,
+      "module": 0,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 99,
+      "module": 0,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 0,
+      "module": 1,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 0,
+      "module": 1,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 0,
+      "module": 1,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 1,
+      "module": 1,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 1,
+      "module": 1,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 1,
+      "module": 1,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 99,
+      "module": 1,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 99,
+      "module": 1,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 99,
+      "module": 1,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 0,
+      "module": 5,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 0,
+      "module": 5,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 0,
+      "module": 5,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 1,
+      "module": 5,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 1,
+      "module": 5,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 1,
+      "module": 5,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 99,
+      "module": 5,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 99,
+      "module": 5,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 99,
+      "module": 5,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 0,
+      "module": 99,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 0,
+      "module": 99,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 0,
+      "module": 99,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 1,
+      "module": 99,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 1,
+      "module": 99,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 1,
+      "module": 99,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 99,
+      "module": 99,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 99,
+      "module": 99,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 99,
+      "module": 99,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 0,
+      "module": 100,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 0,
+      "module": 100,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 0,
+      "module": 100,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 1,
+      "module": 100,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 1,
+      "module": 100,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 1,
+      "module": 100,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 99,
+      "module": 100,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 99,
+      "module": 100,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 99,
+      "module": 100,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 0,
+      "module": 199,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 0,
+      "module": 199,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 0,
+      "module": 199,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 1,
+      "module": 199,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 1,
+      "module": 199,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 1,
+      "module": 199,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 99,
+      "module": 199,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 99,
+      "module": 199,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 99,
+      "module": 199,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 0,
+      "module": 200,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 0,
+      "module": 200,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 0,
+      "module": 200,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 1,
+      "module": 200,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 1,
+      "module": 200,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 1,
+      "module": 200,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 99,
+      "module": 200,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 99,
+      "module": 200,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.mjs",
+      "implied_node_format": 99,
+      "module": 200,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 0,
+      "module": 0,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 0,
+      "module": 0,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 0,
+      "module": 0,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 1,
+      "module": 0,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 1,
+      "module": 0,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 1,
+      "module": 0,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 99,
+      "module": 0,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 99,
+      "module": 0,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 99,
+      "module": 0,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 0,
+      "module": 1,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 0,
+      "module": 1,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 0,
+      "module": 1,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 1,
+      "module": 1,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 1,
+      "module": 1,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 1,
+      "module": 1,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 99,
+      "module": 1,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 99,
+      "module": 1,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 99,
+      "module": 1,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 0,
+      "module": 5,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 0,
+      "module": 5,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 0,
+      "module": 5,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 1,
+      "module": 5,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 1,
+      "module": 5,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 1,
+      "module": 5,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 99,
+      "module": 5,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 99,
+      "module": 5,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 99,
+      "module": 5,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 0,
+      "module": 99,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 0,
+      "module": 99,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 0,
+      "module": 99,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 1,
+      "module": 99,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 1,
+      "module": 99,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 1,
+      "module": 99,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 99,
+      "module": 99,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 99,
+      "module": 99,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 99,
+      "module": 99,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 0,
+      "module": 100,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 0,
+      "module": 100,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 0,
+      "module": 100,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 1,
+      "module": 100,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 1,
+      "module": 100,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 1,
+      "module": 100,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 99,
+      "module": 100,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 99,
+      "module": 100,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 99,
+      "module": 100,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 0,
+      "module": 199,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 0,
+      "module": 199,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 0,
+      "module": 199,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 1,
+      "module": 199,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 1,
+      "module": 199,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 1,
+      "module": 199,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 99,
+      "module": 199,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 99,
+      "module": 199,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 99,
+      "module": 199,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 0,
+      "module": 200,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 0,
+      "module": 200,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 0,
+      "module": 200,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 1,
+      "module": 200,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 1,
+      "module": 200,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 1,
+      "module": 200,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 99,
+      "module": 200,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 99,
+      "module": 200,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.cjs",
+      "implied_node_format": 99,
+      "module": 200,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 0,
+      "module": 0,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 0,
+      "module": 0,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 0,
+      "module": 0,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 1,
+      "module": 0,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 1,
+      "module": 0,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 1,
+      "module": 0,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 99,
+      "module": 0,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 99,
+      "module": 0,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 99,
+      "module": 0,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 0,
+      "module": 1,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 0,
+      "module": 1,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 0,
+      "module": 1,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 1,
+      "module": 1,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 1,
+      "module": 1,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 1,
+      "module": 1,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 99,
+      "module": 1,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 99,
+      "module": 1,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 99,
+      "module": 1,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 0,
+      "module": 5,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 0,
+      "module": 5,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 0,
+      "module": 5,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 1,
+      "module": 5,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 1,
+      "module": 5,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 1,
+      "module": 5,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 99,
+      "module": 5,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 99,
+      "module": 5,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 99,
+      "module": 5,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 0,
+      "module": 99,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 0,
+      "module": 99,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 0,
+      "module": 99,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 1,
+      "module": 99,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 1,
+      "module": 99,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 1,
+      "module": 99,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 99,
+      "module": 99,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 99,
+      "module": 99,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 99,
+      "module": 99,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 0,
+      "module": 100,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 0,
+      "module": 100,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 0,
+      "module": 100,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 1,
+      "module": 100,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 1,
+      "module": 100,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 1,
+      "module": 100,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 99,
+      "module": 100,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 99,
+      "module": 100,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 99,
+      "module": 100,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 0,
+      "module": 199,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 0,
+      "module": 199,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 0,
+      "module": 199,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 1,
+      "module": 199,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 1,
+      "module": 199,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 1,
+      "module": 199,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 99,
+      "module": 199,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 99,
+      "module": 199,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 99,
+      "module": 199,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 0,
+      "module": 200,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 0,
+      "module": 200,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 0,
+      "module": 200,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 1,
+      "module": 200,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 1,
+      "module": 200,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 1,
+      "module": 200,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 99,
+      "module": 200,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 99,
+      "module": 200,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.d.ts",
+      "implied_node_format": 99,
+      "module": 200,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 0,
+      "module": 0,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 0,
+      "module": 0,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 0,
+      "module": 0,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 1,
+      "module": 0,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 1,
+      "module": 0,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 1,
+      "module": 0,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 99,
+      "module": 0,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 99,
+      "module": 0,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 99,
+      "module": 0,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 0,
+      "module": 1,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 0,
+      "module": 1,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 0,
+      "module": 1,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 1,
+      "module": 1,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 1,
+      "module": 1,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 1,
+      "module": 1,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 99,
+      "module": 1,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 99,
+      "module": 1,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 99,
+      "module": 1,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 0,
+      "module": 5,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 0,
+      "module": 5,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 0,
+      "module": 5,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 1,
+      "module": 5,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 1,
+      "module": 5,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 1,
+      "module": 5,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 99,
+      "module": 5,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 99,
+      "module": 5,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 99,
+      "module": 5,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 0,
+      "module": 99,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 0,
+      "module": 99,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 0,
+      "module": 99,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 1,
+      "module": 99,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 1,
+      "module": 99,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 1,
+      "module": 99,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 99,
+      "module": 99,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 99,
+      "module": 99,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 99,
+      "module": 99,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 0,
+      "module": 100,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 0,
+      "module": 100,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 0,
+      "module": 100,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 1,
+      "module": 100,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 1,
+      "module": 100,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 1,
+      "module": 100,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 99,
+      "module": 100,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 99,
+      "module": 100,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 99,
+      "module": 100,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 0,
+      "module": 199,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 0,
+      "module": 199,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 0,
+      "module": 199,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 1,
+      "module": 199,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 1,
+      "module": 199,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 1,
+      "module": 199,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 99,
+      "module": 199,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 99,
+      "module": 199,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 99,
+      "module": 199,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 0,
+      "module": 200,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 0,
+      "module": 200,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 0,
+      "module": 200,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 1,
+      "module": 200,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 1,
+      "module": 200,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 1,
+      "module": 200,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 99,
+      "module": 200,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 99,
+      "module": 200,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.tsx",
+      "implied_node_format": 99,
+      "module": 200,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 0,
+      "module": 0,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 0,
+      "module": 0,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 0,
+      "module": 0,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 1,
+      "module": 0,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 1,
+      "module": 0,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 1,
+      "module": 0,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 99,
+      "module": 0,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 99,
+      "module": 0,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 99,
+      "module": 0,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 0,
+      "module": 1,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 0,
+      "module": 1,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 0,
+      "module": 1,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 1,
+      "module": 1,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 1,
+      "module": 1,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 1,
+      "module": 1,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 99,
+      "module": 1,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 99,
+      "module": 1,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 99,
+      "module": 1,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 0,
+      "module": 5,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 0,
+      "module": 5,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 0,
+      "module": 5,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 1,
+      "module": 5,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 1,
+      "module": 5,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 1,
+      "module": 5,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 99,
+      "module": 5,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 99,
+      "module": 5,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 99,
+      "module": 5,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 0,
+      "module": 99,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 0,
+      "module": 99,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 0,
+      "module": 99,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 1,
+      "module": 99,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 1,
+      "module": 99,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 1,
+      "module": 99,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 99,
+      "module": 99,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 99,
+      "module": 99,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 99,
+      "module": 99,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 0,
+      "module": 100,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 0,
+      "module": 100,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 0,
+      "module": 100,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 1,
+      "module": 100,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 1,
+      "module": 100,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 1,
+      "module": 100,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 99,
+      "module": 100,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 99,
+      "module": 100,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 99,
+      "module": 100,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 0,
+      "module": 199,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 0,
+      "module": 199,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 0,
+      "module": 199,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 1,
+      "module": 199,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 1,
+      "module": 199,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 1,
+      "module": 199,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 99,
+      "module": 199,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 99,
+      "module": 199,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 99,
+      "module": 199,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 0,
+      "module": 200,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 0,
+      "module": 200,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 0,
+      "module": 200,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 1,
+      "module": 200,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 1,
+      "module": 200,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 1,
+      "module": 200,
+      "package_json_type": "commonjs"
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 99,
+      "module": 200,
+      "package_json_type": ""
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 99,
+      "module": 200,
+      "package_json_type": "module"
+     },
+     {
+      "file_name": "/p/a.json",
+      "implied_node_format": 99,
+      "module": 200,
+      "package_json_type": "commonjs"
+     }
+    ]
+   },
+   "request_sha256": "3d34665e4d9811cac2b081bc633aafce3c4e5c60a64247ae434eb59c775c701f"
+  },
+  {
    "column": "ast.IsDeclarationName",
    "group": "positions",
    "id": "ast.IsDeclarationName@s06:compiler/constructorWithIncompleteTypeAnnotation.ts/unit/0/config/0",
@@ -67030,6 +70155,70 @@
    "request_sha256": "d43f20ebf118b9294d4a1c3dfd4361e1f2080ff3bf721a95aa87fff6b159c09a"
   },
   {
+   "column": "core.LimitedSemaphore",
+   "group": "concurrency",
+   "id": "core.LimitedSemaphore@cases",
+   "input": {
+    "cases": [
+     {
+      "jobs": [
+       1,
+       2,
+       3
+      ],
+      "limit": 1
+     },
+     {
+      "jobs": [
+       5,
+       4
+      ],
+      "limit": 3
+     },
+     {
+      "jobs": [],
+      "limit": 2
+     },
+     {
+      "jobs": [
+       7,
+       8,
+       9,
+       10,
+       11
+      ],
+      "limit": 4
+     },
+     {
+      "jobs": [
+       6,
+       6,
+       6,
+       6
+      ],
+      "limit": 2
+     }
+    ]
+   },
+   "request_sha256": "11ef3e49e94641a1740c39493501fcd3a03af7f923d40ef931cc58dacd74c351"
+  },
+  {
+   "column": "core.LimitedSemaphore",
+   "group": "concurrency",
+   "id": "core.LimitedSemaphore@non-positive",
+   "input": {
+    "cases": [
+     {
+      "jobs": [
+       1
+      ],
+      "limit": 0
+     }
+    ]
+   },
+   "request_sha256": "96daf4a45dd7359cf0f993a0f94d224098401104e46ff753e5692b6bfa7caa18"
+  },
+  {
    "column": "tsoptions.ParsedCommandLine.PossiblyMatchesDirectoryName",
    "group": "tsoptions",
    "id": "tsoptions.ParsedCommandLine.PossiblyMatchesDirectoryName@default/cs",
@@ -71879,6 +75068,11 @@
       "survey_rows": 0,
       "synthetic_rows": 1
      },
+     "core.LimitedSemaphore": {
+      "classes": 0,
+      "survey_rows": 0,
+      "synthetic_rows": 2
+     },
      "core.RequestContext": {
       "classes": 0,
       "survey_rows": 0,
@@ -71891,7 +75085,7 @@
      }
     },
     "spec": "data/phase1/tables/concurrency.json",
-    "spec_sha256": "8710e2a0b3e356c447e88ad8cdf2907887821fe843d8bd8471c6515b0b8c1c29",
+    "spec_sha256": "f1fc3f609f628e1bffc516b10677b52fc6cb2e4c2b4faeb996a0b59104cccdb9",
     "survey_sha256": null
    },
    "containers": {
@@ -72197,6 +75391,11 @@
       "survey_rows": 0,
       "synthetic_rows": 1
      },
+     "ast.GetEmitModuleFormatOfFileWorker": {
+      "classes": 0,
+      "survey_rows": 0,
+      "synthetic_rows": 1
+     },
      "ast.GetExternalModuleImportEqualsDeclarationExpression": {
       "classes": 387,
       "survey_rows": 27,
@@ -72220,6 +75419,16 @@
      "ast.GetNonAugmentationDeclaration": {
       "classes": 891,
       "survey_rows": 190,
+      "synthetic_rows": 0
+     },
+     "ast.GetPragmaArgument": {
+      "classes": 10,
+      "survey_rows": 7,
+      "synthetic_rows": 0
+     },
+     "ast.GetPragmaFromSourceFile": {
+      "classes": 8,
+      "survey_rows": 6,
       "synthetic_rows": 0
      },
      "ast.GetSourceFileOfModule": {
@@ -72364,8 +75573,8 @@
      }
     },
     "spec": "data/phase1/tables/modules.json",
-    "spec_sha256": "e9e5e7c4350dfcada623aac601ca35b1ba5046bd1a4077e0b80512e441253273",
-    "survey_sha256": "1734f4164b2ab1e14973fee423f8f82f0c0b2fa921aed1c62e97197cc32ea2fe"
+    "spec_sha256": "e991675e49f01d522fdb6cfb3140a7cacf1247d583b0542fb4d97db8113f1d57",
+    "survey_sha256": "d38c7372f70b15320ccb7f0d12801bf461e520637dbe1ed175f69e27b4761611"
    },
    "positions": {
     "columns": {
@@ -72738,15 +75947,15 @@
   },
   "rule": "per surveyed column: greedy cover of the union of the S06 files' survey classes, taking at each step the file that adds the most uncovered classes (ties: fewer bytes, then the smaller row id); then the spec's synthetic inputs in spec order. Rows are ordered by group (GROUPS order), column (spec order), survey rows in choice order, then synthetic rows."
  },
- "selection_sha256": "e986d7e6127fe2d61d1426d06a779fbc92f31c85155d417e9e78f7a391bce748",
+ "selection_sha256": "2f5c7508182a6a640454cbce0a636decdf73fa15fe4e85267747971997cdfca2",
  "specs": {
   "data/phase1/tables/accessors.json": "0872d157d48028f933b111230ba0c14eabfac795c02bfba2114fa21e02bd583a",
   "data/phase1/tables/class.json": "9bbf32611f85b7614cf6dd8f5bc4bf001aaf4ff5c7ece15ccd60ce1510bd82f7",
-  "data/phase1/tables/concurrency.json": "8710e2a0b3e356c447e88ad8cdf2907887821fe843d8bd8471c6515b0b8c1c29",
+  "data/phase1/tables/concurrency.json": "f1fc3f609f628e1bffc516b10677b52fc6cb2e4c2b4faeb996a0b59104cccdb9",
   "data/phase1/tables/containers.json": "639cdba77f14a7af306bd5c6cf461fc38d37ad7ca2ef9c867e76ee75c131e6a5",
   "data/phase1/tables/core.json": "8505b68bc45fa306ddd906cf2121c3e95cb787b70aeddd0bc70286c8824d7f50",
   "data/phase1/tables/diagnostics.json": "27674ef7948f989d5f2e0023dedeea18f9af42f192f41db666b085d53b6d84a2",
-  "data/phase1/tables/modules.json": "e9e5e7c4350dfcada623aac601ca35b1ba5046bd1a4077e0b80512e441253273",
+  "data/phase1/tables/modules.json": "e991675e49f01d522fdb6cfb3140a7cacf1247d583b0542fb4d97db8113f1d57",
   "data/phase1/tables/positions.json": "f4fdd0b600638379ab009921b94d4bf65d1325666d285fa4de379ab92cdbd1aa",
   "data/phase1/tables/runtime.json": "4092c0b6a2ac9dc98ab6ce6f8479d940b5ae36dfd0026820ead808d920824db7",
   "data/phase1/tables/targets.json": "172e4065ace0e80c4571776ce362dceb6c46a47872c354509f8a8d687e083a63",

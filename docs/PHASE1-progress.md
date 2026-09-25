@@ -3060,3 +3060,52 @@ What remains (20):
 | `fileLoader.resolveLibrary` | no sound operator for its return type; the `libReplacement` path is not exercised | a case with `libReplacement` |
 | `NewLimitedSemaphore`, `LimitedSemaphore.Acquire` | still a `later_step` roster exemption | a leaves case over the semaphore's bounds |
 | `nativepath.Realpath` | a Linux-only case | the Linux CI host capture |
+
+## Remaining operations closed (2026-09-25)
+
+The 20 operations the closure left pending fall to **one**
+(`python3 scripts/phase1_coverage.py report`; no problems). The branch is
+`phase1-remaining-witnesses`.
+
+Owner decisions of the day:
+
+- **`NodeFactory.NewSyntheticExpression`, `UpdateSyntheticExpression`,
+  `SyntheticExpression.Clone`, `.VisitEachChild`:** a reviewed Phase 2 checker
+  destination, chosen over an opaque Phase 1 type slot. They are the first
+  review rows outside `internal/compiler`; each carries `authority_basis`
+  `owner_decision`, which `phase1_scope.reviewed_destinations` now requires for
+  such a row, and a syntax-roster `later_step` entry. The approval block covers
+  all 209 rows ([destinations](PHASE1-F5b-destinations.md#owner-approval)).
+- **The six visitor and clone operations stay in Phase 1.** The generated-AST
+  family's SourceFile special gained `children-stop`, `visit-same` and
+  `visit-replace` actions that enter through `NodeVisitor.VisitSourceFile`
+  (claims read from the hand-written `ast.go` bodies: `SourceFile.ForEachChild`
+  with `visit`/`visitNodeList`/`visitNodes`, `SourceFile.VisitEachChild` with
+  `visitTopLevelStatements` and `visitToken`), a `ModifierList` special builds a
+  list and clones it (`NodeFactory.NewModifierList`, `ModifiersToFlags`,
+  `ModifierList.Clone`), and the 21 embedded-statement shapes claim
+  `NodeVisitor.VisitEmbeddedStatement` and `liftToBlock` in their non-nil
+  modes. The family was recaptured: 1,163 of 1,163 cases match.
+
+Witness tooling for the rest:
+
+| Operations | Mechanism | Result |
+| --- | --- | --- |
+| `GetPragmaFromSourceFile`, `GetPragmaArgument`, `GetEmitModuleFormatOfFileWorker` | table columns in the `modules` group (two surveyed `source` columns over the recorded pragma names and argument names, one constructed grid of file names, module options and metadata); `GetPragmaFromSourceFile` and the two emit-format helpers moved to `tsr_ast`, their Go home | killed by `table` |
+| `NewLimitedSemaphore`, `LimitedSemaphore.Acquire` | a `core.LimitedSemaphore` column in `concurrency` (jobs hold a permit for 10 ms so an unbounded mutant shows; a non-positive limit is the declared panic); statement sites on the bound and the wait loop; the constructor is no longer `const`, so the VFS statics use `LazyLock` | killed by `table` |
+| `Binder.bindSourceFileAsExternalModule` | the closing quote of the module name is the skip-statement site (the old skip-body mutant only crashed) | killed by `binder` |
+| `fileLoader.resolveTripleslashPathReference` | the rooted-path branch is a negated-condition site, so a relative reference goes missing instead of crashing | killed by `syntax` |
+| `fileLoader.resolveLibrary` | the resolution call is a skip-statement site over an unresolved default, so the bundled file stays in place of the replacement | killed by `syntax` |
+| `SourceFile.ForEachChild` | markers on `SourceFileData::for_each_child` (its home) and the statement walk; covered by the SourceFile special's `children-stop` action | covered |
+| `nativepath.Realpath` | needs a Linux capture of this source closure: this branch's CI run, replayed with `phase1_producers.py foundations --host-capture` | **pending** |
+
+Campaign: 1,104 operations planned (1,910 mutants, 276 controls), 1,102
+killed, `confirm` 9,876 of 9,876 pairs, all 202 table columns at parity; see
+[the mutation record](PHASE1-mutation-witnesses.md) section 8. The stale
+`config`, `foundations` and `syntax` producers are left for the phase-end
+green-up, as before.
+
+Cost note, at the owner's request: each plan change re-ran the whole campaign
+(about 35 minutes), because the scripts cannot merge a partial rerun into the
+recorded results. That merge is the next tooling item before further witness
+increments; the mutation record lists it under its known limitations.
