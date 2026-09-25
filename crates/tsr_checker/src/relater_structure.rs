@@ -511,7 +511,7 @@ impl Relater<'_> {
             return Ok(tr::FALSE);
         }
         if s & tf::CONDITIONAL != 0 {
-            return self.conditional_source(source, target);
+            return self.conditional_source(source, target, &saved);
         }
         if s & tf::TEMPLATE_LITERAL != 0 && t & tf::OBJECT == 0 {
             if t & tf::TEMPLATE_LITERAL == 0 {

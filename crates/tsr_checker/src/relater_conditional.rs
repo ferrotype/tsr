@@ -80,6 +80,7 @@ impl Relater<'_> {
         &mut self,
         source: TypeId,
         target: TypeId,
+        saved: &crate::relation_errors::RelationErrors,
     ) -> Result<Ternary, Error> {
         if self
             .checker
@@ -114,8 +115,10 @@ impl Relater<'_> {
             if self
                 .checker
                 .is_type_related_to(extends, b.extends_type, RelationKind::Identity)?
-                && (self.related(a.check_type, b.check_type, BOTH, 0)? != tr::FALSE
-                    || self.related(b.check_type, a.check_type, BOTH, 0)? != tr::FALSE)
+                && (self.related_with_errors(a.check_type, b.check_type, BOTH, 0, false)?
+                    != tr::FALSE
+                    || self.related_with_errors(b.check_type, a.check_type, BOTH, 0, false)?
+                        != tr::FALSE)
             {
                 let yes_a = self.checker.conditional_true_type(source, false)?;
                 let yes_a = self.checker.instantiate_type(yes_a, mapper)?;
@@ -140,6 +143,10 @@ impl Relater<'_> {
             && self.checker.has_non_circular_base_constraint(source)?
         {
             if let Some(constraint) = self.checker.distributive_conditional_constraint(source)? {
+                // The pin restores the error state saved at the worker's entry
+                // before this attempt, so the default-constraint chain does not
+                // survive into the distributive one.
+                self.errors = saved.clone();
                 return self.related(constraint, target, SOURCE, 0);
             }
         }
