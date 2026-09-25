@@ -382,19 +382,18 @@ impl CheckerState {
         }
         let name = self.symbol_to_string(symbol)?;
         let minimum_text = JsString::from_bytes(minimum.to_string().into_bytes());
+        // The pin passes the name, the minimum and the count to both
+        // messages, and the baseline records every argument.
+        let count_text = JsString::from_bytes(parameters.len().to_string().into_bytes());
         let (message, arguments) = if minimum == parameters.len() {
             (
                 tsr_diagnostics::Generic_type_0_requires_1_type_argument_s,
-                vec![name, minimum_text],
+                vec![name, minimum_text, count_text],
             )
         } else {
             (
                 tsr_diagnostics::Generic_type_0_requires_between_1_and_2_type_arguments,
-                vec![
-                    name,
-                    minimum_text,
-                    JsString::from_bytes(parameters.len().to_string().into_bytes()),
-                ],
+                vec![name, minimum_text, count_text],
             )
         };
         self.error_at(Some(node), message, arguments)?;

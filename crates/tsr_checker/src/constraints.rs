@@ -278,11 +278,33 @@ impl CheckerState {
             if self.types.flags(ty)? & tf::TYPE_PARAMETER != 0 {
                 if let Some(node) = self.constraint_declaration(ty)? {
                     let name = self.type_to_string(ty, crate::type_format_flags::NONE)?;
-                    self.error_at(
+                    let index = self.error_at(
                         Some(node),
                         tsr_diagnostics::Type_parameter_0_has_a_circular_constraint,
                         vec![name],
                     )?;
+                    // The pin points at the type being checked when it is
+                    // neither inside nor around the constraint declaration.
+                    if let (Some(index), Some(current)) = (index, self.current_node) {
+                        let view = self.ast(node)?;
+                        let unrelated = !tsr_ast::utilities::is_node_descendant_of(
+                            view,
+                            Some(node),
+                            Some(current),
+                        )? && !tsr_ast::utilities::is_node_descendant_of(
+                            view,
+                            Some(current),
+                            Some(node),
+                        )?;
+                        if unrelated {
+                            let related = self.diagnostic_for_node(
+                                Some(current),
+                                tsr_diagnostics::Circularity_originates_in_type_at_this_location,
+                                vec![],
+                            )?;
+                            self.add_related_diagnostic(index, related)?;
+                        }
+                    }
                 }
             }
             constraint = self.builtins.circular_constraint_type;
