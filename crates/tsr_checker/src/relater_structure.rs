@@ -454,6 +454,14 @@ impl Relater<'_> {
             if result != tr::FALSE {
                 return Ok(result);
             }
+            // The mapped comparison's chain is kept only for a structural
+            // success after a failed variance check; the error state resets.
+            variance.original_chain = if self.errors.chain.is_empty() {
+                None
+            } else {
+                Some(self.errors.chain.clone())
+            };
+            self.errors = saved.clone();
         }
         if s & tf::TYPE_VARIABLE != 0 {
             if s & tf::INDEXED_ACCESS == 0 || t & tf::INDEXED_ACCESS == 0 {
