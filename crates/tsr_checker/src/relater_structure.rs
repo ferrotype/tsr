@@ -422,7 +422,9 @@ impl Relater<'_> {
                 return Ok(result);
             }
         } else if t & tf::TEMPLATE_LITERAL != 0 {
-            return self.template_related(source, target);
+            if let Some(result) = self.template_related(source, target)? {
+                return Ok(result);
+            }
         } else if t & tf::STRING_MAPPING != 0 && s & tf::STRING_MAPPING == 0 {
             if self.checker.member_of_string_mapping(source, target)? {
                 return Ok(tr::TRUE);
