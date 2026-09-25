@@ -859,6 +859,7 @@ dependencies = [
  "tsr_diagnostics",
  "tsr_jsnum",
  "tsr_jsstring",
+ "tsr_locale",
 ]
 
 [[package]]

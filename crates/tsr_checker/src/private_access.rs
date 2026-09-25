@@ -334,7 +334,7 @@ impl CheckerState {
     }
 
     /// `IsPlainJSFile(GetSourceFileOfNode(node), checkJs)`.
-    // port: tsc/internal/ast/utilities.go:IsPlainJSFile
+    // Inline copy of `IsPlainJSFile`; its Phase 1 home is in tsr_ast (table group modules).
     pub(crate) fn is_plain_js_node(&self, node: NodeId) -> Result<bool, Error> {
         let view = self.ast(node)?;
         let Some(source) = tsr_ast::utilities::get_source_file_of_node(view, Some(node))? else {

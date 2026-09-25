@@ -31,7 +31,7 @@ impl TypePrecedence {
 }
 
 /// `None` for a node that is not a type node; upstream panics there.
-// port: tsc/internal/ast/precedence.go:GetTypeNodePrecedence
+// Inline copy of `GetTypeNodePrecedence`; its Phase 1 home is in tsr_ast (table group containers).
 pub fn get_type_node_precedence(
     view: AstView<'_>,
     node: NodeId,

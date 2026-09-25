@@ -20,6 +20,7 @@ hashbrown = { version = "=0.17.1", default-features = false }
 stacker = "=0.1.25"
 tsr_core = { path = "../tsr_core", version = "0.1.0" }
 tsr_diagnostics = { path = "../tsr_diagnostics", version = "0.1.0" }
+tsr_locale = { path = "../tsr_locale", version = "0.1.0" }
 tsr_arena = { path = "../tsr_arena", version = "0.1.0" }
 tsr_jsnum = { path = "../tsr_jsnum", version = "0.1.0" }
 tsr_jsstring = { path = "../tsr_jsstring", version = "0.1.0" }

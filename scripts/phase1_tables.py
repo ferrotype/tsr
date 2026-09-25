@@ -135,8 +135,12 @@ def go_registry(root=ROOT):
     """{column id: (group, input, surveyed)} as the Go column files register them.
 
     A static reading of tools/phase1/tables/go/<group>_columns.go: each file's
-    Register("<group>", Column{ID: ..., Input: ..., Survey: ...}, ...) literals.
-    The driver itself refuses a repeated id at startup.
+    Register("<group>", Column{ID: ..., Input: ..., Survey: ...}, ...) literals,
+    and the generic shapes of columns.go: NodePredicate("<id>", "<input>", ...)
+    and NodeMap("<id>", "<input>", ...), which always survey, and
+    ValuesMap("<id>", ...) and a group's <name>ValuesColumn("<id>", ...) over
+    synthetic values, which never do. The driver itself
+    refuses a repeated id at startup.
     """
     found, problems = {}, []
     for path in sorted((Path(root) / GO_DIRECTORY).glob("*_columns.go")):
@@ -148,6 +152,8 @@ def go_registry(root=ROOT):
         for chunk in text.split("Column{")[1:]:
             identity = re.search(r'\bID:\s*"([^"]+)"', chunk)
             kind = re.search(r'\bInput:\s*"([^"]+)"', chunk)
+            if identity is None and re.match(r'\s*ID:\s*[a-z]\w*,', chunk):
+                continue  # a helper's template (ID: id), registered through its calls
             if identity is None or kind is None:
                 problems.append(f"{path.name}: a Column literal without ID or Input")
                 continue
@@ -156,6 +162,14 @@ def go_registry(root=ROOT):
             if identity.group(1) in found:
                 problems.append(f"column {identity.group(1)} is registered twice in Go")
             found[identity.group(1)] = (groups[0], kind.group(1), surveyed)
+        for identity, kind in re.findall(r'\b(?:NodePredicate|NodeMap)\(\s*"([^"]+)",\s*"([^"]+)"', text):
+            if identity in found:
+                problems.append(f"column {identity} is registered twice in Go")
+            found[identity] = (groups[0], kind, True)
+        for identity in re.findall(r'\b(?:ValuesMap|\w+ValuesColumn)\(\s*"([^"]+)"', text):
+            if identity in found:
+                problems.append(f"column {identity} is registered twice in Go")
+            found[identity] = (groups[0], "values", False)
     return found, problems
 
 

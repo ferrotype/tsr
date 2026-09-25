@@ -265,8 +265,8 @@ impl CheckerState {
         Ok(false)
     }
 
-    // port: tsc/internal/ast/utilities.go:GetEnclosingBlockScopeContainer
-    // port: tsc/internal/ast/utilities.go:IsBlockScope
+    // Inline copy of `GetEnclosingBlockScopeContainer`; its Phase 1 home is in tsr_ast (table group containers).
+    // Inline copy of `IsBlockScope`; its Phase 1 home is in tsr_ast (table group containers).
     fn declaration_block_scope(&self, node: NodeId) -> Result<NodeId, Error> {
         let mut current = self.node(node)?.parent();
         while let Some(node) = current {

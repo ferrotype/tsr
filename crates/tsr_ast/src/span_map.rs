@@ -25,7 +25,7 @@ fn clamp(value: i32, low: i32, high: i32) -> i32 {
 /// Segment starts, including zero-length segments, are contained. A final end
 /// point is also contained; other ends belong to the following gap or segment.
 /// port: tsc/internal/spanmap/spanmap.go:SpanMap.segmentIndexAt
-fn segment_at(segments: &[SpanSegment], pos: i32) -> (Option<usize>, bool) {
+pub(crate) fn segment_at(segments: &[SpanSegment], pos: i32) -> (Option<usize>, bool) {
     let index = segments.partition_point(|s| s.virtual_start.wrapping_sub(pos) < 0);
     if segments.get(index).is_some_and(|s| s.virtual_start == pos) {
         return (Some(index), true);

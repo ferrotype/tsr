@@ -1,5 +1,370 @@
 {
-  "columns": [],
+  "columns": [
+    {
+      "evidence": [
+        "internal/ast/utilities.go:2168",
+        "internal/ast/utilities.go:2170",
+        "internal/ast/utilities.go:2172",
+        "internal/checker/utilities.go:218",
+        "internal/ls/autoinsert.go:46"
+      ],
+      "id": "ast.EntityNameToString",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:EntityNameToString"
+      ],
+      "projection": "[index, [hex of the result without a text source, hex with the harness's bracketed text source]] for every entity name (this, identifiers, and qualified names, property accesses and JSX namespaced names of them): the default arm panics and callers pass entity names",
+      "rust": "tsr_ast::utilities_targets::entity_name_to_string",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ast/utilities.go:1462",
+        "internal/ls/callhierarchy.go:255",
+        "internal/ls/callhierarchy.go:278"
+      ],
+      "id": "ast.GetAssignedName",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:GetAssignedName"
+      ],
+      "projection": "[index, reference of the assigned name] for every node where it is not nil",
+      "rust": "tsr_ast::get_assigned_name",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:2599",
+        "internal/checker/checker.go:32205"
+      ],
+      "id": "ast.GetHostSignatureFromJSDoc",
+      "input": "source_jsdoc",
+      "operations": [
+        "tsc/internal/ast/utilities.go:GetHostSignatureFromJSDoc"
+      ],
+      "projection": "[index, reference of the host signature] for every node where it is not nil of the JSDoc walk",
+      "rust": "tsr_ast::utilities_targets::get_host_signature_from_js_doc",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ast/utilities.go:1254",
+        "internal/checker/checker.go:14260"
+      ],
+      "id": "ast.GetJSDocDeprecatedTag",
+      "input": "source_jsdoc",
+      "operations": [
+        "tsc/internal/ast/utilities.go:GetJSDocDeprecatedTag"
+      ],
+      "projection": "[index, reference of the node's first @deprecated tag] for every node where it is not nil of the JSDoc walk",
+      "rust": "tsr_ast::utilities_targets::get_js_doc_deprecated_tag",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:15878",
+        "internal/transformers/moduletransforms/commonjsmodule.go:722",
+        "internal/transformers/moduletransforms/externalmoduleinfo.go:357",
+        "internal/transformers/moduletransforms/externalmoduleinfo.go:361"
+      ],
+      "id": "ast.GetNamespaceDeclarationNode",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:GetNamespaceDeclarationNode"
+      ],
+      "projection": "[index, reference of the namespace import, import-equals or namespace export] for every node where it is not nil, over import, JS import, import-equals and export declarations (its default arm panics)",
+      "rust": "tsr_ast::utilities_middle::get_namespace_declaration_node",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ast/utilities.go:4461",
+        "internal/ast/utilities.go:4468",
+        "internal/checker/checker.go:19024",
+        "internal/checker/checker.go:27129",
+        "internal/checker/checker.go:27710"
+      ],
+      "id": "ast.GetPropertyNameForPropertyNameNode",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:GetPropertyNameForPropertyNameNode"
+      ],
+      "projection": "[index, hex of the property name] for every property-name kind node (identifiers, private identifiers, string, template, numeric and bigint literals, JSX namespaced names, computed property names; its default arm panics)",
+      "rust": "tsr_ast::utilities_targets::get_property_name_for_property_name_node",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ls/completions.go:1128"
+      ],
+      "id": "ast.GetTypeAnnotationNode",
+      "input": "source_jsdoc",
+      "operations": [
+        "tsc/internal/ast/utilities.go:GetTypeAnnotationNode"
+      ],
+      "projection": "[index, reference of the type annotation] for every node where it is not nil of the JSDoc walk",
+      "rust": "tsr_ast::utilities_targets::get_type_annotation_node",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ls/codeactions_fixmissingtypeannotation.go:1328",
+        "internal/ls/completions.go:1127",
+        "internal/ls/findallreferences.go:572",
+        "internal/ls/findallreferences.go:2160",
+        "internal/ls/utilities.go:401"
+      ],
+      "id": "ast.HasInitializer",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:HasInitializer"
+      ],
+      "projection": "document-order indices of the nodes where it is true",
+      "rust": "tsr_ast::utilities_middle::has_initializer",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/utilities.go:299",
+        "internal/format/rulecontext.go:213"
+      ],
+      "id": "ast.HasQuestionToken",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:HasQuestionToken"
+      ],
+      "projection": "document-order indices of the nodes where it is true",
+      "rust": "tsr_ast::utilities_middle::has_question_token",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ls/findallreferences.go:2101",
+        "internal/ast/utilities.go:3690",
+        "internal/ast/utilities.go:3694",
+        "internal/ast/utilities.go:3698",
+        "internal/ast/utilities.go:3702",
+        "internal/ast/utilities.go:3706"
+      ],
+      "id": "ast.IsCallExpressionTarget",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsCallExpressionTarget",
+        "tsc/internal/ast/utilities.go:isCalleeWorker"
+      ],
+      "projection": "[index, bits] where bit (2*skipPastOuterExpressions + includeElementAccess) is set for the argument combinations where it is true, over the nodes other than the source file (the climb reads node.Parent unconditionally); rows with no bit are omitted",
+      "rust": "tsr_ast::utilities_targets::is_call_expression_target",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ls/callhierarchy.go:545",
+        "internal/ast/utilities.go:3690",
+        "internal/ast/utilities.go:3694",
+        "internal/ast/utilities.go:3698",
+        "internal/ast/utilities.go:3702",
+        "internal/ast/utilities.go:3706"
+      ],
+      "id": "ast.IsCallOrNewExpressionTarget",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsCallOrNewExpressionTarget",
+        "tsc/internal/ast/utilities.go:isCalleeWorker"
+      ],
+      "projection": "[index, bits] where bit (2*skipPastOuterExpressions + includeElementAccess) is set for the argument combinations where it is true, over the nodes other than the source file (the climb reads node.Parent unconditionally); rows with no bit are omitted",
+      "rust": "tsr_ast::utilities_targets::is_call_or_new_expression_target",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ls/callhierarchy.go:547",
+        "internal/ast/utilities.go:3690",
+        "internal/ast/utilities.go:3694",
+        "internal/ast/utilities.go:3698",
+        "internal/ast/utilities.go:3702",
+        "internal/ast/utilities.go:3706"
+      ],
+      "id": "ast.IsDecoratorTarget",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsDecoratorTarget",
+        "tsc/internal/ast/utilities.go:isCalleeWorker"
+      ],
+      "projection": "[index, bits] where bit (2*skipPastOuterExpressions + includeElementAccess) is set for the argument combinations where it is true, over the nodes other than the source file (the climb reads node.Parent unconditionally); rows with no bit are omitted",
+      "rust": "tsr_ast::utilities_targets::is_decorator_target",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ls/findallreferences.go:2080",
+        "internal/ls/findallreferences.go:2300",
+        "internal/ast/utilities.go:3690",
+        "internal/ast/utilities.go:3694",
+        "internal/ast/utilities.go:3698",
+        "internal/ast/utilities.go:3702"
+      ],
+      "id": "ast.IsNewExpressionTarget",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsNewExpressionTarget",
+        "tsc/internal/ast/utilities.go:isCalleeWorker"
+      ],
+      "projection": "[index, bits] where bit (2*skipPastOuterExpressions + includeElementAccess) is set for the argument combinations where it is true, over the nodes other than the source file (the climb reads node.Parent unconditionally); rows with no bit are omitted",
+      "rust": "tsr_ast::utilities_targets::is_new_expression_target",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ls/callhierarchy.go:546",
+        "internal/ast/utilities.go:3690",
+        "internal/ast/utilities.go:3694",
+        "internal/ast/utilities.go:3698",
+        "internal/ast/utilities.go:3702",
+        "internal/ast/utilities.go:3706"
+      ],
+      "id": "ast.IsTaggedTemplateTag",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsTaggedTemplateTag",
+        "tsc/internal/ast/utilities.go:isCalleeWorker",
+        "tsc/internal/ast/utilities.go:selectTagOfTaggedTemplateExpression"
+      ],
+      "projection": "[index, bits] where bit (2*skipPastOuterExpressions + includeElementAccess) is set for the argument combinations where it is true, over the nodes other than the source file (the climb reads node.Parent unconditionally); rows with no bit are omitted",
+      "rust": "tsr_ast::utilities_targets::is_tagged_template_tag",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ls/callhierarchy.go:548",
+        "internal/ast/utilities.go:3690",
+        "internal/ast/utilities.go:3694",
+        "internal/ast/utilities.go:3698",
+        "internal/ast/utilities.go:3702",
+        "internal/ast/utilities.go:3706"
+      ],
+      "id": "ast.IsJsxOpeningLikeElementTagName",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsJsxOpeningLikeElementTagName",
+        "tsc/internal/ast/utilities.go:isCalleeWorker",
+        "tsc/internal/ast/utilities.go:selectTagNameOfJsxOpeningLikeElement"
+      ],
+      "projection": "[index, bits] where bit (2*skipPastOuterExpressions + includeElementAccess) is set for the argument combinations where it is true, over the nodes other than the source file (the climb reads node.Parent unconditionally); rows with no bit are omitted",
+      "rust": "tsr_ast::utilities_targets::is_jsx_opening_like_element_tag_name",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:3053",
+        "internal/checker/checker.go:8535",
+        "internal/checker/checker.go:11546",
+        "internal/checker/checker.go:11886",
+        "internal/checker/checker.go:14278"
+      ],
+      "id": "ast.IsDeprecatedDeclaration",
+      "input": "source_jsdoc",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsDeprecatedDeclaration"
+      ],
+      "projection": "document-order indices of the nodes where it is true over the JSDoc walk",
+      "rust": "tsr_ast::utilities_targets::is_deprecated_declaration",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ast/utilities.go:1241",
+        "internal/checker/checker.go:14250"
+      ],
+      "id": "ast.IsDeprecatedDeclarationWithCachedFlags",
+      "input": "source_jsdoc",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsDeprecatedDeclarationWithCachedFlags"
+      ],
+      "projection": "document-order indices of the nodes where it is true, with the node's own flags as the cached flags, over the JSDoc walk",
+      "rust": "tsr_ast::utilities_targets::is_deprecated_declaration_with_cached_flags",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ast/utilities.go:472",
+        "internal/checker/grammarchecks.go:1475",
+        "internal/checker/grammarchecks.go:1489",
+        "internal/ls/documenthighlights.go:229"
+      ],
+      "id": "ast.IsIterationStatement",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsIterationStatement"
+      ],
+      "projection": "[index, bits] where bit 0 is the result without and bit 1 with lookInLabeledStatements; rows with no bit are omitted",
+      "rust": "tsr_ast::utilities_targets::is_iteration_statement",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ast/utilities.go:2017",
+        "internal/ast/utilities.go:2021",
+        "internal/checker/checker.go:16762",
+        "internal/checker/checker.go:28568",
+        "internal/checker/checker.go:32101"
+      ],
+      "id": "ast.IsJsxTagName",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsJsxTagName"
+      ],
+      "projection": "document-order indices of the nodes where it is true, over the nodes other than the source file (it reads node.Parent unconditionally)",
+      "rust": "tsr_ast::utilities_targets::is_jsx_tag_name",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "none at the pin outside the defining package"
+      ],
+      "id": "ast.IsLet",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsLet"
+      ],
+      "projection": "document-order indices of the nodes where it is true",
+      "rust": "tsr_ast::utilities_targets::is_let",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/utilities.go:1035"
+      ],
+      "id": "ast.IsPrototypeAccess",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsPrototypeAccess"
+      ],
+      "projection": "document-order indices of the nodes where it is true",
+      "rust": "tsr_ast::utilities_targets::is_prototype_access",
+      "survey": true,
+      "synthetic": []
+    }
+  ],
   "group": "targets",
   "version": 1
 }

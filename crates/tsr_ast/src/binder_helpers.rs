@@ -841,7 +841,7 @@ pub fn get_leftmost_access_expression(view: AstView<'_>, mut id: NodeId) -> Resu
     Ok(id)
 }
 /// port: tsc/internal/ast/utilities.go:isVariableDeclarationInitializedWithRequireHelper
-fn variable_initialized_with_require(
+pub(crate) fn variable_initialized_with_require(
     view: AstView<'_>,
     id: NodeId,
     allow_accessed: bool,

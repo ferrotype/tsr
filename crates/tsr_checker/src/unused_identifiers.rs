@@ -251,7 +251,7 @@ impl CheckerState {
         Ok(())
     }
 
-    // port: tsc/internal/ast/symbol.go:SymbolName
+    // Inline copy of `SymbolName`; its Phase 1 home is in tsr_ast (table group modules).
     pub(crate) fn ast_symbol_name(&self, symbol: SymbolId) -> Result<JsString, Error> {
         let read = self.symbol(symbol)?;
         if let Some(declaration) = read.value_declaration() {
@@ -434,7 +434,7 @@ impl CheckerState {
         Ok(())
     }
 
-    // port: tsc/internal/ast/utilities.go:IsThisParameter
+    // Inline copy of `IsThisParameter`; its Phase 1 home is in tsr_ast (table group class).
     fn is_this_parameter(&self, node: NodeId) -> Result<bool, Error> {
         let view = self.ast(node)?;
         let read = view.node(node)?;

@@ -674,7 +674,7 @@ impl CheckerState {
 }
 
 impl CheckerState {
-    // port: tsc/internal/ast/utilities.go:IsPartOfTypeNode
+    // Inline copy of `IsPartOfTypeNode`; its Phase 1 home is in tsr_ast (table group positions).
     pub(crate) fn is_part_of_type_node(&self, node: NodeId) -> Result<bool, Error> {
         let read = self.node(node)?;
         let kind = read.kind();
@@ -741,7 +741,7 @@ impl CheckerState {
         })
     }
 
-    // port: tsc/internal/ast/utilities.go:isPartOfTypeNodeInParent
+    // Inline copy of `isPartOfTypeNodeInParent`; its Phase 1 home is in tsr_ast (table group positions).
     fn is_part_of_type_in_parent(&self, node: NodeId) -> Result<bool, Error> {
         let Some(parent) = self.node(node)?.parent() else {
             return Ok(false);
@@ -795,7 +795,7 @@ impl CheckerState {
         })
     }
 
-    // port: tsc/internal/ast/utilities.go:isPartOfTypeExpressionWithTypeArguments
+    // Inline copy of `isPartOfTypeExpressionWithTypeArguments`; its Phase 1 home is in tsr_ast (table group positions).
     pub(crate) fn is_type_heritage_expression(&self, node: NodeId) -> Result<bool, Error> {
         let Some(parent) = self.node(node)?.parent() else {
             return Ok(false);

@@ -31,6 +31,8 @@ pub trait SymbolAccess: sealed::Sealed {
     fn exports(&self) -> Option<SymbolTableId>;
     fn parent(&self) -> Option<SymbolId>;
     fn export_symbol(&self) -> Option<SymbolId>;
+    /// The one home of both the stored and the bound symbol's method.
+    /// port: tsc/internal/ast/symbol.go:Symbol.IsExternalModule
     fn is_external_module(&self) -> bool {
         self.flags() & symbol_flags::MODULE != 0
             && crate::is_ambient_module_symbol_name(self.name_bytes())
@@ -40,6 +42,7 @@ pub trait SymbolAccess: sealed::Sealed {
             Ok(view.node(node)?.modifier_flags(view)? & modifier_flags::STATIC != 0)
         })
     }
+    /// port: tsc/internal/ast/symbol.go:Symbol.CombinedLocalAndExportSymbolFlags
     fn combined_local_and_export_symbol_flags(
         &self,
         resolve_flags: impl FnOnce(SymbolId) -> Result<u32, Error>,

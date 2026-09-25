@@ -17,6 +17,347 @@
       "rust": "tsr_ast::utilities_positions::is_declaration_name",
       "survey": true,
       "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ast/ast.go:1277",
+        "internal/ls/findallreferences.go:1094"
+      ],
+      "id": "ast.GetDeclarationFromName",
+      "input": "bound_jsdoc",
+      "operations": [
+        "tsc/internal/ast/ast.go:GetDeclarationFromName"
+      ],
+      "projection": "[index, declaration reference] for every node of the JSDoc walk whose declaration is not nil; the callers compare the declaration's identity and kind",
+      "rust": "tsr_ast::utilities_positions::get_declaration_from_name",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ast/ast.go:1365",
+        "internal/ast/ast.go:1423",
+        "internal/ast/ast.go:1427",
+        "internal/checker/services.go:1072",
+        "internal/ls/findallreferences.go:321"
+      ],
+      "id": "ast.IsArrayLiteralOrObjectLiteralDestructuringPattern",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/ast.go:IsArrayLiteralOrObjectLiteralDestructuringPattern"
+      ],
+      "projection": "document-order indices of the nodes where it is true",
+      "rust": "tsr_ast::utilities_positions::is_array_literal_or_object_literal_destructuring_pattern",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:2670",
+        "internal/checker/checker.go:2675",
+        "internal/checker/grammarchecks.go:533",
+        "internal/checker/utilities.go:261",
+        "internal/checker/utilities.go:1075"
+      ],
+      "id": "ast.IsTypeOrJSTypeAliasDeclaration",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/ast.go:IsTypeOrJSTypeAliasDeclaration"
+      ],
+      "projection": "document-order indices of the nodes where it is true",
+      "rust": "tsr_ast::utilities_positions::is_type_or_js_type_alias_declaration",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ast/ast.go:1278",
+        "internal/checker/checker.go:11557",
+        "internal/checker/checker.go:16766",
+        "internal/checker/checker.go:16768",
+        "internal/checker/checker.go:16786",
+        "internal/ast/ast.go:1269"
+      ],
+      "id": "ast.IsWriteAccess",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/ast.go:IsWriteAccess",
+        "tsc/internal/ast/ast.go:accessKind",
+        "tsc/internal/ast/ast.go:reverseAccessKind"
+      ],
+      "projection": "document-order indices of the nodes where IsWriteAccess is true; accessKind and reverseAccessKind are its callees",
+      "rust": "tsr_ast::utilities::is_write_access",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:11565",
+        "internal/checker/checker.go:14112",
+        "internal/checker/checker.go:28065"
+      ],
+      "id": "ast.IsWriteOnlyAccess",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/ast.go:IsWriteOnlyAccess"
+      ],
+      "projection": "document-order indices of the nodes where it is true",
+      "rust": "tsr_ast::utilities::is_write_only_access",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ls/documenthighlights.go:187",
+        "internal/ls/findallreferences.go:851",
+        "internal/ast/ast.go:1278"
+      ],
+      "id": "ast.IsWriteAccessForReference",
+      "input": "bound_jsdoc",
+      "operations": [
+        "tsc/internal/ast/ast.go:IsWriteAccessForReference",
+        "tsc/internal/ast/ast.go:declarationIsWriteAccess"
+      ],
+      "projection": "[index, bool] for every node whose declaration declarationIsWriteAccess decides; a node whose declaration kind reaches the switch's panicking default arm (a named tuple member) is outside the callers' domain and omitted, identically on both sides",
+      "rust": "tsr_ast::utilities_positions::is_write_access_for_reference",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ls/findallreferences.go:2035",
+        "internal/testutil/tsbaseline/type_symbol_baseline.go:362"
+      ],
+      "id": "ast.GetMeaningFromDeclaration",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:GetMeaningFromDeclaration"
+      ],
+      "projection": "[index, meaning bits] for every node whose meaning is not SemanticMeaningAll; the callers test the bits",
+      "rust": "tsr_ast::utilities_positions::get_meaning_from_declaration",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/transformers/estransforms/classfields.go:3257",
+        "internal/transformers/estransforms/esdecorator.go:2201"
+      ],
+      "id": "ast.IsArrayBindingOrAssignmentElement",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsArrayBindingOrAssignmentElement"
+      ],
+      "projection": "document-order indices of the nodes where it is true",
+      "rust": "tsr_ast::utilities_positions::is_array_binding_or_assignment_element",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:31959",
+        "internal/checker/checker.go:32354"
+      ],
+      "id": "ast.IsDeclarationNameOrImportPropertyName",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsDeclarationNameOrImportPropertyName"
+      ],
+      "projection": "document-order indices, among the nodes other than the source file (it reads name.Parent unconditionally), where it is true",
+      "rust": "tsr_ast::utilities_positions::is_declaration_name_or_import_property_name",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ast/utilities.go:3728",
+        "internal/checker/checker.go:27133",
+        "internal/checker/checker.go:29963",
+        "internal/checker/relater.go:1295",
+        "internal/format/rulecontext.go:455"
+      ],
+      "id": "ast.IsExpression",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsExpression"
+      ],
+      "projection": "document-order indices of the nodes where it is true",
+      "rust": "tsr_ast::utilities_positions::is_expression",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ast/utilities.go:2054",
+        "internal/ast/utilities.go:3174",
+        "internal/checker/checker.go:16766",
+        "internal/checker/checker.go:28644",
+        "internal/checker/checker.go:32191"
+      ],
+      "id": "ast.IsExpressionNode",
+      "input": "source_jsdoc",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsExpressionNode"
+      ],
+      "projection": "document-order indices of the nodes of the JSDoc walk where it is true (names under @link and JSDoc name references are expressions)",
+      "rust": "tsr_ast::utilities_positions::is_expression_node",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ast/utilities.go:2026",
+        "internal/checker/checker.go:32018",
+        "internal/ls/hover.go:531"
+      ],
+      "id": "ast.IsInExpressionContext",
+      "input": "source_jsdoc",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsInExpressionContext"
+      ],
+      "projection": "document-order indices, among the nodes of the JSDoc walk that have a parent (it reads node.Parent unconditionally) other than a default clause (Node.Expression panics on one; its children are statements no caller asks about), where it is true",
+      "rust": "tsr_ast::utilities_positions::is_in_expression_context",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ast/utilities.go:4537",
+        "internal/checker/checker.go:31966",
+        "internal/ls/findallreferences.go:1098"
+      ],
+      "id": "ast.IsLiteralComputedPropertyDeclarationName",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsLiteralComputedPropertyDeclarationName"
+      ],
+      "projection": "document-order indices of the nodes where it is true",
+      "rust": "tsr_ast::utilities_positions::is_literal_computed_property_declaration_name",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/emitresolver.go:77",
+        "internal/checker/emitresolver.go:91",
+        "internal/checker/emitresolver.go:113",
+        "internal/checker/emitresolver.go:342",
+        "internal/checker/emitresolver.go:469"
+      ],
+      "id": "ast.IsParseTreeNode",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsParseTreeNode"
+      ],
+      "projection": "[index, result] for every node (parsed nodes are never synthesized, so it is true everywhere; a factory node would be false)",
+      "rust": "tsr_ast::utilities_positions::is_parse_tree_node",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ast/utilities.go:2050",
+        "internal/checker/checker.go:23721",
+        "internal/checker/checker.go:28665",
+        "internal/checker/checker.go:32171",
+        "internal/checker/checker.go:32296",
+        "internal/ast/utilities.go:2071"
+      ],
+      "id": "ast.IsPartOfTypeNode",
+      "input": "source_jsdoc",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsPartOfTypeNode",
+        "tsc/internal/ast/utilities.go:isPartOfTypeExpressionWithTypeArguments",
+        "tsc/internal/ast/utilities.go:isPartOfTypeNodeInParent"
+      ],
+      "projection": "document-order indices of the nodes of the JSDoc walk where it is true (@implements and @augments hold type expressions); the two unexported helpers are its callees",
+      "rust": "tsr_ast::utilities_positions::is_part_of_type_node",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:11225",
+        "internal/checker/checker.go:28748",
+        "internal/checker/checker.go:32006",
+        "internal/checker/flow.go:1610",
+        "internal/checker/flow.go:1668"
+      ],
+      "id": "ast.IsThisInTypeQuery",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsThisInTypeQuery"
+      ],
+      "projection": "document-order indices of the nodes where it is true",
+      "rust": "tsr_ast::utilities_positions::is_this_in_type_query",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ast/utilities.go:3642",
+        "internal/checker/checker.go:1497",
+        "internal/checker/checker.go:3053",
+        "internal/checker/checker.go:7347",
+        "internal/checker/checker.go:32323"
+      ],
+      "id": "ast.IsTypeDeclaration",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsTypeDeclaration"
+      ],
+      "projection": "document-order indices of the nodes where it is true",
+      "rust": "tsr_ast::utilities_positions::is_type_declaration",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:32329"
+      ],
+      "id": "ast.IsTypeDeclarationName",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsTypeDeclarationName"
+      ],
+      "projection": "document-order indices of the nodes where it is true",
+      "rust": "tsr_ast::utilities_positions::is_type_declaration_name",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:24672",
+        "internal/checker/checker.go:24673",
+        "internal/transformers/tstransforms/typeserializer.go:183",
+        "internal/transformers/tstransforms/typeserializer.go:246"
+      ],
+      "id": "ast.SkipTypeParentheses",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:SkipTypeParentheses"
+      ],
+      "projection": "[index, reference of the result] for every node where the result is not the node itself",
+      "rust": "tsr_ast::utilities_positions::skip_type_parentheses",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/printer/factory.go:835",
+        "internal/transformers/destructuring.go:339",
+        "internal/transformers/destructuring.go:445",
+        "internal/transformers/destructuring.go:498"
+      ],
+      "id": "ast.TryGetPropertyNameOfBindingOrAssignmentElement",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:TryGetPropertyNameOfBindingOrAssignmentElement"
+      ],
+      "projection": "[index, reference of the property name] for every node where it is not nil",
+      "rust": "tsr_ast::utilities_positions::try_get_property_name_of_binding_or_assignment_element",
+      "survey": true,
+      "synthetic": []
     }
   ],
   "group": "positions",

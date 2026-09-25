@@ -154,13 +154,18 @@ impl Parser<'_, AstBuilder> {
         attach_file_to_diagnostics(&mut jsdoc_diagnostics, root);
         let node_count = self.factory.node_count();
         let text_count = self.factory.text_count();
-        self.reparsed_clones.sort_by(|&left, &right| {
+        // Go sorts with slices.SortFunc, an unstable pdqsort: clones with
+        // equal ranges keep its order, which ast.GetReparsedNodeForNode's
+        // binary search observes.
+        let mut clones = std::mem::take(&mut self.reparsed_clones);
+        tsr_core::sort_like_go(&mut clones, &mut |&left, &right| {
             let left = self.factory.node(left).range();
             let right = self.factory.node(right).range();
             left.pos()
                 .cmp(&right.pos())
                 .then_with(|| left.end().cmp(&right.end()))
         });
+        self.reparsed_clones = clones;
         {
             let file = self.factory.source_file_mut(root).expect("source metadata");
             file.diagnostics = diagnostics;

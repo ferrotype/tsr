@@ -5,7 +5,7 @@ use tsr_arena::NodeId;
 use tsr_ast::{symbol_flags as sf, SyntaxKind as K};
 
 impl CheckerState {
-    // port: tsc/internal/ast/precedence.go:GetLeftmostExpression
+    // Inline copy of `GetLeftmostExpression`; its Phase 1 home is in tsr_ast (table group containers).
     pub(crate) fn leftmost_context_expression(&self, mut node: NodeId) -> Result<NodeId, Error> {
         loop {
             let read = self.node(node)?;

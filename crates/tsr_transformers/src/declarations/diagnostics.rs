@@ -570,7 +570,7 @@ fn accessor_error<R: tsr_printer::emit_resolver::DeclarationEmitResolver>(
     Ok(diagnostic)
 }
 
-// port: tsc/internal/ast/utilities.go:isPartOfTypeExpressionWithTypeArguments
+// Inline copy of `isPartOfTypeExpressionWithTypeArguments`; its Phase 1 home is in tsr_ast (table group positions).
 fn type_heritage(view: AstView<'_>, node: NodeId) -> Result<bool, Error> {
     let owner = parent(view, node)?;
     let read = view.node(owner)?;
@@ -594,7 +594,7 @@ fn type_heritage(view: AstView<'_>, node: NodeId) -> Result<bool, Error> {
 fn type_kind_range(kind: K) -> bool {
     (K::FirstTypeNode..=K::LastTypeNode).contains(&kind)
 }
-// port: tsc/internal/ast/utilities.go:isPartOfTypeNodeInParent
+// Inline copy of `isPartOfTypeNodeInParent`; its Phase 1 home is in tsr_ast (table group positions).
 fn part_of_type_in_parent(view: AstView<'_>, node: NodeId) -> Result<bool, Error> {
     let owner = parent(view, node)?;
     let read = view.node(owner)?;
@@ -647,7 +647,7 @@ fn part_of_type_in_parent(view: AstView<'_>, node: NodeId) -> Result<bool, Error
         _ => false,
     })
 }
-// port: tsc/internal/ast/utilities.go:IsPartOfTypeNode
+// Inline copy of `IsPartOfTypeNode`; its Phase 1 home is in tsr_ast (table group positions).
 pub(super) fn part_of_type_node(view: AstView<'_>, node: NodeId) -> Result<bool, Error> {
     let read = view.node(node)?;
     let kind = read.kind().known().ok_or(Error::InvalidGraph)?;

@@ -265,7 +265,7 @@ impl CheckerState {
         Ok((types, false))
     }
 
-    // port: tsc/internal/ast/utilities.go:ForEachReturnStatement
+    // Inline copy of `ForEachReturnStatement`; its Phase 1 home is in tsr_ast (table group containers).
     // The restricted statement traversal intentionally does not enter nested
     // functions, class expressions, or arbitrary expression children.
     pub(crate) fn return_statements(&self, body: NodeId) -> Result<Vec<NodeId>, Error> {
@@ -310,7 +310,7 @@ impl CheckerState {
         })
     }
 
-    // port: tsc/internal/ast/functionflags.go:GetFunctionFlags
+    // Inline copy of `GetFunctionFlags`; its Phase 1 home is in tsr_ast (table group containers).
     pub(crate) fn body_function_flags(&self, function: NodeId) -> Result<(bool, bool), Error> {
         let view = self.ast(function)?;
         let read = view.node(function)?;
@@ -502,7 +502,7 @@ impl CheckerState {
         Ok(Some(ty))
     }
 
-    // port: tsc/internal/ast/utilities.go:GetContainingFunction
+    // Inline copy of `GetContainingFunction`; its Phase 1 home is in tsr_ast (table group containers).
     pub(crate) fn containing_body_function(&self, node: NodeId) -> Result<Option<NodeId>, Error> {
         let mut current = self.node(node)?.parent();
         while let Some(node) = current {

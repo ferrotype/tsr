@@ -66,7 +66,7 @@ impl CheckerState {
 
     /// The function declaration, function expression or constructor whose
     /// `new.target` the node reads; arrow functions are transparent.
-    // port: tsc/internal/ast/utilities.go:GetNewTargetContainer
+    // Inline copy of `GetNewTargetContainer`; its Phase 1 home is in tsr_ast (table group containers).
     fn new_target_container(&self, node: NodeId) -> Result<Option<NodeId>, Error> {
         let view = self.ast(node)?;
         let container = tsr_ast::get_this_container(view, node, false, false)?;

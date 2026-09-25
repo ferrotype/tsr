@@ -7,7 +7,7 @@ fn required<T>(value: Option<T>, context: &'static str) -> Result<T, Error> {
 }
 
 impl CheckerState {
-    // port: tsc/internal/ast/utilities.go:IsThisInTypeQuery
+    // Inline copy of `IsThisInTypeQuery`; its Phase 1 home is in tsr_ast (table group positions).
     pub(crate) fn flow_this_type_query(&mut self, node: NodeId) -> Result<bool, Error> {
         if let Some(&result) = self.flow.this_type_queries.get(&node) {
             return Ok(result);

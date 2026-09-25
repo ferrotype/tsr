@@ -62,6 +62,14 @@ impl AstView<'_> {
     pub fn contains_object_rest_or_spread(self, id: NodeId) -> bool {
         Facts { view: self }.contains_object_rest_or_spread(id)
     }
+    /// The subtree-facts home of `IsThisIdentifier`, for AST utilities.
+    pub fn is_this_identifier(self, id: NodeId) -> bool {
+        Facts { view: self }.is_this_identifier(id)
+    }
+    /// The subtree-facts home of `GetTargetOfBindingOrAssignmentElement`.
+    pub fn target_of_binding_or_assignment_element(self, id: NodeId) -> Option<NodeId> {
+        Facts { view: self }.target_of_element(Some(id))
+    }
 }
 struct Facts<'a> {
     view: AstView<'a>,

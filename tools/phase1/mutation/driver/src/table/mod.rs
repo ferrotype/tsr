@@ -35,6 +35,7 @@ mod containers;
 #[path = "core.rs"]
 mod core_group;
 mod diagnostics;
+pub mod helpers;
 mod modules;
 mod positions;
 mod runtime;
@@ -259,6 +260,21 @@ fn walk_with(
     Ok(nodes)
 }
 
+/// A node's children in `ForEachChild` order: the projection of a node no
+/// walk holds (factory output) by the references of its children.
+pub fn children(view: AstView<'_>, id: NodeId) -> Result<Vec<NodeId>, String> {
+    let mut children = Children {
+        view,
+        nodes: Vec::new(),
+        error: None,
+    };
+    let _ = view.node(id).map_err(text)?.for_each_child(&mut children);
+    match children.error {
+        Some(error) => Err(error),
+        None => Ok(children.nodes),
+    }
+}
+
 enum Tree {
     Parsed(Box<ParsedFile>),
     Bound(BoundFile),
@@ -312,6 +328,15 @@ impl Parsed {
     }
 
     /// The bound view of a bound input.
+    /// The parsed file's builder, the factory of a column whose operation
+    /// builds nodes over the input's storage.
+    pub fn builder_mut(&mut self) -> Result<&mut tsr_ast::AstBuilder, String> {
+        match &mut self.tree {
+            Tree::Parsed(parsed) => Ok(parsed.builder_mut()),
+            Tree::Bound(_) => Err("a bound input has no builder".into()),
+        }
+    }
+
     pub fn bound(&self) -> Option<BoundView<'_>> {
         match &self.tree {
             Tree::Parsed(_) => None,
@@ -342,6 +367,19 @@ impl Parsed {
     }
 
     /// The reference list of nodes (Go's `Parsed.Refs`).
+    /// Go's `RefOrFields`: the reference of a walked node, else
+    /// `["fields", kind, pos, end]`.
+    pub fn node_ref_or_fields(&self, node: Option<NodeId>) -> Result<Value, String> {
+        let Some(node) = node else {
+            return Ok(Value::Null);
+        };
+        if let Some(at) = self.index.get(&node) {
+            return Ok(json!(at));
+        }
+        let read = self.view().node(node).map_err(text)?;
+        Ok(json!(["fields", read.kind().raw(), read.pos(), read.end()]))
+    }
+
     pub fn refs(&self, nodes: impl IntoIterator<Item = NodeId>) -> Result<Value, String> {
         nodes
             .into_iter()

@@ -337,7 +337,7 @@ impl<H: Host + ?Sized> Lookup<'_, H> {
             None
         })
     }
-    // port: tsc/internal/ast/utilities.go:GetAllAccessorDeclarationsForDeclaration
+    // Inline copy of `GetAllAccessorDeclarationsForDeclaration`; its Phase 1 home is in tsr_ast (table group class).
     fn accessors(&self, node: NodeId) -> R<Accessors, H> {
         let read = self.node(node)?;
         let setter = read.kind() == K::SetAccessor;

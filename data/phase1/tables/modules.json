@@ -1,5 +1,806 @@
 {
-  "columns": [],
+  "columns": [
+    {
+      "evidence": [
+        "internal/checker/checker.go:28710",
+        "internal/ls/symbols.go:305"
+      ],
+      "id": "ast.IsAnyExportAssignment",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/ast.go:IsAnyExportAssignment"
+      ],
+      "projection": "document-order indices of the nodes where it is true",
+      "rust": "tsr_ast::utilities_modules::is_any_export_assignment",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:5594",
+        "internal/checker/checker.go:5698"
+      ],
+      "id": "ast.IsImportDeclarationOrJSImportDeclaration",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/ast.go:IsImportDeclarationOrJSImportDeclaration"
+      ],
+      "projection": "document-order indices of the nodes where it is true",
+      "rust": "tsr_ast::utilities_modules::is_import_declaration_or_js_import_declaration",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/testutil/tsbaseline/type_symbol_baseline.go:425",
+        "internal/tracing/tracing.go:608",
+        "internal/tracing/tracing.go:610"
+      ],
+      "id": "ast.EscapeAllInternalSymbolNames",
+      "input": "values",
+      "operations": [
+        "tsc/internal/ast/symbol.go:EscapeAllInternalSymbolNames"
+      ],
+      "projection": "the result for each synthetic symbol name, in order, as hex (a one-byte quote is excluded: Go slices it out of bounds)",
+      "rust": "tsr_ast::escape_all_internal_symbol_names",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "names_hex": [
+              "",
+              "61",
+              "5f",
+              "5f5f",
+              "5f5f5f61",
+              "5f61",
+              "5f5f61",
+              "fe",
+              "fefe",
+              "fe64656661756c74",
+              "fe5f5f61",
+              "61fe62fe",
+              "2222",
+              "22666f6f22",
+              "22666f6f",
+              "666f6f22",
+              "fe22",
+              "fe22666f6f227061747465726e4031",
+              "fe22227061747465726e4031",
+              "fe2278227061747465726e40",
+              "fe2261227061747465726e4062227061747465726e4063",
+              "fe226e6f7061747465726e",
+              "fe2278",
+              "fe787061747465726e40",
+              "22fe22",
+              "5f5ffe"
+            ]
+          },
+          "name": "symbol-names"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/checker/nodebuilderimpl.go:1019"
+      ],
+      "id": "ast.EscapeInternalSymbolName",
+      "input": "values",
+      "operations": [
+        "tsc/internal/ast/symbol.go:EscapeInternalSymbolName"
+      ],
+      "projection": "the result for each synthetic symbol name, in order, as hex (a one-byte quote is excluded: Go slices it out of bounds)",
+      "rust": "tsr_ast::escape_internal_symbol_name",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "names_hex": [
+              "",
+              "61",
+              "5f",
+              "5f5f",
+              "5f5f5f61",
+              "5f61",
+              "5f5f61",
+              "fe",
+              "fefe",
+              "fe64656661756c74",
+              "fe5f5f61",
+              "61fe62fe",
+              "2222",
+              "22666f6f22",
+              "22666f6f",
+              "666f6f22",
+              "fe22",
+              "fe22666f6f227061747465726e4031",
+              "fe22227061747465726e4031",
+              "fe2278227061747465726e40",
+              "fe2261227061747465726e4062227061747465726e4063",
+              "fe226e6f7061747465726e",
+              "fe2278",
+              "fe787061747465726e40",
+              "22fe22",
+              "5f5ffe"
+            ]
+          },
+          "name": "symbol-names"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/api/session.go:152"
+      ],
+      "id": "ast.EscapeSymbolName",
+      "input": "values",
+      "operations": [
+        "tsc/internal/ast/symbol.go:EscapeSymbolName"
+      ],
+      "projection": "the result for each synthetic symbol name, in order, as hex (a one-byte quote is excluded: Go slices it out of bounds)",
+      "rust": "tsr_ast::escape_symbol_name",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "names_hex": [
+              "",
+              "61",
+              "5f",
+              "5f5f",
+              "5f5f5f61",
+              "5f61",
+              "5f5f61",
+              "fe",
+              "fefe",
+              "fe64656661756c74",
+              "fe5f5f61",
+              "61fe62fe",
+              "2222",
+              "22666f6f22",
+              "22666f6f",
+              "666f6f22",
+              "fe22",
+              "fe22666f6f227061747465726e4031",
+              "fe22227061747465726e4031",
+              "fe2278227061747465726e40",
+              "fe2261227061747465726e4062227061747465726e4063",
+              "fe226e6f7061747465726e",
+              "fe2278",
+              "fe787061747465726e40",
+              "22fe22",
+              "5f5ffe"
+            ]
+          },
+          "name": "symbol-names"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/ast/utilities.go:1663",
+        "internal/checker/nodebuilderimpl.go:1273",
+        "internal/checker/nodebuilderimpl.go:1278",
+        "internal/ls/findallreferences.go:1978",
+        "internal/ls/lsutil/utilities.go:117"
+      ],
+      "id": "ast.TryGetAmbientModuleNameFromSymbolName",
+      "input": "values",
+      "operations": [
+        "tsc/internal/ast/utilities.go:TryGetAmbientModuleNameFromSymbolName"
+      ],
+      "projection": "the result for each synthetic symbol name, in order, as hex (a one-byte quote is excluded: Go slices it out of bounds); null where it is not an ambient module name",
+      "rust": "tsr_ast::try_get_ambient_module_name_from_symbol_name",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "names_hex": [
+              "",
+              "61",
+              "5f",
+              "5f5f",
+              "5f5f5f61",
+              "5f61",
+              "5f5f61",
+              "fe",
+              "fefe",
+              "fe64656661756c74",
+              "fe5f5f61",
+              "61fe62fe",
+              "2222",
+              "22666f6f22",
+              "22666f6f",
+              "666f6f22",
+              "fe22",
+              "fe22666f6f227061747465726e4031",
+              "fe22227061747465726e4031",
+              "fe2278227061747465726e40",
+              "fe2261227061747465726e4062227061747465726e4063",
+              "fe226e6f7061747465726e",
+              "fe2278",
+              "fe787061747465726e40",
+              "22fe22",
+              "5f5ffe"
+            ]
+          },
+          "name": "symbol-names"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/ast/symbol.go:24",
+        "internal/checker/checker.go:1320",
+        "internal/checker/checker.go:15840"
+      ],
+      "id": "ast.IsAmbientModuleSymbolName",
+      "input": "values",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsAmbientModuleSymbolName"
+      ],
+      "projection": "the result for each synthetic symbol name, in order",
+      "rust": "tsr_ast::is_ambient_module_symbol_name",
+      "survey": false,
+      "synthetic": [
+        {
+          "input": {
+            "names_hex": [
+              "",
+              "61",
+              "5f",
+              "5f5f",
+              "5f5f5f61",
+              "5f61",
+              "5f5f61",
+              "fe",
+              "fefe",
+              "fe64656661756c74",
+              "fe5f5f61",
+              "61fe62fe",
+              "2222",
+              "22666f6f22",
+              "22666f6f",
+              "666f6f22",
+              "fe22",
+              "fe22666f6f227061747465726e4031",
+              "fe22227061747465726e4031",
+              "fe2278227061747465726e40",
+              "fe2261227061747465726e4062227061747465726e4063",
+              "fe226e6f7061747465726e",
+              "fe2278",
+              "fe787061747465726e40",
+              "22fe22",
+              "5f5ffe"
+            ]
+          },
+          "name": "symbol-names"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/binder/binder.go:973",
+        "internal/checker/checker.go:1204",
+        "internal/checker/checker.go:1228",
+        "internal/checker/checker.go:1231",
+        "internal/checker/checker.go:1842"
+      ],
+      "id": "ast.SymbolName",
+      "input": "bound",
+      "operations": [
+        "tsc/internal/ast/symbol.go:SymbolName"
+      ],
+      "projection": "[index, hex of its SymbolName] for every bound node with a symbol; the node id a pattern ambient module's name ends with (binder.go:314, a process-global counter) is blanked",
+      "rust": "tsr_ast::symbol_name",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/services.go:33",
+        "internal/ls/autoimport/extract.go:273",
+        "internal/ls/completions.go:3057",
+        "internal/ls/completions.go:3135",
+        "internal/ls/lsutil/symbol_display.go:167"
+      ],
+      "id": "ast.Symbol.CombinedLocalAndExportSymbolFlags",
+      "input": "bound",
+      "operations": [
+        "tsc/internal/ast/symbol.go:Symbol.CombinedLocalAndExportSymbolFlags"
+      ],
+      "projection": "[index, [combined flags, whether the symbol has an export symbol]] for every bound node with a symbol",
+      "rust": "tsr_ast::SymbolAccess::combined_local_and_export_symbol_flags",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ast/utilities.go:1696",
+        "internal/ast/utilities.go:1726",
+        "internal/ast/utilities.go:1729",
+        "internal/binder/binder.go:427",
+        "internal/binder/binder.go:835"
+      ],
+      "id": "ast.Symbol.IsExternalModule",
+      "input": "bound",
+      "operations": [
+        "tsc/internal/ast/symbol.go:Symbol.IsExternalModule"
+      ],
+      "projection": "[index, IsExternalModule] for every bound node with a symbol",
+      "rust": "tsr_ast::SymbolAccess::is_external_module",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ast/utilities.go:3616",
+        "internal/ls/autoimport/extract.go:98",
+        "internal/ls/autoimport/util.go:28",
+        "internal/ls/autoimport/util.go:45",
+        "internal/ls/string_completions.go:924",
+        "internal/ast/utilities.go:3623"
+      ],
+      "id": "ast.GetNonAugmentationDeclaration",
+      "input": "bound",
+      "operations": [
+        "tsc/internal/ast/utilities.go:GetNonAugmentationDeclaration",
+        "tsc/internal/ast/utilities.go:IsExternalModuleAugmentation"
+      ],
+      "projection": "[index, reference of the first declaration that is no augmentation] for every bound node with a symbol",
+      "rust": "tsr_ast::utilities_modules::get_non_augmentation_declaration",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:15033",
+        "internal/checker/nodebuilderimpl.go:667",
+        "internal/checker/nodebuilderimpl.go:1281",
+        "internal/ls/autoimport/export.go:100",
+        "internal/ls/autoimport/util.go:169"
+      ],
+      "id": "ast.GetSourceFileOfModule",
+      "input": "bound",
+      "operations": [
+        "tsc/internal/ast/utilities.go:GetSourceFileOfModule"
+      ],
+      "projection": "[index, reference of the module's source file] for every bound node whose symbol is a module",
+      "rust": "tsr_ast::utilities_modules::get_source_file_of_module",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:14653",
+        "internal/checker/checker.go:32038",
+        "internal/ls/utilities.go:199",
+        "internal/transformers/declarations/transform.go:2451"
+      ],
+      "id": "ast.GetExternalModuleImportEqualsDeclarationExpression",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:GetExternalModuleImportEqualsDeclarationExpression"
+      ],
+      "projection": "[index, reference of the module reference's expression] for every node where it is not nil, over external-module import-equals declarations (its assertion)",
+      "rust": "tsr_ast::utilities_modules::get_external_module_import_equals_declaration_expression",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:5463",
+        "internal/checker/checker.go:5552",
+        "internal/checker/checker.go:5701",
+        "internal/checker/checker.go:14890",
+        "internal/checker/checker.go:15359",
+        "internal/ast/utilities.go:1952"
+      ],
+      "id": "ast.GetExternalModuleName",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:GetExternalModuleName",
+        "tsc/internal/ast/utilities.go:getImportTypeNodeLiteral"
+      ],
+      "projection": "[index, reference of the module name] for every node where it is not nil, over the kinds it handles (its default arm panics)",
+      "rust": "tsr_ast::utilities_modules::get_external_module_name",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:5410",
+        "internal/checker/checker.go:5490",
+        "internal/checker/checker.go:5533",
+        "internal/checker/checker.go:5595",
+        "internal/checker/checker.go:5597"
+      ],
+      "id": "ast.GetImportAttributes",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:GetImportAttributes"
+      ],
+      "projection": "[index, reference of the attributes] for every node where it is not nil, over the kinds it handles (its default arm panics)",
+      "rust": "tsr_ast::utilities_modules::get_import_attributes",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:15410"
+      ],
+      "id": "ast.GetModuleSpecifierOfBareOrAccessedRequire",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:GetModuleSpecifierOfBareOrAccessedRequire"
+      ],
+      "projection": "[index, reference of the require specifier] for every node where it is not nil",
+      "rust": "tsr_ast::utilities_modules::get_module_specifier_of_bare_or_accessed_require",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:5703",
+        "internal/checker/checker.go:14893",
+        "internal/checker/checker.go:15362"
+      ],
+      "id": "ast.HasImportAttributes",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:HasImportAttributes"
+      ],
+      "projection": "document-order indices of the nodes where it is true",
+      "rust": "tsr_ast::utilities_modules::has_import_attributes",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:15568"
+      ],
+      "id": "ast.HasResolutionModeOverride",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:HasResolutionModeOverride"
+      ],
+      "projection": "document-order indices of the nodes where it is true",
+      "rust": "tsr_ast::utilities_modules::has_resolution_mode_override",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ls/importTracker.go:112",
+        "internal/ls/importTracker.go:115"
+      ],
+      "id": "ast.ImportFromModuleSpecifier",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:ImportFromModuleSpecifier"
+      ],
+      "projection": "[index, reference of the import] for every node where it is not nil, over the string literals whose import TryGetImportFromModuleSpecifier finds (its assertion fails on the others)",
+      "rust": "tsr_ast::utilities_modules::import_from_module_specifier",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ast/utilities.go:4196",
+        "internal/ls/autoimport/fix.go:166",
+        "internal/ls/autoimport/fix.go:857",
+        "internal/ls/completions.go:3302",
+        "internal/ls/findallreferences.go:254"
+      ],
+      "id": "ast.TryGetImportFromModuleSpecifier",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:TryGetImportFromModuleSpecifier"
+      ],
+      "projection": "[index, reference of the import] for every node where it is not nil, over string literals",
+      "rust": "tsr_ast::utilities_modules::try_get_import_from_module_specifier",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ls/importTracker.go:277",
+        "internal/ls/sourcedefinition.go:317",
+        "internal/transformers/moduletransforms/commonjsmodule.go:723",
+        "internal/transformers/moduletransforms/commonjsmodule.go:749",
+        "internal/transformers/moduletransforms/externalmoduleinfo.go:382"
+      ],
+      "id": "ast.IsDefaultImport",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsDefaultImport"
+      ],
+      "projection": "document-order indices of the nodes where it is true",
+      "rust": "tsr_ast::utilities_middle::is_default_import",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:28931",
+        "internal/checker/grammarchecks.go:1193",
+        "internal/checker/grammarchecks.go:1678",
+        "internal/transformers/moduletransforms/commonjsmodule.go:230",
+        "internal/transformers/moduletransforms/externalmoduleinfo.go:263",
+        "internal/ast/utilities.go:1696"
+      ],
+      "id": "ast.IsEffectiveExternalModule",
+      "input": "bound",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsEffectiveExternalModule",
+        "tsc/internal/ast/utilities.go:isCommonJSContainingModuleKind"
+      ],
+      "projection": "[index, bits] of the bound source file (the binder sets the CommonJS module indicator), bit i set under module option i of None, CommonJS, AMD, UMD, System, ES2015, ES2020, ES2022, ESNext, Node16, Node18, Node20, NodeNext, Preserve",
+      "rust": "tsr_ast::utilities_modules::is_effective_external_module",
+      "survey": true,
+      "synthetic": [
+        {
+          "input": {
+            "filename": "/table/cjs.js",
+            "script_kind": 1,
+            "source": "module.exports = { a: 1 };\n"
+          },
+          "name": "commonjs-js"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "none at the pin outside the defining package"
+      ],
+      "id": "ast.IsEmittableImport",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsEmittableImport"
+      ],
+      "projection": "document-order indices of the nodes where it is true",
+      "rust": "tsr_ast::utilities_modules::is_emittable_import",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/transformers/moduletransforms/esmodule.go:229"
+      ],
+      "id": "ast.IsExportNamespaceAsDefaultDeclaration",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsExportNamespaceAsDefaultDeclaration"
+      ],
+      "projection": "document-order indices of the nodes where it is true, excluding export declarations without a clause (it reads the clause's kind)",
+      "rust": "tsr_ast::utilities_modules::is_export_namespace_as_default_declaration",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ast/utilities.go:3623",
+        "internal/checker/checker.go:5282",
+        "internal/checker/emitresolver.go:160",
+        "internal/checker/utilities.go:246",
+        "internal/ls/importTracker.go:312"
+      ],
+      "id": "ast.IsExternalModuleAugmentation",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsExternalModuleAugmentation"
+      ],
+      "projection": "document-order indices of the nodes where it is true",
+      "rust": "tsr_ast::utilities_modules::is_external_module_augmentation",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ast/utilities.go:3287",
+        "internal/checker/checker.go:32038",
+        "internal/ls/utilities.go:199",
+        "internal/transformers/moduletransforms/commonjsmodule.go:778",
+        "internal/transformers/moduletransforms/esmodule.go:125"
+      ],
+      "id": "ast.IsExternalModuleImportEqualsDeclaration",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsExternalModuleImportEqualsDeclaration"
+      ],
+      "projection": "document-order indices of the nodes where it is true",
+      "rust": "tsr_ast::utilities_modules::is_external_module_import_equals_declaration",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/transformers/declarations/transform.go:444",
+        "internal/transformers/declarations/transform.go:454"
+      ],
+      "id": "ast.IsExternalModuleIndicator",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsExternalModuleIndicator"
+      ],
+      "projection": "document-order indices of the nodes where it is true",
+      "rust": "tsr_ast::utilities_modules::is_external_module_indicator",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:5376",
+        "internal/checker/checker.go:5617",
+        "internal/checker/checker.go:6975",
+        "internal/checker/emitresolver.go:298",
+        "internal/ls/utilities.go:285"
+      ],
+      "id": "ast.IsInternalModuleImportEqualsDeclaration",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsInternalModuleImportEqualsDeclaration"
+      ],
+      "projection": "document-order indices of the nodes where it is true",
+      "rust": "tsr_ast::utilities_middle::is_internal_module_import_equals_declaration",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/symbolaccessibility.go:106",
+        "internal/execute/incremental/programtosnapshot.go:256",
+        "internal/ls/autoimport/extract.go:113",
+        "internal/ls/autoimport/extract.go:119",
+        "internal/ls/autoimport/util.go:35"
+      ],
+      "id": "ast.IsModuleWithStringLiteralName",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsModuleWithStringLiteralName"
+      ],
+      "projection": "document-order indices of the nodes where it is true",
+      "rust": "tsr_ast::utilities_modules::is_module_with_string_literal_name",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:15503",
+        "internal/ls/sourcedefinition.go:98",
+        "internal/checker/checker.go:6916",
+        "internal/checker/checker.go:6965",
+        "internal/checker/checker.go:7013",
+        "internal/checker/checker.go:10694"
+      ],
+      "id": "ast.IsPartOfTypeOnlyImportOrExportDeclaration",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsPartOfTypeOnlyImportOrExportDeclaration",
+        "tsc/internal/ast/utilities.go:IsTypeOnlyImportOrExportDeclaration",
+        "tsc/internal/ast/utilities.go:IsTypeOnlyImportDeclaration",
+        "tsc/internal/ast/utilities.go:isTypeOnlyExportDeclaration"
+      ],
+      "projection": "document-order indices of the nodes where it is true",
+      "rust": "tsr_ast::utilities_modules::is_part_of_type_only_import_or_export_declaration",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:6916",
+        "internal/checker/checker.go:6965",
+        "internal/checker/checker.go:7013",
+        "internal/checker/checker.go:10694",
+        "internal/checker/checker.go:15313",
+        "internal/ast/utilities.go:2975"
+      ],
+      "id": "ast.IsTypeOnlyImportOrExportDeclaration",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsTypeOnlyImportOrExportDeclaration",
+        "tsc/internal/ast/utilities.go:isTypeOnlyExportDeclaration"
+      ],
+      "projection": "document-order indices of the nodes where it is true",
+      "rust": "tsr_ast::utilities_modules::is_type_only_import_or_export_declaration",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/ast/utilities.go:2975",
+        "internal/checker/checker.go:1921"
+      ],
+      "id": "ast.IsTypeOnlyImportDeclaration",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsTypeOnlyImportDeclaration"
+      ],
+      "projection": "document-order indices of the nodes where it is true",
+      "rust": "tsr_ast::utilities_modules::is_type_only_import_declaration",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:11486",
+        "internal/checker/checker.go:14430",
+        "internal/checker/checker.go:14431",
+        "internal/compiler/program.go:842",
+        "internal/compiler/program.go:1471"
+      ],
+      "id": "ast.IsPlainJSFile",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsPlainJSFile"
+      ],
+      "projection": "[index, bits] of the source file, bit i set under checkJs Unknown, False, True",
+      "rust": "tsr_ast::utilities_middle::is_plain_js_file",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "none at the pin outside the defining package"
+      ],
+      "id": "ast.IsRequireVariableStatement",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsRequireVariableStatement"
+      ],
+      "projection": "document-order indices of the nodes where it is true",
+      "rust": "tsr_ast::utilities_modules::is_require_variable_statement",
+      "survey": true,
+      "synthetic": []
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:1900",
+        "internal/checker/checker.go:7758",
+        "internal/ls/codeactions_importfixes.go:253",
+        "internal/ls/codeactions_importfixes.go:310",
+        "internal/ls/completions.go:1625",
+        "internal/ast/utilities.go:3172"
+      ],
+      "id": "ast.IsValidTypeOnlyAliasUseSite",
+      "input": "source_jsdoc",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsValidTypeOnlyAliasUseSite",
+        "tsc/internal/ast/utilities.go:isIdentifierInNonEmittingHeritageClause",
+        "tsc/internal/ast/utilities.go:isPartOfPossiblyValidTypeOrAbstractComputedPropertyName",
+        "tsc/internal/ast/utilities.go:isShorthandPropertyNameUseSite"
+      ],
+      "projection": "document-order indices of the nodes where it is true over the JSDoc walk",
+      "rust": "tsr_ast::utilities_modules::is_valid_type_only_alias_use_site",
+      "survey": true,
+      "synthetic": [
+        {
+          "input": {
+            "filename": "/table/heritage.ts",
+            "script_kind": 3,
+            "source": "class C implements A.B {}\ninterface I extends A.B {}\nclass D extends A.B {}\n"
+          },
+          "name": "heritage-access"
+        }
+      ]
+    },
+    {
+      "evidence": [
+        "internal/checker/checker.go:15409",
+        "internal/ls/findallreferences.go:2287",
+        "internal/ls/importTracker.go:657"
+      ],
+      "id": "ast.IsVariableDeclarationInitializedToBareOrAccessedRequire",
+      "input": "source",
+      "operations": [
+        "tsc/internal/ast/utilities.go:IsVariableDeclarationInitializedToBareOrAccessedRequire"
+      ],
+      "projection": "document-order indices of the nodes where it is true",
+      "rust": "tsr_ast::is_variable_declaration_initialized_to_bare_or_accessed_require",
+      "survey": true,
+      "synthetic": []
+    }
+  ],
   "group": "modules",
   "version": 1
 }

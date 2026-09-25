@@ -6,7 +6,7 @@ use tsr_diagnostics as d;
 
 impl CheckerState {
     // port: tsc/internal/checker/utilities.go:entityNameToString
-    // port: tsc/internal/ast/utilities.go:EntityNameToString
+    // Inline copy of `EntityNameToString`; its Phase 1 home is in tsr_ast (table group targets).
     pub(crate) fn entity_name_text(&self, node: NodeId) -> Result<JsString, Error> {
         // The explicit stack also covers long property chains on a small stack.
         enum Part {

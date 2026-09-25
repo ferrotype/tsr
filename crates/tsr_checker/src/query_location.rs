@@ -4,7 +4,7 @@ use crate::{CheckerState, Error, TypeId};
 use tsr_arena::NodeId;
 use tsr_ast::{node_flags as nf, AstView, SyntaxKind as K};
 
-// port: tsc/internal/ast/utilities.go:IsDeclarationNameOrImportPropertyName
+// Inline copy of `IsDeclarationNameOrImportPropertyName`; its Phase 1 home is in tsr_ast (table group positions).
 pub(super) fn declaration_or_import_name(view: AstView<'_>, node: NodeId) -> Result<bool, Error> {
     let read = view.node(node)?;
     let Some(parent) = read.parent() else {
@@ -152,7 +152,7 @@ impl CheckerState {
         }
     }
 
-    // port: tsc/internal/ast/utilities.go:TryGetClassImplementingOrExtendingHeritageClauseElement
+    // Inline copy of `TryGetClassImplementingOrExtendingHeritageClauseElement`; its Phase 1 home is in tsr_ast (table group class).
     fn heritage_class(&self, node: NodeId) -> Result<Option<(NodeId, bool)>, Error> {
         let read = self.node(node)?;
         if !matches!(
