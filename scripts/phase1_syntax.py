@@ -766,23 +766,64 @@ def smoke_problems() -> list[str]:
     return _report_problems(SMOKE)
 
 
+def _display(path: Path) -> str:
+    return str(path.relative_to(ROOT)) if path.is_relative_to(ROOT) else str(path)
+
+
 def full_problems() -> list[str]:
-    # The full run is a production-stage artifact; F4a does not invent one.
-    return _report_problems(FULL, full=True) if FULL.is_file() else []
+    """The committed full report, checked like the smoke.
+
+    The full run is a production-stage artifact and F4a does not invent one.
+    But once the committed smoke says it was derived from a full capture, that
+    full report is committed evidence: its absence is a problem, not silence.
+    """
+    if FULL.is_file():
+        return _report_problems(FULL, full=True)
+    smoke = json.loads(SMOKE.read_text()) if SMOKE.is_file() else {}
+    if smoke.get("capture_selection") == "full" or smoke.get("selection") == "full":
+        return [f"{_display(FULL)} is absent although the committed smoke was derived from a full "
+                "capture; run `phase1_syntax.py smoke --full --write`"]
+    return []
+
+
+def report_freshness(path: Path, current: dict[str, str] | None = None) -> dict:
+    """Whether the Rust sources a committed report ran are still the current ones.
+
+    Informational, never a manifest problem: a later production change is
+    expected to move them, and F4b reruns the capture when it does. A stale
+    report keeps its recorded `rust_sources_current` (true at its revision);
+    this answers for the current sources, and `phase1.py inventory --check`
+    lists a stale one as an outstanding item.
+    """
+    if not path.is_file():
+        return {"rust_sources_current": False, "changed": [], "changed_count": 0}
+    recorded = json.loads(path.read_text()).get("rust_closure", {})
+    current = rust_closure() if current is None else current
+    changed = sorted(name for name in set(recorded) | set(current) if recorded.get(name) != current.get(name))
+    return {"rust_sources_current": not changed, "changed": changed[:20], "changed_count": len(changed)}
 
 
 def smoke_freshness() -> dict:
-    """Whether the Rust sources the committed smoke ran are still the current ones.
+    return report_freshness(SMOKE)
 
-    Informational: a later production change is expected to move them, and F4b
-    reruns the smoke when it does. It is reported, never hidden.
-    """
-    if not SMOKE.is_file():
-        return {"rust_sources_current": False, "changed": []}
-    recorded = json.loads(SMOKE.read_text()).get("rust_closure", {})
-    current = rust_closure()
-    changed = sorted(name for name in set(recorded) | set(current) if recorded.get(name) != current.get(name))
-    return {"rust_sources_current": not changed, "changed": changed[:20], "changed_count": len(changed)}
+
+def full_freshness() -> dict:
+    return report_freshness(FULL)
+
+
+def freshness_items() -> list[str]:
+    """One outstanding item per committed report whose recorded Rust closure is stale."""
+    items, current = [], None
+    for path in (SMOKE, FULL):
+        if not path.is_file():
+            continue
+        current = rust_closure() if current is None else current
+        state = report_freshness(path, current)
+        if not state["rust_sources_current"]:
+            items.append(f"{_display(path)} records a Rust closure that differs from the current "
+                         f"sources in {state['changed_count']} input(s) ({', '.join(state['changed'][:5])}); "
+                         "rerun `phase1_syntax.py smoke --full --write` after the last source edit")
+    return items
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -817,7 +858,8 @@ def main(argv: list[str] | None = None) -> int:
                          indent=2))
     else:
         found = problems() + schedule_problems() + smoke_problems() + full_problems()
-        print(json.dumps({"problems": found, "smoke": smoke_freshness()}, indent=2))
+        print(json.dumps({"problems": found, "smoke": smoke_freshness(), "full": full_freshness(),
+                          "outstanding": freshness_items()}, indent=2))
         return 1 if found else 0
     return 0
 

@@ -1,13 +1,14 @@
 {
-  "accounted_operations": 3150,
+  "accounted_operations": 3143,
   "complete": false,
   "exempt_by_category": {
     "go_test_harness": 155,
-    "later_step": 228,
+    "later_step": 205,
     "unused_at_pin": 5
   },
-  "exempt_operations": 388,
+  "exempt_operations": 365,
   "gap_problems": [],
+  "later_step_unresolved": 0,
   "pending": [
     {
       "disposition": "missing",
@@ -28,22 +29,6 @@
     {
       "disposition": "missing",
       "operation": "tsc/internal/ast/ast.go:BinaryExpression.setModifiers",
-      "rust_home": [
-        "crates/tsr_ast/src/clone.rs",
-        "crates/tsr_ast/src/factory.rs",
-        "crates/tsr_ast/src/node_accessors.rs",
-        "crates/tsr_ast/src/node_text.rs",
-        "crates/tsr_ast/src/source_file.rs",
-        "crates/tsr_ast/src/storage.rs",
-        "crates/tsr_ast/src/subtree_facts.rs",
-        "crates/tsr_ast/src/visitor.rs",
-        "crates/tsr_parser/src/lazy_jsdoc.rs",
-        "crates/tsr_parser/src/state.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/ast/ast.go:BodyBase.BodyData",
       "rust_home": [
         "crates/tsr_ast/src/clone.rs",
         "crates/tsr_ast/src/factory.rs",
@@ -107,39 +92,7 @@
     },
     {
       "disposition": "missing",
-      "operation": "tsc/internal/ast/ast.go:DeclarationBase.DeclarationData",
-      "rust_home": [
-        "crates/tsr_ast/src/clone.rs",
-        "crates/tsr_ast/src/factory.rs",
-        "crates/tsr_ast/src/node_accessors.rs",
-        "crates/tsr_ast/src/node_text.rs",
-        "crates/tsr_ast/src/source_file.rs",
-        "crates/tsr_ast/src/storage.rs",
-        "crates/tsr_ast/src/subtree_facts.rs",
-        "crates/tsr_ast/src/visitor.rs",
-        "crates/tsr_parser/src/lazy_jsdoc.rs",
-        "crates/tsr_parser/src/state.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
       "operation": "tsc/internal/ast/ast.go:ExportableBase.ExportableData",
-      "rust_home": [
-        "crates/tsr_ast/src/clone.rs",
-        "crates/tsr_ast/src/factory.rs",
-        "crates/tsr_ast/src/node_accessors.rs",
-        "crates/tsr_ast/src/node_text.rs",
-        "crates/tsr_ast/src/source_file.rs",
-        "crates/tsr_ast/src/storage.rs",
-        "crates/tsr_ast/src/subtree_facts.rs",
-        "crates/tsr_ast/src/visitor.rs",
-        "crates/tsr_parser/src/lazy_jsdoc.rs",
-        "crates/tsr_parser/src/state.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/ast/ast.go:FlowNodeBase.FlowNodeData",
       "rust_home": [
         "crates/tsr_ast/src/clone.rs",
         "crates/tsr_ast/src/factory.rs",
@@ -171,55 +124,7 @@
     },
     {
       "disposition": "missing",
-      "operation": "tsc/internal/ast/ast.go:FunctionLikeBase.LocalsContainerData",
-      "rust_home": [
-        "crates/tsr_ast/src/clone.rs",
-        "crates/tsr_ast/src/factory.rs",
-        "crates/tsr_ast/src/node_accessors.rs",
-        "crates/tsr_ast/src/node_text.rs",
-        "crates/tsr_ast/src/source_file.rs",
-        "crates/tsr_ast/src/storage.rs",
-        "crates/tsr_ast/src/subtree_facts.rs",
-        "crates/tsr_ast/src/visitor.rs",
-        "crates/tsr_parser/src/lazy_jsdoc.rs",
-        "crates/tsr_parser/src/state.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/ast/ast.go:FunctionLikeWithBodyBase.BodyData",
-      "rust_home": [
-        "crates/tsr_ast/src/clone.rs",
-        "crates/tsr_ast/src/factory.rs",
-        "crates/tsr_ast/src/node_accessors.rs",
-        "crates/tsr_ast/src/node_text.rs",
-        "crates/tsr_ast/src/source_file.rs",
-        "crates/tsr_ast/src/storage.rs",
-        "crates/tsr_ast/src/subtree_facts.rs",
-        "crates/tsr_ast/src/visitor.rs",
-        "crates/tsr_parser/src/lazy_jsdoc.rs",
-        "crates/tsr_parser/src/state.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
       "operation": "tsc/internal/ast/ast.go:FunctionLikeWithBodyBase.FunctionLikeData",
-      "rust_home": [
-        "crates/tsr_ast/src/clone.rs",
-        "crates/tsr_ast/src/factory.rs",
-        "crates/tsr_ast/src/node_accessors.rs",
-        "crates/tsr_ast/src/node_text.rs",
-        "crates/tsr_ast/src/source_file.rs",
-        "crates/tsr_ast/src/storage.rs",
-        "crates/tsr_ast/src/subtree_facts.rs",
-        "crates/tsr_ast/src/visitor.rs",
-        "crates/tsr_parser/src/lazy_jsdoc.rs",
-        "crates/tsr_parser/src/state.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/ast/ast.go:FunctionLikeWithBodyBase.LocalsContainerData",
       "rust_home": [
         "crates/tsr_ast/src/clone.rs",
         "crates/tsr_ast/src/factory.rs",
@@ -300,22 +205,6 @@
     {
       "disposition": "missing",
       "operation": "tsc/internal/ast/ast.go:IsArrayLiteralOrObjectLiteralDestructuringPattern",
-      "rust_home": [
-        "crates/tsr_ast/src/clone.rs",
-        "crates/tsr_ast/src/factory.rs",
-        "crates/tsr_ast/src/node_accessors.rs",
-        "crates/tsr_ast/src/node_text.rs",
-        "crates/tsr_ast/src/source_file.rs",
-        "crates/tsr_ast/src/storage.rs",
-        "crates/tsr_ast/src/subtree_facts.rs",
-        "crates/tsr_ast/src/visitor.rs",
-        "crates/tsr_parser/src/lazy_jsdoc.rs",
-        "crates/tsr_parser/src/state.rs"
-      ]
-    },
-    {
-      "disposition": "implemented_untested",
-      "operation": "tsc/internal/ast/ast.go:IsDeclarationNode",
       "rust_home": [
         "crates/tsr_ast/src/clone.rs",
         "crates/tsr_ast/src/factory.rs",
@@ -412,22 +301,6 @@
     {
       "disposition": "missing",
       "operation": "tsc/internal/ast/ast.go:LiteralLikeNodeBase.LiteralLikeData",
-      "rust_home": [
-        "crates/tsr_ast/src/clone.rs",
-        "crates/tsr_ast/src/factory.rs",
-        "crates/tsr_ast/src/node_accessors.rs",
-        "crates/tsr_ast/src/node_text.rs",
-        "crates/tsr_ast/src/source_file.rs",
-        "crates/tsr_ast/src/storage.rs",
-        "crates/tsr_ast/src/subtree_facts.rs",
-        "crates/tsr_ast/src/visitor.rs",
-        "crates/tsr_parser/src/lazy_jsdoc.rs",
-        "crates/tsr_parser/src/state.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/ast/ast.go:LocalsContainerBase.LocalsContainerData",
       "rust_home": [
         "crates/tsr_ast/src/clone.rs",
         "crates/tsr_ast/src/factory.rs",
@@ -650,22 +523,6 @@
       ]
     },
     {
-      "disposition": "missing",
-      "operation": "tsc/internal/ast/ast.go:Node.BodyData",
-      "rust_home": [
-        "crates/tsr_ast/src/clone.rs",
-        "crates/tsr_ast/src/factory.rs",
-        "crates/tsr_ast/src/node_accessors.rs",
-        "crates/tsr_ast/src/node_text.rs",
-        "crates/tsr_ast/src/source_file.rs",
-        "crates/tsr_ast/src/storage.rs",
-        "crates/tsr_ast/src/subtree_facts.rs",
-        "crates/tsr_ast/src/visitor.rs",
-        "crates/tsr_parser/src/lazy_jsdoc.rs",
-        "crates/tsr_parser/src/state.rs"
-      ]
-    },
-    {
       "disposition": "implemented_untested",
       "operation": "tsc/internal/ast/ast.go:Node.Children",
       "rust_home": [
@@ -763,22 +620,6 @@
     },
     {
       "disposition": "missing",
-      "operation": "tsc/internal/ast/ast.go:Node.DeclarationData",
-      "rust_home": [
-        "crates/tsr_ast/src/clone.rs",
-        "crates/tsr_ast/src/factory.rs",
-        "crates/tsr_ast/src/node_accessors.rs",
-        "crates/tsr_ast/src/node_text.rs",
-        "crates/tsr_ast/src/source_file.rs",
-        "crates/tsr_ast/src/storage.rs",
-        "crates/tsr_ast/src/subtree_facts.rs",
-        "crates/tsr_ast/src/visitor.rs",
-        "crates/tsr_parser/src/lazy_jsdoc.rs",
-        "crates/tsr_parser/src/state.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
       "operation": "tsc/internal/ast/ast.go:Node.Decorators",
       "rust_home": [
         "crates/tsr_ast/src/clone.rs",
@@ -812,22 +653,6 @@
     {
       "disposition": "missing",
       "operation": "tsc/internal/ast/ast.go:Node.ExportableData",
-      "rust_home": [
-        "crates/tsr_ast/src/clone.rs",
-        "crates/tsr_ast/src/factory.rs",
-        "crates/tsr_ast/src/node_accessors.rs",
-        "crates/tsr_ast/src/node_text.rs",
-        "crates/tsr_ast/src/source_file.rs",
-        "crates/tsr_ast/src/storage.rs",
-        "crates/tsr_ast/src/subtree_facts.rs",
-        "crates/tsr_ast/src/visitor.rs",
-        "crates/tsr_parser/src/lazy_jsdoc.rs",
-        "crates/tsr_parser/src/state.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/ast/ast.go:Node.FlowNodeData",
       "rust_home": [
         "crates/tsr_ast/src/clone.rs",
         "crates/tsr_ast/src/factory.rs",
@@ -940,22 +765,6 @@
     {
       "disposition": "missing",
       "operation": "tsc/internal/ast/ast.go:Node.Locals",
-      "rust_home": [
-        "crates/tsr_ast/src/clone.rs",
-        "crates/tsr_ast/src/factory.rs",
-        "crates/tsr_ast/src/node_accessors.rs",
-        "crates/tsr_ast/src/node_text.rs",
-        "crates/tsr_ast/src/source_file.rs",
-        "crates/tsr_ast/src/storage.rs",
-        "crates/tsr_ast/src/subtree_facts.rs",
-        "crates/tsr_ast/src/visitor.rs",
-        "crates/tsr_parser/src/lazy_jsdoc.rs",
-        "crates/tsr_parser/src/state.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/ast/ast.go:Node.LocalsContainerData",
       "rust_home": [
         "crates/tsr_ast/src/clone.rs",
         "crates/tsr_ast/src/factory.rs",
@@ -1163,22 +972,6 @@
     },
     {
       "disposition": "missing",
-      "operation": "tsc/internal/ast/ast.go:NodeDefault.BodyData",
-      "rust_home": [
-        "crates/tsr_ast/src/clone.rs",
-        "crates/tsr_ast/src/factory.rs",
-        "crates/tsr_ast/src/node_accessors.rs",
-        "crates/tsr_ast/src/node_text.rs",
-        "crates/tsr_ast/src/source_file.rs",
-        "crates/tsr_ast/src/storage.rs",
-        "crates/tsr_ast/src/subtree_facts.rs",
-        "crates/tsr_ast/src/visitor.rs",
-        "crates/tsr_parser/src/lazy_jsdoc.rs",
-        "crates/tsr_parser/src/state.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
       "operation": "tsc/internal/ast/ast.go:NodeDefault.ClassLikeData",
       "rust_home": [
         "crates/tsr_ast/src/clone.rs",
@@ -1211,39 +1004,7 @@
     },
     {
       "disposition": "missing",
-      "operation": "tsc/internal/ast/ast.go:NodeDefault.DeclarationData",
-      "rust_home": [
-        "crates/tsr_ast/src/clone.rs",
-        "crates/tsr_ast/src/factory.rs",
-        "crates/tsr_ast/src/node_accessors.rs",
-        "crates/tsr_ast/src/node_text.rs",
-        "crates/tsr_ast/src/source_file.rs",
-        "crates/tsr_ast/src/storage.rs",
-        "crates/tsr_ast/src/subtree_facts.rs",
-        "crates/tsr_ast/src/visitor.rs",
-        "crates/tsr_parser/src/lazy_jsdoc.rs",
-        "crates/tsr_parser/src/state.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
       "operation": "tsc/internal/ast/ast.go:NodeDefault.ExportableData",
-      "rust_home": [
-        "crates/tsr_ast/src/clone.rs",
-        "crates/tsr_ast/src/factory.rs",
-        "crates/tsr_ast/src/node_accessors.rs",
-        "crates/tsr_ast/src/node_text.rs",
-        "crates/tsr_ast/src/source_file.rs",
-        "crates/tsr_ast/src/storage.rs",
-        "crates/tsr_ast/src/subtree_facts.rs",
-        "crates/tsr_ast/src/visitor.rs",
-        "crates/tsr_parser/src/lazy_jsdoc.rs",
-        "crates/tsr_parser/src/state.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/ast/ast.go:NodeDefault.FlowNodeData",
       "rust_home": [
         "crates/tsr_ast/src/clone.rs",
         "crates/tsr_ast/src/factory.rs",
@@ -1292,22 +1053,6 @@
     {
       "disposition": "missing",
       "operation": "tsc/internal/ast/ast.go:NodeDefault.LiteralLikeData",
-      "rust_home": [
-        "crates/tsr_ast/src/clone.rs",
-        "crates/tsr_ast/src/factory.rs",
-        "crates/tsr_ast/src/node_accessors.rs",
-        "crates/tsr_ast/src/node_text.rs",
-        "crates/tsr_ast/src/source_file.rs",
-        "crates/tsr_ast/src/storage.rs",
-        "crates/tsr_ast/src/subtree_facts.rs",
-        "crates/tsr_ast/src/visitor.rs",
-        "crates/tsr_parser/src/lazy_jsdoc.rs",
-        "crates/tsr_parser/src/state.rs"
-      ]
-    },
-    {
-      "disposition": "missing",
-      "operation": "tsc/internal/ast/ast.go:NodeDefault.LocalsContainerData",
       "rust_home": [
         "crates/tsr_ast/src/clone.rs",
         "crates/tsr_ast/src/factory.rs",
@@ -6670,6 +6415,14 @@
       ]
     },
     {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/compiler/fileloader.go:fileLoader.addProjectReferenceTasks",
+      "rust_home": [
+        "crates/tsr_compiler/src/loader.rs",
+        "crates/tsr_compiler/src/metadata.rs"
+      ]
+    },
+    {
       "disposition": "missing",
       "operation": "tsc/internal/compiler/fileloader.go:fileLoader.addRootFileTask",
       "rust_home": [
@@ -6870,6 +6623,14 @@
       ]
     },
     {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+      "rust_home": [
+        "crates/tsr_compiler/src/cache.rs",
+        "crates/tsr_compiler/src/loader.rs"
+      ]
+    },
+    {
       "disposition": "missing",
       "operation": "tsc/internal/compiler/filesparser.go:putParseTaskData",
       "rust_home": [
@@ -6901,6 +6662,13 @@
     {
       "disposition": "missing",
       "operation": "tsc/internal/compiler/host.go:compilerHost.GetCurrentDirectory",
+      "rust_home": [
+        "crates/tsr_compiler/src/loader.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/compiler/host.go:compilerHost.GetResolvedProjectReference",
       "rust_home": [
         "crates/tsr_compiler/src/loader.rs"
       ]
@@ -7047,6 +6815,16 @@
       ]
     },
     {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/compiler/program.go:Program.GetSourceOfProjectReferenceIfOutputIncluded",
+      "rust_home": [
+        "crates/tsr_compiler/src/loader.rs",
+        "crates/tsr_compiler/src/output_paths.rs",
+        "crates/tsr_compiler/src/program_diagnostics.rs",
+        "crates/tsr_compiler/src/verify_options.rs"
+      ]
+    },
+    {
       "disposition": "missing",
       "operation": "tsc/internal/compiler/program.go:Program.Host",
       "rust_home": [
@@ -7089,6 +6867,16 @@
     {
       "disposition": "missing",
       "operation": "tsc/internal/compiler/program.go:Program.Program",
+      "rust_home": [
+        "crates/tsr_compiler/src/loader.rs",
+        "crates/tsr_compiler/src/output_paths.rs",
+        "crates/tsr_compiler/src/program_diagnostics.rs",
+        "crates/tsr_compiler/src/verify_options.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
       "rust_home": [
         "crates/tsr_compiler/src/loader.rs",
         "crates/tsr_compiler/src/output_paths.rs",
@@ -7168,6 +6956,26 @@
     },
     {
       "disposition": "implemented_untested",
+      "operation": "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
+      "rust_home": [
+        "crates/tsr_compiler/src/loader.rs",
+        "crates/tsr_compiler/src/output_paths.rs",
+        "crates/tsr_compiler/src/program_diagnostics.rs",
+        "crates/tsr_compiler/src/verify_options.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/compiler/program.go:ProgramOptions.canUseProjectReferenceSource",
+      "rust_home": [
+        "crates/tsr_compiler/src/loader.rs",
+        "crates/tsr_compiler/src/output_paths.rs",
+        "crates/tsr_compiler/src/program_diagnostics.rs",
+        "crates/tsr_compiler/src/verify_options.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
       "operation": "tsc/internal/compiler/program.go:moduleResolutionSupportsPackageJsonExportsAndImports",
       "rust_home": [
         "crates/tsr_compiler/src/loader.rs",
@@ -7175,6 +6983,86 @@
         "crates/tsr_compiler/src/program_diagnostics.rs",
         "crates/tsr_compiler/src/verify_options.rs"
       ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getCompilerOptionsForFile",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromOutputDts",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getRedirectForResolution",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getRedirectParsedCommandLineForResolution",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getSourceToDtsIfSymlink",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rootConfigPath",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/compiler/projectreferenceparser.go:createProjectReferenceParseTasks",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParseTask.parse",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.initMapper",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.initMapperWorker",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.parse",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.start",
+      "rust_home": []
     },
     {
       "disposition": "missing",
@@ -7836,5 +7724,5 @@
   "step": "syntax",
   "total_operations": 3617,
   "version": 2,
-  "witnessed_operations": 1293
+  "witnessed_operations": 1309
 }

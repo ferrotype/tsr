@@ -2,7 +2,8 @@
 
 This record corrects I17's compiler scope classification at pinned Go
 `1f70213d4922b434345f639b441681e470c7cfc1`. It applies the accepted Phase 1
-plan; it does not assert new owner approvals, waive behavior, or grant coverage.
+plan; it does not waive behavior or grant coverage. The owner approved the
+resulting 205 destinations on 2026-09-25 ([Owner approval](#owner-approval)).
 The exact operation identities, source hashes and evidence are in
 [`coverage-review.json`](../data/phase1/coverage-review.json). The syntax roster
 exempts a preparation *step*, not the whole phase.
@@ -24,23 +25,39 @@ scope evidence. Neither fact authorizes a phase exclusion.
 
 | Classification | Count | Treatment |
 | --- | ---: | --- |
-| Other accepted-plan exclusions, retained | 175 | Explicit plan clause and source/caller evidence; no new approval claimed |
+| Other accepted-plan exclusions, retained | 175 | Explicit plan clause and source/caller evidence |
 | Project-reference checker-facing services | 6 | Phase 2 |
 | Project-reference editor-facing services | 24 | Phase 5 |
-| Ordinary reference loading/configuration | 23 | Unresolved Phase 1 work; pending |
+| Ordinary reference loading/configuration | 23 | Phase 1 work; ported and witnessed (closure phase A) |
 | Unused reference wrapper/helper chain | 1 | `unused_at_pin`, with complete pinned-tree caller check |
 
 There are now 205 reviewed later-phase destinations: 63 in Phase 2, 57 in
-Phase 3, 24 in Phase 4 and 61 in Phase 5. The 23 unresolved operations remain
-in the coverage report with `compiler_destination_unreviewed`; they cannot
-contribute preparation or implementation completion. `later_step` on their
-syntax-roster entries means the config/program loader owns preparation, not
-that Phase 1 is discharged. No original operation ID is removed.
+Phase 3, 24 in Phase 4 and 61 in Phase 5. The 23 ordinary reference-loading
+operations were Phase 1 work. The closure ported them and the
+`syntax/project-references` cases witness them against the pinned loader, so
+they are no longer unresolved or exempt from the syntax roster
+([Reference loading](#reference-loading)). No original operation ID is removed.
 
 This was a bounded scope audit. It checked the 54 reference-related entries
 against their actual call paths and retained the other 175 established
 exclusions under explicit shared plan authority. It did not re-review every
 implementation body or assert absence of Rust implementations.
+
+## Owner approval
+
+On 2026-09-25 the repository owner approved the 205 reviewed later-phase
+destinations ("yes approved"): 63 in Phase 2, 57 in Phase 3, 24 in Phase 4 and
+61 in Phase 5. `coverage-review.json` records it as its `approval` block:
+approver, date, the statement, the approved scope
+(`reviewed_operation_destinations`), the row count and `rows_sha256`. The
+digest is SHA-256 over the compact, key-sorted ASCII JSON of those rows sorted
+by operation (`phase1_scope.review_approval_digest`).
+
+The approval covers exactly those rows. Adding, removing or editing one (its
+destination, reason, evidence, plan clause or pinned source hash) makes
+`phase1_scope.reviewed_destinations` refuse the review and the coverage join
+report a problem until the owner approves again. It does not cover the 23
+reference-loading operations or the two reviewed-unused rows.
 
 ## Why the reference paths differ
 
@@ -64,11 +81,19 @@ The six Phase 2 rows are checker-facing Program accessors and the
 `isSourceFromProjectReference` helper. Their loader-side mapper counterparts
 are separate identities and remain pending where normal loading uses them.
 
-## Unresolved ordinary-loader operations
+## Reference loading
 
-These entries are not requests for an exception. Their next step is to assess
-and prepare the ordinary loading behavior as Phase 1 work; no implementation
-or completion is claimed by this record.
+These 23 operations were never exceptions. The Phase 1 closure ported them:
+`crates/tsr_compiler/src/project_references.rs` holds the config-reading parser
+and the file mapper, `loader.rs` redirects a referenced project's sources to its
+built declarations and resolves their imports with the reference's options,
+`verify_options.rs` ports `verifyProjectReferences`, and `include_reason.rs`
+explains an output with its source. The editor's source-of-reference mode stays
+a Phase 5 boundary: the loader rejects it while references have outputs.
+
+The 29 `syntax/project-references` cases compare each behavior with the pinned
+loader through `tools/phase1/syntax/project_references_probe_test.go`. The table
+keeps the caller evidence that placed each operation in Phase 1.
 
 | Operation | Concrete pinned caller/path |
 | --- | --- |
@@ -96,8 +121,8 @@ or completion is claimed by this record.
 | `projectreferenceparser.go:projectReferenceParser.parse` | projectReferenceParser.start queues task.parse; fileLoader.addProjectReferenceTasks calls projectReferenceParser.parse (fileloader.go:341) |
 | `projectreferenceparser.go:projectReferenceParser.start` | projectReferenceParser.parse and its own recursion (projectreferenceparser.go:50,64) |
 
-The full reason and accepted-plan clause for each row are retained in
-`unresolved_compiler_evidence`, beside `unresolved_compiler_destinations`.
+The per-case operation claims are in `cases.json`; the review keeps
+`unresolved_compiler_destinations` and its evidence list, now empty.
 
 ## Unused helper verification
 

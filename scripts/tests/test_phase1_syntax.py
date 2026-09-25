@@ -7,6 +7,7 @@ real defect would and requires the validator to name it.
 
 import copy
 import json
+import shutil
 import sys
 import tempfile
 import unittest
@@ -287,6 +288,44 @@ class SyntaxComparatorControls(unittest.TestCase):
     def test_a_named_unsupported_branch_is_not_implemented(self):
         outcome = self.result({"id": self.native["id"], "state": "not_implemented", "operation": "x"})
         self.assertEqual(outcome, {"id": self.native["id"], "result": "not_implemented", "operation": "x"})
+
+
+class SyntaxReportFreshnessTests(unittest.TestCase):
+    """A committed report is present when its smoke says it exists, and a moved
+    Rust closure is an outstanding item, not a silently current report."""
+
+    def with_reports(self, smoke, full=None):
+        directory = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, directory, True)
+        smoke_path, full_path = directory / "syntax-smoke.json", directory / "syntax-full.json"
+        smoke_path.write_text(json.dumps(smoke))
+        if full is not None:
+            full_path.write_text(json.dumps(full))
+        for name, value in (("SMOKE", smoke_path), ("FULL", full_path)):
+            saver = patch.object(syntax, name, value)
+            saver.start()
+            self.addCleanup(saver.stop)
+
+    def test_a_smoke_derived_from_a_full_capture_requires_the_full_report(self):
+        self.with_reports({"capture_selection": "full", "selection": "smoke"})
+        self.assertTrue(any("is absent" in problem for problem in syntax.full_problems()))
+
+    def test_a_bounded_smoke_does_not_invent_a_full_report(self):
+        self.with_reports({"capture_selection": "smoke", "selection": "smoke"})
+        self.assertEqual(syntax.full_problems(), [])
+
+    def test_a_stale_recorded_rust_closure_is_an_outstanding_item(self):
+        current = {"crates/tsr_parser/src/lib.rs": "1" * 64, "Cargo.lock": "2" * 64}
+        stale = {**current, "Cargo.lock": "3" * 64}
+        self.with_reports({"capture_selection": "full", "rust_closure": current, "rust_sources_current": True},
+                          {"selection": "full", "rust_closure": stale, "rust_sources_current": True})
+        with patch.object(syntax, "rust_closure", return_value=current):
+            items = syntax.freshness_items()
+            self.assertTrue(syntax.smoke_freshness()["rust_sources_current"])
+            self.assertEqual(syntax.full_freshness()["changed"], ["Cargo.lock"])
+        self.assertEqual(len(items), 1)
+        self.assertIn("syntax-full.json", items[0])
+        self.assertIn("Cargo.lock", items[0])
 
 
 class SyntaxSmokeTests(unittest.TestCase):

@@ -162,6 +162,13 @@ jobs:
         # invalidate the frozen operation-classification audit. Audit refresh
         # remains phase1.py inventory --check, separate from harness contracts.
         run: python3 scripts/phase1_producers.py check --structural
+      - name: Phase 1 operation audit matches the current sources
+        if: ${{ !cancelled() && steps.validate.outcome == 'success' }}
+        # The self-tests only report scope drift, so this is its gate: a source
+        # edit that changes an operation's disposition fails here until
+        # `phase1.py inventory --write` rebuilds scope.json. Needs upstream,
+        # go and cargo on PATH (its preflight checks all three).
+        run: python3 scripts/phase1.py inventory --check
       - name: Workspace build
         if: ${{ !cancelled() && steps.validate.outcome == 'success' }}
         run: cargo xtask run workspace
@@ -191,15 +198,21 @@ jobs:
         # Each runner preserves its own complete applicable inventory. any and
         # posix require Linux and Darwin evidence; host-exclusive rows run only
         # on their declared target. Producer replay consumes separate archives.
+        # rust-cache restores target/, including an earlier run's capture and
+        # records; capture refuses an existing directory, and a restored record
+        # must not be uploaded as this run's evidence, so clear this host's first.
         run: |
           python3 - <<'PY'
-          import json, sys
+          import json, shutil, sys
           from pathlib import Path
           sys.path.insert(0, "scripts")
           import phase1_capture as capture
           import phase1_producers as producers
           goos = {"linux": "linux", "darwin": "darwin"}[sys.platform]
           output = Path("target/phase1-platform") / goos
+          shutil.rmtree(output, ignore_errors=True)
+          shutil.rmtree(output.parent / "records" / goos, ignore_errors=True)
+          (output.parent / (goos + "-record.json")).unlink(missing_ok=True)
           capture.capture("filesystem", output, producers.host_inventory(goos))
           result = producers.platform_summary(output, output.parent / "records" / goos)
           (output.parent / (goos + "-record.json")).write_text(json.dumps(result) + "\n")

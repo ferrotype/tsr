@@ -90707,6 +90707,1096 @@
       }
     },
     {
+      "expected_contract": "The program and its reference write the same .tsbuildinfo: TS6377 at the reference and the build info path blocked for emit. The reference's output is loaded with the reference's options.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/project-references/buildinfo-collision",
+      "last_result": "not_run",
+      "native_authority": "tools/phase1/syntax/project_references_probe_test.go in the pinned compiler package: tsoptions.GetParsedCommandLineOfConfigFile, then processAllProgramFiles for load, NewProgram for Program.RangeResolvedProjectReference (graph), the verifier's raw writes and Program.GetProgramDiagnostics (verify), and include-explaining processing diagnostics (explain)",
+      "operation_actions": {
+        "graph": [
+          "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker"
+        ],
+        "load": [
+          "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromOutputDts",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getRedirectForResolution"
+        ],
+        "verify": [
+          "tsc/internal/compiler/program.go:Program.verifyProjectReferences"
+        ]
+      },
+      "operations": [
+        "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+        "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+        "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromOutputDts",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getRedirectForResolution",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker"
+      ],
+      "request_sha256": "248428502052cda2e3ac9388be9f1700aaf3b4be5c04edbbc1664e0fc834e962"
+    },
+    {
+      "expected_contract": "The same collision with suppressOutputPathCheck set on the parsed options (it is not a tsconfig option): no TS6377 and nothing blocked.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/project-references/buildinfo-collision-suppressed",
+      "last_result": "not_run",
+      "native_authority": "tools/phase1/syntax/project_references_probe_test.go in the pinned compiler package: tsoptions.GetParsedCommandLineOfConfigFile, then processAllProgramFiles for load, NewProgram for Program.RangeResolvedProjectReference (graph), the verifier's raw writes and Program.GetProgramDiagnostics (verify), and include-explaining processing diagnostics (explain)",
+      "operation_actions": {
+        "graph": [
+          "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker"
+        ],
+        "load": [
+          "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource"
+        ],
+        "verify": [
+          "tsc/internal/compiler/program.go:Program.verifyProjectReferences"
+        ]
+      },
+      "operations": [
+        "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+        "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+        "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker"
+      ],
+      "request_sha256": "e997c74292c278f519568eb2964b0a8245b2a39c15954ca4111789264336e508"
+    },
+    {
+      "expected_contract": "One source file owned by a parent reference p and by its child c: the parent's maps are copied first and the child overwrites them, so shared/x.ts is redirected to c/outc/x.d.ts, not p/outp/shared/x.d.ts.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/project-references/child-overwrites-parent",
+      "last_result": "not_run",
+      "native_authority": "tools/phase1/syntax/project_references_probe_test.go in the pinned compiler package: tsoptions.GetParsedCommandLineOfConfigFile, then processAllProgramFiles for load, NewProgram for Program.RangeResolvedProjectReference (graph), the verifier's raw writes and Program.GetProgramDiagnostics (verify), and include-explaining processing diagnostics (explain)",
+      "operation_actions": {
+        "explain": [
+          "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+          "tsc/internal/compiler/program.go:Program.GetSourceOfProjectReferenceIfOutputIncluded"
+        ],
+        "graph": [
+          "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker"
+        ],
+        "load": [
+          "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource",
+          "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.initMapper",
+          "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.initMapperWorker"
+        ],
+        "verify": [
+          "tsc/internal/compiler/program.go:Program.verifyProjectReferences"
+        ]
+      },
+      "operations": [
+        "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+        "tsc/internal/compiler/program.go:Program.GetSourceOfProjectReferenceIfOutputIncluded",
+        "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+        "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker",
+        "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.initMapper",
+        "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.initMapperWorker"
+      ],
+      "request_sha256": "7fb45aec472a9d375bd1ba50c24563373dde1ecd48bba706e9feb0f0c744dbf1"
+    },
+    {
+      "expected_contract": "The same non-composite reference from a container config with an empty files list: no TS6306, because the parent has no files.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/project-references/container-not-composite-no-error",
+      "last_result": "not_run",
+      "native_authority": "tools/phase1/syntax/project_references_probe_test.go in the pinned compiler package: tsoptions.GetParsedCommandLineOfConfigFile, then processAllProgramFiles for load, NewProgram for Program.RangeResolvedProjectReference (graph), the verifier's raw writes and Program.GetProgramDiagnostics (verify), and include-explaining processing diagnostics (explain)",
+      "operation_actions": {
+        "graph": [
+          "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker"
+        ],
+        "load": [],
+        "verify": [
+          "tsc/internal/compiler/program.go:Program.verifyProjectReferences"
+        ]
+      },
+      "operations": [
+        "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+        "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker"
+      ],
+      "request_sha256": "e3e626d0e4cc20f74458bd598d8826d0b5ec93799e4660d7c62c09a91f372c08"
+    },
+    {
+      "expected_contract": "A reference that points back at the root project. The walk skips the root path, but the reparsed root config is a different ConfigFile, so the root's own r.ts is redirected to its output root/r.d.ts (the pinned behavior).",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/project-references/cycle-through-root",
+      "last_result": "not_run",
+      "native_authority": "tools/phase1/syntax/project_references_probe_test.go in the pinned compiler package: tsoptions.GetParsedCommandLineOfConfigFile, then processAllProgramFiles for load, NewProgram for Program.RangeResolvedProjectReference (graph), the verifier's raw writes and Program.GetProgramDiagnostics (verify), and include-explaining processing diagnostics (explain)",
+      "operation_actions": {
+        "explain": [
+          "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+          "tsc/internal/compiler/program.go:Program.GetSourceOfProjectReferenceIfOutputIncluded"
+        ],
+        "graph": [
+          "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rootConfigPath"
+        ],
+        "load": [
+          "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rootConfigPath",
+          "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.initMapperWorker"
+        ],
+        "verify": [
+          "tsc/internal/compiler/program.go:Program.verifyProjectReferences"
+        ]
+      },
+      "operations": [
+        "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+        "tsc/internal/compiler/program.go:Program.GetSourceOfProjectReferenceIfOutputIncluded",
+        "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+        "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rootConfigPath",
+        "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.initMapperWorker"
+      ],
+      "request_sha256": "d08ddd5a6d0efd6ce94b29b15073bd47b970389387878053f1a9bb9bf5219abf"
+    },
+    {
+      "expected_contract": "Nested references in a diamond: root references a and b, both reference c, b also references a missing project. The walk is preorder with path-level dedup (c under b is skipped) and each entry's parent is the referencing config; the nested TS6306 and TS6053 sit in a/tsconfig.json and b/tsconfig.json.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/project-references/diamond-nested",
+      "last_result": "not_run",
+      "native_authority": "tools/phase1/syntax/project_references_probe_test.go in the pinned compiler package: tsoptions.GetParsedCommandLineOfConfigFile, then processAllProgramFiles for load, NewProgram for Program.RangeResolvedProjectReference (graph), the verifier's raw writes and Program.GetProgramDiagnostics (verify), and include-explaining processing diagnostics (explain)",
+      "operation_actions": {
+        "graph": [
+          "tsc/internal/compiler/host.go:compilerHost.GetResolvedProjectReference",
+          "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rootConfigPath",
+          "tsc/internal/compiler/projectreferenceparser.go:createProjectReferenceParseTasks",
+          "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParseTask.parse",
+          "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.initMapperWorker",
+          "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.start"
+        ],
+        "load": [
+          "tsc/internal/compiler/fileloader.go:fileLoader.addProjectReferenceTasks",
+          "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+          "tsc/internal/compiler/host.go:compilerHost.GetResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource",
+          "tsc/internal/compiler/projectreferenceparser.go:createProjectReferenceParseTasks",
+          "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParseTask.parse",
+          "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.initMapper",
+          "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.initMapperWorker",
+          "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.parse",
+          "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.start"
+        ],
+        "verify": [
+          "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker",
+          "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.start"
+        ]
+      },
+      "operations": [
+        "tsc/internal/compiler/fileloader.go:fileLoader.addProjectReferenceTasks",
+        "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+        "tsc/internal/compiler/host.go:compilerHost.GetResolvedProjectReference",
+        "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+        "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rootConfigPath",
+        "tsc/internal/compiler/projectreferenceparser.go:createProjectReferenceParseTasks",
+        "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParseTask.parse",
+        "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.initMapper",
+        "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.initMapperWorker",
+        "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.parse",
+        "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.start"
+      ],
+      "request_sha256": "14eac0e15a1caedc0db763216070bceacf91815e50acba9cd616124cad992735"
+    },
+    {
+      "expected_contract": "Two references naming the same config (a directory and its tsconfig.json): one parse task, both slots listed for the root, the walk visits the path once, so TS6053 is reported once, at index 0.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/project-references/duplicate-reference",
+      "last_result": "not_run",
+      "native_authority": "tools/phase1/syntax/project_references_probe_test.go in the pinned compiler package: tsoptions.GetParsedCommandLineOfConfigFile, then processAllProgramFiles for load, NewProgram for Program.RangeResolvedProjectReference (graph), the verifier's raw writes and Program.GetProgramDiagnostics (verify), and include-explaining processing diagnostics (explain)",
+      "operation_actions": {
+        "graph": [
+          "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker",
+          "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.start"
+        ],
+        "load": [
+          "tsc/internal/compiler/fileloader.go:fileLoader.addProjectReferenceTasks",
+          "tsc/internal/compiler/host.go:compilerHost.GetResolvedProjectReference",
+          "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParseTask.parse",
+          "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.parse",
+          "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.start"
+        ],
+        "verify": [
+          "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker",
+          "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.start"
+        ]
+      },
+      "operations": [
+        "tsc/internal/compiler/fileloader.go:fileLoader.addProjectReferenceTasks",
+        "tsc/internal/compiler/host.go:compilerHost.GetResolvedProjectReference",
+        "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+        "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker",
+        "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParseTask.parse",
+        "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.parse",
+        "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.start"
+      ],
+      "request_sha256": "e5ed14dbcf5439d597f3a3598118362a395d4ee0c0495c1318ba70faba44f61c"
+    },
+    {
+      "expected_contract": "A referenced config that extends a base config: GetResolvedProjectReference parses it for real, so the inherited module nodenext and outDir decide the output name dist/compiler/parser.d.ts and the options the output is parsed with.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/project-references/extends-in-referenced-config",
+      "last_result": "not_run",
+      "native_authority": "tools/phase1/syntax/project_references_probe_test.go in the pinned compiler package: tsoptions.GetParsedCommandLineOfConfigFile, then processAllProgramFiles for load, NewProgram for Program.RangeResolvedProjectReference (graph), the verifier's raw writes and Program.GetProgramDiagnostics (verify), and include-explaining processing diagnostics (explain)",
+      "operation_actions": {
+        "graph": [
+          "tsc/internal/compiler/host.go:compilerHost.GetResolvedProjectReference",
+          "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker"
+        ],
+        "load": [
+          "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+          "tsc/internal/compiler/host.go:compilerHost.GetResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource",
+          "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParseTask.parse"
+        ],
+        "verify": [
+          "tsc/internal/compiler/program.go:Program.verifyProjectReferences"
+        ]
+      },
+      "operations": [
+        "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+        "tsc/internal/compiler/host.go:compilerHost.GetResolvedProjectReference",
+        "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+        "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker",
+        "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParseTask.parse"
+      ],
+      "request_sha256": "fedd90b426344cf7853fc21641a5c4532d0a7aff22fb145b8f4998cbc5e783c9"
+    },
+    {
+      "expected_contract": "A JavaScript source of an allowJs reference, found through node_modules at maxNodeModuleJsDepth 0: it is not treated as JavaScript (it has a redirect), so it is not elided and is replaced by dist/index.d.ts.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/project-references/js-reference-source-under-node_modules",
+      "last_result": "not_run",
+      "native_authority": "tools/phase1/syntax/project_references_probe_test.go in the pinned compiler package: tsoptions.GetParsedCommandLineOfConfigFile, then processAllProgramFiles for load, NewProgram for Program.RangeResolvedProjectReference (graph), the verifier's raw writes and Program.GetProgramDiagnostics (verify), and include-explaining processing diagnostics (explain)",
+      "operation_actions": {
+        "graph": [
+          "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker"
+        ],
+        "load": [
+          "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getRedirectParsedCommandLineForResolution"
+        ],
+        "verify": [
+          "tsc/internal/compiler/program.go:Program.verifyProjectReferences"
+        ]
+      },
+      "operations": [
+        "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+        "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+        "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getRedirectParsedCommandLineForResolution",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker"
+      ],
+      "request_sha256": "1e419f5660c610ecf9c878d82b8ed97076fa037cc260dc64b175635415e063c1"
+    },
+    {
+      "expected_contract": "Control without the reference: the same JavaScript file found through node_modules at depth 0 is elided and never enters the program.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/project-references/js-reference-source-under-node_modules-control",
+      "last_result": "not_run",
+      "native_authority": "tools/phase1/syntax/project_references_probe_test.go in the pinned compiler package: tsoptions.GetParsedCommandLineOfConfigFile, then processAllProgramFiles for load, NewProgram for Program.RangeResolvedProjectReference (graph), the verifier's raw writes and Program.GetProgramDiagnostics (verify), and include-explaining processing diagnostics (explain)",
+      "operation_actions": {
+        "graph": [
+          "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference"
+        ],
+        "load": [
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getRedirectParsedCommandLineForResolution"
+        ],
+        "verify": []
+      },
+      "operations": [
+        "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getRedirectParsedCommandLineForResolution",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference"
+      ],
+      "request_sha256": "728a057128429744a35784e71b1d9c2f9b87efa778927d3516a57d391e15da9d"
+    },
+    {
+      "expected_contract": "A referenced project's JSON source has no declaration output, so it is not redirected and loads as itself. As a referenced source it is not emitted: the composite root, whose outDir would place it at dist/data/values.json, does not ask for it in its file list (no TS6307 on the file).",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/project-references/json-source-of-reference-not-emitted",
+      "last_result": "not_run",
+      "native_authority": "tools/phase1/syntax/project_references_probe_test.go in the pinned compiler package: tsoptions.GetParsedCommandLineOfConfigFile, then processAllProgramFiles for load, NewProgram for Program.RangeResolvedProjectReference (graph), the verifier's raw writes and Program.GetProgramDiagnostics (verify), and include-explaining processing diagnostics (explain)",
+      "operation_actions": {
+        "graph": [
+          "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker"
+        ],
+        "load": [
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource"
+        ],
+        "verify": [
+          "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource"
+        ]
+      },
+      "operations": [
+        "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+        "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker"
+      ],
+      "request_sha256": "802961b6be26e429918996931c9c208a48d6d11389d6aa0663c6c266a8437421"
+    },
+    {
+      "expected_contract": "Missing files are listed in collection order: the unbuilt output reached through the first root precedes the second root, which does not exist.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/project-references/missing-output-order",
+      "last_result": "not_run",
+      "native_authority": "tools/phase1/syntax/project_references_probe_test.go in the pinned compiler package: tsoptions.GetParsedCommandLineOfConfigFile, then processAllProgramFiles for load, NewProgram for Program.RangeResolvedProjectReference (graph), the verifier's raw writes and Program.GetProgramDiagnostics (verify), and include-explaining processing diagnostics (explain)",
+      "operation_actions": {
+        "explain": [
+          "tsc/internal/compiler/filesparser.go:parseTask.redirect"
+        ],
+        "graph": [
+          "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker"
+        ],
+        "load": [
+          "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource"
+        ],
+        "verify": [
+          "tsc/internal/compiler/program.go:Program.verifyProjectReferences"
+        ]
+      },
+      "operations": [
+        "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+        "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+        "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker"
+      ],
+      "request_sha256": "d0e7b4898ded1d4b9f834f71d66b6a535b3ba92378c236a3ad753ed04efd03ce"
+    },
+    {
+      "expected_contract": "A composite config without references: addProjectReferenceTasks builds the empty mapper and returns at once, every file keeps the base options, the reference walk reports nothing and no redirect is made. It pins that the new path leaves an ordinary program unchanged.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/project-references/no-references-control",
+      "last_result": "not_run",
+      "native_authority": "tools/phase1/syntax/project_references_probe_test.go in the pinned compiler package: tsoptions.GetParsedCommandLineOfConfigFile, then processAllProgramFiles for load, NewProgram for Program.RangeResolvedProjectReference (graph), the verifier's raw writes and Program.GetProgramDiagnostics (verify), and include-explaining processing diagnostics (explain)",
+      "operation_actions": {
+        "graph": [
+          "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference"
+        ],
+        "load": [
+          "tsc/internal/compiler/fileloader.go:fileLoader.addProjectReferenceTasks"
+        ],
+        "verify": [
+          "tsc/internal/compiler/program.go:Program.verifyProjectReferences"
+        ]
+      },
+      "operations": [
+        "tsc/internal/compiler/fileloader.go:fileLoader.addProjectReferenceTasks",
+        "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+        "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference"
+      ],
+      "request_sha256": "f66d75edf6e6b51b1c9ac91831ce7bc27418aade13e4c61a8af49ece924422d2"
+    },
+    {
+      "expected_contract": "The implied emit format of a redirected output uses the reference's options: with the reference on module nodenext, lib/dist/a.d.ts explains its source and then 'CommonJS because package.json was not found' (TS1461), which the root's esnext options would not produce.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/project-references/redirect-emit-format-explanation",
+      "last_result": "not_run",
+      "native_authority": "tools/phase1/syntax/project_references_probe_test.go in the pinned compiler package: tsoptions.GetParsedCommandLineOfConfigFile, then processAllProgramFiles for load, NewProgram for Program.RangeResolvedProjectReference (graph), the verifier's raw writes and Program.GetProgramDiagnostics (verify), and include-explaining processing diagnostics (explain)",
+      "not_claimed": {
+        "getCompilerOptionsForFile at parseSourceFile (fileloader.go:404)": "Those options only reach the external-module indicator, which ignores them for declaration and JSON files (ast/parseoptions.go:20-22 and :61-63). Outside the Phase 5 source mode a file with a reference redirect is a declaration output or a referenced project's JSON source, so that call site has no observable effect; the claim rests on the implied-format explanation. The loader's lookup and the published Program::options_for_file share the marked home (ProjectReferenceFileMapper::compiler_options_with), which the explanation reaches."
+      },
+      "operation_actions": {
+        "explain": [
+          "tsc/internal/compiler/program.go:Program.GetSourceOfProjectReferenceIfOutputIncluded",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getCompilerOptionsForFile"
+        ],
+        "graph": [
+          "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker"
+        ],
+        "load": [
+          "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromOutputDts",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getRedirectForResolution"
+        ],
+        "verify": [
+          "tsc/internal/compiler/program.go:Program.verifyProjectReferences"
+        ]
+      },
+      "operations": [
+        "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+        "tsc/internal/compiler/program.go:Program.GetSourceOfProjectReferenceIfOutputIncluded",
+        "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+        "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getCompilerOptionsForFile",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromOutputDts",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getRedirectForResolution",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker"
+      ],
+      "request_sha256": "db01412dab794017686ce7519215cdab3299f087f3b055f0a849bf23707e8c81"
+    },
+    {
+      "expected_contract": "Control for redirect-emit-format-explanation: the same output imported directly, without a reference, is explained with the root's esnext options and has no format line.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/project-references/redirect-emit-format-explanation-control",
+      "last_result": "not_run",
+      "native_authority": "tools/phase1/syntax/project_references_probe_test.go in the pinned compiler package: tsoptions.GetParsedCommandLineOfConfigFile, then processAllProgramFiles for load, NewProgram for Program.RangeResolvedProjectReference (graph), the verifier's raw writes and Program.GetProgramDiagnostics (verify), and include-explaining processing diagnostics (explain)",
+      "operation_actions": {
+        "explain": [
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getCompilerOptionsForFile"
+        ],
+        "graph": [
+          "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference"
+        ],
+        "load": [],
+        "verify": []
+      },
+      "operations": [
+        "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getCompilerOptionsForFile",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference"
+      ],
+      "request_sha256": "089ae3f51786d69955cc1c12f0fff77c0b3d3d909efa12df1392c1172350647d"
+    },
+    {
+      "expected_contract": "The output is loaded directly (by r2, parsed first) before the source is redirected (owned by r3's import), so the redirected task is not the output's loaded task: r1's import of the source is dropped from the output's reasons, which are r3's then r2's.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/project-references/redirect-output-loaded-first",
+      "last_result": "not_run",
+      "native_authority": "tools/phase1/syntax/project_references_probe_test.go in the pinned compiler package: tsoptions.GetParsedCommandLineOfConfigFile, then processAllProgramFiles for load, NewProgram for Program.RangeResolvedProjectReference (graph), the verifier's raw writes and Program.GetProgramDiagnostics (verify), and include-explaining processing diagnostics (explain)",
+      "operation_actions": {
+        "explain": [
+          "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+          "tsc/internal/compiler/program.go:Program.GetSourceOfProjectReferenceIfOutputIncluded"
+        ],
+        "graph": [
+          "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker"
+        ],
+        "load": [
+          "tsc/internal/compiler/filesparser.go:parseTask.redirect"
+        ],
+        "verify": [
+          "tsc/internal/compiler/program.go:Program.verifyProjectReferences"
+        ]
+      },
+      "operations": [
+        "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+        "tsc/internal/compiler/program.go:Program.GetSourceOfProjectReferenceIfOutputIncluded",
+        "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+        "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker"
+      ],
+      "request_sha256": "57c578810f0e6e70fb7f8f41393b26b8c4403f53c8d0cffd2d7740ced6084ef8"
+    },
+    {
+      "expected_contract": "Three roots import the same referenced source. The single-threaded loader parses the last root first, so its import is the task that owns the redirect; collection visits the roots in order, so the output's reasons are r1, then r2 (the owning task, added when the redirect is first walked), then r3, not the visit order r1, r3, r2.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/project-references/redirect-reason-order",
+      "last_result": "not_run",
+      "native_authority": "tools/phase1/syntax/project_references_probe_test.go in the pinned compiler package: tsoptions.GetParsedCommandLineOfConfigFile, then processAllProgramFiles for load, NewProgram for Program.RangeResolvedProjectReference (graph), the verifier's raw writes and Program.GetProgramDiagnostics (verify), and include-explaining processing diagnostics (explain)",
+      "operation_actions": {
+        "explain": [
+          "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+          "tsc/internal/compiler/program.go:Program.GetSourceOfProjectReferenceIfOutputIncluded"
+        ],
+        "graph": [
+          "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker"
+        ],
+        "load": [
+          "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource"
+        ],
+        "verify": [
+          "tsc/internal/compiler/program.go:Program.verifyProjectReferences"
+        ]
+      },
+      "operations": [
+        "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+        "tsc/internal/compiler/program.go:Program.GetSourceOfProjectReferenceIfOutputIncluded",
+        "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+        "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker"
+      ],
+      "request_sha256": "cab8e509613701027ea28dbd2ead6be3b898dd527baf6a0feff2d45157e4d405"
+    },
+    {
+      "expected_contract": "Imports inside a redirected output resolve with the referenced project's options: lib/dist/a.d.ts resolves esm-package in bundler mode (ESNext, esm.d.ts) while the app's own file resolves it with node10 (CommonJS, cjs.d.ts); the trace shows 6215.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/project-references/redirect-resolution-options",
+      "last_result": "not_run",
+      "native_authority": "tools/phase1/syntax/project_references_probe_test.go in the pinned compiler package: tsoptions.GetParsedCommandLineOfConfigFile, then processAllProgramFiles for load, NewProgram for Program.RangeResolvedProjectReference (graph), the verifier's raw writes and Program.GetProgramDiagnostics (verify), and include-explaining processing diagnostics (explain)",
+      "operation_actions": {
+        "explain": [
+          "tsc/internal/compiler/program.go:Program.GetSourceOfProjectReferenceIfOutputIncluded"
+        ],
+        "graph": [
+          "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker"
+        ],
+        "load": [
+          "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromOutputDts",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getRedirectForResolution"
+        ],
+        "verify": [
+          "tsc/internal/compiler/program.go:Program.verifyProjectReferences"
+        ]
+      },
+      "operations": [
+        "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+        "tsc/internal/compiler/program.go:Program.GetSourceOfProjectReferenceIfOutputIncluded",
+        "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+        "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromOutputDts",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getRedirectForResolution",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker"
+      ],
+      "request_sha256": "b9a4ed6fb27934e488c9249df5ff85149f97960eb7820fdad361040f6480e8f8"
+    },
+    {
+      "expected_contract": "A referenced project's sources are replaced by their built .d.ts outputs: beta imports ../alpha/a, which becomes alpha/bin/a.d.ts; that output's './b' is resolved from the source location alpha/a.ts with alpha's options (trace 6215) and is redirected again to alpha/bin/b.d.ts. The sources never enter the program, the include reasons move to the outputs and each output explains its source (TS1428).",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/project-references/redirect-to-output-dts",
+      "last_result": "not_run",
+      "native_authority": "tools/phase1/syntax/project_references_probe_test.go in the pinned compiler package: tsoptions.GetParsedCommandLineOfConfigFile, then processAllProgramFiles for load, NewProgram for Program.RangeResolvedProjectReference (graph), the verifier's raw writes and Program.GetProgramDiagnostics (verify), and include-explaining processing diagnostics (explain)",
+      "not_claimed": {
+        "getParseFileRedirect source-of-reference branch": "UseSourceOfProjectReference without disableSourceOfProjectReferenceRedirect is the Phase 5 editor host (newProjectReferenceDtsFakingHost). The Rust loader rejects it while references have outputs, so canUseProjectReferenceSource is observed returning false only, and the source-of-reference branches of getParseFileRedirect and getSourceToDtsIfSymlink (projectreferencefilemapper.go:36-44, :40) do not run."
+      },
+      "operation_actions": {
+        "explain": [
+          "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+          "tsc/internal/compiler/program.go:Program.GetSourceOfProjectReferenceIfOutputIncluded"
+        ],
+        "graph": [
+          "tsc/internal/compiler/host.go:compilerHost.GetResolvedProjectReference",
+          "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rootConfigPath"
+        ],
+        "load": [
+          "tsc/internal/compiler/fileloader.go:fileLoader.addProjectReferenceTasks",
+          "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+          "tsc/internal/compiler/host.go:compilerHost.GetResolvedProjectReference",
+          "tsc/internal/compiler/program.go:ProgramOptions.canUseProjectReferenceSource",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromOutputDts",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getRedirectForResolution",
+          "tsc/internal/compiler/projectreferenceparser.go:createProjectReferenceParseTasks",
+          "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParseTask.parse",
+          "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.initMapper",
+          "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.initMapperWorker",
+          "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.parse",
+          "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.start"
+        ],
+        "verify": [
+          "tsc/internal/compiler/program.go:Program.verifyProjectReferences"
+        ]
+      },
+      "operations": [
+        "tsc/internal/compiler/fileloader.go:fileLoader.addProjectReferenceTasks",
+        "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+        "tsc/internal/compiler/host.go:compilerHost.GetResolvedProjectReference",
+        "tsc/internal/compiler/program.go:Program.GetSourceOfProjectReferenceIfOutputIncluded",
+        "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+        "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
+        "tsc/internal/compiler/program.go:ProgramOptions.canUseProjectReferenceSource",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromOutputDts",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getRedirectForResolution",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rootConfigPath",
+        "tsc/internal/compiler/projectreferenceparser.go:createProjectReferenceParseTasks",
+        "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParseTask.parse",
+        "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.initMapper",
+        "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.initMapperWorker",
+        "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.parse",
+        "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.start"
+      ],
+      "request_sha256": "5b33c18146edad434a731b84de9f4679c72955d360647a8cb55967cd64c7765d"
+    },
+    {
+      "expected_contract": "The referenced project has not been built: the redirected output utils/index.d.ts is missing. It is listed as a missing file with no loader diagnostic (the checker reports it later), and the import reason still belongs to the missing output.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/project-references/reference-not-built",
+      "last_result": "not_run",
+      "native_authority": "tools/phase1/syntax/project_references_probe_test.go in the pinned compiler package: tsoptions.GetParsedCommandLineOfConfigFile, then processAllProgramFiles for load, NewProgram for Program.RangeResolvedProjectReference (graph), the verifier's raw writes and Program.GetProgramDiagnostics (verify), and include-explaining processing diagnostics (explain)",
+      "operation_actions": {
+        "explain": [
+          "tsc/internal/compiler/filesparser.go:parseTask.redirect"
+        ],
+        "graph": [
+          "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker"
+        ],
+        "load": [
+          "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+          "tsc/internal/compiler/program.go:ProgramOptions.canUseProjectReferenceSource",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource"
+        ],
+        "verify": [
+          "tsc/internal/compiler/program.go:Program.verifyProjectReferences"
+        ]
+      },
+      "operations": [
+        "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+        "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+        "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
+        "tsc/internal/compiler/program.go:ProgramOptions.canUseProjectReferenceSource",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker"
+      ],
+      "request_sha256": "8bf38ecf3cf4035bb6d48078d3647449236eca383e4658b4a937b1ffc23905da"
+    },
+    {
+      "expected_contract": "The referenced config does not exist: GetResolvedProjectReference returns nil, the walk reports a nil config and verification reports TS6053 at the reference's syntax in the root tsconfig.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/project-references/referenced-config-missing",
+      "last_result": "not_run",
+      "native_authority": "tools/phase1/syntax/project_references_probe_test.go in the pinned compiler package: tsoptions.GetParsedCommandLineOfConfigFile, then processAllProgramFiles for load, NewProgram for Program.RangeResolvedProjectReference (graph), the verifier's raw writes and Program.GetProgramDiagnostics (verify), and include-explaining processing diagnostics (explain)",
+      "operation_actions": {
+        "graph": [
+          "tsc/internal/compiler/host.go:compilerHost.GetResolvedProjectReference",
+          "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker",
+          "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParseTask.parse"
+        ],
+        "load": [
+          "tsc/internal/compiler/host.go:compilerHost.GetResolvedProjectReference",
+          "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParseTask.parse"
+        ],
+        "verify": [
+          "tsc/internal/compiler/program.go:Program.verifyProjectReferences"
+        ]
+      },
+      "operations": [
+        "tsc/internal/compiler/host.go:compilerHost.GetResolvedProjectReference",
+        "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+        "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker",
+        "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParseTask.parse"
+      ],
+      "request_sha256": "f18401ce2d9813fc513c8f5cdbe71e444e66f6ba1b35946e01886d434716d839"
+    },
+    {
+      "expected_contract": "A reference with noEmit and no composite: TS6306 and then TS6310 at the same reference, in that order.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/project-references/referenced-noemit-not-composite",
+      "last_result": "not_run",
+      "native_authority": "tools/phase1/syntax/project_references_probe_test.go in the pinned compiler package: tsoptions.GetParsedCommandLineOfConfigFile, then processAllProgramFiles for load, NewProgram for Program.RangeResolvedProjectReference (graph), the verifier's raw writes and Program.GetProgramDiagnostics (verify), and include-explaining processing diagnostics (explain)",
+      "operation_actions": {
+        "graph": [
+          "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker"
+        ],
+        "load": [
+          "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource"
+        ],
+        "verify": [
+          "tsc/internal/compiler/program.go:Program.verifyProjectReferences"
+        ]
+      },
+      "operations": [
+        "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+        "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+        "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker"
+      ],
+      "request_sha256": "feaf6745f7a1eb98a6a4d660cef00e44a79c150c59bc41e4d6603f328e600132"
+    },
+    {
+      "expected_contract": "A referenced project without composite, from a parent that has files: TS6306 at the reference.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/project-references/referenced-not-composite",
+      "last_result": "not_run",
+      "native_authority": "tools/phase1/syntax/project_references_probe_test.go in the pinned compiler package: tsoptions.GetParsedCommandLineOfConfigFile, then processAllProgramFiles for load, NewProgram for Program.RangeResolvedProjectReference (graph), the verifier's raw writes and Program.GetProgramDiagnostics (verify), and include-explaining processing diagnostics (explain)",
+      "operation_actions": {
+        "graph": [
+          "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker"
+        ],
+        "load": [
+          "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource"
+        ],
+        "verify": [
+          "tsc/internal/compiler/program.go:Program.verifyProjectReferences"
+        ]
+      },
+      "operations": [
+        "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+        "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+        "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker"
+      ],
+      "request_sha256": "6e26afa63321a47d6ce031c4a00331014337172b9572059e877b7fd44e491409"
+    },
+    {
+      "expected_contract": "A root file of the program that belongs to a referenced project is redirected like an import: the root reason 'Part of files list' moves to lib/dist/a.d.ts, which explains its source.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/project-references/root-file-in-referenced-project",
+      "last_result": "not_run",
+      "native_authority": "tools/phase1/syntax/project_references_probe_test.go in the pinned compiler package: tsoptions.GetParsedCommandLineOfConfigFile, then processAllProgramFiles for load, NewProgram for Program.RangeResolvedProjectReference (graph), the verifier's raw writes and Program.GetProgramDiagnostics (verify), and include-explaining processing diagnostics (explain)",
+      "operation_actions": {
+        "explain": [
+          "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+          "tsc/internal/compiler/program.go:Program.GetSourceOfProjectReferenceIfOutputIncluded"
+        ],
+        "graph": [
+          "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker"
+        ],
+        "load": [
+          "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+          "tsc/internal/compiler/program.go:ProgramOptions.canUseProjectReferenceSource",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource"
+        ],
+        "verify": [
+          "tsc/internal/compiler/program.go:Program.verifyProjectReferences"
+        ]
+      },
+      "operations": [
+        "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+        "tsc/internal/compiler/program.go:Program.GetSourceOfProjectReferenceIfOutputIncluded",
+        "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+        "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
+        "tsc/internal/compiler/program.go:ProgramOptions.canUseProjectReferenceSource",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker"
+      ],
+      "request_sha256": "16b5239433117fa9eb05bee5592d43293706559fb803e7dfd46a68015f726f26"
+    },
+    {
+      "expected_contract": "Control for symlink-preserve without preserveSymlinks: resolution follows the symlink to the real output path, which the output map finds directly.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/project-references/symlink-no-preserve",
+      "last_result": "not_run",
+      "native_authority": "tools/phase1/syntax/project_references_probe_test.go in the pinned compiler package: tsoptions.GetParsedCommandLineOfConfigFile, then processAllProgramFiles for load, NewProgram for Program.RangeResolvedProjectReference (graph), the verifier's raw writes and Program.GetProgramDiagnostics (verify), and include-explaining processing diagnostics (explain)",
+      "operation_actions": {
+        "graph": [
+          "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker"
+        ],
+        "load": [
+          "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromOutputDts",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getRedirectForResolution",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getSourceToDtsIfSymlink"
+        ],
+        "verify": [
+          "tsc/internal/compiler/program.go:Program.verifyProjectReferences"
+        ]
+      },
+      "operations": [
+        "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+        "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+        "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromOutputDts",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getRedirectForResolution",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getSourceToDtsIfSymlink",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker"
+      ],
+      "request_sha256": "de5922629e0c10e90c52a51a0e05e5776b778ddf83024274c39fb42f68608023"
+    },
+    {
+      "expected_contract": "With preserveSymlinks, a package reached through a node_modules symlink resolves to the symlinked output path; its realpath is the reference's output, so it gets the reference's options and resolves './util' from the source location (trace 6215), which is then redirected to dist/util.d.ts.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/project-references/symlink-preserve",
+      "last_result": "not_run",
+      "native_authority": "tools/phase1/syntax/project_references_probe_test.go in the pinned compiler package: tsoptions.GetParsedCommandLineOfConfigFile, then processAllProgramFiles for load, NewProgram for Program.RangeResolvedProjectReference (graph), the verifier's raw writes and Program.GetProgramDiagnostics (verify), and include-explaining processing diagnostics (explain)",
+      "not_claimed": {
+        "getSourceToDtsIfSymlink from getParseFileRedirect": "UseSourceOfProjectReference without disableSourceOfProjectReferenceRedirect is the Phase 5 editor host (newProjectReferenceDtsFakingHost). The Rust loader rejects it while references have outputs, so canUseProjectReferenceSource is observed returning false only, and the source-of-reference branches of getParseFileRedirect and getSourceToDtsIfSymlink (projectreferencefilemapper.go:36-44, :40) do not run."
+      },
+      "operation_actions": {
+        "explain": [
+          "tsc/internal/compiler/program.go:Program.GetSourceOfProjectReferenceIfOutputIncluded"
+        ],
+        "graph": [
+          "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker"
+        ],
+        "load": [
+          "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getRedirectForResolution",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getSourceToDtsIfSymlink"
+        ],
+        "verify": [
+          "tsc/internal/compiler/program.go:Program.verifyProjectReferences"
+        ]
+      },
+      "operations": [
+        "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+        "tsc/internal/compiler/program.go:Program.GetSourceOfProjectReferenceIfOutputIncluded",
+        "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+        "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getRedirectForResolution",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getSourceToDtsIfSymlink",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker"
+      ],
+      "request_sha256": "e8e56a0fa1ed2f07350055714eabc3a41820d7dc634cb6bc3e1a7bd8b4a9c76b"
+    },
+    {
+      "expected_contract": "The symlink lookup is only tried for paths containing /node_modules/: the same package reached through a symlink elsewhere keeps the root's options and './util' resolves next to the symlinked output.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/project-references/symlink-preserve-outside-node_modules",
+      "last_result": "not_run",
+      "native_authority": "tools/phase1/syntax/project_references_probe_test.go in the pinned compiler package: tsoptions.GetParsedCommandLineOfConfigFile, then processAllProgramFiles for load, NewProgram for Program.RangeResolvedProjectReference (graph), the verifier's raw writes and Program.GetProgramDiagnostics (verify), and include-explaining processing diagnostics (explain)",
+      "operation_actions": {
+        "graph": [
+          "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker"
+        ],
+        "load": [
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getSourceToDtsIfSymlink"
+        ],
+        "verify": [
+          "tsc/internal/compiler/program.go:Program.verifyProjectReferences"
+        ]
+      },
+      "operations": [
+        "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+        "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getSourceToDtsIfSymlink",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker"
+      ],
+      "request_sha256": "d97540718bb8317464d7f69fa53c01922bf8e851aaaa9fb2754e093e25c12834"
+    },
+    {
+      "expected_contract": "A type reference directive inside a redirected output resolves from the source location with the reference's typeRoots: lib/dist/a.d.ts's 'foo' resolves to lib/types/foo/index.d.ts although the root config has types [] and no typeRoots.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/project-references/type-reference-from-output",
+      "last_result": "not_run",
+      "native_authority": "tools/phase1/syntax/project_references_probe_test.go in the pinned compiler package: tsoptions.GetParsedCommandLineOfConfigFile, then processAllProgramFiles for load, NewProgram for Program.RangeResolvedProjectReference (graph), the verifier's raw writes and Program.GetProgramDiagnostics (verify), and include-explaining processing diagnostics (explain)",
+      "operation_actions": {
+        "graph": [
+          "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker"
+        ],
+        "load": [
+          "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromOutputDts",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getRedirectForResolution"
+        ],
+        "verify": [
+          "tsc/internal/compiler/program.go:Program.verifyProjectReferences"
+        ]
+      },
+      "operations": [
+        "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+        "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+        "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromOutputDts",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getRedirectForResolution",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker"
+      ],
+      "request_sha256": "20c1971bb1b16e69b37a7322f33d35af5ee308192b97bcc69b532957b9e0f3e7"
+    },
+    {
+      "expected_contract": "UseSourceOfProjectReference requested but disableSourceOfProjectReferenceRedirect set: canUseProjectReferenceSource is false, so the program redirects to alpha/bin/a.d.ts and records the output-to-source map exactly like the default. The source-of-reference mode itself (Phase 5) is not exercised.",
+      "family": "syntax",
+      "host_applicability": "any",
+      "id": "syntax/project-references/use-source-disabled",
+      "last_result": "not_run",
+      "native_authority": "tools/phase1/syntax/project_references_probe_test.go in the pinned compiler package: tsoptions.GetParsedCommandLineOfConfigFile, then processAllProgramFiles for load, NewProgram for Program.RangeResolvedProjectReference (graph), the verifier's raw writes and Program.GetProgramDiagnostics (verify), and include-explaining processing diagnostics (explain)",
+      "not_claimed": {
+        "source-of-reference mode": "UseSourceOfProjectReference without disableSourceOfProjectReferenceRedirect is the Phase 5 editor host (newProjectReferenceDtsFakingHost). The Rust loader rejects it while references have outputs, so canUseProjectReferenceSource is observed returning false only, and the source-of-reference branches of getParseFileRedirect and getSourceToDtsIfSymlink (projectreferencefilemapper.go:36-44, :40) do not run."
+      },
+      "operation_actions": {
+        "explain": [
+          "tsc/internal/compiler/program.go:Program.GetSourceOfProjectReferenceIfOutputIncluded",
+          "tsc/internal/compiler/program.go:ProgramOptions.canUseProjectReferenceSource"
+        ],
+        "graph": [
+          "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker"
+        ],
+        "load": [
+          "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+          "tsc/internal/compiler/program.go:ProgramOptions.canUseProjectReferenceSource",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+          "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource"
+        ],
+        "verify": [
+          "tsc/internal/compiler/program.go:Program.verifyProjectReferences"
+        ]
+      },
+      "operations": [
+        "tsc/internal/compiler/filesparser.go:parseTask.redirect",
+        "tsc/internal/compiler/program.go:Program.GetSourceOfProjectReferenceIfOutputIncluded",
+        "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
+        "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
+        "tsc/internal/compiler/program.go:ProgramOptions.canUseProjectReferenceSource",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
+        "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker"
+      ],
+      "request_sha256": "212294f0990e93518d1696976350aca89b8907b04047c4ae98bba8a535b54a03"
+    },
+    {
       "expected_contract": "Concatenate stored JSDocText fragments and source spellings of all three link kinds, ignore other node kinds, trim only trailing Go Unicode White_Space; preserve arbitrary bytes and nil/empty behavior.",
       "family": "syntax",
       "host_applicability": "any",
@@ -91756,6 +92846,15 @@
         "tsc/internal/ast/ast.go:Node.ModifierNodes": "constant empty in every row"
       },
       "operations": [
+        "tsc/internal/ast/ast.go:BodyBase.BodyData",
+        "tsc/internal/ast/ast.go:DeclarationBase.DeclarationData",
+        "tsc/internal/ast/ast.go:FlowNodeBase.FlowNodeData",
+        "tsc/internal/ast/ast.go:FunctionLikeBase.LocalsContainerData",
+        "tsc/internal/ast/ast.go:FunctionLikeWithBodyBase.BodyData",
+        "tsc/internal/ast/ast.go:FunctionLikeWithBodyBase.LocalsContainerData",
+        "tsc/internal/ast/ast.go:IsDeclarationNode",
+        "tsc/internal/ast/ast.go:IsLocalsContainer",
+        "tsc/internal/ast/ast.go:LocalsContainerBase.LocalsContainerData",
         "tsc/internal/ast/ast.go:MutableNode.SetExpression",
         "tsc/internal/ast/ast.go:MutableNode.SetInitializer",
         "tsc/internal/ast/ast.go:MutableNode.SetModifiers",
@@ -91763,12 +92862,16 @@
         "tsc/internal/ast/ast.go:Node.ArgumentList",
         "tsc/internal/ast/ast.go:Node.Arguments",
         "tsc/internal/ast/ast.go:Node.Body",
+        "tsc/internal/ast/ast.go:Node.BodyData",
         "tsc/internal/ast/ast.go:Node.CanHaveStatements",
+        "tsc/internal/ast/ast.go:Node.DeclarationData",
         "tsc/internal/ast/ast.go:Node.Expression",
+        "tsc/internal/ast/ast.go:Node.FlowNodeData",
         "tsc/internal/ast/ast.go:Node.Initializer",
         "tsc/internal/ast/ast.go:Node.IsTypeOnly",
         "tsc/internal/ast/ast.go:Node.KindString",
         "tsc/internal/ast/ast.go:Node.KindValue",
+        "tsc/internal/ast/ast.go:Node.LocalsContainerData",
         "tsc/internal/ast/ast.go:Node.ModifierFlags",
         "tsc/internal/ast/ast.go:Node.Modifiers",
         "tsc/internal/ast/ast.go:Node.Name",
@@ -91785,6 +92888,10 @@
         "tsc/internal/ast/ast.go:Node.TypeArguments",
         "tsc/internal/ast/ast.go:Node.TypeParameterList",
         "tsc/internal/ast/ast.go:Node.TypeParameters",
+        "tsc/internal/ast/ast.go:NodeDefault.BodyData",
+        "tsc/internal/ast/ast.go:NodeDefault.DeclarationData",
+        "tsc/internal/ast/ast.go:NodeDefault.FlowNodeData",
+        "tsc/internal/ast/ast.go:NodeDefault.LocalsContainerData",
         "tsc/internal/ast/ast.go:NodeFactory.NewModifierList",
         "tsc/internal/ast/ast.go:NodeFactory.NewNodeList",
         "tsc/internal/ast/ast.go:NodeFactory.NewSourceFile",
@@ -91865,8 +92972,8 @@
         "tsc/internal/ast/positionmap.go:PositionMap.UTF8ToUTF16"
       ],
       "producer": "scripts/s06_oracle/accessors_test.go through scripts/s06_accessor_fixtures.py",
-      "rust_gate": "crates/tsr_ast/tests/node_accessors.rs:358 asserts the row count and every key and :1122 the whole source map; `cargo test -p tsr_ast` (CI step 'Parser, AST runtime and codec contracts', debug and release) and E1's utility tests, which rerun the Go checker with --check first",
-      "witnesses": "27,827 accessor rows over every kind and constructor. Claimed: accessors that return a non-nil value in some row, the four setters, the SourceFile and PositionMap methods, and the constructors whose child wiring is observed."
+      "rust_gate": "crates/tsr_ast/tests/node_accessors.rs:1035 asserts the row count and every key and :1259 the whole source map; `cargo test -p tsr_ast` (CI step 'Parser, AST runtime and codec contracts', debug and release) and E1's utility tests, which rerun the Go checker with --check first",
+      "witnesses": "30,047 accessor rows over every kind and constructor. Claimed: accessors that return a non-nil value in some row, the four setters, the SourceFile and PositionMap methods, the constructors whose child wiring is observed, and payload-interface membership: IsDeclarationNode, IsLocalsContainer and whether FlowNodeData and BodyData are non-nil for every token kind and constructor payload, which enters Node.DeclarationData, Node.LocalsContainerData, Node.FlowNodeData and Node.BodyData and every base or NodeDefault method they dispatch to (answers differ between the embedding and NodeDefault arms, so a payload assigned to the wrong set changes its row). ClassStaticBlockDeclaration is built with a non-nil body, so Node.Body is observed nil for a payload that has its own Body field without BodyBase."
     },
     {
       "artifact": "data/s06/ast-utilities-middle.json",

@@ -20,6 +20,24 @@ class LocaleTableTests(unittest.TestCase):
             with self.subTest(path=path):
                 self.assertEqual(hashlib.sha256((ROOT / path).read_bytes()).hexdigest(), expected)
 
+    def test_manifest_inputs_cover_the_generator_and_its_module_imports(self):
+        """Every script the generator loads at import time is a manifest input (s05_tables was not)."""
+        import ast
+
+        manifest = json.loads((ROOT / "data/phase1/locale-tables-manifest.json").read_text())
+        pending, loaded = ["scripts/generate_locale_tables.py"], set()
+        while pending:
+            relative = pending.pop()
+            if relative in loaded:
+                continue
+            loaded.add(relative)
+            for node in ast.parse((ROOT / relative).read_text()).body:  # module level only
+                names = ([alias.name for alias in node.names] if isinstance(node, ast.Import)
+                         else [node.module] if isinstance(node, ast.ImportFrom) and node.module else [])
+                pending += [f"scripts/{name}.py" for name in names if (ROOT / f"scripts/{name}.py").is_file()]
+        self.assertIn("scripts/s05_tables.py", loaded)
+        self.assertLessEqual(loaded | {"scripts/tracking-bootstrap.py"}, set(manifest["inputs"]))
+
     def test_a_new_matcher_continuation_requires_an_implementation(self):
         with self.assertRaisesRegex(ValueError, "matcher continuation changed"):
             generator.render({}, {"candidates": {"1": [[0] * 8 + [1]]}})

@@ -259,7 +259,9 @@ def workspace_symbol_index() -> dict[str, list[str]]:
     Searching the whole workspace rather than the ledger's claimed files is
     deliberate: 117 of the 169 Phase 1 ledger rows record no Rust home, and
     several name a crate directory that does not exist because the behavior
-    moved (see KNOWN_HOMES).
+    moved (see KNOWN_HOMES). build() judges a bare name only inside the Phase 1
+    home crates (phase1_home_crates); a same-named function elsewhere is named
+    in the basis but is not evidence.
     """
     index: dict[str, list[str]] = {}
     for path in sorted((ROOT / "crates").rglob("*.rs")):
@@ -268,6 +270,29 @@ def workspace_symbol_index() -> dict[str, list[str]]:
         for name in set(re.findall(r"\bfn\s+([a-z0-9_]+)", text)):
             index.setdefault(name, []).append(rel)
     return index
+
+
+def phase1_home_crates() -> frozenset[str]:
+    """The crates a Phase 1 operation can live in: the PORTS.toml homes of Phase 1 packages.
+
+    A crate the ledger names for a Phase 1 package (its `crate`, or a `rust`
+    path under crates/), plus the actual homes KNOWN_HOMES records for them. A
+    bare function name defined only in some other crate -- a formatter, the
+    API, a wasm binding -- says nothing about a Phase 1 operation, so it must
+    not move a disposition. Explicit `port:` markers are claims and count
+    wherever they are.
+    """
+    present = {path.name for path in (ROOT / "crates").iterdir() if path.is_dir()}
+    homes: set[str] = set()
+    for entry in ledger():
+        if MEMBERSHIP.get(entry.get("package"), (None,))[0] not in ("full", "partial"):
+            continue
+        homes.add(entry.get("crate") or "")
+        homes.update(match[1] for path in entry.get("rust") or [] if (match := re.match(r"crates/([^/]+)/", path)))
+    for package, text in KNOWN_HOMES.items():
+        if MEMBERSHIP.get(package, (None,))[0] in ("full", "partial"):
+            homes.update(re.findall(r"\btsr_[a-z0-9_]+", text))
+    return frozenset(homes & present)
 
 
 # `/// port: tsc/internal/<pkg>/<file>.go:<Symbol>` above a `fn`. The annotation
@@ -388,6 +413,7 @@ def classify(
     coverage: list[str],
     ports: dict[str, set[str]] | None = None,
     identity: str = "",
+    elsewhere: dict[str, list[str]] | None = None,
 ) -> tuple[str, str]:
     """Return (disposition, basis). Basis records how the disposition was reached.
 
@@ -403,6 +429,7 @@ def classify(
     status = entry.get("status")
     verify = entry.get("verify") or []
     ports = ports or {}
+    elsewhere = elsewhere or {}
 
     if status == "out-of-scope":
         return "later_phase", "ledger marks the source file out of scope for the port"
@@ -451,6 +478,14 @@ def classify(
         return (
             "missing",
             f"unmapped; `{candidate}` matches an unrelated generic Rust helper, which is not evidence",
+        )
+    outside = elsewhere.get(candidate, [])
+    if outside:
+        shown = ", ".join(outside[:2]) + (" ..." if len(outside) > 2 else "")
+        return (
+            "missing",
+            f"unmapped; `{candidate}` is defined only outside the Phase 1 home crates ({shown}), "
+            "which is not evidence",
         )
     home = KNOWN_HOMES.get(entry["package"])
     if home:
@@ -2000,8 +2035,17 @@ def leaf_preparation(scope: dict, cases: dict, step: str = "leaves", *, suppleme
         if case is None or results.get(identity) not in ("native_unavailable", "not_applicable"):
             raise ValueError(f"{identity}: platform witness may only supplement a bound native-unavailable case")
         results[identity] = "match"
+    # Operations an acceptance case of ANY family prepares. A `later_step`
+    # exemption only says another step prepares the operation, so it stands
+    # only while that step's case (or a covering witness, or a reviewed
+    # later-phase destination) actually does.
+    prepared_anywhere: set[str] = set()
     for case in cases.get("cases", []):
-        if case.get("family") not in families or results[case["id"]] not in PREPARING_RESULTS:
+        if results[case["id"]] not in PREPARING_RESULTS:
+            continue
+        if case.get("family") != "pilot":
+            prepared_anywhere.update(case.get("operations", []))
+        if case.get("family") not in families:
             continue
         for operation in case.get("operations", []):
             prepared.setdefault(operation, []).append(case["id"])
@@ -2012,16 +2056,26 @@ def leaf_preparation(scope: dict, cases: dict, step: str = "leaves", *, suppleme
             witnessed.setdefault(operation, []).append(identity)
     exempt = roster_exemptions(step)
     required = [r for r in scope["operations"] if r["go_package"] in STEP_PACKAGES[step]]
+
+    def later_step_unresolved(row: dict) -> bool:
+        entry = exempt.get(row["id"])
+        reviewed = (row.get("basis_kind") == "review" and row.get("disposition") == "later_phase"
+                    and type(row.get("destination_phase")) is int)
+        return bool(entry and entry.get("category") == "later_step" and not reviewed
+                    and row["id"] not in prepared_anywhere and row["id"] not in witnessed)
+
     pending = [
-        {"operation": r["id"], "rust_home": r["rust_home"], "disposition": r["disposition"]}
+        {"operation": r["id"], "rust_home": r["rust_home"], "disposition": r["disposition"],
+         **({"reason": "later_step_unresolved"} if later_step_unresolved(r) else {})}
         for r in required
-        if r["id"] not in prepared and r["id"] not in witnessed and r["id"] not in exempt
+        if r["id"] not in prepared and r["id"] not in witnessed
+        and (r["id"] not in exempt or later_step_unresolved(r))
     ]
     accounted = [r for r in required if r["id"] not in {p["operation"] for p in pending}]
     by_category: dict[str, int] = {}
     for row in required:
         entry = exempt.get(row["id"])
-        if entry and row["id"] not in prepared and row["id"] not in witnessed:
+        if entry and row["id"] not in prepared and row["id"] not in witnessed and not later_step_unresolved(row):
             by_category[entry["category"]] = by_category.get(entry["category"], 0) + 1
     problems = roster_problems(scope, cases, step)
     gap_problems = gap_record_problems({"cases": [
@@ -2054,6 +2108,7 @@ def leaf_preparation(scope: dict, cases: dict, step: str = "leaves", *, suppleme
         ),
         "exempt_operations": sum(by_category.values()),
         "exempt_by_category": dict(sorted(by_category.items())),
+        "later_step_unresolved": sum(1 for row in pending if row.get("reason") == "later_step_unresolved"),
         "pending": pending,
         "roster_problems": problems,
         "gap_problems": gap_problems,
@@ -2063,7 +2118,12 @@ def leaf_preparation(scope: dict, cases: dict, step: str = "leaves", *, suppleme
 
 def build() -> dict:
     rows: list[dict] = []
-    index = workspace_symbol_index()
+    home_crates = phase1_home_crates()
+    index: dict[str, list[str]] = {}
+    elsewhere: dict[str, list[str]] = {}
+    for name, locations in workspace_symbol_index().items():
+        for location in locations:
+            (index if location.split("/")[1] in home_crates else elsewhere).setdefault(name, []).append(location)
     ports = declared_ports()
     homes = annotated_homes()
     gaps = witnessed_gaps()
@@ -2088,7 +2148,7 @@ def build() -> dict:
         mapped = identity not in missing_ids
         linked = case_links.get(identity, [])
         witnessing = gaps.get(identity, [])
-        disposition, basis = classify(entry, symbol, mapped, index, linked, ports, identity)
+        disposition, basis = classify(entry, symbol, mapped, index, linked, ports, identity, elsewhere)
         if witnessing and disposition != "covered":
             disposition = "missing"
             basis = (
@@ -2184,6 +2244,24 @@ def build() -> dict:
     }
 
 
+def scope_drift(committed: dict) -> dict:
+    """The committed scope.json against a rebuild from the current sources.
+
+    `phase1.py inventory --check` and `phase1_producers.py check` fail on
+    drift; the self-tests report it without failing.
+    """
+    built = build()
+    if built == committed:
+        return {"current": True, "changed_count": 0, "changed_operations": [], "changed_fields": []}
+    before = {row["id"]: row for row in committed.get("operations", [])}
+    after = {row["id"]: row for row in built["operations"]}
+    changed = sorted(identity for identity in before.keys() | after.keys()
+                     if before.get(identity) != after.get(identity))
+    return {"current": False, "changed_count": len(changed), "changed_operations": changed[:20],
+            "changed_fields": sorted(key for key in built.keys() | committed.keys()
+                                     if key != "operations" and built.get(key) != committed.get(key))}
+
+
 def verify(scope: dict) -> list[str]:
     problems: list[str] = []
     rows = scope.get("operations", [])
@@ -2232,6 +2310,52 @@ def verify(scope: dict) -> list[str]:
     return problems
 
 
+# The owner's approval of the reviewed later-phase destinations. It covers the
+# exact rows it digests: any added, removed or edited row needs a new approval.
+REVIEW_APPROVAL_FIELDS = ("approved_by", "date", "decision", "rows", "rows_sha256", "scope", "statement")
+REVIEW_APPROVAL_SCOPE = "reviewed_operation_destinations"
+
+
+def review_approval_digest(rows: list[dict]) -> str:
+    """sha256 of the approved rows: canonical JSON (sorted keys) of the rows sorted by operation."""
+    ordered = sorted(rows, key=lambda row: str(row.get("operation")))
+    return hashlib.sha256(json.dumps(ordered, sort_keys=True, separators=(",", ":"),
+                                     ensure_ascii=True).encode()).hexdigest()
+
+
+def review_approval_problems(review: dict, root: Path = ROOT) -> list[str]:
+    """The approval must name its approver, date and decision and digest exactly the current rows."""
+    approval = review.get("approval")
+    if not isinstance(approval, dict):
+        return ["coverage-review.json records no owner approval of its reviewed later-phase destinations"]
+    problems = []
+    if set(approval) != set(REVIEW_APPROVAL_FIELDS):
+        problems.append("coverage-review.json approval must have exactly the fields "
+                        + ", ".join(REVIEW_APPROVAL_FIELDS))
+    for field in ("approved_by", "statement"):
+        if not isinstance(approval.get(field), str) or not approval[field].strip():
+            problems.append(f"coverage-review.json approval records no {field}")
+    if not isinstance(approval.get("date"), str) or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", approval["date"]):
+        problems.append("coverage-review.json approval date is not YYYY-MM-DD")
+    decision = approval.get("decision")
+    if not isinstance(decision, str) or not (root / decision.split("#")[0]).is_file():
+        problems.append("coverage-review.json approval names no recorded decision document")
+    if approval.get("scope") != REVIEW_APPROVAL_SCOPE:
+        problems.append(f"coverage-review.json approval must cover {REVIEW_APPROVAL_SCOPE}")
+    rows = review.get(REVIEW_APPROVAL_SCOPE, [])
+    if approval.get("rows") != len(rows) or approval.get("rows_sha256") != review_approval_digest(rows):
+        problems.append("coverage-review.json approval does not cover exactly the current reviewed destinations; "
+                        "an added, removed or edited row needs a new owner approval")
+    # The review's own authority statement must agree with the approval it
+    # carries: cite it, and never describe the same rows as not owner-approved.
+    authority = review.get("authority")
+    if not isinstance(authority, str) or "`approval`" not in authority:
+        problems.append("coverage-review.json authority does not cite its `approval` block")
+    elif re.search(r"\bnot\b[^.;]*\bowner[- ]approved\b", authority, re.IGNORECASE):
+        problems.append("coverage-review.json authority describes the approved rows as not owner-approved")
+    return problems
+
+
 def reviewed_destinations() -> dict[str, dict]:
     """Apply exact accepted-plan boundaries, never a package/name heuristic.
 
@@ -2273,4 +2397,8 @@ def reviewed_destinations() -> dict[str, dict]:
         raise ValueError("coverage-review.json: duplicate or simultaneously resolved destination")
     if any(identity not in known for identity in unresolved):
         raise ValueError("coverage-review.json: unknown unresolved operation")
+    # Only the owner's approval of exactly these rows makes them destinations.
+    approval = review_approval_problems(review)
+    if approval:
+        raise ValueError("; ".join(approval))
     return {identity: row for identity, row in decisions.items() if "destination_phase" in row}

@@ -258,12 +258,14 @@ Program-producer and integration-receipt refresh results are recorded
 separately; this checkpoint does not claim those executions have finished or
 that remote CI is green.
 
-The complete operation report still contains **1,365 pending entries**:
+At `02009ce` the complete operation report contained **1,364 pending entries**
+(the mutation-kill witnesses later reduced it to 582; see
+[the mutation-witness record](PHASE1-mutation-witnesses.md)):
 
 | Root cause | Pending entries | Meaning |
 | --- | ---: | --- |
 | Missing exact operation witness | 947 | No accepted request/output or executed Rust-contract link yet |
-| Unverified implementation mapping | 303 | Name-based mapping is not proof that a production port is absent |
+| Unverified implementation mapping | 302 | Name-based mapping is not proof that a production port is absent |
 | Unresolved later-step transfer | 92 | Exemption from one preparation step did not remove Phase 1 ownership |
 | Ordinary project-reference loader/configuration work | 23 | The accepted build-scheduling exclusion does not cover these operations |
 

@@ -121,7 +121,9 @@
       "tests": [
         "boundary_tests::empty_references_and_mappers_preserve_normal_loading",
         "boundary_tests::parsed_enabled_mappers_are_rejected_and_disabled_diagnostics_are_retained",
-        "boundary_tests::parsed_project_references_are_rejected_before_loading_files"
+        "boundary_tests::parsed_project_references_load_the_referenced_configs",
+        "boundary_tests::source_of_project_reference_mode_skips_checking_referenced_sources",
+        "boundary_tests::source_of_project_reference_mode_with_outputs_is_an_explicit_boundary"
       ]
     },
     {

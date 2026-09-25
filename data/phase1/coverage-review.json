@@ -1,5 +1,14 @@
 {
-  "authority": "Accepted docs/PHASE1-implementation-plan.md section 2 exclusions, interpreted per pinned compiler operation; not new owner-approved deferrals or behavioral waivers. Ordinary reference configuration/loading operations remain pending. See docs/PHASE1-F5b-destinations.md.",
+  "approval": {
+    "approved_by": "repository owner (Cristian Ianto), in the Phase 1 closure review conversation",
+    "date": "2026-09-25",
+    "decision": "docs/PHASE1-F5b-destinations.md#owner-approval",
+    "rows": 205,
+    "rows_sha256": "d253e0b5a3672c89f6c5d8fc124c48486df688da83df54cb1e84944a460e01a9",
+    "scope": "reviewed_operation_destinations",
+    "statement": "yes approved"
+  },
+  "authority": "Accepted docs/PHASE1-implementation-plan.md section 2 exclusions, interpreted per pinned compiler operation; the repository owner approved these reviewed destinations on 2026-09-25 (see `approval`). No row adds a deferral beyond the plan or waives behavior. Ordinary reference configuration/loading operations remain pending. See docs/PHASE1-F5b-destinations.md.",
   "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
   "reviewed_operation_destinations": [
     {
@@ -1862,171 +1871,8 @@
       "reason": "Unused-at-pin helper behind the already-reviewed unused Program.GetResolvedProjectReferenceFor wrapper."
     }
   ],
-  "unresolved_compiler_destinations": [
-    "tsc/internal/compiler/fileloader.go:fileLoader.addProjectReferenceTasks",
-    "tsc/internal/compiler/filesparser.go:parseTask.redirect",
-    "tsc/internal/compiler/host.go:compilerHost.GetResolvedProjectReference",
-    "tsc/internal/compiler/program.go:Program.GetSourceOfProjectReferenceIfOutputIncluded",
-    "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
-    "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
-    "tsc/internal/compiler/program.go:ProgramOptions.canUseProjectReferenceSource",
-    "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getCompilerOptionsForFile",
-    "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
-    "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromOutputDts",
-    "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource",
-    "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getRedirectForResolution",
-    "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getRedirectParsedCommandLineForResolution",
-    "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getSourceToDtsIfSymlink",
-    "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
-    "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker",
-    "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rootConfigPath",
-    "tsc/internal/compiler/projectreferenceparser.go:createProjectReferenceParseTasks",
-    "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParseTask.parse",
-    "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.initMapper",
-    "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.initMapperWorker",
-    "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.parse",
-    "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.start"
-  ],
-  "unresolved_compiler_evidence": [
-    {
-      "evidence": "upstream/tsc/internal/compiler/fileloader.go:326-342. Caller: newFileLoader/load setup at fileloader.go:177, before module.NewResolver at :178; method initializes a mapper even when references are empty (:327-334). Loads referenced configuration graph during ordinary program construction. A WorkGroup scheduling config reads is not project-reference build scheduling. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection.",
-      "go_source_sha256": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
-      "operation": "tsc/internal/compiler/fileloader.go:fileLoader.addProjectReferenceTasks",
-      "reason": "Ordinary program/configuration loading, not a reference-project build scheduler. Retain pending until the graph-loading boundary is resolved; no later-phase exclusion is claimed."
-    },
-    {
-      "evidence": "upstream/tsc/internal/compiler/filesparser.go:185-193. Caller: parseTask.load at filesparser.go:73-76, before parsing the requested source Creates a redirected parse subtask preserving lib/include reason and avoiding duplicated depth accounting; does not schedule compilation of a referenced project. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection.",
-      "go_source_sha256": "411a9e85dceb77ddbfc64cd40f247d16a337b78462c35f6a0273d5ad9edaf777",
-      "operation": "tsc/internal/compiler/filesparser.go:parseTask.redirect",
-      "reason": "Ordinary program/configuration loading, not a reference-project build scheduler. Retain pending until the graph-loading boundary is resolved; no later-phase exclusion is claimed."
-    },
-    {
-      "evidence": "upstream/tsc/internal/compiler/host.go:119-122. Caller: projectReferenceParseTask.parse at projectreferenceparser.go:24 host.go:119-121 calls tsoptions.GetParsedCommandLineOfConfigFilePath with the extended-config cache; config parsing, not a builder. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection.",
-      "go_source_sha256": "7f1cea0567a2817c8f6a1dc840fa6d24450e121832e4a516b1e85dfaf50ef6fb",
-      "operation": "tsc/internal/compiler/host.go:compilerHost.GetResolvedProjectReference",
-      "reason": "Ordinary program/configuration loading, not a reference-project build scheduler. Retain pending until the graph-loading boundary is resolved; no later-phase exclusion is claimed."
-    },
-    {
-      "evidence": "upstream/tsc/internal/compiler/program.go:180-185. Caller: processingDiagnostic.createDiagnosticExplainingFile -> includeProcessor.explainRedirectAndImpliedFormat (processingDiagnostic.go:106 / includeprocessor.go:144); Program.GetProgramDiagnostics at program.go:794-800 requests those global load diagnostics. Also emit and CLI ExplainFiles. Required by ordinary load diagnostics/options; exact scope clarification needed before exempting the reference-enabled branch. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection.",
-      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
-      "operation": "tsc/internal/compiler/program.go:Program.GetSourceOfProjectReferenceIfOutputIncluded",
-      "reason": "Ordinary program/configuration loading, not a reference-project build scheduler. Retain pending until the graph-loading boundary is resolved; no later-phase exclusion is claimed."
-    },
-    {
-      "evidence": "upstream/tsc/internal/compiler/program.go:218-220. Caller: Program.verifyProjectReferences at program.go:1375, plus project-system consumers Required by ordinary load diagnostics/options; exact scope clarification needed before exempting the reference-enabled branch. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection.",
-      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
-      "operation": "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
-      "reason": "Ordinary program/configuration loading, not a reference-project build scheduler. Retain pending until the graph-loading boundary is resolved; no later-phase exclusion is claimed."
-    },
-    {
-      "evidence": "upstream/tsc/internal/compiler/program.go:1365-1400. Caller: Program.verifyCompilerOptions at program.go:1047 during NewProgram; reports missing config, composite/noEmit and output-path conflicts Validation includes TS6306/TS6310-style composite/noEmit errors and missing references without running a project build; output-conflict checks are emission-adjacent but do not erase ordinary options diagnostics. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection.",
-      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
-      "operation": "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
-      "reason": "Ordinary program/configuration loading, not a reference-project build scheduler. Retain pending until the graph-loading boundary is resolved; no later-phase exclusion is claimed."
-    },
-    {
-      "evidence": "upstream/tsc/internal/compiler/program.go:51-53. Caller: ordinary parseTask.load redirect predicate through projectreferencefilemapper.go:36, filesparser.go:351,491, and projectReferenceParser.initMapper/initMapperWorker. True is enabled only by project/project.go:454; false controls ordinary .d.ts redirection. Mixed branch: normal loading uses false to choose reference declaration outputs; true source substitution is Phase 5. Preserve both obligations rather than defer the whole predicate under a build-scheduling label. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection.",
-      "go_source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
-      "operation": "tsc/internal/compiler/program.go:ProgramOptions.canUseProjectReferenceSource",
-      "reason": "Ordinary program/configuration loading, not a reference-project build scheduler. Retain pending until the graph-loading boundary is resolved; no later-phase exclusion is claimed."
-    },
-    {
-      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go:80-83. Caller: fileLoader.loadSourceFile at fileloader.go:404 Shared with later consumers but reached from ordinary loader/resolution or config diagnostics. Later use alone cannot defer its required Phase 1 path. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection.",
-      "go_source_sha256": "9fe9076464b9e46ff27c456268c9be07464f00457f3a14bec141c1c0eb6b6a10",
-      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getCompilerOptionsForFile",
-      "reason": "Ordinary program/configuration loading, not a reference-project build scheduler. Retain pending until the graph-loading boundary is resolved; no later-phase exclusion is claimed."
-    },
-    {
-      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go:35-53. Caller: parseTask.load at filesparser.go:73; also Program.GetParseFileRedirect Shared with later consumers but reached from ordinary loader/resolution or config diagnostics. Later use alone cannot defer its required Phase 1 path. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection.",
-      "go_source_sha256": "9fe9076464b9e46ff27c456268c9be07464f00457f3a14bec141c1c0eb6b6a10",
-      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
-      "reason": "Ordinary program/configuration loading, not a reference-project build scheduler. Retain pending until the graph-loading boundary is resolved; no later-phase exclusion is claimed."
-    },
-    {
-      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go:72-74. Caller: getRedirectForResolution at projectreferencefilemapper.go:99 and getSourceToDtsIfSymlink at :183; also source-mode/editor accesses Shared with later consumers but reached from ordinary loader/resolution or config diagnostics. Later use alone cannot defer its required Phase 1 path. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection.",
-      "go_source_sha256": "9fe9076464b9e46ff27c456268c9be07464f00457f3a14bec141c1c0eb6b6a10",
-      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromOutputDts",
-      "reason": "Ordinary program/configuration loading, not a reference-project build scheduler. Retain pending until the graph-loading boundary is resolved; no later-phase exclusion is claimed."
-    },
-    {
-      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go:68-70. Caller: getParseFileRedirect .d.ts branch at projectreferencefilemapper.go:47 and getRedirectForResolution at :93; also checker/emit Program accessor Shared with later consumers but reached from ordinary loader/resolution or config diagnostics. Later use alone cannot defer its required Phase 1 path. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection.",
-      "go_source_sha256": "9fe9076464b9e46ff27c456268c9be07464f00457f3a14bec141c1c0eb6b6a10",
-      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource",
-      "reason": "Ordinary program/configuration loading, not a reference-project build scheduler. Retain pending until the graph-loading boundary is resolved; no later-phase exclusion is claimed."
-    },
-    {
-      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go:90-109. Caller: ordinary module and type-reference resolution at fileloader.go:774,828 Shared with later consumers but reached from ordinary loader/resolution or config diagnostics. Later use alone cannot defer its required Phase 1 path. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection.",
-      "go_source_sha256": "9fe9076464b9e46ff27c456268c9be07464f00457f3a14bec141c1c0eb6b6a10",
-      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getRedirectForResolution",
-      "reason": "Ordinary program/configuration loading, not a reference-project build scheduler. Retain pending until the graph-loading boundary is resolved; no later-phase exclusion is claimed."
-    },
-    {
-      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go:85-88. Caller: getCompilerOptionsForFile at projectreferencefilemapper.go:81 and ordinary import loading at fileloader.go:886 Shared with later consumers but reached from ordinary loader/resolution or config diagnostics. Later use alone cannot defer its required Phase 1 path. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection.",
-      "go_source_sha256": "9fe9076464b9e46ff27c456268c9be07464f00457f3a14bec141c1c0eb6b6a10",
-      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getRedirectParsedCommandLineForResolution",
-      "reason": "Ordinary program/configuration loading, not a reference-project build scheduler. Retain pending until the graph-loading boundary is resolved; no later-phase exclusion is claimed."
-    },
-    {
-      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go:163-192. Caller: getRedirectForResolution at projectreferencefilemapper.go:104; metadata is populated during ordinary loading when preserveSymlinks is enabled Shared with later consumers but reached from ordinary loader/resolution or config diagnostics. Later use alone cannot defer its required Phase 1 path. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection.",
-      "go_source_sha256": "9fe9076464b9e46ff27c456268c9be07464f00457f3a14bec141c1c0eb6b6a10",
-      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getSourceToDtsIfSymlink",
-      "reason": "Ordinary program/configuration loading, not a reference-project build scheduler. Retain pending until the graph-loading boundary is resolved; no later-phase exclusion is claimed."
-    },
-    {
-      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go:116-127. Caller: Program.RangeResolvedProjectReference -> Program.verifyProjectReferences at program.go:1375 Shared with later consumers but reached from ordinary loader/resolution or config diagnostics. Later use alone cannot defer its required Phase 1 path. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection.",
-      "go_source_sha256": "9fe9076464b9e46ff27c456268c9be07464f00457f3a14bec141c1c0eb6b6a10",
-      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
-      "reason": "Ordinary program/configuration loading, not a reference-project build scheduler. Retain pending until the graph-loading boundary is resolved; no later-phase exclusion is claimed."
-    },
-    {
-      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go:129-148. Caller: rangeResolvedProjectReference at projectreferencefilemapper.go:126; also recursive traversal and Phase 5 child traversal Shared with later consumers but reached from ordinary loader/resolution or config diagnostics. Later use alone cannot defer its required Phase 1 path. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection.",
-      "go_source_sha256": "9fe9076464b9e46ff27c456268c9be07464f00457f3a14bec141c1c0eb6b6a10",
-      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker",
-      "reason": "Ordinary program/configuration loading, not a reference-project build scheduler. Retain pending until the graph-loading boundary is resolved; no later-phase exclusion is claimed."
-    },
-    {
-      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go:28-33. Caller: projectReferenceParser.initMapper at projectreferenceparser.go:76 and rangeResolvedProjectReference at projectreferencefilemapper.go:123 Shared with later consumers but reached from ordinary loader/resolution or config diagnostics. Later use alone cannot defer its required Phase 1 path. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection.",
-      "go_source_sha256": "9fe9076464b9e46ff27c456268c9be07464f00457f3a14bec141c1c0eb6b6a10",
-      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rootConfigPath",
-      "reason": "Ordinary program/configuration loading, not a reference-project build scheduler. Retain pending until the graph-loading boundary is resolved; no later-phase exclusion is claimed."
-    },
-    {
-      "evidence": "upstream/tsc/internal/compiler/projectreferenceparser.go:34-40. Caller: fileLoader.addProjectReferenceTasks (fileloader.go:340) and projectReferenceParseTask.parse (projectreferenceparser.go:30) Reads referenced tsconfigs, computes source/output indexes and orders/deduplicates config tasks; no referenced project is emitted or built. Source-mode fake-host installation within initMapper remains Phase 5; the ordinary .d.ts mapping path is separate. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection.",
-      "go_source_sha256": "5dd5e6790d4de30468a1de774196f9c5351036c1c254918afcd714ca73fd6b04",
-      "operation": "tsc/internal/compiler/projectreferenceparser.go:createProjectReferenceParseTasks",
-      "reason": "Ordinary program/configuration loading, not a reference-project build scheduler. Retain pending until the graph-loading boundary is resolved; no later-phase exclusion is claimed."
-    },
-    {
-      "evidence": "upstream/tsc/internal/compiler/projectreferenceparser.go:19-32. Caller: projectReferenceParser.start queues task.parse; fileLoader.addProjectReferenceTasks calls projectReferenceParser.parse (fileloader.go:341) Reads referenced tsconfigs, computes source/output indexes and orders/deduplicates config tasks; no referenced project is emitted or built. Source-mode fake-host installation within initMapper remains Phase 5; the ordinary .d.ts mapping path is separate. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection.",
-      "go_source_sha256": "5dd5e6790d4de30468a1de774196f9c5351036c1c254918afcd714ca73fd6b04",
-      "operation": "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParseTask.parse",
-      "reason": "Ordinary program/configuration loading, not a reference-project build scheduler. Retain pending until the graph-loading boundary is resolved; no later-phase exclusion is claimed."
-    },
-    {
-      "evidence": "upstream/tsc/internal/compiler/projectreferenceparser.go:70-80. Caller: projectReferenceParser.parse after RunAndWait (projectreferenceparser.go:52) Reads referenced tsconfigs, computes source/output indexes and orders/deduplicates config tasks; no referenced project is emitted or built. Source-mode fake-host installation within initMapper remains Phase 5; the ordinary .d.ts mapping path is separate. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection.",
-      "go_source_sha256": "5dd5e6790d4de30468a1de774196f9c5351036c1c254918afcd714ca73fd6b04",
-      "operation": "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.initMapper",
-      "reason": "Ordinary program/configuration loading, not a reference-project build scheduler. Retain pending until the graph-loading boundary is resolved; no later-phase exclusion is claimed."
-    },
-    {
-      "evidence": "upstream/tsc/internal/compiler/projectreferenceparser.go:82-115. Caller: projectReferenceParser.initMapper and recursive child mapping (projectreferenceparser.go:76,113) Reads referenced tsconfigs, computes source/output indexes and orders/deduplicates config tasks; no referenced project is emitted or built. Source-mode fake-host installation within initMapper remains Phase 5; the ordinary .d.ts mapping path is separate. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection.",
-      "go_source_sha256": "5dd5e6790d4de30468a1de774196f9c5351036c1c254918afcd714ca73fd6b04",
-      "operation": "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.initMapperWorker",
-      "reason": "Ordinary program/configuration loading, not a reference-project build scheduler. Retain pending until the graph-loading boundary is resolved; no later-phase exclusion is claimed."
-    },
-    {
-      "evidence": "upstream/tsc/internal/compiler/projectreferenceparser.go:48-53. Caller: projectReferenceParser.start queues task.parse; fileLoader.addProjectReferenceTasks calls projectReferenceParser.parse (fileloader.go:341) Reads referenced tsconfigs, computes source/output indexes and orders/deduplicates config tasks; no referenced project is emitted or built. Source-mode fake-host installation within initMapper remains Phase 5; the ordinary .d.ts mapping path is separate. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection.",
-      "go_source_sha256": "5dd5e6790d4de30468a1de774196f9c5351036c1c254918afcd714ca73fd6b04",
-      "operation": "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.parse",
-      "reason": "Ordinary program/configuration loading, not a reference-project build scheduler. Retain pending until the graph-loading boundary is resolved; no later-phase exclusion is claimed."
-    },
-    {
-      "evidence": "upstream/tsc/internal/compiler/projectreferenceparser.go:55-68. Caller: projectReferenceParser.parse and its own recursion (projectreferenceparser.go:50,64) Reads referenced tsconfigs, computes source/output indexes and orders/deduplicates config tasks; no referenced project is emitted or built. Source-mode fake-host installation within initMapper remains Phase 5; the ordinary .d.ts mapping path is separate. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection.",
-      "go_source_sha256": "5dd5e6790d4de30468a1de774196f9c5351036c1c254918afcd714ca73fd6b04",
-      "operation": "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.start",
-      "reason": "Ordinary program/configuration loading, not a reference-project build scheduler. Retain pending until the graph-loading boundary is resolved; no later-phase exclusion is claimed."
-    }
-  ],
-  "unresolved_reason": "The accepted plan excludes project-reference build scheduling, not ordinary reference configuration loading, declaration-file redirection or option diagnostics. These 23 operations therefore remain unresolved Phase 1 obligations with per-operation caller evidence; neither an absent corpus case nor an existing Unsupported result grants a later-phase exclusion.",
+  "unresolved_compiler_destinations": [],
+  "unresolved_compiler_evidence": [],
+  "unresolved_reason": "The accepted plan excludes project-reference build scheduling, not ordinary reference configuration loading, declaration-file redirection or option diagnostics. The 23 operations once listed here were ported in the Phase 1 closure (crates/tsr_compiler/src/project_references.rs, loader.rs, verify_options.rs and include_reason.rs) and are witnessed by the syntax/project-references cases; none remain unresolved.",
   "version": 1
 }

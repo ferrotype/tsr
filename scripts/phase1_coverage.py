@@ -26,6 +26,7 @@ ROUTES = {
     "pilot": (None, "P1A-F0", None),
 }
 OWNERS = {"leaves": "F1b", "filesystem": "F2b", "config": "F3b", "syntax": "F4b"}
+INTEGRATION_METRIC = "run.foundations.integration_complete"
 
 # Audited execution routes, not guesses from the witness's human-readable
 # `producer` text. Each runner below checks an exact named test inventory or
@@ -97,6 +98,58 @@ def _sha(value: bytes) -> str:
     return hashlib.sha256(value).hexdigest()
 
 
+def capture_command(family: str, cases=()) -> str:
+    """The family capture that reproduces these cases (or the whole family)."""
+    selected = "".join(f" --case {shlex.quote(case)}" for case in cases)
+    return f"python3 scripts/phase1.py capture --family {family}{selected} --output target/phase1-review-{family}"
+
+
+# A case's Rust side is an observation only when the capture compared one.
+RUST_OBSERVED_RESULTS = ("match", "different")
+
+
+def observed_sides(row: dict) -> tuple[bool, bool]:
+    """(native present, Rust present) for one gap row.
+
+    An operation row names a native identity and a Rust home. A case row's
+    `rust` only names its driver and recorded result, which is no observation:
+    the Rust side is present when the recorded result compared a Rust
+    observation (match, different) or an approval quotes it, never for
+    not_implemented, harness_failed, not_run or an unavailable native side.
+    """
+    native = bool(row.get("native"))
+    if "recorded_result" in row:
+        return native, row["recorded_result"] in RUST_OBSERVED_RESULTS or bool(row.get("approved_rust"))
+    return native, bool(row.get("rust"))
+
+
+def observed_pair(row: dict) -> bool:
+    """A gap row carries a native identity/observation and a Rust home/observation."""
+    return all(observed_sides(row))
+
+
+def root_cause_entry(cause: str, level: str, rows: list[dict]) -> dict:
+    """One root cause with its count and one concrete native/Rust example.
+
+    The example is the first row with both sides; a cause none of whose rows
+    has both states why instead of presenting a one-sided example as a pair.
+    """
+    example = next((row for row in rows if observed_pair(row)), rows[0])
+    entry = {"cause": cause, "level": level, "count": len(rows), "example": example}
+    if not observed_pair(example):
+        native, rust = observed_sides(example)
+        if level == "operation":
+            entry["example_reason"] = ("no Rust home is annotated or mapped for any operation with this cause; "
+                                       "the basis says what the audit found: " + example["reason"])
+        else:
+            missing = [side for side, present in (("native", native), ("Rust", rust)) if not present]
+            entry["example_reason"] = (f"no case with this cause has both a native and a Rust observation; "
+                                       f"this one has no {' and no '.join(missing)} observation "
+                                       f"on the recording host (it records {example['recorded_result']})"
+                                       + (f" ({example['host_note']})" if example.get("host_note") else ""))
+    return entry
+
+
 def build(root: Path = ROOT, *, supplemental_prepared_cases=()) -> dict:
     """Rebuild all links without subprocesses or reading untracked captures."""
     inputs: dict[str, str] = {}
@@ -120,6 +173,7 @@ def build(root: Path = ROOT, *, supplemental_prepared_cases=()) -> dict:
             problems.append(f"{name}: pin differs")
     problems.extend(scope.verify(document))
     problems.extend(scope.gap_record_problems(manifest))
+    problems.extend(scope.review_approval_problems(review, root))
     operations = {row["id"]: row for row in document["operations"]}
     # Derive the universe from the pinned inventory, not from report rows. A
     # missing operation cannot make the complete report smaller and greener.
@@ -270,6 +324,19 @@ def build(root: Path = ROOT, *, supplemental_prepared_cases=()) -> dict:
                                      if identity in approvals else None),
             "reproduce": f"python3 scripts/phase1.py capture --family {family} --case {identity} --output target/phase1-review-case",
         })
+    # phase1_integration.evaluate consumes every case a `cases` witness
+    # references for integration_complete, so those rows name that metric too.
+    integration = load("data/phase1/integration.json")
+    by_case = {row["id"]: row for row in joined_cases}
+    for witness in integration["witnesses"]:
+        if witness.get("kind") != "cases":
+            continue
+        for reference in witness.get("references", []):
+            row = by_case.get(reference)
+            if row is None:
+                problems.append(f"integration witness {witness.get('id')} references unknown case {reference}")
+            elif INTEGRATION_METRIC not in row["producer_metrics"]:
+                row["producer_metrics"].append(INTEGRATION_METRIC)
     expected_outputs = {entry["output"].removeprefix("tsc/testdata/baselines/reference/") for group in baselines["groups"].values() for entry in group["outputs"]}
     if len(expected_outputs) != 309 or set(baseline_links) != expected_outputs:
         problems.append("config baseline output identities are not exactly the 309 frozen paths")
@@ -333,6 +400,7 @@ def build(root: Path = ROOT, *, supplemental_prepared_cases=()) -> dict:
             if witness.get("kind") == "rust_gated" or operation in credited:
                 links[operation].append(identity)
     operation_rows, gaps = [], []
+    case_families = {row["id"]: row["family"] for row in joined_cases}
     preparing_cases = {row["id"] for row in joined_cases
                        if row["acceptance"] and row["recorded_result"] in scope.PREPARING_RESULTS}
     supplemental = set(supplemental_prepared_cases)
@@ -378,11 +446,20 @@ def build(root: Path = ROOT, *, supplemental_prepared_cases=()) -> dict:
                   "owner": "F5a" if identity in unresolved else OWNERS.get(step, "F5b")}
         operation_rows.append(joined)
         if root_cause:
+            explain = "python3 scripts/phase1_coverage.py explain --operation " + shlex.quote(identity)
+            # A linked case reproduces the operation's current observation in
+            # its own family; an unlinked operation has only its explanation.
+            linked_cases: dict[str, list[str]] = defaultdict(list)
+            for case in sorted(set(links[identity]) & case_families.keys()):
+                linked_cases[case_families[case]].append(case)
+            reproduce = {family: capture_command(family, ids) for family, ids in sorted(linked_cases.items())}
             gaps.append({**joined, "native": identity, "rust": row.get("annotated_home") or row.get("rust_home"),
                          "reason": row["basis"], "dependencies": row.get("depends_on", []),
                          **({"mutation_witnesses": dict(sorted(stale_mutation_claims[identity].items()))}
                             if root_cause == "mutation_witness_stale" else {}),
-                         "reproduce": "python3 scripts/phase1_coverage.py explain --operation " + shlex.quote(identity)})
+                         "reproduce": next(iter(reproduce.values()), explain), "explain": explain,
+                         "reproduce_by_family": reproduce,
+                         **({"family_capture": capture_command(step)} if step in capture.FAMILIES else {})})
     case_causes = {"different": "observation_difference", "not_implemented": "reported_missing_operation",
                    "native_unavailable": "native_platform_unavailable", "not_applicable": "other_host_evidence_required",
                    "harness_failed": "harness_failure",
@@ -396,13 +473,18 @@ def build(root: Path = ROOT, *, supplemental_prepared_cases=()) -> dict:
                   "approved_difference": row["approved_difference"],
                   **({"approved_native": approvals[row["id"]]["native"], "approved_rust": approvals[row["id"]]["rust"]}
                      if row["id"] in approvals else {}),
+                  **({"hosts": row["hosts"], "host_note": row["host_note"]} if "hosts" in row else {}),
                   "reproduce": row["reproduce"]}
                  for row in joined_cases if row["recorded_result"] != "match"]
     families = {family: dict(sorted(Counter(row["recorded_result"] for row in joined_cases if row["family"] == family).items()))
                 for family in sorted(ROUTES)}
     causes: dict[str, list[dict]] = defaultdict(list)
-    for row in gaps:
-        causes[row["root_cause"]].append(row)
+    levels: dict[str, str] = {}
+    for level, rows in (("operation", gaps), ("case", case_gaps)):
+        for row in rows:
+            if levels.setdefault(row["root_cause"], level) != level:
+                problems.append(f"root cause {row['root_cause']} names both operation and case gaps")
+            causes[row["root_cause"]].append(row)
     # The complete program corpus and cross-family observations have their
     # own validators. They are not leaf operation witnesses and must not be
     # attributed to every operation reached by a large program. Record their
@@ -415,7 +497,6 @@ def build(root: Path = ROOT, *, supplemental_prepared_cases=()) -> dict:
     expected_syntax = phase1_syntax.select(syntax_schedule, syntax_native, full=True)
     if not syntax_cases or syntax_cases != expected_syntax or len(set(syntax_cases)) != len(syntax_cases):
         problems.append("external syntax metric inventory differs from the exact native schedule")
-    integration = load("data/phase1/integration.json")
     integration_ids = [row.get("id") for row in integration["witnesses"]]
     if set(integration_ids) != phase1_integration.WITNESSES or len(set(integration_ids)) != len(integration_ids):
         problems.append("external integration metric inventory differs from the required witnesses")
@@ -448,7 +529,7 @@ def build(root: Path = ROOT, *, supplemental_prepared_cases=()) -> dict:
             "witnesses": joined_witnesses, "metric_contributors": contributions,
             "external_inventories": external_inventories,
             "gaps": gaps, "case_gaps": case_gaps,
-            "root_causes": [{"cause": cause, "count": len(rows), "example": rows[0]} for cause, rows in sorted(causes.items())],
+            "root_causes": [root_cause_entry(cause, levels[cause], rows) for cause, rows in sorted(causes.items())],
             "input_sha256": dict(sorted(inputs.items())), "problems": problems,
             **({"supplemental_prepared_cases": sorted(supplemental)} if supplemental else {})}
 

@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import subprocess
 import sys
+import tempfile
 import unittest
 from unittest.mock import patch
 
@@ -95,6 +96,7 @@ class IntegrationTests(unittest.TestCase):
         paths = integration.input_paths()
         self.assertEqual([p for p in paths if not (ROOT / p).is_file()], [])
         self.assertNotIn("docs/PHASE1-progress.md", paths)
+        self.assertNotIn("crates/tsr_jsnum/SLICE.md", paths)
         self.assertIn("crates/tsr_compiler/examples/phase1_integration.rs", paths)
         self.assertIn("tools/s11/mapper_test.go", paths)
         self.assertIn("tools/phase1/locale/internal_export_test.go", paths)
@@ -158,20 +160,18 @@ class IntegrationTests(unittest.TestCase):
 class IntegrationEvaluationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        import phase1_producers as producers
         cls.prepared = integration.check()
-        cls.inputs = {"fixture": "a" * 64}
+        # The real producer snapshot: each receipt records its own closure from it.
+        cls.inputs = producers.source_closure("foundations")
+
+    def closure(self, identity):
+        return integration.receipt_inputs(identity, self.inputs)
 
     def receipt(self, identity, stdout):
         document = integration.load(ROOT, integration.MANIFEST)
-        if identity == "generation":
-            command = document["generation"]["command"]
-        elif identity == "transport":
-            command = ["python3", "scripts/s11.py", "capture"]
-        elif identity == "rust-witnesses":
-            command = ["python3", "scripts/phase1_integration.py", "observe-rust-witnesses"]
-        else:
-            command = next(row["command"] for row in document["witnesses"] if row["id"] == identity)
-        return integration.receipt(identity, command, self.inputs, stdout)
+        command = integration.receipt_specs(document)[identity]["command"]
+        return integration.receipt(identity, command, self.closure(identity), stdout)
 
     def evaluate(self, reports=(), receipts=()):
         return integration.evaluate(self.prepared, reports, receipts, source_inputs=self.inputs)
@@ -277,7 +277,8 @@ class IntegrationEvaluationTests(unittest.TestCase):
                     self.receipt("generation", json.dumps({"metrics": {"ast_schema": True, "patches_apply": True, "client_identical": True, "drift": False, "locale_complete": True}}))]
         for row in self.prepared["witnesses"]:
             for test in row.get("additional_tests", []):
-                receipts.append(integration.receipt(row["id"] + "/" + test["test"], test["command"], self.inputs,
+                identity = row["id"] + "/" + test["test"]
+                receipts.append(integration.receipt(identity, test["command"], self.closure(identity),
                                                     "test " + test["test"] + " ... ok\n"))
         installed = next(row for row in self.prepared["witnesses"] if row["id"] == "installed-generated-assets")
         packages = integration.load(ROOT, "tools/packaging/packages.json")["packages"]
@@ -287,7 +288,8 @@ class IntegrationEvaluationTests(unittest.TestCase):
                         "diagnostic_code": 2322,
                         "localized_message": 'Der Typ "number" kann dem Typ "string" nicht zugewiesen werden.',
                         "owners_returned_to_baseline": True}}
-        receipts.append(integration.receipt(installed["id"], installed["command"], self.inputs, "", artifact=artifact))
+        receipts.append(integration.receipt(installed["id"], installed["command"], self.closure(installed["id"]), "",
+                                            artifact=artifact))
         observations = [{"id": identity, "command": command, "exit_code": 0,
                          "stdout": "".join("test " + name + " ... ok\n" for name in tests)}
                         for identity, (command, tests) in integration.RUST_WITNESS_TESTS.items()]
@@ -329,6 +331,239 @@ class IntegrationEvaluationTests(unittest.TestCase):
         self.assertTrue(any("command differs" in p for p in self.evaluate(receipts=[receipt])["problems"]))
         receipt["id"] = "invented"
         self.assertTrue(any("unknown integration" in p for p in self.evaluate(receipts=[receipt])["problems"]))
+
+
+class ReceiptClosureTests(unittest.TestCase):
+    """Each receipt is bound to what its own command reads, and to nothing else.
+
+    A change only another receipt depends on (or a coverage record) must not
+    make it unavailable, and every file its command reads must.
+    """
+
+    # One input each receipt's command reads, chosen away from the shared build
+    # inputs, so the test can show that only the receipts reading it go stale.
+    REPRESENTATIVE = {
+        "transport": "crates/tsr_testhost/src/session.rs",
+        "generation": "scripts/s05_tables.py",
+        "rust-witnesses": "crates/tsr_binder/src/container_classification.rs",
+        integration.MUTATION_RECEIPT: "tools/phase1/mutation/go/patches.json",
+        "localized-config-diagnostics": "tools/phase1/config/localized-requests.json",
+        "retained-program-snapshot": "crates/tsr_compiler/src/tests.rs",
+        "installed-generated-assets": "tools/packaging/consumer.rs",
+        "ordered-config-resolution/paths_keep_source_order_on_equal_prefixes_but_exact_matches_win":
+            "crates/tsr_module/tests/relative_paths.rs",
+    }
+
+    @classmethod
+    def setUpClass(cls):
+        import phase1_producers as producers
+        cls.producers = producers
+        cls.prepared = integration.check()
+        cls.document = integration.load(ROOT, integration.MANIFEST)
+        cls.specs = integration.receipt_specs(cls.document)
+        cls.inputs = producers.source_closure("foundations")
+        cls.paths = {identity: set(integration.receipt_input_paths(identity)) for identity in cls.specs}
+        cls.recorded = [integration.receipt(identity, spec["command"], integration.receipt_inputs(identity, cls.inputs), "")
+                        for identity, spec in cls.specs.items()]
+
+    def stale(self, changed):
+        """Receipts recorded on the committed snapshot, evaluated on a changed one."""
+        return integration.evaluate(self.prepared, [], self.recorded, source_inputs=changed)["unavailable"]
+
+    def test_every_receipt_kind_has_a_representative_input(self):
+        self.assertEqual(set(self.REPRESENTATIVE), set(self.specs))
+
+    def test_every_receipt_closure_is_inside_the_producer_closure_and_its_ledger(self):
+        from test_phase1_tracker import runs, selected
+        ledger = selected(ROOT, runs()["foundations"])
+        for identity, paths in self.paths.items():
+            with self.subTest(receipt=identity):
+                self.assertGreater(len(paths), len(integration.RECEIPT_BUILD_INPUTS))
+                self.assertEqual(sorted(path for path in paths if not (ROOT / path).is_file()), [])
+                self.assertEqual(sorted(paths - self.inputs.keys()), [])
+                self.assertEqual(sorted({"upstream" if path.startswith("upstream/") else path
+                                         for path in paths} - ledger), [])
+
+    def test_a_receipt_that_recorded_more_than_its_closure_stays_as_strict(self):
+        # An older receipt recorded the whole producer closure: every input it
+        # recorded still counts, so an unrelated edit keeps it unavailable.
+        identity = "generation"
+        receipt = integration.receipt(identity, self.specs[identity]["command"], dict(self.inputs), "")
+        unrelated = "data/phase1/cases.json"
+        self.assertNotIn(unrelated, self.paths[identity])
+        result = integration.evaluate(self.prepared, [], [receipt], source_inputs={**self.inputs, unrelated: "0" * 64})
+        self.assertEqual(result["unavailable"][identity]["changed_inputs"], [unrelated])
+
+    def test_a_receipt_missing_part_of_its_closure_is_unavailable(self):
+        identity = "transport"
+        inputs = integration.receipt_inputs(identity, self.inputs)
+        inputs.pop("scripts/s11_tunnel.py")
+        receipt = integration.receipt(identity, self.specs[identity]["command"], inputs, "")
+        result = integration.evaluate(self.prepared, [], [receipt], source_inputs=self.inputs)
+        self.assertEqual(result["unavailable"][identity]["changed_inputs"], ["scripts/s11_tunnel.py"])
+
+    def test_a_change_stales_exactly_the_receipts_that_read_it(self):
+        for identity, path in self.REPRESENTATIVE.items():
+            with self.subTest(receipt=identity, path=path):
+                self.assertIn(path, self.paths[identity])
+                self.assertIn(path, self.inputs)
+                changed = {**self.inputs, path: "0" * 64}
+                unavailable = self.stale(changed)
+                self.assertEqual(set(unavailable), {name for name, paths in self.paths.items() if path in paths})
+                self.assertIn(identity, unavailable)
+                self.assertLess(len(unavailable), len(self.specs), "a representative input stales every receipt")
+                for row in unavailable.values():
+                    self.assertEqual(row["changed_inputs"], [path])
+
+    def test_coverage_records_and_the_testhost_do_not_touch_generation(self):
+        # The review's own witness: re-recording cases.json stales no receipt;
+        # a testhost edit stales transport and leaves generation current.
+        self.assertEqual(self.stale({**self.inputs, "data/phase1/cases.json": "0" * 64}), {})
+        unavailable = self.stale({**self.inputs, "crates/tsr_testhost/src/session.rs": "0" * 64})
+        self.assertIn("transport", unavailable)
+        self.assertNotIn("generation", unavailable)
+
+    def edited_digest(self, relative):
+        """The producer snapshot's digest of `relative` after an in-memory edit (None: not an input)."""
+        target, original = ROOT / relative, Path.read_bytes
+        self.assertTrue(target.is_file(), relative)
+        with patch.object(Path, "read_bytes", lambda path: original(path) + b"\nedited\n" if path == target
+                          else original(path)):
+            return self.producers.source_closure("foundations").get(relative)
+
+    def test_a_real_file_edit_reaches_the_receipt_through_the_producer_snapshot(self):
+        # Only the edited digest is applied, so concurrent edits elsewhere cannot blur the result.
+        relative = "scripts/s11_tunnel.py"
+        digest = self.edited_digest(relative)
+        self.assertNotEqual(digest, self.inputs[relative])
+        unavailable = self.stale({**self.inputs, relative: digest})
+        self.assertEqual(unavailable["transport"]["changed_inputs"], [relative])
+
+    def test_entry_scripts_are_followed_through_their_imports(self):
+        for identity, path in (("transport", "scripts/s11_followups.py"), ("transport", "scripts/s11_tunnel.py"),
+                               ("transport", "scripts/tracking-bootstrap.py"),
+                               ("generation", "scripts/s05_tables.py"), ("generation", "scripts/s03.py"),
+                               ("installed-generated-assets", "scripts/package_assets.py"),
+                               ("localized-config-diagnostics", "scripts/phase1_localized.py"),
+                               (integration.MUTATION_RECEIPT, "scripts/phase1_mutation_go.py"),
+                               # s07_binder imports it through sys.path to validate binder graphs.
+                               (integration.MUTATION_RECEIPT, "tools/s07/binder/generate_syntax.py")):
+            with self.subTest(receipt=identity, path=path):
+                self.assertIn(path, self.paths[identity])
+
+    def test_transport_binds_the_whole_testhost_package(self):
+        package = {str(path.relative_to(ROOT)) for path in (ROOT / "crates/tsr_testhost").rglob("*")
+                   if path.is_file() and path.name != ".DS_Store"}
+        self.assertIn("crates/tsr_testhost/src/session.rs", package)
+        self.assertLessEqual(package, self.paths["transport"])
+
+    def test_transport_and_generation_cover_their_ledger_runs(self):
+        """transport is the [testhost] run and generation the [gen] run, less only what the command never reads.
+
+        Prose is no input; `upstream` is bound as the pin (data/upstream.json,
+        .gitmodules); xtask only launches the testhost run and the S11 unit
+        tests are not what `s11.py capture` executes.
+        """
+        from test_phase1_tracker import runs, selected
+        ledger = runs()
+        for identity, section, unread in (
+                ("transport", "testhost", lambda path: path.startswith(("xtask/", "scripts/tests/"))),
+                ("generation", "gen", lambda path: False)):
+            with self.subTest(receipt=identity):
+                expected = selected(ROOT, ledger[section]) | set(ledger[section]["inputs"])
+                missing = sorted(path for path in expected - self.paths[identity]
+                                 if path != "upstream" and not path.endswith(".md") and not unread(path))
+                self.assertEqual(missing, [])
+                self.assertIn("scripts/s05_tables.py", selected(ROOT, ledger["gen"]))
+
+    def test_mutation_receipt_binds_every_spliced_file(self):
+        import phase1_scope
+        manifest = integration.load(ROOT, phase1_scope.MUTATION_MANIFEST)
+        files = {mutant["file"] for mutant in manifest["mutants"]}
+        self.assertTrue(files)
+        self.assertLessEqual(files, self.paths[integration.MUTATION_RECEIPT])
+
+    def test_mutation_receipt_binds_every_oracle_binary_confirm_builds(self):
+        """confirm builds each traced oracle's package; the syntax oracle is phase1_syntax, not the driver."""
+        import gzip
+        import phase1_capture as capture
+        import phase1_mutation_go as go
+        import phase1_mutation_run as run
+        import phase1_scope
+        results = json.loads(gzip.decompress((ROOT / phase1_scope.MUTATION_RESULTS).read_bytes()))
+        traced = set(results["inputs"].get("traced_oracles") or results["inputs"]["oracles"])
+        self.assertIn("syntax", traced)
+        self.assertLessEqual(traced, set(run.PACKAGES))
+        self.assertEqual(set(go.ORACLES), set(run.PACKAGES))
+        names = self.producers.workspace_packages()
+        packages = self.producers.rust_package_closure([names[name] for name in set(run.PACKAGES.values())])
+        self.assertEqual(packages, self.producers.mutation_oracle_packages())
+        for directory in ("tools/phase1/syntax", "tools/phase1/harness", "crates/tsr_checker", "crates/tsr_compiler"):
+            self.assertIn(directory, packages)
+        files = {str(path.resolve().relative_to(ROOT.resolve())) for directory in packages
+                 for path in capture.package_input_files(ROOT / directory)}
+        mutation = self.paths[integration.MUTATION_RECEIPT]
+        self.assertEqual(sorted(files - mutation), [])
+        mutated = {mutant["file"] for mutant in integration.load(ROOT, phase1_scope.MUTATION_MANIFEST)["mutants"]}
+        unmutated = sorted(path for path in files if path.startswith("crates/tsr_checker/src/")
+                           and path.endswith(".rs") and path not in mutated)[0]
+        for path in ("tools/phase1/syntax/src/mutation.rs", "tools/phase1/syntax/src/main.rs",
+                     "tools/phase1/harness/src/lib.rs", unmutated, "tools/s07/binder/generate_syntax.py"):
+            with self.subTest(path=path):
+                unavailable = self.stale({**self.inputs, path: "0" * 64})
+                self.assertIn(integration.MUTATION_RECEIPT, unavailable)
+                self.assertEqual(unavailable[integration.MUTATION_RECEIPT]["changed_inputs"], [path])
+
+    def test_generation_binds_the_pin_xtask_reads_before_it_dispatches_gen(self):
+        # `cargo xtask gen --verify` passes read_ledger(PORTS.toml).pin to s03
+        # and writes it into the generated outputs.
+        main = (ROOT / "xtask/src/main.rs").read_text()
+        self.assertIn('root.join("PORTS.toml")', main)
+        self.assertIn('gen::run(&root, &args[1..], &read_ledger(&root).pin)', main)
+        self.assertIn("PORTS.toml", self.paths["generation"])
+        from test_phase1_tracker import runs, selected
+        self.assertIn("PORTS.toml", selected(ROOT, runs()["gen"]))
+        unavailable = self.stale({**self.inputs, "PORTS.toml": "0" * 64})
+        self.assertIn("generation", unavailable)
+        self.assertEqual(unavailable["generation"]["changed_inputs"], ["PORTS.toml"])
+
+    def test_packaged_files_honor_include_and_readme(self):
+        files = {str(path.relative_to(ROOT)) for path in integration.packaged_files(ROOT / "crates/tsr_jsnum")}
+        self.assertTrue((ROOT / "crates/tsr_jsnum/SLICE.md").is_file())
+        self.assertIn("crates/tsr_jsnum/README.md", files)
+        self.assertIn("crates/tsr_jsnum/src/lib.rs", files)
+        self.assertIn("crates/tsr_jsnum/Cargo.toml", files)
+        self.assertNotIn("crates/tsr_jsnum/SLICE.md", files)
+        self.assertFalse(any("/tests/" in name or "/examples/" in name for name in files))
+        with tempfile.TemporaryDirectory() as temporary:
+            package = Path(temporary)
+            (package / "src").mkdir()
+            for name in ("src/lib.rs", "NOTES.md", "README.md", "docs.txt"):
+                (package / name).write_text("x")
+            (package / "Cargo.toml").write_text('[package]\nname = "p"\nreadme = "README.md"\ninclude = ["/src/**"]\n')
+            self.assertEqual({path.name for path in integration.packaged_files(package)},
+                             {"lib.rs", "README.md", "Cargo.toml"})
+            (package / "Cargo.toml").write_text('[package]\nname = "p"\n')
+            self.assertEqual({path.name for path in integration.packaged_files(package)},
+                             {"lib.rs", "NOTES.md", "README.md", "docs.txt", "Cargo.toml"})
+
+    def test_unpackaged_prose_never_stales_receipts_but_a_packaged_readme_does(self):
+        from test_phase1_tracker import runs, selected
+        ledger = selected(ROOT, runs()["foundations"])
+        for relative, packaged in (("crates/tsr_jsnum/SLICE.md", False), ("crates/tsr_jsstring/SLICE.md", False),
+                                   ("crates/tsr_jsnum/README.md", True)):
+            with self.subTest(path=relative):
+                digest = self.edited_digest(relative)
+                if packaged:
+                    self.assertNotEqual(digest, self.inputs[relative])
+                    unavailable = self.stale({**self.inputs, relative: digest})
+                    self.assertIn("installed-generated-assets", unavailable)
+                    self.assertNotIn("transport", unavailable)
+                    self.assertIn(relative, ledger)
+                else:
+                    self.assertIsNone(digest, "unpackaged prose is a producer input")
+                    self.assertFalse(any(relative in paths for paths in self.paths.values()))
+                    self.assertNotIn(relative, ledger)
 
 
 class GenerationTests(unittest.TestCase):

@@ -13,6 +13,7 @@ from collections import Counter
 import hashlib
 import gzip
 import json
+import re
 from pathlib import Path
 import sys
 import subprocess
@@ -46,9 +47,28 @@ def sha(value: bytes) -> str:
 
 def rust_packages(family: str) -> list[str]:
     """Derive local path dependencies independently of a capture's claimed list."""
+    return rust_package_closure([ROOT / "tools/phase1" / family])
+
+
+def workspace_packages() -> dict[str, str]:
+    """Workspace package name -> its directory, read from the member manifests."""
+    workspace = tomllib.loads((ROOT / "Cargo.toml").read_text())
+    packages = {}
+    for member in workspace["workspace"]["members"]:
+        manifest = tomllib.loads((ROOT / member / "Cargo.toml").read_text())
+        packages[manifest["package"]["name"]] = member
+    return packages
+
+
+def rust_package_closure(directories) -> list[str]:
+    """Every local package directory these packages build, test or patch in, transitively.
+
+    Normal, dev and build dependencies are all followed (a `cargo test` builds
+    the dev-dependencies), as are the workspace's [patch]/[replace] paths.
+    """
     workspace = tomllib.loads((ROOT / "Cargo.toml").read_text())
     inherited = workspace["workspace"].get("dependencies", {})
-    pending = [ROOT / "tools/phase1" / family]
+    pending = [Path(directory) if Path(directory).is_absolute() else ROOT / directory for directory in directories]
     for table in [*workspace.get("patch", {}).values(), workspace.get("replace", {})]:
         pending.extend(ROOT / dep["path"] for dep in table.values()
                        if isinstance(dep, dict) and "path" in dep)
@@ -79,56 +99,151 @@ MUTATION_COMMANDS = ("scripts/phase1_mutation_run.py", "scripts/phase1_mutation_
 
 
 def python_import_closure(entries) -> set[str]:
-    """Every scripts/ module the entry scripts import, transitively.
+    """Every repository module the entry scripts import, transitively.
 
     Read from the syntax tree, at any nesting, so the lazy imports inside
     functions (`comparable` from s07_binder, the protocol and codec fixtures
-    s06_protocol pulls in) count like top-level ones. Only modules that live
-    in scripts/ are followed; the standard library is not an input.
+    s06_protocol pulls in) count like top-level ones. Modules are looked up in
+    scripts/ and in every repository directory a followed module puts on
+    sys.path (s07_binder inserts tools/s07/binder to import generate_syntax);
+    the standard library is not an input. A sys.path entry the scan cannot
+    resolve is refused rather than silently not followed.
     """
     import ast
-    pending, seen = list(entries), set()
-    while pending:
-        relative = pending.pop()
-        if relative in seen:
-            continue
-        seen.add(relative)
-        tree = ast.parse((ROOT / relative).read_bytes(), filename=relative)
-        for node in ast.walk(tree):
-            if isinstance(node, ast.Import):
-                names = [alias.name for alias in node.names]
-            elif isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:
-                names = [node.module]
-            else:
+    directories = ["scripts"]
+    while True:
+        pending, seen, inserted = list(entries), set(), set()
+        while pending:
+            relative = pending.pop()
+            if relative in seen:
                 continue
-            for name in names:
-                top = name.split(".")[0]
-                found = next((candidate for candidate in (f"scripts/{top}.py", f"scripts/{top}/__init__.py")
-                              if (ROOT / candidate).is_file()), None)
-                if found is not None:
-                    pending.append(found)
-    return seen
+            seen.add(relative)
+            tree = ast.parse((ROOT / relative).read_bytes(), filename=relative)
+            inserted.update(_sys_path_entries(tree, relative))
+            for node in ast.walk(tree):
+                if isinstance(node, ast.Import):
+                    names = [alias.name for alias in node.names]
+                elif isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:
+                    names = [node.module]
+                else:
+                    continue
+                for name in names:
+                    top = name.split(".")[0]
+                    found = next((candidate for directory in directories
+                                  for candidate in (f"{directory}/{top}.py", f"{directory}/{top}/__init__.py")
+                                  if (ROOT / candidate).is_file()), None)
+                    if found is not None:
+                        pending.append(found)
+        added = sorted(inserted - set(directories))
+        if not added:
+            return seen
+        # sys.path is process-wide: a directory any followed module inserts
+        # is searched for every import, so rescan with it.
+        directories += added
+
+
+def _sys_path_entries(tree, relative) -> set[str]:
+    """The repository directories a module adds to sys.path.
+
+    Resolves `ROOT / "literal"` (ROOT being the repository root) and the
+    module's own directory (`Path(__file__)...parent`); anything else raises.
+    """
+    import ast
+    entries = set()
+    for node in ast.walk(tree):
+        if not (isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
+                and node.func.attr in ("insert", "append", "extend") and ast.unparse(node.func.value) == "sys.path"):
+            continue
+        argument = ast.unparse(node.args[-1]) if node.args else ""
+        literal = re.fullmatch(r'(?:str\()?ROOT / [\'"]([^\'"]+)[\'"]\)?', argument)
+        if literal:
+            entries.add(literal[1].rstrip("/"))
+        elif re.fullmatch(r"(?:str\()?Path\(__file__\)(?:\.resolve\(\))?\.parent\)?", argument):
+            entries.add(str(Path(relative).parent))
+        else:
+            raise ValueError(f"{relative}: cannot resolve the sys.path entry {argument!r}; "
+                             "python_import_closure would miss the modules imported through it")
+    return entries
 
 
 def mutation_inputs() -> set[str]:
     """What the mutation-witnesses receipt's replay depends on beyond the crates.
 
-    The switch, splicer, driver and Go instrumentation, the driver's local
-    dependency closure, every Python module the mutation commands import, and
-    every committed mutation artifact (the gzip ones are not caught by the
-    data/phase1 JSON glob).
+    The switch, splicer, driver and Go instrumentation, the local dependency
+    closure of every oracle binary `confirm` builds, every Python module the
+    mutation commands import, and every committed mutation artifact (the gzip
+    ones are not caught by the data/phase1 JSON glob).
     """
-    paths: set[str] = set(python_import_closure(name for name in MUTATION_COMMANDS if (ROOT / name).is_file()))
+    paths: set[str] = set(python_import_closure([name for name in MUTATION_COMMANDS if (ROOT / name).is_file()]))
     tools = ROOT / MUTATION_TOOLS
     directories = [tools] if tools.is_dir() else []
-    if (tools / "driver/Cargo.toml").is_file():
-        directories += [ROOT / name for name in rust_packages("mutation/driver")]
+    directories += [ROOT / name for name in mutation_oracle_packages()]
     for directory in directories:
         paths.update(str(path.resolve().relative_to(ROOT.resolve())) for path in capture.package_input_files(directory))
+    paths.update(mutation_artifact_files())
+    return paths
+
+
+def mutation_oracle_packages() -> list[str]:
+    """The local package closure of every oracle binary `confirm` builds and replays.
+
+    phase1_mutation_run.PACKAGES names each oracle's Rust package: the driver
+    serves e1, binder and facts; the syntax oracle is phase1_syntax, whose
+    mutation harness links the checker, compiler, printer and transformer
+    crates the driver does not.
+    """
+    import phase1_mutation_run as run
+    names = workspace_packages()
+    # A package that is not a workspace member raises rather than drop out.
+    return rust_package_closure([names[package] for package in sorted(set(run.PACKAGES.values()))])
+
+
+def mutation_artifact_files() -> set[str]:
+    """Every committed mutation artifact (the gzip ones escape the data/phase1 JSON glob)."""
     artifacts = ROOT / scope.MUTATION_DIRECTORY
-    if artifacts.is_dir():
-        paths.update(str(path.relative_to(ROOT)) for path in artifacts.rglob("*")
-                     if path.is_file() and path.name != ".DS_Store")
+    if not artifacts.is_dir():
+        return set()
+    return {str(path.relative_to(ROOT)) for path in artifacts.rglob("*")
+            if path.is_file() and path.name != ".DS_Store"}
+
+
+def mutation_binding_inputs() -> set[str]:
+    """What binding a mutation witness in the committed view reads.
+
+    coverage.build() and leaf_preparation() bind every mutation witness through
+    scope.recorded_mutations, which checks each oracle's native freeze and Go
+    reach index against the committed request inventory and against what the
+    current code says the Go side is (phase1_mutation_go.oracle_sources and
+    instrumentation_digest: the oracle sources and bridges, the patches, the
+    coverage hooks and the syntax probe). Every such file is an input of any
+    producer that checks harness health, not only of foundations.
+    """
+    import phase1_mutation_go as go
+    paths = mutation_artifact_files()
+    # The oracle definitions the committed freezes come from; the harness
+    # reads the same inventories through scope.MUTATION_ORACLES.
+    for oracle, definition in go.ORACLES.items():
+        paths.add(definition.inventory)
+        paths.update(go.oracle_sources(oracle))
+        paths.update(f"{definition.source_dir}/{name}" for name in definition.sources)
+        paths.update(f"{definition.source_dir}/{source}" for source, _ in definition.bridges)
+    tool = ROOT / "tools/phase1/mutation/go"
+    if tool.is_dir():
+        paths.update(str(path.resolve().relative_to(ROOT.resolve())) for path in capture.package_input_files(tool))
+    return paths
+
+
+def harness_inputs() -> set[str]:
+    """Files harness_check reads beyond the family capture closures.
+
+    The coverage join loads every family's request files, not only the
+    producer's own families, and binds the mutation witnesses (see
+    mutation_binding_inputs). tests/test_phase1_producers.py traces every read
+    harness_check makes and requires it inside the closure and a ledger glob.
+    """
+    paths = mutation_binding_inputs()
+    for spec in capture.FAMILIES.values():
+        paths.update(capture.request_files(spec))
     return paths
 
 
@@ -139,6 +254,7 @@ def source_closure(producer: str) -> dict[str, str]:
     import phase1_coverage
     for runner, inventory, _ in phase1_coverage.RUST_ROUTES.values():
         paths.update((runner, inventory))
+    paths.update(harness_inputs())
     result = {}
     # Live declaration/port-marker classification belongs to the inventory
     # audit, not replay. Each group binds its executable dependency closures
@@ -473,8 +589,12 @@ def harness_check(producer: str | None = None, *, current_classification: bool =
     problems = scope.verify(document)
     if producer is None:
         problems += scope.witness_problems()
-    if producer is None and current_classification and document != scope.build():
-        problems.append("scope.json differs from current source classification; run phase1.py inventory --write")
+    if producer is None and current_classification:
+        drift = scope.scope_drift(document)
+        if not drift["current"]:
+            problems.append(f"scope.json differs from current source classification in {drift['changed_count']} "
+                            f"operation(s) ({', '.join(drift['changed_operations'][:5])}); "
+                            "run phase1.py inventory --write")
     problems += scope.roster_problems(document, cases) + scope.gap_record_problems(cases)
     problems += baselines.verify(read(ROOT / "data/phase1/config-baselines.json"))
     problems += case_manifest_problems()
@@ -618,33 +738,29 @@ def observe(identity: str, output: Path) -> dict:
     """Run one fixed integration witness and retain its real outputs and inputs."""
     import phase1_integration as integration
     manifest = read(ROOT / integration.MANIFEST)
-    witnesses = {row["id"]: row for row in manifest["witnesses"] if row["kind"] != "cases"}
-    for row in manifest["witnesses"]:
-        for test in row.get("additional_tests", []):
-            witnesses[row["id"] + "/" + test["test"]] = test
-    witnesses.update(transport={"command": ["python3", "scripts/s11.py", "capture"]},
-                     generation={"command": manifest["generation"]["command"]},
-                     **{"rust-witnesses": {"command": ["python3", "scripts/phase1_integration.py", "observe-rust-witnesses"]},
-                        integration.MUTATION_RECEIPT: {"command": scope.MUTATION_CONFIRM_COMMAND}})
+    witnesses = integration.receipt_specs(manifest)
     if identity not in witnesses:
         raise ValueError("unknown executable witness; case witnesses use normal family captures")
     command = witnesses[identity]["command"]
+    # The whole producer closure is fingerprinted around the run so no input
+    # can change unseen; the receipt records only its own closure from it.
     before = source_closure("foundations")
+    inputs = integration.receipt_inputs(identity, before, ROOT, manifest)
     process = subprocess.run(command, cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
     output.mkdir(parents=True, exist_ok=True)
-    log_identity = sha(encode({"command": command, "inputs": before}) + process.stdout + process.stderr)
+    log_identity = sha(encode({"command": command, "inputs": inputs}) + process.stdout + process.stderr)
     log_root = output / (identity.replace("/", "--") + "-" + log_identity)
     log_root.mkdir(exist_ok=True)
     (log_root / "stdout.txt").write_bytes(process.stdout)
     (log_root / "stderr.txt").write_bytes(process.stderr)
     (log_root / "execution.json").write_bytes(encode({"command": command, "exit_code": process.returncode,
-                                                       "source_inputs": before}))
+                                                       "source_inputs": inputs}))
     if before != source_closure("foundations"):
         raise ValueError(f"integration sources changed during execution; logs retained at {log_root}")
     artifact = None
     if identity == "installed-generated-assets" and process.returncode == 0:
         artifact = read(ROOT / command[command.index("--output") + 1] / "verified.json")
-    record = integration.receipt(identity, command, before, process.stdout.decode(),
+    record = integration.receipt(identity, command, inputs, process.stdout.decode(),
                                  stderr=process.stderr.decode(), exit_code=process.returncode, artifact=artifact)
     content = encode(record)
     output.mkdir(parents=True, exist_ok=True)

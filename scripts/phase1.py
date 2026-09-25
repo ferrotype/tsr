@@ -156,6 +156,13 @@ def inventory_check() -> dict:
                 f"{len(report['pending'])} {step} operation(s) have neither a prepared case, "
                 "a verified witness nor a reviewed roster exemption"
             )
+    # A committed syntax report whose recorded Rust closure moved is pending
+    # recapture, not a manifest problem; it is listed, never hidden.
+    outstanding.extend(syntax_module.freshness_items())
+    # The operation audit against the live sources. Strict here (`ok` and the
+    # exit status) and in `phase1_producers.py check`; the self-tests only
+    # report it, so an ordinary source edit in flight cannot fail them.
+    drift = scope_module.scope_drift(scope)
     return {
         "pin": pin,
         "operations": scope["total_operations"],
@@ -167,7 +174,8 @@ def inventory_check() -> dict:
         "families_prepared": sorted(capture_module.FAMILIES),
         "baseline_outputs_verified": verified,
         "problems": problems,
-        "ok": not problems,
+        "scope_drift": drift,
+        "ok": not problems and drift["current"],
         "f0_complete": not outstanding,
         "f0_outstanding": outstanding,
         # A `port:` marker outside a crate's src/ claims a production home for

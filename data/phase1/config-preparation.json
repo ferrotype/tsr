@@ -1,13 +1,13 @@
 {
-  "accounted_operations": 402,
-  "complete": true,
+  "accounted_operations": 378,
+  "complete": false,
   "exempt_by_category": {
     "go_test_harness": 17,
-    "later_step": 24,
     "unused_at_pin": 4
   },
-  "exempt_operations": 45,
+  "exempt_operations": 21,
   "gap_problems": [],
+  "later_step_unresolved": 24,
   "outputs": {
     "complete": true,
     "exact_outputs": 167,
@@ -15,7 +15,199 @@
     "problems": [],
     "total_outputs": 167
   },
-  "pending": [],
+  "pending": [
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/declscompiler.go:CompilerOptionsAffectDeclarationPath",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/option_declarations_generated.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/declscompiler.go:CompilerOptionsAffectEmit",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/option_declarations_generated.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/declscompiler.go:CompilerOptionsAffectSemanticDiagnostics",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/option_declarations_generated.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/declscompiler.go:ForEachCompilerOptionValue",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/option_declarations_generated.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/declscompiler.go:optionsHaveChanges",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/option_declarations_generated.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/enummaps.go:TargetToLibMap",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/parsedbuildcommandline.go:ParsedBuildCommandLine.ResolvedProjectPaths",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/command_line.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.GetOutputFileNames",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.LiteralFileNames",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.PossiblyMatchesDirectoryName",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.PossiblyMatchesFileName",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.ReloadFileNamesOfParsedCommandLine",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.WildcardDirectoryGlobs",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.WithFileNames",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/showconfig.go:ConvertToTSConfig",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/showconfig.go:addImpliedOptions",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/showconfig.go:anyDependencyProvided",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/showconfig.go:computeFn",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/showconfig.go:filterSameAsDefaultInclude",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/showconfig.go:getNameOfCompilerOptionValue",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/showconfig.go:serializeCompilerOptions",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/showconfig.go:serializeEnumValue",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/tsoptions/showconfig.go:serializeImpliedOptionValue",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/tsconfigparsing.go:ExtendedConfigCacheEntry.ExtendedFileNames",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_tsoptions/src/config_files.rs",
+        "crates/tsr_tsoptions/src/config_mappers.rs",
+        "crates/tsr_tsoptions/src/config_parse.rs",
+        "crates/tsr_tsoptions/src/config_read.rs",
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/config_substitution.rs",
+        "crates/tsr_tsoptions/src/config_syntax.rs",
+        "crates/tsr_tsoptions/src/config_text.rs",
+        "crates/tsr_tsoptions/src/convert_options.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    }
+  ],
   "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
   "prepared_operations": 312,
   "roster_problems": [],

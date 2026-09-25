@@ -446,12 +446,6 @@
     },
     {
       "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/fileloader.go:326-342. Caller: newFileLoader/load setup at fileloader.go:177, before module.NewResolver at :178; method initializes a mapper even when references are empty (:327-334). Loads referenced configuration graph during ordinary program construction. A WorkGroup scheduling config reads is not project-reference build scheduling. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/fileloader.go:fileLoader.addProjectReferenceTasks",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
-    },
-    {
-      "category": "later_step",
       "evidence": "Definition: upstream/tsc/internal/compiler/fileloader.go:624-631. upstream/tsc/internal/compiler/fileloader.go. Gated by a content-mapper extension (fileloader.go:410) or a content-mapper project; the F4a syntax schedule carries the 15 content-mapped variants as this named boundary. Authority: docs/PHASE1-implementation-plan.md section 2, lines 168-171: LSP/fourslash, production mapper host and project-system services remain Phase 5, per ADR 0019.",
       "operation": "tsc/internal/compiler/fileloader.go:fileLoader.contentMapperUnavailable",
       "owner": "Phase 5 under the accepted section 2 boundary"
@@ -488,12 +482,6 @@
     },
     {
       "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/filesparser.go:185-193. Caller: parseTask.load at filesparser.go:73-76, before parsing the requested source Creates a redirected parse subtask preserving lib/include reason and avoiding duplicated depth accounting; does not schedule compilation of a referenced project. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/filesparser.go:parseTask.redirect",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
-    },
-    {
-      "category": "later_step",
       "evidence": "Definition: upstream/tsc/internal/compiler/host.go:44-53. upstream/tsc/internal/compiler/host.go:44. internal/execute/tsc.go and internal/execute/build/orchestrator.go call this constructor; host.go delegates directly to NewCompilerHost with cachedvfs.From. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation. Authority: docs/PHASE1-implementation-plan.md section 2, lines 165-167: CLI execution, project-reference build scheduling, watch, tracing and process services remain Phase 4; their options remain Phase 1.",
       "operation": "tsc/internal/compiler/host.go:NewCachedFSCompilerHost",
       "owner": "Phase 4 under the accepted section 2 boundary"
@@ -509,12 +497,6 @@
       "evidence": "Definition: upstream/tsc/internal/compiler/host.go:100-113. upstream/tsc/internal/compiler/host.go. Gated by a content-mapper extension (fileloader.go:410) or a content-mapper project; the F4a syntax schedule carries the 15 content-mapped variants as this named boundary. Authority: docs/PHASE1-implementation-plan.md section 2, lines 168-171: LSP/fourslash, production mapper host and project-system services remain Phase 5, per ADR 0019.",
       "operation": "tsc/internal/compiler/host.go:compilerHost.GetContentMappedSourceFiles",
       "owner": "Phase 5 under the accepted section 2 boundary"
-    },
-    {
-      "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/host.go:119-122. Caller: projectReferenceParseTask.parse at projectreferenceparser.go:24 host.go:119-121 calls tsoptions.GetParsedCommandLineOfConfigFilePath with the extended-config cache; config parsing, not a builder. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/host.go:compilerHost.GetResolvedProjectReference",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
     },
     {
       "category": "later_step",
@@ -806,12 +788,6 @@
     },
     {
       "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/program.go:180-185. Caller: processingDiagnostic.createDiagnosticExplainingFile -> includeProcessor.explainRedirectAndImpliedFormat (processingDiagnostic.go:106 / includeprocessor.go:144); Program.GetProgramDiagnostics at program.go:794-800 requests those global load diagnostics. Also emit and CLI ExplainFiles. Required by ordinary load diagnostics/options; exact scope clarification needed before exempting the reference-enabled branch. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/program.go:Program.GetSourceOfProjectReferenceIfOutputIncluded",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
-    },
-    {
-      "category": "later_step",
       "evidence": "Definition: upstream/tsc/internal/compiler/program.go:790-792. upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); Authority: docs/PHASE1-implementation-plan.md section 2, lines 162-163: full checker diagnostics and checker services remain Phase 2.",
       "operation": "tsc/internal/compiler/program.go:Program.GetSuggestionDiagnostics",
       "owner": "Phase 2 under the accepted section 2 boundary"
@@ -911,12 +887,6 @@
       "evidence": "Definition: upstream/tsc/internal/compiler/program.go:166-168. upstream/tsc/internal/compiler/program.go:166. internal/execute/incremental/program.go calls this wrapper; internal/compiler/program.go:167 calls the underlying resolver method, not the Program wrapper. Reviewed against docs/PHASE1-implementation-plan.md section 2; this moves no underlying parser, binder, config or resolver obligation. Authority: docs/PHASE1-implementation-plan.md section 2, lines 165-167: CLI execution, project-reference build scheduling, watch, tracing and process services remain Phase 4; their options remain Phase 1.",
       "operation": "tsc/internal/compiler/program.go:Program.PackageJsonCacheEntries",
       "owner": "Phase 4 under the accepted section 2 boundary"
-    },
-    {
-      "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/program.go:218-220. Caller: Program.verifyProjectReferences at program.go:1375, plus project-system consumers Required by ordinary load diagnostics/options; exact scope clarification needed before exempting the reference-enabled branch. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
     },
     {
       "category": "later_step",
@@ -1094,18 +1064,6 @@
     },
     {
       "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/program.go:1365-1400. Caller: Program.verifyCompilerOptions at program.go:1047 during NewProgram; reports missing config, composite/noEmit and output-path conflicts Validation includes TS6306/TS6310-style composite/noEmit errors and missing references without running a project build; output-conflict checks are emission-adjacent but do not erase ordinary options diagnostics. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
-    },
-    {
-      "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/program.go:51-53. Caller: ordinary parseTask.load redirect predicate through projectreferencefilemapper.go:36, filesparser.go:351,491, and projectReferenceParser.initMapper/initMapperWorker. True is enabled only by project/project.go:454; false controls ordinary .d.ts redirection. Mixed branch: normal loading uses false to choose reference declaration outputs; true source substitution is Phase 5. Preserve both obligations rather than defer the whole predicate under a build-scheduling label. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/program.go:ProgramOptions.canUseProjectReferenceSource",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
-    },
-    {
-      "category": "later_step",
       "evidence": "Definition: upstream/tsc/internal/compiler/program.go:1496-1530. upstream/tsc/internal/compiler/program.go. Its callers are the type checker, the checker pool or the semantic, global, suggestion and declaration diagnostic paths (checker.go:553-579 declares the checker.Program interface these members implement); Authority: docs/PHASE1-implementation-plan.md section 2, lines 168-171: LSP/fourslash, production mapper host and project-system services remain Phase 5, per ADR 0019.",
       "operation": "tsc/internal/compiler/program.go:applyContentMapperDiagnosticDirectives",
       "owner": "Phase 5 under the accepted section 2 boundary"
@@ -1280,42 +1238,6 @@
     },
     {
       "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go:80-83. Caller: fileLoader.loadSourceFile at fileloader.go:404 Shared with later consumers but reached from ordinary loader/resolution or config diagnostics. Later use alone cannot defer its required Phase 1 path. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getCompilerOptionsForFile",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
-    },
-    {
-      "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go:35-53. Caller: parseTask.load at filesparser.go:73; also Program.GetParseFileRedirect Shared with later consumers but reached from ordinary loader/resolution or config diagnostics. Later use alone cannot defer its required Phase 1 path. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
-    },
-    {
-      "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go:72-74. Caller: getRedirectForResolution at projectreferencefilemapper.go:99 and getSourceToDtsIfSymlink at :183; also source-mode/editor accesses Shared with later consumers but reached from ordinary loader/resolution or config diagnostics. Later use alone cannot defer its required Phase 1 path. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromOutputDts",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
-    },
-    {
-      "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go:68-70. Caller: getParseFileRedirect .d.ts branch at projectreferencefilemapper.go:47 and getRedirectForResolution at :93; also checker/emit Program accessor Shared with later consumers but reached from ordinary loader/resolution or config diagnostics. Later use alone cannot defer its required Phase 1 path. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
-    },
-    {
-      "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go:90-109. Caller: ordinary module and type-reference resolution at fileloader.go:774,828 Shared with later consumers but reached from ordinary loader/resolution or config diagnostics. Later use alone cannot defer its required Phase 1 path. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getRedirectForResolution",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
-    },
-    {
-      "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go:85-88. Caller: getCompilerOptionsForFile at projectreferencefilemapper.go:81 and ordinary import loading at fileloader.go:886 Shared with later consumers but reached from ordinary loader/resolution or config diagnostics. Later use alone cannot defer its required Phase 1 path. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getRedirectParsedCommandLineForResolution",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
-    },
-    {
-      "category": "later_step",
       "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go:55-66. Caller: Program.GetResolvedProjectReferences -> project/projectcollectionbuilder.go:661 and ls/autoimport/util.go:184  Authority: docs/PHASE1-implementation-plan.md:168-171 excludes LSP/project-system services; :154-158 directs explicit classification rather than importing editor services through coarse ledger labels.",
       "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getResolvedProjectReferences",
       "owner": "Phase 5 under the accepted section 2 boundary"
@@ -1328,75 +1250,15 @@
     },
     {
       "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go:163-192. Caller: getRedirectForResolution at projectreferencefilemapper.go:104; metadata is populated during ordinary loading when preserveSymlinks is enabled Shared with later consumers but reached from ordinary loader/resolution or config diagnostics. Later use alone cannot defer its required Phase 1 path. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getSourceToDtsIfSymlink",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
-    },
-    {
-      "category": "later_step",
       "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go:76-78. Caller: Program.IsSourceFromProjectReference -> Program.SkipTypeChecking at program.go:827; also editor project collection queries  Authority: docs/PHASE1-implementation-plan.md:162-163 excludes checker services/semantics; the underlying ordinary loader map remains independently in question.",
       "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.isSourceFromProjectReference",
       "owner": "Phase 2 under the accepted section 2 boundary"
     },
     {
       "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go:116-127. Caller: Program.RangeResolvedProjectReference -> Program.verifyProjectReferences at program.go:1375 Shared with later consumers but reached from ordinary loader/resolution or config diagnostics. Later use alone cannot defer its required Phase 1 path. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
-    },
-    {
-      "category": "later_step",
       "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go:150-161. Caller: Program.RangeResolvedProjectReferenceInChildConfig -> project/projectcollectionbuilder.go:670  Authority: docs/PHASE1-implementation-plan.md:168-171 excludes LSP/project-system services; :154-158 directs explicit classification rather than importing editor services through coarse ledger labels.",
       "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReferenceInChildConfig",
       "owner": "Phase 5 under the accepted section 2 boundary"
-    },
-    {
-      "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go:129-148. Caller: rangeResolvedProjectReference at projectreferencefilemapper.go:126; also recursive traversal and Phase 5 child traversal Shared with later consumers but reached from ordinary loader/resolution or config diagnostics. Later use alone cannot defer its required Phase 1 path. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
-    },
-    {
-      "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/projectreferencefilemapper.go:28-33. Caller: projectReferenceParser.initMapper at projectreferenceparser.go:76 and rangeResolvedProjectReference at projectreferencefilemapper.go:123 Shared with later consumers but reached from ordinary loader/resolution or config diagnostics. Later use alone cannot defer its required Phase 1 path. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rootConfigPath",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
-    },
-    {
-      "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/projectreferenceparser.go:34-40. Caller: fileLoader.addProjectReferenceTasks (fileloader.go:340) and projectReferenceParseTask.parse (projectreferenceparser.go:30) Reads referenced tsconfigs, computes source/output indexes and orders/deduplicates config tasks; no referenced project is emitted or built. Source-mode fake-host installation within initMapper remains Phase 5; the ordinary .d.ts mapping path is separate. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/projectreferenceparser.go:createProjectReferenceParseTasks",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
-    },
-    {
-      "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/projectreferenceparser.go:19-32. Caller: projectReferenceParser.start queues task.parse; fileLoader.addProjectReferenceTasks calls projectReferenceParser.parse (fileloader.go:341) Reads referenced tsconfigs, computes source/output indexes and orders/deduplicates config tasks; no referenced project is emitted or built. Source-mode fake-host installation within initMapper remains Phase 5; the ordinary .d.ts mapping path is separate. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParseTask.parse",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
-    },
-    {
-      "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/projectreferenceparser.go:70-80. Caller: projectReferenceParser.parse after RunAndWait (projectreferenceparser.go:52) Reads referenced tsconfigs, computes source/output indexes and orders/deduplicates config tasks; no referenced project is emitted or built. Source-mode fake-host installation within initMapper remains Phase 5; the ordinary .d.ts mapping path is separate. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.initMapper",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
-    },
-    {
-      "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/projectreferenceparser.go:82-115. Caller: projectReferenceParser.initMapper and recursive child mapping (projectreferenceparser.go:76,113) Reads referenced tsconfigs, computes source/output indexes and orders/deduplicates config tasks; no referenced project is emitted or built. Source-mode fake-host installation within initMapper remains Phase 5; the ordinary .d.ts mapping path is separate. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.initMapperWorker",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
-    },
-    {
-      "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/projectreferenceparser.go:48-53. Caller: projectReferenceParser.start queues task.parse; fileLoader.addProjectReferenceTasks calls projectReferenceParser.parse (fileloader.go:341) Reads referenced tsconfigs, computes source/output indexes and orders/deduplicates config tasks; no referenced project is emitted or built. Source-mode fake-host installation within initMapper remains Phase 5; the ordinary .d.ts mapping path is separate. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.parse",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
-    },
-    {
-      "category": "later_step",
-      "evidence": "upstream/tsc/internal/compiler/projectreferenceparser.go:55-68. Caller: projectReferenceParser.parse and its own recursion (projectreferenceparser.go:50,64) Reads referenced tsconfigs, computes source/output indexes and orders/deduplicates config tasks; no referenced project is emitted or built. Source-mode fake-host installation within initMapper remains Phase 5; the ordinary .d.ts mapping path is separate. Authority: docs/PHASE1-implementation-plan.md:147-152 includes module resolution/options and compiler parse/bind/syntactic operations; F3a tasks 5 and 7 at :936-949 include redirection, loader graphs and option diagnostics. Section 2 :165-167 excludes project-reference BUILD scheduling, not all config loading or declaration-file redirection. This syntax-step exemption does not discharge Phase 1 coverage: coverage-review.json keeps the operation unresolved.",
-      "operation": "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.start",
-      "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination"
     },
     {
       "category": "go_test_harness",
@@ -2331,6 +2193,6 @@
   ],
   "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
   "purpose": "Operations removed from F4a's syntax roster, each with the category, the owner that does have it, and the evidence read at the pin. An entry here is a claim that this step owes no prepared case for the operation, and it is validated like any other claim: see roster_problems in scripts/phase1_scope.py.",
-  "rule": "Three categories are recorded: go_test_harness retains upstream test-renderer authority; unused_at_pin records a definition or closed wrapper/helper chain with no live pinned caller; later_step transfers preparation out of the syntax step only. Compiler later_step rows are individually adjudicated in coverage-review.json: 205 accepted-plan later-phase destinations and 23 unresolved ordinary-loader obligations. The unresolved rows remain pending Phase 1 work and gain neither coverage nor a later-phase exemption from this syntax roster.",
+  "rule": "Three categories are recorded: go_test_harness retains upstream test-renderer authority; unused_at_pin records a definition or closed wrapper/helper chain with no live pinned caller; later_step transfers preparation out of the syntax step only. Compiler later_step rows are individually adjudicated in coverage-review.json: 205 accepted-plan later-phase destinations. The ordinary reference-loading operations are not exempt: the syntax step prepares them (syntax/project-references).",
   "version": 1
 }

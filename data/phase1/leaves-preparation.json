@@ -1,18 +1,504 @@
 {
-  "accounted_operations": 460,
-  "complete": true,
+  "accounted_operations": 392,
+  "complete": false,
   "exempt_by_category": {
     "build_tooling": 8,
     "build_variant": 2,
     "equivalent_rust": 8,
     "generated_assertion": 6,
     "go_runtime": 12,
-    "later_step": 68,
     "unused_at_pin": 4
   },
-  "exempt_operations": 108,
+  "exempt_operations": 40,
   "gap_problems": [],
-  "pending": [],
+  "later_step_unresolved": 68,
+  "pending": [
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/bundled/embed.go:fileInfo.Info",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_bundled/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/bundled/embed.go:fileInfo.ModTime",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_bundled/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/bundled/embed.go:fileInfo.Mode",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_bundled/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/bundled/embed.go:fileInfo.Sys",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_bundled/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/bundled/embed.go:fileInfo.Type",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_bundled/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/bfs.go:BreadthFirstSearchLevel.Delete",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/bfs.go:BreadthFirstSearchLevel.Has",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/bfs.go:BreadthFirstSearchLevel.Range",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/bfs.go:BreadthFirstSearchParallel",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/bfs.go:BreadthFirstSearchParallelEx",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/bfs.go:updateMin",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/binarysearch.go:BinarySearchUniqueFunc",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/context.go:GetCheckerLifetime",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/context.go:GetRequestID",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/context.go:WithCheckerLifetime",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/context.go:WithRequestID",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:CheckEachDefined",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:CopyMapInto",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:DiffMaps",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:DiffMapsFunc",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:ElementOrNil",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:FindLastIndex",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:FirstNonNil",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:FirstNonZero",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:FirstOrNilSeq",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/core.go:GetSpellingSuggestionWithMaxCandidateCount",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:IndexAfter",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:MapNonNil",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:MinAllFunc",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:Or",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:ReplaceElement",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:SameMapIndex",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/core.go:ShouldRewriteModuleSpecifier",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:Splice",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:UnorderedEqual",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/linkstore.go:LinkStore.Get",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/linkstore.go:LinkStore.Has",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/linkstore.go:LinkStore.TryGet",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/linkstore.go:PagedLinkStore.Get",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/linkstore.go:PagedLinkStore.Has",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/linkstore.go:PagedLinkStore.TryGet",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/nodemodules.go:NonRelativeModuleNameForTypingCache",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/projectreference.go:ResolveConfigFileNameOfProjectReference",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/projectreference.go:ResolveProjectReferencePath",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/semaphore.go:LimitedSemaphore.Acquire",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_core/src/semaphore.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/semaphore.go:LimitedSemaphore.TryAcquire",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_core/src/semaphore.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/semaphore.go:NewLimitedSemaphore",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_core/src/semaphore.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/stack.go:Stack.Len",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/stack.go:Stack.Peek",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/stack.go:Stack.Pop",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/stack.go:Stack.Push",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/textchange.go:ApplyBulkEdits",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_core/src/text_change.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/textchange.go:TextChange.ApplyTo",
+      "reason": "later_step_unresolved",
+      "rust_home": [
+        "crates/tsr_core/src/text_change.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/typeacquisition.go:TypeAcquisition.Equals",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/version.go:Version",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/version.go:VersionMajorMinor",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/workgroup.go:NewThrottleGroup",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/workgroup.go:NewWorkGroup",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/workgroup.go:ThrottleGroup.Go",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/workgroup.go:ThrottleGroup.Wait",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/workgroup.go:parallelWorkGroup.Queue",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/workgroup.go:parallelWorkGroup.RunAndWait",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/workgroup.go:singleThreadedWorkGroup.Queue",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/workgroup.go:singleThreadedWorkGroup.RunAndWait",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/workgroup.go:singleThreadedWorkGroup.pop",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "later_phase",
+      "operation": "tsc/internal/diagnostics/generate.go:generateLocalizations",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "later_phase",
+      "operation": "tsc/internal/diagnostics/generate.go:main",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    },
+    {
+      "disposition": "later_phase",
+      "operation": "tsc/internal/diagnostics/generate.go:readLocalizedMessages",
+      "reason": "later_step_unresolved",
+      "rust_home": []
+    }
+  ],
   "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
   "prepared_operations": 342,
   "roster_problems": [],

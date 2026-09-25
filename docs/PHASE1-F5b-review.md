@@ -30,7 +30,7 @@ inherit their acceptance.
 | I08 | Confirmed. Request serialization preserves object insertion order at every depth; canonical sorting is reserved for observation metadata. The native paths negative control above demonstrates why this matters. |
 | I09 | Confirmed. Syntax replay now rejects a changed source closure with a typed stale-capture result instead of returning a passing comparison with a warning. |
 | I10 | Confirmed. A `later_step` preparation exemption does not remove an operation from Phase 1. Unresolved leaves/config transfers now appear in gap accounting; the current audit identifies 92 such entries. |
-| I13 | Confirmed. Config and syntax no longer depend on unrelated installed-package/transport integration health or recomputing live whole-workspace classification. Their consumed audit/runner inputs are included in the producer closure and ledger. The inventory audit remains a separate check. |
+| I13 | Confirmed. Config and syntax no longer depend on unrelated installed-package/transport integration health or recomputing live whole-workspace classification. The mutation-witness binding later added harness reads outside the closures (oracle Go sources, instrumentation patches, request inventories, mutation artifacts); the Phase 1 closure binds every file harness health reads into the config, syntax and foundations closures and ledger globs, and `test_phase1_producers.HarnessInputTests` traces the reads to keep it so. The inventory audit remains a separate check. |
 | I14 | Confirmed. Rust-side witnesses now have explicit execution routes to metrics. The five contracts previously pointing only to `workspace` compilation get an exact named-test receipt, `rust-witnesses`; its named tests passed in the reviewed receipt; compilation alone still cannot satisfy the metric. |
 | I15 | Confirmed. The 142 matchFiles observations contribute to both config baseline parity and filesystem completion. |
 | I16 | Confirmed. Ordinary in-crate Markdown is excluded from behavioral capture inputs. Literal embedded Markdown and packages with arbitrary build-script inputs remain conservative inputs; archive receipts deliberately include package README files. The regression uses actual temporary package files and changes both prose and an embedded asset. |
@@ -58,8 +58,8 @@ inherit their acceptance.
   syntax inventory references have been refreshed to the recorded E1/binder
   artifacts as stale where appropriate. The program helper pass now executes
   all 28 named tests, including the composed live-filesystem boundary witness.
-  P1A/P1B remain incomplete: the current report has 1,365 pending
-  entries—947 missing witnesses, 303 unverified implementation mappings,
+  P1A/P1B remain incomplete: the report at `02009ce` has 1,364 pending
+  entries—947 missing witnesses, 302 unverified implementation mappings,
   92 unresolved later-step transfers and 23 ordinary loader/configuration
   operations. The original 1,250 count is a historical checkpoint.
 - **I41:** the Linux step now emits an authenticated platform summary, including
@@ -115,7 +115,7 @@ All seven executable integration receipts passed on these inputs and are retaine
 archive is also retained. The `program`, `foundations`, `config` and `syntax` producers now have valid
 recorded results on these inputs. Foundations reports integration and Rust
 witnesses complete; config reports all direct cases complete. The family
-matches do not discharge the 1,365 remaining
+matches do not discharge the 1,364 remaining
 operation entries, the Linux-only observation, or ownership instrumentation.
 No performance benchmark is implied or required by these correctness captures.
 

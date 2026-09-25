@@ -1,10 +1,10 @@
 {
   "counts": {
-    "covered": 3779,
+    "covered": 3795,
     "equivalent_rust": 8,
-    "implemented_untested": 359,
+    "implemented_untested": 381,
     "later_phase": 223,
-    "missing": 426
+    "missing": 388
   },
   "dispositions": [
     "covered",
@@ -1311,9 +1311,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): witness/s06-accessor-observations-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s06-accessor-observations-rust"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/core",
@@ -1329,7 +1331,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/ast",
       "go_source": "tsc/internal/ast/ast.go",
       "id": "tsc/internal/ast/ast.go:BodyBase.BodyData",
@@ -1349,7 +1351,7 @@
       "membership_reason": "AST utilities, owners and lazy storage",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -2215,9 +2217,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): witness/s06-accessor-observations-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s06-accessor-observations-rust"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/core",
@@ -2233,7 +2237,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/ast",
       "go_source": "tsc/internal/ast/ast.go",
       "id": "tsc/internal/ast/ast.go:DeclarationBase.DeclarationData",
@@ -2253,7 +2257,7 @@
       "membership_reason": "AST utilities, owners and lazy storage",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -2811,9 +2815,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): witness/s06-accessor-observations-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s06-accessor-observations-rust"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/core",
@@ -2829,7 +2835,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/ast",
       "go_source": "tsc/internal/ast/ast.go",
       "id": "tsc/internal/ast/ast.go:FlowNodeBase.FlowNodeData",
@@ -2849,7 +2855,7 @@
       "membership_reason": "AST utilities, owners and lazy storage",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -3229,9 +3235,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): witness/s06-accessor-observations-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s06-accessor-observations-rust"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/core",
@@ -3247,7 +3255,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/ast",
       "go_source": "tsc/internal/ast/ast.go",
       "id": "tsc/internal/ast/ast.go:FunctionLikeBase.LocalsContainerData",
@@ -3267,7 +3275,7 @@
       "membership_reason": "AST utilities, owners and lazy storage",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -3287,9 +3295,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): witness/s06-accessor-observations-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s06-accessor-observations-rust"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/core",
@@ -3305,7 +3315,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/ast",
       "go_source": "tsc/internal/ast/ast.go",
       "id": "tsc/internal/ast/ast.go:FunctionLikeWithBodyBase.BodyData",
@@ -3325,7 +3335,7 @@
       "membership_reason": "AST utilities, owners and lazy storage",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -3403,9 +3413,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): witness/s06-accessor-observations-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s06-accessor-observations-rust"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/core",
@@ -3421,7 +3433,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/ast",
       "go_source": "tsc/internal/ast/ast.go",
       "id": "tsc/internal/ast/ast.go:FunctionLikeWithBodyBase.LocalsContainerData",
@@ -3441,7 +3453,7 @@
       "membership_reason": "AST utilities, owners and lazy storage",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -4115,9 +4127,11 @@
       "annotated_home": [
         "crates/tsr_ast/src/binder_helpers.rs"
       ],
-      "basis": "ledger maps the symbol and its source file carries 6 file-level producer metric(s), which do not witness this operation individually",
+      "basis": "witnessed by 1 exact link(s): witness/s06-accessor-observations-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s06-accessor-observations-rust"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/core",
@@ -4133,7 +4147,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/ast",
       "go_source": "tsc/internal/ast/ast.go",
       "id": "tsc/internal/ast/ast.go:IsDeclarationNode",
@@ -4153,7 +4167,7 @@
       "membership_reason": "AST utilities, owners and lazy storage",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -4233,10 +4247,11 @@
       "annotated_home": [
         "crates/tsr_ast/src/symbols.rs"
       ],
-      "basis": "witnessed by 1 exact link(s): mutation/binder",
+      "basis": "witnessed by 2 exact link(s): mutation/binder, witness/s06-accessor-observations-rust",
       "basis_kind": "rule",
       "cases": [
-        "mutation/binder"
+        "mutation/binder",
+        "witness/s06-accessor-observations-rust"
       ],
       "depends_on": [
         "internal/collections",
@@ -5435,9 +5450,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): witness/s06-accessor-observations-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s06-accessor-observations-rust"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/core",
@@ -5453,7 +5470,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/ast",
       "go_source": "tsc/internal/ast/ast.go",
       "id": "tsc/internal/ast/ast.go:LocalsContainerBase.LocalsContainerData",
@@ -5473,7 +5490,7 @@
       "membership_reason": "AST utilities, owners and lazy storage",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -7168,10 +7185,14 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_ast/src/binder_helpers.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): witness/s06-accessor-observations-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s06-accessor-observations-rust"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/core",
@@ -7187,7 +7208,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/ast",
       "go_source": "tsc/internal/ast/ast.go",
       "id": "tsc/internal/ast/ast.go:Node.BodyData",
@@ -7202,12 +7223,12 @@
         "run.e3.ast_runtime == true",
         "run.e1.ast_utilities == true"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "AST utilities, owners and lazy storage",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -7708,9 +7729,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): witness/s06-accessor-observations-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s06-accessor-observations-rust"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/core",
@@ -7726,7 +7749,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/ast",
       "go_source": "tsc/internal/ast/ast.go",
       "id": "tsc/internal/ast/ast.go:Node.DeclarationData",
@@ -7746,7 +7769,7 @@
       "membership_reason": "AST utilities, owners and lazy storage",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -8186,10 +8209,14 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_ast/src/binder_helpers.rs"
+      ],
+      "basis": "witnessed by 1 exact link(s): witness/s06-accessor-observations-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s06-accessor-observations-rust"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/core",
@@ -8205,7 +8232,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/ast",
       "go_source": "tsc/internal/ast/ast.go",
       "id": "tsc/internal/ast/ast.go:Node.FlowNodeData",
@@ -8220,12 +8247,12 @@
         "run.e3.ast_runtime == true",
         "run.e1.ast_utilities == true"
       ],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "AST utilities, owners and lazy storage",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -9028,9 +9055,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): witness/s06-accessor-observations-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s06-accessor-observations-rust"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/core",
@@ -9046,7 +9075,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/ast",
       "go_source": "tsc/internal/ast/ast.go",
       "id": "tsc/internal/ast/ast.go:Node.LocalsContainerData",
@@ -9066,7 +9095,7 @@
       "membership_reason": "AST utilities, owners and lazy storage",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -11223,9 +11252,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): witness/s06-accessor-observations-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s06-accessor-observations-rust"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/core",
@@ -11241,7 +11272,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/ast",
       "go_source": "tsc/internal/ast/ast.go",
       "id": "tsc/internal/ast/ast.go:NodeDefault.BodyData",
@@ -11261,7 +11292,7 @@
       "membership_reason": "AST utilities, owners and lazy storage",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -11397,9 +11428,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): witness/s06-accessor-observations-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s06-accessor-observations-rust"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/core",
@@ -11415,7 +11448,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/ast",
       "go_source": "tsc/internal/ast/ast.go",
       "id": "tsc/internal/ast/ast.go:NodeDefault.DeclarationData",
@@ -11435,7 +11468,7 @@
       "membership_reason": "AST utilities, owners and lazy storage",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -11513,9 +11546,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): witness/s06-accessor-observations-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s06-accessor-observations-rust"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/core",
@@ -11531,7 +11566,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/ast",
       "go_source": "tsc/internal/ast/ast.go",
       "id": "tsc/internal/ast/ast.go:NodeDefault.FlowNodeData",
@@ -11551,7 +11586,7 @@
       "membership_reason": "AST utilities, owners and lazy storage",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -11745,9 +11780,11 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): witness/s06-accessor-observations-rust",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s06-accessor-observations-rust"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/core",
@@ -11763,7 +11800,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/ast",
       "go_source": "tsc/internal/ast/ast.go",
       "id": "tsc/internal/ast/ast.go:NodeDefault.LocalsContainerData",
@@ -11783,7 +11820,7 @@
       "membership_reason": "AST utilities, owners and lazy storage",
       "roster": {
         "owner": null,
-        "state": "pending",
+        "state": "prepared",
         "step": "syntax"
       },
       "rust_home": [
@@ -154026,8 +154063,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_compiler/src/loader.rs"
+      ],
+      "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
       "depends_on": [
@@ -154069,7 +154108,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "implemented_untested",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/fileloader.go",
       "id": "tsc/internal/compiler/fileloader.go:fileLoader.addProjectReferenceTasks",
@@ -154077,12 +154116,12 @@
       "ledger_phase": 4,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination",
-        "state": "exempt:later_step",
+        "owner": null,
+        "state": "pending",
         "step": "syntax"
       },
       "rust_home": [
@@ -156949,8 +156988,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_compiler/src/loader.rs"
+      ],
+      "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
       "depends_on": [
@@ -156992,7 +157033,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "implemented_untested",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/filesparser.go",
       "id": "tsc/internal/compiler/filesparser.go:parseTask.redirect",
@@ -157000,12 +157041,12 @@
       "ledger_phase": 4,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination",
-        "state": "exempt:later_step",
+        "owner": null,
+        "state": "pending",
         "step": "syntax"
       },
       "rust_home": [
@@ -157545,8 +157586,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_compiler/src/project_references.rs"
+      ],
+      "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
       "depends_on": [
@@ -157588,7 +157631,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "implemented_untested",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/host.go",
       "id": "tsc/internal/compiler/host.go:compilerHost.GetResolvedProjectReference",
@@ -157596,12 +157639,12 @@
       "ledger_phase": 4,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination",
-        "state": "exempt:later_step",
+        "owner": null,
+        "state": "pending",
         "step": "syntax"
       },
       "rust_home": [
@@ -162901,8 +162944,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_compiler/src/loader.rs"
+      ],
+      "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
       "depends_on": [
@@ -162944,7 +162989,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "implemented_untested",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/program.go",
       "id": "tsc/internal/compiler/program.go:Program.GetSourceOfProjectReferenceIfOutputIncluded",
@@ -162952,12 +162997,12 @@
       "ledger_phase": 4,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination",
-        "state": "exempt:later_step",
+        "owner": null,
+        "state": "pending",
         "step": "syntax"
       },
       "rust_home": [
@@ -164584,8 +164629,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_compiler/src/loader.rs"
+      ],
+      "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
       "depends_on": [
@@ -164627,7 +164674,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "implemented_untested",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/program.go",
       "id": "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference",
@@ -164635,12 +164682,12 @@
       "ledger_phase": 4,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination",
-        "state": "exempt:later_step",
+        "owner": null,
+        "state": "pending",
         "step": "syntax"
       },
       "rust_home": [
@@ -167395,8 +167442,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_compiler/src/verify_options.rs"
+      ],
+      "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
       "depends_on": [
@@ -167438,7 +167487,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "implemented_untested",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/program.go",
       "id": "tsc/internal/compiler/program.go:Program.verifyProjectReferences",
@@ -167446,12 +167495,12 @@
       "ledger_phase": 4,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination",
-        "state": "exempt:later_step",
+        "owner": null,
+        "state": "pending",
         "step": "syntax"
       },
       "rust_home": [
@@ -167464,8 +167513,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_compiler/src/loader.rs"
+      ],
+      "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
       "depends_on": [
@@ -167507,7 +167558,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "implemented_untested",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/program.go",
       "id": "tsc/internal/compiler/program.go:ProgramOptions.canUseProjectReferenceSource",
@@ -167515,12 +167566,12 @@
       "ledger_phase": 4,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination",
-        "state": "exempt:later_step",
+        "owner": null,
+        "state": "pending",
         "step": "syntax"
       },
       "rust_home": [
@@ -169952,8 +170003,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_compiler/src/project_references.rs"
+      ],
+      "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
       "depends_on": [
@@ -169995,7 +170048,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "implemented_untested",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/projectreferencefilemapper.go",
       "id": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getCompilerOptionsForFile",
@@ -170003,12 +170056,12 @@
       "ledger_phase": 4,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination",
-        "state": "exempt:later_step",
+        "owner": null,
+        "state": "pending",
         "step": "syntax"
       },
       "rust_home": [],
@@ -170016,8 +170069,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_compiler/src/project_references.rs"
+      ],
+      "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
       "depends_on": [
@@ -170059,7 +170114,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "implemented_untested",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/projectreferencefilemapper.go",
       "id": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect",
@@ -170067,12 +170122,12 @@
       "ledger_phase": 4,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination",
-        "state": "exempt:later_step",
+        "owner": null,
+        "state": "pending",
         "step": "syntax"
       },
       "rust_home": [],
@@ -170080,8 +170135,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_compiler/src/project_references.rs"
+      ],
+      "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
       "depends_on": [
@@ -170123,7 +170180,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "implemented_untested",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/projectreferencefilemapper.go",
       "id": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromOutputDts",
@@ -170131,12 +170188,12 @@
       "ledger_phase": 4,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination",
-        "state": "exempt:later_step",
+        "owner": null,
+        "state": "pending",
         "step": "syntax"
       },
       "rust_home": [],
@@ -170144,8 +170201,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_compiler/src/project_references.rs"
+      ],
+      "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
       "depends_on": [
@@ -170187,7 +170246,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "implemented_untested",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/projectreferencefilemapper.go",
       "id": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource",
@@ -170195,12 +170254,12 @@
       "ledger_phase": 4,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination",
-        "state": "exempt:later_step",
+        "owner": null,
+        "state": "pending",
         "step": "syntax"
       },
       "rust_home": [],
@@ -170208,8 +170267,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_compiler/src/project_references.rs"
+      ],
+      "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
       "depends_on": [
@@ -170251,7 +170312,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "implemented_untested",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/projectreferencefilemapper.go",
       "id": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getRedirectForResolution",
@@ -170259,12 +170320,12 @@
       "ledger_phase": 4,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination",
-        "state": "exempt:later_step",
+        "owner": null,
+        "state": "pending",
         "step": "syntax"
       },
       "rust_home": [],
@@ -170272,8 +170333,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_compiler/src/project_references.rs"
+      ],
+      "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
       "depends_on": [
@@ -170315,7 +170378,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "implemented_untested",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/projectreferencefilemapper.go",
       "id": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getRedirectParsedCommandLineForResolution",
@@ -170323,12 +170386,12 @@
       "ledger_phase": 4,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination",
-        "state": "exempt:later_step",
+        "owner": null,
+        "state": "pending",
         "step": "syntax"
       },
       "rust_home": [],
@@ -170464,8 +170527,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_compiler/src/project_references.rs"
+      ],
+      "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
       "depends_on": [
@@ -170507,7 +170572,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "implemented_untested",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/projectreferencefilemapper.go",
       "id": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getSourceToDtsIfSymlink",
@@ -170515,12 +170580,12 @@
       "ledger_phase": 4,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination",
-        "state": "exempt:later_step",
+        "owner": null,
+        "state": "pending",
         "step": "syntax"
       },
       "rust_home": [],
@@ -170592,8 +170657,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_compiler/src/project_references.rs"
+      ],
+      "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
       "depends_on": [
@@ -170635,7 +170702,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "implemented_untested",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/projectreferencefilemapper.go",
       "id": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference",
@@ -170643,12 +170710,12 @@
       "ledger_phase": 4,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination",
-        "state": "exempt:later_step",
+        "owner": null,
+        "state": "pending",
         "step": "syntax"
       },
       "rust_home": [],
@@ -170720,8 +170787,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_compiler/src/project_references.rs"
+      ],
+      "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
       "depends_on": [
@@ -170763,7 +170832,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "implemented_untested",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/projectreferencefilemapper.go",
       "id": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker",
@@ -170771,12 +170840,12 @@
       "ledger_phase": 4,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination",
-        "state": "exempt:later_step",
+        "owner": null,
+        "state": "pending",
         "step": "syntax"
       },
       "rust_home": [],
@@ -170784,8 +170853,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_compiler/src/project_references.rs"
+      ],
+      "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
       "depends_on": [
@@ -170827,7 +170898,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "implemented_untested",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/projectreferencefilemapper.go",
       "id": "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rootConfigPath",
@@ -170835,12 +170906,12 @@
       "ledger_phase": 4,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination",
-        "state": "exempt:later_step",
+        "owner": null,
+        "state": "pending",
         "step": "syntax"
       },
       "rust_home": [],
@@ -170848,8 +170919,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_compiler/src/project_references.rs"
+      ],
+      "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
       "depends_on": [
@@ -170891,7 +170964,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "implemented_untested",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/projectreferenceparser.go",
       "id": "tsc/internal/compiler/projectreferenceparser.go:createProjectReferenceParseTasks",
@@ -170899,12 +170972,12 @@
       "ledger_phase": 4,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination",
-        "state": "exempt:later_step",
+        "owner": null,
+        "state": "pending",
         "step": "syntax"
       },
       "rust_home": [],
@@ -170912,8 +170985,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_compiler/src/project_references.rs"
+      ],
+      "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
       "depends_on": [
@@ -170955,7 +171030,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "implemented_untested",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/projectreferenceparser.go",
       "id": "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParseTask.parse",
@@ -170963,12 +171038,12 @@
       "ledger_phase": 4,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination",
-        "state": "exempt:later_step",
+        "owner": null,
+        "state": "pending",
         "step": "syntax"
       },
       "rust_home": [],
@@ -170976,8 +171051,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_compiler/src/project_references.rs"
+      ],
+      "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
       "depends_on": [
@@ -171019,7 +171096,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "implemented_untested",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/projectreferenceparser.go",
       "id": "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.initMapper",
@@ -171027,12 +171104,12 @@
       "ledger_phase": 4,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination",
-        "state": "exempt:later_step",
+        "owner": null,
+        "state": "pending",
         "step": "syntax"
       },
       "rust_home": [],
@@ -171040,8 +171117,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_compiler/src/project_references.rs"
+      ],
+      "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
       "depends_on": [
@@ -171083,7 +171162,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "implemented_untested",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/projectreferenceparser.go",
       "id": "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.initMapperWorker",
@@ -171091,12 +171170,12 @@
       "ledger_phase": 4,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination",
-        "state": "exempt:later_step",
+        "owner": null,
+        "state": "pending",
         "step": "syntax"
       },
       "rust_home": [],
@@ -171104,8 +171183,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_compiler/src/project_references.rs"
+      ],
+      "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
       "depends_on": [
@@ -171147,7 +171228,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "implemented_untested",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/projectreferenceparser.go",
       "id": "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.parse",
@@ -171155,12 +171236,12 @@
       "ledger_phase": 4,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination",
-        "state": "exempt:later_step",
+        "owner": null,
+        "state": "pending",
         "step": "syntax"
       },
       "rust_home": [],
@@ -171168,8 +171249,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "annotated_home": [
+        "crates/tsr_compiler/src/project_references.rs"
+      ],
+      "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
       "depends_on": [
@@ -171211,7 +171294,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "implemented_untested",
       "go_package": "internal/compiler",
       "go_source": "tsc/internal/compiler/projectreferenceparser.go",
       "id": "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.start",
@@ -171219,12 +171302,12 @@
       "ledger_phase": 4,
       "ledger_status": "planned",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "partial",
       "membership_reason": "only the runner's parse/bind/syntactic operations are Phase 1; program orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates the exact syntactic surface",
       "roster": {
-        "owner": "Pending Phase 1 config/program loader preparation; no approved later-phase destination",
-        "state": "exempt:later_step",
+        "owner": null,
+        "state": "pending",
         "step": "syntax"
       },
       "rust_home": [],
@@ -193675,7 +193758,7 @@
     {
       "actual_home": null,
       "annotated_home": [],
-      "basis": "unmapped; `init` matches an unrelated generic Rust helper, which is not evidence",
+      "basis": "unmapped; `init` is defined only outside the Phase 1 home crates (crates/tsr_testhost/src/session_tests.rs), which is not evidence",
       "basis_kind": "rule",
       "cases": [],
       "depends_on": [

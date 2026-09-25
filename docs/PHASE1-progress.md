@@ -15,7 +15,7 @@ moved pin invalidates it.
 | F2a — filesystem, path and matching tests | **pending Linux observation**: `filesystem_prepared: false`; 359 cases, 314 of 316 roster operations accounted for; all 142 baselines prepared (68 exact, 74 owner-approved exceptions). The Linux realpath case must observe `Realpath` and `ignoringEINTR`. |
 | F3a — config, command-line and resolution tests | **complete**: `config_prepared: true`; 486 cases, all 402 roster operations prepared, witnessed or exempted, and all 309 reference outputs prepared (F2a's 142 plus F3a's 167, all 167 exact) |
 | F4a — syntax, binder and utility coverage | **prepared, roster open**: every primary and expanded request accounted for; all 15,206 variants scheduled (15,152 observed, 54 on named boundaries). Review corrected source authentication, ordered requests and operation claims. F4b now passes all 83 utility cases and all 15,152 executable syntax variants. `syntax_prepared: false`: 2,803 of 3,617 operations still need exact witness attribution; this is separate from the implementation results below. |
-| F4b — syntax/binder implementation | **prepared production behavior implemented and validated**: 83/83 utility cases, 15,152/15,152 executable syntax variants, parser and binder primary parity 1.0. E1/binder evidence is refreshed; operation attribution and compiler disposition alignment remain for F5a, not claimed complete here. |
+| F4b — syntax/binder implementation | **prepared production behavior implemented and validated**: 83/83 utility cases, 15,152/15,152 executable syntax variants, parser and binder primary parity 1.0. E1/binder evidence was refreshed at `02009ce`; operation attribution and compiler disposition alignment remain for F5a, not claimed complete here. |
 | F5a — integration checks and the stage A review | not started |
 
 `python3 scripts/phase1.py inventory --check` computes this: it reports
@@ -2967,9 +2967,12 @@ on this macOS host. Full program syntax matches all 15,152 executable variants;
 the 54 native selection boundaries remain separate. Raw captures and receipts
 are preserved in `data/phase1/captures`, with hashes and replay instructions.
 
-The corrected operation audit has **1,365 pending entries**: 947 missing exact
-witnesses, 303 unverified implementation mappings, 92 unresolved later-step
-transfers and 23 ordinary reference-loading/configuration operations.
+At `02009ce` the corrected operation audit had **1,364 pending entries**: 947
+missing exact witnesses, 302 unverified implementation mappings, 92 unresolved
+later-step transfers and 23 ordinary reference-loading/configuration operations.
+The mutation-kill witnesses later brought the report at `d4e0cb1` to 582 (165
+missing witnesses, 302, 92 and 23); see
+[the mutation-witness record](PHASE1-mutation-witnesses.md).
 [The destination audit](PHASE1-F5b-destinations.md) distinguishes the latter from
 build scheduling, and supports 205 actual later-phase destinations against
 the accepted plan and pinned callers. These remaining entries prevent P1A/P1B
@@ -2979,7 +2982,9 @@ E1, binder and scanner records from the preceding checkpoint are retained as
 historical evidence after the reviewed production edits. No performance
 benchmark or threshold change was part of this review refresh.
 
-The reviewed `program`, `foundations`, `config` and `syntax` records are current.
+At `02009ce` the reviewed `program`, `foundations`, `config` and `syntax` records
+were current. Later source edits have made all four stale in
+`status/status.json`; they are re-recorded at the end of the phase.
 Integration and routed Rust witnesses report complete; all 309 config outputs
 and 15,152 syntax rows match. Program helpers and option verification pass, but
 loader parity remains 10,727/10,728 because of the named pre-existing

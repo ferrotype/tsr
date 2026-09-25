@@ -62,7 +62,7 @@ The Linux-only `filesystem/osvfs/nativepath-realpath-linux-procfs` observation
 is separate. It still needs an applicable Linux run and is not covered by this
 decision.
 
-## Linux retry correction
+## Unix retry corrections
 
 The audit also found a real Linux port gap. The pinned `Realpath` passes both
 `unix.Open` and `unix.Readlink` through `ignoringEINTR`; Rust retried `openat`
@@ -72,6 +72,36 @@ but called `std::fs::read_link` once. Rust 1.97.1's Unix implementation uses
 Both calls now use one private `ignoring_eintr` helper. Its deterministic test
 checks repeated raw EINTR followed by success, a different raw errno returned
 on the first call, and a wrapped EINTR returned without retry. The wrapper case
-preserves the pinned helper's deliberate raw-error comparison. The test runs
-on either active Unix target; only Linux production uses the helper. It is a
-source-derived contract witness for the helper, not a native procfs comparison.
+preserves the pinned helper's deliberate raw-error comparison.
+
+The helper is not Linux-only. On every Unix target it wraps each syscall that
+Go 1.27.1's `os` package retries and Rust 1.97.1's std does not: `stat` and
+`lstat` (`native::metadata`, `native::symlink_metadata`), `readlink`, the
+`openat` of the Linux `Realpath`, `unlink` and `rmdir` on the `RemoveAll` fast
+path (the descriptor walk uses rustix's `retry_on_intr`), every `mkdir` of
+`ensureDirectoryExists`, and the directory open of `DirFS.ReadDir`. Calls whose
+std implementation already retries (`open` through `cvt_r`, and `read`/`write`
+through the `Interrupted` loops of `read_to_end` and `write_all`) are left alone.
+
+Two of those were added after the review (I30). `os.MkdirAll` makes one level
+at a time and `os.Mkdir` retries each `mkdir(2)`, while std's `create_dir_all`
+calls `cvt` once per level; `ensure_directory` now runs `native::mkdir_all`, a
+transcription of the Go recursion with the stat fast path and the lstat
+double-check. As in Go, a failure is reported for the level that failed, so
+`mkdir <root>/afile: not a directory` for a request under the regular file
+`afile`, not for the requested path (checked against a native Go probe). The
+open in `os.ReadDir` (`openDirNolog`) retries `open(2)`, while std's `read_dir`
+calls `opendir(3)` once; `Dir::read_dir` now opens through `native::read_dir`.
+The unit tests inject a raw EINTR into the first `mkdir` of every level and
+into the first directory open, and check that the tree is created, the call
+sequence, and that another errno is returned once for the level that failed.
+Two more go through the production entry points: `OsFs::ensure_directory` and
+`write_file` under the regular file `afile` must report
+`mkdir <root>/afile: not a directory` (the pinned tsgo `osvfs.FS().WriteFile`
+gives that for `afile/x.txt`, `afile/sub/x.txt` and `afile/sub/deeper/x.txt`),
+and a test-only hook interrupts the raw `mkdir` and directory open under
+`ensure_directory` and `entries`, so a call site that bypasses the retrying
+helpers fails. The family harness cannot see either: it records a PathError's
+op and errno but not its path. They are source-derived contract witnesses: a
+native EINTR comparison is not possible. The Windows build keeps `create_dir_all`, where the helper is the
+identity.

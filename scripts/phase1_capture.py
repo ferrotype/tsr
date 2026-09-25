@@ -396,6 +396,7 @@ FAMILIES = {
             "data/phase1/requests/syntax-parse-outputs.json",
             "data/phase1/requests/syntax-debug.json",
             "data/phase1/requests/syntax-scanner-ast.json",
+            "data/phase1/requests/syntax-project-references.json",
             "tools/phase1/syntax/ast-generated/requests.json",
         ],
         "native_probes": [
@@ -437,6 +438,13 @@ FAMILIES = {
             {"name": "debug", "package": "debug",
              "probe": "tools/phase1/syntax/debug_probe_test.go",
              "test": "TestPhase1SyntaxDebug"},
+            # In-package in the compiler, like the diagnostics probe: it
+            # reaches the loader, the raw verifier writes and processing
+            # diagnostics, and the package's tests link internal/repo.
+            {"name": "project_references", "package": "compiler",
+             "probe": "tools/phase1/syntax/project_references_probe_test.go",
+             "test": "TestPhase1SyntaxProjectReferences",
+             "trimpath": False},
         ],
         "rust_package": "phase1_syntax",
         "rust_target_kind": "bin",
