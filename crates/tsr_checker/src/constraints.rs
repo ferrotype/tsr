@@ -188,6 +188,7 @@ impl CheckerState {
         Ok(constraint)
     }
 
+    // port: tsc/internal/checker/checker.go:Checker.hasNonCircularBaseConstraint
     pub(crate) fn has_non_circular_base_constraint(&mut self, ty: TypeId) -> Result<bool, Error> {
         Ok(self.resolved_base_constraint(ty, &mut Vec::new())?
             != self.builtins.circular_constraint_type)

@@ -451,6 +451,7 @@ impl CheckerState {
         Ok(false)
     }
 
+    // port: tsc/internal/checker/checker.go:Checker.isResolvedByTypeAlias
     fn is_resolved_by_type_alias(&self, node: NodeId) -> Result<bool, Error> {
         let mut parent = self.node(node)?.parent();
         while let Some(node) = parent {
@@ -475,6 +476,7 @@ impl CheckerState {
         Ok(false)
     }
 
+    // port: tsc/internal/checker/checker.go:Checker.mayResolveTypeAlias
     fn may_resolve_type_alias(&mut self, node: NodeId) -> Result<bool, Error> {
         let read = self.node(node)?;
         match read.kind().known() {
