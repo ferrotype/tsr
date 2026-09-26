@@ -157,6 +157,7 @@ impl CheckerState {
                 return Ok(false);
             }
         }
+        // port: tsc/internal/checker/flow.go:Checker.eachTypeContainedIn
         let regular = self.get_regular_type_of_literal_type(ty)?;
         let parts = if self.types.flags(regular)? & tf::UNION != 0 {
             self.types.types_of(regular)?
@@ -202,6 +203,7 @@ impl CheckerState {
             } else {
                 false
             };
+            // port: tsc/internal/checker/flow.go:Checker.narrowTypeBySwitchOptionalChainContainment
             if self.optional_chain_contains_reference(expression, reference)? || optional_typeof {
                 let cases = self.flow_switch_types(statement)?;
                 let range = clause_range(data, cases.len())?;
@@ -224,6 +226,7 @@ impl CheckerState {
         if let Some(access) = self.flow_discriminant_access(reference, declared, expression, ty)? {
             if data.clause_start < data.clause_end && self.types.flags(ty)? & tf::UNION != 0 {
                 if let Some(name) = self.flow_property_name(access)? {
+                    // port: tsc/internal/checker/flow.go:Checker.narrowTypeBySwitchOnDiscriminantProperty
                     if !name.is_empty() && self.flow_key_property_name(ty)? == name {
                         let cases = self.flow_switch_types(statement)?;
                         let mut candidates = Vec::new();

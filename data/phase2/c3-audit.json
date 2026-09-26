@@ -821,170 +821,23 @@
    "item": "C3.4",
    "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
   },
-  "tsc/internal/checker/flow.go:Checker.eachTypeContainedIn": {
-   "disposition": "gap",
-   "item": "C3.2",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
-  "tsc/internal/checker/flow.go:Checker.getAssignedTypeOfArrayLiteralElement": {
-   "disposition": "gap",
-   "item": "C3.2",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
-  "tsc/internal/checker/flow.go:Checker.getAssignedTypeOfBinaryExpression": {
-   "disposition": "gap",
-   "item": "C3.2",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
-  "tsc/internal/checker/flow.go:Checker.getAssignedTypeOfPropertyAssignment": {
-   "disposition": "gap",
-   "item": "C3.2",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
-  "tsc/internal/checker/flow.go:Checker.getAssignedTypeOfShorthandPropertyAssignment": {
-   "disposition": "gap",
-   "item": "C3.2",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
-  "tsc/internal/checker/flow.go:Checker.getAssignedTypeOfSpreadExpression": {
-   "disposition": "gap",
-   "item": "C3.2",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
-  "tsc/internal/checker/flow.go:Checker.getAssignmentReducedTypeWorker": {
-   "disposition": "gap",
-   "item": "C3.2",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
-  "tsc/internal/checker/flow.go:Checker.getElementTypeOfEvolvingArrayType": {
-   "disposition": "gap",
-   "item": "C3.2",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
   "tsc/internal/checker/flow.go:Checker.getFlowState": {
-   "disposition": "gap",
-   "item": "C3.2",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
-  "tsc/internal/checker/flow.go:Checker.getFlowTypeOfReference": {
-   "disposition": "gap",
-   "item": "C3.2",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
-  "tsc/internal/checker/flow.go:Checker.getLiteralPropertyNameText": {
-   "disposition": "gap",
-   "item": "C3.2",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
-  "tsc/internal/checker/flow.go:Checker.getTypeAtFlowAssignment": {
-   "disposition": "gap",
-   "item": "C3.2",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
-  "tsc/internal/checker/flow.go:Checker.getTypeAtFlowBranchLabel": {
-   "disposition": "gap",
-   "item": "C3.2",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
-  "tsc/internal/checker/flow.go:Checker.getTypeAtFlowCall": {
-   "disposition": "gap",
-   "item": "C3.2",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
-  "tsc/internal/checker/flow.go:Checker.getTypeAtFlowCondition": {
-   "disposition": "gap",
-   "item": "C3.2",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
-  "tsc/internal/checker/flow.go:Checker.isDeclarationWithExplicitTypeAnnotation": {
-   "disposition": "gap",
-   "item": "C3.2",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
-  "tsc/internal/checker/flow.go:Checker.isExpandoPropertyFunctionWithReturnTypeAnnotation": {
-   "disposition": "gap",
-   "item": "C3.2",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
-  "tsc/internal/checker/flow.go:Checker.isOrContainsMatchingReference": {
-   "disposition": "gap",
-   "item": "C3.2",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
-  "tsc/internal/checker/flow.go:Checker.narrowTypeByBinaryExpression": {
-   "disposition": "gap",
-   "item": "C3.2",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
-  "tsc/internal/checker/flow.go:Checker.narrowTypeByBooleanComparison": {
-   "disposition": "gap",
-   "item": "C3.2",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
-  "tsc/internal/checker/flow.go:Checker.narrowTypeByOptionality": {
-   "disposition": "gap",
-   "item": "C3.2",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
-  "tsc/internal/checker/flow.go:Checker.narrowTypeBySwitchOnDiscriminantProperty": {
-   "disposition": "gap",
-   "item": "C3.2",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
-  "tsc/internal/checker/flow.go:Checker.narrowTypeBySwitchOptionalChainContainment": {
-   "disposition": "gap",
-   "item": "C3.2",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
-  "tsc/internal/checker/flow.go:Checker.narrowTypeByTypeName": {
-   "disposition": "gap",
-   "item": "C3.2",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
-  "tsc/internal/checker/flow.go:Checker.narrowTypeByTypeof": {
-   "disposition": "gap",
-   "item": "C3.2",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "The pin pools FlowState records through a free list; the Rust FlowQuery is built for each reference query and dropped with it, an allocation strategy with the same per-query state (reference, declared and initial types, reduce labels).",
+   "reviewed_from": "pinned getFlowState/putFlowState and the Rust FlowQuery construction; C3 source audit",
+   "rust": "crates/tsr_checker/src/flow.rs:351"
   },
   "tsc/internal/checker/flow.go:Checker.putFlowState": {
-   "disposition": "gap",
-   "item": "C3.2",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
-  "tsc/internal/checker/flow.go:Checker.typeMaybeAssignableTo": {
-   "disposition": "gap",
-   "item": "C3.2",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "The pin pools FlowState records through a free list; the Rust FlowQuery is built for each reference query and dropped with it, an allocation strategy with the same per-query state (reference, declared and initial types, reduce labels).",
+   "reviewed_from": "pinned getFlowState/putFlowState and the Rust FlowQuery construction; C3 source audit",
+   "rust": "crates/tsr_checker/src/flow.rs:351"
   },
   "tsc/internal/checker/flow.go:FlowType.isNil": {
-   "disposition": "gap",
-   "item": "C3.2",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
-  "tsc/internal/checker/flow.go:getBranchLabelAntecedents": {
-   "disposition": "gap",
-   "item": "C3.2",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
-  "tsc/internal/checker/flow.go:getFlowNodeOfNode": {
-   "disposition": "gap",
-   "item": "C3.2",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
-  "tsc/internal/checker/flow.go:isCoercibleUnderDoubleEquals": {
-   "disposition": "gap",
-   "item": "C3.2",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
-  "tsc/internal/checker/flow.go:isEvolvingArrayTypeList": {
-   "disposition": "gap",
-   "item": "C3.2",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
-  "tsc/internal/checker/flow.go:tryGetNameFromType": {
-   "disposition": "gap",
-   "item": "C3.2",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "The Rust flow type carries no nil state: the walker returns the declared or unreachable type where the pin's loop cache would answer with a nil FlowType, so no caller tests nil.",
+   "reviewed_from": "pinned flow.go isNil callers (getTypeAtFlowLoopLabel) and the Rust type_at_flow loop arm; C3 source audit",
+   "rust": "crates/tsr_checker/src/flow.rs:34"
   },
   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarArrowFunction": {
    "disposition": "gap",

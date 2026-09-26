@@ -84,6 +84,7 @@ impl CheckerState {
             .to_owned())
     }
 
+    // port: tsc/internal/checker/flow.go:getFlowNodeOfNode
     pub(crate) fn node_flow(&self, node: NodeId) -> Result<Option<FlowId>, Error> {
         if let Some(&(_, flow)) = self.flow.synthetic.get(&node) {
             return Ok(Some(flow));
@@ -166,6 +167,8 @@ impl CheckerState {
                 if node.flags & (ff::ASSIGNMENT | ff::CONDITION | ff::ARRAY_MUTATION) != 0 {
                     flow = required(node.antecedent, "reachable antecedent")?;
                 } else if node.flags & ff::BRANCH_LABEL != 0 {
+                    // port: tsc/internal/checker/flow.go:Checker.getTypeAtFlowBranchLabel
+                    // port: tsc/internal/checker/flow.go:getBranchLabelAntecedents
                     let list = reduced
                         .iter()
                         .rev()
@@ -201,6 +204,7 @@ impl CheckerState {
                     reduced.pop();
                     break result?;
                 } else if node.flags & ff::CALL != 0 {
+                    // port: tsc/internal/checker/flow.go:Checker.getTypeAtFlowCall
                     let Some(FlowData::Ast(call)) = node.node else {
                         return Err(tsr_arena::Error::InvalidGraph.into());
                     };
@@ -312,6 +316,7 @@ impl CheckerState {
         })
     }
 
+    // port: tsc/internal/checker/flow.go:Checker.getFlowTypeOfReference
     // port: tsc/internal/checker/flow.go:Checker.getFlowTypeOfReferenceEx
     pub(crate) fn flow_type_of_reference(
         &mut self,
@@ -466,6 +471,7 @@ impl CheckerState {
                     shared = Some(flow);
                 }
                 let result = if node.flags & ff::ASSIGNMENT != 0 {
+                    // port: tsc/internal/checker/flow.go:Checker.getTypeAtFlowAssignment
                     let Some(FlowData::Ast(target)) = node.node else {
                         return Err(tsr_arena::Error::InvalidGraph.into());
                     };
@@ -573,6 +579,7 @@ impl CheckerState {
                         continue;
                     }
                 } else if node.flags & ff::CONDITION != 0 {
+                    // port: tsc/internal/checker/flow.go:Checker.getTypeAtFlowCondition
                     let previous = self
                         .type_at_flow(query, required(node.antecedent, "condition antecedent")?)?;
                     if self.types.flags(previous.ty)? & tf::NEVER != 0 {
@@ -814,6 +821,7 @@ impl CheckerState {
         types: &[TypeId],
         subtype: bool,
     ) -> Result<TypeId, Error> {
+        // port: tsc/internal/checker/flow.go:isEvolvingArrayTypeList
         let mut all_evolving = false;
         for &ty in types {
             if self.types.flags(ty)? & tf::NEVER == 0 {
@@ -825,6 +833,7 @@ impl CheckerState {
             }
         }
         if all_evolving {
+            // port: tsc/internal/checker/flow.go:Checker.getElementTypeOfEvolvingArrayType
             let mut elements = Vec::with_capacity(types.len());
             for &ty in types {
                 elements.push(
@@ -1113,6 +1122,8 @@ impl CheckerState {
         if let Some(&cached) = self.flow.assignment_reduced.get(&(declared, assigned)) {
             return Ok(cached);
         }
+        // port: tsc/internal/checker/flow.go:Checker.getAssignmentReducedTypeWorker
+        // port: tsc/internal/checker/flow.go:Checker.typeMaybeAssignableTo
         let filtered = self.filter_type(declared, &mut |state, ty| {
             if state.types.flags(assigned)? & tf::UNION == 0 {
                 return state.is_type_related_to(assigned, ty, crate::RelationKind::Assignable);
