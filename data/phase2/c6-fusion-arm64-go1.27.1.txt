@@ -1,0 +1,12 @@
+# Fused multiply-subtract in the pinned checker-pool score (C6.7 evidence)
+pin: 1f70213d4922b434345f639b441681e470c7cfc1
+toolchain: go1.27.1 darwin/arm64
+command (run in upstream/tsc): go build -gcflags='-S' ./internal/compiler 2>&1 | grep -E 'checkerpool.go:2(0[89]|1[0-2])\)' | grep -iE 'FMSUB|FMADD|FNMSUB|FNMADD|FMUL|FSUB'
+# checkerpool.go:210  penalty := alpha * (newWeight*math.Sqrt(newWeight) - oldWeight*math.Sqrt(oldWeight))
+# checkerpool.go:211  score := float64(neighborCounts[checkerIndex]) - penalty
+0x0384 00900 (checkerpool.go:210)	FMULD	F5, F3, F3
+0x038c 00908 (checkerpool.go:210)	FMSUBD	F5, F3, F2, F2
+0x0390 00912 (checkerpool.go:211)	FMSUBD	F2, F4, F1, F2
+# amd64 (GOAMD64=v3 included) emits separate MULSD/SUBSD for both lines (reviewer's compile, 2026-09-26).
+# Rust reproduction on aarch64 only: (-old).mul_add(old.sqrt(), new * new.sqrt()) for :210 and (-alpha).mul_add(diff, neighbors) for :211.
+# Re-check whenever the Go toolchain changes: the fusion choice belongs to the compiler.

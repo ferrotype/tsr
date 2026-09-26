@@ -2,9 +2,7 @@
 
 Checkpoint C7 of the [Phase 2 plan](PHASE2-plan.md), written after the
 [C2 plan](PHASE2-C2-plan.md) (PR #62, branch `phase2-c2-plan`) and its review
-amendments, alongside the C3 to C6 drafts, over the reviewed-source C1 capture
-(`target/phase2/rust`: 12,459 of 13,432 rows match in every domain, regression
-9,367 of 9,367). Upstream is Corsa `1f70213d4922b434345f639b441681e470c7cfc1`.
+amendments, alongside the C3 to C6 drafts, over the recorded C2 exit capture (`target/phase2/rust`: 12,647 of 13,432 rows match in every domain, regression 9,367 of 9,367; `P2B-C2` recorded complete with three emit-order rows handed to C5). Upstream is Corsa `1f70213d4922b434345f639b441681e470c7cfc1`.
 C7 is closure work: it adds no checker semantics of its own. It drives every
 remaining difference to a checkpoint or to an owner-approved scope, runs the
 complete acceptance on the final inputs, publishes the operation and
@@ -27,7 +25,7 @@ C7 exits when all of the following hold on the final recorded runs:
 | --- | --- |
 | Stage A closes: the denominator is frozen, the native contract is verified, one complete Rust run is recorded and every withheld observation is a named blocker | `sprint.P2A.done == 1` (`inventory_frozen`, `native_verified`, `harness_valid`, `result_recorded`, `blockers_named`), from the same recorded `checker` run that closes stage B |
 | PLAN's Phase 2 gate: every executed variant matches in `errors`, `types` and `symbols` with approved divergences only, plus `display`, the module-resolution trace, union ordering and parent pointers | `run.checker.errors_parity == 1`, `types_parity == 1`, `symbols_parity == 1`, `display_parity == 1`, `trace_parity == 1`, `ordering == 1`, `parent_pointers == 1`, `unsupported_required == 0`, `harness_valid == true` (the P2B `exit` list) |
-| Every checkpoint is complete | `run.checker.c1_complete` to `c6_complete` all true |
+| Every checkpoint closed on its own recorded run | each `P2B-Cn` item's `done_when` holds on a recorded `checker` run identified by its evidence id (`recorded.checker.cN_complete == true`, the tracker extension of C7.7); the final run does not recompute `cN_complete` or `c2_measured` |
 | No executed row differs in any domain without an owner-approved scope | `run.checker.c7_residuals == 0` over `data/phase2/residuals.json` |
 | The runner's skips are listed explicitly with their native guard reasons and stay informational (S12 matrix) | `run.checker.c7_informational_listed == true` over `data/phase2/informational.json` |
 | The operation and dependency disposition is published: every Phase 2 ledger file `ported` with `verify` checks that derive `verified`, every function of the Phase 2 packages mapped, equivalent or handed with an owner, the blocker register holding only cross-phase joint entries with owners, the divergence ledger valid against the final comparison | `run.checker.c7_dispositions == true`, `c7_divergences_valid == true`; `cargo xtask status` derives `verified` for the Phase 2 files |
@@ -47,7 +45,7 @@ nothing.
 | Asset | Where | What C7 takes from it |
 | --- | --- | --- |
 | The gate wiring | `sprints/P2A.toml` (exit: the five capture-integrity metrics), `sprints/P2B.toml` (exit: `sprint.P2A.done == 1`, `harness_valid`, the seven parity and sub-test metrics, `unsupported_required == 0`; items C1 to C7 bound to `cN_complete`); `status/runs.toml` `[checker]` (`phase2_producers.py checker`, its inputs and sources); `cargo xtask check P2A|P2B`, `check-metrics`, `run <id>`, `status --record`, `status --check-committed`, `validate` | the exit C7 closes and the commands that assert it |
-| The current gap | the reviewed capture's categories: `errors` 12,507 match, 106 different, 818 unsupported, 1 failed; `types` 12,065 match, 38 different, 649 unsupported, 679 native-disabled; `symbols` 12,101 / 2 / 649 / 679; `display` 12,086 / 17 / 649 / 679; `parent_pointers` and `union_ordering` 13,416 match, 15 unsupported, 1 failed; `trace` 154 match, 13,278 disabled; 17 unsupported operations; every recorded producer currently `stale` in `status/status.json` | the distance the checkpoints close before C7; the staleness C7.6 clears |
+| The current gap | the C2 exit capture's categories: `errors` 12,648 match, 20 different, 764 unsupported; `types` 12,188 match, 8 different, 557 unsupported, 679 native-disabled; `symbols` 12,196 / 0 / 557 / 679; `display` 12,196 / 0 / 557 / 679; `parent_pointers` and `union_ordering` 13,417 match, 15 unsupported; `trace` 154 match, 13,278 disabled; 6 unsupported operations; 12,647 rows matching in every domain; every recorded producer currently `stale` in `status/status.json` | the distance the checkpoints close before C7; the staleness C7.6 clears |
 | The denominator and its skips | `data/phase2/inventory.json`: 15,206 effective variants, 13,432 executed (`native_selection: runs`), 1,774 informational (1,720 `option_guard_skip`, 52 `filename_skip`, 2 `not_enumerated`; 39 rejected-option rows are a subset of the filename skips); the guard-only option keys (`baseUrl` on 38 rows, `moduleSuffixes` on 15) | the explicit skip list C7.0 publishes |
 | The native contract | `target/phase2/native` with `data/phase2/native-provenance.json` (13,432 executed, 0 input mismatches, 0 reference disagreements, 0 parent-pointer failures, 0 inconsistent unions, 3 pre/post-emit differences, 154 trace rows, 1,754 declaration requests); the concurrent capture C6.0 adds | the final inputs; reused only when the read-only validator accepts them |
 | The sub-tests | `tools/phase2/subtests.rs`: union ordering (every interned union reproduced by sorting its reversed list and ten seeded shuffles with the production comparator; one checker per program at C0, per checker at C6), parent pointers (below each non-default-library root every node the generated child visitor reaches has the traversal parent as its recorded parent; the root is not checked; the walk stops at its first failure), module-resolution trace (the loader's trace localized and sanitized as the baseline tracer writes it); `phase2_compare.py compare_subtest` compares verdicts, not counts | the Rust definition the review asked C7 to state; C7 validates it, it does not redefine it |
@@ -67,7 +65,7 @@ C7 owns no rows and no semantic cause. It owns closure:
 
 | Unit | State at the C7 start | C7's obligation |
 | --- | --- | --- |
-| Rows that still differ in any domain at the C6 head | expected: the 15 content-mapper rows (B06), the B09 rows if C5's decision 3 was declined, and any row a checkpoint handed to Phase 3 or Phase 5 | consolidated in `data/phase2/residuals.json` with owner and scope; a residual owned by a checkpoint reopens that checkpoint's `cN_open`; a cross-phase residual is resolved by decision 1 |
+| Rows that still differ in any domain at the C6 head | expected: the 15 content-mapper rows (register entry B04 at the C2 exit, B06 in the C1 capture), the three emit-order rows (B05 at the C2 exit, B09 in the C1 capture) if C5's decision 3 was declined, and any row a checkpoint handed to Phase 3 or Phase 5 | consolidated in `data/phase2/residuals.json` with owner and scope; a residual owned by a checkpoint reopens that checkpoint's `cN_open`; a cross-phase residual is resolved by decision 1 |
 | The informational rows | 1,774, listed in the inventory with their native selection | published with the guard reason and the option keys that trigger the guard |
 | The sub-tests and lifecycle contracts | passing per checkpoint | validated once more on the final executable, in both modes |
 | The divergence ledger | empty | validated against the final comparison; entries only with owner approval and witnesses |
@@ -79,6 +77,25 @@ The ownership rule of the checkpoint plans applies unchanged: C7 never marks
 a row closed by editing a status; a row closes when the final comparison shows
 it matching, and a difference is retained only through the divergence ledger
 or an owner-approved sprint-exit amendment that names the joint blocker.
+
+**Completion and handoffs across captures.** Every handoff and the C2
+measurement are bound to one Rust capture: the blocker builder's
+`validated_handoffs` drops a handoff whose `capture_sha256` differs from the
+current comparison's, and `c2_measured` binds the checkerbench record to the
+corpus capture it was verified against. Two rules follow, and every plan from
+C3 on uses them. First, a checkpoint's completion is a recorded historical
+fact: `P2B-Cn` closes on the `checker` run recorded at that checkpoint's exit,
+and no later checkpoint recomputes `cN_complete` or `cN_measured` on its own
+capture; C7.7 extends the tracker so that an item's `done_when` can name a
+recorded run (`recorded.checker.cN_complete == true`, with the evidence
+identity) instead of the current one. Second, at every later checkpoint's item
+0, `phase2_claims.py rebind` re-validates each open handoff against the fresh
+capture: it re-runs the row's reproduction, checks that the new raw observation
+still differs only in the covered domains, and rewrites the capture, request,
+observation and trace digests in both the handing checkpoint's claims file and
+the receiving checkpoint's `incoming` entry; a handoff that no longer holds is
+reported and its row counts as open for the receiving checkpoint. C2.12 is
+complete without a rebind step; C3.9 lands it in the per-checkpoint helper.
 
 ## 4. Work items
 
@@ -102,8 +119,10 @@ or an owner-approved sprint-exit amendment that names the joint blocker.
 
 - Exists: the C1 to C6 claims files with `handed`, `blocked` and `incoming`
   entries; the blocker register.
-- Build: `phase2_residuals.py build` reads the final comparison and every
-  claims file and writes `data/phase2/residuals.json`: each row not matching
+- Build: `phase2_residuals.py build` first runs `phase2_claims.py rebind`
+  against the final capture, so that every open handoff is re-validated (the
+  rule stated in section 3 of the C3 plan), then reads the final comparison
+  and every claims file and writes `data/phase2/residuals.json`: each row not matching
   in some domain, with the checkpoint or phase that owns its cause, the
   validated trace that attributes it, the blocker identity if one withholds
   it, and the resolution path (`checkpoint` when a `cN_open` reopens,
@@ -124,9 +143,11 @@ or an owner-approved sprint-exit amendment that names the joint blocker.
   executable in both modes (per checker in concurrent mode, as C6 wires),
   and make the parent-pointer report name the first failing node's kind,
   file and position so that a failure is attributable; add one direct
-  witness per sub-test that fails on purpose (a union with a broken
-  comparator under a test feature, a synthesized node with a wrong parent)
-  to show the checks observe what they claim; rerun every direct contract
+  witness per sub-test that fails on purpose, injected through a test-only
+  path of `tools/phase2/subtests.rs` (a comparator override and a parent
+  override the test passes in; never a cargo feature, because the exit and
+  clippy builds enable every feature) to show the checks observe what they
+  claim; rerun every direct contract
   suite (`c1_contracts` to `c6_contracts`, `checker_semantics`,
   `checker_display`, `checker_baselines`, `phase2_subtests`) in debug and
   release with fresh v2 receipts; rerun the E2 obligations replay, the E3
@@ -159,9 +180,10 @@ or an owner-approved sprint-exit amendment that names the joint blocker.
   share) set `ported` with its Rust paths and `verify` checks bound to
   `run.checker` metrics (`errors_parity == 1`, `types_parity == 1`,
   `symbols_parity == 1` for checker files; `display_parity == 1` for the
-  node-builder files; `trace_parity == 1` for the module files;
-  `c6_mode_parity == true` for the pool files; `c5_services == true` for
-  `services.go`), so `cargo xtask status` derives `verified`; (b) the
+  node-builder files; `c6_mode_parity == true` for the pool files;
+  `c5_services == true` for `services.go`; no Phase 2 file binds
+  `trace_parity`, whose traced behavior is the Phase 1 resolver, so that gate
+  stays a sprint exit metric only), so `cargo xtask status` derives `verified`; (b) the
   functions: `data/phase2/dispositions.json`, generated by
   `phase2_dispositions.py build` from `data/go-functions.tsv`, the port
   markers and the six audits, giving every function of the Phase 2 packages
@@ -194,8 +216,10 @@ or an owner-approved sprint-exit amendment that names the joint blocker.
     disposal and the public API (Phase 5 and 6), the creation-trace mode and
     the assignment witnesses (diagnostics), the E3 contracts through the
     compiler pool;
-  - the measured performance risks Phase 7 owns: the C2 checkerbench elapsed
-    ratio and type footprint, the last E5 figures against 0.85 (ADR 0022) and
+  - the measured performance risks Phase 7 owns: the C2 checkerbench capture
+    (`data/phase2/c2-benchmark.json`: elapsed 2.136, requested bytes 0.574,
+    retained bytes 1.415, type-storage bytes per reachable type 0.813, Rust
+    over Go, with its `host_busy` qualification), the last E5 figures against 0.85 (ADR 0022) and
     the last E6 figures against 1.25 and 1.45 (ADR 0021), each with its
     capture date and host, with the statement that full checking remains
     extrapolated at those gates and that the multi-checker speedup is
@@ -227,25 +251,36 @@ or an owner-approved sprint-exit amendment that names the joint blocker.
   `run.checker.c7_complete`.
 - Build: the producer reads `data/phase2/residuals.json`,
   `informational.json`, `dispositions.json`, `c7-report.json`, the
-  divergence ledger and the evidence states, and emits `c7_residuals`,
+  divergence ledger and the evidence states of a fingerprinted set of other
+  prerequisite producers (the C7.6 list without `checker`: the tracker writes
+  `checker.latest` as an incomplete attempt before running the producer, so
+  the producer cannot certify its own run, and reading previously generated
+  status would certify an old snapshot; the tracker establishes the checker
+  run's own freshness after recording it), and emits `c7_residuals`,
   `c7_informational_listed`, `c7_dispositions`, `c7_divergences_valid`,
   `c7_evidence_current`, `c7_report` and `c7_complete` (the P2B exit
-  conjunction, `c1_complete` to `c6_complete`, and the six above). All new
-  authorities are `[checker]` inputs. C7.7 lands first so the metrics exist
-  while the residuals close.
+  conjunction, every `P2B-Cn` item closed on a recorded run, and the six
+  above). The tracker extension: `cargo xtask check` accepts
+  `recorded.<run>.<metric> == <value>` in an item's `done_when`, satisfied by
+  a recorded evidence artifact of that run whose report holds the value, and
+  the sprint view names the artifact. All new authorities are `[checker]`
+  inputs. C7.7 lands first so the metrics exist while the residuals close.
 - Exit: `scripts/tests/test_phase2_c7.py` shows that one residual without an
   approved scope keeps `c7_complete` false, that an unused divergence witness
   fails `c7_divergences_valid`, that a function without a disposition fails
-  `c7_dispositions`, that a stale producer fails `c7_evidence_current`, and
-  that changing each new input invalidates the recorded result.
+  `c7_dispositions`, that a stale prerequisite producer fails
+  `c7_evidence_current` while the checker run itself is excluded, that a
+  complete stale-to-current recording sequence (rerun, record, regenerate the
+  status views, check) ends current, and that changing each new input
+  invalidates the recorded result.
 
 ## 5. Dependencies and owners
 
 | Dependency | Owner | State for C7 |
 | --- | --- | --- |
 | C1 to C6 complete on the final head | the checkpoints | C7 starts its wiring and skip list early; its closure waits for C6 |
-| Content-mapper execution behind B06 (15 executed C3 rows) | Phase 5 | decision 1: pulled forward as a C7 prerequisite, or named in an owner-approved amendment of the P2B exit |
-| The emit-order rows behind B09 | C5 with Phase 3 | closed under C5's decision 3, or named in the same amendment |
+| Content-mapper execution (register entry B04 at the C2 exit, B06 in the C1 capture; 15 executed C3 rows) | Phase 5 | decision 1: pulled forward as a C7 prerequisite, or named in an owner-approved amendment of the P2B exit |
+| The emit-order rows (B05 at the C2 exit, B09 in the C1 capture) | C5 with Phase 3 | closed under C5's decision 3, or named in the same amendment |
 | The Linux host capture and the loader-side project-reference operations | Phase 1 | the capture is taken in C7.6; the operations stay Phase 1 with a named owner in the disposition |
 | The owner's recordings (`checker` in both modes, `e3`, `checkerbench`, `bindworkload`, `benchmark`, `status --record`) and the quiet host | owner | C7.6 |
 | Owner decisions of section 9 | owner | before C7.1 |
@@ -282,8 +317,7 @@ python3 scripts/phase2_residuals.py build --rust target/phase2/rust-c7 --check  
 python3 scripts/phase2_divergences.py check --rust target/phase2/rust-c7
 python3 scripts/phase2_dispositions.py build --check
 for n in 1 2 3 4 5 6; do python3 scripts/phase2_audit.py check --audit "data/phase2/c${n}-audit.json"; done
-for t in c1_contracts c2_contracts c3_contracts c4_contracts c5_contracts c6_contracts; do cargo test -p tsr_compiler --all-features --test "$t" --locked && cargo test -p tsr_compiler --all-features --test "$t" --locked --release; done
-for w in c1-contracts c2-contracts c3-contracts c4-contracts c5-contracts c6-contracts; do python3 scripts/phase2_producers.py observe --witness "$w"; done
+for w in c1-contracts c2-contracts c3-contracts c4-contracts c5-contracts c6-contracts; do python3 scripts/phase2_producers.py observe --witness "$w"; done   # each suite with its receipt's exact feature set, debug and release
 python3 scripts/phase2_services.py verify && python3 scripts/phase2_services.py replay --output target/phase2/services-c7
 python3 scripts/phase2_assignments.py compare
 python3 scripts/s08_e2.py obligations --output target/s08/e2-c7
@@ -324,16 +358,20 @@ Linux host capture are the owner's.
 ## 9. Owner decisions before C7 starts
 
 1. **The content-mapper rows.** `unsupported_required == 0` cannot hold
-   while B06 withholds 15 executed rows, and the divergence ledger cannot
+   while the content-mapper entry withholds 15 executed rows, and the divergence ledger cannot
    waive an unsupported operation. Either Phase 5's content-mapper execution
    (the child-process plugins over JSON-RPC and their span maps) is scheduled
-   as a C7 prerequisite, or the owner amends the P2B exit to name B06 as an
-   explicit joint blocker with its 15 rows. Proposed: amend, with the rows
-   listed by identity, and keep the same choice available for B09 if C5's
-   decision 3 is declined.
-2. **One recording closes both stages.** The `checker` run C7 records at the
-   final head satisfies P2A's exit and P2B's; the C0 and C1 recordings still
-   owed are not taken separately. Confirm.
+   as a C7 prerequisite, or the owner amends the P2B exit to name the
+   content-mapper entry as an explicit joint blocker with its 15 rows.
+   Proposed: amend, with the rows listed by identity, and keep the same
+   choice available for the emit-order entry if C5's decision 3 is declined.
+2. **Recorded completion.** The P2A and P2B exit lists close on the final
+   recorded `checker` run; each `P2B-Cn` item closes on the run recorded at
+   its own exit (C2's already is) through the tracker extension of C7.7.
+   Where an item was never recorded on its own exit run (the C0 and C1
+   recordings were owed), the item closes on the earliest recorded run whose
+   report holds its metrics, and the C7 record names that run. Confirm the
+   extension and this rule.
 3. **Ledger `verify` bindings.** The metric-per-file bindings of C7.4, so
    that `verified` derives from `run.checker` evidence rather than from a
    hand-written status. Confirm the mapping.

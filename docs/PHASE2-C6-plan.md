@@ -2,9 +2,7 @@
 
 Checkpoint C6 of the [Phase 2 plan](PHASE2-plan.md), written after the
 [C2 plan](PHASE2-C2-plan.md) (PR #62, branch `phase2-c2-plan`) and its review
-amendments, alongside the C3, C4 and C5 drafts, over the reviewed-source C1
-capture (`target/phase2/rust`: 12,459 of 13,432 rows match in every domain,
-regression 9,367 of 9,367). Upstream is Corsa
+amendments, alongside the C3, C4 and C5 drafts, over the recorded C2 exit capture (`target/phase2/rust`: 12,647 of 13,432 rows match in every domain, regression 9,367 of 9,367; `P2B-C2` recorded complete with three emit-order rows handed to C5). Upstream is Corsa
 `1f70213d4922b434345f639b441681e470c7cfc1`. C6 is production work in
 `crates/tsr_compiler` (the compiler checker pool), `crates/tsr_checker` (the
 cancellation and tracing seams) and `crates/tsr_project` (disposal of a
@@ -35,7 +33,7 @@ C6 exits when all of the following hold, recorded by the owner through
 | Current, full, authenticated and recorded captures with no harness errors, in both execution modes | `inventory_frozen`, `native_verified`, `harness_valid`, `result_recorded` and `blockers_named` are true for the single-threaded run; `native_verified_concurrent` and `harness_valid_concurrent` for the concurrent run; prerequisites of `c6_complete` |
 | Existing cases preserved | `run.checker.regression_parity == 1` (9,367 of 9,367) in the single-threaded run |
 | No previously matching domain of any executed row becomes a non-match | `run.checker.c6_regressions == 0` against the authenticated C6-start row report `data/phase2/c6-baseline.json.gz` |
-| The full comparison passes in both of upstream's modes: the concurrent-mode Rust run reports, row by row and domain by domain, exactly what the single-threaded run reports, and each run is compared with the native capture of its own mode | `run.checker.c6_mode_parity == true` (zero row-domain differences between the two Rust reports; every difference between the two native captures enumerated and attributed in `data/phase2/c6-claims.json`) |
+| The full comparison passes in both of upstream's modes: each Rust run matches the native capture of its own mode, row by row and domain by domain, and every observation difference between the two native captures is enumerated and attributed | `run.checker.c6_mode_parity == true`, outcome parity: the concurrent run's per-row, per-domain outcomes against the concurrent native capture equal the single-threaded run's against the single-threaded capture; native mode differences listed in `data/phase2/c6-claims.json` |
 | File-to-checker assignments equal pinned Go's on the same GOOS/GOARCH for every corpus program and the synthetic witness set, with the toolchain and arithmetic behavior recorded | `run.checker.c6_assignments == true` over `data/phase2/c6-assignments.json` |
 | Interrupted work preserves the pin's contract: no invalid state published, no retired generation reused | `run.checker.c6_contracts == true` (the cancellation and retirement contracts of C6.9), from the recorded v2 receipt |
 | No unexplained production failure in a C6 claim, in either mode | `run.checker.c6_failures == 0` |
@@ -57,8 +55,8 @@ nothing.
 | --- | --- | --- |
 | The pinned compiler pool | `tsc/internal/compiler/checkerpool.go` (491 lines): the `CheckerPool` interface (`GetChecker(ctx, file)` returns an exclusively held checker and its release), the five calibrated constants (text weight divisor 100, source-file weight multiplier 4, balance penalty 16, prioritized-source penalty 12, strong-balance minimum of 4 checkers), the three policy regimes, the FENNEL assignment with gamma 3/2 and its deterministic ties, the source-first order, base weights from node count and text length, import-unit normalization, the checker count (4 by default, 1 when single-threaded, the internal `checkers` option, clamped to at least 1 and at most the smaller of the file count and 256), the once-only creation of checkers in a work group, the undirected import adjacency from resolved in-program modules, exclusive and non-exclusive acquisition, `forEachCheckerGroupDo` with one task per checker and files in program order, and the concatenated, sorted and deduplicated global diagnostics | the algorithm C6.3 ports line by line; ADR 0009 requires the same constants |
 | The pinned program driving | `compiler/program.go`: `collectCheckerDiagnostics` (one file: that file's checker exclusively; all files: grouped by checker when the compiler pool is in use, per-file acquisition otherwise), `collectDiagnosticsFromFiles` with its concurrency flag, `GetTypeChecker`, `GetTypeCheckerForFile`, `GetTypeCheckerForFileExclusive`, `GetCheckerPool`, `SingleThreaded`; `core/workgroup.go`: the parallel work group and the single-threaded one, which runs its queued tasks last-in first-out | the driving C6.4 ports; the LIFO order is observable where task order is |
-| The pinned cancellation contract | `checker.go`: `checkSourceFile` installs the context and clears it at the end; `isCanceled` (`utilities.go`) is polled in `checkSourceElements` per statement, in `checkDeferredNodes` per deferred node, in `checkContextualDeprecations`, and before the unused-identifier passes; `wasCanceled` becomes sticky at the end of a canceled check; `getDiagnostics` and `GetGlobalDiagnostics` first call `checkNotCanceled`, which panics with `Checker was previously cancelled`; a canceled check returns nil diagnostics; `WasCanceled` is exported (`exports.go`); the project pool disposes a canceled checker | the seams C6.5 ports; the polling sites are the pin's, not a Rust choice |
-| The pinned tracer | `checker/tracer.go` (366 lines: `NewTracer`, `RecordType`, `Push`, `Instant`, the checker-index argument helpers and the `wrapType` accessors implementing `tracing.TracedType`); 18 gated call sites (`checker.go` 11, `relater.go` 6, `flow.go` 1) of the form `if tr := c.tracer; tr != nil`; `relater.go` `traceUnionsOrIntersectionsTooLarge` (C1 audit `later: C6`); `internal/tracing` (Phase 4, crate `tsr_tracing`, planned) writes `trace.json`, `types.json` and `legend.json` and is enabled by `generateTrace` | the events and type records C6.2 reproduces through the seam; the writer stays Phase 4's |
+| The pinned cancellation contract | `checker.go`: `checkSourceFile` installs the context and clears it at the end; `isCanceled` (`utilities.go`) is polled in `checkSourceElements` per statement, in `checkDeferredNodes` per deferred node, in `checkContextualDeprecations`, and before the unused-identifier passes; `wasCanceled` becomes sticky at the end of a canceled check; `getDiagnostics` and `GetGlobalDiagnostics` first call `checkNotCanceled`, as does the node builder's `createRecoveryBoundary` (`nodecopy.go`), so hover, services and declaration serialization on a canceled checker refuse too; it panics with `Checker was previously cancelled`; a canceled check returns nil diagnostics; `WasCanceled` is exported (`exports.go`); the project pool disposes a canceled checker | the seams C6.5 ports; the polling sites are the pin's, not a Rust choice |
+| The pinned tracer | `checker/tracer.go` (366 lines: `NewTracer`, `RecordType`, `Push`, `Instant`, the checker-index argument helpers and the `wrapType` accessors implementing `tracing.TracedType`); 16 gated call sites (`checker.go` 9, including `RecordType` in `newType`, `relater.go` 6, `flow.go` 1) of the form `if tr := c.tracer; tr != nil`; `relater.go` `traceUnionsOrIntersectionsTooLarge` (C1 audit `later: C6`); `internal/tracing` (Phase 4, crate `tsr_tracing`, planned) writes `trace.json`, `types.json` and `legend.json` and is enabled by `generateTrace` | the events and type records C6.2 reproduces through the seam; the writer stays Phase 4's |
 | The editor and API pool | `tsc/internal/project/checkerpool.go` (530 lines, Phase 5): one diagnostics checker, ephemeral query checkers with an idle timeout, one persistent API checker; `crates/tsr_project` already implements its slot lifetime and generation retirement (`CheckerSlot::{Diagnostics, Query, Api}`, `acquire`, `evict_idle`, `Project`, `Snapshot`), with scheduling, affinity and idle timers left to Phase 5 | the pool C6 must not conflate with the compiler pool; the disposal C6.5 adds for a canceled checker |
 | The ownership primitives | `tsr_arena`: `Generation` (`retire`, `enter`, `validate_checker`), `CheckerIdentity`, `Counters`, the retirement contention observer; `tsr_checker`: `CheckerOwner` (identity and all mutable checker state) and `Operation` (the exclusive permit and the state lock, dropped together; inside an operation the checker is a single-threaded `&mut` state machine); S09-1 retained results, S09-2 builder caches across generations, S09-4 pool generation, snapshots and API commitment | the primitives C6.3 composes; no new ownership rule |
 | Existing witnesses | `c1_contracts.rs`: `two_checkers_merge_independently_over_one_program`, `an_injected_panic_retires_the_generation_and_a_fresh_checker_succeeds`, `deep_relations_grow_the_stack_and_keep_the_checker_usable`; `tsr_arena` generation tests (nested gates rejected, retirement waits for the committing gate, a poisoned gate never recovers); `tsr_project` tests (initializer panic retires the generation, idle replacement rejects old types, the API checker persists, snapshots share the pool, a panic retires shared snapshots, callback resume rechecks retirement); E3's criteria (`shared_pool_panic_retirement`, `wrong_owner_rejected`, `stale_and_recycled_ids_rejected`, `release_boundaries`, `miri`, `address_sanitizer`) in the ownership harness (`scripts/s08_ownership.py`) | the contracts C6.9 extends to a multi-checker compiler pool through production entry points |
@@ -78,7 +76,7 @@ contract over every executed row:
 | --- | ---: | --- |
 | The concurrent-mode native capture | 13,432 rows | not taken; C6.0 captures and verifies it under `TS_TEST_PROGRAM_SINGLE_THREADED=false` with the C0 sharding, and records `data/phase2/native-provenance-concurrent.json` |
 | Rows whose native observation differs between the two modes | unknown, expected 0 in `errors`, `types` and `symbols` (the pin asserts its committed baselines in both modes) and possibly nonzero in `display`, `union_ordering` and `parent_pointers` (Phase 2's extra domains) | enumerated by C6.0; each difference attributed to the pin behavior that causes it (per-checker type identities reaching an ADR 0010 fallback, checker-index-dependent order) and recorded as a claim, never as a Rust divergence |
-| Rows whose Rust observation differs between the two modes | 0 required | `c6_mode_parity` |
+| Rows whose Rust outcome differs from its own mode's native observation | 0 required | `c6_mode_parity` compares outcomes, never raw observations across modes; a raw observation may differ between modes exactly where the pin's does |
 | Assignment witnesses | every corpus program with more than one checker (the clamp makes programs with a single file single-checker), plus a synthetic set over 2, 4 and 8 checkers | `data/phase2/c6-assignments.json` |
 | Blockers | none | C6 registers a blocker only for an observed missing operation of its own |
 
@@ -92,6 +90,25 @@ difference.
 The seven domains are `errors`, `types`, `symbols`, `display`, `trace`,
 `union_ordering` and `parent_pointers`. C6 adds no domain: the two-mode
 comparison is over the same seven.
+
+**Completion and handoffs across captures.** Every handoff and the C2
+measurement are bound to one Rust capture: the blocker builder's
+`validated_handoffs` drops a handoff whose `capture_sha256` differs from the
+current comparison's, and `c2_measured` binds the checkerbench record to the
+corpus capture it was verified against. Two rules follow, and every plan from
+C3 on uses them. First, a checkpoint's completion is a recorded historical
+fact: `P2B-Cn` closes on the `checker` run recorded at that checkpoint's exit,
+and no later checkpoint recomputes `cN_complete` or `cN_measured` on its own
+capture; C7.7 extends the tracker so that an item's `done_when` can name a
+recorded run (`recorded.checker.cN_complete == true`, with the evidence
+identity) instead of the current one. Second, at every later checkpoint's item
+0, `phase2_claims.py rebind` re-validates each open handoff against the fresh
+capture: it re-runs the row's reproduction, checks that the new raw observation
+still differs only in the covered domains, and rewrites the capture, request,
+observation and trace digests in both the handing checkpoint's claims file and
+the receiving checkpoint's `incoming` entry; a handoff that no longer holds is
+reported and its row counts as open for the receiving checkpoint. C2.12 is
+complete without a rebind step; C3.9 lands it in the per-checkpoint helper.
 
 ## 4. Work items
 
@@ -141,10 +158,11 @@ the ledger stay the mapping authority.
   `filterAndSortDiagnostics`); `core/workgroup.go` (`WorkGroup`, `NewWorkGroup`,
   the parallel and single-threaded groups); the cancellation functions
   (`checkSourceFile`'s context handling, `isCanceled`, `checkNotCanceled`,
-  `WasCanceled`, the polling sites); the 18 tracer call sites and
+  `WasCanceled`, the polling sites); the 16 tracer call sites and
   `traceUnionsOrIntersectionsTooLarge`; the checker constructor's id and lock
-  (`NewChecker` returns the checker and its mutex; `nextCheckerID`). The
-  ledger entry of `checkerpool.go` moves to Phase 2 with its Rust files, and
+  (`NewChecker` returns the checker and its mutex; `nextCheckerID`); at the
+  C2 exit the tracker lists `checkerpool.go` 0 of 18 marked, `workgroup.go`
+  3 of 9 and `tracer.go` 0 of 38. The ledger entry of `checkerpool.go` moves to Phase 2 with its Rust files, and
   the generated phase tables are regenerated by `cargo xtask`. `tracing.go`
   stays Phase 4: C6 ports only the seam and the in-memory sink.
 - Exit: `phase2_audit.py check --audit data/phase2/c6-audit.json` passes with
@@ -153,7 +171,7 @@ the ledger stay the mapping authority.
 
 ### C6.2 The trace-sink seam and the tracer
 
-- Exists: nothing in Rust; the pin's 18 gated call sites and the
+- Exists: nothing in Rust; the pin's 16 gated call sites and the
   `TracedType` accessor shape (`Id`, `FormatFlags`, `IsConditional`, `Symbol`,
   `AliasSymbol`, `AliasTypeArguments`, `IntrinsicName`, `UnionTypes`,
   `IntersectionTypes` and the rest).
@@ -163,7 +181,7 @@ the ledger stay the mapping authority.
   optional sink exactly where `NewChecker` takes an optional `*Tracer`; a
   `None` sink is the pin's nil tracer and every call site keeps its gate; the
   `Tracer` port (checker index, the separate begin and end events, the
-  argument copies) and the traced-type view over the checker's types; the 18
+  argument copies) and the traced-type view over the checker's types; the 16
   call sites with the pin's phases, names and arguments;
   `traceUnionsOrIntersectionsTooLarge`; an in-memory sink for the contracts and
   a JSON-lines sink that emits the pin's event and type records (the
@@ -192,11 +210,19 @@ the ledger stay the mapping authority.
   convex load increment; ties to the lower load, then the lower index; the
   least-loaded fallback); the undirected adjacency from resolved in-program
   modules through the program adapter, self edges and unresolved targets
-  excluded; once-only creation of the checkers, each owner on its own thread
-  with the ADR 0011 reserved stack when not single-threaded, each with its
-  optional trace sink and checker index; the file associations; exclusive
-  acquisition (one mutex per checker, released once), non-exclusive
-  acquisition for the emit resolver, `forEachCheckerParallel` and
+  excluded; once-only creation of the checkers in a work group whose threads
+  carry the ADR 0011 reserved stacks when not single-threaded, each checker
+  with its optional trace sink and checker index; the threading model, stated
+  once for C5.6, this item and contract 2: a `CheckerOwner` is `Send` and not
+  `Sync` and is used by whichever thread holds its operation (a group task, a
+  per-file exclusive acquisition, a resolver call during parallel emit),
+  never confined to a thread with requests forwarded to it; the file
+  associations; exclusive acquisition (one operation per checker, released
+  once); the pin's non-exclusive acquisition hands the resolver a checker
+  without the pool lock and every resolver method then takes the checker's
+  lock for that call, so a Rust resolver call acquires the checker's
+  operation per call and waits for the current holder like any other,
+  never holding one across calls; `forEachCheckerParallel` and
   `forEachCheckerGroupDo`; global diagnostics concatenated across checkers,
   sorted and deduplicated as the pin does. Where the single-threaded work
   group's last-in first-out order is observable (checker creation order and
@@ -223,8 +249,9 @@ the ledger stay the mapping authority.
   `phase2_corpus.py run --mode concurrent` writes a capture whose provenance
   names the mode and the checker count per program.
 - Exit: the concurrent full run completes with 0 harness errors;
-  `phase2_compare.py modes --rust A --rust-concurrent B` reports 0 row-domain
-  differences.
+  `phase2_compare.py modes --rust A --rust-concurrent B` compares each run
+  with its own mode's native capture and reports 0 outcome differences
+  between the two per-row, per-domain results.
 
 ### C6.5 Cancellation
 
@@ -234,9 +261,9 @@ the ledger stay the mapping authority.
   of `checkSourceFile`; polls at exactly the pin's sites (per statement in
   `checkSourceElements`, per deferred node in `checkDeferredNodes`, in
   `checkContextualDeprecations`, before the unused-identifier passes); the
-  sticky `was_canceled` set at the end of a canceled check; `getDiagnostics`
-  and `GetGlobalDiagnostics` refuse a previously canceled checker with the
-  pin's panic (`Checker was previously cancelled`) and return no diagnostics
+  sticky `was_canceled` set at the end of a canceled check; `getDiagnostics`,
+  `GetGlobalDiagnostics` and the node builder's recovery boundary refuse a
+  previously canceled checker with the pin's panic (`Checker was previously cancelled`) and return no diagnostics
   for the canceled check; `WasCanceled` (the C5.2 query gets its semantics
   here); `tsr_project::CheckerPool` evicts a canceled checker at release and
   never hands it out again, replacing the slot as it does for idle eviction;
@@ -276,12 +303,19 @@ the ledger stay the mapping authority.
   `data/phase2/c6-assignments.json` with GOOS, GOARCH, the Go toolchain and
   the overlay fingerprint; `compare` runs the Rust partitioner over the same
   inputs and reports equality per program. The pin's score arithmetic fuses
-  the multiply and subtract on arm64 (`FMSUBD`) and not on amd64; the Rust
-  partitioner reproduces the pin's per-architecture behavior with a fused
-  multiply-add on `aarch64` only, at the sites the record names, so that
-  assignments equal Go's on each host (decision 4). A normalized
-  cross-architecture policy is not proposed; it would need an ADR 0009
-  amendment.
+  on arm64 and not on amd64, and the fusion is the Go compiler's choice, so
+  the sites come from its assembly, not from the assignment record: with
+  go1.27.1, `checkerpool.go:210` emits `FMULD` then `FMSUBD` (the
+  `oldWeight*sqrt(oldWeight)` product fused into the subtraction) and `:211`
+  emits `FMSUBD` (`alpha*(…)` fused into the score); amd64 emits separate
+  `MULSD` and `SUBSD` even with `GOAMD64=v3`. The evidence is committed as
+  `data/phase2/c6-fusion-arm64-go1.27.1.txt` and is re-checked whenever the
+  Go toolchain changes. The Rust partitioner reproduces it on `aarch64` only,
+  `(-old).mul_add(old.sqrt(), new * new.sqrt())` for the penalty difference
+  and `(-alpha).mul_add(diff, neighbors)` for the score, with plain arithmetic
+  elsewhere, so that assignments equal Go's on each host (decision 4). A
+  normalized cross-architecture policy is not proposed; it would need an ADR
+  0009 amendment.
 - Exit: `compare` reports equality for every recorded program on the capture
   host (darwin/arm64) and, when the owner runs the Linux host capture, on
   linux/amd64; differences, if any, are listed with the site and the
@@ -292,7 +326,8 @@ the ledger stay the mapping authority.
 - Exists: the ADR 0010 comparators and the C2 creation-trace mode; per-checker
   type and symbol id spaces.
 - Build: the two-mode comparison of C6.0 and C6.4 as a producer input; every
-  Rust mode difference is traced with the creation-trace mode to the
+  row whose concurrent outcome is not `match` where its single-threaded
+  outcome is, is traced with the creation-trace mode to the
   comparator fallback or the checker-index-dependent order that causes it and
   fixed in the checker it belongs to (the fix is that checkpoint's, C6 owns the
   finding); every native mode difference is a pin behavior recorded in the
@@ -310,15 +345,16 @@ the ledger stay the mapping authority.
      over the recorded graphs equal the native associations at 2, 4 and 8
      checkers, including ties, the fallback and the clamp;
   2. acquisition: exclusive acquisition serializes two threads on one
-     checker, file affinity is stable across calls, non-exclusive acquisition
-     for the resolver does not wait, and one task per checker visits its files
-     in program order;
+     checker, file affinity is stable across calls, a resolver call acquires
+     the checker's operation per call and waits for the current holder, and
+     one task per checker visits its files in program order;
   3. the single-threaded work group runs last-in first-out where the pin's
      order is observable, and the concurrent group produces the same sorted
      global diagnostics;
   4. cancellation between statements: the checker stops at the next poll,
      returns no diagnostics, reports `WasCanceled`, panics with the pin's
-     message on reuse, and the project pool evicts it and serves a fresh one;
+     message on reuse of diagnostics and of the node builder, and the project
+     pool evicts it and serves a fresh one;
   5. cancellation during deferred nodes and during the unused-identifier
      passes, with the same outcomes; retained results taken before the cancel
      stay valid;
@@ -329,8 +365,9 @@ the ledger stay the mapping authority.
      the in-memory sink equal the pin's normalized trace files, and tracing
      on or off leaves the checker's results identical;
   8. two modes: a multi-file program checked single-threaded and with four
-     checkers gives identical `errors`, `types`, `symbols`, display and union
-     ordering;
+     checkers matches, in each mode, the native observation of that mode for
+     `errors`, `types`, `symbols`, display and union ordering, and where the
+     pin's two modes differ the Rust modes differ the same way;
   9. stacks and lifecycle: pool checkers run on threads with the ADR 0011
      reserved stacks, the deep C1 and C3 contracts pass on a pool thread, the
      pool is created once per program and released with it, and wrong-owner
@@ -354,8 +391,8 @@ the ledger stay the mapping authority.
   `phase2_assignments.py compare` are the new comparison entry points; all new
   authorities are added to `[checker]` `inputs`.
 - Exit: `cargo xtask validate`; `phase2_producers.py checker` emits the nine
-  metrics; `scripts/tests/test_phase2_c6.py` shows that one row-domain
-  difference between modes keeps `c6_mode_parity` false, that a stale
+  metrics; `scripts/tests/test_phase2_c6.py` shows that one outcome
+  difference against a mode's native capture keeps `c6_mode_parity` false, that a stale
   concurrent capture keeps `harness_valid_concurrent` false, that an
   assignment difference keeps `c6_assignments` false, and that changing each
   new input invalidates the recorded result.
@@ -406,7 +443,7 @@ python3 scripts/phase2_corpus.py run --native target/phase2/native --output targ
 python3 scripts/phase2_corpus.py run --native target/phase2/native-concurrent --output target/phase2/rust-c6-concurrent --mode concurrent
 python3 scripts/phase2_compare.py report --native target/phase2/native --rust target/phase2/rust-c6 --previous target/phase2/rust-c6-start/comparison.json --record
 python3 scripts/phase2_compare.py report --native target/phase2/native-concurrent --rust target/phase2/rust-c6-concurrent
-python3 scripts/phase2_compare.py modes --rust target/phase2/rust-c6 --rust-concurrent target/phase2/rust-c6-concurrent     # 0 row-domain differences
+python3 scripts/phase2_compare.py modes --rust target/phase2/rust-c6 --rust-concurrent target/phase2/rust-c6-concurrent     # 0 outcome differences against each mode's native capture
 python3 scripts/phase2_blockers.py build --native target/phase2/native --rust target/phase2/rust-c6 --record
 python3 scripts/phase2_assignments.py compare                                  # equal on this GOOS/GOARCH for every recorded program
 python3 scripts/phase2_audit.py check --audit data/phase2/c6-audit.json
@@ -463,8 +500,8 @@ cargo xtask validate
    recorded as a standing `[checker]` input. It costs about one C0 capture.
    Confirm, and say whether it runs on this host or the Linux host.
 4. **Assignment arithmetic.** Reproduce the pin's per-architecture rounding
-   (a fused multiply-add on `aarch64` at the recorded sites, none on
-   `x86_64`) so that assignments equal Go's on each host; no normalized
+   (a fused multiply-add on `aarch64` at the two sites the committed assembly
+   evidence names, none on `x86_64`) so that assignments equal Go's on each host; no normalized
    cross-architecture policy. The alternative is an ADR 0009 amendment for a
    normalized policy. Proposed: reproduce.
 5. **The cancellation token.** A `Send + Sync` token in `tsr_core`, polled
