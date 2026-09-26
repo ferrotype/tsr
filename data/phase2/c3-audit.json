@@ -124,14 +124,16 @@
    "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
   },
   "tsc/internal/checker/checker.go:Checker.checkJSDocComment": {
-   "disposition": "gap",
-   "item": "C3.6",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "The pin checks one JSDoc comment by resolving the member names of its link children; the Rust comment check runs that loop over every comment of the node inline.",
+   "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/jsdoc_checks.rs:36"
   },
   "tsc/internal/checker/checker.go:Checker.checkJSDocTypeIsInJsFile": {
-   "disposition": "gap",
-   "item": "C3.6",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "The pin reports TS8020 for a JSDoc type node outside a JavaScript file before checking the type; the Rust JSDoc type check reports the same diagnostic at this site.",
+   "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/jsdoc_types.rs:187"
   },
   "tsc/internal/checker/checker.go:Checker.checkMemberForOverrideModifier": {
    "disposition": "equivalent",
