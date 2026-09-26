@@ -702,6 +702,7 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.declarationBelongsToPrivateAmbientMember
+    // port: tsc/internal/checker/utilities.go:declarationBelongsToPrivateAmbientMember
     pub(crate) fn binding_private_ambient(&self, declaration: NodeId) -> Result<bool, Error> {
         let mut root = self.root_binding_declaration(declaration)?;
         if self.node(root)?.kind() == K::Parameter {

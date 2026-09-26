@@ -1114,6 +1114,7 @@ impl CheckerState {
         Ok(())
     }
 
+    // port: tsc/internal/checker/utilities.go:getContainingFunctionOrClassStaticBlock
     pub(crate) fn containing_function_or_static_block(
         &self,
         node: NodeId,

@@ -886,479 +886,548 @@
    "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
   },
   "tsc/internal/checker/utilities.go:Checker.callLikeExpressionMayHaveTypeArguments": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (callLikeExpressionMayHaveTypeArguments).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/calls.rs:590"
   },
   "tsc/internal/checker/utilities.go:Checker.checkNotCanceled": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "later",
+   "owner": "C6",
+   "reason": "cancellation is C6.5: the poisoned-checker refusal at diagnostics and the node builder"
   },
   "tsc/internal/checker/utilities.go:Checker.getPackagesMap": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "The pin builds one package map from every resolved module; the Rust host scans the retained resolutions on each query and answers the same two facts (package present, bundles types) without a cached map.",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_compiler/src/checker_host.rs:235"
   },
   "tsc/internal/checker/utilities.go:Checker.isCanceled": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "later",
+   "owner": "C6",
+   "reason": "cancellation polling is C6.5"
   },
   "tsc/internal/checker/utilities.go:Checker.packageBundlesTypes": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "The host method answers whether any resolution of the package resolved to a .d.ts, the map value the pin caches.",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_compiler/src/checker_host.rs:235"
   },
   "tsc/internal/checker/utilities.go:Checker.typesPackageExists": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
-  "tsc/internal/checker/utilities.go:GetSetAccessorValueParameter": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "The host returns None when no resolution names the package, which is the pin's map-membership test for the @types package name at this caller.",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/host.rs:78"
   },
   "tsc/internal/checker/utilities.go:GetSingleVariableOfVariableStatement": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "No caller in the pinned checker package; the Rust site named is where the same fact is computed for its own callers.",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/declaration_checks.rs:54"
   },
   "tsc/internal/checker/utilities.go:IsExternalModuleSymbol": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "later",
+   "owner": "C5",
+   "reason": "its only caller is the node builder's module-specifier override (C5.4)"
   },
   "tsc/internal/checker/utilities.go:IsKnownSymbol": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "IsKnownSymbol is isLateBoundName over the symbol name; the Rust late-bound name test is this function, used by the index and node-builder callers.",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/node_builder_names.rs:1106"
   },
   "tsc/internal/checker/utilities.go:IsPrivateIdentifierSymbol": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "The pin tests the internal `__#` prefix of a private identifier symbol; the Rust node builder tests the `#` prefix of the same symbol name at its only caller.",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/node_builder_names.rs:1021"
   },
   "tsc/internal/checker/utilities.go:IsTypeAny": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (IsTypeAny).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/promises.rs:138"
   },
   "tsc/internal/checker/utilities.go:NewDiagnosticChainForNode": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (NewDiagnosticChainForNode).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/deferred_checks.rs:77"
   },
   "tsc/internal/checker/utilities.go:SkipAlias": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "later",
+   "owner": "C5",
+   "reason": "the services surface (services.go callers only); C5.5 ports it with GetAliasedSymbol"
   },
   "tsc/internal/checker/utilities.go:canHaveFlowNode": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "No caller in the pinned checker package; the Rust site named is where the same fact is computed for its own callers.",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/flow.rs:88"
   },
   "tsc/internal/checker/utilities.go:canHaveLocals": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (canHaveLocals).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/node_builder_scope.rs:18"
   },
   "tsc/internal/checker/utilities.go:createSymbolTable": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
-  "tsc/internal/checker/utilities.go:declarationBelongsToPrivateAmbientMember": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (createSymbolTable).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/meta_properties.rs:120"
   },
   "tsc/internal/checker/utilities.go:findInMap": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "findInMap is a generic map search; its only caller, reportNonExportedMember, is ported here with an iterator search over the same exports.",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/external_aliases.rs:693"
   },
   "tsc/internal/checker/utilities.go:getAliasDeclarationFromName": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (getAliasDeclarationFromName).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/name_resolution.rs:312"
   },
   "tsc/internal/checker/utilities.go:getBindingElementPropertyName": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
-  "tsc/internal/checker/utilities.go:getContainingFunctionOrClassStaticBlock": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (getBindingElementPropertyName).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/flow_destructuring.rs:109"
   },
   "tsc/internal/checker/utilities.go:getContainingQualifiedNameNode": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (getContainingQualifiedNameNode).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/name_qualified.rs:52"
   },
   "tsc/internal/checker/utilities.go:getDeclarationsOfKind": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (getDeclarationsOfKind).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/check_type_syntax.rs:611"
   },
   "tsc/internal/checker/utilities.go:getEnclosingContainer": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (getEnclosingContainer).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/function_symbol_checks.rs:40"
   },
   "tsc/internal/checker/utilities.go:getIndexSymbolFromSymbolTable": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "No caller in the pinned checker package; the Rust site named is where the same fact is computed for its own callers.",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/node_builder_emit.rs:22"
   },
   "tsc/internal/checker/utilities.go:getMembersOfDeclaration": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (getMembersOfDeclaration).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/late_members.rs:43"
   },
   "tsc/internal/checker/utilities.go:getNonRestParameterCount": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "No caller in the pinned checker package; the rest-parameter accounting Rust needs lives in this parameter helper.",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/signature_parameters.rs:126"
   },
   "tsc/internal/checker/utilities.go:getObjectTypeName": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "No caller in the pinned checker package; the Rust site named is where the same fact is computed for its own callers.",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/compare.rs:375"
   },
   "tsc/internal/checker/utilities.go:getSelectedModifierFlags": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (getSelectedModifierFlags).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/declaration_checks.rs:265"
   },
   "tsc/internal/checker/utilities.go:hasAsyncModifier": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly.",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/await_expressions.rs:143"
   },
   "tsc/internal/checker/utilities.go:hasDotDotDotToken": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly.",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/bindings.rs:209"
   },
   "tsc/internal/checker/utilities.go:hasExportAssignmentSymbol": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly.",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/source_module_aliases.rs:114"
   },
   "tsc/internal/checker/utilities.go:hasOnlyExpressionInitializer": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (hasOnlyExpressionInitializer).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/flow_reference.rs:391"
   },
   "tsc/internal/checker/utilities.go:hasOverrideModifier": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly.",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/class_overrides.rs:143"
   },
   "tsc/internal/checker/utilities.go:hasReadonlyModifier": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (hasReadonlyModifier).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/late_indexes.rs:8"
   },
   "tsc/internal/checker/utilities.go:hasType": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "No caller in the pinned checker package; the Rust site named is where the same fact is computed for its own callers.",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/node_builder_reuse.rs:1050"
   },
   "tsc/internal/checker/utilities.go:introducesArgumentsExoticObject": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "later",
+   "owner": "C5",
+   "reason": "its only caller is getSymbolsInScope (C5.5)"
   },
   "tsc/internal/checker/utilities.go:isAdditiveOperator": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "The pin classifies binary operators through a chain of *OrHigher predicates whose only consumer is the compound-like assignment test; Rust answers that test from one operator classification at this site (the in-compound-like caller is ported at flow.rs).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/flow.rs:510"
   },
   "tsc/internal/checker/utilities.go:isAdditiveOperatorOrHigher": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "The pin classifies binary operators through a chain of *OrHigher predicates whose only consumer is the compound-like assignment test; Rust answers that test from one operator classification at this site (the in-compound-like caller is ported at flow.rs).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/flow.rs:510"
   },
   "tsc/internal/checker/utilities.go:isAssignmentOperatorOrHigher": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "The pin classifies binary operators through a chain of *OrHigher predicates whose only consumer is the compound-like assignment test; Rust answers that test from one operator classification at this site (the in-compound-like caller is ported at flow.rs).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/flow.rs:510"
   },
   "tsc/internal/checker/utilities.go:isBinaryOperator": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "No caller in the pinned checker package; the Rust site named is where the same fact is computed for its own callers.",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/arithmetic.rs:226"
   },
   "tsc/internal/checker/utilities.go:isBitwiseOperator": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "The pin classifies binary operators through a chain of *OrHigher predicates whose only consumer is the compound-like assignment test; Rust answers that test from one operator classification at this site (the in-compound-like caller is ported at flow.rs).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/flow.rs:510"
   },
   "tsc/internal/checker/utilities.go:isBitwiseOperatorOrHigher": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "The pin classifies binary operators through a chain of *OrHigher predicates whose only consumer is the compound-like assignment test; Rust answers that test from one operator classification at this site (the in-compound-like caller is ported at flow.rs).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/flow.rs:510"
   },
   "tsc/internal/checker/utilities.go:isCallChain": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (isCallChain).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/expressions.rs:62"
   },
   "tsc/internal/checker/utilities.go:isCompoundLikeAssignment": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "The pin classifies binary operators through a chain of *OrHigher predicates whose only consumer is the compound-like assignment test; Rust answers that test from one operator classification at this site (the in-compound-like caller is ported at flow.rs).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/flow.rs:510"
   },
   "tsc/internal/checker/utilities.go:isConstTypeReference": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (isConstTypeReference).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/check_generics.rs:243"
   },
   "tsc/internal/checker/utilities.go:isConstTypeReferenceName": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (isConstTypeReferenceName).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/name_errors.rs:109"
   },
   "tsc/internal/checker/utilities.go:isDeclarationReadonly": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (isDeclarationReadonly).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/variables.rs:275"
   },
   "tsc/internal/checker/utilities.go:isEmptyArrayLiteral": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (isEmptyArrayLiteral).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/flow_arrays.rs:145"
   },
   "tsc/internal/checker/utilities.go:isEmptyObjectLiteral": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "No caller in the pinned checker package; the Rust site named is where the same fact is computed for its own callers.",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_ast/src/utilities_tail.rs:21"
   },
   "tsc/internal/checker/utilities.go:isEqualityOperator": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "The pin classifies binary operators through a chain of *OrHigher predicates whose only consumer is the compound-like assignment test; Rust answers that test from one operator classification at this site (the in-compound-like caller is ported at flow.rs).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/flow.rs:510"
   },
   "tsc/internal/checker/utilities.go:isEqualityOperatorOrHigher": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "The pin classifies binary operators through a chain of *OrHigher predicates whose only consumer is the compound-like assignment test; Rust answers that test from one operator classification at this site (the in-compound-like caller is ported at flow.rs).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/flow.rs:510"
   },
   "tsc/internal/checker/utilities.go:isExclamationToken": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (isExclamationToken).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/name_scopes.rs:106"
   },
   "tsc/internal/checker/utilities.go:isExponentiationOperator": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "The pin classifies binary operators through a chain of *OrHigher predicates whose only consumer is the compound-like assignment test; Rust answers that test from one operator classification at this site (the in-compound-like caller is ported at flow.rs).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/flow.rs:510"
   },
   "tsc/internal/checker/utilities.go:isExportAssignmentExpressionName": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly.",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/name_errors.rs:378"
   },
   "tsc/internal/checker/utilities.go:isImportTypeQualifierPart": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (isImportTypeQualifierPart).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/query_names.rs:9"
   },
   "tsc/internal/checker/utilities.go:isInNameOfExpressionWithTypeArgumentsOrHeritageTypeReference": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly.",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/query_names.rs:92"
   },
   "tsc/internal/checker/utilities.go:isInfinityOrNaNString": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "No caller in the pinned checker package; the Rust site named is where the same fact is computed for its own callers.",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/node_builder_emit.rs:233"
   },
   "tsc/internal/checker/utilities.go:isJSDocOptionalParameter": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "No caller in the pinned checker package; the Rust site named is where the same fact is computed for its own callers.",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/node_builder_reuse.rs:1161"
   },
   "tsc/internal/checker/utilities.go:isJsxIntrinsicTagName": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "later",
+   "owner": "C4",
+   "reason": "JSX tag classification; the checkJsxElementDeferred and markLinkedReferences callers are C4.3 and C4.5, the symbol-query callers observe it through them"
   },
   "tsc/internal/checker/utilities.go:isLogicalOperatorOrHigher": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "The pin classifies binary operators through a chain of *OrHigher predicates whose only consumer is the compound-like assignment test; Rust answers that test from one operator classification at this site (the in-compound-like caller is ported at flow.rs).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/flow.rs:510"
   },
   "tsc/internal/checker/utilities.go:isMultiplicativeOperator": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "The pin classifies binary operators through a chain of *OrHigher predicates whose only consumer is the compound-like assignment test; Rust answers that test from one operator classification at this site (the in-compound-like caller is ported at flow.rs).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/flow.rs:510"
   },
   "tsc/internal/checker/utilities.go:isMultiplicativeOperatorOrHigher": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "The pin classifies binary operators through a chain of *OrHigher predicates whose only consumer is the compound-like assignment test; Rust answers that test from one operator classification at this site (the in-compound-like caller is ported at flow.rs).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/flow.rs:510"
   },
   "tsc/internal/checker/utilities.go:isNodeDescendantOf": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (isNodeDescendantOf).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/instantiate.rs:718"
   },
   "tsc/internal/checker/utilities.go:isNonNullAccess": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (isNonNullAccess).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/flow_discriminant.rs:158"
   },
   "tsc/internal/checker/utilities.go:isObjectLiteralType": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly.",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/indexes.rs:866"
   },
   "tsc/internal/checker/utilities.go:isObjectOrArrayLiteralType": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (isObjectOrArrayLiteralType).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/constraints.rs:108"
   },
   "tsc/internal/checker/utilities.go:isOptionalDeclaration": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (isOptionalDeclaration).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/function_symbol_checks.rs:95"
   },
   "tsc/internal/checker/utilities.go:isRelationalOperator": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "The pin classifies binary operators through a chain of *OrHigher predicates whose only consumer is the compound-like assignment test; Rust answers that test from one operator classification at this site (the in-compound-like caller is ported at flow.rs).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/flow.rs:510"
   },
   "tsc/internal/checker/utilities.go:isRelationalOperatorOrHigher": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "The pin classifies binary operators through a chain of *OrHigher predicates whose only consumer is the compound-like assignment test; Rust answers that test from one operator classification at this site (the in-compound-like caller is ported at flow.rs).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/flow.rs:510"
   },
   "tsc/internal/checker/utilities.go:isRightSideOfAccessExpression": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "later",
+   "owner": "C5",
+   "reason": "its only caller is the public GetTypeOfSymbolAtLocation (C5.2)"
   },
   "tsc/internal/checker/utilities.go:isShiftOperator": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "The pin classifies binary operators through a chain of *OrHigher predicates whose only consumer is the compound-like assignment test; Rust answers that test from one operator classification at this site (the in-compound-like caller is ported at flow.rs).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/flow.rs:510"
   },
   "tsc/internal/checker/utilities.go:isShiftOperatorOrHigher": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "The pin classifies binary operators through a chain of *OrHigher predicates whose only consumer is the compound-like assignment test; Rust answers that test from one operator classification at this site (the in-compound-like caller is ported at flow.rs).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/flow.rs:510"
   },
   "tsc/internal/checker/utilities.go:isShorthandAmbientModule": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (isShorthandAmbientModule).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/external_aliases.rs:315"
   },
   "tsc/internal/checker/utilities.go:isShorthandAmbientModuleSymbol": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (isShorthandAmbientModuleSymbol).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/external_aliases.rs:315"
   },
   "tsc/internal/checker/utilities.go:isSideEffectImport": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly.",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/external_resolution.rs:212"
   },
   "tsc/internal/checker/utilities.go:isSuperCall": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly.",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/constructor_checks.rs:145"
   },
   "tsc/internal/checker/utilities.go:isThisTypeParameter": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly.",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/access_expressions.rs:91"
   },
   "tsc/internal/checker/utilities.go:isTypeAlias": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (isTypeAlias).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/type_parameters.rs:207"
   },
   "tsc/internal/checker/utilities.go:isTypeAssertion": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly.",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/truthiness.rs:121"
   },
   "tsc/internal/checker/utilities.go:isTypeReferenceIdentifier": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (isTypeReferenceIdentifier).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/name_errors.rs:197"
   },
   "tsc/internal/checker/utilities.go:isTypeUsableAsPropertyName": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "The pin's flag test (string, number or unique-symbol literal) is inlined at this override-check site and at the mapped-type, contextual-assignment and narrowing callers, each testing the same flag mask.",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/class_overrides.rs:30"
   },
   "tsc/internal/checker/utilities.go:isValidESSymbolDeclaration": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (isValidESSymbolDeclaration).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/late_members.rs:514"
   },
   "tsc/internal/checker/utilities.go:isValidNumberString": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (isValidNumberString).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/infer_templates.rs:6"
   },
   "tsc/internal/checker/utilities.go:isVariableDeclarationInVariableStatement": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (isVariableDeclarationInVariableStatement).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/check_type_syntax.rs:9"
   },
   "tsc/internal/checker/utilities.go:minAndMax": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (minAndMax).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/call_failure.rs:83"
   },
   "tsc/internal/checker/utilities.go:nodeStartsNewLexicalEnvironment": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "The pin's only caller, containsArgumentsReference, stops its walk at nodes that start a new lexical environment; the Rust port stops at the same function-like and static-block nodes inside this walk.",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/signature_jsdoc.rs:180"
   },
   "tsc/internal/checker/utilities.go:orderedSet.add": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "orderedSet is the pin's insertion-ordered set for intersection constituents and node-builder scopes; the Rust sites keep an ordered vector with a contains test at each caller.",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/intersection.rs:265"
   },
   "tsc/internal/checker/utilities.go:orderedSet.contains": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "orderedSet is the pin's insertion-ordered set for intersection constituents and node-builder scopes; the Rust sites keep an ordered vector with a contains test at each caller.",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/intersection.rs:265"
   },
   "tsc/internal/checker/utilities.go:pseudoBigIntToString": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (pseudoBigIntToString).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/node_builder.rs:563"
   },
   "tsc/internal/checker/utilities.go:symbolsToArray": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "later",
+   "owner": "C5",
+   "reason": "callers are getSymbolsInScope and the exports services (C5.5)"
   },
   "tsc/internal/checker/utilities.go:tokenIsIdentifierOrKeyword": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "No caller in the pinned checker package; the parser owns the token predicate (tsr_parser tokens.rs).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_parser/src/tokens.rs:201"
   },
   "tsc/internal/checker/utilities.go:tokenIsIdentifierOrKeywordOrGreaterThan": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "No caller in the pinned checker package; the parser owns the token predicate (tsr_parser tokens.rs).",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_parser/src/tokens.rs:201"
   },
   "tsc/internal/checker/utilities.go:walkUpOuterExpressions": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "The pin's only caller, the class expression helper check, walks up outer expressions to the class expression's use; the Rust port walks the same parenthesized and assertion parents at this site.",
+   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/class_expressions.rs:34"
   }
  },
  "groups": {
