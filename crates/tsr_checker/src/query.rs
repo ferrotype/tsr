@@ -55,7 +55,6 @@ pub(crate) struct QueryState {
     pub unresolved_symbols: crate::types::Map<JsString, SymbolId>,
     pub error_types: crate::types::Map<crate::CacheKey, TypeId>,
     pub undefined_properties: crate::types::Map<JsString, SymbolId>,
-    pub function_symbols_checked: crate::types::Set<SymbolId>,
 }
 
 fn required<T>(value: Option<T>, name: &'static str) -> Result<T, Error> {

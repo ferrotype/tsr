@@ -116,8 +116,11 @@ impl CheckerState {
         };
         for property in self.get_properties_of_type(object)? {
             if self.symbol(property)?.flags() & sf::OPTIONAL != 0 {
-                let key = self
-                    .literal_type_from_property(property, tf::STRING_OR_NUMBER_LITERAL_OR_UNIQUE)?;
+                let key = self.literal_type_from_property(
+                    property,
+                    tf::STRING_OR_NUMBER_LITERAL_OR_UNIQUE,
+                    false,
+                )?;
                 if self.is_type_related_to(key, constraint, crate::RelationKind::Assignable)? {
                     return Ok(true);
                 }
@@ -624,9 +627,11 @@ impl CheckerState {
     ) -> Result<Vec<TypeId>, Error> {
         let mut keys = Vec::new();
         for property in self.get_properties_of_type(ty)? {
-            keys.push(
-                self.literal_type_from_property(property, tf::STRING_OR_NUMBER_LITERAL_OR_UNIQUE)?,
-            );
+            keys.push(self.literal_type_from_property(
+                property,
+                tf::STRING_OR_NUMBER_LITERAL_OR_UNIQUE,
+                false,
+            )?);
         }
         if self.types.flags(ty)? & tf::ANY != 0 {
             keys.push(self.builtins.string_type);

@@ -520,3 +520,55 @@ true. This refresh does not refresh the full correctness or measurement
 captures above.
 The relation-stack allocation optimization from review item 7 remains separate:
 its reentrant snapshot requirement has not changed.
+
+## Second review follow-up (2026-09-27)
+
+The review of the symbol-id fix above found the remaining differences from
+Go's lazy `ast.GetSymbolId` assignment and two older defects in C2-owned
+functions. Branch `c2-review-fixes`, on top of the C3 exit, fixes them
+(`edb7e44`):
+
+- Four sites observed the value-symbol link, which assigns the id, after
+  computing the value it stores; the pin observes it first. They are
+  `padObjectLiteralType`, `getTypeFromObjectBindingPattern`,
+  `getTypeFromImportAttributes` and the four `initializeTypeChecker` links.
+- `checkFunctionOrConstructorSymbol` kept its once-only flag in a
+  checker-local set. It now lives on the value links, so every checked
+  function, method and constructor symbol gets its id as in the pin.
+- Type printing assigns ids in Go and did not in Rust: the written name
+  (`getNameOfSymbolAsWritten`), the composite identity of a type with a symbol
+  (`visitAndTransformType`), `addSymbolTypeToContext` and the two
+  `enclosingSymbolTypes` reads, `lookupExpressionChainTypeArgumentNodes`, and
+  the accessibility chain (`getAccessibleSymbolChainFromSymbolTable` and the
+  exports, members and resolved-exports table ids), plus the enum relation key
+  and the emit resolver's linked-alias walk. Each site now takes the id where
+  the pin does; `lookupTypeParameterNodes`, `compareSymbols` and the key
+  builder already did.
+- `getLiteralTypeFromProperty` ignored `includeNonPublic`.
+  `checkIndexConstraints` passes true, so Rust reported a false `TS2411` for a
+  private property beside a number index signature. The function now also
+  tests the modifiers through `getDeclarationModifierFlagsFromSymbol` and
+  reads the late-bound symbol's name type, as the pin does.
+- `instantiateSymbol` lacked the setter branch: a setter whose write type
+  cannot contain type variables is returned as itself instead of copied.
+
+`crates/tsr_compiler/tests/c2_review_fixes.rs` (feature `relation-probe`)
+holds five tests: the pinned tsgo fixture for the index-signature case, the
+setter identity across instantiation, the function symbol's id after
+checking, the padded property's id preceding the ids its element type
+assigns, and the id a written name assigns. The four id and setter tests fail
+with the fixes reverted. A read-only `existing_symbol_runtime_id` probe
+reports an id without assigning one.
+
+The full corpus at `target/phase2/c2rf-full` completed 13,432 rows with no
+harness error, 12,647 full-domain matches, 9,367 of 9,367 regression rows,
+and no regression or changed observation against the recorded C3 exit: the
+corpus does not observe the id drift. Relater parity, the checker unit tests,
+the C1, C2 and C3 contracts and clippy pass. The one S07 anchor the
+node-builder edit moved was re-frozen under the standing approval
+(`302d59b`).
+
+The review's four minor differences (three orderings without an output effect
+and one extra assignment) were reported without locations and are not
+addressed here; an order audit of the 63 `valueSymbolLinks` sites against
+their Rust ports remains open.

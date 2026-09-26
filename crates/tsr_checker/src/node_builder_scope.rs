@@ -55,6 +55,8 @@ impl NodeBuilder<'_> {
                         NameTableId::Exports(symbol),
                         self.checker.symbol(symbol)?.exports(),
                     );
+                    // symbolTableIDFromExports assigns the module symbol's id.
+                    self.checker.symbol_runtime_id(symbol)?;
                     if callback(self, table, Some(node))? {
                         return Ok(true);
                     }
@@ -68,8 +70,13 @@ impl NodeBuilder<'_> {
                         NameTableId::Members(symbol),
                         self.checker.symbol(symbol)?.members(),
                     );
-                    if self.name_table_has_symbols(&table)? && callback(self, table, Some(node))? {
-                        return Ok(true);
+                    if self.name_table_has_symbols(&table)? {
+                        // symbolTableIDFromMembers assigns the class symbol's
+                        // id, only when the filtered table is non-empty.
+                        self.checker.symbol_runtime_id(symbol)?;
+                        if callback(self, table, Some(node))? {
+                            return Ok(true);
+                        }
                     }
                     if kind == K::ClassExpression {
                         if let Some(name) = self.checker.node(node)?.name() {

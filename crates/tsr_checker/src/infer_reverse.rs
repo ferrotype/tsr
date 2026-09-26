@@ -234,8 +234,11 @@ impl CheckerState {
         let limited = self.limited_reverse_constraint(mapped, constraint)?;
         for property in self.get_properties_of_type(source)? {
             if let Some(limited) = limited {
-                let key = self
-                    .literal_type_from_property(property, tf::STRING_OR_NUMBER_LITERAL_OR_UNIQUE)?;
+                let key = self.literal_type_from_property(
+                    property,
+                    tf::STRING_OR_NUMBER_LITERAL_OR_UNIQUE,
+                    false,
+                )?;
                 if !self.is_type_related_to(key, limited, RelationKind::Assignable)? {
                     continue;
                 }

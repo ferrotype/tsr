@@ -581,6 +581,9 @@ impl CheckerState {
         {
             return Ok(false);
         }
+        // EnumRelationKey carries both symbol ids, assigned source first.
+        self.symbol_runtime_id(source)?;
+        self.symbol_runtime_id(target)?;
         if let Some(&related) = self.enums.relations.get(&(source, target)) {
             return Ok(related);
         }

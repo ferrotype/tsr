@@ -38,8 +38,11 @@ impl CheckerState {
             if is_static_index && self.symbol(property)?.flags() & sf::PROTOTYPE != 0 {
                 continue;
             }
-            let key =
-                self.literal_type_from_property(property, tf::STRING_OR_NUMBER_LITERAL_OR_UNIQUE)?;
+            let key = self.literal_type_from_property(
+                property,
+                tf::STRING_OR_NUMBER_LITERAL_OR_UNIQUE,
+                true,
+            )?;
             let value = self.non_missing_symbol_type(property)?;
             self.check_index_property(ty, property, key, value, &indexes)?;
         }
