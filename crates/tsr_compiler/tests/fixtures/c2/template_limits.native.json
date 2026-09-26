@@ -1,0 +1,92 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "source_sha256": "2d1652ed80507adbba88adc43daa8678c16dfe3ce216fc16d5f45dc82db4c49b",
+  "native_executable_sha256": "af6e7b41b4d3a5e07201a925e21a96b1b02f97786bbc45483801a68aa47d3a7a",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--strict",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "template_limits.ts"
+  ],
+  "native_output_sha256": "015168524edf96a33957143fd094e4405514fff773e9126f0ccffcd7bcfd8991",
+  "exit_code": 2,
+  "diagnostics": [
+    {
+      "line": 5,
+      "column": 16,
+      "code": 2590,
+      "message": "Expression produces a union type that is too complex to represent."
+    },
+    {
+      "line": 7,
+      "column": 7,
+      "code": 2322,
+      "message": "Type 'any' is not assignable to type 'never'."
+    },
+    {
+      "line": 10,
+      "column": 29,
+      "code": 2590,
+      "message": "Expression produces a union type that is too complex to represent."
+    },
+    {
+      "line": 12,
+      "column": 7,
+      "code": 2322,
+      "message": "Type 'any' is not assignable to type 'never'."
+    },
+    {
+      "line": 15,
+      "column": 16,
+      "code": 2590,
+      "message": "Expression produces a union type that is too complex to represent."
+    },
+    {
+      "line": 16,
+      "column": 7,
+      "code": 2322,
+      "message": "Type 'any' is not assignable to type 'never'."
+    },
+    {
+      "line": 20,
+      "column": 22,
+      "code": 2590,
+      "message": "Expression produces a union type that is too complex to represent."
+    },
+    {
+      "line": 22,
+      "column": 7,
+      "code": 2322,
+      "message": "Type '(\"00\" | \"000\" | \"001\" | \"002\" | \"003\" | \"004\" | \"005\" | \"006\" | \"007\" | \"008\" | \"009\" | \"01\" | \"010\" | \"011\" | \"012\" | \"013\" | \"014\" | \"015\" | \"016\" | \"017\" | \"018\" | \"019\" | \"02\" | \"020\" | ... 1075 more ... | \"999\")[]' is not assignable to type 'never'."
+    },
+    {
+      "line": 24,
+      "column": 7,
+      "code": 2322,
+      "message": "Type '\"foo\" | (`f${string}` & {})' is not assignable to type 'never'.\n  Type '\"foo\"' is not assignable to type 'never'."
+    },
+    {
+      "line": 26,
+      "column": 7,
+      "code": 2322,
+      "message": "Type '\"foo\" | ({} & `f${string}`)' is not assignable to type 'never'.\n  Type '\"foo\"' is not assignable to type 'never'."
+    },
+    {
+      "line": 28,
+      "column": 11,
+      "code": 2322,
+      "message": "Type '\"foo\" | `f${T}`' is not assignable to type 'never'.\n  Type '\"foo\"' is not assignable to type 'never'."
+    },
+    {
+      "line": 30,
+      "column": 7,
+      "code": 2322,
+      "message": "Type 'string' is not assignable to type 'number'."
+    }
+  ]
+}

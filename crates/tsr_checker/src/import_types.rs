@@ -91,24 +91,14 @@ impl CheckerState {
                     self.constituent_property_ex(ty, text.as_bytes(), false, true)?
                 } else {
                     let exports = self.module_exports_of_symbol(resolved)?;
-                    self.lookup_symbol_resolving(exports, text.as_bytes(), lookup_meaning)?
-                };
-                let Some(next) = next else {
-                    if !type_of {
-                        let immediate = self
-                            .resolve_external_module_symbol(Some(inner), true)?
-                            .ok_or(Error::MissingLink("immediate import namespace"))?;
-                        for declaration in self.symbol_declarations(immediate)?.iter().flatten() {
-                            if self.node(declaration)?.flags()
-                                & tsr_ast::node_flags::JAVA_SCRIPT_FILE
-                                != 0
-                            {
-                                return Err(Error::Unsupported(
-                                    "getTypeFromImportTypeNode: CommonJS typedef export lookup",
-                                ));
-                            }
+                    match self.lookup_symbol_resolving(exports, text.as_bytes(), lookup_meaning)? {
+                        Some(symbol) => Some(symbol),
+                        None => {
+                            self.common_js_import_typedef(inner, text.as_bytes(), lookup_meaning)?
                         }
                     }
+                };
+                let Some(next) = next else {
                     let name = self.fully_qualified_name(namespace, None)?;
                     let member =
                         tsr_scanner::declaration_name_to_string(self.ast(current)?, Some(current))?;
@@ -141,6 +131,39 @@ impl CheckerState {
         *self.query.type_nodes.get_or_default(node) = Some(ty);
         Ok(ty)
     }
+
+    // getTypeFromImportTypeNode's CommonJS fallback reads typedefs from the
+    // parent module only when its immediate export= is a module.exports
+    // assignment. An ordinary JS value export is still missing in type space.
+    fn common_js_import_typedef(
+        &mut self,
+        inner_module: SymbolId,
+        name: &[u8],
+        meaning: u32,
+    ) -> Result<Option<SymbolId>, Error> {
+        let Some(immediate) = self.resolve_external_module_symbol(Some(inner_module), true)? else {
+            return Ok(None);
+        };
+        let mut module_exports = false;
+        for declaration in self.symbol_declarations(immediate)?.iter().flatten() {
+            if tsr_ast::get_assignment_declaration_kind(self.ast(declaration)?, declaration)?
+                == tsr_ast::JSDeclarationKind::ModuleExports
+            {
+                module_exports = true;
+                break;
+            }
+        }
+        if !module_exports {
+            return Ok(None);
+        }
+        let parent = self
+            .symbol(immediate)?
+            .parent()
+            .ok_or(Error::MissingLink("CommonJS export assignment parent"))?;
+        let exports = self.module_exports_of_symbol(parent)?;
+        self.lookup_symbol_resolving(exports, name, meaning)
+    }
+
     // port: tsc/internal/checker/checker.go:Checker.resolveImportSymbolType
     fn resolve_import_symbol_type(
         &mut self,

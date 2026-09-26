@@ -153,17 +153,19 @@ impl CheckerState {
                 (self.builtins.undefined_or_missing_type, ef::OPTIONAL)
             } else {
                 let ty = self.check_expression_for_mutable_location(element)?;
+                let element_type = self.add_type_optionality(ty, true, omitted)?;
                 if tuple_context
                     && self.expression_mode & 2 != 0
                     && self.expression_mode & 4 == 0
                     && self.expression_is_context_sensitive(element)?
                 {
-                    return Err(Error::Unsupported(
-                        "addIntraExpressionInferenceSite: array element",
-                    ));
+                    let inference = self
+                        .call_inference_at_node(node)?
+                        .ok_or(Error::MissingLink("array inference context"))?;
+                    self.add_intra_expression_inference_site(inference, element, ty)?;
                 }
                 (
-                    self.add_type_optionality(ty, true, omitted)?,
+                    element_type,
                     if omitted { ef::OPTIONAL } else { ef::REQUIRED },
                 )
             };

@@ -1,0 +1,2191 @@
+{
+  "changed_observations": [],
+  "compare": [
+    "python3",
+    "scripts/phase2_compare.py",
+    "report",
+    "--native",
+    "target/phase2/native",
+    "--rust",
+    "target/phase2/c2-refusals",
+    "--previous",
+    "target/phase2/c1-reviewed/comparison.json"
+  ],
+  "comparison": {
+    "path": "data/phase2/c2-refusals-comparison.json.gz",
+    "sha256": "515fff4781256750a0539a775ae653f24e29e1d5a84055846d82a405ed24517d"
+  },
+  "executed": 385,
+  "harness_errors": 0,
+  "inventory_sha256": "c09721d36d361eb8646b2321ec3478da0fbdbf12253c086e7b1c34e966aea9b9",
+  "native_observation_sha256": "1b5356b425ad95a3e5e2a0bb29d42534e8d9d4a6159649f063f3317084a0e276",
+  "newly_reached_failures": [
+    {
+      "domains": [
+        "display"
+      ],
+      "id": "compiler/recursiveConditionalCrash3.ts#configuration=0"
+    }
+  ],
+  "partial": true,
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "previous_report_sha256": "00a5a91d3d4d060fbb74a59a5ae6ff18e39ade481f8d43d507a610c07fdca689",
+  "prior_b04_comparison": {
+    "changed_observations": [],
+    "regressions": [],
+    "sha256": "7f49559f3a92fae550be9a1c857fe982c751a61242e074829c16b413d17a8a67"
+  },
+  "purpose": "informational C2 refusal/diagnostic slice; not full checkpoint acceptance",
+  "regression_subset": {
+    "all_domains_match": 100,
+    "by_domain": {
+      "display": {
+        "disabled": 5,
+        "match": 95
+      },
+      "errors": {
+        "match": 100
+      },
+      "parent_pointers": {
+        "match": 100
+      },
+      "symbols": {
+        "disabled": 5,
+        "match": 95
+      },
+      "trace": {
+        "disabled": 99,
+        "match": 1
+      },
+      "types": {
+        "disabled": 5,
+        "match": 95
+      },
+      "union_ordering": {
+        "match": 100
+      }
+    },
+    "rows": 100
+  },
+  "regressions": [],
+  "remaining_unsupported_operations": {
+    "checkClassLikeDeclaration: decorators": 35,
+    "checkDecorators: parameter or binding": 8,
+    "checkExpressionWorker": 138,
+    "content-mapper execution": 27
+  },
+  "run": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "target/phase2/c2-refusals",
+    "--sample",
+    "--jobs",
+    "8",
+    "--case",
+    "compiler/anonClassDeclarationEmitIsAnon.ts#configuration=0",
+    "--case",
+    "compiler/arrayFakeFlatNoCrashInferenceDeclarations.ts#configuration=0",
+    "--case",
+    "compiler/baseConstraintOfDecorator.ts#configuration=0",
+    "--case",
+    "compiler/baseExpressionTypeParameters.ts#configuration=0",
+    "--case",
+    "compiler/bindingPatternCannotBeOnlyInferenceSource.ts#configuration=0",
+    "--case",
+    "compiler/circularReferenceInReturnType2.ts#configuration=0",
+    "--case",
+    "compiler/circularTypeArgumentsLocalAndOuterNoCrash1.ts#configuration=0",
+    "--case",
+    "compiler/conditionalTypeContextualTypeSimplificationsSuceeds.ts#configuration=0",
+    "--case",
+    "compiler/contextualPropertyOfGenericMappedType.ts#configuration=0",
+    "--case",
+    "compiler/contextualTypeFunctionObjectPropertyIntersection.ts#configuration=0",
+    "--case",
+    "compiler/contravariantOnlyInferenceFromAnnotatedFunction.ts#configuration=0",
+    "--case",
+    "compiler/contravariantOnlyInferenceFromAnnotatedFunctionJs.ts#configuration=0",
+    "--case",
+    "compiler/declarationEmitGenericTypeParamerSerialization3.ts#configuration=0",
+    "--case",
+    "compiler/declarationEmitInlinedDistributiveConditional.ts#configuration=0",
+    "--case",
+    "compiler/declarationEmitLocalClassDeclarationMixin.ts#configuration=0",
+    "--case",
+    "compiler/declarationEmitMappedTypePreservesTypeParameterConstraint.ts#configuration=0",
+    "--case",
+    "compiler/declarationEmitPrivateNameCausesError.ts#configuration=0",
+    "--case",
+    "compiler/declarationNoDanglingGenerics.ts#configuration=0",
+    "--case",
+    "compiler/deeplyNestedMappedTypes.ts#configuration=0",
+    "--case",
+    "compiler/definiteAssignmentOfDestructuredVariable.ts#configuration=0",
+    "--case",
+    "compiler/doubleMixinConditionalTypeBaseClassWorks.ts#configuration=0",
+    "--case",
+    "compiler/emitClassExpressionInDeclarationFile.ts#configuration=0",
+    "--case",
+    "compiler/emitClassExpressionInDeclarationFile2.ts#configuration=0",
+    "--case",
+    "compiler/excessivelyDeepConditionalTypes.ts#configuration=0",
+    "--case",
+    "compiler/exportClassExtendingIntersection.ts#configuration=0",
+    "--case",
+    "compiler/homomorphicMappedTypeWithNonHomomorphicInstantiationSpreadable1.ts#configuration=0",
+    "--case",
+    "compiler/indexingTypesWithNever.ts#configuration=0",
+    "--case",
+    "compiler/inferenceExactOptionalProperties2.ts#configuration=0",
+    "--case",
+    "compiler/inferenceUnionOfObjectsMappedContextualType.ts#configuration=0",
+    "--case",
+    "compiler/inferringAnyFunctionType1.ts#configuration=0",
+    "--case",
+    "compiler/inferringAnyFunctionType2.ts#configuration=0",
+    "--case",
+    "compiler/infiniteConstraints.ts#configuration=0",
+    "--case",
+    "compiler/intersectionReductionGenericStringLikeType.ts#configuration=0",
+    "--case",
+    "compiler/intrinsicStringMappingLoneSurrogate.ts#configuration=0",
+    "--case",
+    "compiler/intrinsics.ts#configuration=0",
+    "--case",
+    "compiler/mappedTypeRecursiveInference2.ts#configuration=0",
+    "--case",
+    "compiler/mixinIntersectionIsValidbaseType.ts#configuration=0",
+    "--case",
+    "compiler/mixinOverMappedTypeNoCrash.ts#configuration=0",
+    "--case",
+    "compiler/mixinPrivateAndProtected.ts#configuration=0",
+    "--case",
+    "compiler/mixingApparentTypeOverrides.ts#configuration=0",
+    "--case",
+    "compiler/noCrashOnMixin.ts#configuration=0",
+    "--case",
+    "compiler/noCrashOnMixin2.ts#configuration=0",
+    "--case",
+    "compiler/noCrashOnMixin2_promoted.ts#configuration=0",
+    "--case",
+    "compiler/normalizedIntersectionTooComplex.ts#configuration=0",
+    "--case",
+    "compiler/operationsAvailableOnPromisedType.ts#configuration=0",
+    "--case",
+    "compiler/overrideBaseIntersectionMethod.ts#configuration=0",
+    "--case",
+    "compiler/pickOfLargeObjectUnionWorks.ts#configuration=0",
+    "--case",
+    "compiler/ramdaToolsNoInfinite2.ts#configuration=0",
+    "--case",
+    "compiler/recursiveConditionalCrash1.ts#configuration=0",
+    "--case",
+    "compiler/recursiveConditionalCrash2.ts#configuration=0",
+    "--case",
+    "compiler/recursiveConditionalCrash3.ts#configuration=0",
+    "--case",
+    "compiler/reverseMappedIntersectionInference2.ts#configuration=0",
+    "--case",
+    "compiler/reverseMappedPartiallyInferableTypes.ts#configuration=0",
+    "--case",
+    "compiler/reverseMappedTypeContextualTypesPerElementOfTupleConstraint.ts#configuration=0",
+    "--case",
+    "compiler/reverseMappedTypeInferenceWidening2.ts#configuration=0",
+    "--case",
+    "compiler/reverseMappedTypePrimitiveConstraintProperty.ts#configuration=0",
+    "--case",
+    "compiler/templateLiteralTypeTooComplex.ts#configuration=0",
+    "--case",
+    "compiler/tupleTypes.ts#configuration=0",
+    "--case",
+    "compiler/typeAliasFunctionTypeSharedSymbol.ts#configuration=0",
+    "--case",
+    "compiler/varianceComputationNoCrash.ts#configuration=0",
+    "--case",
+    "conformance/classes/classExpressions/genericClassExpressionInFunction.ts#configuration=0",
+    "--case",
+    "conformance/classes/mixinAbstractClasses.2.ts#configuration=0",
+    "--case",
+    "conformance/classes/mixinAbstractClasses.ts#configuration=0",
+    "--case",
+    "conformance/classes/mixinAbstractClassesReturnTypeInference.ts#configuration=0",
+    "--case",
+    "conformance/classes/mixinAccessors1.ts#configuration=0",
+    "--case",
+    "conformance/classes/mixinAccessors2.ts#configuration=0",
+    "--case",
+    "conformance/classes/mixinAccessors3.ts#configuration=0",
+    "--case",
+    "conformance/classes/mixinAccessors4.ts#configuration=0",
+    "--case",
+    "conformance/classes/mixinClassesAnnotated.ts#configuration=0",
+    "--case",
+    "conformance/classes/mixinClassesAnonymous.ts#configuration=0",
+    "--case",
+    "conformance/classes/propertyMemberDeclarations/accessorsOverrideProperty9.ts#configuration=0",
+    "--case",
+    "conformance/declarationEmit/anonymousClassAccessorsDeclarationEmit1.ts#configuration=0",
+    "--case",
+    "conformance/es6/classExpressions/typeArgumentInferenceWithClassExpression2.ts#configuration=0",
+    "--case",
+    "conformance/expressions/typeGuards/typeGuardFunctionErrors.ts#configuration=0",
+    "--case",
+    "conformance/jsdoc/enumTagImported.ts#configuration=0",
+    "--case",
+    "conformance/jsdoc/jsdocImportTypeReferenceToStringLiteral.ts#configuration=0",
+    "--case",
+    "conformance/salsa/moduleExportAssignment7.ts#configuration=0",
+    "--case",
+    "conformance/types/conditional/conditionalTypes1.ts#configuration=0",
+    "--case",
+    "conformance/types/conditional/inferTypes1.ts#configuration=0",
+    "--case",
+    "conformance/types/import/importWithTypeArguments.ts#configuration=0",
+    "--case",
+    "conformance/types/intersection/intersectionAsWeakTypeSource.ts#configuration=0",
+    "--case",
+    "conformance/types/keyof/keyofAndIndexedAccessErrors.ts#configuration=0",
+    "--case",
+    "conformance/types/literal/stringMappingReduction.ts#configuration=0",
+    "--case",
+    "conformance/types/literal/templateLiteralTypes1.ts#configuration=0",
+    "--case",
+    "conformance/types/literal/templateLiteralTypesPatterns.ts#configuration=0",
+    "--case",
+    "conformance/types/localTypes/localTypes3.ts#configuration=0",
+    "--case",
+    "conformance/types/localTypes/localTypes5.ts#configuration=0",
+    "--case",
+    "conformance/types/typeAliases/intrinsicKeyword.ts#configuration=0",
+    "--case",
+    "conformance/types/typeAliases/intrinsicTypes.ts#configuration=0",
+    "--case",
+    "conformance/types/typeParameters/typeParameterLists/typeParameterConstModifiers.ts#configuration=0",
+    "--case",
+    "conformance/types/typeRelationships/typeInference/intraExpressionInferences.ts#configuration=0"
+  ],
+  "rust_capture_sha256": "ed5fa03c9fbc43e45810e2c7da8b52026fbe149facd8375045bbc9b3bffd9cc5",
+  "selected_full_matches_after": 293,
+  "selected_full_matches_before": 230,
+  "source_stable": true,
+  "targeted_cases": 91,
+  "targeted_full_matches": 65,
+  "targets": [
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/anonClassDeclarationEmitIsAnon.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "different",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "different",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/arrayFakeFlatNoCrashInferenceDeclarations.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/baseConstraintOfDecorator.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/baseExpressionTypeParameters.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "different",
+        "errors": "different",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "different",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/bindingPatternCannotBeOnlyInferenceSource.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "different",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "different",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/circularReferenceInReturnType2.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/circularTypeArgumentsLocalAndOuterNoCrash1.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "different",
+        "errors": "different",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "different",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/conditionalTypeContextualTypeSimplificationsSuceeds.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "different",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "different",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/contextualPropertyOfGenericMappedType.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/contextualTypeFunctionObjectPropertyIntersection.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "different",
+        "errors": "different",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "different",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/contravariantOnlyInferenceFromAnnotatedFunction.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "different",
+        "errors": "different",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "different",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/contravariantOnlyInferenceFromAnnotatedFunctionJs.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/declarationEmitGenericTypeParamerSerialization3.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "different",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/declarationEmitInlinedDistributiveConditional.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/declarationEmitLocalClassDeclarationMixin.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "different",
+        "errors": "different",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "different",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/declarationEmitMappedTypePreservesTypeParameterConstraint.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/declarationEmitPrivateNameCausesError.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/declarationNoDanglingGenerics.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "different",
+        "errors": "different",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "different",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/deeplyNestedMappedTypes.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "different",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "different",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/definiteAssignmentOfDestructuredVariable.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/doubleMixinConditionalTypeBaseClassWorks.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/emitClassExpressionInDeclarationFile.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/emitClassExpressionInDeclarationFile2.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/excessivelyDeepConditionalTypes.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/exportClassExtendingIntersection.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "different",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "different",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/homomorphicMappedTypeWithNonHomomorphicInstantiationSpreadable1.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "different",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/indexingTypesWithNever.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "different",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/inferenceExactOptionalProperties2.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "different",
+        "errors": "different",
+        "parent_pointers": "match",
+        "symbols": "different",
+        "trace": "disabled",
+        "types": "different",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/inferenceUnionOfObjectsMappedContextualType.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/inferringAnyFunctionType1.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/inferringAnyFunctionType2.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "different",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/infiniteConstraints.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/intersectionReductionGenericStringLikeType.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "id": "compiler/intrinsicStringMappingLoneSurrogate.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "id": "compiler/intrinsics.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/mappedTypeRecursiveInference2.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/mixinIntersectionIsValidbaseType.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/mixinOverMappedTypeNoCrash.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/mixinPrivateAndProtected.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/mixingApparentTypeOverrides.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/noCrashOnMixin.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/noCrashOnMixin2.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/noCrashOnMixin2_promoted.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/normalizedIntersectionTooComplex.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/operationsAvailableOnPromisedType.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/overrideBaseIntersectionMethod.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/pickOfLargeObjectUnionWorks.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/ramdaToolsNoInfinite2.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/recursiveConditionalCrash1.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/recursiveConditionalCrash2.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "failed",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/recursiveConditionalCrash3.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/reverseMappedIntersectionInference2.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/reverseMappedPartiallyInferableTypes.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/reverseMappedTypeContextualTypesPerElementOfTupleConstraint.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "different",
+        "errors": "different",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "different",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/reverseMappedTypeInferenceWidening2.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "different",
+        "errors": "different",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "different",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/reverseMappedTypePrimitiveConstraintProperty.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/templateLiteralTypeTooComplex.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/tupleTypes.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/typeAliasFunctionTypeSharedSymbol.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/varianceComputationNoCrash.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "conformance/classes/classExpressions/genericClassExpressionInFunction.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "conformance/classes/mixinAbstractClasses.2.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "conformance/classes/mixinAbstractClasses.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "conformance/classes/mixinAbstractClassesReturnTypeInference.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "conformance/classes/mixinAccessors1.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "conformance/classes/mixinAccessors2.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "conformance/classes/mixinAccessors3.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "conformance/classes/mixinAccessors4.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "different",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "different",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "different",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "conformance/classes/mixinClassesAnnotated.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "conformance/classes/mixinClassesAnonymous.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "conformance/classes/propertyMemberDeclarations/accessorsOverrideProperty9.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "conformance/declarationEmit/anonymousClassAccessorsDeclarationEmit1.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "conformance/es6/classExpressions/typeArgumentInferenceWithClassExpression2.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "conformance/expressions/typeGuards/typeGuardFunctionErrors.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "conformance/jsdoc/enumTagImported.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "conformance/jsdoc/jsdocImportTypeReferenceToStringLiteral.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "conformance/salsa/moduleExportAssignment7.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "different",
+        "errors": "different",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "different",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "conformance/types/conditional/conditionalTypes1.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "different",
+        "errors": "different",
+        "parent_pointers": "match",
+        "symbols": "different",
+        "trace": "disabled",
+        "types": "different",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "conformance/types/conditional/inferTypes1.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "conformance/types/import/importWithTypeArguments.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "different",
+        "errors": "different",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "different",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "conformance/types/intersection/intersectionAsWeakTypeSource.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "different",
+        "errors": "different",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "different",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "conformance/types/keyof/keyofAndIndexedAccessErrors.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "conformance/types/literal/stringMappingReduction.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "conformance/types/literal/templateLiteralTypes1.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "conformance/types/literal/templateLiteralTypesPatterns.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "conformance/types/localTypes/localTypes3.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "conformance/types/localTypes/localTypes5.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "match",
+        "errors": "different",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "id": "conformance/types/typeAliases/intrinsicKeyword.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "match",
+        "errors": "different",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "id": "conformance/types/typeAliases/intrinsicTypes.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "different",
+        "errors": "different",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "different",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "conformance/types/typeParameters/typeParameterLists/typeParameterConstModifiers.ts#configuration=0"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "different",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "conformance/types/typeRelationships/typeInference/intraExpressionInferences.ts#configuration=0"
+    }
+  ],
+  "version": 1
+}

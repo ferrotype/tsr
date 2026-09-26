@@ -186,7 +186,9 @@ impl CheckerState {
                 let right = self.get_intersection_type_ex(&set[middle..], flags, None)?;
                 self.get_intersection_type_ex(&[left, right], flags, alias)?
             } else {
-                self.check_cross_product_union(&set)?;
+                if !self.check_cross_product_union(&set)? {
+                    return Ok(self.builtins.error_type);
+                }
                 let constituents = self.get_cross_product_intersections(&set, flags)?;
                 let mut has_intersection = false;
                 for &ty in &constituents {

@@ -19,20 +19,78 @@ impl NodeBuilder<'_> {
         let arguments = self.checker.get_type_arguments(ty)?;
         let interface = self.checker.types.interface(target)?;
         let outer = interface.outer_type_parameter_count as usize;
-        if arguments[..outer] != interface.type_parameters()[..outer] {
-            return Err(Error::Unsupported(
-                "typeReferenceToTypeNode: applied outer arguments",
-            ));
+        let parameters = interface.type_parameters()[..outer].to_vec();
+        let mut index = 0;
+        let mut result = None;
+        while index < outer {
+            let start = index;
+            let parent = self.type_parameter_parent_symbol(parameters[index])?;
+            index += 1;
+            while index < outer && self.type_parameter_parent_symbol(parameters[index])? == parent {
+                index += 1;
+            }
+            if arguments[start..index] != parameters[start..index] {
+                let reference = self.reference_without_indexed_access(
+                    parent.ok_or(Error::MissingLink("outer type parameter parent symbol"))?,
+                    &arguments[start..index],
+                )?;
+                result = Some(match result {
+                    Some(root) => self.append_reference_to_type(root, reference)?,
+                    None => reference,
+                });
+            }
         }
         let arity = self.reference_display_arity(ty, &arguments)?;
-        self.type_reference(
+        let reference = self.reference_without_indexed_access(
             self.checker
                 .types
                 .get(ty)?
                 .symbol
                 .ok_or(Error::MissingLink("reference symbol"))?,
             &arguments[outer..arity],
-        )
+        )?;
+        match result {
+            Some(root) => self.append_reference_to_type(root, reference),
+            None => Ok(reference),
+        }
+    }
+
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.getParentSymbolOfTypeParameter
+    fn type_parameter_parent_symbol(&mut self, ty: TypeId) -> Result<Option<SymbolId>, Error> {
+        let symbol = self
+            .checker
+            .types
+            .get(ty)?
+            .symbol
+            .ok_or(Error::MissingLink("outer type parameter symbol"))?;
+        let declaration = self
+            .checker
+            .declaration_of_kind(symbol, K::TypeParameter)?
+            .ok_or(Error::MissingLink("outer type parameter declaration"))?;
+        match self.checker.node(declaration)?.parent() {
+            Some(parent) => self.checker.get_symbol_of_declaration(parent),
+            None => Ok(None),
+        }
+    }
+
+    fn reference_without_indexed_access(
+        &mut self,
+        symbol: SymbolId,
+        arguments: &[TypeId],
+    ) -> Result<NodeId, Error> {
+        let arguments = if arguments.is_empty() {
+            None
+        } else {
+            Some(self.type_list(arguments, false)?)
+        };
+        let flags = self.flags;
+        self.flags |= nf::FORBID_INDEXED_ACCESS_SYMBOL_REFERENCES;
+        let result = (|| {
+            self.track_symbol(symbol, sf::TYPE)?;
+            self.symbol_type_node_from_chain(symbol, sf::TYPE, arguments)
+        })();
+        self.flags = flags;
+        result
     }
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.conditionalTypeToTypeNode
@@ -42,16 +100,85 @@ impl NodeBuilder<'_> {
         }
         let data = *self.checker.types.conditional(ty)?;
         let root = self.checker.conditional_root(data.root)?.clone();
+        let check = self.type_node(data.check_type)?;
+        self.approximate_length += 15;
         if self.flags & nf::GENERATE_NAMES_FOR_SHADOWED_TYPE_PARAMS != 0
             && root.distributive
             && self.checker.types.flags(data.check_type)? & crate::type_flags::TYPE_PARAMETER == 0
         {
-            return Err(Error::Unsupported(
-                "conditionalTypeToTypeNode: shadowed distribution parameter",
+            let symbol = self
+                .checker
+                .new_symbol(sf::TYPE_PARAMETER, JsString::from_bytes(b"T".as_slice()))?;
+            let parameter = self.checker.new_type_parameter(Some(symbol))?;
+            let name = self.type_parameter_name(parameter)?;
+            let variable = self.ast.new_type_reference_node(Some(name), None);
+            self.approximate_length += 37;
+            let mapper =
+                self.checker
+                    .prepend_type_mapping(root.check_type, parameter, data.mapper)?;
+            let previous = std::mem::replace(&mut self.infer_parameters, root.infer_parameters);
+            let extends = (|| {
+                let extends = self
+                    .checker
+                    .instantiate_type(root.extends_type, Some(mapper))?;
+                self.type_node(extends)
+            })();
+            self.infer_parameters = previous;
+            let extends = extends?;
+            let (yes, no) = {
+                let read = self.checker.node(root.node)?;
+                let syntax = read
+                    .data_source()
+                    .as_conditional_type_node()
+                    .ok_or(Error::MissingLink("conditional display syntax"))?;
+                (
+                    syntax
+                        .true_type()
+                        .ok_or(Error::MissingLink("conditional true syntax"))?,
+                    syntax
+                        .false_type()
+                        .ok_or(Error::MissingLink("conditional false syntax"))?,
+                )
+            };
+            let yes = self
+                .reuse_type_from_node(yes, false)?
+                .ok_or(Error::MissingLink("conditional true type"))?;
+            let yes = self.checker.instantiate_type(yes, Some(mapper))?;
+            let yes = self.type_node_or_circularity_elision(yes)?;
+            let no = self
+                .reuse_type_from_node(no, false)?
+                .ok_or(Error::MissingLink("conditional false type"))?;
+            let no = self.checker.instantiate_type(no, Some(mapper))?;
+            let no = self.type_node_or_circularity_elision(no)?;
+            let infer_name = tsr_ast::clone_node(&mut self.ast, name);
+            let declaration =
+                self.ast
+                    .new_type_parameter_declaration(None, Some(infer_name), None, None, None);
+            let infer = self.ast.new_infer_type_node(Some(declaration));
+            let inner = self.ast.new_conditional_type_node(
+                Some(variable),
+                Some(extends),
+                Some(yes),
+                Some(no),
+            );
+            let name = tsr_ast::clone_node(&mut self.ast, name);
+            let variable = self.ast.new_type_reference_node(Some(name), None);
+            let cloned_check = tsr_ast::deep_clone_node(&mut self.ast, Some(check));
+            let never = self.ast.new_keyword_type_node(K::NeverKeyword.into());
+            let guarded = self.ast.new_conditional_type_node(
+                Some(variable),
+                cloned_check,
+                Some(inner),
+                Some(never),
+            );
+            let never = self.ast.new_keyword_type_node(K::NeverKeyword.into());
+            return Ok(self.ast.new_conditional_type_node(
+                Some(check),
+                Some(infer),
+                Some(guarded),
+                Some(never),
             ));
         }
-        let check = self.type_node(data.check_type)?;
-        self.approximate_length += 15;
         let previous = std::mem::replace(&mut self.infer_parameters, root.infer_parameters);
         let extends = self.type_node(data.extends_type);
         self.infer_parameters = previous;

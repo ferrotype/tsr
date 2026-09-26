@@ -428,6 +428,27 @@ impl CheckerState {
         } else {
             let annotation = required(self.node(node)?.type_node(), "type alias annotation")?;
             if self.node(annotation)?.kind() == K::IntrinsicKeyword {
+                let parameter_count = self
+                    .source_list(node, self.node(node)?.type_parameter_list())?
+                    .len();
+                let alias_name = self.node_text(name)?;
+                if !(parameter_count == 0 && alias_name.as_bytes() == b"BuiltinIteratorReturn"
+                    || parameter_count == 1
+                        && matches!(
+                            alias_name.as_bytes(),
+                            b"Uppercase"
+                                | b"Lowercase"
+                                | b"Capitalize"
+                                | b"Uncapitalize"
+                                | b"NoInfer"
+                        ))
+                {
+                    self.error_at(
+                        Some(annotation),
+                        messages::The_intrinsic_keyword_can_only_be_used_to_declare_compiler_provided_intrinsic_types,
+                        vec![],
+                    )?;
+                }
                 // The `intrinsic` keyword is a leaf type node with no child nodes to check.
                 return Ok(());
             }

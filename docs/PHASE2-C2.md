@@ -112,3 +112,66 @@ its linked compressed comparison retains all 327 domain results. This is
 intermediate evidence, not a replacement for the C1 record or C2 acceptance.
 Later C2 operators, the full audit, creation-trace contracts, producer wiring
 and quiet-host measurement remain open. No benchmark was run.
+
+## Refusal and diagnostic slice
+
+The next batch ports the remaining immediately attributed refusal paths using
+existing type and inference storage:
+
+- B03 groups applied outer type arguments by declaring container and builds
+  the corresponding reference or instantiation-expression chain. B08 builds
+  the conditional wrapper that preserves distributivity after instantiation.
+  A 16-query native display fixture covers grouped arguments, default groups,
+  shadowed names, flags and conditional inference scopes.
+- B07 registers context-sensitive array elements as intra-expression inference
+  sites, before optionality changes the inferred type. The existing fixing
+  mapper drains those sites. Its direct fixture compares five native errors.
+- B10 reports TS2590 and returns each caller's native recovery result. The
+  intersection caller now honors the failed size check. Template, intersection,
+  spread and tuple probes compare native diagnostics and recovery; tuple
+  normalization deliberately differs from the other recovery paths. The
+  two-constituent pattern-literal intersection with `{}` also preserves the
+  native no-supertype-reduction flag.
+- B11 distinguishes CommonJS typedef exports from ordinary JavaScript value
+  exports and keeps `typeof` and type meanings separate. B01's malformed
+  `import<T>` expression recovers with the builtin error type while preserving
+  grammar and type-argument errors.
+- B16 searches binding-pattern names in source order and reports TS1230 or
+  TS1225 at the predicate name. Renames, omissions, rest elements, defaults and
+  nested patterns are covered by twelve native diagnostics.
+- B18 uses each operator's native compatibility predicate when deciding whether
+  to suggest `await`, preserves original versus base literal types accordingly,
+  and reports the native related-information range. Equality now shares this
+  reporter instead of carrying a second implementation. Its fixture compares
+  all 22 native diagnostics, including nested related information.
+- Intrinsic alias validation follows the pin's name/arity pairs, including
+  `NoInfer` and `BuiltinIteratorReturn`. These forms are allowed outside the
+  libraries too. Invalid names or arities report TS2795; valid constraints
+  still get checked. The plan's earlier library-only wording was corrected.
+
+The native-backed C2 tests share a small diagnostics adapter where their
+contracts coincide. Display and related-information tests retain their own
+observers. All thirteen focused tests pass, and targeted clippy with warnings
+denied passes. Independent source reviews of the array inference, reference
+and conditional display, type-predicate and awaited-operator changes found no
+additional defect. These tests do not replace the sampled corpus comparison
+or the outstanding C2 audit and exit contracts.
+
+The combined sample selected 385 distinct rows: the fixed 300 plus 91 affected
+rows and controls. Every process completed, source inputs stayed stable, and
+there were no harness errors. Full-domain matches rose from 230 at C1 to 293;
+65 of the 91 targets now match completely. All 100 selected S08 regression
+rows still match. No matching domain regressed against C1 or the earlier B04
+sample, and no previously differing domain changed within either overlap.
+
+None of the targeted C2 refusal messages remains in this sample. This exposes
+one further failure in `recursiveConditionalCrash3`: public display fails
+after the conditional wrapper is built. It was previously hidden behind the
+B08 refusal and remains C2 work, not an accepted divergence or closed claim.
+Other targets still have ordinary semantic or display differences.
+
+The exact selection, capture identities, reproduction commands, target outcomes
+and compressed 385-row comparison are retained in
+[data/phase2/c2-refusals.json](../data/phase2/c2-refusals.json). As with B04,
+this is intermediate evidence. The reviewed C1 baseline and C2-start claims
+are preserved.

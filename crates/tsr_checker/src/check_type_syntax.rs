@@ -105,17 +105,25 @@ impl CheckerState {
             .ok_or(Error::MissingLink("predicate"))?
             .parameter_name();
         if data.parameter_index < 0 {
+            let Some(predicate_node) = name else {
+                return Ok(());
+            };
             for parameter in self.source_list(parent, self.node(parent)?.parameter_list())? {
                 if let Some(name) = self.node(parameter)?.name() {
-                    if self.node(name)?.kind() != K::Identifier {
-                        return Err(Error::Unsupported(
-                            "checkIfTypePredicateVariableIsDeclaredInBindingPattern",
-                        ));
+                    if matches!(
+                        self.node(name)?.kind().known(),
+                        Some(K::ArrayBindingPattern | K::ObjectBindingPattern)
+                    ) && self.check_type_predicate_variable_in_binding_pattern(
+                        name,
+                        predicate_node,
+                        &data.parameter_name,
+                    )? {
+                        return Ok(());
                     }
                 }
             }
             self.error_at(
-                name,
+                Some(predicate_node),
                 tsr_diagnostics::Cannot_find_parameter_0,
                 vec![data.parameter_name],
             )?;
@@ -146,6 +154,41 @@ impl CheckerState {
             }
         }
         Ok(())
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.checkIfTypePredicateVariableIsDeclaredInBindingPattern
+    fn check_type_predicate_variable_in_binding_pattern(
+        &mut self,
+        pattern: NodeId,
+        predicate_node: NodeId,
+        predicate_name: &tsr_ast::JsString,
+    ) -> Result<bool, Error> {
+        for element in self.source_list(pattern, self.node(pattern)?.element_list())? {
+            let Some(name) = self.node(element)?.name() else {
+                continue;
+            };
+            if self.node(name)?.kind() == K::Identifier
+                && self.node_text(name)?.as_bytes() == predicate_name.as_bytes()
+            {
+                self.error_at(
+                    Some(predicate_node),
+                    tsr_diagnostics::A_type_predicate_cannot_reference_element_0_in_a_binding_pattern,
+                    vec![predicate_name.clone()],
+                )?;
+                return Ok(true);
+            }
+            if matches!(
+                self.node(name)?.kind().known(),
+                Some(K::ArrayBindingPattern | K::ObjectBindingPattern)
+            ) && self.check_type_predicate_variable_in_binding_pattern(
+                name,
+                predicate_node,
+                predicate_name,
+            )? {
+                return Ok(true);
+            }
+        }
+        Ok(false)
     }
 
     // port: tsc/internal/checker/checker.go:Checker.checkArrayType

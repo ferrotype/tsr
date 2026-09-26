@@ -759,13 +759,12 @@ impl CheckerState {
                 .iter()
                 .position(|&ty| ty == self.builtins.empty_type_literal_type)
             {
-                let other = self.types.flags(types[1 - empty])?;
-                if other & tf::TEMPLATE_LITERAL != 0 {
-                    return Err(Error::Unsupported(
-                        "getTypeFromIntersectionTypeNode: pattern literal",
-                    ));
-                }
-                if other & (tf::STRING | tf::NUMBER | tf::BIG_INT) != 0 {
+                let other = types[1 - empty];
+                let other_flags = self.types.flags(other)?;
+                if other_flags & (tf::STRING | tf::NUMBER | tf::BIG_INT) != 0
+                    || other_flags & tf::TEMPLATE_LITERAL != 0
+                        && self.is_pattern_literal_type(other)?
+                {
                     flags = crate::intersection::NO_SUPERTYPE_REDUCTION;
                 }
             }
@@ -835,6 +834,10 @@ impl CheckerState {
             Some(K::TrueKeyword) => return Ok(self.builtins.true_type),
             Some(K::FalseKeyword) => return Ok(self.builtins.false_type),
             Some(K::NullKeyword) => return Ok(self.builtins.null_widening_type),
+            // A malformed import<T> has already reported its grammar error.
+            // The pin's checkExpressionWorker falls through to errorType for
+            // its bare import keyword; preserve checks of the type arguments.
+            Some(K::ImportKeyword) => return Ok(self.builtins.error_type),
             Some(K::ParenthesizedExpression) => {
                 return self.check_expression_ex(
                     required(read.expression(), "parenthesized expression")?,

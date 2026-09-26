@@ -100,7 +100,7 @@ The buckets at the C1 head (`target/phase2/rust/comparison.json`, owner C2):
 | `unsupported: Expression_produces_a_union_type_that_is_too_complex_to_represent` (B10) | 3 | `templateLiteralTypeTooComplex` | the union-size limit in template-literal cross products (C2.7, C2.10) |
 | `unsupported: getTypeFromImportTypeNode: CommonJS typedef export lookup` (B11) | 3 | `jsdocImportTypeReferenceToStringLiteral` | import types over JSDoc typedef exports (C2.8) |
 | `diagnostics: TS2352` | 2 | `aliasInstantiationExpressionGenericIntersectionNoCrash1` | returned by C1: the comparable relation over instantiation-expression aliases (C2.3) |
-| `diagnostics: TS2795` | 2 | `intrinsicKeyword` | the `intrinsic` keyword outside the lib (C2.7) |
+| `diagnostics: TS2795` | 2 | `intrinsicKeyword` | invalid `intrinsic` alias names or arities (C2.7) |
 | `unsupported: node builder synthetic elision comments` (B13, B14) | 2, 2 | `nestedSpreadsAndWidening`, `hugeDeclarationOutputGetsTruncatedWithError` | node-builder output: re-own to C5 with the trace (decision 2) |
 | `unsupported: someSymbolTableInScope: reparsed module` (B15) | 2 | `jsDeclarationsImportAliasExposedWithinNamespace` | node-builder scope lookup over reparsed JS modules: re-own to C5 (decision 2) |
 | `diagnostics: TS18048`, `TS2536`, `TS7053`, `TS7006`, `TS1477` | 1 each | `specialIntersectionsInMappedTypes`, `unknownControlFlow`, `indexSignatures1`, `contextualTypeCaching`, `instantiationExpressionErrors` | mapped intersections, indexed access under narrowing, index-signature access, contextual type caching, instantiation-expression syntax (C2.6, C2.9, C2.3) |
@@ -411,7 +411,7 @@ authority, and the counts are the marker state at the C1 head.
   (`checker.go:27004`). That helper returns false, and
   `getTemplateLiteralType` then returns the error type; `TS2795`
   (`intrinsicKeyword`: the `intrinsic` keyword
-  outside the lib's four mappings); `isTypeMatchedByTemplateLiteralOrStringMapping`,
+  outside the pinned intrinsic names/arity pairs); `isTypeMatchedByTemplateLiteralOrStringMapping`,
   `applyTemplateStringMapping`, `isTemplateLiteralContext(ualType)`.
 - Exit: the claimed rows match; B04 and B10 are closed; both limit sites have
   a direct case with the pin's diagnostic.
