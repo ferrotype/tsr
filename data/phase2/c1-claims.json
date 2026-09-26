@@ -967,11 +967,11 @@
   },
   {
    "bucket": "failed: stack overflow",
-   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
-   "go": "tsc/internal/checker/checker.go:Checker.hasNonCircularBaseConstraint",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26: the depth guard ported into compute_base_constraint; the row completes and its structured diagnostics match the pin (none)",
+   "go": "tsc/internal/checker/checker.go:Checker.computeBaseConstraint",
    "id": "compiler/infiniteConstraints2.ts#configuration=0",
    "item": "C1.5",
-   "mechanism": "infiniteConstraints2 overflows the stack while resolving constraints; the pin bounds the exploration (10 then 50 levels, deeply nested types) in getResolvedBaseConstraint",
+   "mechanism": "computeBaseConstraint's conditional case stops exploring nested conditional constraints at 100 levels (conditionalConstraintDepth); the port had no such bound, so the unbounded chain of Prepend/Conv instantiations recursed through constraint_from_conditional until the stack overflowed",
    "status": "claimed"
   },
   {

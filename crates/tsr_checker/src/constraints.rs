@@ -433,8 +433,15 @@ impl CheckerState {
             return self.next_base_constraint(constraint, stack);
         }
         if flags & tf::CONDITIONAL != 0 {
-            let constraint = self.constraint_from_conditional(ty)?;
-            return self.next_base_constraint(constraint, stack);
+            // Nested conditional constraints stop at 100 levels, as in the pin;
+            // an unbounded chain of instantiations has no constraint.
+            if self.conditional_constraint_depth >= 100 {
+                return Ok(None);
+            }
+            self.conditional_constraint_depth += 1;
+            let constraint = self.constraint_from_conditional(ty);
+            self.conditional_constraint_depth -= 1;
+            return self.next_base_constraint(constraint?, stack);
         }
         if self.is_generic_tuple_type(ty)? {
             let original = self.element_types(ty)?;

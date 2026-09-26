@@ -48,6 +48,8 @@ pub(crate) struct CheckerState {
     pub(crate) module_aliases: crate::module_aliases::ModuleAliasState,
     pub(crate) bindings: crate::bindings::BindingState,
     pub(crate) within_unreachable_code: bool,
+    /// Nesting of conditional-type constraint exploration; the pin stops at 100.
+    pub(crate) conditional_constraint_depth: u32,
     pub(crate) current_node: Option<NodeId>,
     pub(crate) late_members: crate::late_members::LateMemberState,
     pub(crate) query: crate::query::QueryState,
@@ -122,6 +124,7 @@ impl CheckerState {
             bindings: crate::bindings::BindingState::default(),
             current_node: None,
             within_unreachable_code: false,
+            conditional_constraint_depth: 0,
             query: crate::query::QueryState::default(),
             late_members: crate::late_members::LateMemberState::default(),
             instantiation: crate::instantiate::InstantiationState::default(),
