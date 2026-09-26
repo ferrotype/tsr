@@ -19,6 +19,9 @@ creation-trace diagnostic mode of [ADR 0010](adr/0010-order-sensitive-outputs-ar
 in both binaries and witness its two residual cases. Retain everything S08 and
 C1 implement.
 
+The numbers below describe the pre-review C1 capture, not the amended sources.
+C2.0 refreshes them after the C1 review fixes; C1 completion is not assumed.
+
 C2 exits when all of the following hold on one full run at the C2 head,
 recorded by the owner through `cargo xtask run checker`:
 
@@ -52,11 +55,15 @@ nothing.
 | Limits already in place | `instantiate.rs`: depth 100 or 5,000,000 instantiations report `Type_instantiation_is_excessively_deep_and_possibly_infinite` at the current node; `constraints.rs`: the 100-level conditional constraint bound; `union_reduction.rs`: the union-size error at the pin's cross-product estimate | witnesses to add, not code to write |
 | ADR 0010 assets | the ported comparators (`CompareTypes`, `compareSymbols`, `compareNodes`, `CompareDiagnostics`); the S08 P3 comparator replay (`scripts/s08_p3_comparators.py`, run by the E2 obligations: 8 residual families, 7 union matrices, 77 exact permutations); the union-ordering sub-test over every interned union (C0.7) | the fixtures C2 retains; the sub-test the trace mode complements |
 | Measurement producers | `[checkerbench]` (`scripts/s08_checkerbench.py`: elapsed time and the type footprint over the S08 workload on the quiet host), `[e5]`/`[e6]` (peak RSS) | the capture C2's exit records once, without a threshold |
-| Direct tests | `crates/tsr_compiler/tests/c1_contracts.rs` (7 contracts, feature `relation-probe`), `checker_semantics.rs`, `checker_display.rs`, `checker_dynamic_imports.rs`; 44 direct tests in `tsr_checker` | the homes C2.11 adds to |
-| Pin tracing | the harness overlay build (`phase2_native.build_oracle`) and one-row shard (`run_shard`) accept an instrumented `upstream/tsc` checkout; the `tsgo` CLI skips semantic diagnostics when global diagnostics exist, so noLib rows are traced through the harness | the attribution method of C2.1 (a `PrintStack` or `println` in the pin, one row, `go.stderr`) |
+| Direct tests | `crates/tsr_compiler/tests/c1_contracts.rs` (7 contracts, feature `recursion-probe`), `checker_semantics.rs`, `checker_display.rs`, `checker_dynamic_imports.rs`; 44 direct tests in `tsr_checker` | the homes C2.11 adds to |
+| Pin tracing | the harness overlay build (`phase2_native.build_oracle`) and one-row shard (`run_shard`) support instrumented copies through Go overlays; the pinned `upstream/` checkout remains untouched; the `tsgo` CLI skips semantic diagnostics when global diagnostics exist, so noLib rows are traced through the harness | the attribution method of C2.1 (an access-only observation hook in an overlay, one row, `go.stderr`; never edit the gitlink checkout) |
 
-The C1 exit capture is `target/phase2/rust`; C2.0 moves it aside as
-`target/phase2/rust-c1` and the producer keeps reading `target/phase2/rust`.
+The historical C1 capture is `target/phase2/rust`. Preserve it and its
+row report without overwriting an existing directory. C2.0 captures the reviewed
+C1 sources into a fresh named output, then freezes the authenticated C2 baseline.
+The final producer uses an explicit capture path (or the default
+`target/phase2/rust` after a deliberate promotion); never move or overwrite a
+capture as an incidental exit-check step.
 
 ## 3. What C2 owns
 
@@ -78,13 +85,13 @@ The buckets at the C1 head (`target/phase2/rust/comparison.json`, owner C2):
 
 | Bucket | Variants | Representative | Proposed cause |
 | --- | ---: | --- | --- |
-| `unsupported: typeReferenceToTypeNode: applied outer arguments` (B03) | 36 | `typeArgumentInferenceWithClassExpression` | display of instantiated anonymous types that carry outer type arguments; the instantiation model is C2's (C2.3) |
+| `unsupported: typeReferenceToTypeNode: applied outer arguments` (B03) | 36 | `typeArgumentInferenceWithClassExpression` | missing reference-display branch for applied outer type arguments; existing parameter and argument state must be traced before attributing a type-model gap (C2.3) |
 | `diagnostics: TS4025` | 31 | `declarationEmitTupleRestSignatureLeadingVariadic` | declaration-emit accessibility over C2 types: handoff candidate to C5 unless the trace lands in instantiation |
 | `unsupported: extractRedundantTemplateLiterals` (B04) | 30 | `contextualPropertyOfGenericMappedType` | intersection reduction over template literals (C2.7) |
 | `diagnostics: TS4060` | 10 | `declarationEmitNestedGenerics` | declaration-emit accessibility: handoff candidate to C5 |
 | `different: types` | 9 | `circularInstantiationExpression` | instantiation-expression and conditional display (C2.3, C2.5) |
 | `unsupported: addIntraExpressionInferenceSite: array element` (B07) | 7 | `inferringAnyFunctionType2` | intra-expression inference sites (C2.4) |
-| `unsupported: conditionalTypeToTypeNode: shadowed distribution parameter` (B08) | 5 | `recursiveConditionalCrash1` | conditional display with a shadowed distribution parameter (C2.5) |
+| `unsupported: conditionalTypeToTypeNode: shadowed distribution parameter` (B08) | 5 | `recursiveConditionalCrash1` | conditional display must preserve distribution when the instantiated check type is no longer a type parameter (C2.5) |
 | `diagnostics: TS2345`, `TS2554`, `TS2558` | 4, 1, 1 | `superWithTypeArgument3` | `super` calls with type arguments: argument and arity checking against the instantiated base (C2.9) |
 | `diagnostics: TS7060` | 4 | `nodeModulesForbidenSyntax` | option-dependent checking of `import type` in node16 modules: handoff candidate to C3 |
 | `diagnostics: TS2322`, `TS2339`, `TS2344`, `TS2313` | 3, 3, 3, 1 | `recursiveIndexedAccessSimplification`, `defaultPropsEmptyCurlyBecomesAnyForJs`, `distributiveConditionalBaseConstraint`, `inferTypesWithExtends1` | indexed-access simplification, generic member access, type-argument constraint satisfaction, `infer` constraints (C2.6, C2.2, C2.5) |
@@ -102,8 +109,8 @@ The buckets at the C1 head (`target/phase2/rust/comparison.json`, owner C2):
 | `unsupported: reportOperatorError: awaited operand suggestions` (B18) | 1 | `operationsAvailableOnPromisedType` | the awaited-operand suggestion in operator errors (C2.9) |
 | `unsupported: checkExpressionWorker` (B01, the C2 share) | 1 | `importWithTypeArguments` | `import()` expressions with type arguments (C2.8) |
 | `different: display` | 1 | `spuriousCircularityOnTypeImport` | circular import-type display (C2.8) |
-| `failed: walker_error` | 1 | `packageDeduplicationDuplicateGlobals` | the lazy-root transaction error of the baseline walker; not a checker cause on the current evidence: handoff candidate to C5 |
-| `panic: tsr_ast::factory` | 1 | `declarationEmitAugmentationUsesCorrectSourceFile` | node-builder retention: C5's, recorded by C1 |
+| `failed: walker_error` | 1 historically | `packageDeduplicationDuplicateGlobals` | fixed in the C1 review: discarded package-dependency metadata poisoned module-specifier generation; matches in the reviewed-source C2 baseline |
+| `panic: tsr_ast::factory` | 1 | `declarationEmitAugmentationUsesCorrectSourceFile` | C5 declaration-transform late visibility retention, confirmed by the debugger stack recorded in C1 |
 
 Blockers C2 owns in the register: B03, B04, B07, B08, B10, B11, B13, B14, B15,
 B16, B18 (92 variants) and the C2 share of B01. C2 closes a blocker by
@@ -115,14 +122,16 @@ records every open C2 row with its bucket, its smallest reproduction, the
 pinned function the trace named and a status: `open` (C2's), `closed` (matches
 at the current head, with the commit), `blocked` (a registered blocker of
 another owner withholds it, for example B09), or `handed` (a trace attributes
-the remaining difference to a named checkpoint's cause). Only `open` rows count
+the remaining difference to a named checkpoint's cause). The producer validates the complete inventory and all statuses. A `closed` row
+that no longer matches becomes open again; a candidate without a demonstrated
+cause stays open. Both `open` and regressed `closed` rows count
 in `c2_open`; `handed` rows are counted separately in `c2_handoffs` and listed
 in the C2 record, so the exit shows exactly what C2 leaves to C3 and C5.
 A handoff needs the same evidence a C1 claim needed: the reproduction, the
 pinned function and the observation that places the cause outside C2's groups.
 Rows C1 returned to C2 (the two `TS2352` rows) start as `open`.
 
-The 225 C4-owned rows that also carry C2 families are not C2's exit set; their
+The C4-owned rows that also carry C2 families are not C2's exit set; their
 open outcomes are JSX and decorator refusals. C2's operators are still
 exercised through them, and a C4 row whose only remaining difference is a C2
 operator after C4's refusal is lifted comes back to C2 by the same handoff rule
@@ -139,13 +148,15 @@ authority, and the counts are the marker state at the C1 head.
 
 - Exists: the C1 exit capture and comparison at `c583254`; `phase2_compare.py
   baseline`.
-- Build: `mv target/phase2/rust target/phase2/rust-c1`; one full contract at
-  the branch point (`verify`, `run`, `report --previous
-  target/phase2/rust-c1/comparison.json`, `baseline` into
-  `data/phase2/c2-baseline.json.gz`); `data/phase2/c2-claims.json` from the
+- Build: preserve the historical C1 report, check the existing native capture
+  with its read-only freshness validator, and run one full Rust contract on
+  the reviewed C1 sources in a fresh output directory. Compare against the
+  historical report and explain every change from the C1 review fixes. Freeze
+  the authenticated result with `baseline` into
+  `data/phase2/c2-baseline.json.gz`; `data/phase2/c2-claims.json` from the
   table of section 3, every open C2 row with status `open` and the C1 returns.
-- Exit: 0 harness errors, 0 changed observations against the C1 exit
-  comparison, the baseline committed; the claims file names every open C2 row
+- Exit: 0 harness errors, 0 regressions and an explained per-row delta against
+  the historical C1 comparison, the baseline committed; the claims file names every open C2 row
   exactly once.
 
 ### C2.1 Audit and attribution
@@ -153,6 +164,8 @@ authority, and the counts are the marker state at the C1 head.
 - Exists: `scripts/phase2_audit.py` (dispositions `mapped`, `equivalent`,
   `missing_mapping`, `gap`, `later`; markers as the authority; `--audit`
   selects the document), the C1 audit's conventions for inlined equivalents.
+  The current validator deliberately binds C1's exact reviewed groups; extend
+  it with a separately reviewed C2 scope binding, not by weakening the C1 check.
 - Build: `data/phase2/c2-audit.json` with these groups, each function listed
   by its pinned name:
   - `inference.go` (77 functions, 38 unmarked: `getInferenceState`,
@@ -234,10 +247,9 @@ authority, and the counts are the marker state at the C1 head.
     `getAwaitedTypeOfPromiseEx`).
   The 118 unmarked names above are the inventory of the C1-head marker state,
   not an effort measure: many will be `equivalent` (inlined at a cited Rust
-  site, as 50 of C1's 59 gaps were). The audit also confirms that C1's audit
-  left no `later: C2` disposition: variance measurement over instantiated
-  references was disposed inside C1's groups, and C2.2 re-verifies it over the
-  generic families rather than inheriting a list.
+  site, as 50 of C1's 59 gaps were). C1's explicit `c2-variance-measurement` handoff is separate from its
+  mapped function dispositions. Consume its named functions and seven cases
+  in C2.2; output equality does not prove the measurement flags or cycle state.
 - Build, second half: the attribution of every open row of section 3 to a
   cause, by reproduction (`phase2_corpus.py run --case`) and, where the Rust
   observation does not name the function, by tracing the pin through the
@@ -275,16 +287,22 @@ authority, and the counts are the marker state at the C1 head.
   and the instantiation-expression display of `.types`; the two `TS2352` rows
   C1 returned (the comparable relation over `typeof Err<U>` intersections);
   `TS1477` (instantiation-expression syntax placement); B03: the node builder's
-  `typeReferenceToTypeNode` refuses instantiated anonymous types that carry
-  outer type arguments (36 rows) because the Rust type model does not keep
-  `outerTypeParameters` on single-signature and instantiation-expression types
-  the way `getObjectTypeInstantiation` records them (the C1 wildcard trace
-  showed the same field in play), so C2 keeps this blocker and closes it with
-  the model, not in the builder; the alias instantiation key: the pin keys
+  `typeReferenceToTypeNode` refuses references with applied outer type
+  arguments (36 rows) at `node_builder_extra.rs`. `InterfaceData` already
+  retains the outer-parameter count and parameter identities, while
+  `ReferenceData` retains the resolved arguments. The pin groups outer
+  parameters by declaring container, emits references for groups whose
+  arguments differ from those parameters, and appends the final reference.
+  First compare those values and container identities at the refusing branch.
+  Port missing node-builder behavior using existing identities when sufficient;
+  add type storage only for a demonstrated absent semantic fact. C2 retains
+  this dependency until a trace proves a C5 cause; the alias instantiation key: the pin keys
   `getTypeAliasInstantiation` by the *unfilled* type arguments while
-  `type_alias_instantiation` keys by the filled list, which merges
-  `Foo<string>` and `Foo<string, Default>` into one identity and one displayed
-  alias; C2 ports the pin's keying (decision 4); the unmarked instantiation,
+  `type_alias_instantiation` keys by the filled list, which conflates the alias-cache entries for
+  `Foo<string>` and `Foo<string, Default>`. Port the keying, but do not assume
+  distinct resulting type identities: downstream interning may still unify
+  them in Go. Observe cache work, returned identities and display independently
+  before fixing expectations (decision 4); the unmarked instantiation,
   key and mapper functions of C2.1.
 - Exit: the claimed rows match; `--previous` shows no changed observation
   outside the rows named; the alias-key contract of C2.11 passes.
@@ -318,10 +336,15 @@ authority, and the counts are the marker state at the C1 head.
   and distributive constraints, simplification), `relater_conditional.rs`,
   the C1 fixes listed in section 2.
 - Build: B08 (`conditionalTypeToTypeNode: shadowed distribution parameter`,
-  5 rows): the node builder's conditional display renames a distribution
-  parameter that shadows an outer one, which needs the conditional root's
-  parameter identity that the Rust root does not keep; C2 keeps and closes it
-  with the root model; the unmarked conditional helpers of C2.1; the
+  5 rows): with `GenerateNamesForShadowedTypeParams`, the pin wraps a
+  distributive conditional whenever its instantiated check type is no longer
+  a type parameter. It introduces an `infer T` parameter and two outer
+  conditionals to preserve distribution; a textual name collision is not
+  required. The root already retains the source check and extends types,
+  syntax node and infer parameters; `ConditionalData` retains the mapper and
+  instantiated check and extends types. Trace those identities and prepend the
+  new parameter mapping as the pin does before proposing a root-layout change.
+  Keep B08 with C2 until the cause is attributed; the unmarked conditional helpers of C2.1; the
   `unknownControlFlow` `TS2536` row (indexed access under a narrowed
   conditional); `isDeeplyNestedType` over conditional roots with the pin's
   `Maybe` result (a C1.5 mechanism, now measured over the conditional family);
@@ -357,9 +380,11 @@ authority, and the counts are the marker state at the C1 head.
   reports `Expression_produces_a_union_type_that_is_too_complex_to_represent`).
 - Build: B04, `extractRedundantTemplateLiterals` (30 rows, the refusal in
   `intersection.rs`); B10 (3 rows): `template.rs` refuses the template
-  cross product instead of reporting the pin's error at the pin's site
-  (`getUnionType` over 100,000 constituents, `checker.go:27004`) and returning
-  the error type; `TS2795` (`intrinsicKeyword`: the `intrinsic` keyword
+  cross product instead of reporting the pin's error in
+  `checkCrossProductUnion` when the estimated product is at least 100,000
+  (`checker.go:27004`). That helper returns false, and
+  `getTemplateLiteralType` then returns the error type; `TS2795`
+  (`intrinsicKeyword`: the `intrinsic` keyword
   outside the lib's four mappings); `isTypeMatchedByTemplateLiteralOrStringMapping`,
   `applyTemplateStringMapping`, `isTemplateLiteralContext(ualType)`.
 - Exit: the claimed rows match; B04 and B10 are closed; both limit sites have
@@ -473,16 +498,19 @@ authority, and the counts are the marker state at the C1 head.
   `run.checker.c2_complete`; `[checkerbench]` in `status/runs.toml`.
 - Build: the producer reads `data/phase2/c2-claims.json`,
   `data/phase2/c2-audit.json`, `data/phase2/c2-baseline.json.gz`, the
-  contracts receipt (`observe --witness c2-contracts`, sources: the checker
-  crates and the test crate) and the checkerbench capture identity, and emits
+  contracts receipt (`observe --witness c2-contracts`, exact debug/release
+  commands and test inventory bound to the complete dependency/assets closure) and the checkerbench capture identity, and emits
   `c2_open` (rows with status `open` not matching in every domain),
   `c2_handoffs` (rows with status `handed`, reported, not asserted),
   `c2_regressions` (against the C2 baseline, over the full denominator),
-  `c2_failures` (failed rows whose panic module or error site is a C2 module,
-  `foundation_modules` renamed to the checkpoint's module list),
+  `c2_failures` (all unattributed failures, plus failures traced to C2; only
+  a validated handoff or registered blocker can exclude a failure),
   `c2_blockers_open` (register entries owned by C2 at the exit),
-  `c2_audit_complete`, `c2_contracts`, `c2_measured` (a checkerbench capture
-  whose Rust executable identity equals the exit run's) and `c2_complete`. The
+  `c2_audit_complete`, `c2_contracts`, `c2_measured` (an independently verified checkerbench capture of the same
+  relevant production sources and pin as the exit run; the corpus driver and
+  benchmark are different executables and profiles, so their binary digests
+  must not be equal. Validate each binary against its own build record, then
+  join their common production source/configuration identity explicitly) and `c2_complete`. The
   `c1_*` code is generalized to a per-checkpoint helper rather than copied, so
   C3–C7 reuse it. All new authorities are added to `[checker]` `inputs` in
   `status/runs.toml`; the exit run writes `target/phase2/rust`.
@@ -503,21 +531,23 @@ authority, and the counts are the marker state at the C1 head.
 
 | Dependency | Owner | State for C2 |
 | --- | --- | --- |
-| C1's foundations (symbols, members, tuples, relations, variance state, limits) | C1 | delivered at `c583254`; the C1 recording is the owner's, like C0's |
-| C1's audit handoffs to C2 | C1 | none recorded; C2.2 re-verifies variance over the generic families |
+| C1's foundations (symbols, members, tuples, relations, variance state, limits) | C1 | review fixes and contract validation precede the C2 baseline; unresolved C1 work stays visible |
+| C1's audit handoffs to C2 | C1 | explicit variance measurement handoff in `c1-audit.json` and the C1 record; C2.2 observes its named functions and cases |
 | Narrowing and flow-sensitive operand typing behind `TS2365`, `TS2536` and the JS rows | C3 | handoff targets by trace (section 3); C3 can start its ordinary cases now and its generic-dependent cases after C2.4 |
-| JSX and decorator refusals in the 225 C4 rows that carry C2 families | C4 | not C2's exit set; C2 operators verified through them once C4 lifts the refusal |
-| Declaration-emit diagnostics (TS40xx, TS9010) and node-builder output (B13, B14, B15, the factory panic) | C5 | handoff targets; C2 keeps B03 and B08 because their cause is the type model |
+| JSX and decorator refusals in the C4 rows that carry C2 families | C4 | not C2's exit set; C2 operators verified through them once C4 lifts the refusal |
+| Declaration-emit diagnostics (TS40xx, TS9010) and node-builder output (B13, B14, B15, the factory panic) | C5 | handoff targets; C2 keeps B03 and B08 until the missing node-builder branches and retained type state establish their cause |
 | The emit-order dependency (B09) | C5 emit resolver with Phase 3 emit | withholds 3 rows, two of them C2-owned; unchanged |
-| The `packageDeduplicationDuplicateGlobals` walker error | C5 or the arena owner | traced in C2.1; not assumed to be C2's |
+| The `packageDeduplicationDuplicateGlobals` walker error | C1 | metadata for discarded package dependencies was retained; the C1 review fix filters it at publication and C2.0 confirms the corpus row |
 | The checkerbench capture on the quiet host, and the recording of `checker` | owner | C2.12 |
-| Owner decisions of section 9 | owner | before C2.1 |
+| Execution choices of section 9 | implementer | authorized by the instruction to proceed; new semantic divergences still require owner approval |
 
 ## 6. Delivery order
 
 1. C2.0 the fresh gap map and the claims file, then C2.1 the audit and the
-   attribution of every open row, reviewed before production changes; the
-   audit decides how much of section 4 is mapping work.
+   attribution worksheet. Review each production slice against its pinned
+   functions and affected rows before changing it; keep the remaining rows open.
+   The full audit decides how much of section 4 is mapping work and must be
+   complete at exit, but does not block an independently attributed refusal fix.
 2. The refusals first, because an `unsupported` domain withholds every
    observation of its row: B04 and B10 (C2.7), B07 (C2.4), B03 (C2.3), B08
    (C2.5), B11 and B01's share (C2.8), B16 and B18 (C2.9), each with a direct
@@ -538,11 +568,16 @@ through `--previous`, and match-to-non-match transitions through the baseline.
 
 ## 7. Executable exit checks
 
+`target/phase2/rust-c1/comparison.json` below is the preserved reviewed C1
+report from C2.0. Use its actual saved path if a differently named capture was
+created; do not move over an existing capture. Exit output must be a fresh
+directory (or an explicitly resumed capture with identical inputs).
+
 ```sh
 export PATH="$(mise where go)/bin:$PATH"
 python3 scripts/phase2_inventory.py check
-python3 scripts/phase2_native.py verify --capture target/phase2/native --shards 7 --scheme interleaved --jobs 7
-mv target/phase2/rust target/phase2/rust-c1                                  # once; the producer reads target/phase2/rust
+# Reuse current verified native output. Re-run verify only after an oracle/pin
+# change, not as a routine prelude to every Rust checkpoint.
 python3 scripts/phase2_corpus.py run --native target/phase2/native --output target/phase2/rust
 python3 scripts/phase2_compare.py report --native target/phase2/native --rust target/phase2/rust --previous target/phase2/rust-c1/comparison.json --record
 python3 scripts/phase2_blockers.py build --native target/phase2/native --rust target/phase2/rust --record
@@ -553,9 +588,11 @@ python3 scripts/s08_e2.py obligations --output target/s08/e2-c2               # 
 python3 scripts/s08_relater.py build  --output target/s08/relater-c2
 python3 scripts/s08_relater.py parity --output target/s08/relater-c2         # 105/105, all_cases_match true, both implementations
 python3 scripts/phase2_producers.py checker            # c2_open 0, c2_regressions 0, c2_failures 0, c2_blockers_open 0, c2_audit_complete, c2_contracts, c2_measured, c2_complete; c2_handoffs reported
-python3 -m pytest scripts/tests -q
+python3 -m pytest scripts/tests/test_phase2_*.py -q
 python3 scripts/checks.py fmt && python3 scripts/checks.py clippy
-cargo xtask validate && cargo xtask check P2B                                 # reports P2B-C2 done once the owner records the run
+cargo xtask validate
+# Assert current C2 metrics explicitly. Whole-sprint check P2B remains pending
+# until C3-C7 are complete; a nonzero result is not a C2 implementation failure.
 ```
 
 `scripts/s08_checkerbench.py capture` on the quiet host, `cargo xtask run
@@ -566,13 +603,16 @@ scratch output; the recorded `e2` run stays the owner's.
 
 ## 8. Evidence reuse rules
 
-- The C0 native capture is reused as long as `verify` accepts it; C2 changes
+- The C0 native capture is reused only when its read-only current-input
+  validator succeeds and its authenticated verification record is present; C2 changes
   no oracle source outside the creation-trace hook of the harness overlay,
   which is off during capture and does not alter observations; if the overlay
   fingerprint changes, the native contract is re-verified before the exit.
-- A Rust capture is reused only when `replay` accepts it against the captured
-  executable; every production commit stales it, which is why intermediate
-  work runs the sample.
+- A Rust capture supplies current acceptance only when replay succeeds
+  against the captured executable and reports `source_stable: true` for the
+  current source inputs. Historical replay may succeed with stale sources; that
+  preserves a baseline, not current acceptance. Production source edits stale
+  captures, which is why intermediate work runs the sample.
 - The C2-start baseline is reused only while it names the current native
   observation and inventory digests.
 - Claims are per row and per cause; the claims file is the only record of
@@ -587,18 +627,23 @@ scratch output; the recorded `e2` run stays the owner's.
 - Mapping progress is reported by markers and the ledger, never as behavioral
   coverage; the corpus and the C2.11 contracts are the behavioral evidence.
 
-## 9. Owner decisions before C2 starts
+## 9. Execution decisions
+
+Implementation is authorized on the shared `phase2-c2-plan` branch. The
+choices below preserve the accepted Phase 2 scope and Go authority; they do not
+introduce divergence approvals or authorize a quiet-host benchmark during coding.
 
 1. **Handoff rule.** C2 owns rows; a row whose remaining difference is traced
    to another checkpoint's cause is recorded as `handed` with the trace, is
    excluded from `c2_open` and counted in `c2_handoffs`. The alternative is to
    keep every C2-owned row in `c2_open` until C3 and C5 close them, which
-   would make `c2_complete` depend on later checkpoints. Proposed: the handoff
-   rule, with the handoff list reviewed at the exit.
-2. **Node-builder blockers.** B03 and B08 stay with C2 (their cause is the
-   type model); B13, B14 and B15 (elision comments, the reparsed-module scope
-   lookup) are re-owned to C5 at C2.1 with the trace. Confirm, or keep all
-   five with C2.
+   would make `c2_complete` depend on later checkpoints. Use the handoff
+   rule, with the handoff list reviewed at the exit and unresolved attribution
+   counted as open rather than treated as a handoff.
+2. **Node-builder blockers.** B03 and B08 stay with C2 pending attribution
+   of the missing display branches; B13, B14 and B15 (elision comments, the reparsed-module scope
+   lookup) are re-owned to C5 at C2.1 with the trace. The actual refusing branches and retained type state decide the handoff;
+   the bucket label alone is not evidence of a missing type model.
 3. **Creation-trace mode.** Implement it as C2.10 describes: an access-only
    hook in the harness overlay and a cargo feature in the checker, scoped to
    the two residual kinds, with direct witnesses for both. The alternative is
@@ -606,14 +651,14 @@ scratch output; the recorded `e2` run stays the owner's.
    and the union-ordering sub-test replace it; the review recorded that
    fixtures alone do not discharge the requirement.
 4. **Alias instantiation keys.** Port the pin's keying by unfilled type
-   arguments (C2.3), which changes type identities and displayed alias
-   arguments for references that rely on defaults; the alternative is a
+   arguments (C2.3), with native witnesses establishing which cache identities and displayed alias
+   arguments actually change for references that rely on defaults; the alternative is a
    recorded divergence, which the plan does not expect.
 5. **Measurement.** `c2_measured` requires one checkerbench capture on the
    quiet host at the C2 head, recorded without a threshold, as the plan's
-   section 6 asks; confirm that this capture is the owner's step, like the
-   recording, and that the E5/E6 peak-RSS figures are reported from their
+   section 6 asks; this capture remains the owner's quiet-host step, while the E5/E6 peak-RSS figures are reported from their
    last capture rather than re-measured for C2.
 6. **Exit run.** `c2_complete` is computed only from a recorded full capture,
-   as C1's was. Confirm that the C2 exit recording is the owner's and whether
-   the C1 recording still owed is taken at the same time.
+   as C1's was. Record C1/C2 evidence only when their respective current validators pass;
+   do not certify historical C1 captures against amended source or infer C1
+   completion from C2 parity alone.

@@ -1,0 +1,4879 @@
+{
+ "baseline_sha256": "0751bc1ffc78f6abe4bcc175f5c48d7d990937718e512e37727b0726783c67cb",
+ "inventory_sha256": "c09721d36d361eb8646b2321ec3478da0fbdbf12253c086e7b1c34e966aea9b9",
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "rows": [
+  {
+   "baseline_outcomes": {
+    "display": "different",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "different",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS2352",
+   "id": "compiler/aliasInstantiationExpressionGenericIntersectionNoCrash1.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/aliasInstantiationExpressionGenericIntersectionNoCrash1.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS2352",
+   "id": "compiler/aliasInstantiationExpressionGenericIntersectionNoCrash2.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/aliasInstantiationExpressionGenericIntersectionNoCrash2.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: typeReferenceToTypeNode: applied outer arguments",
+   "id": "compiler/anonClassDeclarationEmitIsAnon.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/anonClassDeclarationEmitIsAnon.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: conditionalTypeToTypeNode: shadowed distribution parameter",
+   "id": "compiler/arrayFakeFlatNoCrashInferenceDeclarations.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/arrayFakeFlatNoCrashInferenceDeclarations.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: typeReferenceToTypeNode: applied outer arguments",
+   "id": "compiler/baseConstraintOfDecorator.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/baseConstraintOfDecorator.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: typeReferenceToTypeNode: applied outer arguments",
+   "id": "compiler/baseExpressionTypeParameters.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/baseExpressionTypeParameters.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS1539",
+   "id": "compiler/bigintPropertyName.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/bigintPropertyName.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: extractRedundantTemplateLiterals",
+   "go": "tsc/internal/checker/checker.go:Checker.extractRedundantTemplateLiterals",
+   "id": "compiler/bindingPatternCannotBeOnlyInferenceSource.ts#configuration=0",
+   "item": "C2.7",
+   "mechanism": "get_intersection_type_ex returns Unsupported instead of reducing template/string-mapping constituents against string literals.",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/bindingPatternCannotBeOnlyInferenceSource.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "different",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "different",
+    "union_ordering": "match"
+   },
+   "bucket": "different: types",
+   "id": "compiler/circularInstantiationExpression.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/circularInstantiationExpression.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: extractRedundantTemplateLiterals",
+   "go": "tsc/internal/checker/checker.go:Checker.extractRedundantTemplateLiterals",
+   "id": "compiler/circularReferenceInReturnType2.ts#configuration=0",
+   "item": "C2.7",
+   "mechanism": "get_intersection_type_ex returns Unsupported instead of reducing template/string-mapping constituents against string literals.",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/circularReferenceInReturnType2.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: typeReferenceToTypeNode: applied outer arguments",
+   "id": "compiler/circularTypeArgumentsLocalAndOuterNoCrash1.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/circularTypeArgumentsLocalAndOuterNoCrash1.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS2344",
+   "id": "compiler/circularlyConstrainedMappedTypeContainingConditionalNoInfiniteInstantiationDepth.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/circularlyConstrainedMappedTypeContainingConditionalNoInfiniteInstantiationDepth.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "different",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS2315",
+   "id": "compiler/cjsExportGenericTypes.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/cjsExportGenericTypes.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "different",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "different",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS2345",
+   "id": "compiler/classExtendsInstantiationExpressionType.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/classExtendsInstantiationExpressionType.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: extractRedundantTemplateLiterals",
+   "go": "tsc/internal/checker/checker.go:Checker.extractRedundantTemplateLiterals",
+   "id": "compiler/conditionalTypeContextualTypeSimplificationsSuceeds.ts#configuration=0",
+   "item": "C2.7",
+   "mechanism": "get_intersection_type_ex returns Unsupported instead of reducing template/string-mapping constituents against string literals.",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/conditionalTypeContextualTypeSimplificationsSuceeds.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "different",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "different",
+    "union_ordering": "match"
+   },
+   "bucket": "different: types",
+   "id": "compiler/contextualOuterTypeParameters.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/contextualOuterTypeParameters.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: extractRedundantTemplateLiterals",
+   "go": "tsc/internal/checker/checker.go:Checker.extractRedundantTemplateLiterals",
+   "id": "compiler/contextualPropertyOfGenericMappedType.ts#configuration=0",
+   "item": "C2.7",
+   "mechanism": "get_intersection_type_ex returns Unsupported instead of reducing template/string-mapping constituents against string literals.",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/contextualPropertyOfGenericMappedType.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "different",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "different",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS7006",
+   "id": "compiler/contextualTypeCaching.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/contextualTypeCaching.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: extractRedundantTemplateLiterals",
+   "go": "tsc/internal/checker/checker.go:Checker.extractRedundantTemplateLiterals",
+   "id": "compiler/contextualTypeFunctionObjectPropertyIntersection.ts#configuration=0",
+   "item": "C2.7",
+   "mechanism": "get_intersection_type_ex returns Unsupported instead of reducing template/string-mapping constituents against string literals.",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/contextualTypeFunctionObjectPropertyIntersection.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: extractRedundantTemplateLiterals",
+   "go": "tsc/internal/checker/checker.go:Checker.extractRedundantTemplateLiterals",
+   "id": "compiler/contravariantOnlyInferenceFromAnnotatedFunction.ts#configuration=0",
+   "item": "C2.7",
+   "mechanism": "get_intersection_type_ex returns Unsupported instead of reducing template/string-mapping constituents against string literals.",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/contravariantOnlyInferenceFromAnnotatedFunction.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: extractRedundantTemplateLiterals",
+   "go": "tsc/internal/checker/checker.go:Checker.extractRedundantTemplateLiterals",
+   "id": "compiler/contravariantOnlyInferenceFromAnnotatedFunctionJs.ts#configuration=0",
+   "item": "C2.7",
+   "mechanism": "get_intersection_type_ex returns Unsupported instead of reducing template/string-mapping constituents against string literals.",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/contravariantOnlyInferenceFromAnnotatedFunctionJs.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4025",
+   "id": "compiler/correlatedUnions.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/correlatedUnions.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: node builder synthetic elision comments",
+   "id": "compiler/crossProductUnionIntersectionRepeatedPropDeclarationsNoOOM1.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/crossProductUnionIntersectionRepeatedPropDeclarationsNoOOM1.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "different",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4025",
+   "id": "compiler/declarationEmitArrowFunctionNoRenaming.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/declarationEmitArrowFunctionNoRenaming.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "failed",
+    "errors": "failed",
+    "parent_pointers": "failed",
+    "symbols": "failed",
+    "trace": "disabled",
+    "types": "failed",
+    "union_ordering": "failed"
+   },
+   "bucket": "panic: tsr_ast::factory",
+   "evidence": "2026-09-26 single captured-executable LLDB replay: declaration_diagnostics_with_checker -> transform_declarations -> module_declaration -> late_statements (statements.rs:113) -> Factory::node (factory.rs:122), WrongOwner. See docs/PHASE2-C1.md and data/phase2/c1-review/augmentation-stack.txt. Traced declaration-transform retention is C5, not an assumed node-builder or C1 relation defect.",
+   "go": "tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.transformAndReplaceLatePaintedStatements",
+   "id": "compiler/declarationEmitAugmentationUsesCorrectSourceFile.ts#configuration=0",
+   "mechanism": "Declaration-transform late visibility processing reads a declaration from another retained program source through the output builder, which initially retains only the emitted source. The failing factory access is in Transformer::late_statements, before the type/symbol walker.",
+   "owner": "C5",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/declarationEmitAugmentationUsesCorrectSourceFile.ts#configuration=0"
+   ],
+   "status": "handed"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4025",
+   "id": "compiler/declarationEmitBindingPatternWithReservedWord.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/declarationEmitBindingPatternWithReservedWord.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4025",
+   "id": "compiler/declarationEmitConstObjectLiteralGenericMethod1.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/declarationEmitConstObjectLiteralGenericMethod1.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4025",
+   "id": "compiler/declarationEmitDistributiveConditionalWithInfer.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/declarationEmitDistributiveConditionalWithInfer.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4025",
+   "id": "compiler/declarationEmitExpandoArrowFunctionParameter.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/declarationEmitExpandoArrowFunctionParameter.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4025",
+   "id": "compiler/declarationEmitExpandoWithGenericConstraint.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/declarationEmitExpandoWithGenericConstraint.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4060",
+   "id": "compiler/declarationEmitFirstTypeArgumentGenericFunctionType.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/declarationEmitFirstTypeArgumentGenericFunctionType.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: typeReferenceToTypeNode: applied outer arguments",
+   "id": "compiler/declarationEmitGenericTypeParamerSerialization3.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/declarationEmitGenericTypeParamerSerialization3.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4025",
+   "id": "compiler/declarationEmitHigherOrderRetainedGenerics.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/declarationEmitHigherOrderRetainedGenerics.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: conditionalTypeToTypeNode: shadowed distribution parameter",
+   "id": "compiler/declarationEmitInlinedDistributiveConditional.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/declarationEmitInlinedDistributiveConditional.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS9010",
+   "id": "compiler/declarationEmitIsolatedDeclarationErrorNotEmittedForNonEmittedFile.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/declarationEmitIsolatedDeclarationErrorNotEmittedForNonEmittedFile.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4076",
+   "id": "compiler/declarationEmitJsExportAssignedArrowNoCrash.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/declarationEmitJsExportAssignedArrowNoCrash.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: typeReferenceToTypeNode: applied outer arguments",
+   "id": "compiler/declarationEmitLocalClassDeclarationMixin.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/declarationEmitLocalClassDeclarationMixin.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "different",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4082",
+   "id": "compiler/declarationEmitMappedTypeDistributivityPreservesConstraints.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/declarationEmitMappedTypeDistributivityPreservesConstraints.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: extractRedundantTemplateLiterals",
+   "go": "tsc/internal/checker/checker.go:Checker.extractRedundantTemplateLiterals",
+   "id": "compiler/declarationEmitMappedTypePreservesTypeParameterConstraint.ts#configuration=0",
+   "item": "C2.7",
+   "mechanism": "get_intersection_type_ex returns Unsupported instead of reducing template/string-mapping constituents against string literals.",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/declarationEmitMappedTypePreservesTypeParameterConstraint.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "different",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4060",
+   "id": "compiler/declarationEmitNestedAnonymousMappedType.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/declarationEmitNestedAnonymousMappedType.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "different",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4060",
+   "id": "compiler/declarationEmitNestedGenerics.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/declarationEmitNestedGenerics.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "different",
+    "union_ordering": "match"
+   },
+   "bucket": "different: types",
+   "id": "compiler/declarationEmitNoInvalidCommentReuse1.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/declarationEmitNoInvalidCommentReuse1.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "different",
+    "union_ordering": "match"
+   },
+   "bucket": "different: types",
+   "id": "compiler/declarationEmitNoInvalidCommentReuse2.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/declarationEmitNoInvalidCommentReuse2.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4025",
+   "id": "compiler/declarationEmitObjectLiteralMethodGenericNoSuffix.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/declarationEmitObjectLiteralMethodGenericNoSuffix.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4025",
+   "id": "compiler/declarationEmitPreserveReferencedImports.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/declarationEmitPreserveReferencedImports.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: typeReferenceToTypeNode: applied outer arguments",
+   "id": "compiler/declarationEmitPrivateNameCausesError.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/declarationEmitPrivateNameCausesError.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "disabled",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "disabled",
+    "trace": "disabled",
+    "types": "disabled",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: node builder synthetic property elision comments",
+   "id": "compiler/declarationEmitPrivatePromiseLikeInterface.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/declarationEmitPrivatePromiseLikeInterface.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "different",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4060",
+   "id": "compiler/declarationEmitPromise.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/declarationEmitPromise.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4025",
+   "id": "compiler/declarationEmitRecursiveConditionalAliasPreserved.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/declarationEmitRecursiveConditionalAliasPreserved.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4025",
+   "id": "compiler/declarationEmitRetainedAnnotationRetainsImportInOutput.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/declarationEmitRetainedAnnotationRetainsImportInOutput.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4025",
+   "id": "compiler/declarationEmitReusesLambdaParameterNodes.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/declarationEmitReusesLambdaParameterNodes.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "different",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4031",
+   "id": "compiler/declarationEmitShadowing.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/declarationEmitShadowing.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "different",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4025",
+   "id": "compiler/declarationEmitShadowingInferNotRenamed.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/declarationEmitShadowingInferNotRenamed.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4052",
+   "id": "compiler/declarationEmitStaticMethodNonIdentifierNames.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/declarationEmitStaticMethodNonIdentifierNames.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4025",
+   "id": "compiler/declarationEmitTupleRestSignatureLeadingVariadic.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/declarationEmitTupleRestSignatureLeadingVariadic.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4025",
+   "id": "compiler/declarationEmitTypeParameterNameInOuterScope.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/declarationEmitTypeParameterNameInOuterScope.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4025",
+   "id": "compiler/declarationEmitTypeParameterNameShadowedInternally.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/declarationEmitTypeParameterNameShadowedInternally.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "different",
+    "union_ordering": "match"
+   },
+   "bucket": "different: types",
+   "id": "compiler/declarationEmitUsingTypeAlias2.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/declarationEmitUsingTypeAlias2.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: typeReferenceToTypeNode: applied outer arguments",
+   "id": "compiler/declarationNoDanglingGenerics.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/declarationNoDanglingGenerics.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4025",
+   "id": "compiler/declarationsWithRecursiveInternalTypesProduceUniqueTypeParams.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/declarationsWithRecursiveInternalTypesProduceUniqueTypeParams.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: extractRedundantTemplateLiterals",
+   "go": "tsc/internal/checker/checker.go:Checker.extractRedundantTemplateLiterals",
+   "id": "compiler/deeplyNestedMappedTypes.ts#configuration=0",
+   "item": "C2.7",
+   "mechanism": "get_intersection_type_ex returns Unsupported instead of reducing template/string-mapping constituents against string literals.",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/deeplyNestedMappedTypes.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "different",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "different",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS2339",
+   "id": "compiler/defaultPropsEmptyCurlyBecomesAnyForJs.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/defaultPropsEmptyCurlyBecomesAnyForJs.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4060",
+   "id": "compiler/deferredLookupTypeResolution.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/deferredLookupTypeResolution.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: extractRedundantTemplateLiterals",
+   "go": "tsc/internal/checker/checker.go:Checker.extractRedundantTemplateLiterals",
+   "id": "compiler/definiteAssignmentOfDestructuredVariable.ts#configuration=0",
+   "item": "C2.7",
+   "mechanism": "get_intersection_type_ex returns Unsupported instead of reducing template/string-mapping constituents against string literals.",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/definiteAssignmentOfDestructuredVariable.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS2344",
+   "id": "compiler/distributiveConditionalBaseConstraint.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/distributiveConditionalBaseConstraint.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: typeReferenceToTypeNode: applied outer arguments",
+   "id": "compiler/doubleMixinConditionalTypeBaseClassWorks.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/doubleMixinConditionalTypeBaseClassWorks.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: typeReferenceToTypeNode: applied outer arguments",
+   "id": "compiler/emitClassExpressionInDeclarationFile.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/emitClassExpressionInDeclarationFile.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: typeReferenceToTypeNode: applied outer arguments",
+   "id": "compiler/emitClassExpressionInDeclarationFile2.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/emitClassExpressionInDeclarationFile2.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: extractRedundantTemplateLiterals",
+   "go": "tsc/internal/checker/checker.go:Checker.extractRedundantTemplateLiterals",
+   "id": "compiler/excessivelyDeepConditionalTypes.ts#configuration=0",
+   "item": "C2.7",
+   "mechanism": "get_intersection_type_ex returns Unsupported instead of reducing template/string-mapping constituents against string literals.",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/excessivelyDeepConditionalTypes.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: typeReferenceToTypeNode: applied outer arguments",
+   "id": "compiler/exportClassExtendingIntersection.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/exportClassExtendingIntersection.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: extractRedundantTemplateLiterals",
+   "go": "tsc/internal/checker/checker.go:Checker.extractRedundantTemplateLiterals",
+   "id": "compiler/homomorphicMappedTypeWithNonHomomorphicInstantiationSpreadable1.ts#configuration=0",
+   "item": "C2.7",
+   "mechanism": "get_intersection_type_ex returns Unsupported instead of reducing template/string-mapping constituents against string literals.",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/homomorphicMappedTypeWithNonHomomorphicInstantiationSpreadable1.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: node builder synthetic property elision comments",
+   "id": "compiler/hugeDeclarationOutputGetsTruncatedWithError.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/hugeDeclarationOutputGetsTruncatedWithError.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4025",
+   "id": "compiler/importTypeGenericArrowTypeParenthesized.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/importTypeGenericArrowTypeParenthesized.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "emit order: native pre/post-emit sets differ",
+   "id": "compiler/incorrectRecursiveMappedTypeConstraint.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/incorrectRecursiveMappedTypeConstraint.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: extractRedundantTemplateLiterals",
+   "go": "tsc/internal/checker/checker.go:Checker.extractRedundantTemplateLiterals",
+   "id": "compiler/indexingTypesWithNever.ts#configuration=0",
+   "item": "C2.7",
+   "mechanism": "get_intersection_type_ex returns Unsupported instead of reducing template/string-mapping constituents against string literals.",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/indexingTypesWithNever.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "different",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "different",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS2345",
+   "id": "compiler/inferenceDoesNotAddUndefinedOrNull.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/inferenceDoesNotAddUndefinedOrNull.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: extractRedundantTemplateLiterals",
+   "go": "tsc/internal/checker/checker.go:Checker.extractRedundantTemplateLiterals",
+   "id": "compiler/inferenceExactOptionalProperties2.ts#configuration=0",
+   "item": "C2.7",
+   "mechanism": "get_intersection_type_ex returns Unsupported instead of reducing template/string-mapping constituents against string literals.",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/inferenceExactOptionalProperties2.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: extractRedundantTemplateLiterals",
+   "go": "tsc/internal/checker/checker.go:Checker.extractRedundantTemplateLiterals",
+   "id": "compiler/inferenceUnionOfObjectsMappedContextualType.ts#configuration=0",
+   "item": "C2.7",
+   "mechanism": "get_intersection_type_ex returns Unsupported instead of reducing template/string-mapping constituents against string literals.",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/inferenceUnionOfObjectsMappedContextualType.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: addIntraExpressionInferenceSite: array element",
+   "id": "compiler/inferringAnyFunctionType1.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/inferringAnyFunctionType1.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: addIntraExpressionInferenceSite: array element",
+   "id": "compiler/inferringAnyFunctionType2.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/inferringAnyFunctionType2.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: extractRedundantTemplateLiterals",
+   "go": "tsc/internal/checker/checker.go:Checker.extractRedundantTemplateLiterals",
+   "id": "compiler/infiniteConstraints.ts#configuration=0",
+   "item": "C2.7",
+   "mechanism": "get_intersection_type_ex returns Unsupported instead of reducing template/string-mapping constituents against string literals.",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/infiniteConstraints.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "different",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4060",
+   "id": "compiler/inlineMappedTypeModifierDeclarationEmit.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/inlineMappedTypeModifierDeclarationEmit.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: extractRedundantTemplateLiterals",
+   "go": "tsc/internal/checker/checker.go:Checker.extractRedundantTemplateLiterals",
+   "id": "compiler/intersectionReductionGenericStringLikeType.ts#configuration=0",
+   "item": "C2.7",
+   "mechanism": "get_intersection_type_ex returns Unsupported instead of reducing template/string-mapping constituents against string literals.",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/intersectionReductionGenericStringLikeType.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4025",
+   "id": "compiler/jsFileFunctionOverloads.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/jsFileFunctionOverloads.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4025",
+   "id": "compiler/jsFileFunctionOverloads2.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/jsFileFunctionOverloads2.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4025",
+   "id": "compiler/mappedTypeGenericIndexedAccess.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/mappedTypeGenericIndexedAccess.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4023",
+   "id": "compiler/mappedTypeGenericInstantiationPreservesHomomorphism.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/mappedTypeGenericInstantiationPreservesHomomorphism.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4025",
+   "id": "compiler/mappedTypeGenericInstantiationPreservesInlineForm.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/mappedTypeGenericInstantiationPreservesInlineForm.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: addIntraExpressionInferenceSite: array element",
+   "id": "compiler/mappedTypeRecursiveInference2.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/mappedTypeRecursiveInference2.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4025",
+   "id": "compiler/mappedTypeWithAsClauseAndLateBoundProperty2.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/mappedTypeWithAsClauseAndLateBoundProperty2.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: typeReferenceToTypeNode: applied outer arguments",
+   "id": "compiler/mixinIntersectionIsValidbaseType.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/mixinIntersectionIsValidbaseType.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: typeReferenceToTypeNode: applied outer arguments",
+   "id": "compiler/mixinOverMappedTypeNoCrash.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/mixinOverMappedTypeNoCrash.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: typeReferenceToTypeNode: applied outer arguments",
+   "id": "compiler/mixinPrivateAndProtected.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/mixinPrivateAndProtected.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: typeReferenceToTypeNode: applied outer arguments",
+   "id": "compiler/mixingApparentTypeOverrides.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/mixingApparentTypeOverrides.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "different",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "different",
+    "union_ordering": "match"
+   },
+   "bucket": "different: types",
+   "id": "compiler/narrowingDestructuring.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/narrowingDestructuring.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: node builder synthetic elision comments",
+   "id": "compiler/nestedSpreadsAndWidening.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/nestedSpreadsAndWidening.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: typeReferenceToTypeNode: applied outer arguments",
+   "id": "compiler/noCrashOnMixin.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/noCrashOnMixin.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: typeReferenceToTypeNode: applied outer arguments",
+   "id": "compiler/noCrashOnMixin2.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/noCrashOnMixin2.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: typeReferenceToTypeNode: applied outer arguments",
+   "id": "compiler/noCrashOnMixin2_promoted.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/noCrashOnMixin2_promoted.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: Expression_produces_a_union_type_that_is_too_complex_to_represent",
+   "id": "compiler/normalizedIntersectionTooComplex.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/normalizedIntersectionTooComplex.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS2365",
+   "id": "compiler/numberVsBigIntOperations.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/numberVsBigIntOperations.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: reportOperatorError: awaited operand suggestions",
+   "id": "compiler/operationsAvailableOnPromisedType.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/operationsAvailableOnPromisedType.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: typeReferenceToTypeNode: applied outer arguments",
+   "id": "compiler/overrideBaseIntersectionMethod.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/overrideBaseIntersectionMethod.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: extractRedundantTemplateLiterals",
+   "go": "tsc/internal/checker/checker.go:Checker.extractRedundantTemplateLiterals",
+   "id": "compiler/pickOfLargeObjectUnionWorks.ts#configuration=0",
+   "item": "C2.7",
+   "mechanism": "get_intersection_type_ex returns Unsupported instead of reducing template/string-mapping constituents against string literals.",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/pickOfLargeObjectUnionWorks.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: extractRedundantTemplateLiterals",
+   "go": "tsc/internal/checker/checker.go:Checker.extractRedundantTemplateLiterals",
+   "id": "compiler/ramdaToolsNoInfinite2.ts#configuration=0",
+   "item": "C2.7",
+   "mechanism": "get_intersection_type_ex returns Unsupported instead of reducing template/string-mapping constituents against string literals.",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/ramdaToolsNoInfinite2.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS2365",
+   "id": "compiler/reachabilityChecksNoCrash1.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/reachabilityChecksNoCrash1.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS2344",
+   "id": "compiler/reactReduxLikeDeferredInferenceAllowsAssignment.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/reactReduxLikeDeferredInferenceAllowsAssignment.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: conditionalTypeToTypeNode: shadowed distribution parameter",
+   "id": "compiler/recursiveConditionalCrash1.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/recursiveConditionalCrash1.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: conditionalTypeToTypeNode: shadowed distribution parameter",
+   "id": "compiler/recursiveConditionalCrash2.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/recursiveConditionalCrash2.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: conditionalTypeToTypeNode: shadowed distribution parameter",
+   "id": "compiler/recursiveConditionalCrash3.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/recursiveConditionalCrash3.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS2322",
+   "id": "compiler/recursiveIndexedAccessSimplification.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/recursiveIndexedAccessSimplification.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: addIntraExpressionInferenceSite: array element",
+   "id": "compiler/reverseMappedIntersectionInference2.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/reverseMappedIntersectionInference2.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: addIntraExpressionInferenceSite: array element",
+   "id": "compiler/reverseMappedPartiallyInferableTypes.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/reverseMappedPartiallyInferableTypes.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: extractRedundantTemplateLiterals",
+   "go": "tsc/internal/checker/checker.go:Checker.extractRedundantTemplateLiterals",
+   "id": "compiler/reverseMappedTypeContextualTypesPerElementOfTupleConstraint.ts#configuration=0",
+   "item": "C2.7",
+   "mechanism": "get_intersection_type_ex returns Unsupported instead of reducing template/string-mapping constituents against string literals.",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/reverseMappedTypeContextualTypesPerElementOfTupleConstraint.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: extractRedundantTemplateLiterals",
+   "go": "tsc/internal/checker/checker.go:Checker.extractRedundantTemplateLiterals",
+   "id": "compiler/reverseMappedTypeInferenceWidening2.ts#configuration=0",
+   "item": "C2.7",
+   "mechanism": "get_intersection_type_ex returns Unsupported instead of reducing template/string-mapping constituents against string literals.",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/reverseMappedTypeInferenceWidening2.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: extractRedundantTemplateLiterals",
+   "go": "tsc/internal/checker/checker.go:Checker.extractRedundantTemplateLiterals",
+   "id": "compiler/reverseMappedTypePrimitiveConstraintProperty.ts#configuration=0",
+   "item": "C2.7",
+   "mechanism": "get_intersection_type_ex returns Unsupported instead of reducing template/string-mapping constituents against string literals.",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/reverseMappedTypePrimitiveConstraintProperty.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "different",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "different",
+    "trace": "disabled",
+    "types": "different",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS18048",
+   "id": "compiler/specialIntersectionsInMappedTypes.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/specialIntersectionsInMappedTypes.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "different",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "different: display",
+   "id": "compiler/spuriousCircularityOnTypeImport.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/spuriousCircularityOnTypeImport.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS2558",
+   "id": "compiler/superWithTypeArgument.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/superWithTypeArgument.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS2554",
+   "id": "compiler/superWithTypeArgument2.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/superWithTypeArgument2.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS2345",
+   "id": "compiler/superWithTypeArgument3.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/superWithTypeArgument3.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: Expression_produces_a_union_type_that_is_too_complex_to_represent",
+   "id": "compiler/templateLiteralTypeTooComplex.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/templateLiteralTypeTooComplex.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4025",
+   "id": "compiler/trackedSymbolsNoCrash.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/trackedSymbolsNoCrash.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: addIntraExpressionInferenceSite: array element",
+   "id": "compiler/tupleTypes.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/tupleTypes.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: typeReferenceToTypeNode: applied outer arguments",
+   "id": "compiler/typeAliasFunctionTypeSharedSymbol.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/typeAliasFunctionTypeSharedSymbol.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "emit order: native pre/post-emit sets differ",
+   "id": "compiler/typeParameterWithInvalidConstraintType.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/typeParameterWithInvalidConstraintType.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: extractRedundantTemplateLiterals",
+   "go": "tsc/internal/checker/checker.go:Checker.extractRedundantTemplateLiterals",
+   "id": "compiler/varianceComputationNoCrash.ts#configuration=0",
+   "item": "C2.7",
+   "mechanism": "get_intersection_type_ex returns Unsupported instead of reducing template/string-mapping constituents against string literals.",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/varianceComputationNoCrash.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: typeReferenceToTypeNode: applied outer arguments",
+   "id": "conformance/classes/classExpressions/genericClassExpressionInFunction.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/classes/classExpressions/genericClassExpressionInFunction.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: typeReferenceToTypeNode: applied outer arguments",
+   "id": "conformance/classes/mixinAbstractClasses.2.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/classes/mixinAbstractClasses.2.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: typeReferenceToTypeNode: applied outer arguments",
+   "id": "conformance/classes/mixinAbstractClasses.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/classes/mixinAbstractClasses.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: typeReferenceToTypeNode: applied outer arguments",
+   "id": "conformance/classes/mixinAbstractClassesReturnTypeInference.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/classes/mixinAbstractClassesReturnTypeInference.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: typeReferenceToTypeNode: applied outer arguments",
+   "id": "conformance/classes/mixinAccessors1.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/classes/mixinAccessors1.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: typeReferenceToTypeNode: applied outer arguments",
+   "id": "conformance/classes/mixinAccessors2.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/classes/mixinAccessors2.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: typeReferenceToTypeNode: applied outer arguments",
+   "id": "conformance/classes/mixinAccessors3.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/classes/mixinAccessors3.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: typeReferenceToTypeNode: applied outer arguments",
+   "id": "conformance/classes/mixinAccessors4.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/classes/mixinAccessors4.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: typeReferenceToTypeNode: applied outer arguments",
+   "id": "conformance/classes/mixinClassesAnnotated.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/classes/mixinClassesAnnotated.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: typeReferenceToTypeNode: applied outer arguments",
+   "id": "conformance/classes/mixinClassesAnonymous.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/classes/mixinClassesAnonymous.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: typeReferenceToTypeNode: applied outer arguments",
+   "id": "conformance/classes/propertyMemberDeclarations/accessorsOverrideProperty9.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/classes/propertyMemberDeclarations/accessorsOverrideProperty9.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "different",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "different",
+    "union_ordering": "match"
+   },
+   "bucket": "different: types",
+   "id": "conformance/controlFlow/controlFlowGenericTypes.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/controlFlow/controlFlowGenericTypes.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: typeReferenceToTypeNode: applied outer arguments",
+   "id": "conformance/declarationEmit/anonymousClassAccessorsDeclarationEmit1.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/declarationEmit/anonymousClassAccessorsDeclarationEmit1.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4025",
+   "id": "conformance/declarationEmit/typeofImportTypeOnlyExport.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/declarationEmit/typeofImportTypeOnlyExport.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: typeReferenceToTypeNode: applied outer arguments",
+   "id": "conformance/es6/classExpressions/typeArgumentInferenceWithClassExpression2.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/es6/classExpressions/typeArgumentInferenceWithClassExpression2.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "different",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "different",
+    "union_ordering": "match"
+   },
+   "bucket": "different: types",
+   "id": "conformance/expressions/arrayLiterals/arrayLiteralInference.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/expressions/arrayLiterals/arrayLiteralInference.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS2365",
+   "id": "conformance/expressions/binaryOperators/comparisonOperator/comparisonOperatorWithNumberOperand.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/expressions/binaryOperators/comparisonOperator/comparisonOperatorWithNumberOperand.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS2337",
+   "id": "conformance/expressions/superCalls/errorSuperCalls.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/expressions/superCalls/errorSuperCalls.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: checkIfTypePredicateVariableIsDeclaredInBindingPattern",
+   "id": "conformance/expressions/typeGuards/typeGuardFunctionErrors.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/expressions/typeGuards/typeGuardFunctionErrors.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS2349",
+   "id": "conformance/jsdoc/declarations/jsDeclarationsFunctions.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/jsdoc/declarations/jsDeclarationsFunctions.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "different",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "different",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS2339",
+   "id": "conformance/jsdoc/declarations/jsDeclarationsFunctionsCjs.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/jsdoc/declarations/jsDeclarationsFunctionsCjs.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: someSymbolTableInScope: reparsed module",
+   "id": "conformance/jsdoc/declarations/jsDeclarationsImportAliasExposedWithinNamespace.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/jsdoc/declarations/jsDeclarationsImportAliasExposedWithinNamespace.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: someSymbolTableInScope: reparsed module",
+   "id": "conformance/jsdoc/declarations/jsDeclarationsImportAliasExposedWithinNamespaceCjs.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/jsdoc/declarations/jsDeclarationsImportAliasExposedWithinNamespaceCjs.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: getTypeFromImportTypeNode: CommonJS typedef export lookup",
+   "id": "conformance/jsdoc/enumTagImported.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/jsdoc/enumTagImported.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS2355",
+   "id": "conformance/jsdoc/errorOnFunctionReturnType.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/jsdoc/errorOnFunctionReturnType.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4025",
+   "id": "conformance/jsdoc/instantiateTemplateTagTypeParameterOnVariableStatement.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/jsdoc/instantiateTemplateTagTypeParameterOnVariableStatement.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: getTypeFromImportTypeNode: CommonJS typedef export lookup",
+   "id": "conformance/jsdoc/jsdocImportTypeReferenceToStringLiteral.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/jsdoc/jsdocImportTypeReferenceToStringLiteral.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "different",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "different",
+    "trace": "disabled",
+    "types": "different",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS2339",
+   "id": "conformance/jsdoc/jsdocThisType.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/jsdoc/jsdocThisType.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS7060",
+   "id": "conformance/node/nodeModulesForbidenSyntax.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/node/nodeModulesForbidenSyntax.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS7060",
+   "id": "conformance/node/nodeModulesForbidenSyntax.ts#configuration=1",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/node/nodeModulesForbidenSyntax.ts#configuration=1"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS7060",
+   "id": "conformance/node/nodeModulesForbidenSyntax.ts#configuration=2",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/node/nodeModulesForbidenSyntax.ts#configuration=2"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS7060",
+   "id": "conformance/node/nodeModulesForbidenSyntax.ts#configuration=3",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/node/nodeModulesForbidenSyntax.ts#configuration=3"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: getTypeFromImportTypeNode: CommonJS typedef export lookup",
+   "id": "conformance/salsa/moduleExportAssignment7.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/salsa/moduleExportAssignment7.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4060",
+   "id": "conformance/salsa/typeTagOnFunctionReferencesGeneric.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/salsa/typeTagOnFunctionReferencesGeneric.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: extractRedundantTemplateLiterals",
+   "go": "tsc/internal/checker/checker.go:Checker.extractRedundantTemplateLiterals",
+   "id": "conformance/types/conditional/conditionalTypes1.ts#configuration=0",
+   "item": "C2.7",
+   "mechanism": "get_intersection_type_ex returns Unsupported instead of reducing template/string-mapping constituents against string literals.",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/types/conditional/conditionalTypes1.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: extractRedundantTemplateLiterals",
+   "go": "tsc/internal/checker/checker.go:Checker.extractRedundantTemplateLiterals",
+   "id": "conformance/types/conditional/inferTypes1.ts#configuration=0",
+   "item": "C2.7",
+   "mechanism": "get_intersection_type_ex returns Unsupported instead of reducing template/string-mapping constituents against string literals.",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/types/conditional/inferTypes1.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "different",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4060",
+   "id": "conformance/types/conditional/inferTypes2.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/types/conditional/inferTypes2.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS2313",
+   "id": "conformance/types/conditional/inferTypesWithExtends1.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/types/conditional/inferTypesWithExtends1.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: checkExpressionWorker",
+   "id": "conformance/types/import/importWithTypeArguments.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/types/import/importWithTypeArguments.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: extractRedundantTemplateLiterals",
+   "go": "tsc/internal/checker/checker.go:Checker.extractRedundantTemplateLiterals",
+   "id": "conformance/types/intersection/intersectionAsWeakTypeSource.ts#configuration=0",
+   "item": "C2.7",
+   "mechanism": "get_intersection_type_ex returns Unsupported instead of reducing template/string-mapping constituents against string literals.",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/types/intersection/intersectionAsWeakTypeSource.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4025",
+   "id": "conformance/types/keyof/keyofAndIndexedAccess.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/types/keyof/keyofAndIndexedAccess.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: extractRedundantTemplateLiterals",
+   "go": "tsc/internal/checker/checker.go:Checker.extractRedundantTemplateLiterals",
+   "id": "conformance/types/keyof/keyofAndIndexedAccessErrors.ts#configuration=0",
+   "item": "C2.7",
+   "mechanism": "get_intersection_type_ex returns Unsupported instead of reducing template/string-mapping constituents against string literals.",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/types/keyof/keyofAndIndexedAccessErrors.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: extractRedundantTemplateLiterals",
+   "go": "tsc/internal/checker/checker.go:Checker.extractRedundantTemplateLiterals",
+   "id": "conformance/types/literal/stringMappingReduction.ts#configuration=0",
+   "item": "C2.7",
+   "mechanism": "get_intersection_type_ex returns Unsupported instead of reducing template/string-mapping constituents against string literals.",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/types/literal/stringMappingReduction.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: Expression_produces_a_union_type_that_is_too_complex_to_represent",
+   "id": "conformance/types/literal/templateLiteralTypes1.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/types/literal/templateLiteralTypes1.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: extractRedundantTemplateLiterals",
+   "go": "tsc/internal/checker/checker.go:Checker.extractRedundantTemplateLiterals",
+   "id": "conformance/types/literal/templateLiteralTypesPatterns.ts#configuration=0",
+   "item": "C2.7",
+   "mechanism": "get_intersection_type_ex returns Unsupported instead of reducing template/string-mapping constituents against string literals.",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/types/literal/templateLiteralTypesPatterns.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: typeReferenceToTypeNode: applied outer arguments",
+   "id": "conformance/types/localTypes/localTypes3.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/types/localTypes/localTypes3.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: typeReferenceToTypeNode: applied outer arguments",
+   "id": "conformance/types/localTypes/localTypes5.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/types/localTypes/localTypes5.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "different",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4060",
+   "id": "conformance/types/mapped/isomorphicMappedTypeInference.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/types/mapped/isomorphicMappedTypeInference.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS2322",
+   "id": "conformance/types/mapped/mappedTypeConstraints2.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/types/mapped/mappedTypeConstraints2.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "emit order: native pre/post-emit sets differ",
+   "id": "conformance/types/mapped/recursiveMappedTypes.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/types/mapped/recursiveMappedTypes.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "different",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "different",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS7053",
+   "id": "conformance/types/members/indexSignatures1.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/types/members/indexSignatures1.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS2345",
+   "id": "conformance/types/rest/restTuplesFromContextualTypes.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/types/rest/restTuplesFromContextualTypes.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS2795",
+   "id": "conformance/types/typeAliases/intrinsicKeyword.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/types/typeAliases/intrinsicKeyword.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS2795",
+   "id": "conformance/types/typeAliases/intrinsicTypes.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/types/typeAliases/intrinsicTypes.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS1477",
+   "id": "conformance/types/typeParameters/typeArgumentLists/instantiationExpressionErrors.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/types/typeParameters/typeArgumentLists/instantiationExpressionErrors.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "different",
+    "errors": "match",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "different",
+    "union_ordering": "match"
+   },
+   "bucket": "different: types",
+   "id": "conformance/types/typeParameters/typeArgumentLists/instantiationExpressions.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/types/typeParameters/typeArgumentLists/instantiationExpressions.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: extractRedundantTemplateLiterals",
+   "go": "tsc/internal/checker/checker.go:Checker.extractRedundantTemplateLiterals",
+   "id": "conformance/types/typeParameters/typeParameterLists/typeParameterConstModifiers.ts#configuration=0",
+   "item": "C2.7",
+   "mechanism": "get_intersection_type_ex returns Unsupported instead of reducing template/string-mapping constituents against string literals.",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/types/typeParameters/typeParameterLists/typeParameterConstModifiers.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4060",
+   "id": "conformance/types/typeParameters/typeParameterLists/typeParametersAvailableInNestedScope3.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/types/typeParameters/typeParameterLists/typeParametersAvailableInNestedScope3.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4025",
+   "id": "conformance/types/typeParameters/typeParameterLists/varianceAnnotations.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/types/typeParameters/typeParameterLists/varianceAnnotations.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS2322",
+   "id": "conformance/types/typeRelationships/recursiveTypes/recursiveTypeReferences2.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/types/typeRelationships/recursiveTypes/recursiveTypeReferences2.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4025",
+   "id": "conformance/types/typeRelationships/typeInference/genericContextualTypes1.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/types/typeRelationships/typeInference/genericContextualTypes1.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "match",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "match"
+   },
+   "bucket": "unsupported: addIntraExpressionInferenceSite: array element",
+   "id": "conformance/types/typeRelationships/typeInference/intraExpressionInferences.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/types/typeRelationships/typeInference/intraExpressionInferences.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS4025",
+   "id": "conformance/types/typeRelationships/typeInference/noInferRedeclaration.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/types/typeRelationships/typeInference/noInferRedeclaration.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "different",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "different",
+    "union_ordering": "match"
+   },
+   "bucket": "diagnostics: TS2536",
+   "id": "conformance/types/unknown/unknownControlFlow.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/types/unknown/unknownControlFlow.ts#configuration=0"
+   ],
+   "status": "open"
+  }
+ ],
+ "rust_capture_sha256": "b6b7ceb630ff3eb9f410284b76768482bf22a873786b81e39257f7fb0d6ab46a",
+ "scope": "C2-start attribution worksheet over every C2-owned row open in the reviewed C1 capture. Open rows remain unresolved until a traced fix and current observation establish closure. An initial bucket is not a cause. This file does not claim audit or C2 completion.",
+ "version": 1
+}
