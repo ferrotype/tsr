@@ -80,6 +80,7 @@ impl CheckerState {
         Ok(false)
     }
 
+    // port: tsc/internal/checker/checker.go:Checker.maybeTypeOfKind
     pub(crate) fn maybe_type_of_kind(
         &self,
         ty: TypeId,
@@ -536,6 +537,7 @@ impl CheckerState {
         Ok(false)
     }
 
+    // port: tsc/internal/checker/checker.go:Checker.isTypeAssignableToKind
     // port: tsc/internal/checker/checker.go:Checker.isTypeAssignableToKindEx
     pub(crate) fn type_assignable_to_kind(
         &mut self,

@@ -261,7 +261,7 @@ pub use handles::{
     MemberSpec, NodeRef, RetainedNode, RetainedSignature, RetainedSymbol, RetainedType,
     RetainedTypeList, SignatureRef, SymbolRef, TypeNodeBuilder, TypeRef,
 };
-pub use host::{CheckerHost, ModuleSpecifierPath};
+pub use host::{CheckerHost, ModuleSpecifierPath, ProjectReferenceSource};
 pub(crate) use ids::{
     AliasId, ConditionalRootId, IndexInfoId, InferenceId, MapperId, RelationFrameId, SignatureId,
     TypeId, TypePredicateId,

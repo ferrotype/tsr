@@ -341,6 +341,20 @@ impl Operation<'_> {
     }
 
     /// Owned counter/cache snapshot. It cannot warm a type or relation cache.
+    /// C3 contract 6: the alias links the resolver reads, for the symbol of
+    /// `declaration` (an import or export specifier, clause or equals declaration).
+    #[cfg(feature = "relation-probe")]
+    pub fn alias_link_state(&mut self, declaration: NodeId) -> Result<serde_json::Value, Error> {
+        let state = self.state_mut();
+        let Some(symbol) = state.get_symbol_of_declaration(declaration)? else {
+            return Ok(serde_json::Value::Null);
+        };
+        Ok(serde_json::json!({
+            "referenced": state.module_aliases.referenced.contains(&symbol),
+            "type_only": state.module_aliases.type_only.contains_key(&symbol),
+        }))
+    }
+
     #[cfg(feature = "relation-probe")]
     pub fn relation_state(&self) -> serde_json::Value {
         let state = self.state();

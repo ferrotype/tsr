@@ -213,7 +213,7 @@ impl CheckerState {
         key: crate::TypeId,
     ) -> Result<crate::TypeId, Error> {
         if let Some(symbol) =
-            self.lookup_symbol(self.builtins.globals, b"Extract", sf::TYPE_ALIAS)?
+            self.lookup_symbol_resolving(self.builtins.globals, b"Extract", sf::TYPE_ALIAS)?
         {
             let declared = self.get_declared_type_of_symbol(symbol)?;
             let parameters = self

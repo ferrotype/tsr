@@ -333,6 +333,7 @@ impl CheckerState {
         Ok(None)
     }
     // Inline copy of `GetPropertyNameForPropertyNameNode`; its Phase 1 home is in tsr_ast (table group targets).
+    // port: tsc/internal/checker/flow.go:tryGetNameFromType
     pub(crate) fn index_property_name_node(&self, node: NodeId) -> Result<JsString, Error> {
         let read = self.node(node)?;
         if read.kind() != K::ComputedPropertyName {

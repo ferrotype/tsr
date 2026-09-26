@@ -78,6 +78,7 @@ impl CheckerState {
             match read.kind().known() {
                 Some(K::ForInStatement) => Ok(self.builtins.string_type),
                 Some(K::ForOfStatement) => self.check_right_hand_side_of_for_of(parent),
+                // port: tsc/internal/checker/flow.go:Checker.getAssignedTypeOfBinaryExpression
                 Some(K::BinaryExpression) => {
                     let right = required(
                         read.data_source()
@@ -103,6 +104,7 @@ impl CheckerState {
                     }
                 }
                 Some(K::DeleteExpression) => Ok(self.builtins.undefined_type),
+                // port: tsc/internal/checker/flow.go:Checker.getAssignedTypeOfArrayLiteralElement
                 Some(K::ArrayLiteralExpression) => {
                     let elements = self.source_list(parent, read.element_list())?;
                     let index = elements
@@ -113,11 +115,14 @@ impl CheckerState {
                     let assigned = self.flow_assigned_type(parent)?;
                     self.flow_destructured_array_element(assigned, index)
                 }
+                // port: tsc/internal/checker/flow.go:Checker.getAssignedTypeOfSpreadExpression
                 Some(K::SpreadElement) => {
                     let array = required(read.parent(), "assigned spread array")?;
                     let assigned = self.flow_assigned_type(array)?;
                     self.flow_destructured_spread_type(assigned)
                 }
+                // port: tsc/internal/checker/flow.go:Checker.getAssignedTypeOfPropertyAssignment
+                // port: tsc/internal/checker/flow.go:Checker.getAssignedTypeOfShorthandPropertyAssignment
                 Some(K::PropertyAssignment | K::ShorthandPropertyAssignment) => {
                     let name = required(read.name(), "assigned property name")?;
                     let object = required(read.parent(), "assigned property object")?;

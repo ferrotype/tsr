@@ -1,0 +1,36 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "source_sha256": "049a16d4c4690bb1c0fc285bc81db91a5bf1cae28156fed992bfcc9218cb9a3b",
+  "native_executable_sha256": "429a5f8e3ee6a3674883329cd1dc8e99481be2071be8a4912fadab28cbfa8501",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "--allowJs",
+    "--checkJs",
+    "--strict",
+    "--module",
+    "commonjs",
+    "changes_mixed_module_exports.js"
+  ],
+  "native_output_sha256": "d69359007b1a9886d07ef15a336a076b0d04d39da29a06a6bb1918034cd89aec",
+  "exit_code": 2,
+  "diagnostics": [
+    {
+      "line": 1,
+      "column": 1,
+      "code": 2309,
+      "message": "An export assignment cannot be used in a module with other exported elements."
+    },
+    {
+      "line": 2,
+      "column": 16,
+      "code": 2339,
+      "message": "Property 'b' does not exist on type '{ a: number; }'."
+    }
+  ]
+}

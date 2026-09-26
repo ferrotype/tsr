@@ -1,0 +1,28 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "source_sha256": "1855c954c100735679483dae2d9e7e273c9e35347dc4a5a57b75829e77f225fb",
+  "native_executable_sha256": "429a5f8e3ee6a3674883329cd1dc8e99481be2071be8a4912fadab28cbfa8501",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "--allowJs",
+    "--checkJs",
+    "--strict",
+    "changes_void_zero_expando.js"
+  ],
+  "native_output_sha256": "00f699fb87d1bc1148c40e7417a06e49620325643802fbd6726559c00cd85d41",
+  "exit_code": 2,
+  "diagnostics": [
+    {
+      "line": 2,
+      "column": 1,
+      "code": 7008,
+      "message": "Member 'y' implicitly has an 'any' type."
+    }
+  ]
+}

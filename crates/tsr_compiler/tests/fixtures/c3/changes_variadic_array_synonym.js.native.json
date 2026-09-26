@@ -1,0 +1,34 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "source_sha256": "871516f5e5d730a18731b352ab8748b88011699cec238df335055147771b0a63",
+  "native_executable_sha256": "429a5f8e3ee6a3674883329cd1dc8e99481be2071be8a4912fadab28cbfa8501",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "--allowJs",
+    "--checkJs",
+    "--strict",
+    "changes_variadic_array_synonym.js"
+  ],
+  "native_output_sha256": "d06cf9d78f20786fc0b1d714f7381d56879ad663faa0e6f7a06e9227c3dbabdc",
+  "exit_code": 2,
+  "diagnostics": [
+    {
+      "line": 6,
+      "column": 8,
+      "code": 2345,
+      "message": "Argument of type 'string' is not assignable to parameter of type 'number'."
+    },
+    {
+      "line": 11,
+      "column": 10,
+      "code": 2345,
+      "message": "Argument of type 'string' is not assignable to parameter of type 'number'."
+    }
+  ]
+}

@@ -131,6 +131,7 @@ impl CheckerState {
             None
         };
         if let Some(name) = name {
+            // port: tsc/internal/checker/flow.go:Checker.getLiteralPropertyNameText
             let ty = self.literal_type_from_property_name(name)?;
             return if self.types.flags(ty)? & tf::STRING_OR_NUMBER_LITERAL != 0 {
                 self.index_property_name(ty)

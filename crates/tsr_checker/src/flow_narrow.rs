@@ -51,6 +51,7 @@ impl CheckerState {
         } else {
             false
         };
+        // port: tsc/internal/checker/flow.go:Checker.narrowTypeByOptionality
         if optionality {
             let facts = if assume {
                 f::NE_UNDEFINED_OR_NULL
@@ -128,6 +129,7 @@ impl CheckerState {
                     );
                 }
             }
+            // port: tsc/internal/checker/flow.go:Checker.narrowTypeByBinaryExpression
             Some(K::BinaryExpression) => {
                 let data = read
                     .data_source()
@@ -150,6 +152,7 @@ impl CheckerState {
                             let candidate = self.reference_candidate(candidate)?;
                             let value = self.reference_candidate(value)?;
                             let read = self.node(candidate)?;
+                            // port: tsc/internal/checker/flow.go:Checker.narrowTypeByTypeof
                             if read.kind() == K::TypeOfExpression
                                 && matches!(
                                     self.node(value)?.kind().known(),
@@ -221,6 +224,7 @@ impl CheckerState {
                         for (expr, value) in [(left, right), (right, left)] {
                             if matches!(
                                 self.node(value)?.kind().known(),
+                                // port: tsc/internal/checker/flow.go:Checker.narrowTypeByBooleanComparison
                                 Some(K::TrueKeyword | K::FalseKeyword)
                             ) && !matches!(
                                 self.node(expr)?.kind().known(),
@@ -419,7 +423,7 @@ impl CheckerState {
             });
         }
         if assume {
-            if let Some(symbol) = self.lookup_symbol(
+            if let Some(symbol) = self.lookup_symbol_resolving(
                 self.builtins.globals,
                 b"Record",
                 tsr_ast::symbol_flags::TYPE_ALIAS,
@@ -509,6 +513,7 @@ impl CheckerState {
         assume: bool,
     ) -> Result<TypeId, Error> {
         let (implied, eq, ne) = match name {
+            // port: tsc/internal/checker/flow.go:Checker.narrowTypeByTypeName
             b"string" => (
                 self.builtins.string_type,
                 f::TYPEOF_EQ_STRING,

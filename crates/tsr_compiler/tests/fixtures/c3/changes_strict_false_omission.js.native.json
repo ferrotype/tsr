@@ -1,0 +1,29 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "source_sha256": "95bc6f35a51c8c4f8bf12b73a237ad36777676b04b1e47af4ab44e19f777f51e",
+  "native_executable_sha256": "429a5f8e3ee6a3674883329cd1dc8e99481be2071be8a4912fadab28cbfa8501",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "--allowJs",
+    "--checkJs",
+    "--strict",
+    "false",
+    "changes_strict_false_omission.js"
+  ],
+  "native_output_sha256": "15b472b5172771e079b77c6ea889aac4cad0e0e6e6c71a5174c4602c5089d3f4",
+  "exit_code": 2,
+  "diagnostics": [
+    {
+      "line": 5,
+      "column": 1,
+      "code": 2554,
+      "message": "Expected 1 arguments, but got 0."
+    }
+  ]
+}

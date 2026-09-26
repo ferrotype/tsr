@@ -71,6 +71,7 @@ impl CheckerState {
             let filtered = self.filter_type(ty, &mut |state, part| {
                 Ok(state.types_comparable(part, value_type)?
                     || double
+                        // port: tsc/internal/checker/flow.go:isCoercibleUnderDoubleEquals
                         && state.types.flags(part)?
                             & (tf::NUMBER | tf::STRING | tf::BOOLEAN_LITERAL)
                             != 0

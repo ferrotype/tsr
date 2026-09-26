@@ -301,12 +301,16 @@ impl Program {
             .0
             .map(|index| self.references.config(index))
     }
-    /// The referenced project a source belongs to (the pin's
+    /// The referenced project a source belongs to, with the declaration output
+    /// that stands in for the source (the pin's
     /// Program.GetProjectReferenceFromSource, a checker accessor).
-    pub fn project_reference_from_source(&self, path: &[u8]) -> Option<&ParsedCommandLine> {
+    pub fn project_reference_from_source(
+        &self,
+        path: &[u8],
+    ) -> Option<(&JsString, &ParsedCommandLine)> {
         self.references
             .project_reference_from_source(path)
-            .map(|file| self.references.config(file.config))
+            .map(|file| (&file.output_dts, self.references.config(file.config)))
     }
     /// The referenced project a declaration output belongs to (the pin's
     /// Program.GetProjectReferenceFromOutputDts, a checker accessor).

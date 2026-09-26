@@ -1,0 +1,29 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "source_sha256": "5b676635ab9e30b4fc7b6bbe002cae365f099975fea1732d4c2549588431b3ac",
+  "native_executable_sha256": "429a5f8e3ee6a3674883329cd1dc8e99481be2071be8a4912fadab28cbfa8501",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "--strict",
+    "--verbatimModuleSyntax",
+    "--module",
+    "esnext",
+    "options_verbatim_module_syntax.ts"
+  ],
+  "native_output_sha256": "fc99f553b26471d214ad9c1540d6c626edb3df716671185be075d7793173d996",
+  "exit_code": 2,
+  "diagnostics": [
+    {
+      "line": 2,
+      "column": 10,
+      "code": 1205,
+      "message": "Re-exporting a type when 'verbatimModuleSyntax' is enabled requires using 'export type'."
+    }
+  ]
+}

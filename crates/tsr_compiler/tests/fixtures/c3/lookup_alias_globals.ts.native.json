@@ -1,0 +1,38 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "source_sha256": "338d5bb1fe5209a21bb88edf31d57c1b38bc7eca363cebfbc9384634b55e1461",
+  "native_executable_sha256": "429a5f8e3ee6a3674883329cd1dc8e99481be2071be8a4912fadab28cbfa8501",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "--strict",
+    "lookup_alias_globals.ts"
+  ],
+  "native_output_sha256": "af8fda30b039307f5cfd0ba7c33b1cb3a9fef008b7d2c62d6d6f303aba119b14",
+  "exit_code": 2,
+  "diagnostics": [
+    {
+      "line": 5,
+      "column": 1,
+      "code": 2440,
+      "message": "Import declaration conflicts with local declaration of 'Record'."
+    },
+    {
+      "line": 6,
+      "column": 1,
+      "code": 2440,
+      "message": "Import declaration conflicts with local declaration of 'NaN'."
+    },
+    {
+      "line": 15,
+      "column": 10,
+      "code": 2845,
+      "message": "This condition will always return 'false'."
+    }
+  ]
+}

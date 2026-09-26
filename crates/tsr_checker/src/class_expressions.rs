@@ -194,6 +194,7 @@ impl CheckerState {
         Ok(ty.unwrap_or(self.builtins.any_type))
     }
 
+    // port: tsc/internal/checker/checker.go:Checker.tryGetThisTypeAt
     // port: tsc/internal/checker/checker.go:Checker.tryGetThisTypeAtEx
     pub(crate) fn try_this_type_at(
         &mut self,

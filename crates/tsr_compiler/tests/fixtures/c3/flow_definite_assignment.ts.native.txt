@@ -1,0 +1,4 @@
+flow_definite_assignment.ts(6,10): error TS2454: Variable 'a' is used before being assigned.
+flow_definite_assignment.ts(15,10): error TS2454: Variable 'b' is used before being assigned.
+flow_definite_assignment.ts(22,5): error TS2454: Variable 'c' is used before being assigned.
+flow_definite_assignment.ts(27,3): error TS2564: Property 'x' has no initializer and is not definitely assigned in the constructor.

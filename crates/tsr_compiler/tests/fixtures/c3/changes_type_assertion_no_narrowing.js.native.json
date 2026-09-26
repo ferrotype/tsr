@@ -1,0 +1,28 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "source_sha256": "79982a0a3f8b5e2fb55579fa0c214f3bf97081610cedc631598f24565073f285",
+  "native_executable_sha256": "429a5f8e3ee6a3674883329cd1dc8e99481be2071be8a4912fadab28cbfa8501",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "--allowJs",
+    "--checkJs",
+    "--strict",
+    "changes_type_assertion_no_narrowing.js"
+  ],
+  "native_output_sha256": "3b7f7e2f32cf3fa234323789ccb5a202f0097e26506f251d21e9f5b1b3efb891",
+  "exit_code": 2,
+  "diagnostics": [
+    {
+      "line": 5,
+      "column": 5,
+      "code": 18048,
+      "message": "'cu' is possibly 'undefined'."
+    }
+  ]
+}

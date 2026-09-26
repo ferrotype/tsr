@@ -532,6 +532,8 @@ impl CheckerState {
             .generator_return_iteration_types(ty, asynchronous)?
             .get(kind))
     }
+    // port: tsc/internal/checker/checker.go:Checker.combineIterationTypes
+    // port: tsc/internal/checker/checker.go:Checker.getIterationTypeUnion
     pub(crate) fn combine_iteration_types(
         &mut self,
         values: &[IterationTypes],
@@ -639,6 +641,7 @@ impl CheckerState {
         allow_string: bool,
     ) -> Result<(&'static d::Message, bool), Error> {
         if self.types.flags(input)? & tf::ANY == 0
+            // port: tsc/internal/checker/checker.go:Checker.getIterationTypeOfIterable
             && self
                 .iteration_types_of_iterable(input, use_, None)?
                 .yield_type
@@ -648,6 +651,7 @@ impl CheckerState {
         }
         if let Some(symbol) = self.types.get(input)?.symbol {
             if matches!(
+                // port: tsc/internal/checker/checker.go:isES2015OrLaterIterable
                 self.symbol(symbol)?.name_bytes(),
                 b"Float32Array"
                     | b"Float64Array"
@@ -674,7 +678,7 @@ impl CheckerState {
     }
     // port: tsc/internal/checker/flow.go:Checker.getPropertyNameForKnownSymbolName
     pub(crate) fn property_name_for_known_symbol(&mut self, name: &str) -> Result<JsString, Error> {
-        if let Some(symbol) = self.lookup_symbol(
+        if let Some(symbol) = self.lookup_symbol_resolving(
             self.builtins.globals,
             b"Symbol",
             tsr_ast::symbol_flags::VALUE,

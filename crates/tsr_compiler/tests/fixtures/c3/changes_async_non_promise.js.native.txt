@@ -1,0 +1,1 @@
+changes_async_non_promise.js(1,15): error TS1064: The return type of an async function or method must be the global Promise<T> type. Did you mean to write 'Promise<number>'?

@@ -1,0 +1,32 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "source_sha256": "ffc8888156aa3291a9425b2b9522dfc17dd92c7464de85348f813d600d450dd2",
+  "native_executable_sha256": "429a5f8e3ee6a3674883329cd1dc8e99481be2071be8a4912fadab28cbfa8501",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "--strict",
+    "flow_iteration.ts"
+  ],
+  "native_output_sha256": "a9d5b2c44f5f021ebe99a454389d1d8f8ac42d9e5d7ea1b0b9967330a0c7f054",
+  "exit_code": 2,
+  "diagnostics": [
+    {
+      "line": 17,
+      "column": 21,
+      "code": 2488,
+      "message": "Type 'AsyncIterable<number>' must have a '[Symbol.iterator]()' method that returns an iterator."
+    },
+    {
+      "line": 23,
+      "column": 42,
+      "code": 2488,
+      "message": "Type '5' must have a '[Symbol.iterator]()' method that returns an iterator."
+    }
+  ]
+}

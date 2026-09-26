@@ -1,0 +1,32 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "source_sha256": "2f0cb96ecf1c6db78d4029a09be80395d10fd96d6918631cbe25171d111ce7c4",
+  "native_executable_sha256": "429a5f8e3ee6a3674883329cd1dc8e99481be2071be8a4912fadab28cbfa8501",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "--strict",
+    "changes_template_code_point.ts"
+  ],
+  "native_output_sha256": "8bbe7363190eea5237790596386dfc59a80a7b6659a527cd3020e9fa0a5e6de1",
+  "exit_code": 2,
+  "diagnostics": [
+    {
+      "line": 5,
+      "column": 7,
+      "code": 2322,
+      "message": "Type '\"x\"' is not assignable to type '\"\ud83d\ude00\"'."
+    },
+    {
+      "line": 6,
+      "column": 7,
+      "code": 2322,
+      "message": "Type '\"x\"' is not assignable to type '\"abc\"'."
+    }
+  ]
+}

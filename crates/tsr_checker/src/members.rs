@@ -59,6 +59,7 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.getPropertyOfTypeEx
+    // port: tsc/internal/checker/checker.go:Checker.getPropertyOfType
     pub(crate) fn constituent_property(
         &mut self,
         ty: TypeId,

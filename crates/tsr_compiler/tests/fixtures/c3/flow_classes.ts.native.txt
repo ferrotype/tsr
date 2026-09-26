@@ -1,0 +1,7 @@
+flow_classes.ts(7,17): error TS2729: Property 'count' is used before its initialization.
+flow_classes.ts(14,24): error TS2339: Property '#nope' does not exist on type 'Derived'.
+flow_classes.ts(16,7): error TS2515: Non-abstract class 'Wrong' does not implement inherited abstract member area from class 'Base'.
+flow_classes.ts(18,12): error TS4113: This member cannot have an 'override' modifier because it is not declared in the base class 'Base'.
+flow_classes.ts(20,7): error TS2515: Non-abstract class 'NotAbstract' does not implement inherited abstract member area from class 'Base'.
+flow_classes.ts(21,11): error TS2511: Cannot create an instance of an abstract class.
+flow_classes.ts(29,15): error TS2540: Cannot assign to 'onlyGetter' because it is a read-only property.

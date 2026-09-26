@@ -300,7 +300,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.getGlobalNonNullableTypeInstantiation
     fn global_non_nullable_type(&mut self, ty: TypeId) -> Result<TypeId, Error> {
-        if let Some(symbol) = self.lookup_symbol(
+        if let Some(symbol) = self.lookup_symbol_resolving(
             self.builtins.globals,
             b"NonNullable",
             tsr_ast::symbol_flags::TYPE_ALIAS,

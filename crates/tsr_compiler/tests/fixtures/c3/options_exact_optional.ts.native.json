@@ -1,0 +1,27 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "source_sha256": "cd207a39334ef2e6cab75c613fb29cc25e27e8f86abcbe8fdea946393d975a28",
+  "native_executable_sha256": "429a5f8e3ee6a3674883329cd1dc8e99481be2071be8a4912fadab28cbfa8501",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "--strict",
+    "--exactOptionalPropertyTypes",
+    "options_exact_optional.ts"
+  ],
+  "native_output_sha256": "55b8edd66e813a9cfbabe870e46552c284d2077c87afdb74825fcc484f1f0889",
+  "exit_code": 2,
+  "diagnostics": [
+    {
+      "line": 2,
+      "column": 7,
+      "code": 2375,
+      "message": "Type '{ a: undefined; }' is not assignable to type 'A' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.\n  Types of property 'a' are incompatible.\n    Type 'undefined' is not assignable to type 'number'."
+    }
+  ]
+}

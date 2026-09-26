@@ -1,0 +1,3 @@
+lookup_alias_globals.ts(5,1): error TS2440: Import declaration conflicts with local declaration of 'Record'.
+lookup_alias_globals.ts(6,1): error TS2440: Import declaration conflicts with local declaration of 'NaN'.
+lookup_alias_globals.ts(15,10): error TS2845: This condition will always return 'false'.

@@ -113,6 +113,7 @@ impl CheckerState {
         Ok(symbol)
     }
 
+    // port: tsc/internal/checker/checker.go:Checker.allTypesAssignableToKindEx
     // port: tsc/internal/checker/checker.go:Checker.allTypesAssignableToKind
     pub(crate) fn all_assignable_to_kind(&mut self, ty: TypeId, mask: u32) -> Result<bool, Error> {
         if self.types.flags(ty)? & tf::UNION != 0 {

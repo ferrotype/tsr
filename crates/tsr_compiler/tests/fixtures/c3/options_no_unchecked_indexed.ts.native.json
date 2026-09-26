@@ -1,0 +1,27 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "source_sha256": "7c1f506ddda9559ac2da896f825c6ed3ede7899bc79f1d36a8495f552e73faf0",
+  "native_executable_sha256": "429a5f8e3ee6a3674883329cd1dc8e99481be2071be8a4912fadab28cbfa8501",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "--strict",
+    "--noUncheckedIndexedAccess",
+    "options_no_unchecked_indexed.ts"
+  ],
+  "native_output_sha256": "36cbccac831a557bbc86d840ebfb123fbb48d02f7929e4e4fa34bce3e5e3532d",
+  "exit_code": 2,
+  "diagnostics": [
+    {
+      "line": 2,
+      "column": 7,
+      "code": 2322,
+      "message": "Type 'number | undefined' is not assignable to type 'number'.\n  Type 'undefined' is not assignable to type 'number'."
+    }
+  ]
+}
