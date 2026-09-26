@@ -4,7 +4,7 @@
 
 use crate::{CheckerState, Error, TypeId, TypeList};
 use tsr_arena::{NodeId, SymbolId};
-use tsr_ast::{node_flags as nf, SyntaxKind as K};
+use tsr_ast::{node_flags as nf, symbol_flags as sf, SyntaxKind as K};
 
 #[derive(Default)]
 pub(crate) struct TypeAliasLinks {
@@ -13,6 +13,90 @@ pub(crate) struct TypeAliasLinks {
 }
 
 impl CheckerState {
+    // port: tsc/internal/checker/checker.go:Checker.getClassOrInterfaceLikeDeclaration
+    pub(crate) fn class_or_interface_like_declaration(
+        &self,
+        symbol: SymbolId,
+    ) -> Result<Option<NodeId>, Error> {
+        if self.symbol(symbol)?.flags() & (sf::CLASS | sf::FUNCTION) != 0 {
+            return Ok(self.symbol(symbol)?.value_declaration());
+        }
+        for declaration in self.symbol_declarations(symbol)?.iter().flatten() {
+            let read = self.node(declaration)?;
+            if read.kind() == K::InterfaceDeclaration {
+                return Ok(Some(declaration));
+            }
+            if read.kind() == K::VariableDeclaration {
+                if let Some(initializer) = read.initializer() {
+                    if matches!(
+                        self.node(initializer)?.kind().known(),
+                        Some(K::FunctionExpression | K::ArrowFunction)
+                    ) {
+                        return Ok(Some(declaration));
+                    }
+                }
+            }
+        }
+        Ok(None)
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.canGetTypeParametersOfClassOrInterface
+    pub(crate) fn can_get_type_parameters_of_class_or_interface(
+        &self,
+        symbol: SymbolId,
+    ) -> Result<bool, Error> {
+        Ok(self.class_or_interface_like_declaration(symbol)?.is_some())
+    }
+
+    // port: tsc/internal/checker/checker.go:isUnconstrainedTypeParameter
+    #[allow(
+        dead_code,
+        reason = "Pinned helper has no production callers; exercised by the native direct contract"
+    )]
+    pub(crate) fn is_unconstrained_type_parameter(&self, ty: TypeId) -> Result<bool, Error> {
+        let target = self.types.type_parameter(ty)?.target.unwrap_or(ty);
+        let Some(symbol) = self.types.get(target)?.symbol else {
+            return Ok(false);
+        };
+        for declaration in self.symbol_declarations(symbol)?.iter().flatten() {
+            let read = self.node(declaration)?;
+            if let Some(parameter) = read.data_source().as_type_parameter_declaration() {
+                let parent = read
+                    .parent()
+                    .map(|node| self.node(node).map(|read| read.kind()))
+                    .transpose()?;
+                if parameter.constraint().is_some()
+                    || parent.is_some_and(|kind| {
+                        matches!(kind.known(), Some(K::MappedType | K::InferType))
+                    })
+                {
+                    return Ok(false);
+                }
+            }
+        }
+        Ok(true)
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.getOuterInferenceTypeParameters
+    #[allow(
+        dead_code,
+        reason = "Pinned helper has no production callers; exercised by the native direct contract"
+    )]
+    pub(crate) fn outer_inference_type_parameters(&self) -> Result<TypeList, Error> {
+        let mut parameters = Vec::new();
+        for &(_, context) in &self.calls.inference_contexts {
+            if let Some(context) = context {
+                parameters.extend(
+                    self.inference_context(context)?
+                        .inferences
+                        .iter()
+                        .map(|info| info.parameter),
+                );
+            }
+        }
+        Ok(parameters.into())
+    }
+
     pub(crate) fn source_children(&self, node: NodeId) -> Result<Vec<NodeId>, Error> {
         use std::ops::ControlFlow;
         struct Collector<'a> {
@@ -187,8 +271,18 @@ impl CheckerState {
         for node in ancestors.into_iter().rev() {
             let kind = self.node(node)?.kind();
             if kind == K::MappedType {
-                let ty = self.source_mapped_type(node)?;
-                result.push(self.mapped_parameter(ty)?);
+                // Collecting an enclosing parameter must not resolve the
+                // mapped constraint, which may contain this conditional type.
+                let parameter = self
+                    .node(node)?
+                    .data_source()
+                    .as_mapped_type_node()
+                    .and_then(|data| data.type_parameter())
+                    .ok_or(Error::MissingLink("mapped type parameter"))?;
+                let symbol = self
+                    .get_symbol_of_declaration(parameter)?
+                    .ok_or(Error::MissingLink("mapped parameter symbol"))?;
+                result.push(self.get_declared_type_of_type_parameter(symbol)?);
                 continue;
             }
             if kind == K::ConditionalType {

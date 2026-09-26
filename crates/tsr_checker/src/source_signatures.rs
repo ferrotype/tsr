@@ -268,6 +268,13 @@ impl CheckerState {
             flags |= sg::ABSTRACT;
         }
         let nodes = self.source_list(node, read.parameter_list())?;
+        let iife = tsr_ast::get_immediately_invoked_function_expression(self.ast(node)?, node)?;
+        let iife_argument_count = iife
+            .map(|call| {
+                self.source_list(call, self.node(call)?.argument_list())
+                    .map(|arguments| arguments.len())
+            })
+            .transpose()?;
         let java_script = read.flags() & nf::JAVA_SCRIPT_FILE != 0
             && matches!(
                 read.kind().known(),
@@ -281,10 +288,7 @@ impl CheckerState {
                         | K::Constructor
                 )
             );
-        if java_script
-            && tsr_ast::get_immediately_invoked_function_expression(self.ast(node)?, node)?
-                .is_none()
-        {
+        if java_script && iife.is_none() {
             let mut untyped = true;
             for &parameter in &nodes {
                 if self.node(parameter)?.type_node().is_some() {
@@ -345,7 +349,10 @@ impl CheckerState {
             if read.question_token(self.ast(parameter)?)?.is_none()
                 && read.initializer().is_none()
                 && !rest
-                && !self.is_optional_source_parameter(parameter)?
+                // Signature arity uses the written IIFE arguments; the separate
+                // isOptionalParameter query uses expanded tuple arguments.
+                && !(read.type_node().is_none()
+                    && iife_argument_count.is_some_and(|count| parameters.len() > count))
             {
                 minimum = parameters.len();
             }
@@ -546,7 +553,8 @@ impl CheckerState {
         signature: SignatureId,
         mapper: MapperId,
     ) -> Result<SignatureId, Error> {
-        self.instantiate_signature_ex(signature, mapper, false)
+        let erase = Some(mapper) == self.conditional.permissive_mapper;
+        self.instantiate_signature_ex(signature, mapper, erase)
     }
 
     // port: tsc/internal/checker/checker.go:Checker.instantiateSignatureEx

@@ -34,7 +34,8 @@ impl CheckerState {
         }
         self.calls.contexts.push(crate::calls::ArgumentContext {
             node,
-            ty: self.builtins.any_type,
+            ty: Some(self.builtins.any_type),
+            is_cache: false,
             inference: None,
         });
         let result = self.check_expression_ex(node, 4);

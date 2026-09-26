@@ -264,3 +264,85 @@ the exact selection, reproduction commands, comparison identities and all
 target outcomes; its linked compressed comparison contains all 393 rows.
 Focused tests and targeted clippy with warnings denied pass. No benchmark or
 full C2 acceptance capture is claimed.
+
+## Native contracts and the source audit
+
+The C2 audit enumerates 231 pinned functions, including every function in
+`inference.go` and `mapper.go`. Inline Rust implementations are described at
+an actual call site rather than credited by file-level coverage. Two inference
+predicates depend on state populated only by Phase 5 signature-help services;
+that dependency remains explicit. Decorator contextual typing belongs to C4.
+The audit also checks semantic `open_issues` on functions that already carry
+port markers: an annotation alone cannot close an identified implementation gap.
+
+The contracts now exercise source-based inference fixing and cloning, mapper
+kinds, syntactic defaults, generic tuple inference, contextual restoration,
+instantiation/cache identities, higher-order inference, reverse mappings and
+library overload diagnostics. The variance fixture observes all seven flag
+values and recursive entry-order restarts. Limit fixtures execute the actual
+instantiation depth and five-million-call thresholds, the subtype-work estimate,
+base/conditional constraint depths and mapped/conditional recursion identities.
+They do not seed counters or lower thresholds to force the branches.
+
+These fixtures found differences in mapped inference, enum-index filtering,
+generic tuple intersections, cached contextual absence, constraint resolution,
+deprecated type suggestions and mapped recursion identities. Their regression
+expectations come from independently captured pinned Go operations. A source
+witness also exposed binary fallback contextual typing: for a destructuring
+parameter initialized with `values || [1, "hi"]`, with `values: number[] |
+undefined`, Go gives both elements `string | number`; Rust previously gave the
+first `number`.
+
+The mapped recursion fix may allocate a stack snapshot once the relation's
+native depth threshold is reached. The snapshot preserves the active relation
+frame if mapped-modifier resolution reenters the checker. This is a correctness
+fix with a potential allocation cost, not an allocation-neutral optimization;
+the final measurement must include it.
+
+## Creation-order witnesses
+
+`tools/phase2/order-trace/witnesses.json` declares four source programs for
+intrinsic types, reverse-mapped types, declaration-less equal-named properties
+and properties with equal first declarations. The diagnostic overlay observes
+object birth, natural semantic-ID assignment, the actual comparator fallback
+and enclosing sort inputs/outputs. Its tokens are independent of semantic IDs;
+logging never calls a lazy ID getter or display function to label an event.
+The frozen native trace is `data/phase2/c2-order-traces.json`.
+
+The symbol witnesses found a production difference. Go's `valueSymbolLinks.Get`
+assigns a lazy symbol ID when instantiated, tuple and compound property links
+are read or written. Rust had left those IDs unassigned until sorting, so the
+same source properties sorted in the opposite order. The fix assigns the ID
+at the corresponding production link operations. It does not replace the
+comparator's semantic ID with allocation order. The four native/Rust witnesses
+now agree on ordinary output and the relative order of the actual fallback
+operands, without requiring equal whole-program allocation sequences.
+
+The diagnostic runner keeps parse, bind and checker work on the same parser
+worker so its thread-local observer sees binder births. It builds ordinary and
+instrumented executables separately. Tracing-enabled and tracing-disabled
+outputs must agree, and provenance binds the observer, request manifest,
+replacement bytes, compiler flags, pin and executable. These diagnostic builds
+are excluded from performance measurements.
+
+## Declaration/display fixes shared with C5
+
+The user authorized working across C2–C6 where a shared implementation cause
+is involved. The queued augmentation declaration now retains its actual source
+before the declaration transformer reads it through the output factory; the
+active transform source remains unchanged. The exact corpus request now matches
+native diagnostics, type/symbol baselines and public display without the former
+`WrongOwner` panic.
+
+The large recursive conditional display is now compared against the full
+native output digest, not merely successful completion. A temporary diagnostic
+trace localized truncation drift to type-parameter names and infer-type length
+accounting. Pinned `symbolToName` adds no type-access length charge; an infer
+node charges its name and the optional constraint wrapper. After those fixes,
+the 790,211-byte output matches native SHA-256
+`f401efcd5b97621a0019f1e9465d1228b8df7a18db17c442bd14fe9e333ded0c`.
+The temporary per-node trace hooks were removed after the comparison.
+
+The combined 15-test C2 contract suite currently passes in debug. This is an
+implementation checkpoint, not the full C2 exit: the current-source corpus,
+release contracts, relater/obligations and measurement still have to be recorded.

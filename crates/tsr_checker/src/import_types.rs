@@ -198,19 +198,7 @@ impl CheckerState {
             self.check_grammar_import_attribute_values(attributes)?;
             self.import_resolution_mode_override(attributes, true)?;
         }
-        let ty = self.get_type_from_type_node(node)?;
-        if ty != self.builtins.error_type
-            && !self
-                .source_list(node, self.node(node)?.type_argument_list())?
-                .is_empty()
-        {
-            if let Some(symbol) = self.query.resolved_symbols.try_get(node).copied().flatten() {
-                let parameters = self.get_local_type_parameters(symbol)?;
-                if !parameters.is_empty() {
-                    self.check_type_argument_constraints(node, &parameters)?;
-                }
-            }
-        }
+        self.check_type_reference_or_import(node)?;
         self.check_import_attributes(node)
     }
 }

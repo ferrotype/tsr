@@ -21,6 +21,8 @@ pub struct CheckerOptions {
 }
 
 pub(crate) struct CheckerState {
+    #[cfg(feature = "recursion-probe")]
+    pub(crate) c2_limits_probe: Option<crate::handles::c2_limits_probe::LimitsProbe>,
     pub(crate) counters: Counters,
     pub(crate) options: CheckerOptions,
     pub(crate) program: Option<crate::program::ProgramContext>,
@@ -125,6 +127,8 @@ impl CheckerState {
             current_node: None,
             within_unreachable_code: false,
             conditional_constraint_depth: 0,
+            #[cfg(feature = "recursion-probe")]
+            c2_limits_probe: None,
             query: crate::query::QueryState::default(),
             late_members: crate::late_members::LateMemberState::default(),
             instantiation: crate::instantiate::InstantiationState::default(),

@@ -750,16 +750,6 @@
    "reason": "inlined in the indexed-access target case: chain lengths pick the shorter of the direct and constraint chains",
    "rust": "crates/tsr_checker/src/relater_structure.rs:380"
   },
-  "tsc/internal/checker/relater.go:getRecursionIdentityFromTarget": {
-   "disposition": "equivalent",
-   "reason": "the identity choice is the body of recursion_identity",
-   "rust": "crates/tsr_checker/src/constraints.rs:79"
-  },
-  "tsc/internal/checker/relater.go:getRecursionIdentityTarget": {
-   "disposition": "equivalent",
-   "reason": "recursion_identity unwraps indexed access and mapped targets inline",
-   "rust": "crates/tsr_checker/src/constraints.rs:79"
-  },
   "tsc/internal/checker/relater.go:isHyphenatedJsxName": {
    "disposition": "later",
    "owner": "C4",

@@ -1,0 +1,28 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "source_sha256": "9c3560f4703a4a2fd45d64053fe79dd2580253f29308d2078a698fac6f52ebd2",
+  "native_go": "go1.27.1",
+  "native_command": [
+    "tsc",
+    "--strict",
+    "--target",
+    "esnext",
+    "--declaration",
+    "--emitDeclarationOnly",
+    "--outDir",
+    "/private/tmp/c2-declaration-type-params",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "input.ts"
+  ],
+  "exit_code": 1,
+  "diagnostics": [
+    {
+      "line": 9,
+      "column": 14,
+      "code": 4094,
+      "message": "Property 'secret' of exported anonymous class type may not be private or protected."
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-//! A C5 display dependency exposed by B08's conditional wrapper port.
+//! Native display length accounting across recursive conditional types.
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 use std::sync::Arc;
@@ -61,30 +61,6 @@ fn recursive_conditional_display_completes_and_recovers() {
         format!(
             "{:x}",
             Sha256::digest(include_bytes!("fixtures/c2/elision/oracle_test.go"))
-        )
-    );
-    let branch_request = include_bytes!("fixtures/c2/elision/branches.requests.json");
-    let branch_native = include_bytes!("fixtures/c2/elision/branches.observations.json");
-    let branch_provenance: Value = serde_json::from_slice(include_bytes!(
-        "fixtures/c2/elision/branches.provenance.json"
-    ))
-    .unwrap();
-    let branch_output: Value = serde_json::from_slice(branch_native).unwrap();
-    assert_eq!(branch_provenance["pin"], pin["pin"]);
-    let branch_hash = format!("{:x}", Sha256::digest(branch_request));
-    assert_eq!(branch_provenance["request_sha256"], branch_hash);
-    assert_eq!(branch_output["request_sha256"], branch_hash);
-    assert_eq!(
-        branch_provenance["output_sha256"],
-        format!("{:x}", Sha256::digest(branch_native))
-    );
-    assert_eq!(
-        branch_provenance["source_sha256"],
-        format!(
-            "{:x}",
-            Sha256::digest(include_bytes!(
-                "fixtures/c2/elision/branches_oracle_test.go"
-            ))
         )
     );
     let mut fs = tsr_vfs::MemoryBuilder::new(b"/", true);
@@ -153,10 +129,7 @@ fn recursive_conditional_display_completes_and_recovers() {
         observed.push(json!({"declaration": name, "bytes": text.as_bytes().len(),
             "sha256": format!("{:x}", Sha256::digest(text.as_bytes()))}));
     }
-    // This exact corpus query previously refused at synthetic elision. Byte parity
-    // remains open: Rust reaches the approximate-length budget earlier than Go.
-    // Keep native truth in the fixture and test completion without asserting a
-    // false parity claim. The following ordinary query must still match native.
-    assert!(observed[0]["bytes"].as_u64().unwrap() > 700_000);
-    assert_eq!(observed[1], native["queries"][1]);
+    // The recursive query must reach the same truncation boundary, including
+    // every byte before it; the following query also verifies context recovery.
+    assert_eq!(json!(observed), native["queries"]);
 }

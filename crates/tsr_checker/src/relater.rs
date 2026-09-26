@@ -588,7 +588,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/relater.go:Checker.isDeeplyNestedType
     pub(crate) fn deeply_nested_type(
-        &self,
+        &mut self,
         ty: TypeId,
         stack: &[TypeId],
         max: usize,
@@ -596,15 +596,16 @@ impl CheckerState {
         if stack.len() < max {
             return Ok(false);
         }
-        if self.types.flags(ty)? & tf::INTERSECTION != 0 {
-            for &part in self.types.types_of(ty)? {
+        let target = self.recursion_identity_target(ty)?;
+        if self.types.flags(target)? & tf::INTERSECTION != 0 {
+            for part in self.types.types_of(target)?.to_vec() {
                 if self.deeply_nested_type(part, stack, max)? {
                     return Ok(true);
                 }
             }
             return Ok(false);
         }
-        let identity = self.recursion_identity(ty)?;
+        let identity = self.recursion_identity_from_target(target)?;
         let mut last = 0;
         let mut count = 0;
         for &ty in stack {
@@ -623,23 +624,44 @@ impl CheckerState {
 
     // port: tsc/internal/checker/relater.go:hasMatchingRecursionIdentity
     fn has_recursion_identity(
-        &self,
+        &mut self,
         ty: TypeId,
         identity: crate::constraints::RecursionIdentity,
     ) -> Result<bool, Error> {
-        if self.types.flags(ty)? & tf::INTERSECTION != 0 {
-            for &part in self.types.types_of(ty)? {
+        let target = self.recursion_identity_target(ty)?;
+        if self.types.flags(target)? & tf::INTERSECTION != 0 {
+            for part in self.types.types_of(target)?.to_vec() {
                 if self.has_recursion_identity(part, identity)? {
                     return Ok(true);
                 }
             }
             return Ok(false);
         }
-        Ok(self.recursion_identity(ty)? == identity)
+        Ok(self.recursion_identity_from_target(target)? == identity)
     }
 }
 
 impl Relater<'_> {
+    pub(crate) fn deeply_nested_relation_type(
+        &mut self,
+        ty: TypeId,
+        side: u32,
+        max: usize,
+    ) -> Result<bool, Error> {
+        let stack = if side == SOURCE {
+            &self.frame().source_stack
+        } else {
+            &self.frame().target_stack
+        };
+        if stack.len() < max {
+            return Ok(false);
+        }
+        // Resolving a mapped modifier can reenter relations. Retain the slice
+        // seen at entry while leaving the live frame available to that work.
+        let stack = stack.clone();
+        self.checker.deeply_nested_type(ty, &stack, max)
+    }
+
     pub(crate) fn frame(&self) -> &RelationFrame {
         self.checker.relations.frames[self.frame.index(0).expect("allocated relation frame")]
             .as_ref()
@@ -936,17 +958,13 @@ impl Relater<'_> {
         let result = (|| {
             if recursion & SOURCE != 0
                 && self.frame().expanding & SOURCE == 0
-                && self
-                    .checker
-                    .deeply_nested_type(source, &self.frame().source_stack, 3)?
+                && self.deeply_nested_relation_type(source, SOURCE, 3)?
             {
                 self.frame_mut().expanding |= SOURCE;
             }
             if recursion & TARGET != 0
                 && self.frame().expanding & TARGET == 0
-                && self
-                    .checker
-                    .deeply_nested_type(target, &self.frame().target_stack, 3)?
+                && self.deeply_nested_relation_type(target, TARGET, 3)?
             {
                 self.frame_mut().expanding |= TARGET;
             }

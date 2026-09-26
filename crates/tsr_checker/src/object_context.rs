@@ -1,7 +1,7 @@
 //! Contextual object properties preserve intersections, mapped substitutions,
 //! and index signatures without reducing the contextual union prematurely.
 use crate::{type_flags as tf, CheckerState, Error, TypeId};
-use tsr_arena::NodeId;
+use tsr_arena::{NodeId, SymbolId};
 use tsr_ast::{check_flags as cf, symbol_flags as sf, JsString, SyntaxKind as K};
 
 impl CheckerState {
@@ -161,37 +161,30 @@ impl CheckerState {
         let Some(symbol) = self.constituent_property(ty, name, false)? else {
             return Ok(None);
         };
-        if self.symbol(symbol)?.check_flags() & cf::MAPPED != 0
-            && self
-                .value_symbol_links
-                .try_get(symbol)
-                .is_none_or(|links| links.resolved_type.is_none())
-        {
-            let values = &self.value_symbol_links;
-            if self
-                .resolution
-                .find_resolution_cycle_start_index(
-                    crate::TypeSystemEntity::Symbol(symbol),
-                    crate::TypeSystemPropertyName::Type,
-                    |entry| {
-                        let crate::TypeSystemEntity::Symbol(symbol) = entry.target else {
-                            return false;
-                        };
-                        entry.property_name == crate::TypeSystemPropertyName::Type
-                            && values
-                                .try_get(symbol)
-                                .is_some_and(|links| links.resolved_type.is_some())
-                    },
-                )
-                .is_some()
-            {
-                return Ok(None);
-            }
+        if self.is_circular_mapped_property(symbol)? {
+            return Ok(None);
         }
         let optional = self.symbol(symbol)?.flags() & sf::OPTIONAL != 0;
         let ty = self.get_type_of_symbol(symbol)?;
         self.remove_missing_type(ty, optional).map(Some)
     }
+    // port: tsc/internal/checker/checker.go:Checker.isCircularMappedProperty
+    pub(crate) fn is_circular_mapped_property(&self, symbol: SymbolId) -> Result<bool, Error> {
+        Ok(self.symbol(symbol)?.check_flags() & cf::MAPPED != 0
+            && self
+                .value_symbol_links
+                .try_get(symbol)
+                .is_none_or(|links| links.resolved_type.is_none())
+            && self
+                .resolution
+                .find_resolution_cycle_start_index(
+                    crate::TypeSystemEntity::Symbol(symbol),
+                    crate::TypeSystemPropertyName::Type,
+                    |entry| self.type_resolution_has_property(entry),
+                )
+                .is_some())
+    }
+
     // port: tsc/internal/checker/checker.go:Checker.getTypeFromIndexInfosOfContextualType
     fn contextual_index_property(
         &mut self,

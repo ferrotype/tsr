@@ -10,6 +10,8 @@ pub(crate) mod sealed {
     pub trait Sealed {
         fn observe_runtime_identity(&self) -> u64;
         fn assign_runtime_identity(&self) -> u64;
+        #[cfg(feature = "creation-trace")]
+        fn diagnostic_runtime_key(&self) -> usize;
     }
 }
 
@@ -56,6 +58,10 @@ pub trait SymbolAccess: sealed::Sealed {
 }
 
 impl sealed::Sealed for Symbol {
+    #[cfg(feature = "creation-trace")]
+    fn diagnostic_runtime_key(&self) -> usize {
+        std::ptr::from_ref(&self.runtime_id) as usize
+    }
     fn observe_runtime_identity(&self) -> u64 {
         crate::symbols::observe_runtime_cell(&self.runtime_id)
     }
@@ -96,6 +102,10 @@ impl SymbolAccess for Symbol {
     }
 }
 impl sealed::Sealed for SymbolRead<'_> {
+    #[cfg(feature = "creation-trace")]
+    fn diagnostic_runtime_key(&self) -> usize {
+        std::ptr::from_ref((*self).runtime_cell()) as usize
+    }
     fn observe_runtime_identity(&self) -> u64 {
         crate::symbols::observe_runtime_cell((*self).runtime_cell())
     }
@@ -171,6 +181,13 @@ impl<'a> SymbolRef<'a> {
     }
 }
 impl sealed::Sealed for SymbolRef<'_> {
+    #[cfg(feature = "creation-trace")]
+    fn diagnostic_runtime_key(&self) -> usize {
+        match self {
+            Self::Owned(value) => value.diagnostic_runtime_key(),
+            Self::Stored(value) => value.diagnostic_runtime_key(),
+        }
+    }
     fn observe_runtime_identity(&self) -> u64 {
         match self {
             Self::Owned(value) => crate::existing_runtime_symbol_id(*value),
@@ -220,6 +237,10 @@ impl SymbolAccess for SymbolRef<'_> {
 macro_rules! retained_access {
     ($type:ty) => {
         impl sealed::Sealed for $type {
+            #[cfg(feature = "creation-trace")]
+            fn diagnostic_runtime_key(&self) -> usize {
+                self.symbol().diagnostic_runtime_key()
+            }
             fn observe_runtime_identity(&self) -> u64 {
                 crate::existing_runtime_symbol_id(&self.symbol())
             }

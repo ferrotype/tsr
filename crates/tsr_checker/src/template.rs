@@ -239,11 +239,11 @@ impl CheckerState {
         Ok(false)
     }
 
-    // port: tsc/internal/checker/checker.go:Checker.isGenericIndexType
     pub(crate) fn is_generic_type(&mut self, t: TypeId) -> Result<bool, Error> {
         Ok(self.get_generic_object_flags(t)? & object_flags::IS_GENERIC_TYPE != 0)
     }
 
+    // port: tsc/internal/checker/checker.go:Checker.isGenericIndexType
     pub(crate) fn is_generic_index_type(&mut self, t: TypeId) -> Result<bool, Error> {
         Ok(self.get_generic_object_flags(t)? & object_flags::IS_GENERIC_INDEX_TYPE != 0)
     }

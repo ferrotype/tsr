@@ -78,8 +78,12 @@ pub enum DeclarationTrackerEvent {
 /// mutable borrow of the checker from inside node serialization. Its boolean
 /// is consumed immediately, as in the pinned SymbolTracker.TrackSymbol.
 pub trait DeclarationSymbolTracker {
-    /// Native watched-symbol path handles the identity before accessibility is queried.
-    fn track_symbol_without_accessibility(&mut self, _symbol: SymbolId) -> bool {
+    /// Native type-parameter and watched-symbol paths skip accessibility queries.
+    fn track_symbol_without_accessibility(
+        &mut self,
+        _symbol: SymbolId,
+        _flags: SymbolFlags,
+    ) -> bool {
         false
     }
     fn track_symbol(

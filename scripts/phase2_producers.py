@@ -43,8 +43,18 @@ are `[checker]` inputs by name:
   c1_failures == 0, c1_audit_complete and c1_contracts; false while any of
   them is unavailable.
 
-`observe --witness c1-contracts` runs the contract tests and writes that
-receipt. No threshold is introduced; PLAN's Phase 2 gate binds the parity
+For C2, the shared checkpoint accounting additionally requires complete
+baseline-bound claims, current domain-bound handoffs, no unresolved C2
+blocker share, all five C0 prerequisites, and an authenticated measurement.
+Missing authorities leave c2_complete false. Declaration diagnostics remain
+inside errors, one of the same seven comparison domains.
+
+`observe --witness c1-contracts` or `c2-contracts` runs the contract tests and
+writes that receipt. `observe --witness c2-measurement --measurement DIR`
+authenticates an existing full checkerbench capture and joins its production
+inputs with the exit corpus. It never runs a benchmark or updates old capture
+metadata: captures lacking newly registered source hashes are stale.
+No threshold is introduced; PLAN's Phase 2 gate binds the parity
 metrics at C7. A missing or stale capture leaves the correctness metrics
 unavailable.
 """
@@ -57,6 +67,7 @@ from pathlib import Path
 import re
 import subprocess
 import sys
+import math
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from s04_common import strict_json_loads  # noqa: E402
@@ -75,6 +86,11 @@ CLAIMS = ROOT / "data/phase2/c1-claims.json"
 AUDIT = phase2_audit.AUDIT
 BASELINE = phase2_compare.BASELINE
 RECEIPTS = ROOT / "data/phase2/receipts"
+CHECKPOINT_AUTHORITIES = {
+    "C1": {"claims": CLAIMS, "audit": AUDIT, "baseline": BASELINE},
+    "C2": {name: ROOT / f"data/phase2/c2-{name}{'.json.gz' if name == 'baseline' else '.json'}"
+           for name in ("claims", "audit", "baseline", "measurement")},
+}
 WITNESSES = {
     "c1-contracts": {
         # The contracts drive production entry points over loaded programs, so
@@ -90,6 +106,25 @@ WITNESSES = {
                     ".cargo", "rust-toolchain.toml", "scripts/phase2_producers.py"],
     },
 }
+WITNESSES["c2-contracts"] = {
+    "commands": [["cargo", "test", "-p", "tsr_compiler", "--features", "recursion-probe,creation-trace",
+                  "--test", "c2_contracts", "--locked", *release] for release in ([], ["--release"])],
+    "test_source": "crates/tsr_compiler/tests/c2_contracts.rs", "minimum_tests": 9,
+    "test_modules": {
+        "cross_product_limits": "support/c2_cross_product_limits.rs",
+        "order_contract": "support/c2_order_contract.rs",
+        "variance_limits": "support/c2_variance_limits.rs",
+    },
+    # Frozen native observations and their observer sources are contract inputs,
+    # separate from production inputs shared by corpus and measurement builds.
+    "sources": [*WITNESSES["c1-contracts"]["sources"],
+                "data/phase2/c2-order-traces.json", "tools/phase2/order-trace",
+                "scripts/phase2_order_trace.py", "data/upstream.json", "data/s04/toolchains.toml",
+                "scripts/s04.py", "scripts/s04_common.py", "scripts/s04_runtime.py",
+                "scripts/tracking-bootstrap.py", "scripts/s08_oracle.py"],
+}
+PRODUCTION_PATTERNS = tuple(path for path in WITNESSES["c1-contracts"]["sources"]
+                            if path != "scripts/phase2_producers.py")
 
 
 def source_inputs(paths):
@@ -109,11 +144,25 @@ def source_inputs(paths):
 
 
 def witness_tests(spec):
-    """Expected top-level contract tests; source changes also stale the receipt."""
-    source = (ROOT / spec["test_source"]).read_text()
-    tests = re.findall(r"(?m)^#\[test\]\s*\nfn ([A-Za-z_][A-Za-z_0-9]*)\(", source)
-    if not tests or len(tests) != len(set(tests)) or source.count("#[test]") != len(tests):
-        raise ValueError("contract test inventory is empty, duplicated or not top-level")
+    """Exact contract inventory, including explicitly reviewed test modules."""
+    root = ROOT / spec["test_source"]
+    source = root.read_text()
+    sources = [("", source)]
+    for module, relative in spec.get("test_modules", {}).items():
+        binding = rf'(?m)^#\[path = "{re.escape(relative)}"\]\s*\nmod {re.escape(module)};'
+        path = root.parent / relative
+        if (len(re.findall(binding, source)) != 1
+                or not path.resolve().is_relative_to(root.parent.resolve())):
+            raise ValueError("contract test module binding differs: " + module)
+        sources.append((module + "::", path.read_text()))
+    tests = []
+    for prefix, content in sources:
+        names = re.findall(r"(?m)^#\[test\]\s*\nfn ([A-Za-z_][A-Za-z_0-9]*)\(", content)
+        if len(names) != len(set(names)) or content.count("#[test]") != len(names):
+            raise ValueError("contract test inventory is duplicated or not top-level")
+        tests.extend(prefix + name for name in names)
+    if len(tests) < spec.get("minimum_tests", 1) or len(tests) != len(set(tests)):
+        raise ValueError("contract test inventory is empty or incomplete")
     return sorted(tests)
 
 
@@ -180,7 +229,7 @@ def receipt_current(identity, path=None):
     return record.get("source_inputs") == source_inputs(spec["sources"])
 
 
-def c1_metrics(comparison, claims, audit_ok, baseline, contracts_ok, regression_parity, blockers=None):
+def _c1_claim_metrics(comparison, claims, blockers=None):
     """The C1 exit metrics from a full comparison and the four authorities.
 
     Candidates remain open until their trace resolves ownership. Failed rows
@@ -190,8 +239,6 @@ def c1_metrics(comparison, claims, audit_ok, baseline, contracts_ok, regression_
     phase2_compare.validate_complete_rows(comparison)
     rows = {row["id"]: row for row in comparison["rows"]}
     metrics = {}
-    if baseline is not None:
-        metrics["c1_regressions"] = len(phase2_compare.regressions_against(baseline, comparison))
     if claims is not None:
         if (not isinstance(claims, dict) or claims.get("version") != 1
                 or not isinstance(claims.get("rows"), list) or not claims["rows"]
@@ -215,7 +262,9 @@ def c1_metrics(comparison, claims, audit_ok, baseline, contracts_ok, regression_
             if status == "returned" and entry.get("owner") not in phase2_audit.CHECKPOINTS:
                 raise ValueError(f"returned claim {vid} needs another checkpoint owner")
             if status == "blocked":
-                blocker = known_blockers.get(entry.get("blocker"))
+                identity = phase2_blockers.stable_blocker(entry)
+                blocker = (phase2_blockers.covering_blocker(blockers, vid, identity) if identity is not None
+                           else known_blockers.get(entry.get("blocker")))
                 if blocker is None or vid not in blocker.get("variants", []):
                     raise ValueError(f"blocked claim {vid} names no registered blocker covering the variant")
             entries[vid] = entry
@@ -233,14 +282,142 @@ def c1_metrics(comparison, claims, audit_ok, baseline, contracts_ok, regression_
                                for vid in blocker.get("variants", [])}
         metrics["c1_failures"] = sum(row.get("bucket") in modules or row["id"] in claimed | candidates
                                      or row["id"] not in returned | registered_failures for row in failed)
-    if audit_ok is not None:
-        metrics["c1_audit_complete"] = audit_ok
-    if contracts_ok is not None:
-        metrics["c1_contracts"] = contracts_ok
-    metrics["c1_complete"] = (regression_parity == 1 and metrics.get("c1_open") == 0
-                              and metrics.get("c1_regressions") == 0 and metrics.get("c1_failures") == 0
-                              and metrics.get("c1_audit_complete") is True and metrics.get("c1_contracts") is True)
     return metrics
+
+
+def checkpoint_metrics(checkpoint, comparison, claims, audit_ok, baseline, contracts_ok, regression_parity,
+                       blockers=None, *, handoffs=None, measured_ok=None, baseline_sha256=None,
+                       prerequisites=None, inventory=None, incoming=None):
+    """Shared exit accounting; a status label alone never exempts a current row."""
+    phase2_compare.validate_complete_rows(comparison)
+    prefix = checkpoint.lower()
+    metrics = {}
+    if baseline is not None:
+        metrics[prefix + "_regressions"] = len(phase2_compare.regressions_against(baseline, comparison))
+    if checkpoint == "C1":
+        metrics.update(_c1_claim_metrics(comparison, claims, blockers))
+    elif claims is not None and baseline is not None:
+        inventory = phase2_inventory.executed() if inventory is None else inventory
+        owners = {row["id"]: row["checkpoint"] for row in inventory}
+        rows = {row["id"]: row for row in comparison["rows"]}
+        handoffs, incoming = handoffs or {}, incoming or {}
+        if (not isinstance(claims, dict) or claims.get("version") != 1 or not isinstance(claims.get("rows"), list)
+                or claims.get("pin") != baseline["pin"] or claims.get("pin") != comparison["pin"]
+                or claims.get("inventory_sha256") != baseline["inventory_sha256"]
+                or claims.get("baseline_sha256") != baseline_sha256
+                or claims.get("rust_capture_sha256") != baseline["rust_capture_sha256"]):
+            raise ValueError(f"{checkpoint} claims authority has missing or mismatched baseline bindings")
+        entries = {}
+        for entry in claims["rows"]:
+            vid = entry.get("id")
+            if vid not in rows or vid in entries:
+                raise ValueError("unknown or duplicate checkpoint claim: " + str(vid))
+            if entry.get("status") not in ("open", "closed", "handed", "blocked"):
+                raise ValueError("unknown checkpoint claim status: " + str(entry.get("status")))
+            failure_return = (entry["status"] in ("handed", "blocked") and vid in handoffs
+                              and "failed" in rows[vid]["outcomes"].values())
+            if owners.get(vid) != checkpoint and vid not in incoming and not failure_return:
+                raise ValueError("checkpoint claim requires a validated incoming handoff: " + vid)
+            if entry["status"] == "closed" and not re.fullmatch(r"[0-9a-f]{7,40}", entry.get("commit", "")):
+                raise ValueError("closed claim needs its fixing commit: " + vid)
+            entries[vid] = entry
+        required = {row["id"] for row in baseline["rows"] if owners.get(row["id"]) == checkpoint
+                    and any(value not in MATCHED for value in row["outcomes"].values())}
+        if not required <= entries.keys():
+            raise ValueError("claims omit baseline-open checkpoint variants: " + ", ".join(sorted(required - entries.keys())))
+        # Only a validated transfer can remove all currently unmet domains.
+        excluded = {vid for vid, handoff in handoffs.items() if vid in entries
+                    and entries[vid]["status"] in ("handed", "blocked")
+                    and handoff["owner"] != checkpoint
+                    and {d for d, value in rows[vid]["outcomes"].items() if value not in MATCHED} <= set(handoff["domains"])}
+        for vid in list(excluded):
+            handoff = handoffs[vid]
+            if entries[vid]["status"] == "blocked":
+                identity = dict(handoff["blocker"], domains=handoff["domains"])
+                if phase2_blockers.covering_blocker(blockers, vid, identity) is None:
+                    excluded.remove(vid)
+        metrics[prefix + "_open"] = sum((owners.get(vid) == checkpoint or vid in incoming) and vid not in excluded
+                                         and any(value not in MATCHED for value in row["outcomes"].values())
+                                         for vid, row in rows.items())
+        metrics[prefix + "_handoffs"] = sum(entry["status"] == "handed" for entry in entries.values())
+        metrics[prefix + "_failures"] = sum("failed" in row["outcomes"].values() and vid not in excluded
+                                             for vid, row in rows.items())
+        if blockers is not None:
+            metrics[prefix + "_blockers_open"] = sum(
+                any(item.get("effective_owner") == checkpoint for item in entry.get("ownership", []))
+                or (not entry.get("ownership") and checkpoint in entry.get("owner", "").split("/"))
+                for entry in blockers.get("entries", []))
+    for suffix, value in (("audit_complete", audit_ok), ("contracts", contracts_ok)):
+        if value is not None:
+            metrics[prefix + "_" + suffix] = value
+    counters = ["open", "regressions", "failures"]
+    booleans = ["audit_complete", "contracts"]
+    if checkpoint != "C1":
+        metrics[prefix + "_measured"] = measured_ok is True
+        counters.append("blockers_open")
+        booleans.append("measured")
+    evidence_ok = checkpoint == "C1" or (prerequisites is not None and all(
+        prerequisites.get(name) is True for name in ("inventory_frozen", "native_verified", "harness_valid",
+                                                    "result_recorded", "blockers_named")))
+    metrics[prefix + "_complete"] = (evidence_ok and regression_parity == 1
+        and all(metrics.get(prefix + "_" + name) == 0 for name in counters)
+        and all(metrics.get(prefix + "_" + name) is True for name in booleans))
+    return metrics
+
+
+def c1_metrics(comparison, claims, audit_ok, baseline, contracts_ok, regression_parity, blockers=None):
+    return checkpoint_metrics("C1", comparison, claims, audit_ok, baseline, contracts_ok, regression_parity, blockers)
+
+
+def measurement_identity(directory, comparison, rust):
+    """Independently replay each executable; join complete production inputs."""
+    import s08_checkerbench as benchmark
+    directory, rust = Path(directory), Path(rust)
+    result = quietly(benchmark.report, directory)
+    capture_raw = (directory / "capture.json").read_bytes()
+    capture = strict_json_loads(capture_raw)
+    build_raw = (directory / "build.json").read_bytes()
+    build = strict_json_loads(build_raw)
+    corpus = strict_json_loads((rust / "capture.json").read_bytes())
+    replay = quietly(phase2_corpus.replay, rust)
+    required = source_inputs(PRODUCTION_PATTERNS)
+    if (result.get("smoke") or not result.get("source_stable")
+            or result.get("pin") != comparison["pin"] or capture.get("pin") != comparison["pin"]
+            or replay["summary"]["partial"] or replay["summary"]["harness_errors"]
+            or not replay["source_stable"] or replay["capture_sha256"] != comparison["rust_capture_sha256"]
+            or capture["build_sha256"] != digest(build_raw)):
+        raise ValueError("measurement requires current independent full captures at the exit pin")
+    for name, inputs in (("measurement", build["sources"]), ("corpus", corpus["build"]["sources"])):
+        if any(inputs.get(path) != value for path, value in required.items()):
+            raise ValueError(name + " capture lacks the current complete production/configuration identity")
+    for name in ("elapsed_ratio", "retained_bytes_ratio", "type_footprint_ratio"):
+        value = result.get("metrics", {}).get(name)
+        if type(value) not in (int, float) or not math.isfinite(value) or value <= 0:
+            raise ValueError("measurement did not establish " + name)
+    return {"version": 1, "pin": comparison["pin"], "directory": str(directory.resolve()),
+            "capture_sha256": digest(capture_raw), "build_sha256": digest(build_raw),
+            "corpus_capture_sha256": comparison["rust_capture_sha256"],
+            "production_sources_sha256": digest(canonical(required))}
+
+
+def measurement_current(comparison, rust, path=None):
+    path = Path(path) if path else CHECKPOINT_AUTHORITIES["C2"]["measurement"]
+    if not path.is_file():
+        return None
+    record = strict_json_loads(path.read_bytes())
+    if not isinstance(record, dict) or not isinstance(record.get("directory"), str):
+        return False
+    return record == measurement_identity(record["directory"], comparison, rust)
+
+
+def observe_measurement(directory, native, rust):
+    comparison = quietly(phase2_compare.report, native, rust, write=False)
+    phase2_compare.validate_complete_rows(comparison)
+    record = measurement_identity(directory, comparison, rust)
+    path = CHECKPOINT_AUTHORITIES["C2"]["measurement"]
+    path.write_bytes(json.dumps(record, indent=1, sort_keys=True).encode() + b"\n")
+    print(json.dumps({"receipt": str(path), "capture_sha256": record["capture_sha256"]}))
+    return record
 
 
 def quietly(function, *args, **kwargs):
@@ -258,7 +435,7 @@ def ratio(rows, domain, *, exclude_disabled=False):
 
 def checker(native=NATIVE, rust=RUST):
     metrics = {"inventory_frozen": False, "native_verified": False, "harness_valid": False,
-               "result_recorded": False, "blockers_named": False}
+               "result_recorded": False, "blockers_named": False, "c1_complete": False, "c2_complete": False}
     try:
         document = phase2_inventory.read()
         metrics["inventory_frozen"] = (phase2_inventory.INVENTORY.read_bytes()
@@ -324,15 +501,43 @@ def checker(native=NATIVE, rust=RUST):
                     if phase2_blockers.REGISTER.exists() else None)
         metrics.update(c1_metrics(comparison, claims, audit_ok, baseline, receipt_current("c1-contracts"),
                                   metrics["regression_parity"], blockers))
-    except (OSError, ValueError, KeyError) as error:
+    except (OSError, ValueError, KeyError, TypeError) as error:
         print("C1 metrics unavailable: " + str(error), file=sys.stderr)
         metrics["c1_complete"] = False
+    register = None
     try:
         register = quietly(phase2_blockers.build, native, rust)
         committed = json.loads(phase2_blockers.REGISTER.read_bytes()) if phase2_blockers.REGISTER.exists() else None
         metrics["blockers_named"] = register == committed and phase2_blockers.complete(register, comparison)
-    except (OSError, ValueError, KeyError) as error:
+    except (OSError, ValueError, KeyError, TypeError) as error:
         print("blocker register unavailable: " + str(error), file=sys.stderr)
+    try:
+        authorities = CHECKPOINT_AUTHORITIES["C2"]
+        claims = strict_json_loads(authorities["claims"].read_bytes()) if authorities["claims"].is_file() else None
+        audit = phase2_audit.load(authorities["audit"]) if authorities["audit"].is_file() else None
+        audit_ok = phase2_audit.complete(audit) if audit is not None else None
+        baseline = phase2_compare.load_baseline(authorities["baseline"]) if authorities["baseline"].is_file() else None
+        transfers, incoming = {}, {}
+        if claims is not None and any(entry.get("status") in ("handed", "blocked") or "incoming" in entry
+                                     for entry in claims.get("rows", [])):
+            if audit is None or phase2_audit.problems(audit, allow_open=True):
+                raise ValueError("handoff ownership requires a valid reviewed C2 audit scope")
+            context = phase2_blockers.capture_context(rust, comparison)
+            transfers = phase2_blockers.validated_handoffs(
+                "C2", claims, comparison, context,
+                owned_functions=phase2_blockers.audit_owned_functions(audit, "C2"))
+            incoming = phase2_blockers.validated_handoffs(
+                "C2", claims, comparison, context, incoming=True,
+                owned_functions=phase2_blockers.audit_owned_functions(audit, "C2"))
+        measured = measurement_current(comparison, rust)
+        metrics.update(checkpoint_metrics(
+            "C2", comparison, claims, audit_ok, baseline, receipt_current("c2-contracts"),
+            metrics["regression_parity"], register, handoffs=transfers, measured_ok=measured,
+            baseline_sha256=digest(authorities["baseline"].read_bytes()) if baseline is not None else None,
+            prerequisites=metrics, incoming=incoming))
+    except (OSError, ValueError, KeyError, TypeError) as error:
+        print("C2 metrics unavailable: " + str(error), file=sys.stderr)
+        metrics["c2_complete"] = False
     print("checker evidence: " + canonical({"native": report["observation_sha256"],
                                              "rust": comparison["rust_capture_sha256"]}).decode(), file=sys.stderr)
     return {"metrics": {k: v for k, v in metrics.items() if v is not None}}
@@ -344,11 +549,17 @@ def main():
     parser.add_argument("--native", type=Path, default=NATIVE)
     parser.add_argument("--rust", type=Path, default=RUST)
     parser.add_argument("--witness", help="contract witness identity for observe")
+    parser.add_argument("--measurement", type=Path, help="existing checkerbench capture for c2-measurement")
     args = parser.parse_args()
     if args.command == "observe":
         if not args.witness:
             raise ValueError("observe requires --witness")
-        observe(args.witness)
+        if args.witness == "c2-measurement":
+            if args.measurement is None:
+                raise ValueError("c2-measurement requires --measurement DIR; it does not run a benchmark")
+            observe_measurement(args.measurement, args.native, args.rust)
+        else:
+            observe(args.witness)
         return
     print(json.dumps(checker(args.native, args.rust), sort_keys=True))
 

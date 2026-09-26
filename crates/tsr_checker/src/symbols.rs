@@ -56,18 +56,23 @@ pub(crate) fn split_symbol<'a>(
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.newSymbol
+    #[cfg_attr(feature = "creation-trace", track_caller)]
     pub(crate) fn new_symbol(
         &mut self,
         flags: SymbolFlags,
         name: JsString,
     ) -> Result<SymbolId, Error> {
         self.symbol_count = self.symbol_count.checked_add(1).ok_or(Error::IdExhausted)?;
-        Ok(self
+        let id = self
             .symbols
-            .push(Symbol::new(flags | symbol_flags::TRANSIENT, name)))
+            .push(Symbol::new(flags | symbol_flags::TRANSIENT, name));
+        #[cfg(feature = "creation-trace")]
+        tsr_ast::creation_trace::symbol_birth(self.symbols.get(id)?);
+        Ok(id)
     }
 
     // port: tsc/internal/checker/checker.go:Checker.newSymbolEx
+    #[cfg_attr(feature = "creation-trace", track_caller)]
     pub(crate) fn new_symbol_ex(
         &mut self,
         flags: SymbolFlags,
@@ -138,6 +143,10 @@ impl CheckerState {
                 symbol_flags::TYPE_ALIAS | symbol_flags::TRANSIENT,
                 JsString::from_bytes(primitive),
             ));
+            #[cfg(feature = "creation-trace")]
+            tsr_ast::creation_trace::symbol_birth(
+                self.symbols.get(suggestion).expect("new suggestion"),
+            );
             self.builtins
                 .primitive_alias_suggestions
                 .push((builtin, suggestion));

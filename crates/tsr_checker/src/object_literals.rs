@@ -77,19 +77,9 @@ impl CheckerState {
         self.defer_checker_node(node)?;
         let destructuring = tsr_ast::is_assignment_target(self.ast(node)?, node)?;
         self.check_object_literal_grammar(node, destructuring)?;
-        let context = self.contextual_expression_type(node)?;
-        let inference = self.call_inference_at_node(node)?;
-        if let Some(ty) = context {
-            self.calls.contexts.push(crate::calls::ArgumentContext {
-                node,
-                ty,
-                inference,
-            });
-        }
+        self.push_cached_contextual_type(node)?;
         let result = self.check_object_literal_members(node, &properties, symbol, destructuring);
-        if context.is_some() {
-            self.calls.contexts.pop();
-        }
+        self.calls.contexts.pop();
         result
     }
     fn check_object_literal_members(

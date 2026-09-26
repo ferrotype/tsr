@@ -10,6 +10,8 @@ use tsr_ast::{check_flags as cf, symbol_flags as sf, SyntaxKind as K};
 
 #[derive(Default)]
 pub(crate) struct InstantiationState {
+    #[cfg(feature = "recursion-probe")]
+    pub(crate) probe: Option<crate::handles::c2_probe::InstantiationProbe>,
     pub(crate) mappers: Vec<crate::mapper::Mapper>,
     active: Vec<(MapperId, crate::types::Map<CacheKey, TypeId>)>,
     pub(crate) depth: u32,
@@ -143,6 +145,11 @@ impl CheckerState {
             return Ok(ty);
         }
         if self.instantiation.depth == 100 || self.instantiation.count >= 5_000_000 {
+            #[cfg(feature = "recursion-probe")]
+            if let Some(probe) = &mut self.instantiation.probe {
+                probe.depth_limit_hits += usize::from(self.instantiation.depth == 100);
+                probe.count_limit_hits += usize::from(self.instantiation.count >= 5_000_000);
+            }
             self.error_at(
                 self.current_node,
                 tsr_diagnostics::Type_instantiation_is_excessively_deep_and_possibly_infinite,
@@ -177,6 +184,13 @@ impl CheckerState {
         self.instantiation.count += 1;
         self.instantiation.total_count += 1;
         let result = stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+            #[cfg(feature = "recursion-probe")]
+            if let Some(probe) = &mut self.instantiation.probe {
+                probe.maximum_depth = probe.maximum_depth.max(self.instantiation.depth);
+                probe.maximum_remaining_stack = probe
+                    .maximum_remaining_stack
+                    .max(stacker::remaining_stack().expect("instantiation contract stack bounds"));
+            }
             self.instantiate_type_worker(ty, mapper, alias)
         });
         self.instantiation.depth -= 1;
@@ -341,6 +355,9 @@ impl CheckerState {
         symbol: SymbolId,
         mapper: MapperId,
     ) -> Result<SymbolId, Error> {
+        // Go's valueSymbolLinks.Get assigns this lazy comparison identity even
+        // when the symbol can be returned without instantiation.
+        self.symbol_runtime_id(symbol)?;
         let links = self
             .value_symbol_links
             .try_get(symbol)
@@ -380,6 +397,7 @@ impl CheckerState {
         write.parent = parent;
         write.value_declaration = value_declaration;
         write.declarations = declarations;
+        self.symbol_runtime_id(result)?;
         let result_links = self.value_symbol_links.get_or_default(result);
         result_links.target = Some(symbol);
         result_links.mapper = Some(mapper);
@@ -834,7 +852,8 @@ impl InstantiationState {
         census.vec_capacity("mappers", &self.mappers, self.mappers.capacity());
         for mapper in &self.mappers {
             match mapper {
-                crate::mapper::Mapper::DeferredArguments { sources, .. } => {
+                crate::mapper::Mapper::DeferredArguments { sources, .. }
+                | crate::mapper::Mapper::ArrayToSingle { sources, .. } => {
                     census.list("type_lists", sources);
                 }
                 crate::mapper::Mapper::Array { sources, targets } => {

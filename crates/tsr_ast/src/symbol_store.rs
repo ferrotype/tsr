@@ -444,9 +444,14 @@ impl<'a> SymbolsMut<'a> {
     pub fn id(&self) -> ArenaId {
         self.store.id()
     }
+    #[cfg_attr(feature = "creation-trace", track_caller)]
     pub fn push(self, value: Symbol) -> SymbolId {
         let id = self.store.rows.push(StoredSymbol::default());
         self.store.replace(id, value, self.tables);
+        #[cfg(feature = "creation-trace")]
+        crate::creation_trace::symbol_birth(
+            &self.store.read(self.tables).get(id).expect("new symbol"),
+        );
         id
     }
     pub fn get_mut(self, id: SymbolId) -> Result<SymbolMut<'a>, Error> {

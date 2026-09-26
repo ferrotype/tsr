@@ -487,6 +487,9 @@ impl CheckerState {
                 result.parent = parent;
             }
         }
+        // valueSymbolLinks.Get assigns the native lazy id here, before later
+        // sorting can compare same-named properties with equal declarations.
+        self.symbol_runtime_id(result)?;
         let links = self.value_symbol_links.get_or_default(result);
         links.containing_type = Some(containing);
         links.name_type = name_type;

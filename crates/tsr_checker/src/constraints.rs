@@ -75,12 +75,42 @@ impl crate::TypeStore {
 }
 
 impl CheckerState {
-    // port: tsc/internal/checker/relater.go:getRecursionIdentity
-    pub(crate) fn recursion_identity(&self, ty: TypeId) -> Result<RecursionIdentity, Error> {
-        let record = self.types.get(ty)?;
+    // port: tsc/internal/checker/relater.go:getRecursionIdentityTarget
+    pub(crate) fn recursion_identity_target(&mut self, ty: TypeId) -> Result<TypeId, Error> {
+        let record = *self.types.get(ty)?;
         if record.flags & tf::INDEXED_ACCESS != 0 {
-            return self.recursion_identity(self.types.indexed_access(ty)?.object_type);
+            return self.recursion_identity_target(self.types.indexed_access(ty)?.object_type);
         }
+        if record.object_flags & of::INSTANTIATED_MAPPED == of::INSTANTIATED_MAPPED {
+            let target = self.mapped_modifiers_type(ty)?;
+            let mut has_symbol = self.types.get(target)?.symbol.is_some();
+            if !has_symbol && self.types.flags(target)? & tf::INTERSECTION != 0 {
+                for &part in self.types.types_of(target)? {
+                    if self.types.get(part)?.symbol.is_some() {
+                        has_symbol = true;
+                        break;
+                    }
+                }
+            }
+            if has_symbol {
+                return self.recursion_identity_target(target);
+            }
+        }
+        Ok(ty)
+    }
+
+    // port: tsc/internal/checker/relater.go:getRecursionIdentity
+    pub(crate) fn recursion_identity(&mut self, ty: TypeId) -> Result<RecursionIdentity, Error> {
+        let target = self.recursion_identity_target(ty)?;
+        self.recursion_identity_from_target(target)
+    }
+
+    // port: tsc/internal/checker/relater.go:getRecursionIdentityFromTarget
+    pub(crate) fn recursion_identity_from_target(
+        &self,
+        ty: TypeId,
+    ) -> Result<RecursionIdentity, Error> {
+        let record = self.types.get(ty)?;
         if record.flags & tf::CONDITIONAL != 0 {
             return Ok(RecursionIdentity::Node(
                 self.conditional_root(self.types.conditional(ty)?.root)?
@@ -188,6 +218,16 @@ impl CheckerState {
         Ok(constraint)
     }
 
+    // port: tsc/internal/checker/checker.go:Checker.getConstraintOrUnknownFromTypeParameter
+    pub(crate) fn constraint_or_unknown_from_type_parameter(
+        &mut self,
+        ty: TypeId,
+    ) -> Result<TypeId, Error> {
+        Ok(self
+            .constraint_from_type_parameter(ty)?
+            .unwrap_or(self.builtins.unknown_type))
+    }
+
     // port: tsc/internal/checker/checker.go:Checker.hasNonCircularBaseConstraint
     pub(crate) fn has_non_circular_base_constraint(&mut self, ty: TypeId) -> Result<bool, Error> {
         Ok(self.resolved_base_constraint(ty, &mut Vec::new())?
@@ -252,6 +292,19 @@ impl CheckerState {
         if let Some(constraint) = *slot {
             return Ok(constraint);
         }
+        // Constraint exploration can recurse through separate conditional
+        // roots before its semantic depth limit. Preserve that limit while
+        // providing the stack space required to reach it.
+        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+            self.resolved_base_constraint_uncached(ty, stack)
+        })
+    }
+
+    fn resolved_base_constraint_uncached(
+        &mut self,
+        ty: TypeId,
+        stack: &mut Vec<RecursionIdentity>,
+    ) -> Result<TypeId, Error> {
         let types = &self.types;
         if !self.resolution.push(
             TypeSystemEntity::Type(ty),
@@ -271,6 +324,10 @@ impl CheckerState {
         let result = (|| {
             let identity = self.recursion_identity(ty)?;
             if stack.len() >= 10 && (stack.len() >= 50 || stack.contains(&identity)) {
+                #[cfg(feature = "recursion-probe")]
+                if let Some(probe) = &mut self.c2_limits_probe {
+                    probe.base_depths.push(stack.len());
+                }
                 return Ok(None);
             }
             stack.push(identity);
@@ -435,6 +492,12 @@ impl CheckerState {
             // Nested conditional constraints stop at 100 levels, as in the pin;
             // an unbounded chain of instantiations has no constraint.
             if self.conditional_constraint_depth >= 100 {
+                #[cfg(feature = "recursion-probe")]
+                if let Some(probe) = &mut self.c2_limits_probe {
+                    probe
+                        .conditional_depths
+                        .push(self.conditional_constraint_depth);
+                }
                 return Ok(None);
             }
             self.conditional_constraint_depth += 1;

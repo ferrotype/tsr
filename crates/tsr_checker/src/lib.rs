@@ -82,6 +82,8 @@ mod conditional;
 mod constraints;
 mod construct;
 mod constructor_checks;
+#[cfg(feature = "creation-trace")]
+mod creation_trace;
 mod declaration_checks;
 mod deferred_checks;
 mod delete_expressions;

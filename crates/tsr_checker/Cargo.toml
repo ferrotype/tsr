@@ -18,6 +18,7 @@ relation-probe = ["dep:serde_json"]
 # Contract-only stack/depth observation and panic injection; excluded from the
 # relation benchmark's feature so its hot path remains uninstrumented.
 recursion-probe = ["relation-probe"]
+creation-trace = ["relation-probe", "tsr_ast/creation-trace"]
 
 [dependencies]
 stacker = "=0.1.25"

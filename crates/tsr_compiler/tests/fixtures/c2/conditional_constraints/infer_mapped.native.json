@@ -1,0 +1,31 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "source_sha256": "f782a6d25c97e54f9e33f17c9367eff632096785e21c97cd99ddf550401042eb",
+  "native_go": "go1.27.1",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--strict",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "infer_mapped.ts"
+  ],
+  "exit_code": 2,
+  "diagnostics": [
+    {
+      "line": 8,
+      "column": 26,
+      "code": 2313,
+      "message": "Type parameter 'T' has a circular constraint."
+    },
+    {
+      "line": 9,
+      "column": 7,
+      "code": 2322,
+      "message": "Type 'string' is not assignable to type 'number'."
+    }
+  ]
+}

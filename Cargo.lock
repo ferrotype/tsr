@@ -853,6 +853,7 @@ name = "tsr_ast"
 version = "0.1.0"
 dependencies = [
  "hashbrown",
+ "serde_json",
  "stacker",
  "tsr_arena",
  "tsr_core",

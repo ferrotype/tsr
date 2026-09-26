@@ -229,7 +229,8 @@ impl CheckerState {
         } else if let Some(ty) = contextual {
             self.calls.contexts.push(crate::calls::ArgumentContext {
                 node: initializer,
-                ty,
+                ty: Some(ty),
+                is_cache: false,
                 inference: None,
             });
             let result = self.check_expression_ex(initializer, mode | 1);

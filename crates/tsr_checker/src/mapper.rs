@@ -28,6 +28,10 @@ pub(crate) enum Mapper {
         sources: TypeList,
         targets: TypeList,
     },
+    ArrayToSingle {
+        sources: TypeList,
+        target: TypeId,
+    },
     Merged {
         first: MapperId,
         second: MapperId,
@@ -63,6 +67,7 @@ impl CheckerState {
             | Mapper::Permissive
             | Mapper::Restrictive
             | Mapper::Inference { .. }
+            | Mapper::ArrayToSingle { .. }
             | Mapper::DeferredArguments { .. } => 0,
             Mapper::Simple { .. } => 1,
             Mapper::Array { .. } => 2,
@@ -192,6 +197,18 @@ impl CheckerState {
         })
     }
 
+    // port: tsc/internal/checker/mapper.go:newArrayToSingleTypeMapper
+    pub(crate) fn new_array_to_single_type_mapper(
+        &mut self,
+        sources: &[TypeId],
+        target: TypeId,
+    ) -> Result<MapperId, Error> {
+        self.alloc_mapper(Mapper::ArrayToSingle {
+            sources: sources.into(),
+            target,
+        })
+    }
+
     // port: tsc/internal/checker/mapper.go:Checker.combineTypeMappers
     pub(crate) fn combine_type_mappers(
         &mut self,
@@ -235,7 +252,13 @@ impl CheckerState {
     pub(crate) fn mapper_maps_this_only(&self, id: MapperId) -> Result<bool, Error> {
         let source = match self.mapper(id)? {
             Mapper::Simple { source, .. } => Some(*source),
-            Mapper::Array { sources, .. } if sources.len() == 1 => Some(sources[0]),
+            Mapper::Array { sources, .. }
+            | Mapper::ArrayToSingle { sources, .. }
+            | Mapper::DeferredArguments { sources, .. }
+                if sources.len() == 1 =>
+            {
+                Some(sources[0])
+            }
             _ => None,
         };
         match source {
@@ -298,6 +321,10 @@ impl CheckerState {
                 },
             ),
             Mapper::Simple { source, target } => Ok(if ty == source { target } else { ty }),
+            Mapper::ArrayToSingle {
+                ref sources,
+                target,
+            } => Ok(if sources.contains(&ty) { target } else { ty }),
             Mapper::Array {
                 ref sources,
                 ref targets,

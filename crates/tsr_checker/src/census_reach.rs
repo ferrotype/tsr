@@ -268,6 +268,10 @@ impl CheckerState {
                             work.types(sources.iter().copied());
                             work.types(targets.iter().copied());
                         }
+                        Mapper::ArrayToSingle { sources, target } => {
+                            work.types(sources.iter().copied());
+                            work.types([*target]);
+                        }
                         Mapper::DeferredArguments { sources, .. } => {
                             work.types(sources.iter().copied());
                         }

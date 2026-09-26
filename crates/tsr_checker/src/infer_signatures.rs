@@ -290,8 +290,7 @@ impl CheckerState {
                 *ty = self.instantiate_type(*ty, Some(mapper))?;
             }
         }
-        let eraser =
-            self.new_type_mapper(&parameters, &vec![self.builtins.any_type; parameters.len()])?;
+        let eraser = self.new_array_to_single_type_mapper(&parameters, self.builtins.any_type)?;
         for ty in &mut types {
             *ty = self.instantiate_type(*ty, Some(eraser))?;
         }

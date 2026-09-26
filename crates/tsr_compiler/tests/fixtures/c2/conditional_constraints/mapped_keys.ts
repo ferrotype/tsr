@@ -1,0 +1,12 @@
+type ObjectKeys<T extends Record<string, unknown>> = { [P in keyof T]: P };
+const objectKeys: ObjectKeys<{ named: number }> = { named: "named" };
+type ArrayKeys<T extends readonly unknown[]> = { [P in keyof T]: P extends number | `${number}` ? P : never };
+const arrayKeys: ArrayKeys<string[]> = [0, 1];
+const tupleKeys: ArrayKeys<readonly [string, number]> = ["0", "1"];
+type TupleUnionKeys<T extends [unknown] | [unknown, unknown]> = { [P in keyof T]: P };
+const tupleUnionKeys: TupleUnionKeys<[string, number]> = ["0", "1"];
+type MixedKeys<T extends readonly unknown[] | { name: unknown }> = { [P in keyof T]: P };
+const mixedObjectKeys: MixedKeys<{ name: number }> = { name: "name" };
+const mixedTupleKeys: MixedKeys<[number]> = ["0"];
+const wrongObjectKey: ObjectKeys<{ named: number }>["named"] = "wrong";
+const wrongTupleKey: ArrayKeys<[string]>[0] = "wrong";

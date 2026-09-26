@@ -1,4 +1,4 @@
-use crate::{mapper::Mapper, object_flags as of, type_flags as tf, CheckerState, Error, TypeId};
+use crate::{mapper::Mapper, object_flags as of, CheckerState, Error, TypeId};
 use tsr_ast::{symbol_flags as sf, SyntaxKind as K};
 
 impl CheckerState {
@@ -38,7 +38,7 @@ impl CheckerState {
             let kind = read.kind();
             if kind == K::TypeReference && !omit_references {
                 let referenced = self.get_type_from_type_node(parent)?;
-                if self.types.flags(referenced)? & tf::ANY != 0 {
+                if self.is_error_type(referenced)? {
                     continue;
                 }
                 let Some(symbol) = self.type_reference_symbol(parent, true)? else {

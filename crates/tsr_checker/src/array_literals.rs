@@ -53,18 +53,8 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.checkArrayLiteral
     pub(crate) fn check_array_literal(&mut self, node: NodeId) -> Result<TypeId, Error> {
-        let contextual = self.contextual_expression_type(node)?;
         let length = self.calls.contexts.len();
-        if let Some(ty) = contextual {
-            let inference = self
-                .contextual_call_argument(node)
-                .and_then(|context| context.inference);
-            self.calls.contexts.push(crate::calls::ArgumentContext {
-                node,
-                ty,
-                inference,
-            });
-        }
+        self.push_cached_contextual_type(node)?;
         let result = self.check_array_literal_worker(node);
         self.calls.contexts.truncate(length);
         result

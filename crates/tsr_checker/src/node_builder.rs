@@ -202,8 +202,9 @@ impl<'a> NodeBuilder<'a> {
             return Ok(false);
         }
         let mut reported = false;
+        let symbol_flags = self.checker.symbol(symbol)?.flags();
         if let Some(tracker) = self.tracker.as_deref_mut() {
-            if tracker.track_symbol_without_accessibility(symbol) {
+            if tracker.track_symbol_without_accessibility(symbol, symbol_flags) {
                 return Ok(false);
             }
             let accessibility = self.checker.emit_symbol_accessible(
@@ -221,7 +222,7 @@ impl<'a> NodeBuilder<'a> {
         }
         if reported {
             self.reported_diagnostic = true;
-        } else if self.checker.symbol(symbol)?.flags() & sf::TYPE_PARAMETER == 0 {
+        } else if symbol_flags & sf::TYPE_PARAMETER == 0 {
             self.tracked_symbols.push(cache::TrackedSymbol {
                 symbol,
                 enclosing: self.enclosing,
@@ -738,6 +739,10 @@ impl<'a> NodeBuilder<'a> {
             };
         }
         if record.flags & tf::TYPE_PARAMETER != 0 && self.infer_parameters.contains(&ty) {
+            let symbol = record
+                .symbol
+                .ok_or(Error::MissingLink("infer parameter symbol"))?;
+            self.approximate_length += self.checker.symbol(symbol)?.name_bytes().len() + 6;
             let mut constraint_node = None;
             if let Some(constraint) = self.checker.constraint_of_type_parameter(ty)? {
                 let inferred = self.checker.inferred_parameter_constraint(ty, true)?;
@@ -749,6 +754,7 @@ impl<'a> NodeBuilder<'a> {
                     )?,
                     None => false,
                 } {
+                    self.approximate_length += 9;
                     constraint_node = Some(self.type_node(constraint)?);
                 }
             }

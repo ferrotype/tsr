@@ -2,7 +2,7 @@
 //! returned identity. The fixture observer reads links and pointer equality only.
 #![cfg(feature = "relation-probe")]
 
-use serde_json::{Value, json};
+use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 use std::sync::Arc;
 use tsr_arena::{CheckerIdentity, Counters, Generation, NodeId};
@@ -47,25 +47,21 @@ fn fixtures() -> (Value, Value) {
         "dependent-b-first"
     ]);
     assert_eq!(
-        json!(
-            requests
-                .as_array()
-                .unwrap()
-                .iter()
-                .map(|r| &r["id"])
-                .collect::<Vec<_>>()
-        ),
+        json!(requests
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|r| &r["id"])
+            .collect::<Vec<_>>()),
         ids
     );
     assert_eq!(
-        json!(
-            observed["rows"]
-                .as_array()
-                .unwrap()
-                .iter()
-                .map(|r| &r["id"])
-                .collect::<Vec<_>>()
-        ),
+        json!(observed["rows"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|r| &r["id"])
+            .collect::<Vec<_>>()),
         ids
     );
     (requests, observed)

@@ -19,7 +19,8 @@ enum Resolution {
 #[derive(Clone, Copy)]
 pub(crate) struct ArgumentContext {
     pub node: NodeId,
-    pub ty: TypeId,
+    pub ty: Option<TypeId>,
+    pub is_cache: bool,
     pub inference: Option<InferenceId>,
 }
 
@@ -80,7 +81,7 @@ impl CallState {
             )
     }
     pub(crate) fn census_types(&self) -> impl Iterator<Item = TypeId> + '_ {
-        self.contexts.iter().map(|context| context.ty).chain(
+        self.contexts.iter().filter_map(|context| context.ty).chain(
             self.instantiation_expressions
                 .iter()
                 .flat_map(|(&(_, source), &result)| [source, result]),
@@ -126,12 +127,33 @@ impl CheckerState {
     }
 
     pub(crate) fn contextual_call_argument(&self, node: NodeId) -> Option<ArgumentContext> {
+        self.contextual_call_argument_ex(node, true)
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.findContextualNode
+    pub(crate) fn contextual_call_argument_ex(
+        &self,
+        node: NodeId,
+        include_caches: bool,
+    ) -> Option<ArgumentContext> {
         self.calls
             .contexts
             .iter()
-            .rev()
-            .find(|context| context.node == node)
+            .find(|context| context.node == node && (include_caches || !context.is_cache))
             .copied()
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.pushCachedContextualType
+    pub(crate) fn push_cached_contextual_type(&mut self, node: NodeId) -> Result<(), Error> {
+        let ty = self.contextual_expression_type(node)?;
+        let inference = self.call_inference_at_node(node)?;
+        self.calls.contexts.push(ArgumentContext {
+            node,
+            ty,
+            is_cache: true,
+            inference,
+        });
+        Ok(())
     }
 
     // port: tsc/internal/checker/checker.go:Checker.getInferenceContext
@@ -672,10 +694,13 @@ impl CheckerState {
         signatures: &[SignatureId],
         call_chain_flags: u32,
     ) -> Result<SignatureId, Error> {
-        let type_arguments = if self.node(node)?.kind() == K::BinaryExpression {
+        let read = self.node(node)?;
+        let type_arguments = if read.kind() == K::BinaryExpression
+            || tsr_ast::utilities_middle::is_super_call(self.ast(node)?, &read)?
+        {
             Vec::new()
         } else {
-            self.source_list(node, self.node(node)?.type_argument_list())?
+            self.source_list(node, read.type_argument_list())?
         };
         for &argument in &type_arguments {
             self.check_source_element(argument)?;

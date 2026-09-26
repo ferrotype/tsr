@@ -124,6 +124,9 @@ pub(crate) fn assign_runtime_cell(cell: &AtomicU64) -> u64 {
             .is_err()
         {
             id = cell.load(Ordering::SeqCst);
+        } else {
+            #[cfg(feature = "creation-trace")]
+            crate::creation_trace::assigned(std::ptr::from_ref(cell) as usize, id);
         }
     }
     id

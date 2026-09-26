@@ -46,14 +46,15 @@ SUBTESTS = ("trace", "union_ordering", "parent_pointers")
 # native capture are bound by digest in capture.json, and validation reruns
 # with the current code at every replay, so scripts cannot stale a capture.
 SOURCE_PATTERNS = ("tools/phase2/**/*.rs", "tools/s08/p5/**/*", "rust-toolchain.toml",
-                   ".cargo/**/*", "crates/tsr_bundled/bundled/**/*")
+                   ".cargo/**/*", "crates/**/*", "tools/**/Cargo.toml", "tools/s08/relater-prototype/**/*",
+                   "xtask/**/*", "tools/s03/**/*", "scripts/generate_locale_tables.py")
 
 
 def sources():
     result = p4.sources()
     for pattern in SOURCE_PATTERNS:
         for path in ROOT.glob(pattern):
-            if path.is_file():
+            if path.is_file() and not ({"target", "__pycache__"} & set(path.parts)) and path.name != ".DS_Store":
                 result[str(path.relative_to(ROOT))] = digest(path.read_bytes())
     return dict(sorted(result.items()))
 

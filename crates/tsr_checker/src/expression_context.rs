@@ -36,8 +36,8 @@ impl CheckerState {
         if read.flags() & nf::IN_WITH_STATEMENT != 0 {
             return Ok(None);
         }
-        if let Some(context) = self.contextual_call_argument(node) {
-            return Ok(Some(context.ty));
+        if let Some(context) = self.contextual_call_argument_ex(node, context_flags == 0) {
+            return Ok(context.ty);
         }
         if matches!(
             read.kind().known(),
@@ -173,43 +173,13 @@ impl CheckerState {
                 let template = read.parent().ok_or(Error::MissingLink("template parent"))?;
                 if let Some(parent) = self.node(template)?.parent() {
                     if self.node(parent)?.kind() == K::TaggedTemplateExpression {
-                        let args = self.effective_call_arguments(parent)?;
-                        let Some(index) = args.iter().position(|&argument| argument == node) else {
-                            return Ok(None);
-                        };
-                        let signature = if let Some(signature) = self.cached_call_signature(parent)
-                        {
-                            signature
-                        } else {
-                            self.check_tagged_template_expression(parent)?;
-                            self.cached_call_signature(parent)
-                                .ok_or(Error::MissingLink("contextual tagged signature"))?
-                        };
-                        return self.parameter_type_at(signature, index);
+                        return self.contextual_call_argument_type(parent, node);
                     }
                 }
                 Ok(None)
             }
             Some(K::CallExpression | K::NewExpression) => {
-                let args = self.source_list(parent, read.argument_list())?;
-                let Some(index) = args.iter().position(|&arg| arg == node) else {
-                    return Ok(None);
-                };
-                if crate::external_resolution::is_import_call(self.ast(parent)?, &read)? {
-                    return match index {
-                        0 => Ok(Some(self.builtins.string_type)),
-                        1 => self.global_import_call_options_type(false).map(Some),
-                        _ => Ok(Some(self.builtins.any_type)),
-                    };
-                }
-                let signature = if let Some(signature) = self.cached_call_signature(parent) {
-                    signature
-                } else {
-                    self.check_call_expression(parent)?;
-                    self.cached_call_signature(parent)
-                        .ok_or(Error::MissingLink("contextual call signature"))?
-                };
-                self.parameter_type_at(signature, index)
+                self.contextual_call_argument_type(parent, node)
             }
             Some(K::BinaryExpression) => {
                 let data = read
@@ -242,7 +212,10 @@ impl CheckerState {
                     }
                     Some(K::BarBarToken | K::QuestionQuestionToken) => {
                         let context = self.contextual_expression_type_ex(parent, context_flags)?;
-                        if right == Some(node) && context.is_none() {
+                        if right == Some(node)
+                            && context
+                                .is_none_or(|ty| self.bindings.pattern_for_type.contains_key(&ty))
+                        {
                             self.get_type_of_expression(left).map(Some)
                         } else {
                             Ok(context)
@@ -285,6 +258,57 @@ impl CheckerState {
             )),
             _ => Ok(None),
         }
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.getContextualTypeForArgument
+    fn contextual_call_argument_type(
+        &mut self,
+        call: NodeId,
+        argument: NodeId,
+    ) -> Result<Option<TypeId>, Error> {
+        let args = self.effective_call_arguments(call)?;
+        let Some(index) = args.iter().position(|&node| node == argument) else {
+            return Ok(None);
+        };
+        self.contextual_call_argument_at(call, index)
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.getContextualTypeForArgumentAtIndex
+    fn contextual_call_argument_at(
+        &mut self,
+        call: NodeId,
+        index: usize,
+    ) -> Result<Option<TypeId>, Error> {
+        if crate::external_resolution::is_import_call(self.ast(call)?, &self.node(call)?)? {
+            return match index {
+                0 => Ok(Some(self.builtins.string_type)),
+                1 => self.global_import_call_options_type(false).map(Some),
+                _ => Ok(Some(self.builtins.any_type)),
+            };
+        }
+        let signature = match self.cached_call_signature(call) {
+            Some(signature) if signature == self.builtins.resolving_signature => signature,
+            _ => self.resolved_call_signature(call)?,
+        };
+        let data = self.signatures.get(signature)?;
+        let parameters = data.parameters.clone().unwrap_or_else(|| [].into());
+        if data.flags & crate::signature_flags::HAS_REST_PARAMETER != 0
+            && index >= parameters.len().saturating_sub(1)
+        {
+            let rest = *parameters
+                .last()
+                .ok_or(Error::MissingLink("contextual rest parameter"))?;
+            let ty = self.get_type_of_symbol(rest)?;
+            let offset = index - (parameters.len() - 1);
+            let index = self.get_number_literal_type(tsr_jsnum::Number::new(offset as f64))?;
+            return self
+                .get_indexed_access_type(ty, index, crate::access_flags::CONTEXTUAL, None, None)
+                .map(Some);
+        }
+        Ok(Some(
+            self.parameter_type_at(signature, index)?
+                .unwrap_or(self.builtins.any_type),
+        ))
     }
 
     // port: tsc/internal/checker/checker.go:Checker.getApparentTypeOfContextualType

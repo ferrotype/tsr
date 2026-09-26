@@ -508,6 +508,8 @@ pub struct TypeCaches {
 
 #[derive(Debug, Default)]
 pub struct TypeStore {
+    #[cfg(feature = "creation-trace")]
+    pub(crate) trace_owner: tsr_ast::creation_trace::TypeOwner,
     /// Ids start above this; only tests move it, to reach exhaustion.
     base: u32,
     records: Vec<TypeRecord>,
@@ -632,6 +634,7 @@ impl TypeStore {
     /// in creation order as `TypeCount` does, and clearing the same computed
     /// object-flag bits. Exhaustion is an error, never a wrap.
     // port: tsc/internal/checker/checker.go:Checker.newType
+    #[cfg_attr(feature = "creation-trace", track_caller)]
     pub(crate) fn new_type(
         &mut self,
         flags: TypeFlags,
@@ -653,6 +656,13 @@ impl TypeStore {
                 alias: None,
                 payload,
             },
+        );
+        #[cfg(feature = "creation-trace")]
+        tsr_ast::creation_trace::type_birth(
+            &self.trace_owner,
+            id.get(),
+            flags,
+            object_flags & !flags_to_clear,
         );
         Ok(id)
     }

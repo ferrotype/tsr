@@ -500,6 +500,7 @@ impl CheckerState {
                         JsString::from_bytes(i.to_string().into_bytes()),
                         readonly_flags,
                     )?;
+                    self.symbol_runtime_id(property)?;
                     self.value_symbol_links
                         .get_or_default(property)
                         .resolved_type = Some(type_parameter);
@@ -514,6 +515,7 @@ impl CheckerState {
             JsString::from_bytes(&b"length"[..]),
             readonly_flags,
         )?;
+        self.symbol_runtime_id(length_symbol)?;
         if combined_flags & element_flags::VARIABLE != 0 {
             self.value_symbol_links
                 .get_or_default(length_symbol)

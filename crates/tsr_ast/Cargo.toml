@@ -14,8 +14,11 @@ include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/lice
 
 [features]
 layout-profile = []
+# Diagnostic-only ADR 0010 observer. Absent from corpus and timing binaries.
+creation-trace = ["dep:serde_json"]
 
 [dependencies]
+serde_json = { version = "1", optional = true }
 hashbrown = { version = "=0.17.1", default-features = false }
 stacker = "=0.1.25"
 tsr_core = { path = "../tsr_core", version = "0.1.0" }

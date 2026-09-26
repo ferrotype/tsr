@@ -152,10 +152,16 @@ impl CheckerState {
         self.inference.reverse.target_stack.push(target);
         let saved = self.inference.reverse.expanding;
         let result = (|| {
-            if self.deeply_nested_type(source, &self.inference.reverse.source_stack, 2)? {
+            if self.inference.reverse.source_stack.len() >= 2 && {
+                let stack = self.inference.reverse.source_stack.clone();
+                self.deeply_nested_type(source, &stack, 2)?
+            } {
                 self.inference.reverse.expanding |= crate::relater::SOURCE;
             }
-            if self.deeply_nested_type(target, &self.inference.reverse.target_stack, 2)? {
+            if self.inference.reverse.target_stack.len() >= 2 && {
+                let stack = self.inference.reverse.target_stack.clone();
+                self.deeply_nested_type(target, &stack, 2)?
+            } {
                 self.inference.reverse.expanding |= crate::relater::TARGET;
             }
             if self.inference.reverse.expanding == crate::relater::BOTH {

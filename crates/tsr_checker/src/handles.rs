@@ -25,6 +25,18 @@ use tsr_jsnum::{Number, PseudoBigInt};
 mod display;
 pub use display::TypeNodeBuilder;
 
+#[cfg(feature = "recursion-probe")]
+#[path = "handles_c2_probe.rs"]
+pub(crate) mod c2_probe;
+
+#[cfg(feature = "recursion-probe")]
+#[path = "handles_c2_limits_probe.rs"]
+pub(crate) mod c2_limits_probe;
+
+#[cfg(feature = "recursion-probe")]
+#[path = "handles_c2_audit_probe.rs"]
+mod c2_audit_probe;
+
 /// A type of one checker, usable inside an operation on that checker.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct TypeRef {
@@ -163,6 +175,67 @@ pub struct MemberSpec<'a> {
 }
 
 impl Operation<'_> {
+    /// Read-only diagnostic labels of already queried types; creates no IDs.
+    #[cfg(feature = "creation-trace")]
+    pub fn trace_types(&self, types: &[TypeRef]) -> Result<serde_json::Value, Error> {
+        let ids = types
+            .iter()
+            .map(|t| self.check_type(*t))
+            .collect::<Result<Vec<_>, _>>()?;
+        Ok(serde_json::Value::Array(
+            ids.iter().map(|id| self.state().trace_type(*id)).collect(),
+        ))
+    }
+
+    /// Sort properties created by ordinary checker queries, without manufacturing
+    /// duplicate-name symbols.
+    #[cfg(feature = "relation-probe")]
+    pub fn trace_property_order(
+        &mut self,
+        types: &[TypeRef],
+        name: &[u8],
+    ) -> Result<serde_json::Value, Error> {
+        let types = types
+            .iter()
+            .map(|t| self.check_type(*t))
+            .collect::<Result<Vec<_>, _>>()?;
+        let state = self.state_mut();
+        let mut symbols = Vec::new();
+        for ty in types {
+            symbols.push(
+                state
+                    .constituent_property(ty, name, false)?
+                    .ok_or(Error::MissingLink("trace property"))?,
+            );
+        }
+        #[cfg(feature = "creation-trace")]
+        let before = serde_json::json!(symbols
+            .iter()
+            .map(|id| state.trace_symbol(*id))
+            .collect::<Vec<_>>());
+        #[cfg(not(feature = "creation-trace"))]
+        let before = serde_json::Value::Null;
+        let original = symbols.clone();
+        state.sort_symbols(&mut symbols)?;
+        let order = symbols
+            .iter()
+            .map(|id| {
+                original
+                    .iter()
+                    .position(|old| old == id)
+                    .expect("sort retains symbols")
+            })
+            .collect::<Vec<_>>();
+        #[cfg(feature = "creation-trace")]
+        let after = serde_json::json!(symbols
+            .iter()
+            .map(|id| state.trace_symbol(*id))
+            .collect::<Vec<_>>());
+        #[cfg(not(feature = "creation-trace"))]
+        let after = serde_json::Value::Null;
+        Ok(serde_json::json!({"before":before, "order":order, "after":after}))
+    }
+
     /// Compares two results owned by this checker in the selected production
     /// relation. Types retained from another checker are rejected first.
     pub fn is_type_related_to(
@@ -356,6 +429,30 @@ impl Operation<'_> {
         let symbol = self.check_symbol_ref(symbol)?;
         let ty = self.state_mut().get_declared_type_of_symbol(symbol)?;
         Ok(self.type_ref(ty))
+    }
+
+    /// Declared parameters of a type alias, retaining this operation's owner.
+    // port: tsc/internal/checker/checker.go:Checker.GetTypeAliasTypeParameters
+    pub fn get_type_alias_type_parameters(
+        &mut self,
+        symbol: SymbolRef,
+    ) -> Result<Vec<TypeRef>, Error> {
+        let symbol = self.check_symbol_ref(symbol)?;
+        if self.state().symbol(symbol)?.flags() & tsr_ast::symbol_flags::TYPE_ALIAS == 0 {
+            return Err(Error::MissingLink("type alias symbol required"));
+        }
+        self.state_mut().get_declared_type_of_symbol(symbol)?;
+        let parameters = self
+            .state()
+            .query
+            .type_aliases
+            .try_get(symbol)
+            .and_then(|links| links.parameters.clone())
+            .unwrap_or_default();
+        Ok(parameters
+            .iter()
+            .map(|&parameter| self.type_ref(parameter))
+            .collect())
     }
 
     pub fn get_type_of_symbol(&mut self, symbol: SymbolRef) -> Result<TypeRef, Error> {

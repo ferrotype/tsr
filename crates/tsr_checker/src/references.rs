@@ -603,19 +603,9 @@ impl CheckerState {
         let interface = self.types.interface(target)?;
         let parameters = interface.type_parameters().to_vec();
         let outer_count = interface.outer_type_parameter_count as usize;
-        let types = &self.types;
-        if !self.resolution.push(
+        if !self.push_type_resolution(
             TypeSystemEntity::Type(ty),
             TypeSystemPropertyName::ResolvedTypeArguments,
-            |resolution| {
-                let TypeSystemEntity::Type(ty) = resolution.target else {
-                    return false;
-                };
-                resolution.property_name == TypeSystemPropertyName::ResolvedTypeArguments
-                    && types
-                        .type_reference(ty)
-                        .is_ok_and(|reference| reference.resolved_type_arguments.is_some())
-            },
         ) {
             return Ok(vec![self.builtins.error_type; parameters.len()].into());
         }
@@ -676,13 +666,12 @@ impl CheckerState {
                 .clone()
                 .ok_or(Error::MissingLink("circular arguments"));
         }
+        if let Some(arguments) = &self.types.type_reference(ty)?.resolved_type_arguments {
+            return Ok(arguments.clone());
+        }
         let arguments = self.instantiate_types(&arguments, mapper)?;
-        Ok(self
-            .types
-            .type_reference_mut(ty)?
-            .resolved_type_arguments
-            .get_or_insert(arguments)
-            .clone())
+        self.types.type_reference_mut(ty)?.resolved_type_arguments = Some(arguments.clone());
+        Ok(arguments)
     }
 }
 

@@ -1083,14 +1083,13 @@ impl CheckerState {
         {
             return Ok(true);
         }
-        if flags & tf::INTERSECTION != 0 && !self.is_generic_index_type(ty)? {
+        if flags & tf::INTERSECTION != 0 && !self.is_generic_type(ty)? {
             let parts = self.types.compound_types(ty)?.clone();
             for &part in parts.iter() {
-                if !self.valid_index_key_type(part)? {
-                    return Ok(false);
+                if self.valid_index_key_type(part)? {
+                    return Ok(true);
                 }
             }
-            return Ok(true);
         }
         Ok(false)
     }

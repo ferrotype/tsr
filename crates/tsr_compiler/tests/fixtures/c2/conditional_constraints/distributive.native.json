@@ -1,0 +1,18 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "source_sha256": "832d372c7c2e13035c06b033b16dc4cd05aeaf50a0b59ab1794851a51357bdd1",
+  "native_go": "go1.27.1",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--strict",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "distributive.ts"
+  ],
+  "exit_code": 0,
+  "diagnostics": []
+}

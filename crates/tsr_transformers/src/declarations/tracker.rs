@@ -97,7 +97,10 @@ impl Tracker {
     }
 }
 impl DeclarationSymbolTracker for Tracker {
-    fn track_symbol_without_accessibility(&mut self, symbol: SymbolId) -> bool {
+    fn track_symbol_without_accessibility(&mut self, symbol: SymbolId, flags: SymbolFlags) -> bool {
+        if flags & tsr_ast::symbol_flags::TYPE_PARAMETER != 0 {
+            return true;
+        }
         if self.watched_class == Some(symbol) {
             self.class_tracked = true;
             true

@@ -1,0 +1,46 @@
+{
+  "acceptance_tier": "executed",
+  "baseline_header": "tests/cases/compiler/superWithTypeArgument.ts",
+  "baseline_inputs": [
+    {
+      "content_hex": "636c6173732043207b0a202020200a7d0a0a636c61737320443c543e20657874656e64732043207b0a20202020636f6e7374727563746f722829207b0a202020202020202073757065723c543e28293b0a202020207d0a7d",
+      "name_hex": "2f2e7372632f73757065725769746854797065417267756d656e742e7473"
+    }
+  ],
+  "diagnostic_phases": [
+    "config",
+    "program",
+    "syntactic",
+    "semantic",
+    "global"
+  ],
+  "error_baseline_requested": true,
+  "error_inputs": [
+    {
+      "content_hex": "636c6173732043207b0a202020200a7d0a0a636c61737320443c543e20657874656e64732043207b0a20202020636f6e7374727563746f722829207b0a202020202020202073757065723c543e28293b0a202020207d0a7d",
+      "name_hex": "2f2e7372632f73757065725769746854797065417267756d656e742e7473"
+    }
+  ],
+  "id": "compiler/superWithTypeArgument.ts#configuration=0",
+  "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+      "/.src/superWithTypeArgument.ts": "636c6173732043207b0a202020200a7d0a0a636c61737320443c543e20657874656e64732043207b0a20202020636f6e7374727563746f722829207b0a202020202020202073757065723c543e28293b0a202020207d0a7d"
+    },
+    "id": "compiler/superWithTypeArgument.ts#configuration=0",
+    "options": {
+      "newLine": 1,
+      "noErrorTruncation": true,
+      "skipDefaultLibCheck": true,
+      "target": 2
+    },
+    "roots": [
+      "/.src/superWithTypeArgument.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+  },
+  "public_type_strings": true,
+  "type_baseline_requested": true
+}
