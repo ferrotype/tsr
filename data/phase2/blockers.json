@@ -1,7 +1,7 @@
 {
  "comparison": {
   "native_observation_sha256": "1b5356b425ad95a3e5e2a0bb29d42534e8d9d4a6159649f063f3317084a0e276",
-  "rust_capture_sha256": "37fba879efd84ffe4a9bb112f06cf84d735da420d168ec4f2d9fc5358673fe6d"
+  "rust_capture_sha256": "2422cc6e7e57a50808b6c073ff90978493f1cfbf010846040157537ee73f81d2"
  },
  "declaration_audit": {
   "examples": {
@@ -13,9 +13,7 @@
     "compiler/declarationEmitConstObjectLiteralGenericMethod1.ts#configuration=0"
    ],
    "failed: panic": [
-    "compiler/declarationEmitAugmentationUsesCorrectSourceFile.ts#configuration=0",
-    "conformance/types/tuple/restTupleElements1.ts#configuration=0",
-    "conformance/types/tuple/variadicTuples2.ts#configuration=0"
+    "compiler/declarationEmitAugmentationUsesCorrectSourceFile.ts#configuration=0"
    ],
    "not loaded: unsupported": [
     "compiler/contentMapperDeclarationEmit.ts#configuration=0",
@@ -47,14 +45,14 @@
   "native_requests": 1754,
   "outcomes": {
    "different": 67,
-   "failed: panic": 3,
+   "failed: panic": 1,
    "not loaded: unsupported": 3,
    "unsupported: checkExpressionWorker": 6,
    "unsupported: conditionalTypeToTypeNode: shadowed distribution parameter": 1,
    "unsupported: extractRedundantTemplateLiterals": 1,
    "unsupported: node builder synthetic property elision comments": 2,
    "unsupported: someSymbolTableInScope: reparsed module": 2,
-   "working": 1669
+   "working": 1671
   },
   "rule": "working paths keep their results; only a missing transform or emit-resolver operation becomes a blocker, under its Phase 3 or Phase 2 owner"
  },
