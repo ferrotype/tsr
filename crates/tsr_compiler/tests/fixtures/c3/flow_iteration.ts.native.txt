@@ -1,0 +1,2 @@
+flow_iteration.ts(17,21): error TS2488: Type 'AsyncIterable<number>' must have a '[Symbol.iterator]()' method that returns an iterator.
+flow_iteration.ts(23,42): error TS2488: Type '5' must have a '[Symbol.iterator]()' method that returns an iterator.

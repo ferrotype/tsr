@@ -1,0 +1,34 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "source_sha256": "08387166996fa68e2fad309880c0051f2e9c7c7a02aba0bcf4683ca33c8323c7",
+  "native_executable_sha256": "429a5f8e3ee6a3674883329cd1dc8e99481be2071be8a4912fadab28cbfa8501",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "--allowJs",
+    "--checkJs",
+    "--strict",
+    "changes_this_property_annotation.js"
+  ],
+  "native_output_sha256": "72b61b9b1bf310aef9282c4653e2315aac5b12c709ae5301912e3bd65df5a576",
+  "exit_code": 2,
+  "diagnostics": [
+    {
+      "line": 4,
+      "column": 10,
+      "code": 2339,
+      "message": "Property 'id' does not exist on type 'SharedClass'."
+    },
+    {
+      "line": 14,
+      "column": 3,
+      "code": 2339,
+      "message": "Property 'id' does not exist on type 'SharedClass'."
+    }
+  ]
+}

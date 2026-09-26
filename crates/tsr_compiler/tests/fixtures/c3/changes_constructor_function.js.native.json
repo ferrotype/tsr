@@ -1,0 +1,34 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "source_sha256": "6566c0e217c0e6eba4632559945251490b89fdcafdc268c02467518f250158d4",
+  "native_executable_sha256": "429a5f8e3ee6a3674883329cd1dc8e99481be2071be8a4912fadab28cbfa8501",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "--allowJs",
+    "--checkJs",
+    "--strict",
+    "changes_constructor_function.js"
+  ],
+  "native_output_sha256": "1510ce729564158ffb8aef82d95f8377e433403ba80d061c98136d5cade95cc4",
+  "exit_code": 2,
+  "diagnostics": [
+    {
+      "line": 2,
+      "column": 3,
+      "code": 2683,
+      "message": "'this' implicitly has type 'any' because it does not have a type annotation."
+    },
+    {
+      "line": 5,
+      "column": 11,
+      "code": 7009,
+      "message": "'new' expression, whose target lacks a construct signature, implicitly has an 'any' type."
+    }
+  ]
+}

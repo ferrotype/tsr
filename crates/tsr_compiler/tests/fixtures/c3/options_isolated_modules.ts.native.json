@@ -1,0 +1,27 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "source_sha256": "fcdede3335deb9117a7bd238f9791edc58dcae225daa46069683a562d0bce784",
+  "native_executable_sha256": "429a5f8e3ee6a3674883329cd1dc8e99481be2071be8a4912fadab28cbfa8501",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "--strict",
+    "--isolatedModules",
+    "options_isolated_modules.ts"
+  ],
+  "native_output_sha256": "3b23d991e1dd017b4f8f1f3167b6ce8546809651b5f4e45ddf3490a435705f82",
+  "exit_code": 2,
+  "diagnostics": [
+    {
+      "line": 2,
+      "column": 9,
+      "code": 2748,
+      "message": "Cannot access ambient const enums when 'isolatedModules' is enabled."
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "source_sha256": "3f76c49d016ef5063d73c8b2968c9541b2736f288029c503911f0a72e8238170",
+  "native_executable_sha256": "429a5f8e3ee6a3674883329cd1dc8e99481be2071be8a4912fadab28cbfa8501",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "--allowJs",
+    "--checkJs",
+    "--strict",
+    "changes_param_one_function.js"
+  ],
+  "native_output_sha256": "064ce649a64a53d39c50c00a0606670804e163862fc7764f389444c793bfd28d",
+  "exit_code": 2,
+  "diagnostics": [
+    {
+      "line": 3,
+      "column": 8,
+      "code": 7006,
+      "message": "Parameter 'x' implicitly has an 'any' type."
+    }
+  ]
+}

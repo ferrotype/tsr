@@ -1,0 +1,34 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "source_sha256": "c037f1ff1b693b194db0079ee3d0f81afd3daed675cb31d21dd3db90acfad5ef",
+  "native_executable_sha256": "429a5f8e3ee6a3674883329cd1dc8e99481be2071be8a4912fadab28cbfa8501",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "--allowJs",
+    "--checkJs",
+    "--strict",
+    "changes_arguments_no_rest.js"
+  ],
+  "native_output_sha256": "bda15cdc127f415ae5877590dc941a26399ac7577f3948bbca5d1993e463ed41",
+  "exit_code": 2,
+  "diagnostics": [
+    {
+      "line": 4,
+      "column": 3,
+      "code": 2554,
+      "message": "Expected 0 arguments, but got 1."
+    },
+    {
+      "line": 5,
+      "column": 12,
+      "code": 7019,
+      "message": "Rest parameter 'args' implicitly has an 'any[]' type."
+    }
+  ]
+}

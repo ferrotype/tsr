@@ -1,0 +1,62 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "source_sha256": "542e00fb2652ece8d6d7d76554b29d73d3b653572b5155b786014a0c2b3348ab",
+  "native_executable_sha256": "429a5f8e3ee6a3674883329cd1dc8e99481be2071be8a4912fadab28cbfa8501",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "--strict",
+    "flow_classes.ts"
+  ],
+  "native_output_sha256": "0dedb61639253735b5190013a07700981d5cf0c457daa2fd84cc26fefa134408",
+  "exit_code": 2,
+  "diagnostics": [
+    {
+      "line": 7,
+      "column": 17,
+      "code": 2729,
+      "message": "Property 'count' is used before its initialization."
+    },
+    {
+      "line": 14,
+      "column": 24,
+      "code": 2339,
+      "message": "Property '#nope' does not exist on type 'Derived'."
+    },
+    {
+      "line": 16,
+      "column": 7,
+      "code": 2515,
+      "message": "Non-abstract class 'Wrong' does not implement inherited abstract member area from class 'Base'."
+    },
+    {
+      "line": 18,
+      "column": 12,
+      "code": 4113,
+      "message": "This member cannot have an 'override' modifier because it is not declared in the base class 'Base'."
+    },
+    {
+      "line": 20,
+      "column": 7,
+      "code": 2515,
+      "message": "Non-abstract class 'NotAbstract' does not implement inherited abstract member area from class 'Base'."
+    },
+    {
+      "line": 21,
+      "column": 11,
+      "code": 2511,
+      "message": "Cannot create an instance of an abstract class."
+    },
+    {
+      "line": 29,
+      "column": 15,
+      "code": 2540,
+      "message": "Cannot assign to 'onlyGetter' because it is a read-only property."
+    }
+  ]
+}

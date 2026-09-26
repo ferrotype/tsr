@@ -1,0 +1,27 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "source_sha256": "8c892510505e27e4794360ac2da87ae5c5eb4a721decc9f3ffe95f076b6c15da",
+  "native_executable_sha256": "429a5f8e3ee6a3674883329cd1dc8e99481be2071be8a4912fadab28cbfa8501",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "--strict",
+    "--noFallthroughCasesInSwitch",
+    "options_no_fallthrough.ts"
+  ],
+  "native_output_sha256": "e247cacf11374768660c482ce81e04b3794bec4f01f907ce731e6e329180d50c",
+  "exit_code": 2,
+  "diagnostics": [
+    {
+      "line": 3,
+      "column": 5,
+      "code": 7029,
+      "message": "Fallthrough case in switch."
+    }
+  ]
+}

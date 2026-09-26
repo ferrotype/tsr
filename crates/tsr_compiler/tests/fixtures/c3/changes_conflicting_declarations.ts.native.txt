@@ -1,0 +1,1 @@
+changes_conflicting_declarations.ts(2,22): error TS2717: Subsequent property declarations must have the same type.  Property 'a' must be of type 'string', but here has type 'number'.

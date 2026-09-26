@@ -1,0 +1,28 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "source_sha256": "452e2393fa1047241bc82a92e42a50b09844bdb6d9a3f70f3ab99bdd7cea31a0",
+  "native_executable_sha256": "429a5f8e3ee6a3674883329cd1dc8e99481be2071be8a4912fadab28cbfa8501",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "--allowJs",
+    "--checkJs",
+    "--strict",
+    "changes_class_tag_not_constructor.js"
+  ],
+  "native_output_sha256": "45d83dd35823d66c17e48ca465630d89fd31e10f27b1afb2c7e1b994ce751bbf",
+  "exit_code": 2,
+  "diagnostics": [
+    {
+      "line": 3,
+      "column": 11,
+      "code": 7009,
+      "message": "'new' expression, whose target lacks a construct signature, implicitly has an 'any' type."
+    }
+  ]
+}

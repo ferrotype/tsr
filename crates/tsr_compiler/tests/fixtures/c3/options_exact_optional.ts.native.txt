@@ -1,0 +1,3 @@
+options_exact_optional.ts(2,7): error TS2375: Type '{ a: undefined; }' is not assignable to type 'A' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'a' are incompatible.
+    Type 'undefined' is not assignable to type 'number'.

@@ -1,0 +1,1 @@
+changes_void_zero_expando.js(2,1): error TS7008: Member 'y' implicitly has an 'any' type.

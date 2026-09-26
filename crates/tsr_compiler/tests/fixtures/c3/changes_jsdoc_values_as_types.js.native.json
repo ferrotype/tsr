@@ -1,0 +1,40 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "source_sha256": "c1804194eb5c0893f2c895da31f2eecffab5c3ad07faf771f2587e1e0a713474",
+  "native_executable_sha256": "429a5f8e3ee6a3674883329cd1dc8e99481be2071be8a4912fadab28cbfa8501",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "--allowJs",
+    "--checkJs",
+    "--strict",
+    "changes_jsdoc_values_as_types.js"
+  ],
+  "native_output_sha256": "405496d07252d4f59b89cd12c585d3bc359ec32c9bf4ffa38fcfc7bf05472a48",
+  "exit_code": 2,
+  "diagnostics": [
+    {
+      "line": 1,
+      "column": 15,
+      "code": 2749,
+      "message": "'FORWARD' refers to a value, but is being used as a type here. Did you mean 'typeof FORWARD'?"
+    },
+    {
+      "line": 1,
+      "column": 25,
+      "code": 2749,
+      "message": "'BACKWARD' refers to a value, but is being used as a type here. Did you mean 'typeof BACKWARD'?"
+    },
+    {
+      "line": 8,
+      "column": 7,
+      "code": 2322,
+      "message": "Type '3' is not assignable to type 'Direction2'."
+    }
+  ]
+}

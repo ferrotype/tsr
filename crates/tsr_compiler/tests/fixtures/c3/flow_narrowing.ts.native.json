@@ -1,0 +1,44 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "source_sha256": "5f51ee89b408c873107ddcf7184f16d4d829e8963359060bdc7e8f3835c75bac",
+  "native_executable_sha256": "429a5f8e3ee6a3674883329cd1dc8e99481be2071be8a4912fadab28cbfa8501",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "--strict",
+    "flow_narrowing.ts"
+  ],
+  "native_output_sha256": "e8d511cfcb43080791673ac8d8561fa677e306d6973c4ded1291fd247ca62b7a",
+  "exit_code": 2,
+  "diagnostics": [
+    {
+      "line": 16,
+      "column": 14,
+      "code": 18048,
+      "message": "'shape' is possibly 'undefined'."
+    },
+    {
+      "line": 21,
+      "column": 32,
+      "code": 18047,
+      "message": "'v' is possibly 'null'."
+    },
+    {
+      "line": 22,
+      "column": 39,
+      "code": 18047,
+      "message": "'v' is possibly 'null'."
+    },
+    {
+      "line": 22,
+      "column": 41,
+      "code": 2339,
+      "message": "Property 'toFixed' does not exist on type 'number | (() => void)'.\n  Property 'toFixed' does not exist on type '() => void'."
+    }
+  ]
+}

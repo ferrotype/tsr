@@ -1,0 +1,28 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "source_sha256": "443f7f5797c3d71233be443af46b0722445d2e14a73f0cc080a505040033683c",
+  "native_executable_sha256": "429a5f8e3ee6a3674883329cd1dc8e99481be2071be8a4912fadab28cbfa8501",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "--allowJs",
+    "--checkJs",
+    "--strict",
+    "changes_overload_arrow.js"
+  ],
+  "native_output_sha256": "48866c39bbee679f683590fe160c4f3f39418a86ea7b8438ee211bbc1ddaa0f4",
+  "exit_code": 2,
+  "diagnostics": [
+    {
+      "line": 25,
+      "column": 15,
+      "code": 2769,
+      "message": "No overload matches this call.\n  The last overload gave the following error.\n    Argument of type 'boolean' is not assignable to parameter of type 'number'."
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "source_sha256": "9ff1ffdd8d0b09b499cc88814b47ce58a9f91808d7eb0b2881062987c2a5e624",
+  "native_executable_sha256": "429a5f8e3ee6a3674883329cd1dc8e99481be2071be8a4912fadab28cbfa8501",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "--strict",
+    "--skipLibCheck",
+    "changes_conflicting_declarations.ts"
+  ],
+  "native_output_sha256": "e689296943efc9ceb10480817e4965591847f2b89ae78dd692f9d24f65d55c6a",
+  "exit_code": 2,
+  "diagnostics": [
+    {
+      "line": 2,
+      "column": 22,
+      "code": 2717,
+      "message": "Subsequent property declarations must have the same type.  Property 'a' must be of type 'string', but here has type 'number'."
+    }
+  ]
+}

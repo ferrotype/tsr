@@ -1,0 +1,1 @@
+changes_class_tag_not_constructor.js(3,11): error TS7009: 'new' expression, whose target lacks a construct signature, implicitly has an 'any' type.

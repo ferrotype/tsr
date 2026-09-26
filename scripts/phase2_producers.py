@@ -126,6 +126,15 @@ WITNESSES["c2-contracts"] = {
                 "scripts/s04.py", "scripts/s04_common.py", "scripts/s04_runtime.py",
                 "scripts/tracking-bootstrap.py", "scripts/s08_oracle.py"],
 }
+WITNESSES["c3-contracts"] = {
+    "commands": [["cargo", "test", "-p", "tsr_compiler", "--features", "recursion-probe",
+                  "--test", "c3_contracts", "--locked", *release] for release in ([], ["--release"])],
+    "test_source": "crates/tsr_compiler/tests/c3_contracts.rs", "minimum_tests": 34,
+    "test_modules": {"changes": "support/c3_changes.rs", "native": "support/c3_native_diagnostics.rs"},
+    # The fixtures and their pinned native observations are contract inputs.
+    "sources": [*WITNESSES["c1-contracts"]["sources"], "crates/tsr_compiler/tests/fixtures/c3",
+                "upstream/tsc/testdata/tests/cases/compiler/binderBinaryExpressionStress.ts"],
+}
 PRODUCTION_PATTERNS = tuple(path for path in WITNESSES["c1-contracts"]["sources"]
                             if path != "scripts/phase2_producers.py")
 

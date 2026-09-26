@@ -1,0 +1,8 @@
+malformed.ts(1,8): error TS1110: Type expected.
+malformed.ts(3,10): error TS1005: ':' expected.
+malformed.ts(3,11): error TS1005: ',' expected.
+malformed.ts(5,1): error TS1005: ',' expected.
+malformed.ts(5,7): error TS1005: ',' expected.
+malformed.ts(5,25): error TS1005: ',' expected.
+malformed.ts(6,1): error TS1390: 'class' is not allowed as a parameter name.
+malformed.ts(8,1): error TS1005: ',' expected.

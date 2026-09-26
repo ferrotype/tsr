@@ -1,0 +1,2 @@
+changes_this_property_annotation.js(4,10): error TS2339: Property 'id' does not exist on type 'SharedClass'.
+changes_this_property_annotation.js(14,3): error TS2339: Property 'id' does not exist on type 'SharedClass'.

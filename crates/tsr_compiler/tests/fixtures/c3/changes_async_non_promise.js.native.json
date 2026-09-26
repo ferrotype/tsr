@@ -1,0 +1,28 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "source_sha256": "f6481ded89b45b53c95abb8a0cf5b7f70d8c9199e58b22b259dfe2859f4c879e",
+  "native_executable_sha256": "429a5f8e3ee6a3674883329cd1dc8e99481be2071be8a4912fadab28cbfa8501",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "--allowJs",
+    "--checkJs",
+    "--strict",
+    "changes_async_non_promise.js"
+  ],
+  "native_output_sha256": "e5c2358eb1d5dc99fc0a46fb981530dd32b42efa7f6b507339917301185b253e",
+  "exit_code": 2,
+  "diagnostics": [
+    {
+      "line": 1,
+      "column": 15,
+      "code": 1064,
+      "message": "The return type of an async function or method must be the global Promise<T> type. Did you mean to write 'Promise<number>'?"
+    }
+  ]
+}

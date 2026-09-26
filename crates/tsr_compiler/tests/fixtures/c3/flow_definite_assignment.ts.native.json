@@ -1,0 +1,44 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "source_sha256": "6d3d8441e51fd5f9c6e9ac48753e4f3f17c4445bf93de4d5c081ae0345ff3d9e",
+  "native_executable_sha256": "429a5f8e3ee6a3674883329cd1dc8e99481be2071be8a4912fadab28cbfa8501",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "--strict",
+    "flow_definite_assignment.ts"
+  ],
+  "native_output_sha256": "0d8b85020276b0ab146a8c655150bb1919b4d27a61125648aedb649d28f3b96b",
+  "exit_code": 2,
+  "diagnostics": [
+    {
+      "line": 6,
+      "column": 10,
+      "code": 2454,
+      "message": "Variable 'a' is used before being assigned."
+    },
+    {
+      "line": 15,
+      "column": 10,
+      "code": 2454,
+      "message": "Variable 'b' is used before being assigned."
+    },
+    {
+      "line": 22,
+      "column": 5,
+      "code": 2454,
+      "message": "Variable 'c' is used before being assigned."
+    },
+    {
+      "line": 27,
+      "column": 3,
+      "code": 2564,
+      "message": "Property 'x' has no initializer and is not definitely assigned in the constructor."
+    }
+  ]
+}

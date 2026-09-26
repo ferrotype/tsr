@@ -1,0 +1,143 @@
+{
+  "changes_conflicting_declarations.ts": [
+    "--strict",
+    "--skipLibCheck"
+  ],
+  "changes_template_code_point.ts": [
+    "--strict"
+  ],
+  "changes_strict_false_omission.js": [
+    "--allowJs",
+    "--checkJs",
+    "--strict",
+    "false"
+  ],
+  "changes_jsdoc_values_as_types.js": [
+    "--allowJs",
+    "--checkJs",
+    "--strict"
+  ],
+  "changes_arguments_no_rest.js": [
+    "--allowJs",
+    "--checkJs",
+    "--strict"
+  ],
+  "changes_variadic_array_synonym.js": [
+    "--allowJs",
+    "--checkJs",
+    "--strict"
+  ],
+  "changes_variadic_not_rest.js": [
+    "--allowJs",
+    "--checkJs",
+    "--strict"
+  ],
+  "changes_postfix_equals_optional.js": [
+    "--allowJs",
+    "--checkJs",
+    "--strict",
+    "false"
+  ],
+  "changes_asserts_on_arrow.js": [
+    "--allowJs",
+    "--checkJs",
+    "--strict"
+  ],
+  "changes_async_non_promise.js": [
+    "--allowJs",
+    "--checkJs",
+    "--strict"
+  ],
+  "changes_typedef_in_class_hoisted.js": [
+    "--allowJs",
+    "--checkJs",
+    "--strict"
+  ],
+  "changes_class_tag_not_constructor.js": [
+    "--allowJs",
+    "--checkJs",
+    "--strict"
+  ],
+  "changes_param_one_function.js": [
+    "--allowJs",
+    "--checkJs",
+    "--strict"
+  ],
+  "changes_type_assertion_no_narrowing.js": [
+    "--allowJs",
+    "--checkJs",
+    "--strict"
+  ],
+  "changes_overload_arrow.js": [
+    "--allowJs",
+    "--checkJs",
+    "--strict"
+  ],
+  "changes_constructor_function.js": [
+    "--allowJs",
+    "--checkJs",
+    "--strict"
+  ],
+  "changes_void_zero_expando.js": [
+    "--allowJs",
+    "--checkJs",
+    "--strict"
+  ],
+  "changes_this_property_annotation.js": [
+    "--allowJs",
+    "--checkJs",
+    "--strict"
+  ],
+  "changes_mixed_module_exports.js": [
+    "--allowJs",
+    "--checkJs",
+    "--strict",
+    "--module",
+    "commonjs"
+  ],
+  "options_exact_optional.ts": [
+    "--strict",
+    "--exactOptionalPropertyTypes"
+  ],
+  "options_no_unchecked_indexed.ts": [
+    "--strict",
+    "--noUncheckedIndexedAccess"
+  ],
+  "options_unknown_catch.ts": [
+    "--strict",
+    "false",
+    "--useUnknownInCatchVariables"
+  ],
+  "options_verbatim_module_syntax.ts": [
+    "--strict",
+    "--verbatimModuleSyntax",
+    "--module",
+    "esnext"
+  ],
+  "options_isolated_modules.ts": [
+    "--strict",
+    "--isolatedModules"
+  ],
+  "options_no_fallthrough.ts": [
+    "--strict",
+    "--noFallthroughCasesInSwitch"
+  ],
+  "flow_definite_assignment.ts": [
+    "--strict"
+  ],
+  "flow_narrowing.ts": [
+    "--strict"
+  ],
+  "flow_iteration.ts": [
+    "--strict"
+  ],
+  "flow_classes.ts": [
+    "--strict"
+  ],
+  "malformed.ts": [
+    "--strict"
+  ],
+  "lookup_alias_globals.ts": [
+    "--strict"
+  ]
+}

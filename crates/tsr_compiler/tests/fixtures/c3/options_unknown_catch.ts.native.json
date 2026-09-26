@@ -1,0 +1,28 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "source_sha256": "88a617fc14201429b2b67ba64f8aa5e2e93d4f205168a24e1d7ad57ca6237b5c",
+  "native_executable_sha256": "429a5f8e3ee6a3674883329cd1dc8e99481be2071be8a4912fadab28cbfa8501",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "--strict",
+    "false",
+    "--useUnknownInCatchVariables",
+    "options_unknown_catch.ts"
+  ],
+  "native_output_sha256": "efdf54ac200aec22833a76aa67ba7eb782bc70094c04102236b58894fb3f1c92",
+  "exit_code": 2,
+  "diagnostics": [
+    {
+      "line": 3,
+      "column": 5,
+      "code": 2339,
+      "message": "Property 'message' does not exist on type 'unknown'."
+    }
+  ]
+}
