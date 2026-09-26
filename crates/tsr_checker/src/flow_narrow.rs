@@ -423,11 +423,9 @@ impl CheckerState {
             });
         }
         if assume {
-            if let Some(symbol) = self.lookup_symbol_resolving(
-                self.builtins.globals,
-                b"Record",
-                tsr_ast::symbol_flags::TYPE_ALIAS,
-            )? {
+            // getGlobalRecordSymbol: the memoized global alias lookup, which
+            // checks the arity and reports a global error when it differs.
+            if let Some(symbol) = self.global_type_alias_symbol("Record", 2, true)? {
                 let declared = self.get_declared_type_of_symbol(symbol)?;
                 let parameters = self
                     .query
@@ -435,16 +433,14 @@ impl CheckerState {
                     .try_get(symbol)
                     .and_then(|links| links.parameters.clone())
                     .unwrap_or_default();
-                if parameters.len() == 2 {
-                    let record = self.type_alias_instantiation(
-                        symbol,
-                        declared,
-                        &parameters,
-                        &[key, self.builtins.unknown_type],
-                        None,
-                    )?;
-                    return self.get_intersection_type(&[ty, record]);
-                }
+                let record = self.type_alias_instantiation(
+                    symbol,
+                    declared,
+                    &parameters,
+                    &[key, self.builtins.unknown_type],
+                    None,
+                )?;
+                return self.get_intersection_type(&[ty, record]);
             }
         }
         Ok(ty)
