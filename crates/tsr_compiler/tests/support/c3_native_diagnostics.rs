@@ -45,6 +45,7 @@ fn options_from_command(command: &[Value]) -> CompilerOptions {
             "--verbatimModuleSyntax" => options.verbatim_module_syntax = tristate,
             "--isolatedModules" => options.isolated_modules = tristate,
             "--noFallthroughCasesInSwitch" => options.no_fallthrough_cases_in_switch = tristate,
+            "--noLib" => options.no_lib = tristate,
             "--module" => {
                 options.module = match value {
                     Some("commonjs") => ModuleKind::COMMON_JS,
@@ -69,6 +70,19 @@ pub fn load(name: &str, source_text: &str, native_json: &str) -> Fixture {
         native["source_sha256"],
         format!("{:x}", Sha256::digest(source_text.as_bytes())),
         "{name}: fixture source digest"
+    );
+    // The recorder refuses unclean runs; the loader refuses a record whose
+    // exit code disagrees with its diagnostics or that carries stderr.
+    let count = native["diagnostics"].as_array().unwrap().len();
+    let exit = native["exit_code"].as_i64().unwrap();
+    assert!(
+        (exit == 0 && count == 0) || (exit == 2 && count > 0),
+        "{name}: exit code {exit} disagrees with {count} recorded diagnostics"
+    );
+    assert_eq!(
+        native["native_stderr"].as_str().unwrap_or(""),
+        "",
+        "{name}: the native run wrote to stderr"
     );
     let path = format!("/{name}");
     let mut fs = tsr_vfs::MemoryBuilder::new(b"/", true);
@@ -117,33 +131,82 @@ fn position(source_text: &str, offset: usize) -> (usize, usize) {
     (line, column)
 }
 
-/// Syntactic then semantic diagnostics of the fixture file, rendered the way
-/// the non-pretty native output records them (chains and related
-/// information joined by newlines with two-space indentation).
+/// A diagnostic in the pinned Go oracle's JSON shape (base file name,
+/// positions, code, category, localized message, chain and related
+/// information), for the fixtures observed through the checker API.
+pub fn diagnostic_json(program: &Program, d: &tsr_ast::Diagnostic) -> Value {
+    let file = d.file.map(|id| {
+        let file = program
+            .files()
+            .iter()
+            .find(|file| file.source() == id)
+            .expect("diagnostic source retained");
+        let name = file.bound().view().source_file().unwrap().file_name();
+        String::from_utf8(name.rsplit(|&c| c == b'/').next().unwrap().to_vec()).unwrap()
+    });
+    json!({"file":file,"pos":d.loc.pos(),"end":d.loc.end(),"code":d.code,"category":d.category,
+        "message":String::from_utf8(tsr_compiler::diagnostic_writer::localized(d).unwrap()).unwrap(),
+        "reports_deprecated":d.reports_deprecated,"chain":d.message_chain.iter().map(|d|diagnostic_json(program,d)).collect::<Vec<_>>(),
+        "related":d.related_information.iter().map(|d|diagnostic_json(program,d)).collect::<Vec<_>>()})
+}
+
+/// The diagnostics of the fixture file the way the pinned command line
+/// composes and prints them (`GetDiagnosticsOfAnyProgram`, then
+/// `SortAndDeduplicateDiagnostics`): the syntactic diagnostics alone when there
+/// are any; otherwise the global diagnostics alone when the checker starts
+/// with any; otherwise the file's bind and checker diagnostics with the global
+/// diagnostics found while checking. Chains are joined by newlines with
+/// two-space indentation, related information is not printed, and a global
+/// diagnostic has no line or column.
+/// The command line's sort key (`CompareDiagnostics`): file path (empty for a
+/// global diagnostic), start, end, code, category, then the message text.
+type SortKey = (String, i64, i64, i32, i32, String);
+
 pub fn observed(fixture: &Fixture) -> Vec<Value> {
     let file = fixture.program.file(fixture.path.as_bytes()).unwrap();
     let source = file.source();
     let mut diagnostics = fixture.program.syntactic_diagnostics(Some(file)).unwrap();
-    let mut op = fixture.owner.operation().unwrap();
-    diagnostics.extend(op.semantic_diagnostics(source).unwrap());
-    diagnostics
+    if diagnostics.is_empty() {
+        let mut op = fixture.owner.operation().unwrap();
+        diagnostics = op.global_diagnostics().unwrap();
+        if diagnostics.is_empty() {
+            diagnostics = fixture.program.bind_diagnostics(Some(source)).unwrap();
+            diagnostics.extend(op.semantic_diagnostics(source).unwrap());
+            diagnostics.extend(op.global_diagnostics().unwrap());
+        }
+    }
+    let mut rendered: Vec<(SortKey, Value)> = diagnostics
         .iter()
         .map(|diagnostic| {
-            assert_eq!(diagnostic.file, Some(source));
+            assert!(diagnostic.file.is_none() || diagnostic.file == Some(source));
             assert_eq!(diagnostic.category, 1);
-            let (line, column) = position(
-                &fixture.source_text,
-                usize::try_from(diagnostic.loc.pos()).unwrap(),
-            );
-            // The pinned non-pretty output prints the message chain and no
-            // related information, so the rendering compares chains only.
             let message = String::from_utf8(
                 tsr_compiler::diagnostic_writer::flattened(diagnostic, b"\n").unwrap(),
             )
             .unwrap();
-            json!({"line": line, "column": column, "code": diagnostic.code, "message": message})
+            let (path, line, column) = if diagnostic.file.is_some() {
+                let (line, column) = position(
+                    &fixture.source_text,
+                    usize::try_from(diagnostic.loc.pos()).unwrap(),
+                );
+                (fixture.path.clone(), json!(line), json!(column))
+            } else {
+                (String::new(), Value::Null, Value::Null)
+            };
+            let key = (
+                path,
+                diagnostic.loc.pos(),
+                diagnostic.loc.end(),
+                diagnostic.code,
+                diagnostic.category,
+                message.clone(),
+            );
+            (key, json!({"line": line, "column": column, "code": diagnostic.code, "message": message}))
         })
-        .collect()
+        .collect();
+    rendered.sort_by(|a, b| a.0.cmp(&b.0));
+    rendered.dedup_by(|a, b| a.1 == b.1);
+    rendered.into_iter().map(|(_, value)| value).collect()
 }
 
 pub fn assert_fixture(name: &str, source_text: &str, native_json: &str) -> Fixture {

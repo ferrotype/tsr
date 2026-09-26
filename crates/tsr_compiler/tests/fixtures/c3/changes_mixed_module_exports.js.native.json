@@ -19,6 +19,7 @@
   ],
   "native_output_sha256": "d69359007b1a9886d07ef15a336a076b0d04d39da29a06a6bb1918034cd89aec",
   "exit_code": 2,
+  "native_stderr": "",
   "diagnostics": [
     {
       "line": 1,
