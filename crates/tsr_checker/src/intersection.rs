@@ -57,8 +57,9 @@ impl CheckerState {
         }
         if includes & (tf::TEMPLATE_LITERAL | tf::STRING_MAPPING) != 0
             && includes & tf::STRING_LITERAL != 0
+            && self.extract_redundant_template_literals(&mut set)?
         {
-            return Err(Error::Unsupported("extractRedundantTemplateLiterals"));
+            return Ok(self.builtins.never_type);
         }
         if includes & tf::ANY != 0 {
             return Ok(if includes & tf::INCLUDES_WILDCARD != 0 {
@@ -301,6 +302,38 @@ impl CheckerState {
             includes |= flags & tf::INCLUDES_MASK;
         }
         Ok(includes)
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.extractRedundantTemplateLiterals
+    /// Remove templates and string mappings that contain a literal constituent.
+    /// An incompatible pattern makes the intersection empty; an unresolved
+    /// generic template or mapping remains in the original constituent order.
+    fn extract_redundant_template_literals(
+        &mut self,
+        types: &mut Vec<TypeId>,
+    ) -> Result<bool, Error> {
+        let mut literals = Vec::new();
+        for &ty in types.iter() {
+            if self.types.flags(ty)? & tf::STRING_LITERAL != 0 {
+                literals.push(ty);
+            }
+        }
+        for index in (0..types.len()).rev() {
+            let ty = types[index];
+            if self.types.flags(ty)? & (tf::TEMPLATE_LITERAL | tf::STRING_MAPPING) == 0 {
+                continue;
+            }
+            for &literal in &literals {
+                if self.is_type_related_to(literal, ty, crate::RelationKind::Subtype)? {
+                    types.remove(index);
+                    break;
+                }
+                if self.is_pattern_literal_type(ty)? {
+                    return Ok(true);
+                }
+            }
+        }
+        Ok(false)
     }
 
     // port: tsc/internal/checker/checker.go:Checker.removeRedundantSupertypes

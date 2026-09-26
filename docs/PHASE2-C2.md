@@ -85,7 +85,30 @@ position before `any` handling. No new type representation is needed.
 
 Direct native probes cover matching templates, incompatible patterns,
 `Lowercase<string>`, generic templates/mappings, retained constituent order,
-and incompatible patterns combined with `any`. Implementation and sampled
-results are recorded below once observed. Later C2 operators, the full audit,
-creation-trace contracts, producer wiring and quiet-host measurement remain
-open.
+and incompatible patterns combined with `any`. The public regression test
+failed with the named refusal before the port, then passed against eight
+complete native diagnostics. The test binds the pin and fixture source hash.
+Targeted clippy with warnings denied passes. A separate source review found no
+subtype-direction, ordering or cache-mutation defect.
+
+The frozen 300-case sample plus all 30 affected cases selected 327 distinct
+variants. The source-stable capture at `target/phase2/c2-b04` completed all of
+them with no harness error or execution failure. Full-domain matches rose
+from 228 to 235. All 100 selected S08 regression rows still match. There are
+zero matching-domain regressions and zero changed observations in domains
+that remained `different`.
+
+The B04 refusal is absent from all 30 target rows. Seven now match completely;
+23 remain open: 20 expose ordinary diagnostic/type/display differences and
+three reach further refusals (`addIntraExpressionInferenceSite: array element`,
+`conditionalTypeToTypeNode: shadowed distribution parameter`, and
+`getTypeFromIntersectionTypeNode: pattern literal`). Removing this refusal
+does not close those rows. Claims retain their starting status until the
+current full exit report validates closure or an attributed handoff.
+
+[data/phase2/c2-b04.json](../data/phase2/c2-b04.json) records the exact
+selection/reproduction commands, capture identities and per-target outcomes;
+its linked compressed comparison retains all 327 domain results. This is
+intermediate evidence, not a replacement for the C1 record or C2 acceptance.
+Later C2 operators, the full audit, creation-trace contracts, producer wiring
+and quiet-host measurement remain open. No benchmark was run.
