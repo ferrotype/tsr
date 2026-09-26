@@ -313,6 +313,20 @@ impl CheckerState {
                     self.builtins.unknown_type
                 }
             } else {
+                let default = if in_js
+                    && (self.is_type_related_to(
+                        default,
+                        self.builtins.unknown_type,
+                        crate::RelationKind::Identity,
+                    )? || self.is_type_related_to(
+                        default,
+                        self.builtins.empty_object_type,
+                        crate::RelationKind::Identity,
+                    )?) {
+                    self.builtins.any_type
+                } else {
+                    default
+                };
                 let mapper = self.new_type_mapper(parameters, &result)?;
                 self.instantiate_type(default, Some(mapper))?
             };

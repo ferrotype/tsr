@@ -1,0 +1,134 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "sources": [
+    {
+      "file": "/classes.d.ts",
+      "sha256": "8b88bf9c6dbeeddfe7da05e30225542f139a86eea86625fd5fd0bc743948203a"
+    },
+    {
+      "file": "/control.ts",
+      "sha256": "2b5c5fd9c3c246c0400d367d7500991882dea945ab31cd6b86a415010ec1409b"
+    },
+    {
+      "file": "/use.js",
+      "sha256": "3a77cf86e7d309713eee3a716bd687af9a5f7f182a5ad212d1e163abae0dbe16"
+    }
+  ],
+  "native_go": "go1.27.1",
+  "native_executable_sha256": "af6e7b41b4d3a5e07201a925e21a96b1b02f97786bbc45483801a68aa47d3a7a",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--strict",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "--allowJs",
+    "--checkJs",
+    "use.js",
+    "control.ts"
+  ],
+  "exit_code": 2,
+  "diagnostics": [
+    {
+      "file": "/control.ts",
+      "line": 7,
+      "column": 7,
+      "code": 2322,
+      "message": "Type 'unknown' is not assignable to type 'never'."
+    },
+    {
+      "file": "/control.ts",
+      "line": 8,
+      "column": 7,
+      "code": 2322,
+      "message": "Type '{}' is not assignable to type 'never'."
+    },
+    {
+      "file": "/control.ts",
+      "line": 9,
+      "column": 7,
+      "code": 2322,
+      "message": "Type 'EmptyShape' is not assignable to type 'never'."
+    },
+    {
+      "file": "/control.ts",
+      "line": 10,
+      "column": 7,
+      "code": 2322,
+      "message": "Type 'string' is not assignable to type 'never'."
+    },
+    {
+      "file": "/control.ts",
+      "line": 11,
+      "column": 7,
+      "code": 2322,
+      "message": "Type 'unknown' is not assignable to type 'never'."
+    },
+    {
+      "file": "/use.js",
+      "line": 21,
+      "column": 28,
+      "code": 2322,
+      "message": "Type 'any' is not assignable to type 'never'."
+    },
+    {
+      "file": "/use.js",
+      "line": 22,
+      "column": 28,
+      "code": 2322,
+      "message": "Type 'any' is not assignable to type 'never'."
+    },
+    {
+      "file": "/use.js",
+      "line": 23,
+      "column": 28,
+      "code": 2322,
+      "message": "Type 'any' is not assignable to type 'never'."
+    },
+    {
+      "file": "/use.js",
+      "line": 24,
+      "column": 28,
+      "code": 2322,
+      "message": "Type 'string' is not assignable to type 'never'."
+    },
+    {
+      "file": "/use.js",
+      "line": 25,
+      "column": 28,
+      "code": 2322,
+      "message": "Type 'any' is not assignable to type 'never'."
+    },
+    {
+      "file": "/use.js",
+      "line": 26,
+      "column": 28,
+      "code": 2322,
+      "message": "Type 'unknown' is not assignable to type 'never'."
+    },
+    {
+      "file": "/use.js",
+      "line": 27,
+      "column": 28,
+      "code": 2322,
+      "message": "Type '{}' is not assignable to type 'never'."
+    },
+    {
+      "file": "/use.js",
+      "line": 28,
+      "column": 28,
+      "code": 2322,
+      "message": "Type 'unknown' is not assignable to type 'never'."
+    },
+    {
+      "file": "/use.js",
+      "line": 29,
+      "column": 28,
+      "code": 2322,
+      "message": "Type '{}' is not assignable to type 'never'."
+    }
+  ]
+}

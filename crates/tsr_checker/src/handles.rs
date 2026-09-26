@@ -293,6 +293,18 @@ impl Operation<'_> {
         serde_json::json!({"types_created":state.types.len(),"signatures_created":state.signatures.len(),"instantiations":state.instantiation.total_count,"caches":caches})
     }
 
+    /// Reads the alias cache without resolving its declaration or creating links.
+    #[cfg(feature = "relation-probe")]
+    pub fn alias_instantiation_cache_entries(&self, symbol: SymbolRef) -> Result<usize, Error> {
+        let symbol = self.check_symbol_ref(symbol)?;
+        Ok(self
+            .state()
+            .query
+            .type_aliases
+            .try_get(symbol)
+            .map_or(0, |links| links.instantiations.len()))
+    }
+
     /// Imports the exact identity only if the checker retains its symbol store.
     /// This preserves raw symbol observation, like Go's symbol-taking APIs;
     /// it does not substitute a merged clone. Source name/location queries

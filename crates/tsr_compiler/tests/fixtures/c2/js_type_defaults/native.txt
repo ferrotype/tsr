@@ -1,0 +1,14 @@
+control.ts(7,7): error TS2322: Type 'unknown' is not assignable to type 'never'.
+control.ts(8,7): error TS2322: Type '{}' is not assignable to type 'never'.
+control.ts(9,7): error TS2322: Type 'EmptyShape' is not assignable to type 'never'.
+control.ts(10,7): error TS2322: Type 'string' is not assignable to type 'never'.
+control.ts(11,7): error TS2322: Type 'unknown' is not assignable to type 'never'.
+use.js(21,28): error TS2322: Type 'any' is not assignable to type 'never'.
+use.js(22,28): error TS2322: Type 'any' is not assignable to type 'never'.
+use.js(23,28): error TS2322: Type 'any' is not assignable to type 'never'.
+use.js(24,28): error TS2322: Type 'string' is not assignable to type 'never'.
+use.js(25,28): error TS2322: Type 'any' is not assignable to type 'never'.
+use.js(26,28): error TS2322: Type 'unknown' is not assignable to type 'never'.
+use.js(27,28): error TS2322: Type '{}' is not assignable to type 'never'.
+use.js(28,28): error TS2322: Type 'unknown' is not assignable to type 'never'.
+use.js(29,28): error TS2322: Type '{}' is not assignable to type 'never'.
