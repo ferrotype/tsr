@@ -395,6 +395,7 @@ impl CheckerState {
         }
     }
 
+    // port: tsc/internal/checker/checker.go:Checker.markIdentifierAliasReferenced
     fn mark_value_identifier_alias(&mut self, node: NodeId, symbol: SymbolId) -> Result<(), Error> {
         let parent = self.node(node)?.parent();
         if let Some(parent) = parent {

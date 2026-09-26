@@ -34,6 +34,7 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.getModuleSpecifierForImportOrExport
+    // port: tsc/internal/checker/checker.go:getModuleSpecifierFromNode
     pub(crate) fn module_specifier(&self, mut node: NodeId) -> Result<Option<NodeId>, Error> {
         loop {
             let read = self.node(node)?;
@@ -686,6 +687,7 @@ fn ts_extension(name: &[u8]) -> Option<&'static [u8]> {
         .copied()
         .find(|extension| name.ends_with(extension))
 }
+// port: tsc/internal/checker/checker.go:resolutionExtensionIsTSOrJson
 fn ts_or_json_extension(extension: &[u8]) -> bool {
     TS_EXTENSIONS.contains(&extension) || extension == b".json"
 }
