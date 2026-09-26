@@ -1,5 +1,6 @@
 """C2 exits require current domain-bound ownership and independent evidence."""
 import copy
+import fnmatch
 import json
 from pathlib import Path
 import subprocess
@@ -313,6 +314,17 @@ class Measurement(unittest.TestCase):
 
 
 class Registration(unittest.TestCase):
+    def test_recorded_handoff_traces_are_in_the_checker_fingerprint(self):
+        spec = tomllib.loads((ROOT / "status/runs.toml").read_text())["checker"]
+        claims = json.loads((ROOT / "data/phase2/c2-claims.json").read_text())
+        traces = [row["handoff"]["trace"] for row in claims["rows"] if row["status"] == "handed"]
+        self.assertTrue(traces)
+        for trace in traces:
+            with self.subTest(path=trace["path"]):
+                self.assertEqual(producers.digest((ROOT / trace["path"]).read_bytes()), trace["sha256"])
+                self.assertTrue(trace["path"] in spec["inputs"] or any(
+                    fnmatch.fnmatchcase(trace["path"], pattern) for pattern in spec["sources"]))
+
     def test_c2_authorities_and_complete_closures_invalidate_tracker(self):
         spec = tomllib.loads((ROOT / "status/runs.toml").read_text())["checker"]
         for path in producers.CHECKPOINT_AUTHORITIES["C2"].values():

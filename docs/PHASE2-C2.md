@@ -439,3 +439,43 @@ current-source checkerbench capture is verified and recorded. No performance
 threshold is changed or inferred from the correctness capture.
 
 Ledger validation also passes on this recorded correctness checkpoint.
+
+## Completed measurement and final recording
+
+The full checkerbench capture is retained at
+`target/s08/c2-checkerbench-01`, with its replayed report committed as
+`data/phase2/c2-benchmark.json`. All 48 processes completed: both runtimes,
+normal/phase/allocation modes, one warmup and seven measured samples each.
+Every one of the 9,369 variants has identical action counts and output digests
+across all samples and runtimes. Sources stayed unchanged; every census metric
+is available.
+
+| Metric | Rust / Go |
+| --- | ---: |
+| Checker elapsed time | 2.135771 |
+| Requested bytes | 0.573941 |
+| Retained bytes | 1.414528 |
+| Type-storage bytes per reachable type | 0.812580 |
+
+Normal interval medians are 12.947 seconds Rust and 6.062 seconds Go. Their
+max/min ratios are 1.013 and 1.041, respectively, within the existing stability
+rule. The report nevertheless marks `host_busy: true`: observed one-minute
+loads exceed its 2.0 threshold in every mode. This is a current-source measured
+result with that qualification, not certification of a quiet host or a claim
+of meeting the later CPU/memory budgets. No sample or threshold was changed.
+The C2 exit requires an authenticated measurement with available metrics; it
+does not turn the later performance budgets into a C2 gate.
+
+The three handoff claims now hash the actual native stack artifact directly.
+The checker evidence fingerprint includes the entire handoff/reproducer bundle,
+and a regression checks every recorded handoff trace against that closure.
+The 31 C2 script tests and 27 subtests pass after this final metadata change.
+The S07 operation inventory is also refreshed for moved Rust mapping lines;
+its operation set and pinned native source are unchanged.
+
+`cargo xtask run checker` now records `c2_complete = true`,
+`c2_measured = true`, `c2_contracts = true`, and `c2_audit_complete = true`.
+Open C2 cases, regressions, execution failures and C2-owned blockers are all
+zero; the three validated C5 handoffs remain reported. `P2B-C2` is complete.
+Whole Phase 2 remains open for C3–C7; older checkpoint receipts retain their
+own source freshness rather than being relabeled as current.

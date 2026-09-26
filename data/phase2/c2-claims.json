@@ -2996,8 +2996,8 @@
     ],
     "request_sha256": "63e40392b21bdc79f58ea06efe888fff6e9842854b2b3cf1213fd66a4721c684",
     "trace": {
-     "path": "data/phase2/c2-emit-handoffs/provenance.json",
-     "sha256": "1eeb02d960df7bdea2e35b54b12780db6cd72155b61df3742ebbdaec41f86838"
+     "path": "data/phase2/c2-emit-handoffs/stacks.json",
+     "sha256": "400258c2041e7572e119b6b0d76732d207fa4d677105e289f2d25b8f87bc706d"
     }
    },
    "id": "compiler/incorrectRecursiveMappedTypeConstraint.ts#configuration=0",
@@ -5120,8 +5120,8 @@
     ],
     "request_sha256": "bd395918c32a707fb675783c719c35e1e5d715b021353fedb05e961d45106ad6",
     "trace": {
-     "path": "data/phase2/c2-emit-handoffs/provenance.json",
-     "sha256": "1eeb02d960df7bdea2e35b54b12780db6cd72155b61df3742ebbdaec41f86838"
+     "path": "data/phase2/c2-emit-handoffs/stacks.json",
+     "sha256": "400258c2041e7572e119b6b0d76732d207fa4d677105e289f2d25b8f87bc706d"
     }
    },
    "id": "compiler/typeParameterWithInvalidConstraintType.ts#configuration=0",
@@ -7195,8 +7195,8 @@
     ],
     "request_sha256": "9428c81478addd989feda1603c4bdbe1fc7930bbe590c364a7a24659386fe523",
     "trace": {
-     "path": "data/phase2/c2-emit-handoffs/provenance.json",
-     "sha256": "1eeb02d960df7bdea2e35b54b12780db6cd72155b61df3742ebbdaec41f86838"
+     "path": "data/phase2/c2-emit-handoffs/stacks.json",
+     "sha256": "400258c2041e7572e119b6b0d76732d207fa4d677105e289f2d25b8f87bc706d"
     }
    },
    "id": "conformance/types/mapped/recursiveMappedTypes.ts#configuration=0",
