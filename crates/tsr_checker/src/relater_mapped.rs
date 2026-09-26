@@ -59,26 +59,28 @@ impl Relater<'_> {
     }
 
     // port: tsc/internal/checker/relater.go:Relater.structuredTypeRelatedToWorker
+    /// `None` skips the mapped comparison. Only a failed comparison of a
+    /// non-generic source to a target without `-?` resets the caller's errors.
     pub(crate) fn generic_mapped_target(
         &mut self,
         source: TypeId,
         target: TypeId,
-    ) -> Result<Ternary, Error> {
+    ) -> Result<Option<Ternary>, Error> {
         let name = self.checker.mapped_name(target)?;
         let template = self.checker.mapped_template(target)?;
         let modifiers = self.checker.mapped_modifiers(target)?;
         if modifiers & crate::mapped::EXCLUDE_OPTIONAL != 0 {
-            return Ok(tr::FALSE);
+            return Ok(None);
         }
         let parameter = self.checker.mapped_parameter(target)?;
         if name.is_none() && self.checker.types.flags(template)? & tf::INDEXED_ACCESS != 0 {
             let data = self.checker.types.indexed_access(template)?;
             if data.object_type == source && data.index_type == parameter {
-                return Ok(tr::TRUE);
+                return Ok(Some(tr::TRUE));
             }
         }
         if self.checker.is_generic_mapped_type(source)? {
-            return Ok(tr::FALSE);
+            return Ok(None);
         }
         let target_keys = match name {
             Some(name) => name,
@@ -103,7 +105,7 @@ impl Relater<'_> {
             }
         };
         if !applicable {
-            return Ok(tr::FALSE);
+            return Ok(Some(tr::FALSE));
         }
         let template = self.checker.mapped_template(target)?;
         let non_null = self.checker.filter_type_flags(template, !tf::NULLABLE)?;
@@ -111,12 +113,14 @@ impl Relater<'_> {
             && self.checker.types.flags(non_null)? & tf::INDEXED_ACCESS != 0
             && self.checker.types.indexed_access(non_null)?.index_type == parameter
         {
-            return self.related(
-                source,
-                self.checker.types.indexed_access(non_null)?.object_type,
-                TARGET,
-                0,
-            );
+            return self
+                .related(
+                    source,
+                    self.checker.types.indexed_access(non_null)?.object_type,
+                    TARGET,
+                    0,
+                )
+                .map(Some);
         }
         let index = if name.is_some() {
             filtered.unwrap_or(target_keys)
@@ -128,6 +132,6 @@ impl Relater<'_> {
         let indexed = self
             .checker
             .get_indexed_access_type(source, index, 0, None, None)?;
-        self.related(indexed, template, BOTH, 0)
+        self.related(indexed, template, BOTH, 0).map(Some)
     }
 }

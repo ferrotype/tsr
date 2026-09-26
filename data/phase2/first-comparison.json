@@ -1,5 +1,5 @@
 {
- "all_domains_match": 12458,
+ "all_domains_match": 12459,
  "buckets": [
   {
    "bucket": "unsupported: checkExpressionWorker",
@@ -302,12 +302,6 @@
    "variants": 1
   },
   {
-   "bucket": "failed: walker_error",
-   "owner": "C2",
-   "representative": "compiler/packageDeduplicationDuplicateGlobals.ts#configuration=0",
-   "variants": 1
-  },
-  {
    "bucket": "panic: tsr_ast::factory",
    "owner": "C2",
    "representative": "compiler/declarationEmitAugmentationUsesCorrectSourceFile.ts#configuration=0",
@@ -370,8 +364,8 @@
  ],
  "by_checkpoint": {
   "C2": {
-   "match": 2762,
-   "open": 192
+   "match": 2763,
+   "open": 191
   },
   "C3": {
    "match": 170,
@@ -389,8 +383,8 @@
   "display": {
    "different": 17,
    "disabled": 679,
-   "failed": 2,
-   "match": 12085,
+   "failed": 1,
+   "match": 12086,
    "unsupported": 649
   },
   "errors": {
@@ -407,8 +401,8 @@
   "symbols": {
    "different": 2,
    "disabled": 679,
-   "failed": 2,
-   "match": 12100,
+   "failed": 1,
+   "match": 12101,
    "unsupported": 649
   },
   "trace": {
@@ -418,8 +412,8 @@
   "types": {
    "different": 38,
    "disabled": 679,
-   "failed": 2,
-   "match": 12064,
+   "failed": 1,
+   "match": 12065,
    "unsupported": 649
   },
   "union_ordering": {
@@ -428,48 +422,7 @@
    "unsupported": 15
   }
  },
- "changed_observations": [
-  {
-   "domain": "errors",
-   "id": "compiler/circularlyConstrainedMappedTypeContainingConditionalNoInfiniteInstantiationDepth.ts#configuration=0"
-  },
-  {
-   "domain": "errors",
-   "id": "compiler/correlatedUnions.ts#configuration=0"
-  },
-  {
-   "domain": "errors",
-   "id": "compiler/reactReduxLikeDeferredInferenceAllowsAssignment.ts#configuration=0"
-  },
-  {
-   "domain": "errors",
-   "id": "conformance/types/keyof/keyofAndIndexedAccess.ts#configuration=0"
-  },
-  {
-   "domain": "errors",
-   "id": "conformance/types/mapped/isomorphicMappedTypeInference.ts#configuration=0"
-  },
-  {
-   "domain": "types",
-   "id": "conformance/types/mapped/isomorphicMappedTypeInference.ts#configuration=0"
-  },
-  {
-   "domain": "errors",
-   "id": "conformance/types/mapped/mappedTypeConstraints2.ts#configuration=0"
-  },
-  {
-   "domain": "errors",
-   "id": "conformance/types/mapped/recursiveMappedTypes.ts#configuration=0"
-  },
-  {
-   "domain": "errors",
-   "id": "conformance/types/rest/restTuplesFromContextualTypes.ts#configuration=0"
-  },
-  {
-   "domain": "errors",
-   "id": "conformance/types/typeParameters/typeParameterLists/varianceAnnotations.ts#configuration=0"
-  }
- ],
+ "changed_observations": [],
  "dimensions": {
   "area": {
    "diagnostics: TS1240": 2,
@@ -513,7 +466,6 @@
    "different: display": 1,
    "different: types": 9,
    "emit order: native pre/post-emit sets differ": 3,
-   "failed: walker_error": 1,
    "panic: tsr_ast::factory": 1,
    "unsupported: Expression_produces_a_union_type_that_is_too_complex_to_represent": 3,
    "unsupported: addIntraExpressionInferenceSite: array element": 7,
@@ -544,11 +496,11 @@
    "infer_types": 34,
    "jsx": 436,
    "mapped_types": 73,
-   "nonempty_type_arguments": 263,
+   "nonempty_type_arguments": 262,
    "template_literal_types": 18
   },
   "first_code": {
-   "(none)": 868,
+   "(none)": 867,
    "1240": 2,
    "1241": 2,
    "1272": 1,
@@ -596,7 +548,7 @@
    "react-jsx": 38,
    "react-jsxdev": 19,
    "react-native": 2,
-   "unset": 547
+   "unset": 546
   },
   "module": {
    "commonjs": 306,
@@ -609,11 +561,11 @@
    "node20": 2,
    "nodenext": 8,
    "preserve": 7,
-   "unset": 540
+   "unset": 539
   },
   "strict": {
    "False": 778,
-   "True": 196
+   "True": 195
   },
   "target": {
    "es2015": 731,
@@ -623,7 +575,7 @@
    "es2021": 1,
    "es2022": 55,
    "esnext": 118,
-   "unset": 31
+   "unset": 30
   }
  },
  "executed": 13432,
@@ -632,7 +584,7 @@
  "native_observation_sha256": "1b5356b425ad95a3e5e2a0bb29d42534e8d9d4a6159649f063f3317084a0e276",
  "partial": false,
  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
- "previous": "48b590ddd69385e0c91fee842468ed29f742d82f19bad7ac16221eecc69a38a8",
+ "previous": "ece059f06aa4201c25f2451f051d14f6286f1bf339cf36cd6c1a0a41d618f7de",
  "regression_subset": {
   "all_domains_match": 9367,
   "by_domain": {
@@ -665,7 +617,7 @@
   "rows": 9367
  },
  "regressions": [],
- "rust_capture_sha256": "d9fcb53b383c2dc64e773058c9f6bf7cbcb049345881e64b7c7219c3b8b80882",
+ "rust_capture_sha256": "b6b7ceb630ff3eb9f410284b76768482bf22a873786b81e39257f7fb0d6ab46a",
  "rust_source_stable": true,
  "selection": {
   "cases": [],

@@ -168,8 +168,8 @@ authority; the counts are the current `status/unmapped-functions.json` state.
   `resolveAliasWithDeprecationCheck`, `resolveIndirectionAlias` and the
   export/import target lookups (`getTargetOfExportAssignment`,
   `getTargetOfExportSpecifier`, `getTargetOfImportSpecifier`), each disposed
-  by C1.1; the four `getSymbolFlags: alias resolution` refusal sites in
-  `name_resolution.rs`, which the corpus does not reach and a direct native
+  by C1.1; the internal `getSymbolFlags: alias resolution` sentinel and its retry
+  handlers in `name_resolution.rs`, which the corpus does not reach and a direct native
   case must.
 - Exit: the two claimed buckets match; the merge schedules still pass; the
   direct alias-resolution case has a native observation.
@@ -213,15 +213,16 @@ authority; the counts are the current `status/unmapped-functions.json` state.
   enum and literal functions `getTypeFromLiteralTypeNode`,
   `parseBigIntLiteralType`, `getWidenedLiteralTypeForInitializer`,
   `getUniqueLiteralTypeForTypeParameter`, `isConstEnumSymbol` and
-  `getBigIntLiteralValue`; and the unreached refusals `getWidenedLiteralType:
+  `getBigIntLiteralValue`; and the representation guards `getWidenedLiteralType:
   enum`, `getTupleElementLabel: binding pattern`, `typeToTypeNode: computed
-  enum` and `AnyToString: computed enum value`, each either implemented or
-  reached by a direct native case that shows the refusal is outside the pinned
-  corpus. `fresh non-string literal type` is not a production gap: its only
+  enum` and `AnyToString: computed enum value`, each either implemented,
+  reached by a direct native case, or proved unreachable for valid constructed
+  types by the exact constructor and dispatch paths in the C1 record. Absence
+  from the corpus is not such a proof. `fresh non-string literal type` is not a production gap: its only
   site is `storage_pilot.rs:109`, the deliberately restricted S08 storage
   probe, and the audit classifies it as a harness boundary.
-- Exit: the two panic buckets match; no refusal in these modules is unreached
-  by a case.
+- Exit: the two panic buckets match; each listed refusal has a behavioral witness or a reviewed representation
+  invariant; genuine reachable gaps retain a named owner and remain open.
 
 ### C1.5 Recursive type resolution and limits
 
@@ -289,8 +290,10 @@ authority; the counts are the current `status/unmapped-functions.json` state.
   the pin's chain order and arguments.
 - Exit: the claimed buckets match; the relation contract stays at 105 of 105
   against the prototype (its record may go stale under the phase-end rule, but
-  the parity itself is rerun here); every unmatched-property and elaboration
-  path has a native case.
+  the parity itself is rerun here); the C1 unmatched-property and elaboration behaviors named in
+  `PHASE2-C1.md` have native observations. This is not a claim of branch
+  coverage over all advanced/generic/JSX elaboration; those combinations
+  remain obligations of C2/C4, with their implemented helpers retained.
 
 ### C1.7 Variance state
 
@@ -305,7 +308,9 @@ authority; the counts are the current `status/unmapped-functions.json` state.
   of the instantiation-dependent measurements (each with its pinned function
   and the corpus rows that need it).
 - Exit: `TS2636` matches; the handoff list is in the C1 record and in
-  `c1-audit.json` as `later: C2`.
+  `c1-audit.json` under `handoffs` with owner `C2`. These are outstanding
+  measurement obligations: the existing implementation dispositions and port
+  markers remain intact.
 
 ### C1.8 Direct contracts: recursive, cold/repeated and failure paths
 
@@ -333,7 +338,7 @@ authority; the counts are the current `status/unmapped-functions.json` state.
      succeeds;
   8. the five relation modes over the 21 fixtures, first, repeated and
      reversed, in debug and release.
-- Exit: `cargo test -p tsr_compiler --features relation-probe --test c1_contracts` in debug and release;
+- Exit: `cargo test -p tsr_compiler --features recursion-probe --test c1_contracts` in debug and release;
   the receipt is recorded by the producer (C1.10).
 
 ### C1.9 Inherited Phase 1 items
@@ -378,7 +383,8 @@ not, so C1 does:
   invalidates the recorded result; the producer keeps one capture identity:
   the exit run writes `target/phase2/rust` (the C0 capture moves to
   `target/phase2/rust-c0`), and the producer, the ledger command and the
-  recording all read that path. A sample run cannot feed these metrics: they
+  recording all read that path. Candidate and unknown-failure attribution remains open; a status label alone
+  cannot suppress it. A sample run cannot feed these metrics: they
   come only from a recorded full capture, as C0's run policy says.
   `P2B-C1.done_when` stays `run.checker.c1_complete == true`.
 - Exit: `cargo xtask validate`; `phase2_producers.py checker` emits the six
@@ -431,8 +437,8 @@ mv target/phase2/rust target/phase2/rust-c0                                  # o
 python3 scripts/phase2_corpus.py run --native target/phase2/native --output target/phase2/rust
 python3 scripts/phase2_compare.py report --native target/phase2/native --rust target/phase2/rust --previous target/phase2/rust-c0/comparison.json --record
 python3 scripts/phase2_blockers.py build --native target/phase2/native --rust target/phase2/rust --record
-python3 scripts/phase2_audit.py check --groups c1
-cargo test -p tsr_compiler --features relation-probe --test c1_contracts && cargo test -p tsr_compiler --features relation-probe --test c1_contracts --release
+python3 scripts/phase2_audit.py check
+cargo test -p tsr_compiler --features recursion-probe --test c1_contracts && cargo test -p tsr_compiler --features recursion-probe --test c1_contracts --release
 python3 scripts/phase2_producers.py observe --witness c1-contracts           # the receipt, with source binding
 python3 scripts/phase2_producers.py checker            # c1_open 0, c1_regressions 0, c1_failures 0, c1_audit_complete, c1_contracts, c1_complete
 python3 scripts/s08_relater.py build  --output target/s08/relater-c1

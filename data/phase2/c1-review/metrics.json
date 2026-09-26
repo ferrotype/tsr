@@ -1,0 +1,12 @@
+{
+ "metrics": {
+  "c1_audit_complete": true,
+  "c1_complete": true,
+  "c1_contracts": true,
+  "c1_failures": 0,
+  "c1_open": 0,
+  "c1_regressions": 0
+ },
+ "rust_capture_sha256": "b6b7ceb630ff3eb9f410284b76768482bf22a873786b81e39257f7fb0d6ab46a",
+ "source_stable": true
+}

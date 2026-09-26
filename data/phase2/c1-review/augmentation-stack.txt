@@ -1,0 +1,23 @@
+Observed with the immutable target/phase2/c1-reviewed/executable on inventory row 1553.
+LLDB: breakpoint set -r rust_begin_unwind; run; bt 30; continue.
+Selected consecutive frames (4 through 22), not a synthesized stack:
+    frame #4: 0x000000010091f848 executable`<tsr_ast::storage::AstBuilder as tsr_ast::factory::Factory>::node(self=<unavailable>, id=NodeId @ x20) at factory.rs:0 [opt]
+    frame #5: 0x00000001000f1acc executable`<tsr_transformers::declarations::transform::Transformer<tsr_checker::owner::Operation>>::node(self=0x000000016fdf80f0, node=NodeId @ x24) at transform.rs:114:9 [opt] [inlined]
+    frame #6: 0x00000001000f1abc executable`<tsr_transformers::declarations::transform::Transformer<tsr_checker::owner::Operation>>::late_statements(self=<unavailable>, statements=<unavailable>) at statements.rs:113:18 [opt]
+    frame #7: 0x00000001000f3914 executable`<tsr_transformers::declarations::transform::Transformer<tsr_checker::owner::Operation>>::module_declaration(self=0x000000016fdf80f0, node=NodeId @ x20) at statements.rs:709:43 [opt]
+    frame #8: 0x00000001000f29e4 executable`<tsr_transformers::declarations::transform::Transformer<tsr_checker::owner::Operation>>::top_level_worker(self=0x000000016fdf80f0, node=NodeId @ x20) at statements.rs:243:48 [opt]
+    frame #9: 0x00000001000f5b3c executable`<tsr_transformers::declarations::transform::Transformer<tsr_checker::owner::Operation>>::top_level(self=<unavailable>, node=NodeId @ 0x000000016fdf7570) at statements.rs:189:27 [opt]
+    frame #10: 0x00000001000f5744 executable`<tsr_transformers::declarations::transform::Transformer<tsr_checker::owner::Operation>>::statement(self=0x000000016fdf80f0, node=NodeId @ 0x000000016fdf76b0) at statements.rs:97:39 [opt]
+    frame #11: 0x000000010010a3f0 executable`<tsr_transformers::declarations::transform::Transformer<tsr_checker::owner::Operation>>::visit(self=<unavailable>, input=<unavailable>) at transform.rs:156:23 [opt]
+    frame #12: 0x000000010010a0f8 executable`<tsr_transformers::declarations::transform::Transformer<tsr_checker::owner::Operation>>::visit_list_result(self=0x000000016fdf80f0, list=Option<tsr_ast::lists::NodeListId> @ x21) at transform.rs:198:40 [opt]
+    frame #13: 0x00000001000f37f4 executable`<tsr_transformers::declarations::transform::Transformer<tsr_checker::owner::Operation>>::module_declaration(self=0x000000016fdf80f0, node=NodeId @ x20) at statements.rs:708:39 [opt]
+    frame #14: 0x00000001000f29e4 executable`<tsr_transformers::declarations::transform::Transformer<tsr_checker::owner::Operation>>::top_level_worker(self=0x000000016fdf80f0, node=NodeId @ x20) at statements.rs:243:48 [opt]
+    frame #15: 0x00000001000f5b3c executable`<tsr_transformers::declarations::transform::Transformer<tsr_checker::owner::Operation>>::top_level(self=<unavailable>, node=NodeId @ 0x000000016fdf7b50) at statements.rs:189:27 [opt]
+    frame #16: 0x00000001000f5744 executable`<tsr_transformers::declarations::transform::Transformer<tsr_checker::owner::Operation>>::statement(self=0x000000016fdf80f0, node=NodeId @ 0x000000016fdf7c90) at statements.rs:97:39 [opt]
+    frame #17: 0x000000010010a3f0 executable`<tsr_transformers::declarations::transform::Transformer<tsr_checker::owner::Operation>>::visit(self=<unavailable>, input=<unavailable>) at transform.rs:156:23 [opt]
+    frame #18: 0x000000010010a0f8 executable`<tsr_transformers::declarations::transform::Transformer<tsr_checker::owner::Operation>>::visit_list_result(self=0x000000016fdf80f0, list=Option<tsr_ast::lists::NodeListId> @ x21) at transform.rs:198:40 [opt]
+    frame #19: 0x00000001000f02c4 executable`<tsr_transformers::declarations::transform::Transformer<tsr_checker::owner::Operation>>::source_file(self=<unavailable>, node=<unavailable>) at statements.rs:19:31 [opt]
+    frame #20: 0x00000001000ed730 executable`tsr_transformers::declarations::transform::transform_declarations::<tsr_checker::owner::Operation>(resolver=<unavailable>, output=<unavailable>, emit=<unavailable>, source=<unavailable>, options=<unavailable>) at transform.rs:64:19 [opt]
+    frame #21: 0x00000001001575b4 executable`<tsr_compiler::loader::Program>::declaration_diagnostics_with_checker(self=<unavailable>, operation=<unavailable>, file=<unavailable>) at declaration_diagnostics.rs:57:17 [opt]
+    frame #22: 0x0000000100048178 executable`phase2_checker::executor::observe::<phase2_checker::corpus::observe_with::{closure#0}::{closure#0}>(request=0x000000016fdfd700, cache=<unavailable>, hooks=&mut dyn phase2_checker::executor::Hooks @ 0x0000000a523663c0, baseline={closure_env#0} @ 0x0000000a52366370) at executor.rs:240:34 [opt]
+factory node belongs to retained storage: WrongOwner

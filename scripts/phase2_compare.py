@@ -17,7 +17,7 @@ first observed cause; secondary dimensions (families, configuration, first
 differing diagnostic code, area) are counted, never used to invent a result.
 
     report --native DIR --rust DIR [--previous REPORT] [--record]
-    baseline --rust DIR [--output data/phase2/c1-baseline.json.gz]
+    baseline --rust DIR [--native DIR] [--output data/phase2/c1-baseline.json.gz]
 
 `report --previous` lists two things about an earlier row report: rows that
 stayed `different` with a changed observation (`changed_observations`) and
@@ -50,6 +50,7 @@ BASELINE = ROOT / "data/phase2/c1-baseline.json.gz"
 DOMAINS = ("errors", "types", "symbols", "display", "trace", "union_ordering", "parent_pointers")
 MATCHED = ("match", "disabled")
 CATEGORIES = ("match", "different", "failed", "unsupported", "disabled", "unexecuted")
+HISTORY_FIELDS = ("changed_observations", "regressions", "previous")
 TYPE_PULLS = ("GetTypeAtLocation", "TypeToTypeNode")
 SYMBOL_PULLS = ("GetSymbolAtLocation", "SymbolToStringEx")
 MODULE = phase2_inventory.MODULE
@@ -336,7 +337,38 @@ def regressions(before_rows, after_rows):
     return found
 
 
-def baseline(rust_dir, output=BASELINE):
+def acceptance_summary(comparison):
+    """The replayable acceptance result, independent of optional change history.
+
+    History remains in the recorded report. Replaying without --previous must
+    neither erase it nor mistake it for a change in the current observation.
+    """
+    return {key: value for key, value in comparison.items() if key not in ("rows", *HISTORY_FIELDS)}
+
+
+def validate_complete_rows(document, expected_ids=None):
+    """Reject a changed denominator, duplicate identities or invalid domains."""
+    expected_ids = ([row["id"] for row in phase2_inventory.executed()]
+                    if expected_ids is None else list(expected_ids))
+    rows = document.get("rows")
+    if not isinstance(rows, list) or not expected_ids:
+        raise ValueError("baseline/comparison needs the complete executed row inventory")
+    ids = [row.get("id") for row in rows]
+    if ids != expected_ids or len(set(ids)) != len(ids):
+        raise ValueError("baseline/comparison rows differ from the complete unique executed inventory")
+    if document.get("executed") != len(expected_ids):
+        raise ValueError("baseline/comparison executed count differs from its row inventory")
+    for row in rows:
+        outcomes = row.get("outcomes")
+        if (not isinstance(outcomes, dict) or set(outcomes) != set(DOMAINS)
+                or any(value not in CATEGORIES for value in outcomes.values())):
+            raise ValueError("baseline/comparison has invalid outcome domains: " + str(row.get("id")))
+    matched = sum(all(value in MATCHED for value in row["outcomes"].values()) for row in rows)
+    if document.get("all_domains_match") != matched:
+        raise ValueError("baseline/comparison all_domains_match differs from its rows")
+
+
+def baseline(rust_dir, output=BASELINE, *, native_dir=ROOT / "target/phase2/native"):
     """Retain a full row report as the C1-start baseline, bound to its contract."""
     import gzip
     path = Path(rust_dir) / "comparison.json"
@@ -346,6 +378,17 @@ def baseline(rust_dir, output=BASELINE):
         raise ValueError("a partial or selected run cannot be the baseline")
     if comparison["harness_errors"]:
         raise ValueError("a run with harness errors cannot be the baseline")
+    validate_complete_rows(comparison)
+    # Authenticate the named capture's executable, source snapshot, requests
+    # and raw observations, then recompute every domain against native. A JSON
+    # comparison by itself is not evidence. Historical source staleness is
+    # allowed: replay authenticates the sources that actually built the run.
+    replayed = report(native_dir, rust_dir, write=False)
+    expected, actual = acceptance_summary(comparison), acceptance_summary(replayed)
+    expected.pop("rust_source_stable", None)
+    actual.pop("rust_source_stable", None)
+    if expected != actual or comparison["rows"] != replayed["rows"]:
+        raise ValueError("baseline comparison differs from the authenticated Rust capture replay")
     document = {"version": 1, "pin": comparison["pin"],
                 "native_observation_sha256": comparison["native_observation_sha256"],
                 "inventory_sha256": comparison["inventory_sha256"],
@@ -367,7 +410,11 @@ def baseline(rust_dir, output=BASELINE):
 
 def load_baseline(path=BASELINE):
     import gzip
-    return strict_json_loads(gzip.decompress(Path(path).read_bytes()))
+    document = strict_json_loads(gzip.decompress(Path(path).read_bytes()))
+    if document.get("version") != 1:
+        raise ValueError("unsupported baseline version")
+    validate_complete_rows(document)
+    return document
 
 
 def regressions_against(document, comparison):
@@ -375,10 +422,12 @@ def regressions_against(document, comparison):
     for key in ("native_observation_sha256", "inventory_sha256", "pin"):
         if document[key] != comparison[key]:
             raise ValueError(f"the baseline was taken against another contract ({key} differs)")
+    validate_complete_rows(document)
+    validate_complete_rows(comparison)
     return regressions(document["rows"], comparison["rows"])
 
 
-def report(native_dir, rust_dir, previous=None, record=False):
+def report(native_dir, rust_dir, previous=None, record=False, *, write=True):
     native_dir, native_report, native_rows = phase2_native.load_capture(native_dir)
     phase2_native.current(native_report)
     replayed, requests, rust_rows, harness, attributions = load_rust(rust_dir)
@@ -462,7 +511,8 @@ def report(native_dir, rust_dir, previous=None, record=False):
         "previous": digest(Path(previous).read_bytes()) if previous else None,
     }
     full = dict(summary, rows=rows)
-    Path(rust_dir, "comparison.json").write_bytes(canonical(full) + b"\n")
+    if write:
+        Path(rust_dir, "comparison.json").write_bytes(canonical(full) + b"\n")
     if record:
         if not replayed["source_stable"]:
             raise ValueError("record requires a Rust capture of the current sources")
@@ -484,10 +534,11 @@ def main():
     sub.add_argument("--record", action="store_true", help="write data/phase2/first-comparison.json")
     base = commands.add_parser("baseline", help="retain a full row report as the C1-start baseline")
     base.add_argument("--rust", type=Path, required=True)
+    base.add_argument("--native", type=Path, default=ROOT / "target/phase2/native")
     base.add_argument("--output", type=Path, default=BASELINE)
     args = parser.parse_args()
     if args.command == "baseline":
-        baseline(args.rust, args.output)
+        baseline(args.rust, args.output, native_dir=args.native)
     else:
         report(args.native, args.rust, args.previous, args.record)
 

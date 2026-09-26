@@ -43,6 +43,18 @@ pub(crate) struct Relations {
     free_frames: Vec<crate::RelationFrameId>,
     #[cfg(feature = "relation-probe")]
     pub observer: Option<Vec<Ternary>>,
+    #[cfg(feature = "recursion-probe")]
+    pub recursion_probe: Option<RecursionProbe>,
+}
+
+#[cfg(feature = "recursion-probe")]
+#[derive(Default)]
+pub(crate) struct RecursionProbe {
+    pub calls: usize,
+    pub maximum_depth: usize,
+    pub maximum_remaining_stack: usize,
+    pub depth_limit_hits: usize,
+    pub panic_at_depth: Option<usize>,
 }
 
 pub(crate) struct Relater<'a> {
@@ -659,6 +671,25 @@ impl Relater<'_> {
         head: Option<&'static tsr_diagnostics::Message>,
     ) -> Result<Ternary, Error> {
         stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+            #[cfg(feature = "recursion-probe")]
+            {
+                let depth = self
+                    .frame()
+                    .source_stack
+                    .len()
+                    .max(self.frame().target_stack.len());
+                if let Some(probe) = &mut self.checker.relations.recursion_probe {
+                    probe.calls += 1;
+                    probe.maximum_depth = probe.maximum_depth.max(depth);
+                    probe.maximum_remaining_stack = probe.maximum_remaining_stack.max(
+                        stacker::remaining_stack().expect("native recursion probe stack bounds"),
+                    );
+                    assert!(
+                        probe.panic_at_depth.is_none_or(|limit| depth < limit),
+                        "injected panic inside recursive relation at depth {depth}"
+                    );
+                }
+            }
             self.related_worker(source, target, recursion, intersection, head)
         })
     }
@@ -885,6 +916,10 @@ impl Relater<'_> {
             }
         }
         if self.frame().source_stack.len() == 100 || self.frame().target_stack.len() == 100 {
+            #[cfg(feature = "recursion-probe")]
+            if let Some(probe) = &mut self.checker.relations.recursion_probe {
+                probe.depth_limit_hits += 1;
+            }
             return Ok(tr::MAYBE);
         }
         let start = self.frame().maybe_keys.len();

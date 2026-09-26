@@ -275,82 +275,116 @@ fn two_checkers_merge_independently_over_one_program() {
         .is_err());
 }
 
-fn deep_program(levels: usize) -> String {
-    let mut text = String::from("type N0 = { x: string };\n");
-    for i in 1..=levels {
-        text.push_str(&format!("type N{i} = {{ x: N{} }};\n", i - 1));
-    }
-    text.push_str(&format!(
-        "declare let a: N{levels};\nlet b: N{levels} = a;\n"
-    ));
-    text
-}
+const DEEP_RELATIONS: &str = include_str!("fixtures/c1/recursion.ts");
 
-/// Contract 5 (ADR 0011, `stacker::maybe_grow`): a relation deep enough to
-/// grow the stack completes with the ordinary result on a small thread stack,
-/// and the same checker answers a later query. Pinned tsc: no diagnostics.
+/// Contract 5 (ADR 0011): distinct finite chains reach the real relation
+/// backstop. The observer runs inside the growth guard and must see a grown
+/// native segment; no diagnostic follows, exactly as pinned tsc observes on
+/// fixtures/c1/recursion.ts, despite incompatible leaves below depth 100.
 #[test]
 fn deep_relations_grow_the_stack_and_keep_the_checker_usable() {
-    let text = deep_program(400);
+    const STACK: usize = 256 * 1024;
+    let program = program(&[("/deep.ts", DEEP_RELATIONS)]);
     std::thread::Builder::new()
-        .stack_size(512 * 1024)
+        .stack_size(STACK)
         .spawn(move || {
-            let program = program(&[("/deep.ts", text.as_str())]);
             let (_counters, _generation, owner) = checker(&program);
             let mut op = owner.operation().unwrap();
+            let a = op
+                .get_type_at_location(name_of(&program, "/deep.ts", "a"))
+                .unwrap();
+            let b = op
+                .get_type_at_location(name_of(&program, "/deep.ts", "b"))
+                .unwrap();
+            assert_ne!(a.id(), b.id(), "identity must not bypass the relation");
+            op.begin_recursion_probe(None).unwrap();
+            assert!(op
+                .is_type_related_to(a, b, RelationKind::Assignable)
+                .unwrap());
+            let observed = op.take_recursion_probe().unwrap();
+            assert!(
+                observed["maximum_remaining_stack"].as_u64().unwrap() > STACK as u64,
+                "relation must execute on a grown segment: {observed}"
+            );
+            assert_eq!(observed["maximum_depth"], 100, "{observed}");
+            assert!(
+                observed["depth_limit_hits"].as_u64().unwrap() > 0,
+                "{observed}"
+            );
             let source = program.file(b"/deep.ts").unwrap().source();
             let diagnostics = op.semantic_diagnostics(source).unwrap();
-            assert_eq!(codes(&diagnostics), Vec::<i32>::new(), "{diagnostics:?}");
-            let b = name_of(&program, "/deep.ts", "b");
-            let ty = op.get_type_at_location(b).unwrap();
-            assert_eq!(op.type_to_string(ty, 0).unwrap().as_bytes(), b"N400");
+            assert!(diagnostics.is_empty(), "{diagnostics:?}");
+            let ty = op
+                .get_type_at_location(name_of(&program, "/deep.ts", "subsequent"))
+                .unwrap();
+            assert_eq!(op.type_to_string(ty, 0).unwrap().as_bytes(), b"number");
         })
         .unwrap()
         .join()
         .unwrap();
 }
 
-/// Contract 6 (the pin's semantic limits): recursive structural types reach
-/// the relater's 100-level backstop, which answers `TernaryMaybe` with no
-/// diagnostic (relater.go:3133), so the assignment is accepted; an unbounded
-/// instantiation reports `Type instantiation is excessively deep and
-/// possibly infinite` (TS2589, checker.go:22452). Both observed with the
-/// pinned tsc.
+/// Contract 6: a fresh checker must execute the depth-100 backstop, not a
+/// repeated-pair assumption. Pinned tsc accepts the finite chains despite the
+/// incompatible leaves beyond its limit. Instantiation depth separately emits
+/// TS2589; neither semantic limit retires the checker.
 #[test]
 fn semantic_limits_produce_the_pins_results() {
     let program = program(&[
-        (
-            "/recursive.ts",
-            "type A = { x: A; y: string };\ntype B = { x: B; y: string };\ndeclare let a: A;\nlet b: B = a;\n",
-        ),
+        ("/recursive.ts", DEEP_RELATIONS),
         (
             "/depth.ts",
             "type Deep<T> = T extends any ? Deep<[T]> : never;\ntype X = Deep<string>;\n",
         ),
     ]);
-    let (_counters, _generation, owner) = checker(&program);
+    let (_counters, generation, owner) = checker(&program);
     let mut op = owner.operation().unwrap();
+    op.begin_recursion_probe(None).unwrap();
     let recursive = program.file(b"/recursive.ts").unwrap().source();
     let diagnostics = op.semantic_diagnostics(recursive).unwrap();
-    assert_eq!(codes(&diagnostics), Vec::<i32>::new(), "{diagnostics:?}");
+    assert!(diagnostics.is_empty(), "{diagnostics:?}");
+    let observed = op.take_recursion_probe().unwrap();
+    assert_eq!(observed["maximum_depth"], 100, "{observed}");
+    assert!(
+        observed["depth_limit_hits"].as_u64().unwrap() > 0,
+        "{observed}"
+    );
     let depth = program.file(b"/depth.ts").unwrap().source();
     let diagnostics = op.semantic_diagnostics(depth).unwrap();
     assert_eq!(codes(&diagnostics), vec![2589], "{diagnostics:?}");
+    assert!(generation.validate().is_ok());
+    let ty = op
+        .get_type_at_location(name_of(&program, "/recursive.ts", "subsequent"))
+        .unwrap();
+    assert_eq!(op.type_to_string(ty, 0).unwrap().as_bytes(), b"number");
 }
 
 /// Contract 7 (ADR 0012): only an actually caught panic inside an operation
 /// retires the generation; a fresh checker over the same program succeeds.
 #[test]
 fn an_injected_panic_retires_the_generation_and_a_fresh_checker_succeeds() {
-    let program = program(&[("/p.ts", "declare let a: { x: string };\nlet b = a.x;\n")]);
+    let program = program(&[("/p.ts", DEEP_RELATIONS)]);
     let (_counters, generation, owner) = checker(&program);
+    let a = name_of(&program, "/p.ts", "a");
     let b = name_of(&program, "/p.ts", "b");
     let result = catch_unwind(AssertUnwindSafe(|| {
         let mut op = owner.operation().unwrap();
-        op.get_type_at_location(b).unwrap();
-        panic!("injected checker failure");
+        let a = op.get_type_at_location(a).unwrap();
+        let b = op.get_type_at_location(b).unwrap();
+        op.begin_recursion_probe(Some(8)).unwrap();
+        op.is_type_related_to(a, b, RelationKind::Assignable)
+            .unwrap();
     }));
-    assert!(result.is_err());
+    let panic = result.expect_err("the relation must reach the injected panic");
+    let message = panic
+        .downcast_ref::<String>()
+        .map(String::as_str)
+        .or_else(|| panic.downcast_ref::<&str>().copied())
+        .unwrap_or("");
+    assert!(
+        message.starts_with("injected panic inside recursive relation at depth "),
+        "{message}"
+    );
     assert_eq!(generation.validate(), Err(tsr_arena::Error::Retired));
     assert!(matches!(
         owner.operation(),
@@ -358,6 +392,9 @@ fn an_injected_panic_retires_the_generation_and_a_fresh_checker_succeeds() {
     ));
     let (_counters, _generation, fresh) = checker(&program);
     let mut op = fresh.operation().unwrap();
-    let ty = op.get_type_at_location(b).unwrap();
-    assert_eq!(op.type_to_string(ty, 0).unwrap().as_bytes(), b"string");
+    let a = op.get_type_at_location(a).unwrap();
+    let b = op.get_type_at_location(b).unwrap();
+    assert!(op
+        .is_type_related_to(a, b, RelationKind::Assignable)
+        .unwrap());
 }

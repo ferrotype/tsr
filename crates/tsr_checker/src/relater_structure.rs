@@ -450,18 +450,19 @@ impl Relater<'_> {
         } else if self.checker.is_generic_mapped_type(target)?
             && self.kind != RelationKind::Identity
         {
-            let result = self.generic_mapped_target(source, target)?;
-            if result != tr::FALSE {
-                return Ok(result);
+            if let Some(result) = self.generic_mapped_target(source, target)? {
+                if result != tr::FALSE {
+                    return Ok(result);
+                }
+                // The pin resets only after the non-generic-source branch,
+                // which excludes mapped targets with `-?`.
+                variance.original_chain = if self.errors.chain.is_empty() {
+                    None
+                } else {
+                    Some(self.errors.chain.clone())
+                };
+                self.errors = saved.clone();
             }
-            // The mapped comparison's chain is kept only for a structural
-            // success after a failed variance check; the error state resets.
-            variance.original_chain = if self.errors.chain.is_empty() {
-                None
-            } else {
-                Some(self.errors.chain.clone())
-            };
-            self.errors = saved.clone();
         }
         if s & tf::TYPE_VARIABLE != 0 {
             if s & tf::INDEXED_ACCESS == 0 || t & tf::INDEXED_ACCESS == 0 {

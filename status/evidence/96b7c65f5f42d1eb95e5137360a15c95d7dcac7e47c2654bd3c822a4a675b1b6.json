@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "run_id": "checker",
+  "recorded_at": 1790394588,
+  "context": {
+    "revision": "61140fd98861d9741d8cbb79ffc62096297a5b2d",
+    "source_sha256": "d36a1ac4ecd0345e431598975475a4d765ce1a93bc03bef35e681f1d23e4f106",
+    "upstream_pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+    "environment": {
+      "CARGO_BUILD_TARGET": "",
+      "CARGO_ENCODED_RUSTFLAGS": "",
+      "CARGO_HOME": "/Users/cristian/.cargo",
+      "CGO_ENABLED": "",
+      "GOARCH": "",
+      "GOFLAGS": "",
+      "GOOS": "",
+      "RUSTC_WRAPPER": "",
+      "RUSTFLAGS": "",
+      "RUSTUP_HOME": "/Users/cristian/.rustup",
+      "RUSTUP_TOOLCHAIN": "1.97.1-aarch64-apple-darwin",
+      "S04_CACHE_HOME": "",
+      "S04_RUSTUP_HOME": ""
+    },
+    "host": "macos-aarch64",
+    "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n"
+  },
+  "spec_sha256": "89b67412a16c579389e19435d29880b0a2cf64e792de2c8ef1f9b249f0288075",
+  "inputs": {
+    ".gitmodules": "7f9e8e0a446a547c56d8444637b3ee73064ce52055bc3c983c05eb13f4331bdd",
+    "data/divergences.toml": "b493505fbca126117391592d28305a7e76649e365d424cfac526cb44ed180019",
+    "data/go-functions.tsv": "de8a425667bb2a0e6c080b5131cbbbe9b027c11f17a9d439c9a8867f8fa3604f",
+    "data/phase1/syntax-schedule.json": "ef5c321a21772d9a512b078cb939fb57f09c7be31cc3f3fd8f6205027e1a61f2",
+    "data/phase2/blockers.json": "22f0136c52de82305635374632e624de6d03de6b0ffcaf8e1f8d22c007aeae19",
+    "data/phase2/c1-audit.json": "a469b5e80f54be6a99515c0b180ae6af013099a1b793889e283521cd07e33ee7",
+    "data/phase2/c1-baseline.json.gz": "316640c222dc7755b744b296fb32722ce8c4e82cb9f9bfc7db81b71ffcef7274",
+    "data/phase2/c1-claims.json": "2a7c6a5482fffbb67d88f36739d35b00872ff536f3227c82aa86407ad5d94b71",
+    "data/phase2/first-comparison.json": "ab5e65f160e3985b2eaf88f1b61116c9d36da1973854354ece49490ea830ee13",
+    "data/phase2/inventory.json": "c09721d36d361eb8646b2321ec3478da0fbdbf12253c086e7b1c34e966aea9b9",
+    "data/phase2/native-provenance.json": "da608ad2b05e201cc002ea1092d0c33c03ced0a8f0babd6d3911e5430d605b3f",
+    "data/phase2/receipts/c1-contracts.json": "94f9aa5aec17e54d0912762b81ee54c1cd52f46128df96c9a065664955cc2815",
+    "data/s04/toolchains.toml": "f7f747f45b0570c179771ba0e01e37a3fc3c1ca7e98dbf042b7eabf6d9f9c0be",
+    "data/s07/e2-acceptance.json": "1ee86a7a575ff8d209dde0c2b30e3625fd4d5ac11d4da59cd7453763c6d0294b",
+    "data/s07/subset.json": "8539ce8af2f0cd5245554114e8d257805fe266e46fcabbb4ac220d5bcd2c4f2a",
+    "data/upstream.json": "9f3a288befbb79b1dcd59c2fd0d87fd2cddf120563f8b4c129ce88e3c3957af9"
+  },
+  "command": [
+    "python3",
+    "scripts/phase2_producers.py",
+    "checker"
+  ],
+  "target": "host",
+  "config": "Phase 2 C0 checker acceptance contract: 13,432 executed compiler/conformance variants (runner-enumerated, not skipped), native contract verified from two shardings against every committed reference, one categorized Rust run (errors, types, symbols, display, trace, union ordering, parent pointers) with harness defects separate from compiler gaps, named blockers; single-threaded mode; no threshold",
+  "host": "macos-aarch64",
+  "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n",
+  "exit_code": 0,
+  "stdout": "{\"metrics\": {\"blockers_named\": true, \"c1_audit_complete\": true, \"c1_complete\": true, \"c1_contracts\": true, \"c1_failures\": 0, \"c1_open\": 0, \"c1_regressions\": 0, \"display_parity\": 0.9503424657534246, \"errors_parity\": 0.9311346039309113, \"harness_valid\": true, \"inventory_frozen\": true, \"native_verified\": true, \"ordering\": 0.9988088147706968, \"parent_pointers\": 0.9988088147706968, \"regression_parity\": 1.0, \"result_recorded\": true, \"symbols_parity\": 0.9514592019058964, \"trace_parity\": 1.0, \"types_parity\": 0.9487790351399643, \"unsupported_required\": 859}}\n",
+  "stderr": "{\"declaration_requests\": 1754, \"input_mismatches\": 0, \"parent_pointer_failures\": 0, \"pre_post_different\": 3, \"reference_disagreements\": 0, \"requests\": 13432, \"states\": {\"executed\": 13432}, \"trace_rows\": 154, \"union_ordering_inconsistent\": 0}\n+ git ls-tree -r --name-only 1f70213d4922b434345f639b441681e470c7cfc1 tsc/testdata/tests/cases/compiler/ tsc/testdata/tests/cases/conformance/ tsc/internal/bundled/libs/\n+ git ls-tree -r --name-only 1f70213d4922b434345f639b441681e470c7cfc1 tsc/testdata/tests/lib\n{\n \"all_domains_match\": 12459,\n \"buckets\": 60,\n \"categories\": {\n  \"display\": {\n   \"different\": 17,\n   \"disabled\": 679,\n   \"failed\": 1,\n   \"match\": 12086,\n   \"unsupported\": 649\n  },\n  \"errors\": {\n   \"different\": 106,\n   \"failed\": 1,\n   \"match\": 12507,\n   \"unsupported\": 818\n  },\n  \"parent_pointers\": {\n   \"failed\": 1,\n   \"match\": 13416,\n   \"unsupported\": 15\n  },\n  \"symbols\": {\n   \"different\": 2,\n   \"disabled\": 679,\n   \"failed\": 1,\n   \"match\": 12101,\n   \"unsupported\": 649\n  },\n  \"trace\": {\n   \"disabled\": 13278,\n   \"match\": 154\n  },\n  \"types\": {\n   \"different\": 38,\n   \"disabled\": 679,\n   \"failed\": 1,\n   \"match\": 12065,\n   \"unsupported\": 649\n  },\n  \"union_ordering\": {\n   \"failed\": 1,\n   \"match\": 13416,\n   \"unsupported\": 15\n  }\n },\n \"executed\": 13432,\n \"harness_errors\": 0,\n \"partial\": false,\n \"regression_all_domains_match\": 9367\n}\n{\n \"entries\": [\n  [\n   \"B01\",\n   \"unsupported\",\n   \"checkExpressionWorker\",\n   \"C2/C4\",\n   440\n  ],\n  [\n   \"B02\",\n   \"unsupported\",\n   \"checkClassLikeDeclaration: decorators\",\n   \"C4\",\n   284\n  ],\n  [\n   \"B03\",\n   \"unsupported\",\n   \"typeReferenceToTypeNode: applied outer arguments\",\n   \"C2\",\n   36\n  ],\n  [\n   \"B04\",\n   \"unsupported\",\n   \"extractRedundantTemplateLiterals\",\n   \"C2\",\n   30\n  ],\n  [\n   \"B05\",\n   \"unsupported\",\n   \"checkDecorators: parameter or binding\",\n   \"C4\",\n   25\n  ],\n  [\n   \"B06\",\n   \"unsupported\",\n   \"content-mapper execution\",\n   \"Phase 5 (content-mapper execution)\",\n   15\n  ],\n  [\n   \"B07\",\n   \"unsupported\",\n   \"addIntraExpressionInferenceSite: array element\",\n   \"C2\",\n   7\n  ],\n  [\n   \"B08\",\n   \"unsupported\",\n   \"conditionalTypeToTypeNode: shadowed distribution parameter\",\n   \"C2\",\n   5\n  ],\n  [\n   \"B09\",\n   \"emit_order\",\n   \"checking in the post-emit program order: the native harness \",\n   \"C5 emit resolver, with Phase 3 emit (joint)\",\n   3\n  ],\n  [\n   \"B10\",\n   \"unsupported\",\n   \"Expression_produces_a_union_type_that_is_too_complex_to_repr\",\n   \"C2\",\n   3\n  ],\n  [\n   \"B11\",\n   \"unsupported\",\n   \"getTypeFromImportTypeNode: CommonJS typedef export lookup\",\n   \"C2\",\n   3\n  ],\n  [\n   \"B12\",\n   \"unsupported\",\n   \"getContextualType: decorator/JSX context\",\n   \"C4\",\n   2\n  ],\n  [\n   \"B13\",\n   \"unsupported\",\n   \"node builder synthetic elision comments\",\n   \"C2\",\n   2\n  ],\n  [\n   \"B14\",\n   \"unsupported\",\n   \"node builder synthetic property elision comments\",\n   \"C2\",\n   2\n  ],\n  [\n   \"B15\",\n   \"unsupported\",\n   \"someSymbolTableInScope: reparsed module\",\n   \"C2\",\n   2\n  ],\n  [\n   \"B16\",\n   \"unsupported\",\n   \"checkIfTypePredicateVariableIsDeclaredInBindingPattern\",\n   \"C2\",\n   1\n  ],\n  [\n   \"B17\",\n   \"unsupported\",\n   \"checkSourceElementWorker: statement/type family\",\n   \"C4\",\n   1\n  ],\n  [\n   \"B18\",\n   \"unsupported\",\n   \"reportOperatorError: awaited operand suggestions\",\n   \"C2\",\n   1\n  ]\n ],\n \"declaration_audit\": {\n  \"different\": 67,\n  \"failed: panic\": 1,\n  \"not loaded: unsupported\": 3,\n  \"unsupported: checkExpressionWorker\": 6,\n  \"unsupported: conditionalTypeToTypeNode: shadowed distribution parameter\": 1,\n  \"unsupported: extractRedundantTemplateLiterals\": 1,\n  \"unsupported: node builder synthetic property elision comments\": 2,\n  \"unsupported: someSymbolTableInScope: reparsed module\": 2,\n  \"working\": 1671\n }\n}\nchecker evidence: {\"native\":\"1b5356b425ad95a3e5e2a0bb29d42534e8d9d4a6159649f063f3317084a0e276\",\"rust\":\"b6b7ceb630ff3eb9f410284b76768482bf22a873786b81e39257f7fb0d6ab46a\"}\n",
+  "stdout_sha256": "62e161e3e252850a222311a0efb556bfe200bee0330487812650ed60e5c42c62",
+  "stderr_sha256": "7b4a093839998ebe7c37c5573fcfa762b4592229bd2ce11d04f31e2ea648cfd8",
+  "valid_capture": true
+}

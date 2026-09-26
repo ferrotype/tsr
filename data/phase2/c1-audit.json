@@ -1727,6 +1727,28 @@
    "tsc/internal/checker/types.go:VarianceFlags.String"
   ]
  },
+ "handoffs": [
+  {
+   "cases": [
+    "compiler/varianceMeasurement.ts#configuration=0",
+    "compiler/varianceRepeatedlyPropegatesWithUnreliableFlag.ts#configuration=0",
+    "compiler/circularVariance1.ts#configuration=0",
+    "compiler/circularVariance2.ts#configuration=0",
+    "compiler/classVarianceResolveCircularity1.ts#configuration=0",
+    "compiler/classVarianceResolveCircularity2.ts#configuration=0",
+    "compiler/varianceComputationNoCrash.ts#configuration=0"
+   ],
+   "functions": [
+    "tsc/internal/checker/relater.go:Checker.createMarkerType",
+    "tsc/internal/checker/relater.go:Checker.getAliasVariances",
+    "tsc/internal/checker/relater.go:Checker.getVariances",
+    "tsc/internal/checker/relater.go:Checker.getVariancesWorker"
+   ],
+   "id": "c2-variance-measurement",
+   "owner": "C2",
+   "reason": "The algorithms and their mappings are present. C2 must observe marker instantiation, cycle/restart behavior and Unmeasurable/Unreliable propagation over these generic families; C1 corpus/display equality does not independently certify the measurement state. varianceComputationNoCrash additionally requires the template-intersection operator B04."
+  }
+ ],
  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
  "scope": "C1 foundation function groups (docs/PHASE2-C1-plan.md, C1.1). A group lists pinned function ids; every member is disposed by a port marker (mapped) or by an entry in dispositions. checker.go and utilities.go groups are the functions the plan names; relater.go and types.go are complete files.",
  "version": 1

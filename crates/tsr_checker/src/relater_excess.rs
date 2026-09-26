@@ -156,11 +156,7 @@ impl Relater<'_> {
                 // filterPrimitivesIfContainsNonPrimitive: only a union that
                 // contains the `object` type drops its primitive constituents,
                 // and only when something remains.
-                let mut has_object_keyword = false;
-                for &part in self.checker.types.types_of(target)? {
-                    has_object_keyword |= self.checker.types.flags(part)? & tf::NON_PRIMITIVE != 0;
-                }
-                if has_object_keyword {
+                if self.checker.maybe_type_of_kind(target, tf::NON_PRIMITIVE)? {
                     let filtered = self.checker.filter_type_flags(target, !tf::PRIMITIVE)?;
                     if self.checker.types.flags(filtered)? & tf::NEVER == 0 {
                         reduced = filtered;

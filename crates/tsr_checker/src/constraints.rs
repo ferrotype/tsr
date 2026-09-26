@@ -297,13 +297,12 @@ impl CheckerState {
                     // The pin points at the type being checked when it is
                     // neither inside nor around the constraint declaration.
                     if let (Some(index), Some(current)) = (index, self.current_node) {
-                        let view = self.ast(node)?;
                         let unrelated = !tsr_ast::utilities::is_node_descendant_of(
-                            view,
+                            self.ast(node)?,
                             Some(node),
                             Some(current),
                         )? && !tsr_ast::utilities::is_node_descendant_of(
-                            view,
+                            self.ast(current)?,
                             Some(current),
                             Some(node),
                         )?;

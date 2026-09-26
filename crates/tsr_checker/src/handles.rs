@@ -234,6 +234,39 @@ impl Operation<'_> {
         result.map(|(result, diagnostic)| (result, calls, diagnostic))
     }
 
+    /// Install contract-only observation without changing any semantic limit.
+    /// A configured panic happens inside the real recursive relation, after
+    /// stack growth. A panic retires the operation's generation as usual.
+    #[cfg(feature = "recursion-probe")]
+    pub fn begin_recursion_probe(&mut self, panic_at_depth: Option<usize>) -> Result<(), Error> {
+        let state = self.state_mut();
+        if state.relations.recursion_probe.is_some() {
+            return Err(Error::MissingLink("recursion probe already installed"));
+        }
+        state.relations.recursion_probe = Some(crate::relater::RecursionProbe {
+            panic_at_depth,
+            ..Default::default()
+        });
+        Ok(())
+    }
+
+    /// Remove the contract observer and return only its executed-path counts.
+    #[cfg(feature = "recursion-probe")]
+    pub fn take_recursion_probe(&mut self) -> Result<serde_json::Value, Error> {
+        let probe = self
+            .state_mut()
+            .relations
+            .recursion_probe
+            .take()
+            .ok_or(Error::MissingLink("recursion probe not installed"))?;
+        Ok(serde_json::json!({
+            "calls": probe.calls,
+            "maximum_depth": probe.maximum_depth,
+            "maximum_remaining_stack": probe.maximum_remaining_stack,
+            "depth_limit_hits": probe.depth_limit_hits,
+        }))
+    }
+
     /// Owned counter/cache snapshot. It cannot warm a type or relation cache.
     #[cfg(feature = "relation-probe")]
     pub fn relation_state(&self) -> serde_json::Value {
