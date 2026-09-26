@@ -308,6 +308,8 @@ impl<'a> NodeBuilder<'a> {
         };
         if identity.is_none() {
             if let Some(symbol) = record.symbol {
+                // CompositeSymbolIdentity carries the symbol id, assigned here.
+                self.checker.symbol_runtime_id(symbol)?;
                 identity = Some(SymbolIdentity::Symbol {
                     constructor: record.object_flags & of::ANONYMOUS != 0
                         && self.checker.symbol(symbol)?.flags() & sf::CLASS != 0,

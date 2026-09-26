@@ -7,8 +7,10 @@ the parsed diagnostics (line, column, code, message with chain lines joined by n
 bound to the pin, the source digest and the executable digest.
 """
 import hashlib, json, pathlib, re, subprocess, sys
-FIX = pathlib.Path(__file__).resolve().parent
-ROOT = FIX.parents[4]
+# Records the fixtures of its own directory, or of the directory named as the
+# first argument (other checkpoints' native fixtures reuse this recorder).
+FIX = pathlib.Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else pathlib.Path(__file__).resolve().parent
+ROOT = pathlib.Path(__file__).resolve().parents[5]
 TSGO = ROOT / "target/tsgo"
 pin = json.loads((ROOT / "data/upstream.json").read_text())["pin"]
 head = subprocess.check_output(["git", "-C", str(ROOT / "upstream/tsc"), "rev-parse", "HEAD"], text=True).strip()

@@ -1,0 +1,26 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "source_sha256": "5b2a6f7540717d37245985f8a6b50b0c1d86f268fe8a1e00a0f5d67aecf755be",
+  "native_executable_sha256": "429a5f8e3ee6a3674883329cd1dc8e99481be2071be8a4912fadab28cbfa8501",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "--strict",
+    "private_index_signature.ts"
+  ],
+  "native_output_sha256": "73d6e4aa601ce38c069948ca299d9aff3d9c7ff01b3094712702a233e90b6e83",
+  "exit_code": 2,
+  "diagnostics": [
+    {
+      "line": 12,
+      "column": 3,
+      "code": 2411,
+      "message": "Property 's' of type 'string' is not assignable to 'string' index type 'number'."
+    }
+  ]
+}

@@ -95,22 +95,28 @@ impl CheckerState {
             }
         }
         self.add_undefined_to_globals()?;
+        // The pin observes each link, assigning the symbol's id, before it
+        // computes the right-hand side.
+        let undefined_key = self.value_symbol_key(self.builtins.undefined_symbol)?;
         self.value_symbol_links
-            .get_or_default(self.value_symbol_key(self.builtins.undefined_symbol)?)
+            .get_or_default(undefined_key)
             .resolved_type = Some(self.builtins.undefined_widening_type);
+        let arguments_key = self.value_symbol_key(self.builtins.arguments_symbol)?;
         let arguments = self.get_global_type("IArguments", 0, true)?;
         self.value_symbol_links
-            .get_or_default(self.value_symbol_key(self.builtins.arguments_symbol)?)
+            .get_or_default(arguments_key)
             .resolved_type = Some(arguments);
+        let unknown_key = self.value_symbol_key(self.builtins.unknown_symbol)?;
         self.value_symbol_links
-            .get_or_default(self.value_symbol_key(self.builtins.unknown_symbol)?)
+            .get_or_default(unknown_key)
             .resolved_type = Some(self.builtins.error_type);
+        let global_this_key = self.value_symbol_key(self.builtins.global_this_symbol)?;
         let global_this = self.new_object_type(
             object_flags::ANONYMOUS,
             Some(self.builtins.global_this_symbol),
         )?;
         self.value_symbol_links
-            .get_or_default(self.value_symbol_key(self.builtins.global_this_symbol)?)
+            .get_or_default(global_this_key)
             .resolved_type = Some(global_this);
         for (name, arity) in [
             ("Array", 1),

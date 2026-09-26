@@ -355,6 +355,16 @@ impl Operation<'_> {
         }))
     }
 
+    /// The symbol's lazily assigned runtime id (`ast.GetSymbolId`), or 0 when
+    /// nothing has observed the symbol yet. A read only; it assigns nothing.
+    #[cfg(feature = "relation-probe")]
+    pub fn existing_symbol_runtime_id(&self, symbol: SymbolRef) -> Result<u64, Error> {
+        let id = self.check_symbol_ref(symbol)?;
+        Ok(tsr_ast::existing_runtime_symbol_id(
+            &self.state().symbol(id)?,
+        ))
+    }
+
     #[cfg(feature = "relation-probe")]
     pub fn relation_state(&self) -> serde_json::Value {
         let state = self.state();

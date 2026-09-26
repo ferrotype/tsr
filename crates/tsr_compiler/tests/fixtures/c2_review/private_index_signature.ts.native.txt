@@ -1,0 +1,1 @@
+private_index_signature.ts(12,3): error TS2411: Property 's' of type 'string' is not assignable to 'string' index type 'number'.

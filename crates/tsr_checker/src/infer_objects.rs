@@ -188,6 +188,7 @@ impl CheckerState {
                     let key = self.literal_type_from_property(
                         property,
                         tf::STRING_OR_NUMBER_LITERAL_OR_UNIQUE,
+                        false,
                     )?;
                     if self.applicable_index_type(key, target_info.key_type)? {
                         let mut ty = self.get_type_of_symbol(property)?;

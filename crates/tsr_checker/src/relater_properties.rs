@@ -563,9 +563,11 @@ impl Relater<'_> {
         let info = self.checker.signatures.index_info(target)?.clone();
         let mut result = tr::TRUE;
         for property in self.checker.get_properties_of_type(source)? {
-            let key = self
-                .checker
-                .literal_type_from_property(property, tf::STRING_OR_NUMBER_LITERAL_OR_UNIQUE)?;
+            let key = self.checker.literal_type_from_property(
+                property,
+                tf::STRING_OR_NUMBER_LITERAL_OR_UNIQUE,
+                false,
+            )?;
             if self.checker.applicable_index_type(key, info.key_type)? {
                 let mut value = self.checker.non_missing_symbol_type(property)?;
                 if !self.checker.options.exact_optional_property_types
