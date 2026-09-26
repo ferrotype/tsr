@@ -21,7 +21,6 @@ pub(crate) struct ArgumentContext {
     pub node: NodeId,
     pub ty: Option<TypeId>,
     pub is_cache: bool,
-    pub inference: Option<InferenceId>,
 }
 
 #[derive(Clone)]
@@ -126,10 +125,6 @@ impl CheckerState {
         }
     }
 
-    pub(crate) fn contextual_call_argument(&self, node: NodeId) -> Option<ArgumentContext> {
-        self.contextual_call_argument_ex(node, true)
-    }
-
     // port: tsc/internal/checker/checker.go:Checker.findContextualNode
     pub(crate) fn contextual_call_argument_ex(
         &self,
@@ -146,12 +141,10 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.pushCachedContextualType
     pub(crate) fn push_cached_contextual_type(&mut self, node: NodeId) -> Result<(), Error> {
         let ty = self.contextual_expression_type(node)?;
-        let inference = self.call_inference_at_node(node)?;
         self.calls.contexts.push(ArgumentContext {
             node,
             ty,
             is_cache: true,
-            inference,
         });
         Ok(())
     }

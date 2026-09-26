@@ -231,7 +231,6 @@ impl CheckerState {
                 node: initializer,
                 ty: Some(ty),
                 is_cache: false,
-                inference: None,
             });
             let result = self.check_expression_ex(initializer, mode | 1);
             self.calls.contexts.pop();

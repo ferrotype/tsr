@@ -1,0 +1,410 @@
+{
+  "id": "compiler/typeParameterWithInvalidConstraintType.ts#configuration=0",
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "request_sha256": "fe8a6ce3308b17cd01ce430db8066fd809db2e0e6635948dd86b077399bddca8",
+  "captured_native_observations_sha256": "1b5356b425ad95a3e5e2a0bb29d42534e8d9d4a6159649f063f3317084a0e276",
+  "diagnostics_before_emit": [
+    {
+      "args_hex": [
+        "54"
+      ],
+      "category": 1,
+      "chain": [],
+      "code": 2313,
+      "deprecated": false,
+      "end": 19,
+      "file_hex": "2f2e7372632f74797065506172616d6574657257697468496e76616c6964436f6e73747261696e74547970652e7473",
+      "key_hex": "547970655f706172616d657465725f305f6861735f615f63697263756c61725f636f6e73747261696e745f32333133",
+      "pos": 18,
+      "related": [],
+      "skipped_on_no_emit": false,
+      "source_hex": "",
+      "text_hex": "",
+      "unnecessary": false
+    },
+    {
+      "args_hex": [
+        "666f6f",
+        "54"
+      ],
+      "category": 1,
+      "chain": [],
+      "code": 2339,
+      "deprecated": false,
+      "end": 75,
+      "file_hex": "2f2e7372632f74797065506172616d6574657257697468496e76616c6964436f6e73747261696e74547970652e7473",
+      "key_hex": "50726f70657274795f305f646f65735f6e6f745f65786973745f6f6e5f747970655f315f32333339",
+      "pos": 72,
+      "related": [],
+      "skipped_on_no_emit": false,
+      "source_hex": "",
+      "text_hex": "",
+      "unnecessary": false
+    },
+    {
+      "args_hex": [],
+      "category": 1,
+      "chain": [
+        {
+          "args_hex": [
+            "7b7d"
+          ],
+          "category": 1,
+          "chain": [],
+          "code": 2761,
+          "deprecated": false,
+          "end": 100,
+          "file_hex": "2f2e7372632f74797065506172616d6574657257697468496e76616c6964436f6e73747261696e74547970652e7473",
+          "key_hex": "547970655f305f6861735f6e6f5f636f6e7374727563745f7369676e6174757265735f32373631",
+          "pos": 99,
+          "related": [],
+          "skipped_on_no_emit": false,
+          "source_hex": "",
+          "text_hex": "",
+          "unnecessary": false
+        }
+      ],
+      "code": 2351,
+      "deprecated": false,
+      "end": 100,
+      "file_hex": "2f2e7372632f74797065506172616d6574657257697468496e76616c6964436f6e73747261696e74547970652e7473",
+      "key_hex": "546869735f65787072657373696f6e5f69735f6e6f745f636f6e73747275637461626c655f32333531",
+      "pos": 99,
+      "related": [],
+      "skipped_on_no_emit": false,
+      "source_hex": "",
+      "text_hex": "",
+      "unnecessary": false
+    },
+    {
+      "args_hex": [],
+      "category": 1,
+      "chain": [
+        {
+          "args_hex": [
+            "7b7d"
+          ],
+          "category": 1,
+          "chain": [],
+          "code": 2757,
+          "deprecated": false,
+          "end": 146,
+          "file_hex": "2f2e7372632f74797065506172616d6574657257697468496e76616c6964436f6e73747261696e74547970652e7473",
+          "key_hex": "547970655f305f6861735f6e6f5f63616c6c5f7369676e6174757265735f32373537",
+          "pos": 145,
+          "related": [],
+          "skipped_on_no_emit": false,
+          "source_hex": "",
+          "text_hex": "",
+          "unnecessary": false
+        }
+      ],
+      "code": 2349,
+      "deprecated": false,
+      "end": 146,
+      "file_hex": "2f2e7372632f74797065506172616d6574657257697468496e76616c6964436f6e73747261696e74547970652e7473",
+      "key_hex": "546869735f65787072657373696f6e5f69735f6e6f745f63616c6c61626c655f32333439",
+      "pos": 145,
+      "related": [],
+      "skipped_on_no_emit": false,
+      "source_hex": "",
+      "text_hex": "",
+      "unnecessary": false
+    }
+  ],
+  "diagnostics_after_emit": [
+    {
+      "args_hex": [
+        "54"
+      ],
+      "category": 1,
+      "chain": [],
+      "code": 2313,
+      "deprecated": false,
+      "end": 19,
+      "file_hex": "2f2e7372632f74797065506172616d6574657257697468496e76616c6964436f6e73747261696e74547970652e7473",
+      "key_hex": "547970655f706172616d657465725f305f6861735f615f63697263756c61725f636f6e73747261696e745f32333133",
+      "pos": 18,
+      "related": [
+        {
+          "args_hex": [],
+          "category": 1,
+          "chain": [],
+          "code": 2751,
+          "deprecated": false,
+          "end": 71,
+          "file_hex": "2f2e7372632f74797065506172616d6574657257697468496e76616c6964436f6e73747261696e74547970652e7473",
+          "key_hex": "43697263756c61726974795f6f726967696e617465735f696e5f747970655f61745f746869735f6c6f636174696f6e5f32373531",
+          "pos": 70,
+          "related": [],
+          "skipped_on_no_emit": false,
+          "source_hex": "",
+          "text_hex": "",
+          "unnecessary": false
+        }
+      ],
+      "skipped_on_no_emit": false,
+      "source_hex": "",
+      "text_hex": "",
+      "unnecessary": false
+    },
+    {
+      "args_hex": [
+        "666f6f",
+        "54"
+      ],
+      "category": 1,
+      "chain": [],
+      "code": 2339,
+      "deprecated": false,
+      "end": 75,
+      "file_hex": "2f2e7372632f74797065506172616d6574657257697468496e76616c6964436f6e73747261696e74547970652e7473",
+      "key_hex": "50726f70657274795f305f646f65735f6e6f745f65786973745f6f6e5f747970655f315f32333339",
+      "pos": 72,
+      "related": [],
+      "skipped_on_no_emit": false,
+      "source_hex": "",
+      "text_hex": "",
+      "unnecessary": false
+    },
+    {
+      "args_hex": [],
+      "category": 1,
+      "chain": [
+        {
+          "args_hex": [
+            "7b7d"
+          ],
+          "category": 1,
+          "chain": [],
+          "code": 2761,
+          "deprecated": false,
+          "end": 100,
+          "file_hex": "2f2e7372632f74797065506172616d6574657257697468496e76616c6964436f6e73747261696e74547970652e7473",
+          "key_hex": "547970655f305f6861735f6e6f5f636f6e7374727563745f7369676e6174757265735f32373631",
+          "pos": 99,
+          "related": [],
+          "skipped_on_no_emit": false,
+          "source_hex": "",
+          "text_hex": "",
+          "unnecessary": false
+        }
+      ],
+      "code": 2351,
+      "deprecated": false,
+      "end": 100,
+      "file_hex": "2f2e7372632f74797065506172616d6574657257697468496e76616c6964436f6e73747261696e74547970652e7473",
+      "key_hex": "546869735f65787072657373696f6e5f69735f6e6f745f636f6e73747275637461626c655f32333531",
+      "pos": 99,
+      "related": [],
+      "skipped_on_no_emit": false,
+      "source_hex": "",
+      "text_hex": "",
+      "unnecessary": false
+    },
+    {
+      "args_hex": [],
+      "category": 1,
+      "chain": [
+        {
+          "args_hex": [
+            "7b7d"
+          ],
+          "category": 1,
+          "chain": [],
+          "code": 2757,
+          "deprecated": false,
+          "end": 146,
+          "file_hex": "2f2e7372632f74797065506172616d6574657257697468496e76616c6964436f6e73747261696e74547970652e7473",
+          "key_hex": "547970655f305f6861735f6e6f5f63616c6c5f7369676e6174757265735f32373537",
+          "pos": 145,
+          "related": [],
+          "skipped_on_no_emit": false,
+          "source_hex": "",
+          "text_hex": "",
+          "unnecessary": false
+        }
+      ],
+      "code": 2349,
+      "deprecated": false,
+      "end": 146,
+      "file_hex": "2f2e7372632f74797065506172616d6574657257697468496e76616c6964436f6e73747261696e74547970652e7473",
+      "key_hex": "546869735f65787072657373696f6e5f69735f6e6f745f63616c6c61626c655f32333439",
+      "pos": 145,
+      "related": [],
+      "skipped_on_no_emit": false,
+      "source_hex": "",
+      "text_hex": "",
+      "unnecessary": false
+    }
+  ],
+  "errors": {
+    "state": "content",
+    "text_hex": "74797065506172616d6574657257697468496e76616c6964436f6e73747261696e74547970652e747328312c3139293a206572726f72205453323331333a205479706520706172616d65746572202754272068617320612063697263756c617220636f6e73747261696e742e0d0a74797065506172616d6574657257697468496e76616c6964436f6e73747261696e74547970652e747328342c3139293a206572726f72205453323333393a2050726f70657274792027666f6f2720646f6573206e6f74206578697374206f6e2074797065202754272e0d0a74797065506172616d6574657257697468496e76616c6964436f6e73747261696e74547970652e747328352c3231293a206572726f72205453323335313a20546869732065787072657373696f6e206973206e6f7420636f6e73747275637461626c652e0d0a20205479706520277b7d2720686173206e6f20636f6e737472756374207369676e6174757265732e0d0a74797065506172616d6574657257697468496e76616c6964436f6e73747261696e74547970652e747328372c3137293a206572726f72205453323334393a20546869732065787072657373696f6e206973206e6f742063616c6c61626c652e0d0a20205479706520277b7d2720686173206e6f2063616c6c207369676e6174757265732e0d0a0d0a0d0a3d3d3d3d2074797065506172616d6574657257697468496e76616c6964436f6e73747261696e74547970652e7473202834206572726f727329203d3d3d3d0d0a20202020636c61737320413c5420657874656e647320543e207b0d0a202020202020202020202020202020202020202020207e0d0a212121206572726f72205453323331333a205479706520706172616d65746572202754272068617320612063697263756c617220636f6e73747261696e742e0d0a2121212072656c61746564205453323735312074797065506172616d6574657257697468496e76616c6964436f6e73747261696e74547970652e74733a343a31373a2043697263756c6172697479206f726967696e6174657320696e20747970652061742074686973206c6f636174696f6e2e0d0a2020202020202020666f6f2829207b0d0a2020202020202020202020207661722078213a20543b0d0a2020202020202020202020207661722061203d20782e666f6f28293b0d0a202020202020202020202020202020202020202020207e7e7e0d0a212121206572726f72205453323333393a2050726f70657274792027666f6f2720646f6573206e6f74206578697374206f6e2074797065202754272e0d0a2020202020202020202020207661722062203d206e6577207828313233293b0d0a2020202020202020202020202020202020202020202020207e0d0a212121206572726f72205453323335313a20546869732065787072657373696f6e206973206e6f7420636f6e73747275637461626c652e0d0a212121206572726f72205453323335313a2020205479706520277b7d2720686173206e6f20636f6e737472756374207369676e6174757265732e0d0a2020202020202020202020207661722063203d20785b315d3b0d0a2020202020202020202020207661722064203d207828293b0d0a20202020202020202020202020202020202020207e0d0a212121206572726f72205453323334393a20546869732065787072657373696f6e206973206e6f742063616c6c61626c652e0d0a212121206572726f72205453323334393a2020205479706520277b7d2720686173206e6f2063616c6c207369676e6174757265732e0d0a20202020202020207d0d0a202020207d"
+  },
+  "types": {
+    "state": "content",
+    "text_hex": "2f2f2f2f205b74657374732f63617365732f636f6d70696c65722f74797065506172616d6574657257697468496e76616c6964436f6e73747261696e74547970652e74735d202f2f2f2f0d0a0d0a3d3d3d2074797065506172616d6574657257697468496e76616c6964436f6e73747261696e74547970652e7473203d3d3d0d0a636c61737320413c5420657874656e647320543e207b0d0a3e41203a20413c543e0d0a0d0a20202020666f6f2829207b0d0a3e666f6f203a202829203d3e20766f69640d0a0d0a20202020202020207661722078213a20543b0d0a3e78203a20540d0a0d0a20202020202020207661722061203d20782e666f6f28293b0d0a3e61203a20616e790d0a3e782e666f6f2829203a20616e790d0a3e782e666f6f203a20616e790d0a3e78203a20540d0a3e666f6f203a20616e790d0a0d0a20202020202020207661722062203d206e6577207828313233293b0d0a3e62203a20616e790d0a3e6e657720782831323329203a20616e790d0a3e78203a20540d0a3e313233203a203132330d0a0d0a20202020202020207661722063203d20785b315d3b0d0a3e63203a20616e790d0a3e785b315d203a20616e790d0a3e78203a20540d0a3e31203a20310d0a0d0a20202020202020207661722064203d207828293b0d0a3e64203a20616e790d0a3e782829203a20616e790d0a3e78203a20540d0a202020207d0d0a7d0d0a"
+  },
+  "symbols": {
+    "state": "content",
+    "text_hex": "2f2f2f2f205b74657374732f63617365732f636f6d70696c65722f74797065506172616d6574657257697468496e76616c6964436f6e73747261696e74547970652e74735d202f2f2f2f0d0a0d0a3d3d3d2074797065506172616d6574657257697468496e76616c6964436f6e73747261696e74547970652e7473203d3d3d0d0a636c61737320413c5420657874656e647320543e207b0d0a3e41203a2053796d626f6c28412c204465636c2874797065506172616d6574657257697468496e76616c6964436f6e73747261696e74547970652e74732c20302c203029290d0a3e54203a2053796d626f6c28542c204465636c2874797065506172616d6574657257697468496e76616c6964436f6e73747261696e74547970652e74732c20302c203829290d0a3e54203a2053796d626f6c28542c204465636c2874797065506172616d6574657257697468496e76616c6964436f6e73747261696e74547970652e74732c20302c203829290d0a0d0a20202020666f6f2829207b0d0a3e666f6f203a2053796d626f6c28412e666f6f2c204465636c2874797065506172616d6574657257697468496e76616c6964436f6e73747261696e74547970652e74732c20302c20323229290d0a0d0a20202020202020207661722078213a20543b0d0a3e78203a2053796d626f6c28782c204465636c2874797065506172616d6574657257697468496e76616c6964436f6e73747261696e74547970652e74732c20322c20313129290d0a3e54203a2053796d626f6c28542c204465636c2874797065506172616d6574657257697468496e76616c6964436f6e73747261696e74547970652e74732c20302c203829290d0a0d0a20202020202020207661722061203d20782e666f6f28293b0d0a3e61203a2053796d626f6c28612c204465636c2874797065506172616d6574657257697468496e76616c6964436f6e73747261696e74547970652e74732c20332c20313129290d0a3e78203a2053796d626f6c28782c204465636c2874797065506172616d6574657257697468496e76616c6964436f6e73747261696e74547970652e74732c20322c20313129290d0a0d0a20202020202020207661722062203d206e6577207828313233293b0d0a3e62203a2053796d626f6c28622c204465636c2874797065506172616d6574657257697468496e76616c6964436f6e73747261696e74547970652e74732c20342c20313129290d0a3e78203a2053796d626f6c28782c204465636c2874797065506172616d6574657257697468496e76616c6964436f6e73747261696e74547970652e74732c20322c20313129290d0a0d0a20202020202020207661722063203d20785b315d3b0d0a3e63203a2053796d626f6c28632c204465636c2874797065506172616d6574657257697468496e76616c6964436f6e73747261696e74547970652e74732c20352c20313129290d0a3e78203a2053796d626f6c28782c204465636c2874797065506172616d6574657257697468496e76616c6964436f6e73747261696e74547970652e74732c20322c20313129290d0a0d0a20202020202020207661722064203d207828293b0d0a3e64203a2053796d626f6c28642c204465636c2874797065506172616d6574657257697468496e76616c6964436f6e73747261696e74547970652e74732c20362c20313129290d0a3e78203a2053796d626f6c28782c204465636c2874797065506172616d6574657257697468496e76616c6964436f6e73747261696e74547970652e74732c20322c20313129290d0a202020207d0d0a7d0d0a"
+  },
+  "public_type_strings": {
+    "queries": [
+      {
+        "end": 7,
+        "file": "/.src/typeParameterWithInvalidConstraintType.ts",
+        "kind": 79,
+        "operation": "TypeToString",
+        "pos": 5,
+        "text_hex": "413c543e"
+      },
+      {
+        "end": 30,
+        "file": "/.src/typeParameterWithInvalidConstraintType.ts",
+        "kind": 79,
+        "operation": "TypeToString",
+        "pos": 22,
+        "text_hex": "2829203d3e20766f6964"
+      },
+      {
+        "end": 48,
+        "file": "/.src/typeParameterWithInvalidConstraintType.ts",
+        "kind": 79,
+        "operation": "TypeToString",
+        "pos": 46,
+        "text_hex": "54"
+      },
+      {
+        "end": 67,
+        "file": "/.src/typeParameterWithInvalidConstraintType.ts",
+        "kind": 79,
+        "operation": "TypeToString",
+        "pos": 65,
+        "text_hex": "616e79"
+      },
+      {
+        "end": 77,
+        "file": "/.src/typeParameterWithInvalidConstraintType.ts",
+        "kind": 214,
+        "operation": "TypeToString",
+        "pos": 69,
+        "text_hex": "616e79"
+      },
+      {
+        "end": 75,
+        "file": "/.src/typeParameterWithInvalidConstraintType.ts",
+        "kind": 212,
+        "operation": "TypeToString",
+        "pos": 69,
+        "text_hex": "616e79"
+      },
+      {
+        "end": 71,
+        "file": "/.src/typeParameterWithInvalidConstraintType.ts",
+        "kind": 79,
+        "operation": "TypeToString",
+        "pos": 69,
+        "text_hex": "54"
+      },
+      {
+        "end": 75,
+        "file": "/.src/typeParameterWithInvalidConstraintType.ts",
+        "kind": 79,
+        "operation": "TypeToString",
+        "pos": 72,
+        "text_hex": "616e79"
+      },
+      {
+        "end": 92,
+        "file": "/.src/typeParameterWithInvalidConstraintType.ts",
+        "kind": 79,
+        "operation": "TypeToString",
+        "pos": 90,
+        "text_hex": "616e79"
+      },
+      {
+        "end": 105,
+        "file": "/.src/typeParameterWithInvalidConstraintType.ts",
+        "kind": 215,
+        "operation": "TypeToString",
+        "pos": 94,
+        "text_hex": "616e79"
+      },
+      {
+        "end": 100,
+        "file": "/.src/typeParameterWithInvalidConstraintType.ts",
+        "kind": 79,
+        "operation": "TypeToString",
+        "pos": 98,
+        "text_hex": "54"
+      },
+      {
+        "end": 104,
+        "file": "/.src/typeParameterWithInvalidConstraintType.ts",
+        "kind": 8,
+        "operation": "TypeToString",
+        "pos": 101,
+        "text_hex": "313233"
+      },
+      {
+        "end": 120,
+        "file": "/.src/typeParameterWithInvalidConstraintType.ts",
+        "kind": 79,
+        "operation": "TypeToString",
+        "pos": 118,
+        "text_hex": "616e79"
+      },
+      {
+        "end": 127,
+        "file": "/.src/typeParameterWithInvalidConstraintType.ts",
+        "kind": 213,
+        "operation": "TypeToString",
+        "pos": 122,
+        "text_hex": "616e79"
+      },
+      {
+        "end": 124,
+        "file": "/.src/typeParameterWithInvalidConstraintType.ts",
+        "kind": 79,
+        "operation": "TypeToString",
+        "pos": 122,
+        "text_hex": "54"
+      },
+      {
+        "end": 126,
+        "file": "/.src/typeParameterWithInvalidConstraintType.ts",
+        "kind": 8,
+        "operation": "TypeToString",
+        "pos": 125,
+        "text_hex": "31"
+      },
+      {
+        "end": 142,
+        "file": "/.src/typeParameterWithInvalidConstraintType.ts",
+        "kind": 79,
+        "operation": "TypeToString",
+        "pos": 140,
+        "text_hex": "616e79"
+      },
+      {
+        "end": 148,
+        "file": "/.src/typeParameterWithInvalidConstraintType.ts",
+        "kind": 214,
+        "operation": "TypeToString",
+        "pos": 144,
+        "text_hex": "616e79"
+      },
+      {
+        "end": 146,
+        "file": "/.src/typeParameterWithInvalidConstraintType.ts",
+        "kind": 79,
+        "operation": "TypeToString",
+        "pos": 144,
+        "text_hex": "54"
+      }
+    ],
+    "state": "executed"
+  }
+}

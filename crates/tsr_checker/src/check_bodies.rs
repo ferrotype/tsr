@@ -860,9 +860,7 @@ impl CheckerState {
         let read = self.node(function)?;
         let annotation = read.type_node();
         let body = read.body();
-        let return_type = annotation
-            .map(|node| self.get_type_from_type_node(node))
-            .transpose()?;
+        let return_type = self.return_type_from_annotation(function)?;
         self.check_function_return_paths(function, return_type)?;
         let Some(body) = body else { return Ok(()) };
         if annotation.is_none() {
@@ -911,7 +909,10 @@ impl CheckerState {
         }
         let read = self.node(function)?;
         let explicit = read.flags() & nf::HAS_EXPLICIT_RETURN != 0;
-        let error_node = read.type_node().unwrap_or(function);
+        let error_node = match read.type_node() {
+            Some(annotation) => annotation,
+            None => self.full_signature_type_node(function)?.unwrap_or(function),
+        };
         let diagnostic = if let Some(ty) = annotation {
             if self.types.flags(ty)? & tf::NEVER != 0 {
                 Some(messages::A_function_returning_never_cannot_have_a_reachable_end_point)

@@ -270,6 +270,23 @@ impl CheckerState {
         let mut result = Vec::new();
         for node in ancestors.into_iter().rev() {
             let kind = self.node(node)?.kind();
+            if (matches!(kind.known(), Some(K::FunctionExpression | K::ArrowFunction))
+                || tsr_ast::utilities::is_object_literal_method(self.ast(node)?, Some(node))?)
+                && self.expression_is_context_sensitive(node)?
+            {
+                let symbol = self
+                    .get_symbol_of_declaration(node)?
+                    .ok_or(Error::MissingLink("contextual outer function symbol"))?;
+                let ty = self.get_type_of_symbol(symbol)?;
+                if let Some(&signature) = self.signatures_of_type(ty, false)?.first() {
+                    if let Some(parameters) = &self.signatures.get(signature)?.type_parameters {
+                        if !parameters.is_empty() {
+                            result.extend_from_slice(parameters);
+                            continue;
+                        }
+                    }
+                }
+            }
             if kind == K::MappedType {
                 // Collecting an enclosing parameter must not resolve the
                 // mapped constraint, which may contain this conditional type.

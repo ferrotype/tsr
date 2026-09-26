@@ -346,3 +346,46 @@ The temporary per-node trace hooks were removed after the comparison.
 The combined 15-test C2 contract suite currently passes in debug. This is an
 implementation checkpoint, not the full C2 exit: the current-source corpus,
 release contracts, relater/obligations and measurement still have to be recorded.
+
+
+## Remaining-row native fixes
+
+The 482-row audit sample (the fixed 300 plus the C2 claims) exposed 24 C2
+rows still open. The next fixes are checked against retained native requests
+and complete observations, rather than Rust-authored expected diagnostics:
+
+- Bigint declaration names report TS1539; branded intersection index keys use
+  the native any-constituent test; mapped display resolves the original
+  `keyof` operand; mutable expression inference finds the enclosing inference
+  scope instead of requiring an exact contextual-node cache entry.
+- Context-sensitive functions contribute their contextual signature parameters
+  to nested generic declarations. Uninitialized-reference checks use the
+  native top-level undefined predicate instead of descending intersections.
+- Empty-object checks reject generic mapped types before resolving their
+  members. The reversed order had reentered constraint inference and cached a
+  circular constraint, truncating both Redux diagnostic chains.
+- Entity-name resolution follows aliases until the requested meaning is
+  present. JSDoc full signatures supply their return and `this` types, and
+  structured members are published before named-member enumeration can reenter
+  resolution. CommonJS declaration exports preserve their annotated type.
+- Import-type reuse tracks the full display symbol chain, including its module;
+  reparsed JSDoc modules use their reparsed declaration symbol.
+- Synthetic property elision now preserves native empty-object and entry
+  shortcuts, omitted-property comments, final-property ordering and approximate
+  length accounting. Index-signature names, readonly modifiers and the eagerly
+  evaluated elided placeholder contribute their native charges.
+
+The exact corpus fixtures establish diagnostics, type/symbol baselines and
+public display. They do not claim declaration-text parity. The separate native
+property observer establishes node kinds, synthetic-comment metadata, length
+increments, restored flags and printer text for 14 branch schedules. Large
+naturally truncated corpus displays are verified by their full canonical byte
+length and SHA-256, without committing another 30 MB of rendered text.
+
+The contextual-node cache no longer duplicates inference identities. Inference
+scopes live in their dedicated stack; the reachability census follows that
+stack. This removes an unused field after mutable-expression inference started
+using the native ancestor search.
+
+These are focused results. The final current-source full corpus and exit
+receipts below, when recorded, remain the acceptance authority.

@@ -83,8 +83,13 @@ impl CheckerState {
     pub(crate) fn empty_object_type(&mut self, ty: TypeId) -> Result<bool, Error> {
         let flags = self.types.flags(ty)?;
         if flags & tf::OBJECT != 0 {
-            self.resolve_type_members(ty)?;
+            // Resolving generic mapped members here can re-enter the constraint
+            // being inferred. The pin excludes these types before resolution.
             if self.is_generic_mapped_type(ty)? {
+                return Ok(false);
+            }
+            self.resolve_type_members(ty)?;
+            if ty == self.builtins.any_function_type {
                 return Ok(false);
             }
             let data = self.types.structured(ty)?;

@@ -63,3 +63,101 @@ fn elision_branches_match_native_text_and_length() {
     }
     assert_eq!(json!(observed), expected["cases"]);
 }
+
+#[test]
+fn property_elision_matches_native_members_comments_and_length() {
+    use tsr_ast::{symbol_flags, JsString, SyntaxKind as K};
+    let request: Value = serde_json::from_str(include_str!(
+        "../../tsr_compiler/tests/fixtures/c2/elision/property.requests.json"
+    ))
+    .unwrap();
+    let expected: Value = serde_json::from_str(include_str!(
+        "../../tsr_compiler/tests/fixtures/c2/elision/property.observations.json"
+    ))
+    .unwrap();
+    let counters = Counters::new();
+    let identity = CheckerIdentity::new(Generation::new(&counters), &counters);
+    let mut checker = CheckerState::new(&identity, &counters, CheckerOptions::default()).unwrap();
+    let mut observed = Vec::new();
+    for q in request["cases"].as_array().unwrap() {
+        // These resolved shapes correspond to the source declarations consumed
+        // by the native observer; only the builder's entry length is seeded.
+        let number = checker.builtins.number_type;
+        let mut properties = Vec::new();
+        for i in 0..q["properties"].as_u64().unwrap() {
+            let symbol = checker
+                .new_symbol(
+                    symbol_flags::PROPERTY,
+                    JsString::from_bytes(vec![b'a' + i as u8]),
+                )
+                .unwrap();
+            checker
+                .value_symbol_links
+                .get_or_default(symbol)
+                .resolved_type = Some(number);
+            properties.push(symbol);
+        }
+        let mut calls = Vec::new();
+        let mut constructors = Vec::new();
+        for (key, list) in [("calls", &mut calls), ("constructors", &mut constructors)] {
+            for _ in 0..q[key].as_u64().unwrap() {
+                list.push(
+                    checker
+                        .signatures
+                        .new_signature(0, None, None, None, None, Some(number), None, 0)
+                        .unwrap(),
+                );
+            }
+        }
+        let mut indexes = Vec::new();
+        for _ in 0..q["indexes"].as_u64().unwrap() {
+            indexes.push(
+                checker
+                    .signatures
+                    .new_index_info(
+                        checker.builtins.string_type,
+                        number,
+                        q["readonly"] == true,
+                        None,
+                        None,
+                    )
+                    .unwrap(),
+            );
+        }
+        let ty = checker
+            .new_anonymous_type(None, None, &calls, &constructors, &indexes)
+            .unwrap();
+        checker.types.structured_mut(ty).unwrap().properties = Some(properties.into());
+        let flags = if q["no_truncation"].as_bool().unwrap() {
+            tsr_nodebuilder::flags::NO_TRUNCATION
+        } else {
+            0
+        };
+        let length = q["length"].as_u64().unwrap() as usize;
+        let mut builder = NodeBuilder::new(&mut checker, flags);
+        builder.approximate_length = length;
+        let node = builder.object_type_members_node(ty).unwrap();
+        let mut members = Vec::new();
+        let read = builder.ast.view().node(node).unwrap();
+        let kind = read.kind().raw();
+        if read.kind() == K::TypeLiteral {
+            let list = read.member_list().unwrap();
+            let view = builder.ast.view();
+            for member in view
+                .node_slice(view.list(list).unwrap().nodes())
+                .unwrap()
+                .iter()
+            {
+                let member = member.unwrap();
+                let comments = builder.emit.synthetic_trailing_comments(member).into_iter().map(|c| json!({"kind":c.kind as u16,"text":String::from_utf8(c.text.as_bytes().to_vec()).unwrap(),"pos":c.loc.pos(),"end":c.loc.end(),"leading_newline":c.has_leading_new_line,"trailing_newline":c.has_trailing_new_line})).collect::<Vec<_>>();
+                members.push(json!({"kind":builder.ast.view().node(member).unwrap().kind().raw(),"comments":comments}));
+            }
+        }
+        let mut writer = TextWriter::new(b"", 0);
+        Printer::new(PrinterOptions::default(), &builder.emit)
+            .write(builder.ast.view(), node, None, &mut writer)
+            .unwrap();
+        observed.push(json!({"id":q["id"],"observation":{"text":String::from_utf8(writer.text().to_vec()).unwrap(),"kind":kind,"members":members,"added_length":builder.approximate_length-length,"restored_flags":builder.flags==flags}}));
+    }
+    assert_eq!(json!(observed), expected["cases"]);
+}

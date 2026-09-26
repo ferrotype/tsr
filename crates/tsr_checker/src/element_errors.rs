@@ -85,7 +85,6 @@ impl CheckerState {
                 node,
                 ty: Some(target),
                 is_cache: false,
-                inference: None,
             });
             let result = self.check_expression_ex(node, 1 | 128);
             self.calls.contexts.pop();
@@ -166,7 +165,6 @@ impl CheckerState {
             node,
             ty: Some(context),
             is_cache: false,
-            inference: None,
         });
         let previous = std::mem::replace(&mut self.expression_mode, 1);
         let result = self.check_expression_for_mutable_location(node);

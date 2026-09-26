@@ -1591,11 +1591,9 @@ impl NodeBuilder<'_> {
                 .accessibility
                 == SymbolAccessibility::Accessible
             {
-                let chain = if let Some(enclosing) = self.enclosing {
-                    self.accessibility_chain(symbol, enclosing, meaning)?
-                } else {
-                    vec![symbol]
-                };
+                self.track_symbol(symbol, meaning)?;
+                let chain =
+                    self.display_name_chain_with_module(symbol, self.enclosing, meaning, true)?;
                 parent_symbol = chain.first().copied();
             }
         }

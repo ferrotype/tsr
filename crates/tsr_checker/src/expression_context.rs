@@ -477,9 +477,7 @@ impl CheckerState {
             return Ok(ty);
         }
         let contextual = self.contextual_expression_type(node)?;
-        let inference = self
-            .contextual_call_argument(node)
-            .and_then(|context| context.inference);
+        let inference = self.call_inference_at_node(node)?;
         let contextual = contextual
             .map(|t| self.instantiate_call_contextual_type(t, inference, false))
             .transpose()?;

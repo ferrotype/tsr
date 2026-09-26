@@ -167,7 +167,6 @@ impl CheckerState {
             node,
             ty: Some(contextual),
             is_cache: false,
-            inference,
         });
         self.calls.inference_contexts.push((node, inference));
         let result = (|| {

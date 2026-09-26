@@ -55,6 +55,22 @@ macro_rules! case {
 
 case!(contextual_cache_respects_flags, "contextualTypeCaching");
 case!(
+    bigint_property_declarations_report_native_errors,
+    "bigintPropertyName"
+);
+case!(
+    branded_index_signature_keys_survive_keyof,
+    "indexSignatures1"
+);
+case!(
+    array_elements_use_the_enclosing_inference_context,
+    "arrayLiteralInference"
+);
+case!(
+    mapped_display_keeps_the_original_parameter_constraint,
+    "declarationEmitMappedTypeDistributivityPreservesConstraints"
+);
+case!(
     mapped_intersection_keys_preserve_index_signature,
     "specialIntersectionsInMappedTypes"
 );

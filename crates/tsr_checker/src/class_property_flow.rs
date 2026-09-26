@@ -15,7 +15,7 @@ impl CheckerState {
     ) -> Result<bool, Error> {
         let initial = self.add_type_optionality(ty, false, true)?;
         let flow = self.class_property_reference_flow(name, ty, initial, constructor)?;
-        Ok(!self.class_type_contains_undefined(flow)?)
+        Ok(!self.contains_undefined_type(flow)?)
     }
 
     // port: tsc/internal/checker/checker.go:Checker.isPropertyInitializedInStaticBlocks
@@ -33,7 +33,7 @@ impl CheckerState {
                 let initial = self.get_union_type(&[ty, self.builtins.undefined_type])?;
                 let flow =
                     self.class_property_reference_flow_ex(name, ty, initial, block, false)?;
-                if !self.class_type_contains_undefined(flow)? {
+                if !self.contains_undefined_type(flow)? {
                     return Ok(true);
                 }
             }

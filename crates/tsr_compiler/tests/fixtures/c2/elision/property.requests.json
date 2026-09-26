@@ -1,0 +1,158 @@
+{
+  "cases": [
+    {
+      "id": "entry-False",
+      "source": "type Subject = { (): number; new(): number; [x: string]: number; a: number; b: number; c: number; d: number; e: number; f: number; g: number; h: number; };",
+      "length": 161,
+      "no_truncation": false,
+      "properties": 8,
+      "calls": 1,
+      "constructors": 1,
+      "indexes": 1,
+      "readonly": false
+    },
+    {
+      "id": "signatures_entry-False",
+      "source": "type Subject = { (): number; (): number; };",
+      "length": 161,
+      "no_truncation": false,
+      "properties": 0,
+      "calls": 2,
+      "constructors": 0,
+      "indexes": 0,
+      "readonly": false
+    },
+    {
+      "id": "empty-False",
+      "source": "type Subject = {  };",
+      "length": 161,
+      "no_truncation": false,
+      "properties": 0,
+      "calls": 0,
+      "constructors": 0,
+      "indexes": 0,
+      "readonly": false
+    },
+    {
+      "id": "single_signature-False",
+      "source": "type Subject = { (): number; };",
+      "length": 161,
+      "no_truncation": false,
+      "properties": 0,
+      "calls": 1,
+      "constructors": 0,
+      "indexes": 0,
+      "readonly": false
+    },
+    {
+      "id": "properties_mid-False",
+      "source": "type Subject = { a: number; b: number; c: number; d: number; e: number; f: number; g: number; h: number; };",
+      "length": 159,
+      "no_truncation": false,
+      "properties": 8,
+      "calls": 0,
+      "constructors": 0,
+      "indexes": 0,
+      "readonly": false
+    },
+    {
+      "id": "signature_index_mid-False",
+      "source": "type Subject = { (): number; new(): number; [x: string]: number; a: number; b: number; c: number; d: number; e: number; f: number; g: number; h: number; };",
+      "length": 159,
+      "no_truncation": false,
+      "properties": 8,
+      "calls": 1,
+      "constructors": 1,
+      "indexes": 1,
+      "readonly": false
+    },
+    {
+      "id": "entry-True",
+      "source": "type Subject = { (): number; new(): number; [x: string]: number; a: number; b: number; c: number; d: number; e: number; f: number; g: number; h: number; };",
+      "length": 1000001,
+      "no_truncation": true,
+      "properties": 8,
+      "calls": 1,
+      "constructors": 1,
+      "indexes": 1,
+      "readonly": false
+    },
+    {
+      "id": "signatures_entry-True",
+      "source": "type Subject = { (): number; (): number; };",
+      "length": 1000001,
+      "no_truncation": true,
+      "properties": 0,
+      "calls": 2,
+      "constructors": 0,
+      "indexes": 0,
+      "readonly": false
+    },
+    {
+      "id": "empty-True",
+      "source": "type Subject = {  };",
+      "length": 1000001,
+      "no_truncation": true,
+      "properties": 0,
+      "calls": 0,
+      "constructors": 0,
+      "indexes": 0,
+      "readonly": false
+    },
+    {
+      "id": "single_signature-True",
+      "source": "type Subject = { (): number; };",
+      "length": 1000001,
+      "no_truncation": true,
+      "properties": 0,
+      "calls": 1,
+      "constructors": 0,
+      "indexes": 0,
+      "readonly": false
+    },
+    {
+      "id": "properties_mid-True",
+      "source": "type Subject = { a: number; b: number; c: number; d: number; e: number; f: number; g: number; h: number; };",
+      "length": 999999,
+      "no_truncation": true,
+      "properties": 8,
+      "calls": 0,
+      "constructors": 0,
+      "indexes": 0,
+      "readonly": false
+    },
+    {
+      "id": "signature_index_mid-True",
+      "source": "type Subject = { (): number; new(): number; [x: string]: number; a: number; b: number; c: number; d: number; e: number; f: number; g: number; h: number; };",
+      "length": 999999,
+      "no_truncation": true,
+      "properties": 8,
+      "calls": 1,
+      "constructors": 1,
+      "indexes": 1,
+      "readonly": false
+    },
+    {
+      "id": "readonly_index_mid-False",
+      "source": "type Subject = { readonly [x: string]: number; a: number; b: number; c: number; d: number; e: number; f: number; g: number; h: number; };",
+      "length": 159,
+      "no_truncation": false,
+      "properties": 8,
+      "calls": 0,
+      "constructors": 0,
+      "indexes": 1,
+      "readonly": true
+    },
+    {
+      "id": "readonly_index_mid-True",
+      "source": "type Subject = { readonly [x: string]: number; a: number; b: number; c: number; d: number; e: number; f: number; g: number; h: number; };",
+      "length": 999999,
+      "no_truncation": true,
+      "properties": 8,
+      "calls": 0,
+      "constructors": 0,
+      "indexes": 1,
+      "readonly": true
+    }
+  ]
+}

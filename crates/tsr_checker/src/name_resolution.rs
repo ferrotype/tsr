@@ -434,12 +434,15 @@ impl CheckerState {
             symbol
         };
         if let Some(symbol) = symbol {
-            let symbol = self.get_merged_symbol(symbol);
-            if self.symbol(symbol)?.flags() & sf::ALIAS != 0
+            let mut symbol = self.get_merged_symbol(symbol);
+            // resolveAlias stops at a target with any non-alias meaning. A
+            // CommonJS export can carry namespace members while its class
+            // meaning still requires another step through the alias chain.
+            while self.symbol(symbol)?.flags() & sf::ALIAS != 0
                 && self.symbol(symbol)?.flags() & meaning == 0
                 && !dont_resolve_alias
             {
-                return self.resolve_alias(symbol).map(Some);
+                symbol = self.resolve_alias(symbol)?;
             }
             return Ok(Some(symbol));
         }

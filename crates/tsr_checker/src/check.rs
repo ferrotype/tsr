@@ -531,6 +531,15 @@ impl CheckerState {
         if self.check_require_alias_declaration(node, symbol)? {
             return Ok(());
         }
+        if let Some(name) = self.node(node)?.name() {
+            if self.node(name)?.kind() == K::BigIntLiteral {
+                self.error_at(
+                    Some(name),
+                    messages::A_bigint_literal_cannot_be_used_as_a_property_name,
+                    vec![],
+                )?;
+            }
+        }
         let target = self.get_type_of_symbol(symbol)?;
         let target = self.auto_to_any(target)?;
         if self.symbol(symbol)?.value_declaration() != Some(node) {

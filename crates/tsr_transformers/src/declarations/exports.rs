@@ -151,15 +151,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
             let modifiers = self.declare_modifiers();
             self.class_expression_declaration(unwrapped, name, modifiers)?
         } else if tsr_ast::utilities::is_function_like(Some(&self.node(unwrapped))) {
-            self.function_expression_declaration(
-                unwrapped,
-                name,
-                if self.node(node).kind() == K::ExportAssignment {
-                    self.node(node).type_node()
-                } else {
-                    None
-                },
-            )?
+            self.function_expression_declaration(unwrapped, name, self.node(node).type_node())?
         } else {
             let old = self.tracker.selector.clone();
             self.tracker.selector = super::tracker::Selector::fixed(

@@ -221,8 +221,8 @@ impl CheckerState {
                 };
             }
         } else if !assume
-            && !self.maybe_type_of_kind(ty, tf::UNDEFINED)?
-            && self.maybe_type_of_kind(flow, tf::UNDEFINED)?
+            && !self.contains_undefined_type(ty)?
+            && self.contains_undefined_type(flow)?
         {
             let name = self.symbol_to_string(local)?;
             self.error_at(

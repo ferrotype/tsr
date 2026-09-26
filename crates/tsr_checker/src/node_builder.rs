@@ -934,6 +934,13 @@ impl<'a> NodeBuilder<'a> {
         let call_count = members.call_signature_count as usize;
         let indexes = members.index_infos.clone().unwrap_or_default();
         let properties = members.properties.clone().unwrap_or_default();
+        if properties.is_empty() && indexes.is_empty() && signatures.is_empty() {
+            let members = self.list(Vec::new())?;
+            let node = self.ast.new_type_literal_node(Some(members));
+            self.approximate_length += 2;
+            self.emit.set_emit_flags(node, emit_flags::SINGLE_LINE);
+            return Ok(node);
+        }
         if properties.is_empty() && indexes.is_empty() && signatures.len() == 1 {
             return self.signature_node(
                 signatures[0],
@@ -980,34 +987,18 @@ impl<'a> NodeBuilder<'a> {
         let saved_flags = self.flags;
         self.flags |= nf::IN_OBJECT_TYPE_LITERAL;
         let result = (|| {
-            let mut nodes = Vec::new();
-            for (index, &signature) in signatures.iter().enumerate() {
-                nodes.push(self.signature_node(
-                    signature,
-                    if index < call_count {
-                        K::CallSignature
-                    } else {
-                        K::ConstructSignature
-                    },
-                    None,
-                    None,
-                )?);
-            }
-            for &index in indexes.iter() {
-                if self.checker.types.object_flags(ty)? & of::REVERSE_MAPPED != 0 {
-                    let placeholder = self.elided_type();
-                    nodes.extend(self.object_index_nodes(index, Some(placeholder))?);
-                } else {
-                    nodes.extend(self.object_index_nodes(index, None)?);
-                }
-            }
-            nodes.extend(self.object_members(&properties)?);
+            let reverse = self.checker.types.object_flags(ty)? & of::REVERSE_MAPPED != 0;
+            let nodes = self.resolved_type_members(
+                &signatures,
+                call_count,
+                &indexes,
+                &properties,
+                reverse,
+            )?;
             let members = self.list(nodes)?;
             let node = self.ast.new_type_literal_node(Some(members));
             self.approximate_length += 2;
-            if properties.is_empty() && signatures.is_empty() && indexes.is_empty()
-                || saved_flags & nf::MULTILINE_OBJECT_LITERALS == 0
-            {
+            if saved_flags & nf::MULTILINE_OBJECT_LITERALS == 0 {
                 self.emit.set_emit_flags(node, emit_flags::SINGLE_LINE);
             }
             Ok(node)
@@ -1016,16 +1007,10 @@ impl<'a> NodeBuilder<'a> {
         result
     }
 
-    fn elided_property(&mut self, text: &[u8]) -> Result<NodeId, Error> {
-        if self.flags & nf::NO_TRUNCATION != 0 {
-            return Err(Error::Unsupported(
-                "node builder synthetic property elision comments",
-            ));
-        }
+    fn elided_property(&mut self, text: &[u8]) -> NodeId {
         let name = self.ast.new_identifier(JsString::from_bytes(text));
-        Ok(self
-            .ast
-            .new_property_signature_declaration(None, Some(name), None, None, None))
+        self.ast
+            .new_property_signature_declaration(None, Some(name), None, None, None)
     }
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.createElidedInformationPlaceholder
@@ -1035,20 +1020,70 @@ impl<'a> NodeBuilder<'a> {
     }
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.createTypeNodesFromResolvedType
-    fn object_members(&mut self, properties: &[SymbolId]) -> Result<Vec<NodeId>, Error> {
-        if !properties.is_empty() && self.check_truncation() {
-            return Ok(vec![self.elided_property(b"...")?]);
+    fn resolved_type_members(
+        &mut self,
+        signatures: &[crate::SignatureId],
+        call_count: usize,
+        indexes: &[crate::IndexInfoId],
+        properties: &[SymbolId],
+        reverse: bool,
+    ) -> Result<Vec<NodeId>, Error> {
+        if self.check_truncation() {
+            let node = if self.flags & nf::NO_TRUNCATION != 0 {
+                let node = self.ast.new_not_emitted_type_element();
+                self.emit.add_synthetic_trailing_comment(
+                    node,
+                    K::MultiLineCommentTrivia,
+                    JsString::from_bytes(b"elided".as_slice()),
+                    false,
+                )
+            } else {
+                self.elided_property(b"...")
+            };
+            return Ok(vec![node]);
         }
         let mut members = Vec::new();
+        for (index, &signature) in signatures.iter().enumerate() {
+            members.push(self.signature_node(
+                signature,
+                if index < call_count {
+                    K::CallSignature
+                } else {
+                    K::ConstructSignature
+                },
+                None,
+                None,
+            )?);
+        }
+        for &index in indexes {
+            // Go evaluates the placeholder argument before core.IfElse even
+            // for an ordinary index, including its approximate-length charge.
+            let placeholder = self.elided_type();
+            members.extend(self.object_index_nodes(index, reverse.then_some(placeholder))?);
+        }
         for (index, &property) in properties.iter().enumerate() {
             if !self.class_expansion_property(property)? {
                 continue;
             }
             let display_index = index + 1;
             if self.check_truncation() && display_index + 2 < properties.len().saturating_sub(1) {
-                members.push(self.elided_property(
-                    format!("... {} more ...", properties.len() - display_index).as_bytes(),
-                )?);
+                let remaining = properties.len() - display_index;
+                if self.flags & nf::NO_TRUNCATION != 0 {
+                    let previous = *members
+                        .last()
+                        .ok_or(Error::MissingLink("elision preceding member"))?;
+                    self.emit.add_synthetic_trailing_comment(
+                        previous,
+                        K::MultiLineCommentTrivia,
+                        JsString::from_bytes(
+                            format!("... {remaining} more elided ...").into_bytes(),
+                        ),
+                        false,
+                    );
+                } else {
+                    members
+                        .push(self.elided_property(format!("... {remaining} more ...").as_bytes()));
+                }
                 members.extend(self.property_elements(properties[properties.len() - 1])?);
                 break;
             }

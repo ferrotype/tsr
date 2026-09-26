@@ -790,7 +790,7 @@ impl NodeBuilder<'_> {
         self.display_name_chain_with_module(symbol, enclosing, meaning, false)
     }
 
-    fn display_name_chain_with_module(
+    pub(super) fn display_name_chain_with_module(
         &mut self,
         symbol: SymbolId,
         enclosing: Option<NodeId>,

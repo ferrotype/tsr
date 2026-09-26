@@ -224,7 +224,7 @@
     },
     "tsc/internal/checker/checker.go:Checker.getOuterTypeParametersOfClassOrInterface": {
       "disposition": "equivalent",
-      "reason": "declared_interface_type selects the class value declaration or first interface declaration, then obtains outer parameters with include_this=false before local parameters. This is the native class/interface declaration selection and outer-parameter call inline.",
+      "reason": "declared_interface_type selects the class value declaration or first interface declaration, then obtains outer parameters with include_this=false before local parameters. This is the native class/interface declaration selection and outer-parameter call inline. Its getOuterTypeParameters dependency now includes contextual signature parameters for context-sensitive function/arrow/object methods before syntactic fallback, matching checker.go:24119\u201324124; c2_constraint_gaps::contextual_outer_parameters preserves the exact native generic conditional results.",
       "rust": "crates/tsr_checker/src/references.rs:18"
     },
     "tsc/internal/checker/checker.go:Checker.getReturnTypeOfSingleNonGenericSignature": {

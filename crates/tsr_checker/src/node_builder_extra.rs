@@ -717,6 +717,7 @@ impl NodeBuilder<'_> {
         } else {
             JsString::from_bytes(b"x".as_slice())
         };
+        let name_length = name.len();
         let name = self.ast.new_identifier(name);
         let key = self.type_node(info.key_type)?;
         let value = match value_node {
@@ -727,7 +728,9 @@ impl NodeBuilder<'_> {
             self.ast
                 .new_parameter_declaration(None, None, Some(name), None, Some(key), None);
         let parameters = self.list(vec![parameter])?;
+        self.approximate_length += name_length + 4;
         let modifiers = if info.is_readonly {
+            self.approximate_length += 9;
             let token = self.ast.new_modifier(K::ReadonlyKeyword.into());
             Some(self.list(vec![token])?)
         } else {
@@ -1121,6 +1124,11 @@ impl NodeBuilder<'_> {
         self.emit.add_emit_flags(result, emit_flags::SINGLE_LINE);
         if generate_names && self.non_homomorphic_instantiation(ty)? {
             let raw = self.checker.mapped_constraint_node(ty)?;
+            let raw = self
+                .checker
+                .node(raw)?
+                .type_node()
+                .ok_or(Error::MissingLink("homomorphic keyof operand"))?;
             let raw = match self.reuse_type_from_node(raw, false)? {
                 Some(ty) => self.checker.constraint_of_type_parameter(ty)?,
                 None => None,

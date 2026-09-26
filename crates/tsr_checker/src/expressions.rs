@@ -36,7 +36,6 @@ impl CheckerState {
             node,
             ty: Some(self.builtins.any_type),
             is_cache: false,
-            inference: None,
         });
         let result = self.check_expression_ex(node, 4);
         self.calls.contexts.pop();
