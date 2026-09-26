@@ -154,6 +154,7 @@ impl CheckerState {
         let declarations = read.declarations();
         let name = read.name_to_owned();
         let result = self.new_symbol_ex(flags, name, checks)?;
+        let result_key = self.value_symbol_key(result)?;
         let ty = if setonly {
             self.builtins.undefined_type
         } else {
@@ -161,9 +162,9 @@ impl CheckerState {
         };
         let name_type = self
             .value_symbol_links
-            .try_get(source)
+            .try_get(self.value_symbol_key(source)?)
             .and_then(|links| links.name_type);
-        let links = self.value_symbol_links.get_or_default(result);
+        let links = self.value_symbol_links.get_or_default(result_key);
         links.resolved_type = Some(ty);
         links.name_type = name_type;
         self.symbol_mut(result)?.declarations = declarations;

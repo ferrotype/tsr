@@ -53,18 +53,8 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.checkArrayLiteral
     pub(crate) fn check_array_literal(&mut self, node: NodeId) -> Result<TypeId, Error> {
-        let contextual = self.contextual_expression_type(node)?;
         let length = self.calls.contexts.len();
-        if let Some(ty) = contextual {
-            let inference = self
-                .contextual_call_argument(node)
-                .and_then(|context| context.inference);
-            self.calls.contexts.push(crate::calls::ArgumentContext {
-                node,
-                ty,
-                inference,
-            });
-        }
+        self.push_cached_contextual_type(node)?;
         let result = self.check_array_literal_worker(node);
         self.calls.contexts.truncate(length);
         result
@@ -153,17 +143,19 @@ impl CheckerState {
                 (self.builtins.undefined_or_missing_type, ef::OPTIONAL)
             } else {
                 let ty = self.check_expression_for_mutable_location(element)?;
+                let element_type = self.add_type_optionality(ty, true, omitted)?;
                 if tuple_context
                     && self.expression_mode & 2 != 0
                     && self.expression_mode & 4 == 0
                     && self.expression_is_context_sensitive(element)?
                 {
-                    return Err(Error::Unsupported(
-                        "addIntraExpressionInferenceSite: array element",
-                    ));
+                    let inference = self
+                        .call_inference_at_node(node)?
+                        .ok_or(Error::MissingLink("array inference context"))?;
+                    self.add_intra_expression_inference_site(inference, element, ty)?;
                 }
                 (
-                    self.add_type_optionality(ty, true, omitted)?,
+                    element_type,
                     if omitted { ef::OPTIONAL } else { ef::REQUIRED },
                 )
             };

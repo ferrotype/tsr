@@ -759,7 +759,7 @@ impl CheckerState {
     ) -> Result<(), Error> {
         if self
             .value_symbol_links
-            .try_get(parameter)
+            .try_get(self.value_symbol_key(parameter)?)
             .and_then(|links| links.resolved_type)
             .is_some()
         {
@@ -789,7 +789,7 @@ impl CheckerState {
         };
         let ty = self.add_type_optionality(ty, false, optional)?;
         self.value_symbol_links
-            .get_or_default(parameter)
+            .get_or_default(self.value_symbol_key(parameter)?)
             .resolved_type = Some(ty);
         if let Some(declaration) = declaration {
             if let Some(name) = self.node(declaration)?.name() {
@@ -797,7 +797,7 @@ impl CheckerState {
                     let ty = if ty == self.builtins.unknown_type {
                         let ty = self.type_from_binding_pattern(name, false, false)?;
                         self.value_symbol_links
-                            .get_or_default(parameter)
+                            .get_or_default(self.value_symbol_key(parameter)?)
                             .resolved_type = Some(ty);
                         ty
                     } else {
@@ -860,9 +860,7 @@ impl CheckerState {
         let read = self.node(function)?;
         let annotation = read.type_node();
         let body = read.body();
-        let return_type = annotation
-            .map(|node| self.get_type_from_type_node(node))
-            .transpose()?;
+        let return_type = self.return_type_from_annotation(function)?;
         self.check_function_return_paths(function, return_type)?;
         let Some(body) = body else { return Ok(()) };
         if annotation.is_none() {
@@ -911,7 +909,10 @@ impl CheckerState {
         }
         let read = self.node(function)?;
         let explicit = read.flags() & nf::HAS_EXPLICIT_RETURN != 0;
-        let error_node = read.type_node().unwrap_or(function);
+        let error_node = match read.type_node() {
+            Some(annotation) => annotation,
+            None => self.full_signature_type_node(function)?.unwrap_or(function),
+        };
         let diagnostic = if let Some(ty) = annotation {
             if self.types.flags(ty)? & tf::NEVER != 0 {
                 Some(messages::A_function_returning_never_cannot_have_a_reachable_end_point)

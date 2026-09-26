@@ -47,13 +47,9 @@ impl CheckerState {
                 if s == t {
                     continue;
                 }
-                let sc = self
-                    .constraint_of_type_parameter(s)?
-                    .unwrap_or(self.builtins.unknown_type);
+                let sc = self.constraint_or_unknown_from_type_parameter(s)?;
                 let sc = self.instantiate_type(sc, Some(mapper))?;
-                let tc = self
-                    .constraint_of_type_parameter(t)?
-                    .unwrap_or(self.builtins.unknown_type);
+                let tc = self.constraint_or_unknown_from_type_parameter(t)?;
                 if compare(self, sc, tc)? == tr::FALSE {
                     return Ok(tr::FALSE);
                 }

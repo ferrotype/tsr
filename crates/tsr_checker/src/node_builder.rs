@@ -22,6 +22,9 @@ use tsr_printer::{emit_flags, EmitContext};
 mod accessibility;
 #[path = "node_builder_emit.rs"]
 mod declaration_emit;
+#[cfg(test)]
+#[path = "node_builder_elision_tests.rs"]
+mod elision_tests;
 #[path = "node_builder_extra.rs"]
 mod extra;
 #[path = "node_builder_names.rs"]
@@ -199,8 +202,9 @@ impl<'a> NodeBuilder<'a> {
             return Ok(false);
         }
         let mut reported = false;
+        let symbol_flags = self.checker.symbol(symbol)?.flags();
         if let Some(tracker) = self.tracker.as_deref_mut() {
-            if tracker.track_symbol_without_accessibility(symbol) {
+            if tracker.track_symbol_without_accessibility(symbol, symbol_flags) {
                 return Ok(false);
             }
             let accessibility = self.checker.emit_symbol_accessible(
@@ -218,7 +222,7 @@ impl<'a> NodeBuilder<'a> {
         }
         if reported {
             self.reported_diagnostic = true;
-        } else if self.checker.symbol(symbol)?.flags() & sf::TYPE_PARAMETER == 0 {
+        } else if symbol_flags & sf::TYPE_PARAMETER == 0 {
             self.tracked_symbols.push(cache::TrackedSymbol {
                 symbol,
                 enclosing: self.enclosing,
@@ -257,7 +261,7 @@ impl<'a> NodeBuilder<'a> {
                     if let Some(name_type) = self
                         .checker
                         .value_symbol_links
-                        .try_get(symbol)
+                        .try_get(self.checker.value_symbol_key(symbol)?)
                         .and_then(|links| links.name_type)
                     {
                         if self.checker.types.flags(name_type)?
@@ -320,7 +324,7 @@ impl<'a> NodeBuilder<'a> {
         let Some(name_type) = self
             .checker
             .value_symbol_links
-            .try_get(symbol)
+            .try_get(self.checker.value_symbol_key(symbol)?)
             .and_then(|links| links.name_type)
         else {
             return Ok(None);
@@ -422,14 +426,29 @@ impl<'a> NodeBuilder<'a> {
         self.truncating
     }
 
-    fn elision(&mut self, text: &[u8]) -> Result<NodeId, Error> {
-        if self.flags & nf::NO_TRUNCATION != 0 {
-            return Err(Error::Unsupported(
-                "node builder synthetic elision comments",
-            ));
+    fn elision(&mut self, remaining: Option<usize>) -> NodeId {
+        let no_truncation = self.flags & nf::NO_TRUNCATION != 0;
+        let text = match (remaining, no_truncation) {
+            (None, false) => JsString::from_bytes(b"...".as_slice()),
+            (None, true) => JsString::from_bytes(b"elided".as_slice()),
+            (Some(count), false) => {
+                JsString::from_bytes(format!("... {count} more ...").as_bytes())
+            }
+            (Some(count), true) => {
+                JsString::from_bytes(format!("... {count} more elided ...").as_bytes())
+            }
+        };
+        if no_truncation {
+            let node = self.ast.new_keyword_type_node(K::AnyKeyword.into());
+            return self.emit.add_synthetic_leading_comment(
+                node,
+                K::MultiLineCommentTrivia,
+                text,
+                false,
+            );
         }
-        let name = self.ast.new_identifier(JsString::from_bytes(text));
-        Ok(self.ast.new_type_reference_node(Some(name), None))
+        let name = self.ast.new_identifier(text);
+        self.ast.new_type_reference_node(Some(name), None)
     }
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.mapToTypeNodes
@@ -445,14 +464,13 @@ impl<'a> NodeBuilder<'a> {
         }
         if self.check_truncation() {
             if !bare {
-                let node = self.elision(b"...")?;
+                let node = self.elision(None);
                 return Ok(vec![node]);
             }
             if types.len() > 2 {
                 let first = self.type_node(types[0])?;
                 let last = self.type_node(types[types.len() - 1])?;
-                let elision =
-                    self.elision(format!("... {} more ...", types.len() - 2).as_bytes())?;
+                let elision = self.elision(Some(types.len() - 2));
                 return Ok(vec![first, elision, last]);
             }
         }
@@ -465,11 +483,7 @@ impl<'a> NodeBuilder<'a> {
         for (index, &ty) in types.iter().enumerate() {
             let display_index = index + 1;
             if self.check_truncation() && display_index + 2 < types.len().saturating_sub(1) {
-                nodes.push(
-                    self.elision(
-                        format!("... {} more ...", types.len() - display_index).as_bytes(),
-                    )?,
-                );
+                nodes.push(self.elision(Some(types.len() - display_index)));
                 nodes.push(self.type_node(types[types.len() - 1])?);
                 break;
             }
@@ -725,6 +739,10 @@ impl<'a> NodeBuilder<'a> {
             };
         }
         if record.flags & tf::TYPE_PARAMETER != 0 && self.infer_parameters.contains(&ty) {
+            let symbol = record
+                .symbol
+                .ok_or(Error::MissingLink("infer parameter symbol"))?;
+            self.approximate_length += self.checker.symbol(symbol)?.name_bytes().len() + 6;
             let mut constraint_node = None;
             if let Some(constraint) = self.checker.constraint_of_type_parameter(ty)? {
                 let inferred = self.checker.inferred_parameter_constraint(ty, true)?;
@@ -736,6 +754,7 @@ impl<'a> NodeBuilder<'a> {
                     )?,
                     None => false,
                 } {
+                    self.approximate_length += 9;
                     constraint_node = Some(self.type_node(constraint)?);
                 }
             }
@@ -915,6 +934,13 @@ impl<'a> NodeBuilder<'a> {
         let call_count = members.call_signature_count as usize;
         let indexes = members.index_infos.clone().unwrap_or_default();
         let properties = members.properties.clone().unwrap_or_default();
+        if properties.is_empty() && indexes.is_empty() && signatures.is_empty() {
+            let members = self.list(Vec::new())?;
+            let node = self.ast.new_type_literal_node(Some(members));
+            self.approximate_length += 2;
+            self.emit.set_emit_flags(node, emit_flags::SINGLE_LINE);
+            return Ok(node);
+        }
         if properties.is_empty() && indexes.is_empty() && signatures.len() == 1 {
             return self.signature_node(
                 signatures[0],
@@ -961,34 +987,18 @@ impl<'a> NodeBuilder<'a> {
         let saved_flags = self.flags;
         self.flags |= nf::IN_OBJECT_TYPE_LITERAL;
         let result = (|| {
-            let mut nodes = Vec::new();
-            for (index, &signature) in signatures.iter().enumerate() {
-                nodes.push(self.signature_node(
-                    signature,
-                    if index < call_count {
-                        K::CallSignature
-                    } else {
-                        K::ConstructSignature
-                    },
-                    None,
-                    None,
-                )?);
-            }
-            for &index in indexes.iter() {
-                if self.checker.types.object_flags(ty)? & of::REVERSE_MAPPED != 0 {
-                    let placeholder = self.elided_type();
-                    nodes.extend(self.object_index_nodes(index, Some(placeholder))?);
-                } else {
-                    nodes.extend(self.object_index_nodes(index, None)?);
-                }
-            }
-            nodes.extend(self.object_members(&properties)?);
+            let reverse = self.checker.types.object_flags(ty)? & of::REVERSE_MAPPED != 0;
+            let nodes = self.resolved_type_members(
+                &signatures,
+                call_count,
+                &indexes,
+                &properties,
+                reverse,
+            )?;
             let members = self.list(nodes)?;
             let node = self.ast.new_type_literal_node(Some(members));
             self.approximate_length += 2;
-            if properties.is_empty() && signatures.is_empty() && indexes.is_empty()
-                || saved_flags & nf::MULTILINE_OBJECT_LITERALS == 0
-            {
+            if saved_flags & nf::MULTILINE_OBJECT_LITERALS == 0 {
                 self.emit.set_emit_flags(node, emit_flags::SINGLE_LINE);
             }
             Ok(node)
@@ -997,50 +1007,83 @@ impl<'a> NodeBuilder<'a> {
         result
     }
 
-    fn elided_property(&mut self, text: &[u8]) -> Result<NodeId, Error> {
-        if self.flags & nf::NO_TRUNCATION != 0 {
-            return Err(Error::Unsupported(
-                "node builder synthetic property elision comments",
-            ));
-        }
+    fn elided_property(&mut self, text: &[u8]) -> NodeId {
         let name = self.ast.new_identifier(JsString::from_bytes(text));
-        Ok(self
-            .ast
-            .new_property_signature_declaration(None, Some(name), None, None, None))
+        self.ast
+            .new_property_signature_declaration(None, Some(name), None, None, None)
     }
 
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.createElidedInformationPlaceholder
     fn elided_type(&mut self) -> NodeId {
         self.approximate_length += 3;
-        if self.flags & nf::NO_TRUNCATION != 0 {
-            let node = self.ast.new_keyword_type_node(K::AnyKeyword.into());
-            return self.emit.add_synthetic_leading_comment(
-                node,
-                K::MultiLineCommentTrivia,
-                JsString::from_bytes(b"elided".as_slice()),
-                false,
-            );
-        }
-        let name = self
-            .ast
-            .new_identifier(JsString::from_bytes(b"...".as_slice()));
-        self.ast.new_type_reference_node(Some(name), None)
+        self.elision(None)
     }
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.createTypeNodesFromResolvedType
-    fn object_members(&mut self, properties: &[SymbolId]) -> Result<Vec<NodeId>, Error> {
-        if !properties.is_empty() && self.check_truncation() {
-            return Ok(vec![self.elided_property(b"...")?]);
+    fn resolved_type_members(
+        &mut self,
+        signatures: &[crate::SignatureId],
+        call_count: usize,
+        indexes: &[crate::IndexInfoId],
+        properties: &[SymbolId],
+        reverse: bool,
+    ) -> Result<Vec<NodeId>, Error> {
+        if self.check_truncation() {
+            let node = if self.flags & nf::NO_TRUNCATION != 0 {
+                let node = self.ast.new_not_emitted_type_element();
+                self.emit.add_synthetic_trailing_comment(
+                    node,
+                    K::MultiLineCommentTrivia,
+                    JsString::from_bytes(b"elided".as_slice()),
+                    false,
+                )
+            } else {
+                self.elided_property(b"...")
+            };
+            return Ok(vec![node]);
         }
         let mut members = Vec::new();
+        for (index, &signature) in signatures.iter().enumerate() {
+            members.push(self.signature_node(
+                signature,
+                if index < call_count {
+                    K::CallSignature
+                } else {
+                    K::ConstructSignature
+                },
+                None,
+                None,
+            )?);
+        }
+        for &index in indexes {
+            // Go evaluates the placeholder argument before core.IfElse even
+            // for an ordinary index, including its approximate-length charge.
+            let placeholder = self.elided_type();
+            members.extend(self.object_index_nodes(index, reverse.then_some(placeholder))?);
+        }
         for (index, &property) in properties.iter().enumerate() {
             if !self.class_expansion_property(property)? {
                 continue;
             }
             let display_index = index + 1;
             if self.check_truncation() && display_index + 2 < properties.len().saturating_sub(1) {
-                members.push(self.elided_property(
-                    format!("... {} more ...", properties.len() - display_index).as_bytes(),
-                )?);
+                let remaining = properties.len() - display_index;
+                if self.flags & nf::NO_TRUNCATION != 0 {
+                    let previous = *members
+                        .last()
+                        .ok_or(Error::MissingLink("elision preceding member"))?;
+                    self.emit.add_synthetic_trailing_comment(
+                        previous,
+                        K::MultiLineCommentTrivia,
+                        JsString::from_bytes(
+                            format!("... {remaining} more elided ...").into_bytes(),
+                        ),
+                        false,
+                    );
+                } else {
+                    members
+                        .push(self.elided_property(format!("... {remaining} more ...").as_bytes()));
+                }
                 members.extend(self.property_elements(properties[properties.len() - 1])?);
                 break;
             }
@@ -1118,7 +1161,7 @@ impl<'a> NodeBuilder<'a> {
         let name_type = self
             .checker
             .value_symbol_links
-            .try_get(symbol)
+            .try_get(self.checker.value_symbol_key(symbol)?)
             .and_then(|links| links.name_type);
         let raw_name = read.name_to_owned();
         let enclosing = match read.value_declaration() {

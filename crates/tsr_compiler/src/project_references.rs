@@ -229,6 +229,7 @@ impl ProjectReferenceFileMapper {
 
     /// Only the source-of-reference mode loads a referenced project's sources as
     /// themselves (the pin's isSourceFromProjectReference, a checker helper).
+    /// port: tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.isSourceFromProjectReference
     pub(crate) fn is_source_from_project_reference(&self, path: &[u8]) -> bool {
         self.can_use_source && self.project_reference_from_source(path).is_some()
     }

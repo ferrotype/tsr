@@ -71,9 +71,6 @@ impl CheckerState {
         work.signatures(self.flow.signature_roots());
         work.types(self.calls.census_types());
         work.signatures(self.calls.census_signatures());
-        for context in &self.calls.contexts {
-            work.pending.extend(context.inference.map(Edge::Inference));
-        }
         for (_, inference) in &self.calls.inference_contexts {
             work.pending.extend(inference.map(Edge::Inference));
         }
@@ -267,6 +264,10 @@ impl CheckerState {
                         Mapper::Array { sources, targets } => {
                             work.types(sources.iter().copied());
                             work.types(targets.iter().copied());
+                        }
+                        Mapper::ArrayToSingle { sources, target } => {
+                            work.types(sources.iter().copied());
+                            work.types([*target]);
                         }
                         Mapper::DeferredArguments { sources, .. } => {
                             work.types(sources.iter().copied());

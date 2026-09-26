@@ -1,0 +1,3 @@
+nullish_instantiation.ts(8,20): error TS2869: Right operand of ?? is unreachable because the left operand is never nullish.
+nullish_instantiation.ts(9,21): error TS2871: This expression is always nullish.
+nullish_instantiation.ts(10,7): error TS2322: Type 'string' is not assignable to type 'number'.

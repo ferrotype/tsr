@@ -42,14 +42,14 @@ impl NodeBuilder<'_> {
             }
             match kind.known() {
                 Some(K::SourceFile | K::ModuleDeclaration) if !global_source => {
-                    if self.checker.node(node)?.flags() & tsr_ast::node_flags::REPARSED != 0 {
-                        return Err(Error::Unsupported(
-                            "someSymbolTableInScope: reparsed module",
-                        ));
-                    }
+                    let declaration = tsr_ast::utilities_containers::get_reparsed_node_for_node(
+                        self.checker.ast(node)?,
+                        Some(node),
+                    )?
+                    .ok_or(Error::MissingLink("name scope module declaration"))?;
                     let symbol = self
                         .checker
-                        .get_symbol_of_declaration(node)?
+                        .get_symbol_of_declaration(declaration)?
                         .ok_or(Error::MissingLink("name scope module symbol"))?;
                     let table = Self::name_table(
                         NameTableId::Exports(symbol),

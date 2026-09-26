@@ -1,0 +1,26 @@
+{
+ "capture": "target/phase2/c1-reviewed",
+ "capture_sha256": "b6b7ceb630ff3eb9f410284b76768482bf22a873786b81e39257f7fb0d6ab46a",
+ "case": "compiler/declarationEmitAugmentationUsesCorrectSourceFile.ts#configuration=0",
+ "command": [
+  "lldb",
+  "--batch",
+  "-o",
+  "breakpoint set -r rust_begin_unwind",
+  "-o",
+  "run",
+  "-o",
+  "bt 30",
+  "-o",
+  "continue",
+  "--",
+  "target/phase2/c1-reviewed/executable",
+  "target/phase2/c1-reviewed/cases/01553/request.json",
+  "/tmp/c1-augmentation-observation.json"
+ ],
+ "executable_sha256": "7f98a740fc5f8edd958e6826d26fc9681b8d5135c6b7ae55fec6da15d651d51f",
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "request_sha256": "735cde3174991477ad4df5a71d9ea1a70995249696a2e33a2a366a86fdd6fafe",
+ "stack_sha256": "3b1704e5ece91d2981a64fe8c3d23ed64ac7dd2cc230a54c7f7ea05642787907",
+ "version": 1
+}

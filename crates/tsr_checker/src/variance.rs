@@ -14,6 +14,8 @@ pub(crate) const RELIABILITY: u32 = REPORTS_UNMEASURABLE | REPORTS_UNRELIABLE;
 
 #[derive(Default)]
 pub(crate) struct VarianceState {
+    #[cfg(feature = "recursion-probe")]
+    pub contract_cycles: Option<[usize; 2]>,
     pub links: crate::types::Map<SymbolId, Vec<VarianceFlags>>,
     pub stack: Vec<(SymbolId, TypeList)>,
     pub markers: crate::types::Set<TypeId>,
@@ -60,6 +62,10 @@ impl CheckerState {
             return Ok(variances.clone());
         }
         if let Some(start) = self.variance.stack.iter().position(|(s, _)| *s == symbol) {
+            #[cfg(feature = "recursion-probe")]
+            if let Some(counts) = &mut self.variance.contract_cycles {
+                counts[0] += 1;
+            }
             let mut smallest = start;
             for index in start + 1..self.variance.stack.len() {
                 if self
@@ -73,6 +79,10 @@ impl CheckerState {
                 }
             }
             if smallest > start {
+                #[cfg(feature = "recursion-probe")]
+                if let Some(counts) = &mut self.variance.contract_cycles {
+                    counts[1] += 1;
+                }
                 let stack = std::mem::take(&mut self.variance.stack);
                 let result = self.variances_worker(stack[smallest].0, &stack[smallest].1);
                 self.variance.stack = stack;

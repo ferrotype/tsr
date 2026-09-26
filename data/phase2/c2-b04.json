@@ -1,0 +1,769 @@
+{
+  "changed_observations": [],
+  "compare": [
+    "python3",
+    "scripts/phase2_compare.py",
+    "report",
+    "--native",
+    "target/phase2/native",
+    "--rust",
+    "target/phase2/c2-b04",
+    "--previous",
+    "target/phase2/c1-reviewed/comparison.json"
+  ],
+  "comparison": {
+    "path": "data/phase2/c2-b04-comparison.json.gz",
+    "sha256": "d507f5150b80a6599553a85eb98fb3f081d33f1d343c79ce685c79cc59d82e74"
+  },
+  "executed": 327,
+  "harness_errors": 0,
+  "inventory_sha256": "c09721d36d361eb8646b2321ec3478da0fbdbf12253c086e7b1c34e966aea9b9",
+  "native_observation_sha256": "1b5356b425ad95a3e5e2a0bb29d42534e8d9d4a6159649f063f3317084a0e276",
+  "partial": true,
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "previous_report_sha256": "00a5a91d3d4d060fbb74a59a5ae6ff18e39ade481f8d43d507a610c07fdca689",
+  "purpose": "informational C2 B04 slice; not full checkpoint acceptance",
+  "refusal_remaining": false,
+  "regressions": [],
+  "run": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "target/phase2/c2-b04",
+    "--sample",
+    "--jobs",
+    "8",
+    "--case",
+    "compiler/bindingPatternCannotBeOnlyInferenceSource.ts#configuration=0",
+    "--case",
+    "compiler/circularReferenceInReturnType2.ts#configuration=0",
+    "--case",
+    "compiler/conditionalTypeContextualTypeSimplificationsSuceeds.ts#configuration=0",
+    "--case",
+    "compiler/contextualPropertyOfGenericMappedType.ts#configuration=0",
+    "--case",
+    "compiler/contextualTypeFunctionObjectPropertyIntersection.ts#configuration=0",
+    "--case",
+    "compiler/contravariantOnlyInferenceFromAnnotatedFunction.ts#configuration=0",
+    "--case",
+    "compiler/contravariantOnlyInferenceFromAnnotatedFunctionJs.ts#configuration=0",
+    "--case",
+    "compiler/declarationEmitMappedTypePreservesTypeParameterConstraint.ts#configuration=0",
+    "--case",
+    "compiler/deeplyNestedMappedTypes.ts#configuration=0",
+    "--case",
+    "compiler/definiteAssignmentOfDestructuredVariable.ts#configuration=0",
+    "--case",
+    "compiler/excessivelyDeepConditionalTypes.ts#configuration=0",
+    "--case",
+    "compiler/homomorphicMappedTypeWithNonHomomorphicInstantiationSpreadable1.ts#configuration=0",
+    "--case",
+    "compiler/indexingTypesWithNever.ts#configuration=0",
+    "--case",
+    "compiler/inferenceExactOptionalProperties2.ts#configuration=0",
+    "--case",
+    "compiler/inferenceUnionOfObjectsMappedContextualType.ts#configuration=0",
+    "--case",
+    "compiler/infiniteConstraints.ts#configuration=0",
+    "--case",
+    "compiler/intersectionReductionGenericStringLikeType.ts#configuration=0",
+    "--case",
+    "compiler/pickOfLargeObjectUnionWorks.ts#configuration=0",
+    "--case",
+    "compiler/ramdaToolsNoInfinite2.ts#configuration=0",
+    "--case",
+    "compiler/reverseMappedTypeContextualTypesPerElementOfTupleConstraint.ts#configuration=0",
+    "--case",
+    "compiler/reverseMappedTypeInferenceWidening2.ts#configuration=0",
+    "--case",
+    "compiler/reverseMappedTypePrimitiveConstraintProperty.ts#configuration=0",
+    "--case",
+    "compiler/varianceComputationNoCrash.ts#configuration=0",
+    "--case",
+    "conformance/types/conditional/conditionalTypes1.ts#configuration=0",
+    "--case",
+    "conformance/types/conditional/inferTypes1.ts#configuration=0",
+    "--case",
+    "conformance/types/intersection/intersectionAsWeakTypeSource.ts#configuration=0",
+    "--case",
+    "conformance/types/keyof/keyofAndIndexedAccessErrors.ts#configuration=0",
+    "--case",
+    "conformance/types/literal/stringMappingReduction.ts#configuration=0",
+    "--case",
+    "conformance/types/literal/templateLiteralTypesPatterns.ts#configuration=0",
+    "--case",
+    "conformance/types/typeParameters/typeParameterLists/typeParameterConstModifiers.ts#configuration=0"
+  ],
+  "rust_capture_sha256": "88962aafc890903962b3a70e5cc70a099cad909a2320e6eea59c81d9b148e31f",
+  "selected_full_matches_after": 235,
+  "selected_full_matches_before": 228,
+  "source_stable": true,
+  "targeted_cases": 30,
+  "targeted_full_matches": 7,
+  "targets": [
+    {
+      "after": {
+        "display": "different",
+        "errors": "different",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "different",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/bindingPatternCannotBeOnlyInferenceSource.ts#configuration=0",
+      "next_bucket": "diagnostics: TS2556"
+    },
+    {
+      "after": {
+        "display": "different",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "different",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/circularReferenceInReturnType2.ts#configuration=0",
+      "next_bucket": "different: types"
+    },
+    {
+      "after": {
+        "display": "different",
+        "errors": "different",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "different",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/conditionalTypeContextualTypeSimplificationsSuceeds.ts#configuration=0",
+      "next_bucket": "diagnostics: TS2322"
+    },
+    {
+      "after": {
+        "display": "different",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "different",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/contextualPropertyOfGenericMappedType.ts#configuration=0",
+      "next_bucket": "different: types"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/contextualTypeFunctionObjectPropertyIntersection.ts#configuration=0",
+      "next_bucket": null
+    },
+    {
+      "after": {
+        "display": "different",
+        "errors": "different",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "different",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/contravariantOnlyInferenceFromAnnotatedFunction.ts#configuration=0",
+      "next_bucket": "diagnostics: TS2322"
+    },
+    {
+      "after": {
+        "display": "different",
+        "errors": "different",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "different",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/contravariantOnlyInferenceFromAnnotatedFunctionJs.ts#configuration=0",
+      "next_bucket": "diagnostics: TS2322"
+    },
+    {
+      "after": {
+        "display": "different",
+        "errors": "different",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "different",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/declarationEmitMappedTypePreservesTypeParameterConstraint.ts#configuration=0",
+      "next_bucket": "diagnostics: TS4025"
+    },
+    {
+      "after": {
+        "display": "different",
+        "errors": "different",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "different",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/deeplyNestedMappedTypes.ts#configuration=0",
+      "next_bucket": "diagnostics: TS2322"
+    },
+    {
+      "after": {
+        "display": "different",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "different",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/definiteAssignmentOfDestructuredVariable.ts#configuration=0",
+      "next_bucket": "different: types"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/excessivelyDeepConditionalTypes.ts#configuration=0",
+      "next_bucket": null
+    },
+    {
+      "after": {
+        "display": "different",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "different",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/homomorphicMappedTypeWithNonHomomorphicInstantiationSpreadable1.ts#configuration=0",
+      "next_bucket": "different: types"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "different",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/indexingTypesWithNever.ts#configuration=0",
+      "next_bucket": "diagnostics: TS2322"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "different",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/inferenceExactOptionalProperties2.ts#configuration=0",
+      "next_bucket": "diagnostics: TS2345"
+    },
+    {
+      "after": {
+        "display": "different",
+        "errors": "different",
+        "parent_pointers": "match",
+        "symbols": "different",
+        "trace": "disabled",
+        "types": "different",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/inferenceUnionOfObjectsMappedContextualType.ts#configuration=0",
+      "next_bucket": "diagnostics: TS2322"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "different",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/infiniteConstraints.ts#configuration=0",
+      "next_bucket": "diagnostics: TS2322"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/intersectionReductionGenericStringLikeType.ts#configuration=0",
+      "next_bucket": null
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/pickOfLargeObjectUnionWorks.ts#configuration=0",
+      "next_bucket": null
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/ramdaToolsNoInfinite2.ts#configuration=0",
+      "next_bucket": null
+    },
+    {
+      "after": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/reverseMappedTypeContextualTypesPerElementOfTupleConstraint.ts#configuration=0",
+      "next_bucket": "unsupported: addIntraExpressionInferenceSite: array element"
+    },
+    {
+      "after": {
+        "display": "different",
+        "errors": "different",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "different",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/reverseMappedTypeInferenceWidening2.ts#configuration=0",
+      "next_bucket": "diagnostics: TS2322"
+    },
+    {
+      "after": {
+        "display": "different",
+        "errors": "different",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "different",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/reverseMappedTypePrimitiveConstraintProperty.ts#configuration=0",
+      "next_bucket": "diagnostics: TS2322"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "compiler/varianceComputationNoCrash.ts#configuration=0",
+      "next_bucket": null
+    },
+    {
+      "after": {
+        "display": "unsupported",
+        "errors": "different",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "conformance/types/conditional/conditionalTypes1.ts#configuration=0",
+      "next_bucket": "unsupported: conditionalTypeToTypeNode: shadowed distribution parameter"
+    },
+    {
+      "after": {
+        "display": "different",
+        "errors": "different",
+        "parent_pointers": "match",
+        "symbols": "different",
+        "trace": "disabled",
+        "types": "different",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "conformance/types/conditional/inferTypes1.ts#configuration=0",
+      "next_bucket": "diagnostics: TS2322"
+    },
+    {
+      "after": {
+        "display": "different",
+        "errors": "different",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "different",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "conformance/types/intersection/intersectionAsWeakTypeSource.ts#configuration=0",
+      "next_bucket": "diagnostics: TS2322"
+    },
+    {
+      "after": {
+        "display": "different",
+        "errors": "different",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "different",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "conformance/types/keyof/keyofAndIndexedAccessErrors.ts#configuration=0",
+      "next_bucket": "diagnostics: TS2322"
+    },
+    {
+      "after": {
+        "display": "match",
+        "errors": "match",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "match",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "conformance/types/literal/stringMappingReduction.ts#configuration=0",
+      "next_bucket": null
+    },
+    {
+      "after": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "conformance/types/literal/templateLiteralTypesPatterns.ts#configuration=0",
+      "next_bucket": "unsupported: getTypeFromIntersectionTypeNode: pattern literal"
+    },
+    {
+      "after": {
+        "display": "different",
+        "errors": "different",
+        "parent_pointers": "match",
+        "symbols": "match",
+        "trace": "disabled",
+        "types": "different",
+        "union_ordering": "match"
+      },
+      "before": {
+        "display": "unsupported",
+        "errors": "unsupported",
+        "parent_pointers": "match",
+        "symbols": "unsupported",
+        "trace": "disabled",
+        "types": "unsupported",
+        "union_ordering": "match"
+      },
+      "id": "conformance/types/typeParameters/typeParameterLists/typeParameterConstModifiers.ts#configuration=0",
+      "next_bucket": "diagnostics: TS2322"
+    }
+  ],
+  "version": 1
+}

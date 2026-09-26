@@ -86,8 +86,7 @@ impl CheckerState {
             .iter()
             .map(|i| i.parameter)
             .collect();
-        let first =
-            self.new_type_mapper(&forward, &vec![self.builtins.unknown_type; forward.len()])?;
+        let first = self.new_array_to_single_type_mapper(&forward, self.builtins.unknown_type)?;
         let second = self.inference_context(context)?.non_fixing_mapper;
         let mapper = self.alloc_mapper(crate::mapper::Mapper::Merged { first, second })?;
         Ok((Some(self.instantiate_type(default, Some(mapper))?), None))

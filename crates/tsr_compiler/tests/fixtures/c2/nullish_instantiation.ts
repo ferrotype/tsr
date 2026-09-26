@@ -1,0 +1,10 @@
+export {};
+declare let factory: (<T>(value: T) => T) | undefined;
+const direct = factory<string> ?? ((value: string) => value);
+const parenthesized = ((factory<string>)) ?? ((value: string) => value);
+const asserted = (factory<string> as ((value: string) => string) | undefined) ?? ((value: string) => value);
+const nonNull = (factory<string>)! ?? ((value: string) => value);
+const satisfies = (factory<string> satisfies ((value: string) => string) | undefined) ?? ((value: string) => value);
+const neverNull = (1 as number) ?? 2;
+const alwaysNull = (null as null) ?? 2;
+const later: number = "still checked";

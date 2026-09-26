@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "witnesses": [
+    {
+      "id": "intrinsic-order",
+      "required_branch": "final_type_id",
+      "request": {
+        "source": "declare let plain: any; let unresolved = nonexistent;\n",
+        "queries": ["unresolved", "plain"],
+        "union": true
+      }
+    },
+    {
+      "id": "declarationless-duplicate-symbols",
+      "required_branch": "declarationless",
+      "request": {
+        "source": "interface Array<T> { length: number; }\ndeclare let first: [string]; declare let second: [number];\n",
+        "queries": ["first", "second"],
+        "property": "0"
+      }
+    },
+    {
+      "id": "equal-first-declaration-symbols",
+      "required_branch": "equal_first_declaration",
+      "request": {
+        "source": "interface A { x: string }\ninterface B { x: number }\ninterface C { x: boolean }\ndeclare let first: A | B; declare let second: A | C;\n",
+        "queries": ["first", "second"],
+        "property": "x"
+      }
+    },
+    {
+      "id": "reverse-mapped-order",
+      "required_branch": "final_type_id",
+      "request": {
+        "source": "declare function unwrap<T>(obj: { [K in keyof T]: { value: T[K] } }): T;\nlet first = unwrap({ x: { value: 1 } }); let second = unwrap({ y: { value: 's' } });\n",
+        "queries": ["first", "second"],
+        "union": true
+      }
+    }
+  ]
+}

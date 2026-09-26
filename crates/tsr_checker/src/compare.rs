@@ -17,6 +17,8 @@ fn ordering(value: i64) -> Ordering {
 impl CheckerState {
     /// Sorts types with the ported comparator; the first comparator error wins.
     pub(crate) fn sort_types(&self, types: &mut [TypeId]) -> Result<(), Error> {
+        #[cfg(feature = "creation-trace")]
+        self.trace_type_sort("sort_begin", types);
         let mut failure = None;
         types.sort_by(|a, b| match self.compare_types(*a, *b) {
             Ok(order) => order,
@@ -27,11 +29,15 @@ impl CheckerState {
                 Ordering::Equal
             }
         });
+        #[cfg(feature = "creation-trace")]
+        self.trace_type_sort("sort_end", types);
         failure.map_or(Ok(()), Err)
     }
 
     // port: tsc/internal/checker/utilities.go:Checker.sortSymbols
     pub(crate) fn sort_symbols(&self, symbols: &mut [SymbolId]) -> Result<(), Error> {
+        #[cfg(feature = "creation-trace")]
+        self.trace_symbol_sort("sort_begin", symbols);
         // `compareSymbols` orders by the first declaration's file and position
         // before names and ids. Each symbol's key is computed once; only equal
         // keys fall back to the full comparison, which decides by name and id.
@@ -65,6 +71,8 @@ impl CheckerState {
         for (slot, (_, symbol)) in symbols.iter_mut().zip(keyed) {
             *slot = symbol;
         }
+        #[cfg(feature = "creation-trace")]
+        self.trace_symbol_sort("sort_end", symbols);
         failure.map_or(Ok(()), Err)
     }
 
@@ -341,6 +349,13 @@ impl CheckerState {
             }
         }
         // Fall back to type IDs. This results in type creation order for built-in types.
+        #[cfg(feature = "creation-trace")]
+        if tsr_ast::creation_trace::active() {
+            tsr_ast::creation_trace::record(
+                serde_json::json!({"event":"fallback", "kind":"type", "branch":"final_type_id",
+                "left":self.trace_type(t1), "right":self.trace_type(t2), "sign":t1.get().cmp(&t2.get()) as i8}),
+            );
+        }
         Ok(t1.get().cmp(&t2.get()))
     }
 
@@ -523,7 +538,17 @@ impl CheckerState {
         }
         // Fall back to symbol IDs. This is a last resort that should happen only when symbols have
         // no declaration and duplicate names.
-        Ok(tsr_ast::runtime_symbol_id(&sym1).cmp(&tsr_ast::runtime_symbol_id(&sym2)))
+        let left = tsr_ast::runtime_symbol_id(&sym1);
+        let right = tsr_ast::runtime_symbol_id(&sym2);
+        #[cfg(feature = "creation-trace")]
+        if tsr_ast::creation_trace::active() {
+            tsr_ast::creation_trace::record(
+                serde_json::json!({"event":"fallback", "kind":"symbol",
+                "branch":if has1 {"equal_first_declaration"} else {"declarationless"},
+                "left":self.trace_symbol(s1), "right":self.trace_symbol(s2), "sign":left.cmp(&right) as i8}),
+            );
+        }
+        Ok(left.cmp(&right))
     }
 
     // port: tsc/internal/checker/utilities.go:Checker.compareNodes

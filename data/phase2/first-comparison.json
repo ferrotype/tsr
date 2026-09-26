@@ -1,5 +1,5 @@
 {
- "all_domains_match": 12458,
+ "all_domains_match": 12647,
  "buckets": [
   {
    "bucket": "unsupported: checkExpressionWorker",
@@ -14,24 +14,6 @@
    "variants": 284
   },
   {
-   "bucket": "unsupported: typeReferenceToTypeNode: applied outer arguments",
-   "owner": "C2",
-   "representative": "conformance/es6/classExpressions/typeArgumentInferenceWithClassExpression2.ts#configuration=0",
-   "variants": 36
-  },
-  {
-   "bucket": "diagnostics: TS4025",
-   "owner": "C2",
-   "representative": "compiler/declarationEmitTupleRestSignatureLeadingVariadic.ts#configuration=0",
-   "variants": 31
-  },
-  {
-   "bucket": "unsupported: extractRedundantTemplateLiterals",
-   "owner": "C2",
-   "representative": "compiler/contextualPropertyOfGenericMappedType.ts#configuration=0",
-   "variants": 30
-  },
-  {
    "bucket": "unsupported: checkDecorators: parameter or binding",
    "owner": "C4",
    "representative": "conformance/decorators/invalid/decoratorOnFunctionParameter.ts#configuration=0",
@@ -44,118 +26,16 @@
    "variants": 15
   },
   {
-   "bucket": "diagnostics: TS4060",
-   "owner": "C2",
-   "representative": "compiler/declarationEmitNestedGenerics.ts#configuration=0",
-   "variants": 10
-  },
-  {
-   "bucket": "different: types",
-   "owner": "C2",
-   "representative": "compiler/circularInstantiationExpression.ts#configuration=0",
-   "variants": 9
-  },
-  {
-   "bucket": "unsupported: addIntraExpressionInferenceSite: array element",
-   "owner": "C2",
-   "representative": "compiler/inferringAnyFunctionType2.ts#configuration=0",
-   "variants": 7
-  },
-  {
-   "bucket": "unsupported: conditionalTypeToTypeNode: shadowed distribution parameter",
-   "owner": "C2",
-   "representative": "compiler/recursiveConditionalCrash1.ts#configuration=0",
-   "variants": 5
-  },
-  {
    "bucket": "diagnostics: TS2304",
    "owner": "C4",
    "representative": "compiler/anonymousClassDecoratorEs2022.ts#configuration=0",
    "variants": 5
   },
   {
-   "bucket": "diagnostics: TS2345",
-   "owner": "C2",
-   "representative": "compiler/superWithTypeArgument3.ts#configuration=0",
-   "variants": 4
-  },
-  {
-   "bucket": "diagnostics: TS7060",
-   "owner": "C2",
-   "representative": "conformance/node/nodeModulesForbidenSyntax.ts#configuration=0",
-   "variants": 4
-  },
-  {
-   "bucket": "diagnostics: TS2322",
-   "owner": "C2",
-   "representative": "compiler/recursiveIndexedAccessSimplification.ts#configuration=0",
-   "variants": 3
-  },
-  {
-   "bucket": "diagnostics: TS2339",
-   "owner": "C2",
-   "representative": "compiler/defaultPropsEmptyCurlyBecomesAnyForJs.ts#configuration=0",
-   "variants": 3
-  },
-  {
-   "bucket": "diagnostics: TS2344",
-   "owner": "C2",
-   "representative": "compiler/distributiveConditionalBaseConstraint.ts#configuration=0",
-   "variants": 3
-  },
-  {
-   "bucket": "diagnostics: TS2365",
-   "owner": "C2",
-   "representative": "conformance/expressions/binaryOperators/comparisonOperator/comparisonOperatorWithNumberOperand.ts#configuration=0",
-   "variants": 3
-  },
-  {
-   "bucket": "unsupported: Expression_produces_a_union_type_that_is_too_complex_to_represent",
-   "owner": "C2",
-   "representative": "compiler/templateLiteralTypeTooComplex.ts#configuration=0",
-   "variants": 3
-  },
-  {
-   "bucket": "unsupported: getTypeFromImportTypeNode: CommonJS typedef export lookup",
-   "owner": "C2",
-   "representative": "conformance/jsdoc/jsdocImportTypeReferenceToStringLiteral.ts#configuration=0",
-   "variants": 3
-  },
-  {
    "bucket": "emit order: native pre/post-emit sets differ",
    "owner": "C5 / Phase 3 (emit order)",
    "representative": "compiler/incorrectRecursiveMappedTypeConstraint.ts#configuration=0",
    "variants": 3
-  },
-  {
-   "bucket": "diagnostics: TS2352",
-   "owner": "C2",
-   "representative": "compiler/aliasInstantiationExpressionGenericIntersectionNoCrash1.ts#configuration=0",
-   "variants": 2
-  },
-  {
-   "bucket": "diagnostics: TS2795",
-   "owner": "C2",
-   "representative": "conformance/types/typeAliases/intrinsicKeyword.ts#configuration=0",
-   "variants": 2
-  },
-  {
-   "bucket": "unsupported: node builder synthetic elision comments",
-   "owner": "C2",
-   "representative": "compiler/nestedSpreadsAndWidening.ts#configuration=0",
-   "variants": 2
-  },
-  {
-   "bucket": "unsupported: node builder synthetic property elision comments",
-   "owner": "C2",
-   "representative": "compiler/hugeDeclarationOutputGetsTruncatedWithError.ts#configuration=0",
-   "variants": 2
-  },
-  {
-   "bucket": "unsupported: someSymbolTableInScope: reparsed module",
-   "owner": "C2",
-   "representative": "conformance/jsdoc/declarations/jsDeclarationsImportAliasExposedWithinNamespace.ts#configuration=0",
-   "variants": 2
   },
   {
    "bucket": "diagnostics: TS1240",
@@ -180,156 +60,6 @@
    "owner": "C4",
    "representative": "conformance/decorators/class/decoratorChecksFunctionBodies.ts#configuration=0",
    "variants": 2
-  },
-  {
-   "bucket": "diagnostics: TS1477",
-   "owner": "C2",
-   "representative": "conformance/types/typeParameters/typeArgumentLists/instantiationExpressionErrors.ts#configuration=0",
-   "variants": 1
-  },
-  {
-   "bucket": "diagnostics: TS1539",
-   "owner": "C2",
-   "representative": "compiler/bigintPropertyName.ts#configuration=0",
-   "variants": 1
-  },
-  {
-   "bucket": "diagnostics: TS18048",
-   "owner": "C2",
-   "representative": "compiler/specialIntersectionsInMappedTypes.ts#configuration=0",
-   "variants": 1
-  },
-  {
-   "bucket": "diagnostics: TS2313",
-   "owner": "C2",
-   "representative": "conformance/types/conditional/inferTypesWithExtends1.ts#configuration=0",
-   "variants": 1
-  },
-  {
-   "bucket": "diagnostics: TS2315",
-   "owner": "C2",
-   "representative": "compiler/cjsExportGenericTypes.ts#configuration=0",
-   "variants": 1
-  },
-  {
-   "bucket": "diagnostics: TS2337",
-   "owner": "C2",
-   "representative": "conformance/expressions/superCalls/errorSuperCalls.ts#configuration=0",
-   "variants": 1
-  },
-  {
-   "bucket": "diagnostics: TS2349",
-   "owner": "C2",
-   "representative": "conformance/jsdoc/declarations/jsDeclarationsFunctions.ts#configuration=0",
-   "variants": 1
-  },
-  {
-   "bucket": "diagnostics: TS2355",
-   "owner": "C2",
-   "representative": "conformance/jsdoc/errorOnFunctionReturnType.ts#configuration=0",
-   "variants": 1
-  },
-  {
-   "bucket": "diagnostics: TS2536",
-   "owner": "C2",
-   "representative": "conformance/types/unknown/unknownControlFlow.ts#configuration=0",
-   "variants": 1
-  },
-  {
-   "bucket": "diagnostics: TS2554",
-   "owner": "C2",
-   "representative": "compiler/superWithTypeArgument2.ts#configuration=0",
-   "variants": 1
-  },
-  {
-   "bucket": "diagnostics: TS2558",
-   "owner": "C2",
-   "representative": "compiler/superWithTypeArgument.ts#configuration=0",
-   "variants": 1
-  },
-  {
-   "bucket": "diagnostics: TS4023",
-   "owner": "C2",
-   "representative": "compiler/mappedTypeGenericInstantiationPreservesHomomorphism.ts#configuration=0",
-   "variants": 1
-  },
-  {
-   "bucket": "diagnostics: TS4031",
-   "owner": "C2",
-   "representative": "compiler/declarationEmitShadowing.ts#configuration=0",
-   "variants": 1
-  },
-  {
-   "bucket": "diagnostics: TS4052",
-   "owner": "C2",
-   "representative": "compiler/declarationEmitStaticMethodNonIdentifierNames.ts#configuration=0",
-   "variants": 1
-  },
-  {
-   "bucket": "diagnostics: TS4076",
-   "owner": "C2",
-   "representative": "compiler/declarationEmitJsExportAssignedArrowNoCrash.ts#configuration=0",
-   "variants": 1
-  },
-  {
-   "bucket": "diagnostics: TS4082",
-   "owner": "C2",
-   "representative": "compiler/declarationEmitMappedTypeDistributivityPreservesConstraints.ts#configuration=0",
-   "variants": 1
-  },
-  {
-   "bucket": "diagnostics: TS7006",
-   "owner": "C2",
-   "representative": "compiler/contextualTypeCaching.ts#configuration=0",
-   "variants": 1
-  },
-  {
-   "bucket": "diagnostics: TS7053",
-   "owner": "C2",
-   "representative": "conformance/types/members/indexSignatures1.ts#configuration=0",
-   "variants": 1
-  },
-  {
-   "bucket": "diagnostics: TS9010",
-   "owner": "C2",
-   "representative": "compiler/declarationEmitIsolatedDeclarationErrorNotEmittedForNonEmittedFile.ts#configuration=0",
-   "variants": 1
-  },
-  {
-   "bucket": "different: display",
-   "owner": "C2",
-   "representative": "compiler/spuriousCircularityOnTypeImport.ts#configuration=0",
-   "variants": 1
-  },
-  {
-   "bucket": "failed: walker_error",
-   "owner": "C2",
-   "representative": "compiler/packageDeduplicationDuplicateGlobals.ts#configuration=0",
-   "variants": 1
-  },
-  {
-   "bucket": "panic: tsr_ast::factory",
-   "owner": "C2",
-   "representative": "compiler/declarationEmitAugmentationUsesCorrectSourceFile.ts#configuration=0",
-   "variants": 1
-  },
-  {
-   "bucket": "unsupported: checkExpressionWorker",
-   "owner": "C2",
-   "representative": "conformance/types/import/importWithTypeArguments.ts#configuration=0",
-   "variants": 1
-  },
-  {
-   "bucket": "unsupported: checkIfTypePredicateVariableIsDeclaredInBindingPattern",
-   "owner": "C2",
-   "representative": "conformance/expressions/typeGuards/typeGuardFunctionErrors.ts#configuration=0",
-   "variants": 1
-  },
-  {
-   "bucket": "unsupported: reportOperatorError: awaited operand suggestions",
-   "owner": "C2",
-   "representative": "compiler/operationsAvailableOnPromisedType.ts#configuration=0",
-   "variants": 1
   },
   {
    "bucket": "diagnostics: TS1272",
@@ -370,8 +100,8 @@
  ],
  "by_checkpoint": {
   "C2": {
-   "match": 2762,
-   "open": 192
+   "match": 2951,
+   "open": 3
   },
   "C3": {
    "match": 170,
@@ -387,208 +117,87 @@
  },
  "categories": {
   "display": {
-   "different": 17,
    "disabled": 679,
-   "failed": 2,
-   "match": 12085,
-   "unsupported": 649
+   "match": 12196,
+   "unsupported": 557
   },
   "errors": {
-   "different": 106,
-   "failed": 1,
-   "match": 12507,
-   "unsupported": 818
+   "different": 20,
+   "match": 12648,
+   "unsupported": 764
   },
   "parent_pointers": {
-   "failed": 1,
-   "match": 13416,
+   "match": 13417,
    "unsupported": 15
   },
   "symbols": {
-   "different": 2,
    "disabled": 679,
-   "failed": 2,
-   "match": 12100,
-   "unsupported": 649
+   "match": 12196,
+   "unsupported": 557
   },
   "trace": {
    "disabled": 13278,
    "match": 154
   },
   "types": {
-   "different": 38,
+   "different": 8,
    "disabled": 679,
-   "failed": 2,
-   "match": 12064,
-   "unsupported": 649
+   "match": 12188,
+   "unsupported": 557
   },
   "union_ordering": {
-   "failed": 1,
-   "match": 13416,
+   "match": 13417,
    "unsupported": 15
   }
  },
- "changed_observations": [
-  {
-   "domain": "errors",
-   "id": "compiler/circularlyConstrainedMappedTypeContainingConditionalNoInfiniteInstantiationDepth.ts#configuration=0"
-  },
-  {
-   "domain": "errors",
-   "id": "compiler/correlatedUnions.ts#configuration=0"
-  },
-  {
-   "domain": "errors",
-   "id": "compiler/reactReduxLikeDeferredInferenceAllowsAssignment.ts#configuration=0"
-  },
-  {
-   "domain": "errors",
-   "id": "conformance/types/keyof/keyofAndIndexedAccess.ts#configuration=0"
-  },
-  {
-   "domain": "errors",
-   "id": "conformance/types/mapped/isomorphicMappedTypeInference.ts#configuration=0"
-  },
-  {
-   "domain": "types",
-   "id": "conformance/types/mapped/isomorphicMappedTypeInference.ts#configuration=0"
-  },
-  {
-   "domain": "errors",
-   "id": "conformance/types/mapped/mappedTypeConstraints2.ts#configuration=0"
-  },
-  {
-   "domain": "errors",
-   "id": "conformance/types/mapped/recursiveMappedTypes.ts#configuration=0"
-  },
-  {
-   "domain": "errors",
-   "id": "conformance/types/rest/restTuplesFromContextualTypes.ts#configuration=0"
-  },
-  {
-   "domain": "errors",
-   "id": "conformance/types/typeParameters/typeParameterLists/varianceAnnotations.ts#configuration=0"
-  }
- ],
+ "changed_observations": [],
  "dimensions": {
   "area": {
    "diagnostics: TS1240": 2,
    "diagnostics: TS1241": 2,
    "diagnostics: TS1272": 1,
    "diagnostics: TS1329": 2,
-   "diagnostics: TS1477": 1,
-   "diagnostics: TS1539": 1,
-   "diagnostics: TS18048": 1,
    "diagnostics: TS2304": 5,
-   "diagnostics: TS2313": 1,
-   "diagnostics: TS2315": 1,
    "diagnostics: TS2318": 1,
-   "diagnostics: TS2322": 3,
    "diagnostics: TS2331": 1,
-   "diagnostics: TS2337": 1,
-   "diagnostics: TS2339": 3,
-   "diagnostics: TS2344": 3,
-   "diagnostics: TS2345": 4,
-   "diagnostics: TS2349": 1,
-   "diagnostics: TS2352": 2,
-   "diagnostics: TS2355": 1,
-   "diagnostics: TS2365": 3,
-   "diagnostics: TS2536": 1,
-   "diagnostics: TS2554": 1,
-   "diagnostics: TS2558": 1,
    "diagnostics: TS2593": 1,
    "diagnostics: TS2660": 1,
-   "diagnostics: TS2795": 2,
-   "diagnostics: TS4023": 1,
-   "diagnostics: TS4025": 31,
-   "diagnostics: TS4031": 1,
-   "diagnostics: TS4052": 1,
-   "diagnostics: TS4060": 10,
-   "diagnostics: TS4076": 1,
-   "diagnostics: TS4082": 1,
-   "diagnostics: TS7006": 1,
-   "diagnostics: TS7053": 1,
-   "diagnostics: TS7060": 4,
-   "diagnostics: TS9010": 1,
-   "different: display": 1,
-   "different: types": 9,
    "emit order: native pre/post-emit sets differ": 3,
-   "failed: walker_error": 1,
-   "panic: tsr_ast::factory": 1,
-   "unsupported: Expression_produces_a_union_type_that_is_too_complex_to_represent": 3,
-   "unsupported: addIntraExpressionInferenceSite: array element": 7,
    "unsupported: checkClassLikeDeclaration: decorators": 284,
    "unsupported: checkDecorators: parameter or binding": 25,
-   "unsupported: checkExpressionWorker": 440,
-   "unsupported: checkIfTypePredicateVariableIsDeclaredInBindingPattern": 1,
+   "unsupported: checkExpressionWorker": 439,
    "unsupported: checkSourceElementWorker: statement/type family": 1,
-   "unsupported: conditionalTypeToTypeNode: shadowed distribution parameter": 5,
    "unsupported: content-mapper execution": 15,
-   "unsupported: extractRedundantTemplateLiterals": 30,
-   "unsupported: getContextualType: decorator/JSX context": 2,
-   "unsupported: getTypeFromImportTypeNode: CommonJS typedef export lookup": 3,
-   "unsupported: node builder synthetic elision comments": 2,
-   "unsupported: node builder synthetic property elision comments": 2,
-   "unsupported: reportOperatorError: awaited operand suggestions": 1,
-   "unsupported: someSymbolTableInScope: reparsed module": 2,
-   "unsupported: typeReferenceToTypeNode: applied outer arguments": 36
+   "unsupported: getContextualType: decorator/JSX context": 2
   },
   "family": {
-   "conditional_types": 65,
+   "conditional_types": 15,
    "content_mapper_execution": 15,
    "decorators": 331,
    "emitted_output_only": 182,
-   "explicit_type_parameters": 295,
-   "import_types": 11,
-   "indexed_access_types": 85,
-   "infer_types": 34,
+   "explicit_type_parameters": 122,
+   "import_types": 1,
+   "indexed_access_types": 13,
+   "infer_types": 7,
    "jsx": 436,
-   "mapped_types": 73,
-   "nonempty_type_arguments": 263,
-   "template_literal_types": 18
+   "mapped_types": 9,
+   "nonempty_type_arguments": 138,
+   "template_literal_types": 2
   },
   "first_code": {
-   "(none)": 868,
+   "(none)": 765,
    "1240": 2,
    "1241": 2,
    "1272": 1,
    "1329": 2,
-   "1477": 1,
-   "1539": 1,
-   "18048": 1,
    "2304": 5,
-   "2313": 3,
-   "2315": 1,
+   "2313": 2,
    "2318": 1,
-   "2322": 3,
    "2331": 1,
-   "2337": 1,
-   "2339": 3,
-   "2344": 3,
-   "2345": 5,
-   "2349": 1,
-   "2352": 2,
-   "2355": 1,
-   "2365": 3,
-   "2536": 1,
-   "2554": 1,
-   "2558": 1,
+   "2345": 1,
    "2593": 1,
    "2615": 1,
-   "2660": 1,
-   "2795": 2,
-   "4023": 1,
-   "4025": 32,
-   "4031": 1,
-   "4052": 1,
-   "4060": 10,
-   "4076": 1,
-   "4082": 1,
-   "5088": 1,
-   "7006": 1,
-   "7053": 1,
-   "7060": 4,
-   "9010": 1
+   "2660": 1
   },
   "jsx": {
    "preserve": 210,
@@ -596,34 +205,34 @@
    "react-jsx": 38,
    "react-jsxdev": 19,
    "react-native": 2,
-   "unset": 547
+   "unset": 358
   },
   "module": {
-   "commonjs": 306,
+   "commonjs": 272,
    "es2015": 9,
    "es2020": 1,
    "es2022": 4,
    "esnext": 93,
-   "node16": 2,
-   "node18": 2,
-   "node20": 2,
-   "nodenext": 8,
-   "preserve": 7,
-   "unset": 540
+   "node16": 1,
+   "node18": 1,
+   "node20": 1,
+   "nodenext": 5,
+   "preserve": 6,
+   "unset": 392
   },
   "strict": {
-   "False": 778,
-   "True": 196
+   "False": 673,
+   "True": 112
   },
   "target": {
-   "es2015": 731,
-   "es2017": 18,
+   "es2015": 580,
+   "es2017": 16,
    "es2018": 4,
-   "es2020": 16,
+   "es2020": 15,
    "es2021": 1,
-   "es2022": 55,
-   "esnext": 118,
-   "unset": 31
+   "es2022": 51,
+   "esnext": 103,
+   "unset": 15
   }
  },
  "executed": 13432,
@@ -632,7 +241,7 @@
  "native_observation_sha256": "1b5356b425ad95a3e5e2a0bb29d42534e8d9d4a6159649f063f3317084a0e276",
  "partial": false,
  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
- "previous": "48b590ddd69385e0c91fee842468ed29f742d82f19bad7ac16221eecc69a38a8",
+ "previous": "00a5a91d3d4d060fbb74a59a5ae6ff18e39ade481f8d43d507a610c07fdca689",
  "regression_subset": {
   "all_domains_match": 9367,
   "by_domain": {
@@ -665,7 +274,7 @@
   "rows": 9367
  },
  "regressions": [],
- "rust_capture_sha256": "d9fcb53b383c2dc64e773058c9f6bf7cbcb049345881e64b7c7219c3b8b80882",
+ "rust_capture_sha256": "616e3f795dc1401f354af22c16b92ffb797a54df209e3c487f7de6bb6078fd84",
  "rust_source_stable": true,
  "selection": {
   "cases": [],
@@ -673,23 +282,12 @@
   "sample": false
  },
  "unsupported_operations": {
-  "Expression_produces_a_union_type_that_is_too_complex_to_represent": 12,
-  "addIntraExpressionInferenceSite: array element": 28,
   "checkClassLikeDeclaration: decorators": 569,
   "checkDecorators: parameter or binding": 82,
-  "checkExpressionWorker": 1733,
-  "checkIfTypePredicateVariableIsDeclaredInBindingPattern": 4,
+  "checkExpressionWorker": 1729,
   "checkSourceElementWorker: statement/type family": 4,
-  "conditionalTypeToTypeNode: shadowed distribution parameter": 16,
   "content-mapper execution": 75,
-  "extractRedundantTemplateLiterals": 120,
-  "getContextualType: decorator/JSX context": 6,
-  "getTypeFromImportTypeNode: CommonJS typedef export lookup": 12,
-  "node builder synthetic elision comments": 6,
-  "node builder synthetic property elision comments": 5,
-  "reportOperatorError: awaited operand suggestions": 4,
-  "someSymbolTableInScope: reparsed module": 8,
-  "typeReferenceToTypeNode: applied outer arguments": 111
+  "getContextualType: decorator/JSX context": 6
  },
  "version": 1
 }

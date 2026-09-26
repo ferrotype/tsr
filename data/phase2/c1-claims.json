@@ -1085,22 +1085,21 @@
   },
   {
    "bucket": "failed: checker_error",
-   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; traced: the InvalidGraph arena error is raised in iteration_types_fast (iteration_protocol.rs:53) while computing the contextual element type of an array literal (iteration_types_of_iterable <- contextual_element_type <- is_const_context), which is C3's iteration and contextual typing, not symbol merging",
+   "evidence": "The C1 head full capture target/phase2/rust/cases/06200/observation.json and its comparison match every enabled domain after the first-three-arguments fix. This row is closed C1 work, not an outstanding C3 handoff.",
    "go": "tsc/internal/checker/checker.go:Checker.mergeSymbol",
    "id": "compiler/thislessFunctionsNotContextSensitive1.ts#configuration=0",
    "item": "C1.2",
-   "mechanism": "after 2c87ef7 the checker stops with the arena error 'lazy roots must belong to the current transaction' (tsr_arena lazy.rs publish), the same defect as packageDeduplicationDuplicateGlobals; trace pending",
-   "owner": "C3",
-   "status": "returned"
+   "mechanism": "iteration_types_fast required exactly three global iterator type arguments; pinned Go consumes the first three even when the reference carries extra parameters. C1 fixed this in iteration_protocol.rs.",
+   "status": "claimed"
   },
   {
    "bucket": "failed: walker_error",
-   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
-   "go": "tsc/internal/checker/checker.go:Checker.mergeSymbol",
+   "evidence": "C1 review: pinned filesparser.go duplicate-package exit precedes metadata insertion; regression c1_package_metadata::discarded_package_dependencies_do_not_poison_module_specifier_paths reaches production module-specifier generation and verifies redirect identity. The historical full row remains failed until the reviewed-source recapture. Reviewed-source full capture target/phase2/c1-reviewed: all seven domains match; no previously matching domain regressed.",
+   "go": "tsc/internal/compiler/filesparser.go:filesParser.parse",
    "id": "compiler/packageDeduplicationDuplicateGlobals.ts#configuration=0",
    "item": "C1.2",
-   "mechanism": "the walk over duplicated globals of deduplicated packages fails with the arena error 'lazy roots must belong to the current transaction'; the merging site that keeps a lazy root across transactions is not yet traced",
-   "status": "candidate"
+   "mechanism": "Metadata for parsed dependencies discarded during package deduplication was retained. GetSymlinkCache tried to resolve an orphan metadata key and returned InvalidGraph during TypeToTypeNode; publish metadata only for collected source files, as the pin does.",
+   "status": "claimed"
   },
   {
    "bucket": "emit order: native pre/post-emit sets differ",
@@ -1246,8 +1245,18 @@
    "item": "C1.6",
    "mechanism": "structured diagnostics equal; the rendered .errors.txt or the pre/post-emit sets differ; the rendering diff decides the owner",
    "status": "claimed"
+  },
+  {
+   "bucket": "panic: tsr_ast::factory",
+   "evidence": "2026-09-26 single captured-executable LLDB replay: declaration_diagnostics_with_checker -> transform_declarations -> module_declaration -> late_statements (statements.rs:113) -> Factory::node (factory.rs:122), WrongOwner. See docs/PHASE2-C1.md and data/phase2/c1-review/augmentation-stack.txt. Traced declaration-transform retention is C5, not an assumed node-builder or C1 relation defect.",
+   "go": "tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.transformAndReplaceLatePaintedStatements",
+   "id": "compiler/declarationEmitAugmentationUsesCorrectSourceFile.ts#configuration=0",
+   "item": "C1.2",
+   "mechanism": "Declaration-transform late visibility processing reads a declaration from another retained program source through the output builder, which initially retains only the emitted source. The failing factory access is in Transformer::late_statements, before the type/symbol walker.",
+   "owner": "C5",
+   "status": "returned"
   }
  ],
- "scope": "C1 claims causes inside rows another checkpoint owns (docs/PHASE2-C1-plan.md, section 3). A row counts only with status claimed, after its reproduction named a foundation function; candidate rows are the C0 buckets the plan lists and carry no metric weight. A row with status blocked names the blocker (data/phase2/blockers.json) that withholds its observation after the foundation cause is fixed; it carries no metric weight either. A row with status returned went back to its owner after its reproduction named a non-foundation cause; it carries no metric weight.",
+ "scope": "C1 claims causes inside rows another checkpoint owns (docs/PHASE2-C1-plan.md, section 3). A claimed row must match every enabled domain. Unresolved candidate rows remain open. A blocked row needs a registered blocker covering it after its foundation cause is fixed. A returned row needs trace evidence naming another checkpoint; failed rows without a valid return or covering blocker remain C1 failures.",
  "version": 1
 }

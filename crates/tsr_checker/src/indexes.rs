@@ -209,16 +209,21 @@ impl CheckerState {
         Ok(result)
     }
 
+    // port: tsc/internal/checker/checker.go:Checker.isKeyTypeIncluded
     fn key_type_included(&self, ty: TypeId, include: crate::TypeFlags) -> Result<bool, Error> {
-        if self.types.flags(ty)? & tf::INTERSECTION != 0 {
-            for &part in self.types.types_of(ty)? {
-                if !self.key_type_included(part, include)? {
-                    return Ok(false);
-                }
-            }
+        let flags = self.types.flags(ty)?;
+        if flags & include != 0 {
             return Ok(true);
         }
-        Ok(self.types.flags(ty)? & include != 0)
+        if flags & tf::INTERSECTION != 0 {
+            for &part in self.types.types_of(ty)? {
+                if self.key_type_included(part, include)? {
+                    return Ok(true);
+                }
+            }
+            return Ok(false);
+        }
+        Ok(false)
     }
 
     // port: tsc/internal/checker/checker.go:Checker.getLiteralTypeFromProperty
@@ -240,7 +245,7 @@ impl CheckerState {
         }
         let mut ty = self
             .value_symbol_links
-            .try_get(symbol)
+            .try_get(self.value_symbol_key(symbol)?)
             .and_then(|links| links.name_type);
         if ty.is_none() {
             if name.as_bytes() == tsr_ast::internal_symbol_names::DEFAULT {

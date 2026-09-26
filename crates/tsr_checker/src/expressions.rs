@@ -34,8 +34,8 @@ impl CheckerState {
         }
         self.calls.contexts.push(crate::calls::ArgumentContext {
             node,
-            ty: self.builtins.any_type,
-            inference: None,
+            ty: Some(self.builtins.any_type),
+            is_cache: false,
         });
         let result = self.check_expression_ex(node, 4);
         self.calls.contexts.pop();
@@ -398,7 +398,13 @@ impl CheckerState {
                 let nullable = self.types.flags(a)? & tf::NULLABLE != 0
                     || self.types.flags(b)? & tf::NULLABLE != 0;
                 if !nullable && !self.types_comparable(a, b)? {
-                    self.report_equality_operator_error(a, b, node)?;
+                    self.report_binary_operator_error(
+                        node,
+                        operator,
+                        a,
+                        b,
+                        Some(Self::equality_comparable),
+                    )?;
                 }
                 Ok(self.builtins.boolean_type)
             }
@@ -430,54 +436,6 @@ impl CheckerState {
             ) => self.arithmetic_binary(node, left, right, op, a, b),
             _ => Err(Error::Unsupported("checkBinaryLikeExpression: operator")),
         }
-    }
-
-    /// The equality case of reportOperatorError: literal base types when
-    /// those are also unrelated, error-display names, and the await hint.
-    // port: tsc/internal/checker/checker.go:Checker.reportOperatorError
-    // port: tsc/internal/checker/checker.go:Checker.getBaseTypesIfUnrelated
-    // port: tsc/internal/checker/checker.go:Checker.errorAndMaybeSuggestAwait
-    fn report_equality_operator_error(
-        &mut self,
-        left: TypeId,
-        right: TypeId,
-        node: NodeId,
-    ) -> Result<(), Error> {
-        let mut would_work_with_await = false;
-        if let (Some(awaited_left), Some(awaited_right)) = (
-            self.awaited_type_no_alias(left)?,
-            self.awaited_type_no_alias(right)?,
-        ) {
-            would_work_with_await = !(awaited_left == left && awaited_right == right)
-                && self.equality_comparable(awaited_left, awaited_right)?;
-        }
-        let (mut effective_left, mut effective_right) = (left, right);
-        if !would_work_with_await {
-            let left_base = self.base_literal_type(left)?;
-            let right_base = self.base_literal_type(right)?;
-            if !self.equality_comparable(left_base, right_base)? {
-                effective_left = left_base;
-                effective_right = right_base;
-            }
-        }
-        let (left_name, right_name) =
-            self.type_names_for_error_display(effective_left, effective_right)?;
-        let mut diagnostic = self.diagnostic_for_node(
-            Some(node),
-            tsr_diagnostics::This_comparison_appears_to_be_unintentional_because_the_types_0_and_1_have_no_overlap,
-            vec![left_name, right_name],
-        )?;
-        if would_work_with_await {
-            diagnostic
-                .related_information
-                .push(std::sync::Arc::new(self.diagnostic_for_node(
-                    Some(node),
-                    tsr_diagnostics::Did_you_forget_to_use_await,
-                    vec![],
-                )?));
-        }
-        self.add_diagnostic(diagnostic)?;
-        Ok(())
     }
 
     // port: tsc/internal/checker/checker.go:Checker.isTypeEqualityComparableTo

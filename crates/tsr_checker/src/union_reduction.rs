@@ -181,6 +181,12 @@ impl CheckerState {
                 if count == 100_000
                     && (count / (original_length - index)) * original_length > 1_000_000
                 {
+                    #[cfg(feature = "recursion-probe")]
+                    if let Some(probe) = &mut self.c2_limits_probe {
+                        probe
+                            .subtype_estimates
+                            .push((count, (count / (original_length - index)) * original_length));
+                    }
                     // After 100000 subtype checks we estimate the remaining amount of work by assuming the
                     // same ratio of checks per element. If the estimated number of remaining type checks is
                     // greater than 1M we deem the union type too complex to represent.

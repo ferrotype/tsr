@@ -1,0 +1,11 @@
+import { UnknownDefault, EmptyDefault, StructuralDefault, StringDefault, DependentDefault } from './classes';
+declare const unknownDefault: UnknownDefault;
+declare const emptyDefault: EmptyDefault;
+declare const structuralDefault: StructuralDefault;
+declare const stringDefault: StringDefault;
+declare const dependentDefault: DependentDefault;
+const observeUnknown: never = unknownDefault.value;
+const observeEmpty: never = emptyDefault.value;
+const observeStructural: never = structuralDefault.value;
+const observeString: never = stringDefault.value;
+const observeDependent: never = dependentDefault.value;

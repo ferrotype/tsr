@@ -393,11 +393,14 @@ impl CheckerState {
             if !merged_instantiations {
                 return Ok(Some(first));
             }
-            let links = self
-                .value_symbol_links
-                .try_get(first)
-                .copied()
-                .unwrap_or_default();
+            let links = if self.symbol(first)?.flags() & sf::TRANSIENT != 0 {
+                self.value_symbol_links
+                    .try_get(self.value_symbol_key(first)?)
+                    .copied()
+                    .unwrap_or_default()
+            } else {
+                crate::ValueSymbolLinks::default()
+            };
             let cloned = self.clone_symbol_with_type(first, links.resolved_type)?;
             if let Some(declaration) = self.symbol(first)?.value_declaration() {
                 let source = self
@@ -410,7 +413,9 @@ impl CheckerState {
                 self.symbol_mut(cloned)?.parent = parent;
             }
             let write = self.write_type_of_symbol(first)?;
-            let result = self.value_symbol_links.get_or_default(cloned);
+            let result = self
+                .value_symbol_links
+                .get_or_default(self.value_symbol_key(cloned)?);
             result.containing_type = Some(containing);
             result.mapper = links.mapper;
             result.write_type = Some(write);
@@ -445,7 +450,7 @@ impl CheckerState {
             } else {
                 name_type = self
                     .value_symbol_links
-                    .try_get(prop)
+                    .try_get(self.value_symbol_key(prop)?)
                     .and_then(|l| l.name_type);
             }
             let write = self.write_type_of_symbol(prop)?;
@@ -487,7 +492,10 @@ impl CheckerState {
                 result.parent = parent;
             }
         }
-        let links = self.value_symbol_links.get_or_default(result);
+        // valueSymbolLinks.Get assigns the native lazy id here, before later
+        // sorting can compare same-named properties with equal declarations.
+        let result_key = self.value_symbol_key(result)?;
+        let links = self.value_symbol_links.get_or_default(result_key);
         links.containing_type = Some(containing);
         links.name_type = name_type;
         if prop_types.len() > 2 {
@@ -503,14 +511,18 @@ impl CheckerState {
             } else {
                 self.get_intersection_type(&prop_types)?
             };
-            self.value_symbol_links.get_or_default(result).resolved_type = Some(ty);
+            self.value_symbol_links
+                .get_or_default(result_key)
+                .resolved_type = Some(ty);
             if let Some(write) = write_types {
                 let ty = if is_union {
                     self.get_union_type(&write)?
                 } else {
                     self.get_intersection_type(&write)?
                 };
-                self.value_symbol_links.get_or_default(result).write_type = Some(ty);
+                self.value_symbol_links
+                    .get_or_default(result_key)
+                    .write_type = Some(ty);
             }
         }
         Ok(Some(result))
@@ -543,7 +555,7 @@ impl CheckerState {
     ) -> Result<TypeId, Error> {
         if let Some(ty) = self
             .value_symbol_links
-            .try_get(symbol)
+            .try_get(self.value_symbol_key(symbol)?)
             .and_then(|l| l.resolved_type)
         {
             return Ok(ty);
@@ -559,7 +571,7 @@ impl CheckerState {
             .clone();
         let containing = self
             .value_symbol_links
-            .try_get(symbol)
+            .try_get(self.value_symbol_key(symbol)?)
             .and_then(|links| links.containing_type)
             .ok_or(Error::MissingLink("deferred property containing type"))?;
         let ty = if self.types.flags(containing)? & tf::UNION != 0 {
@@ -567,7 +579,9 @@ impl CheckerState {
         } else {
             self.get_intersection_type(&types)?
         };
-        self.value_symbol_links.get_or_default(symbol).resolved_type = Some(ty);
+        self.value_symbol_links
+            .get_or_default(self.value_symbol_key(symbol)?)
+            .resolved_type = Some(ty);
         Ok(ty)
     }
 }

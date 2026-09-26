@@ -55,7 +55,13 @@ impl CheckerState {
                 }
                 return Ok(result);
             }
-            self.report_binary_operator_error(node, operator, a, b)?;
+            self.report_binary_operator_error(
+                node,
+                operator,
+                a,
+                b,
+                Some(Self::addition_operands_close_enough),
+            )?;
             return Ok(self.builtins.any_type);
         }
         if self.types.flags(a)? & tf::BOOLEAN_LIKE != 0
@@ -96,7 +102,7 @@ impl CheckerState {
                 Some(
                     K::GreaterThanGreaterThanGreaterThanToken
                     | K::GreaterThanGreaterThanGreaterThanEqualsToken,
-                ) => self.report_binary_operator_error(node, operator, a, b)?,
+                ) => self.report_binary_operator_error(node, operator, a, b, None)?,
                 Some(K::AsteriskAsteriskToken | K::AsteriskAsteriskEqualsToken)
                     if self.program()?.host.options().emit_script_target()
                         < tsr_core::ScriptTarget::ES2016 =>
@@ -107,7 +113,7 @@ impl CheckerState {
             }
             self.builtins.bigint_type
         } else {
-            self.report_binary_operator_error(node, operator, a, b)?;
+            self.report_binary_operator_error(node, operator, a, b, Some(Self::both_big_int_like))?;
             self.builtins.error_type
         };
         if left_ok && right_ok {

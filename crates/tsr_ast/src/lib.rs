@@ -17,6 +17,8 @@ pub mod symbol_flags;
 mod symbol_store;
 mod symbol_tables;
 pub use symbol_tables::name_hash;
+#[cfg(feature = "creation-trace")]
+pub mod creation_trace;
 mod symbols;
 pub use flow::*;
 pub use symbol_access::{SymbolAccess, SymbolRef};

@@ -1,0 +1,47 @@
+{
+  "acceptance_tier": "executed",
+  "baseline_header": "tests/cases/compiler/typeParameterWithInvalidConstraintType.ts",
+  "baseline_inputs": [
+    {
+      "content_hex": "636c61737320413c5420657874656e647320543e207b0a20202020666f6f2829207b0a20202020202020207661722078213a20543b0a20202020202020207661722061203d20782e666f6f28293b0a20202020202020207661722062203d206e6577207828313233293b0a20202020202020207661722063203d20785b315d3b0a20202020202020207661722064203d207828293b0a202020207d0a7d",
+      "name_hex": "2f2e7372632f74797065506172616d6574657257697468496e76616c6964436f6e73747261696e74547970652e7473"
+    }
+  ],
+  "diagnostic_phases": [
+    "config",
+    "program",
+    "syntactic",
+    "semantic",
+    "global"
+  ],
+  "error_baseline_requested": true,
+  "error_inputs": [
+    {
+      "content_hex": "636c61737320413c5420657874656e647320543e207b0a20202020666f6f2829207b0a20202020202020207661722078213a20543b0a20202020202020207661722061203d20782e666f6f28293b0a20202020202020207661722062203d206e6577207828313233293b0a20202020202020207661722063203d20785b315d3b0a20202020202020207661722064203d207828293b0a202020207d0a7d",
+      "name_hex": "2f2e7372632f74797065506172616d6574657257697468496e76616c6964436f6e73747261696e74547970652e7473"
+    }
+  ],
+  "id": "compiler/typeParameterWithInvalidConstraintType.ts#configuration=0",
+  "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+      "/.src/typeParameterWithInvalidConstraintType.ts": "636c61737320413c5420657874656e647320543e207b0a20202020666f6f2829207b0a20202020202020207661722078213a20543b0a20202020202020207661722061203d20782e666f6f28293b0a20202020202020207661722062203d206e6577207828313233293b0a20202020202020207661722063203d20785b315d3b0a20202020202020207661722064203d207828293b0a202020207d0a7d"
+    },
+    "id": "compiler/typeParameterWithInvalidConstraintType.ts#configuration=0",
+    "options": {
+      "newLine": 1,
+      "noErrorTruncation": true,
+      "skipDefaultLibCheck": true,
+      "strict": false,
+      "target": 2
+    },
+    "roots": [
+      "/.src/typeParameterWithInvalidConstraintType.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+  },
+  "public_type_strings": true,
+  "type_baseline_requested": true
+}

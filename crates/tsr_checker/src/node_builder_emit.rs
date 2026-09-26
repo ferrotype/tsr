@@ -1,7 +1,7 @@
 //! Request serialization into the transformer's retained output owner.
 use super::NodeBuilder;
 use crate::{type_flags as tf, Error, LiteralValue};
-use tsr_arena::NodeId;
+use tsr_arena::{NodeId, SymbolId};
 use tsr_ast::{symbol_flags as sf, Factory, FactoryMethods, JsString, SyntaxKind as K};
 
 impl NodeBuilder<'_> {
@@ -153,7 +153,6 @@ impl NodeBuilder<'_> {
         Err(tsr_arena::Error::WrongOwner.into())
     }
 
-    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typeParametersToTypeParameterDeclarations
     pub(crate) fn declaration_type_parameters(
         &mut self,
         declaration: NodeId,
@@ -161,6 +160,14 @@ impl NodeBuilder<'_> {
         let Some(symbol) = self.checker.get_symbol_of_declaration(declaration)? else {
             return Ok(vec![]);
         };
+        self.symbol_type_parameter_declarations(symbol)
+    }
+
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typeParametersToTypeParameterDeclarations
+    pub(super) fn symbol_type_parameter_declarations(
+        &mut self,
+        symbol: SymbolId,
+    ) -> Result<Vec<NodeId>, Error> {
         let target = self.checker.target_symbol(symbol)?;
         let flags = self.checker.symbol(target)?.flags();
         let parameters = if flags & (sf::CLASS | sf::INTERFACE | sf::ALIAS) != 0 {

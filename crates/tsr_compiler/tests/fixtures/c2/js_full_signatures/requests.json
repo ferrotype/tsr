@@ -1,0 +1,70 @@
+[
+  {
+    "id": "generic_export",
+    "origin": "compiler/cjsExportGenericTypes.ts#configuration=0",
+    "files": {
+      "/.src/index.js": "const Set = require(\"./set\");\n\n/** @typedef {Set<string>} MyDefinedType */\n",
+      "/.src/set.js": "/**\n * @template D\n * @typedef {(a: D, b: D) => number} SomeUnrelatedGeneric\n */\n\n/**\n * @template T\n */\nclass SomeGenericClass {\n  /**\n   * @param {Set<T>} param\n   */\n  constructor(param) {}\n}\n\nmodule.exports = SomeGenericClass;\n"
+    },
+    "roots": [
+      "/.src/index.js"
+    ],
+    "cwd": "/.src"
+  },
+  {
+    "id": "cjs_function_aliases",
+    "origin": "conformance/jsdoc/declarations/jsDeclarationsFunctionsCjs.ts#configuration=0",
+    "files": {
+      "/.src/index.js": "module.exports.a = function a() {}\n\nmodule.exports.b = function b() {}\nmodule.exports.b.cat = \"cat\";\n\nmodule.exports.c = function c() {}\nmodule.exports.c.Cls = class {}\n\n/**\n * @param {number} a\n * @param {number} b\n * @return {string} \n */\nmodule.exports.d = function d(a, b) { return /** @type {*} */(null); }\n\n/**\n * @template T,U\n * @param {T} a\n * @param {U} b\n * @return {T & U} \n */\nmodule.exports.e = function e(a, b) { return /** @type {*} */(null); }\n\n/**\n * @template T\n * @param {T} a\n */\nmodule.exports.f = function f(a) {\n    return a;\n}\nmodule.exports.f.self = module.exports.f;\n\n/**\n * @param {{x: string}} a\n * @param {{y: typeof module.exports.b}} b\n */\nfunction g(a, b) {\n    return a.x && b.y();\n}\n\nmodule.exports.g = g;\n\n/**\n * @param {{x: string}} a\n * @param {{y: typeof module.exports.b}} b\n */\nfunction hh(a, b) {\n    return a.x && b.y();\n}\n\nmodule.exports.h = hh;\n\nmodule.exports.i = function i() {}\nmodule.exports.ii = module.exports.i;\n\n// note that this last one doesn't make much sense in cjs, since exports aren't hoisted bindings\nmodule.exports.jj = module.exports.j;\nmodule.exports.j = function j() {}\n"
+    },
+    "roots": [
+      "/.src/index.js"
+    ],
+    "cwd": "/.src"
+  },
+  {
+    "id": "return_annotations",
+    "origin": "conformance/jsdoc/errorOnFunctionReturnType.ts#configuration=0",
+    "files": {
+      "/.src/foo.js": "/**\n * @callback FunctionReturningPromise\n * @returns {Promise<number>}\n */\n\n/** @type {FunctionReturningPromise} */\nfunction testPromise1() {\n    console.log(\"Nope\");\n}\n\n/** @type {FunctionReturningPromise} */\nasync function testPromise2() {\n    return \"asd\";\n}\n\nvar testPromise3 = /** @type {FunctionReturningPromise} */ function() {\n    console.log(\"test\")\n}\n\n/** @type {FunctionReturningPromise} */\nvar testPromise4 = function() {\n    console.log(\"test\")\n}\n\n/**\n * @callback FunctionReturningNever\n * @returns {never}\n */\n\n/** @type {FunctionReturningNever} */\nfunction testNever1() {\n\n}\n\n/** @type {FunctionReturningNever} */\nasync function testNever2() {\n    return \"asd\";\n}\n\nvar testNever3 = /** @type {FunctionReturningNever} */ function() {\n    console.log(\"test\")\n}\n\n/** @type {FunctionReturningNever} */\nvar testNever4 = function() {\n    console.log(\"test\")\n}"
+    },
+    "roots": [
+      "/.src/foo.js"
+    ],
+    "cwd": "/.src"
+  },
+  {
+    "id": "this_annotations",
+    "origin": "conformance/jsdoc/jsdocThisType.ts#configuration=0",
+    "files": {
+      "/a.js": "/** @type {import('./types').M} */\nexport const f1 = function() {\n    this.test();\n}\n\n/** @type {import('./types').M} */\nexport function f2() {\n    this.test();\n}\n\n/** @type {(this: import('./types').Foo) => void} */\nexport const f3 = function() {\n    this.test();\n}\n\n/** @type {(this: import('./types').Foo) => void} */\nexport function f4() {\n    this.test();\n}\n\n/** @type {function(this: import('./types').Foo): void} */\nexport const f5 = function() {\n    this.test();\n}\n\n/** @type {function(this: import('./types').Foo): void} */\nexport function f6() {\n    this.test();\n}\n",
+      "/types.d.ts": "export interface Foo {\n    foo: () => void;\n}\n\nexport type M = (this: Foo) => void;\n"
+    },
+    "roots": [
+      "/types.d.ts",
+      "/a.js"
+    ],
+    "cwd": "/.src"
+  },
+  {
+    "id": "alias_meanings",
+    "files": {
+      "/lib.js": "/** @template U @typedef {{ value: U }} Member */\n/** @template T */\nclass Box {\n  /** @param {T} value */\n  constructor(value) { this.value = value; }\n}\nmodule.exports = Box;\n",
+      "/main.ts": "import Box = require(\"./lib\");\ndeclare let value: Box<string>;\ndeclare let member: Box.Member<number>;\nconst a = value.value;\nconst b = member.value;\n"
+    },
+    "roots": [
+      "/main.ts"
+    ],
+    "cwd": "/"
+  },
+  {
+    "id": "member_publication",
+    "files": {
+      "/main.js": "module.exports.i = function i() {};\nmodule.exports.ii = module.exports.i;\nmodule.exports.jj = module.exports.j;\nmodule.exports.j = function j() {};\nconst alias = module.exports.ii;\n"
+    },
+    "roots": [
+      "/main.js"
+    ],
+    "cwd": "/"
+  }
+]

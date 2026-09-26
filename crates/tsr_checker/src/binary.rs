@@ -7,6 +7,8 @@ use tsr_arena::NodeId;
 use tsr_ast::{JsString, NodeKind, SyntaxKind as K};
 use tsr_diagnostics as d;
 
+type OperandRelation = fn(&mut CheckerState, TypeId, TypeId) -> Result<bool, Error>;
+
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.isTypeAssignableToKindEx
     pub(crate) fn type_assignable_to_kind_strict(
@@ -213,63 +215,110 @@ impl CheckerState {
             let b = self.check_non_null_type(b, right)?;
             let a = self.comparison_base_type(a)?;
             let b = self.comparison_base_type(b)?;
-            let compatible = if (self.types.flags(a)? | self.types.flags(b)?) & tf::ANY != 0 {
-                true
-            } else {
-                let an = self.is_type_related_to(
+            if !self.relational_operands_compatible(a, b)? {
+                self.report_binary_operator_error(
+                    node,
+                    operator,
                     a,
-                    self.builtins.number_or_big_int_type,
-                    RelationKind::Assignable,
-                )?;
-                let bn = self.is_type_related_to(
                     b,
-                    self.builtins.number_or_big_int_type,
-                    RelationKind::Assignable,
+                    Some(Self::relational_operands_compatible),
                 )?;
-                an && bn || !an && !bn && self.types_comparable(a, b)?
-            };
-            if !compatible {
-                self.report_binary_operator_error(node, operator, a, b)?;
             }
         }
         Ok(self.builtins.boolean_type)
     }
 
+    fn relational_operands_compatible(&mut self, a: TypeId, b: TypeId) -> Result<bool, Error> {
+        if (self.types.flags(a)? | self.types.flags(b)?) & tf::ANY != 0 {
+            return Ok(true);
+        }
+        let an = self.is_type_related_to(
+            a,
+            self.builtins.number_or_big_int_type,
+            RelationKind::Assignable,
+        )?;
+        let bn = self.is_type_related_to(
+            b,
+            self.builtins.number_or_big_int_type,
+            RelationKind::Assignable,
+        )?;
+        Ok(an && bn || !an && !bn && self.types_comparable(a, b)?)
+    }
+
+    pub(crate) fn addition_operands_close_enough(
+        &mut self,
+        a: TypeId,
+        b: TypeId,
+    ) -> Result<bool, Error> {
+        let close = tf::NUMBER_LIKE | tf::BIG_INT_LIKE | tf::STRING_LIKE | tf::ANY_OR_UNKNOWN;
+        Ok(self.type_assignable_to_kind(a, close)? && self.type_assignable_to_kind(b, close)?)
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.bothAreBigIntLike
+    pub(crate) fn both_big_int_like(&mut self, a: TypeId, b: TypeId) -> Result<bool, Error> {
+        Ok(self.type_assignable_to_kind(a, tf::BIG_INT_LIKE)?
+            && self.type_assignable_to_kind(b, tf::BIG_INT_LIKE)?)
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.reportOperatorError
+    // port: tsc/internal/checker/checker.go:Checker.getBaseTypesIfUnrelated
+    // port: tsc/internal/checker/checker.go:Checker.errorAndMaybeSuggestAwait
     pub(crate) fn report_binary_operator_error(
         &mut self,
         node: NodeId,
         operator: NodeKind,
         a: TypeId,
         b: TypeId,
+        is_related: Option<OperandRelation>,
     ) -> Result<(), Error> {
-        // Missing-await elaboration changes both message and related information.
-        if self.property_type(a, b"then")?.is_some() || self.property_type(b, b"then")?.is_some() {
-            return Err(Error::Unsupported(
-                "reportOperatorError: awaited operand suggestions",
-            ));
-        }
-        let (mut a, mut b) = (a, b);
-        if matches!(operator.known(), Some(K::PlusToken | K::PlusEqualsToken)) {
-            // reportOperatorError's getBaseTypesIfUnrelated uses the caller's
-            // closeEnoughKind predicate for addition. Keep the original types
-            // when their bases would make the operands compatible.
-            let left_base = self.base_literal_type(a)?;
-            let right_base = self.base_literal_type(b)?;
-            let close = tf::NUMBER_LIKE | tf::BIG_INT_LIKE | tf::STRING_LIKE | tf::ANY_OR_UNKNOWN;
-            if !(self.type_assignable_to_kind(left_base, close)?
-                && self.type_assignable_to_kind(right_base, close)?)
-            {
-                a = left_base;
-                b = right_base;
+        let mut would_work_with_await = false;
+        if let Some(is_related) = is_related {
+            if let (Some(awaited_a), Some(awaited_b)) = (
+                self.awaited_type_no_alias(a)?,
+                self.awaited_type_no_alias(b)?,
+            ) {
+                would_work_with_await =
+                    !(awaited_a == a && awaited_b == b) && is_related(self, awaited_a, awaited_b)?;
             }
         }
-        let a = self.type_to_string(a, crate::type_display::DEFAULT_FLAGS)?;
-        let b = self.type_to_string(b, crate::type_display::DEFAULT_FLAGS)?;
-        self.error_at(
-            Some(node),
-            d::Operator_0_cannot_be_applied_to_types_1_and_2,
-            vec![operator_text(operator), a, b],
-        )?;
+        let (mut a, mut b) = (a, b);
+        if !would_work_with_await {
+            if let Some(is_related) = is_related {
+                let left_base = self.base_literal_type(a)?;
+                let right_base = self.base_literal_type(b)?;
+                if !is_related(self, left_base, right_base)? {
+                    a = left_base;
+                    b = right_base;
+                }
+            }
+        }
+        let (a, b) = self.type_names_for_error_display(a, b)?;
+        let (message, arguments) = match operator.known() {
+            Some(
+                K::EqualsEqualsToken
+                | K::EqualsEqualsEqualsToken
+                | K::ExclamationEqualsToken
+                | K::ExclamationEqualsEqualsToken,
+            ) => (
+                d::This_comparison_appears_to_be_unintentional_because_the_types_0_and_1_have_no_overlap,
+                vec![a, b],
+            ),
+            _ => (
+                d::Operator_0_cannot_be_applied_to_types_1_and_2,
+                vec![operator_text(operator), a, b],
+            ),
+        };
+        let mut diagnostic = self.diagnostic_for_node(Some(node), message, arguments)?;
+        if would_work_with_await {
+            diagnostic
+                .related_information
+                .push(std::sync::Arc::new(self.diagnostic_for_node(
+                    Some(node),
+                    d::Did_you_forget_to_use_await,
+                    vec![],
+                )?));
+        }
+        self.add_diagnostic(diagnostic)?;
         Ok(())
     }
 }

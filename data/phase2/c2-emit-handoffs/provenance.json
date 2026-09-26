@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "command": [
+    "go",
+    "test",
+    "-mod=readonly",
+    "-trimpath",
+    "-gcflags=github.com/microsoft/TypeScript/tsc/internal/repo=-trimpath=/Users/cristian/git/ts-rust/target/phase2/c2-emit-handoffs/unmatched",
+    "-overlay",
+    "/Users/cristian/git/ts-rust/target/phase2/c2-emit-handoffs/overlay.json",
+    "./internal/testrunner",
+    "-run",
+    "^TestPhase2Checker$",
+    "-count=1",
+    "-v",
+    "-timeout=2m"
+  ],
+  "go": {
+    "go": "go1.27.1",
+    "goos": "darwin",
+    "goarch": "arm64",
+    "single_threaded": true
+  },
+  "artifacts": {
+    "requests.json": "6b52681bafcaead8ceea2fb908abc2593e3a9a488d6bb1bbd450e512d11cf9e5",
+    "observations.json": "d66e7453d551794de6c392de5a721321e3b508e704f91cb21b0cc9231691d27b",
+    "stacks.json": "400258c2041e7572e119b6b0d76732d207fa4d677105e289f2d25b8f87bc706d",
+    "observer.go": "6e2705bd097b546ad174a3666d68a68cadf81c06795c16498a5ba12b53f7a190",
+    "regenerate.py": "fc25237bedee9a27dbd0b100a56e1f0303fd214949dc5f20850fa3a78e8eff80"
+  },
+  "producer_inputs": {
+    "scripts/phase2_native.py": "01f096c396230aa953e584e9e11f8cb54c43807a8482b3a0dcc003f56338a393",
+    "scripts/phase2_inventory.py": "93e7367a713dcffa883ce4e9e67ac58da7c52de8281e4092f4c3e46547e0e95a",
+    "scripts/s08_baselines.py": "d269502f9bb860d485deb0fde98817fcedde190f3bb00d62da5615d176855bdb",
+    "scripts/s04.py": "552e676a31ef745c77b1c06304e2ef0153c83c3752a045347bc1a0f7c58e554a",
+    "scripts/s04_common.py": "0c9ff31e34d83cbd9c500bb9462631b862a221acfb6f85e4816d1aedbb6a68d7",
+    "scripts/s04_runtime.py": "80fe4361129d4fd5ffd7a4a6f3a890ce7a18f06f6c5aaa39a17951ccd6e271d5",
+    "scripts/s08_oracle.py": "40f1e75bda1c909fa55f7011ac3b0b324b1e3fd6a0ea1197bfdd686644cc3f7d",
+    "scripts/tracking-bootstrap.py": "3eeb28198dd1d9d1e2946cd0435a5b8f2e59c7d6b5b9987e7eafb555bb64c8c7",
+    "scripts/s07_acceptance.py": "73ed929c6b5b1256ac1db5ab01a674a42adb94e63191f76f84a9477795d119e3",
+    "scripts/s08_manifest.py": "c3c4e43807dc474d9a0874ab9de2eb45f0a22e988ff499645fa5832d777c76ba",
+    "data/s04/toolchains.toml": "f7f747f45b0570c179771ba0e01e37a3fc3c1ca7e98dbf042b7eabf6d9f9c0be",
+    "data/upstream.json": "9f3a288befbb79b1dcd59c2fd0d87fd2cddf120563f8b4c129ce88e3c3957af9",
+    "data/phase2/inventory.json": "c09721d36d361eb8646b2321ec3478da0fbdbf12253c086e7b1c34e966aea9b9",
+    "data/s07/subset.json": "8539ce8af2f0cd5245554114e8d257805fe266e46fcabbb4ac220d5bcd2c4f2a",
+    "tools/s08/oracle/baselines_test.go": "a9e2ca97100cbf5f253071a71ef51c8b3a740e74c8f0c2353082d96f69d61781",
+    "tools/s08/oracle/baselines_bridge.go": "049137e41ad5579b528698e432e6e3b3a68b55d0372fa56da9418ada77bb08ad",
+    "tools/s08/oracle/diagnostics_observer.go": "03de33614987dbef8187c150b9f3fbec5505ad3add2109614cbbfaf8ead86731"
+  },
+  "overlay_sha256": {
+    "checker/c2_emit_stack.go": "6e2705bd097b546ad174a3666d68a68cadf81c06795c16498a5ba12b53f7a190",
+    "checker/checker.go": "576d32811065dedd7403c20efd892bba45c0558017053a5d83aa917f9b7a163e",
+    "testrunner/phase2_checker_test.go": "20f466cb3135b3f87ea8334b2d0dd10ac91376cce725a9157f7b2f976e7b6d25",
+    "testrunner/phase2_subtests_test.go": "ac80be2113ff24ae4b05d0718611a508f1f067f1def01c5ed99b67bd09102cdd",
+    "testutil/harnessutil/harnessutil.go": "ebac4b3a21ec38e53c3f423135ad6663544fa7e0adca0ca5f5d1ffebbafd5552",
+    "testutil/harnessutil/phase2_observer.go": "5b59a9cd9efbf759fdd01b83bc9092b8b5aa3f616c4ae69736df62ce95682824",
+    "testutil/harnessutil/s08_diagnostics_observer.go": "03de33614987dbef8187c150b9f3fbec5505ad3add2109614cbbfaf8ead86731",
+    "testutil/tsbaseline/s08_baselines_bridge.go": "049137e41ad5579b528698e432e6e3b3a68b55d0372fa56da9418ada77bb08ad",
+    "testutil/tsbaseline/type_symbol_baseline.go": "fca11987ce00793d2af7d8131c6e33fdd1f90913136c4aaa07956347ca205ceb"
+  },
+  "raw_log_sha256": "d701cc2fcdb14f1a40441796434602084bf13a217b2ded3339ba375c9e205138",
+  "raw_observations_sha256": "0f3a990d14785ffb7ac420cf6afa584810882d99ac070fcae89a2b8a7196a62a",
+  "scope": "Exactly three errors-domain handoffs. Separate pre/post programs preserve pinned emit-before-semantic order. No checker queries, counter changes, threshold changes, or diagnostic changes were added by the observer. Stack arguments/addresses omitted from the retained normalized frames."
+}

@@ -142,7 +142,9 @@ impl CheckerState {
                 .ok_or(Error::MissingLink("padded property text"))?;
             let symbol = self.new_symbol(sf::PROPERTY | sf::OPTIONAL, name.clone())?;
             let ty = self.type_from_binding_element(element, false, false)?;
-            self.value_symbol_links.get_or_default(symbol).resolved_type = Some(ty);
+            self.value_symbol_links
+                .get_or_default(self.value_symbol_key(symbol)?)
+                .resolved_type = Some(ty);
             members.insert(name, Some(symbol));
         }
         let record = *self.types.get(ty)?;
@@ -280,7 +282,7 @@ impl CheckerState {
             if let Some(symbol) = self.get_symbol_of_declaration(declaration)? {
                 if let Some(ty) = self
                     .value_symbol_links
-                    .try_get(symbol)
+                    .try_get(self.value_symbol_key(symbol)?)
                     .and_then(|links| links.resolved_type)
                 {
                     if !(self.options.strict_null_checks
@@ -576,7 +578,9 @@ impl CheckerState {
                 name.clone(),
             )?;
             let ty = self.type_from_binding_element(element, include_pattern, report)?;
-            self.value_symbol_links.get_or_default(symbol).resolved_type = Some(ty);
+            self.value_symbol_links
+                .get_or_default(self.value_symbol_key(symbol)?)
+                .resolved_type = Some(ty);
             members.insert(name, Some(symbol));
         }
         let members = self.alloc_symbol_table(members);
@@ -729,7 +733,9 @@ impl CheckerState {
                     let symbol = self
                         .get_symbol_of_declaration(element)?
                         .ok_or(Error::MissingLink("assigned binding symbol"))?;
-                    self.value_symbol_links.get_or_default(symbol).resolved_type = Some(ty);
+                    self.value_symbol_links
+                        .get_or_default(self.value_symbol_key(symbol)?)
+                        .resolved_type = Some(ty);
                 } else {
                     self.assign_binding_element_types(name, ty)?;
                 }

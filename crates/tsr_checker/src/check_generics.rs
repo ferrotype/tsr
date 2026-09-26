@@ -7,6 +7,32 @@ use tsr_arena::NodeId;
 use tsr_ast::SyntaxKind as K;
 
 impl CheckerState {
+    // port: tsc/internal/checker/checker.go:Checker.getTypeParametersForTypeAndSymbol
+    pub(crate) fn type_parameters_for_type_and_symbol(
+        &mut self,
+        ty: TypeId,
+        symbol: tsr_arena::SymbolId,
+    ) -> Result<crate::TypeList, Error> {
+        if self.is_error_type(ty)? {
+            return Ok(crate::TypeList::default());
+        }
+        if self.symbol(symbol)?.flags() & tsr_ast::symbol_flags::TYPE_ALIAS != 0 {
+            if let Some(parameters) = &self.query.type_aliases.get_or_default(symbol).parameters {
+                if !parameters.is_empty() {
+                    return Ok(parameters.clone());
+                }
+            }
+        }
+        if self.types.object_flags(ty)? & crate::object_flags::REFERENCE != 0 {
+            let interface = self.types.interface(self.types.target(ty)?)?;
+            return Ok(interface.type_parameters()
+                [interface.outer_type_parameter_count as usize..]
+                .to_vec()
+                .into());
+        }
+        Ok(crate::TypeList::default())
+    }
+
     // port: tsc/internal/checker/checker.go:Checker.checkTypeParameters
     pub(crate) fn check_type_parameters(&mut self, node: NodeId) -> Result<(), Error> {
         let nodes = self.source_list(node, self.node(node)?.type_parameter_list())?;
@@ -244,15 +270,38 @@ impl CheckerState {
         for &node in &nodes {
             self.check_source_element(node)?;
         }
+        self.check_type_reference_or_import(node)
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.checkTypeReferenceOrImport
+    pub(crate) fn check_type_reference_or_import(&mut self, node: NodeId) -> Result<(), Error> {
         let ty = self.get_type_from_type_node(node)?;
-        if ty == self.builtins.error_type || nodes.is_empty() {
+        if self.is_error_type(ty)? {
             return Ok(());
         }
-        let Some(symbol) = self.type_reference_symbol(node, true)? else {
+        let Some(symbol) = self.query.resolved_symbols.try_get(node).copied().flatten() else {
             return Ok(());
         };
-        let parameters = self.get_local_type_parameters(symbol)?;
-        self.check_type_argument_constraints(node, &parameters)?;
+        if !self
+            .source_list(node, self.node(node)?.type_argument_list())?
+            .is_empty()
+        {
+            let parameters = self.type_parameters_for_type_and_symbol(ty, symbol)?;
+            if !parameters.is_empty() {
+                self.check_type_argument_constraints(node, &parameters)?;
+            }
+        }
+        let declarations = self.symbol_declarations(symbol)?.to_vec();
+        for declaration in declarations.iter().flatten() {
+            if self.is_type_declaration(*declaration)?
+                && self.is_deprecated_declaration(*declaration)?
+            {
+                let location = self.deprecated_suggestion_node(node)?;
+                let name = self.symbol(symbol)?.name_to_owned();
+                self.add_deprecated_suggestion(location, &declarations, name)?;
+                break;
+            }
+        }
         Ok(())
     }
 

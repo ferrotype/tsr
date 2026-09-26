@@ -7,15 +7,16 @@ use tsr_ast::{FactoryMethods, JsString, SymbolTable, SymbolTableId, SyntaxKind a
 use tsr_core::collections::{CopyOnWriteMap, CopyOnWriteSet};
 use tsr_nodebuilder::flags as nf;
 
-// Scope entry must remain O(1): every table here is copy-on-write. When Phase 2
-// adds Go's typeParameterSymbolList for generic qualified names, it must use a
-// CopyOnWriteSet too. An explicit snapshot lists every field so a new plain
+// Scope entry must remain O(1): every table here is copy-on-write, including
+// Go's typeParameterSymbolList for generic qualified names. An explicit snapshot
+// lists every field so a new plain
 // collection cannot silently inherit a deep copy through derive(Clone).
 #[derive(Default)]
 pub(super) struct TypeParameterNames {
     names: CopyOnWriteMap<TypeId, NodeId, crate::types::FastState>,
     text: CopyOnWriteSet<JsString, crate::types::FastState>,
     next: CopyOnWriteMap<JsString, usize, crate::types::FastState>,
+    pub(super) symbols: CopyOnWriteSet<SymbolId, crate::types::FastState>,
 }
 
 impl TypeParameterNames {
@@ -24,6 +25,7 @@ impl TypeParameterNames {
             names: self.names.snapshot(),
             text: self.text.snapshot(),
             next: self.next.snapshot(),
+            symbols: self.symbols.snapshot(),
         }
     }
 }
@@ -262,7 +264,7 @@ impl NodeBuilder<'_> {
         }
         let symbol = self.checker.types.get(ty)?.symbol;
         let mut node = match symbol {
-            Some(symbol) => self.symbol_node(symbol)?,
+            Some(symbol) => self.symbol_name_node(symbol, tsr_ast::symbol_flags::TYPE, true)?,
             None => self
                 .ast
                 .new_identifier(JsString::from_bytes(b"?".as_slice())),

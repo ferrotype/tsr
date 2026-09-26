@@ -141,6 +141,7 @@ impl ProgramCheckerHost {
             .map(|output| path::absolute(output.output_dts.as_bytes(), cwd));
         let mut targets: Vec<Vec<u8>> = reference_redirect.iter().cloned().collect();
         targets.push(path::absolute(target, cwd));
+        // port: tsc/internal/compiler/program.go:Program.GetRedirectTargets
         for (alias, destination) in &program.redirect_paths {
             if destination == &imported {
                 let name = program

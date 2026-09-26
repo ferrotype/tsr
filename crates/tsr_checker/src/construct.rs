@@ -266,9 +266,19 @@ impl CheckerState {
         index_infos: &[IndexInfoId],
     ) -> Result<(), Error> {
         let container = self.types.get(t)?.symbol;
-        let properties = self.get_named_members(members, container)?;
+        // Named-member filtering can resolve a CommonJS alias whose right
+        // side reads this same object. Native publishes the member table and
+        // completion bit first so that reentry can look up that property.
+        self.types.get_mut(t)?.object_flags |= object_flags::MEMBERS_RESOLVED;
+        self.types.structured_mut(t)?.members = members;
+        let properties = match self.get_named_members(members, container) {
+            Ok(properties) => properties,
+            Err(error) => {
+                self.types.get_mut(t)?.object_flags &= !object_flags::MEMBERS_RESOLVED;
+                return Err(error);
+            }
+        };
         let data = self.types.structured_mut(t)?;
-        data.members = members;
         data.properties = properties;
         if call_signatures.is_empty() && construct_signatures.is_empty() {
             data.signatures = None;
@@ -284,9 +294,6 @@ impl CheckerState {
         } else {
             Some(Arc::from(index_infos))
         };
-        // An unsupported member read must not leave the completion bit set:
-        // a later query would otherwise skip the same unfinished operation.
-        self.types.get_mut(t)?.object_flags |= object_flags::MEMBERS_RESOLVED;
         Ok(())
     }
 
@@ -501,7 +508,7 @@ impl CheckerState {
                         readonly_flags,
                     )?;
                     self.value_symbol_links
-                        .get_or_default(property)
+                        .get_or_default(self.value_symbol_key(property)?)
                         .resolved_type = Some(type_parameter);
                     let name = self.symbol(property)?.name_to_owned();
                     members.insert(name, Some(property));
@@ -514,9 +521,10 @@ impl CheckerState {
             JsString::from_bytes(&b"length"[..]),
             readonly_flags,
         )?;
+        let length_key = self.value_symbol_key(length_symbol)?;
         if combined_flags & element_flags::VARIABLE != 0 {
             self.value_symbol_links
-                .get_or_default(length_symbol)
+                .get_or_default(length_key)
                 .resolved_type = Some(self.builtins.number_type);
         } else {
             let mut literal_types = Vec::with_capacity(arity + 1 - min_length);
@@ -525,7 +533,7 @@ impl CheckerState {
             }
             let length = self.get_union_type(&literal_types)?;
             self.value_symbol_links
-                .get_or_default(length_symbol)
+                .get_or_default(length_key)
                 .resolved_type = Some(length);
         }
         members.insert(JsString::from_bytes(&b"length"[..]), Some(length_symbol));

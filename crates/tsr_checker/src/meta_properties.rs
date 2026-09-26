@@ -130,7 +130,9 @@ impl CheckerState {
             tsr_ast::check_flags::READONLY,
         )?;
         self.symbol_mut(meta)?.parent = Some(symbol);
-        self.value_symbol_links.get_or_default(meta).resolved_type = Some(import_meta);
+        self.value_symbol_links
+            .get_or_default(self.value_symbol_key(meta)?)
+            .resolved_type = Some(import_meta);
         let mut table = tsr_ast::SymbolTable::default();
         table.insert(JsString::from_bytes(&b"meta"[..]), Some(meta));
         let members = self.alloc_symbol_table(table);

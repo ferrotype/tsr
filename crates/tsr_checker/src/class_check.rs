@@ -449,7 +449,7 @@ impl CheckerState {
                 .ok_or(Error::MissingLink("class property symbol"))?;
             let ty = self.get_type_of_symbol(symbol)?;
             if self.types.flags(ty)? & tf::ANY_OR_UNKNOWN != 0
-                || self.class_type_contains_undefined(ty)?
+                || self.contains_undefined_type(ty)?
             {
                 continue;
             }
@@ -462,20 +462,6 @@ impl CheckerState {
             self.error_at(Some(name), messages::Property_0_has_no_initializer_and_is_not_definitely_assigned_in_the_constructor, vec![text])?;
         }
         Ok(())
-    }
-
-    pub(crate) fn class_type_contains_undefined(&self, ty: TypeId) -> Result<bool, Error> {
-        if self.types.flags(ty)? & tf::UNDEFINED != 0 {
-            return Ok(true);
-        }
-        if self.types.flags(ty)? & tf::UNION != 0 {
-            for &part in self.types.types_of(ty)? {
-                if self.class_type_contains_undefined(part)? {
-                    return Ok(true);
-                }
-            }
-        }
-        Ok(false)
     }
 }
 

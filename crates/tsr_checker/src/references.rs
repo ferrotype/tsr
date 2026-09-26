@@ -78,6 +78,17 @@ impl CheckerState {
         arguments: &[TypeId],
         alias: Option<AliasId>,
     ) -> Result<TypeId, Error> {
+        if ty == self.builtins.intrinsic_marker_type && arguments.len() == 1 {
+            match self.symbol(symbol)?.name_bytes() {
+                b"Uppercase" | b"Lowercase" | b"Capitalize" | b"Uncapitalize" => {
+                    return self.get_string_mapping_type(symbol, arguments[0]);
+                }
+                b"NoInfer" => return self.no_infer_type(arguments[0]),
+                _ => {}
+            }
+        }
+        // The cache distinguishes supplied arguments from arguments filled by
+        // defaults, even when the resulting instantiated type is interned.
         let mut key = crate::key::KeyBuilder::new();
         key.write_types(arguments);
         let parts = self.alias_key_parts(alias)?;
@@ -96,7 +107,12 @@ impl CheckerState {
         {
             return Ok(cached);
         }
-        let mapper = self.new_type_mapper(parameters, arguments)?;
+        let in_js = match self.symbol(symbol)?.value_declaration() {
+            Some(declaration) => self.node(declaration)?.flags() & nf::JAVA_SCRIPT_FILE != 0,
+            None => false,
+        };
+        let arguments = self.fill_missing_type_arguments(arguments, parameters, in_js)?;
+        let mapper = self.new_type_mapper(parameters, &arguments)?;
         let result = self.instantiate_type_with_alias(ty, Some(mapper), alias)?;
         self.query
             .type_aliases
@@ -292,16 +308,6 @@ impl CheckerState {
                 if !self.check_reference_arity(node, symbol, &argument_nodes, &parameters)? {
                     return Ok(self.builtins.error_type);
                 }
-                let arguments = self.effective_type_arguments(node, &parameters)?;
-                if ty == self.builtins.intrinsic_marker_type && arguments.len() == 1 {
-                    match self.symbol(symbol)?.name_bytes() {
-                        b"Uppercase" | b"Lowercase" | b"Capitalize" | b"Uncapitalize" => {
-                            return self.get_string_mapping_type(symbol, arguments[0])
-                        }
-                        b"NoInfer" => return self.no_infer_type(arguments[0]),
-                        _ => {}
-                    }
-                }
                 // We refrain from associating a local type alias with an
                 // instantiation of a top-level type alias because the local alias
                 // may end up being referenced in an inferred return type where it
@@ -343,6 +349,10 @@ impl CheckerState {
                 let alias = alias
                     .map(|alias| self.types.push_alias(alias))
                     .transpose()?;
+                let arguments = argument_nodes
+                    .iter()
+                    .map(|&argument| self.get_type_from_type_node(argument))
+                    .collect::<Result<Vec<_>, _>>()?;
                 return self.type_alias_instantiation(symbol, ty, &parameters, &arguments, alias);
             }
         }
@@ -593,19 +603,9 @@ impl CheckerState {
         let interface = self.types.interface(target)?;
         let parameters = interface.type_parameters().to_vec();
         let outer_count = interface.outer_type_parameter_count as usize;
-        let types = &self.types;
-        if !self.resolution.push(
+        if !self.push_type_resolution(
             TypeSystemEntity::Type(ty),
             TypeSystemPropertyName::ResolvedTypeArguments,
-            |resolution| {
-                let TypeSystemEntity::Type(ty) = resolution.target else {
-                    return false;
-                };
-                resolution.property_name == TypeSystemPropertyName::ResolvedTypeArguments
-                    && types
-                        .type_reference(ty)
-                        .is_ok_and(|reference| reference.resolved_type_arguments.is_some())
-            },
         ) {
             return Ok(vec![self.builtins.error_type; parameters.len()].into());
         }
@@ -666,13 +666,12 @@ impl CheckerState {
                 .clone()
                 .ok_or(Error::MissingLink("circular arguments"));
         }
+        if let Some(arguments) = &self.types.type_reference(ty)?.resolved_type_arguments {
+            return Ok(arguments.clone());
+        }
         let arguments = self.instantiate_types(&arguments, mapper)?;
-        Ok(self
-            .types
-            .type_reference_mut(ty)?
-            .resolved_type_arguments
-            .get_or_insert(arguments)
-            .clone())
+        self.types.type_reference_mut(ty)?.resolved_type_arguments = Some(arguments.clone());
+        Ok(arguments)
     }
 }
 

@@ -128,6 +128,7 @@ impl CheckerState {
                         sf::PROPERTY | (self.symbol(left_property)?.flags() & sf::OPTIONAL),
                         name.clone(),
                     )?;
+                    let property_key = self.value_symbol_key(property)?;
                     let left_type = self.get_type_of_symbol(left_property)?;
                     let left_without = self.remove_missing_or_undefined(left_type)?;
                     let right_without = self.remove_missing_or_undefined(right_type)?;
@@ -143,9 +144,9 @@ impl CheckerState {
                     };
                     let name_type = self
                         .value_symbol_links
-                        .try_get(left_property)
+                        .try_get(self.value_symbol_key(left_property)?)
                         .and_then(|links| links.name_type);
-                    let links = self.value_symbol_links.get_or_default(property);
+                    let links = self.value_symbol_links.get_or_default(property_key);
                     links.resolved_type = Some(value);
                     links.name_type = name_type;
                     self.bindings
@@ -259,6 +260,7 @@ impl CheckerState {
                 read.flags() & sf::SET_ACCESSOR != 0 && read.flags() & sf::GET_ACCESSOR == 0;
             let checks = read.check_flags() & cf::LATE | if readonly { cf::READONLY } else { 0 };
             let property = self.new_symbol_ex(sf::PROPERTY | sf::OPTIONAL, name.clone(), checks)?;
+            let property_key = self.value_symbol_key(property)?;
             let value = if setonly {
                 self.builtins.undefined_type
             } else {
@@ -267,9 +269,9 @@ impl CheckerState {
             };
             let name_type = self
                 .value_symbol_links
-                .try_get(source)
+                .try_get(self.value_symbol_key(source)?)
                 .and_then(|links| links.name_type);
-            let links = self.value_symbol_links.get_or_default(property);
+            let links = self.value_symbol_links.get_or_default(property_key);
             links.resolved_type = Some(value);
             links.name_type = name_type;
             self.symbol_mut(property)?.declarations = declarations;

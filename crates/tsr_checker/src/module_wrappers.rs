@@ -46,7 +46,7 @@ impl CheckerState {
             let defaults =
                 self.default_property_wrapper_for_module(symbol, Some(original), Some(anonymous))?;
             self.value_symbol_links
-                .get_or_default(anonymous)
+                .get_or_default(self.value_symbol_key(anonymous)?)
                 .resolved_type = Some(defaults);
             if self.valid_spread_type(ty)? {
                 self.object_spread_type(ty, defaults, Some(anonymous), 0, false)?
@@ -69,7 +69,9 @@ impl CheckerState {
         let default = self.new_symbol(sf::ALIAS, JsString::from_bytes(names::DEFAULT))?;
         self.symbol_mut(default)?.parent = original;
         let name_type = self.get_string_literal_type(JsString::from_bytes(names::DEFAULT))?;
-        self.value_symbol_links.get_or_default(default).name_type = Some(name_type);
+        self.value_symbol_links
+            .get_or_default(self.value_symbol_key(default)?)
+            .name_type = Some(name_type);
         let target = self
             .resolve_module_symbol(Some(symbol), false)?
             .ok_or(Error::MissingLink("module default alias target"))?;
@@ -125,7 +127,9 @@ impl CheckerState {
         let members = resolved.members;
         let indexes = resolved.index_infos.as_deref().unwrap_or_default().to_vec();
         let ty = self.new_anonymous_type(Some(result), members, &[], &[], &indexes)?;
-        self.value_symbol_links.get_or_default(result).resolved_type = Some(ty);
+        self.value_symbol_links
+            .get_or_default(self.value_symbol_key(result)?)
+            .resolved_type = Some(ty);
         Ok(result)
     }
     fn clone_module_wrapper_table(

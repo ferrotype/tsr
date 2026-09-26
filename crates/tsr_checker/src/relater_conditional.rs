@@ -36,10 +36,7 @@ impl Relater<'_> {
         target: TypeId,
         intersection: u32,
     ) -> Result<Ternary, Error> {
-        if self
-            .checker
-            .deeply_nested_type(target, &self.frame().target_stack, 10)?
-        {
+        if self.deeply_nested_relation_type(target, TARGET, 10)? {
             return Ok(tr::MAYBE);
         }
         let data = *self.checker.types.conditional(target)?;
@@ -84,10 +81,7 @@ impl Relater<'_> {
         target: TypeId,
         saved: &crate::relation_errors::RelationErrors,
     ) -> Result<Ternary, Error> {
-        if self
-            .checker
-            .deeply_nested_type(source, &self.frame().source_stack, 10)?
-        {
+        if self.deeply_nested_relation_type(source, SOURCE, 10)? {
             return Ok(tr::MAYBE);
         }
         if self.checker.types.flags(target)? & tf::CONDITIONAL != 0 {

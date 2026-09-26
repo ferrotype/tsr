@@ -14,6 +14,8 @@ include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/lice
 
 [features]
 relation-probe = ["tsr_checker/relation-probe"]
+recursion-probe = ["relation-probe", "tsr_checker/recursion-probe"]
+creation-trace = ["relation-probe", "tsr_checker/creation-trace"]
 # S08 P7 measurement executables (`data/s08/checker-workload.json`): the normal
 # timing binary has neither; phase timing adds nested exclusive clocks;
 # allocation adds the counting allocator wrapper.
@@ -22,10 +24,14 @@ s08-allocation = ["tsr_checker/storage-pilot"]
 
 [[test]]
 name = "c1_contracts"
-required-features = ["relation-probe"]
+required-features = ["recursion-probe"]
 
 [[example]]
 name = "p3_relations"
+required-features = ["relation-probe"]
+
+[[example]]
+name = "c2_order_trace"
 required-features = ["relation-probe"]
 
 [[example]]

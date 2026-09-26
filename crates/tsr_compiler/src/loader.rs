@@ -290,6 +290,7 @@ impl Program {
     }
     /// The referenced project whose options resolve this file's imports
     /// (the pin's Program.GetRedirectForResolution, a checker accessor).
+    /// port: tsc/internal/compiler/program.go:Program.GetRedirectForResolution
     pub fn redirect_for_resolution(
         &self,
         path: &[u8],
@@ -316,6 +317,7 @@ impl Program {
     }
     /// The output that replaced a referenced project's source, if any (the
     /// pin's Program.GetParseFileRedirect, a checker accessor).
+    /// port: tsc/internal/compiler/program.go:Program.GetParseFileRedirect
     pub fn parse_file_redirect(&self, file_name: &[u8]) -> Option<JsString> {
         let file = new_has_file_name(JsString::from_bytes(file_name), self.to_path(file_name));
         self.references.published_parse_file_redirect(file.path())
@@ -657,6 +659,12 @@ impl<'a> Loader<'a> {
             })
             .collect();
         let retained_paths: BTreeSet<_> = by_path.keys().cloned().collect();
+        // filesParser.parse publishes metadata only for collected source files.
+        // A deduplicated package's unvisited dependencies were parsed but do not
+        // belong to the program. Redirect spellings resolve through by_path to
+        // their retained source, whose own path selects its metadata.
+        self.metadata
+            .retain(|file_path, _| retained_paths.contains(file_path));
         for (alias, target) in &redirects {
             if let Some(&index) = by_path.get(target) {
                 by_path.insert(alias.clone(), index);

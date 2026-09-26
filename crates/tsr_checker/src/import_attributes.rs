@@ -81,7 +81,9 @@ impl CheckerState {
             let member = self.new_symbol(sf::PROPERTY, name.clone())?;
             let ty = self.check_expression_cached(value)?;
             let ty = self.get_regular_type_of_literal_type(ty)?;
-            self.value_symbol_links.get_or_default(member).resolved_type = Some(ty);
+            self.value_symbol_links
+                .get_or_default(self.value_symbol_key(member)?)
+                .resolved_type = Some(ty);
             members.insert(name, Some(member));
         }
         let members = self.alloc_symbol_table(members);

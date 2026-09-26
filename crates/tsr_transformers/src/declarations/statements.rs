@@ -108,6 +108,16 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
     ) -> Result<Option<NodeListId>, R::Error> {
         while let Some(node) = self.tracker.late_marked.first().copied() {
             self.tracker.late_marked.remove(0);
+            // Accessibility can queue a declaration from a merged namespace
+            // in another file. Its syntax must outlive the emitted replacement.
+            if self.output.view().node(node).is_err() {
+                let source = tsr_ast::utilities::get_source_file_of_node(
+                    self.resolver.ast(node)?,
+                    Some(node),
+                )?
+                .ok_or(tsr_arena::Error::InvalidGraph)?;
+                self.resolver.retain_source(source, self.output)?;
+            }
             let old = self.needs_declare;
             self.needs_declare = self
                 .node(node)

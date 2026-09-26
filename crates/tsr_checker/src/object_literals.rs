@@ -77,19 +77,9 @@ impl CheckerState {
         self.defer_checker_node(node)?;
         let destructuring = tsr_ast::is_assignment_target(self.ast(node)?, node)?;
         self.check_object_literal_grammar(node, destructuring)?;
-        let context = self.contextual_expression_type(node)?;
-        let inference = self.call_inference_at_node(node)?;
-        if let Some(ty) = context {
-            self.calls.contexts.push(crate::calls::ArgumentContext {
-                node,
-                ty,
-                inference,
-            });
-        }
+        self.push_cached_contextual_type(node)?;
         let result = self.check_object_literal_members(node, &properties, symbol, destructuring);
-        if context.is_some() {
-            self.calls.contexts.pop();
-        }
+        self.calls.contexts.pop();
         result
     }
     fn check_object_literal_members(
@@ -176,7 +166,9 @@ impl CheckerState {
                     text.clone(),
                     checks | if name_type.is_some() { cf::LATE } else { 0 },
                 )?;
-                self.value_symbol_links.get_or_default(prop).name_type = name_type;
+                self.value_symbol_links
+                    .get_or_default(self.value_symbol_key(prop)?)
+                    .name_type = name_type;
                 if destructuring && self.object_member_has_default(declaration)? {
                     self.symbol_mut(prop)?.flags |= sf::OPTIONAL;
                 } else if context_pattern {
@@ -210,7 +202,9 @@ impl CheckerState {
                 stored.declarations = declarations;
                 stored.parent = parent;
                 stored.value_declaration = value;
-                let links = self.value_symbol_links.get_or_default(prop);
+                let links = self
+                    .value_symbol_links
+                    .get_or_default(self.value_symbol_key(prop)?);
                 links.resolved_type = Some(ty);
                 links.target = Some(original);
                 member = Some(prop);

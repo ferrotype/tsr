@@ -6,6 +6,16 @@ use crate::{
 };
 
 impl CheckerState {
+    // port: tsc/internal/checker/checker.go:Checker.containsUndefinedType
+    pub(crate) fn contains_undefined_type(&self, ty: TypeId) -> Result<bool, Error> {
+        let ty = if self.types.flags(ty)? & tf::UNION != 0 {
+            self.types.types_of(ty)?[0]
+        } else {
+            ty
+        };
+        Ok(self.types.flags(ty)? & tf::UNDEFINED != 0)
+    }
+
     // port: tsc/internal/checker/checker.go:Checker.getNonNullableTypeIfNeeded
     pub(crate) fn non_nullable_type_if_needed(&mut self, ty: TypeId) -> Result<TypeId, Error> {
         if self.type_facts(ty, f::IS_UNDEFINED_OR_NULL)? != 0 {

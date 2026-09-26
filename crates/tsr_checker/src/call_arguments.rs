@@ -165,8 +165,8 @@ impl CheckerState {
     ) -> Result<TypeId, Error> {
         self.calls.contexts.push(crate::calls::ArgumentContext {
             node,
-            ty: contextual,
-            inference,
+            ty: Some(contextual),
+            is_cache: false,
         });
         self.calls.inference_contexts.push((node, inference));
         let result = (|| {
@@ -203,11 +203,9 @@ impl CheckerState {
                     let infos = self.inference_context(inference)?.inferences.clone();
                     let mut candidates = false;
                     for info in infos {
-                        let default = self.resolved_type_parameter_default(info.parameter)?;
                         if !info.candidates.is_empty()
                             || !info.contra_candidates.is_empty()
-                            || default != self.builtins.no_constraint_type
-                                && default != self.builtins.circular_constraint_type
+                            || self.inference_parameter_has_default(info.parameter)?
                         {
                             candidates = true;
                             break;

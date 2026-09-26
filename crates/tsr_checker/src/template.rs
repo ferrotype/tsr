@@ -157,15 +157,18 @@ impl CheckerState {
         )
     }
 
-    /// Too complex a cross product is a diagnostic on the current node, which
-    /// arrives with diagnostics (P2); the size check itself is complete.
+    /// Report at the current checking node and let each caller choose the
+    /// pin's recovery type without constructing the oversized cross product.
     // port: tsc/internal/checker/checker.go:Checker.checkCrossProductUnion
-    pub(crate) fn check_cross_product_union(&self, types: &[TypeId]) -> Result<bool, Error> {
+    pub(crate) fn check_cross_product_union(&mut self, types: &[TypeId]) -> Result<bool, Error> {
         let size = self.get_cross_product_union_size(types)?;
         if size >= 100_000 {
-            return Err(Error::Unsupported(
-                "Expression_produces_a_union_type_that_is_too_complex_to_represent",
-            ));
+            self.error_at(
+                self.current_node,
+                tsr_diagnostics::Expression_produces_a_union_type_that_is_too_complex_to_represent,
+                vec![],
+            )?;
+            return Ok(false);
         }
         Ok(true)
     }
@@ -178,8 +181,9 @@ impl CheckerState {
             if flags & type_flags::UNION != 0 {
                 let n = self.types.types_of(*t)?.len();
                 // Cap the result to avoid integer overflow when computing the cross product of many large unions.
-                if n > 0 && size > usize::MAX / n {
-                    return Ok(usize::MAX);
+                let max_go_int = isize::MAX as usize;
+                if n > 0 && size > max_go_int / n {
+                    return Ok(max_go_int);
                 }
                 size *= n;
             } else if flags & type_flags::NEVER != 0 {
@@ -235,11 +239,11 @@ impl CheckerState {
         Ok(false)
     }
 
-    // port: tsc/internal/checker/checker.go:Checker.isGenericIndexType
     pub(crate) fn is_generic_type(&mut self, t: TypeId) -> Result<bool, Error> {
         Ok(self.get_generic_object_flags(t)? & object_flags::IS_GENERIC_TYPE != 0)
     }
 
+    // port: tsc/internal/checker/checker.go:Checker.isGenericIndexType
     pub(crate) fn is_generic_index_type(&mut self, t: TypeId) -> Result<bool, Error> {
         Ok(self.get_generic_object_flags(t)? & object_flags::IS_GENERIC_INDEX_TYPE != 0)
     }

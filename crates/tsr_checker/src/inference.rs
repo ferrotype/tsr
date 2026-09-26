@@ -55,6 +55,24 @@ pub(crate) struct InferenceStore {
 }
 
 impl CheckerState {
+    // port: tsc/internal/checker/inference.go:hasTypeParameterDefault
+    pub(crate) fn inference_parameter_has_default(&self, parameter: TypeId) -> Result<bool, Error> {
+        let Some(symbol) = self.types.get(parameter)?.symbol else {
+            return Ok(false);
+        };
+        for declaration in self.symbol_declarations(symbol)?.iter().flatten() {
+            if self
+                .node(declaration)?
+                .data_source()
+                .as_type_parameter_declaration()
+                .is_some_and(|parameter| parameter.default_type().is_some())
+            {
+                return Ok(true);
+            }
+        }
+        Ok(false)
+    }
+
     pub(crate) fn inference_context(&self, id: InferenceId) -> Result<&InferenceContext, Error> {
         id.index(0)
             .and_then(|i| self.inference.contexts.get(i))

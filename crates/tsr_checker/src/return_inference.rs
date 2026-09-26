@@ -43,15 +43,7 @@ impl CheckerState {
                 let contextual = contextual
                     .map(|ty| self.unwrap_body_return_type(function, ty))
                     .transpose()?;
-                let contains_undefined = contextual
-                    .map(|ty| self.return_type_contains_undefined(ty))
-                    .transpose()?
-                    .unwrap_or(false);
-                let ty = if contains_undefined {
-                    self.builtins.undefined_type
-                } else {
-                    self.builtins.void_type
-                };
+                let ty = self.empty_body_return_type(contextual)?;
                 return if is_async {
                     self.create_promise_return_type(function, ty)
                 } else {
@@ -386,19 +378,23 @@ impl CheckerState {
         Ok(true)
     }
 
-    fn return_type_contains_undefined(&self, ty: TypeId) -> Result<bool, Error> {
-        let flags = self.types.flags(ty)?;
-        if flags & tf::UNDEFINED != 0 {
-            return Ok(true);
-        }
-        if flags & tf::UNION != 0 {
-            for &part in self.types.compound_types(ty)?.iter() {
-                if self.return_type_contains_undefined(part)? {
-                    return Ok(true);
-                }
+    // getReturnTypeFromBody uses someType here, not containsUndefinedType:
+    // unreduced contextual unions can place any/unknown before undefined.
+    fn empty_body_return_type(&self, contextual: Option<TypeId>) -> Result<TypeId, Error> {
+        let Some(contextual) = contextual else {
+            return Ok(self.builtins.void_type);
+        };
+        let parts = if self.types.flags(contextual)? & tf::UNION != 0 {
+            self.types.types_of(contextual)?
+        } else {
+            std::slice::from_ref(&contextual)
+        };
+        for &part in parts {
+            if self.types.flags(part)? & tf::UNDEFINED != 0 {
+                return Ok(self.builtins.undefined_type);
             }
         }
-        Ok(false)
+        Ok(self.builtins.void_type)
     }
 
     // port: tsc/internal/checker/checker.go:Checker.getContextualReturnType
@@ -788,5 +784,49 @@ impl CheckerState {
         )?;
         let false_subtype = self.get_reduced_type(false_subtype)?;
         Ok((self.types.flags(false_subtype)? & tf::NEVER != 0).then_some(true_type))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::CheckerOptions;
+    use tsr_arena::{CheckerIdentity, Counters, Generation};
+
+    #[test]
+    fn empty_body_return_preserves_undefined_after_any_or_unknown() {
+        let counters = Counters::new();
+        let identity = CheckerIdentity::new(Generation::new(&counters), &counters);
+        let mut checker = CheckerState::new(
+            &identity,
+            &counters,
+            CheckerOptions {
+                strict_null_checks: true,
+                ..CheckerOptions::default()
+            },
+        )
+        .unwrap();
+        let undefined = checker.builtins.undefined_type;
+        let void = checker.builtins.void_type;
+        for first in [checker.builtins.any_type, checker.builtins.unknown_type] {
+            let contextual = checker
+                .get_union_type_ex(&[first, undefined], UnionReduction::None, None, None)
+                .unwrap();
+            assert_eq!(
+                checker.types.types_of(contextual).unwrap(),
+                &[first, undefined]
+            );
+            assert!(!checker.contains_undefined_type(contextual).unwrap());
+            assert_eq!(
+                checker.empty_body_return_type(Some(contextual)),
+                Ok(undefined)
+            );
+            assert_eq!(checker.empty_body_return_type(Some(first)), Ok(void));
+        }
+        assert_eq!(
+            checker.empty_body_return_type(Some(undefined)),
+            Ok(undefined)
+        );
+        assert_eq!(checker.empty_body_return_type(None), Ok(void));
     }
 }

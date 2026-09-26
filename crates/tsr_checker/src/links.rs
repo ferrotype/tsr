@@ -42,6 +42,45 @@ impl LinkKey for SymbolId {
     }
 }
 
+/// A value-symbol link access observes Go's lazy comparison ID before reading
+/// even an absent entry. Other symbol stores use pointer keys in Go and must
+/// not acquire this side effect.
+#[derive(Clone, Copy)]
+pub(crate) struct ValueSymbolKey(SymbolId);
+
+impl ValueSymbolKey {
+    pub(crate) fn observe(id: SymbolId, symbol: &(impl tsr_ast::SymbolAccess + ?Sized)) -> Self {
+        tsr_ast::runtime_symbol_id(symbol);
+        Self(id)
+    }
+}
+
+impl LinkKey for ValueSymbolKey {
+    fn arena(self) -> ArenaId {
+        self.0.arena()
+    }
+
+    fn slot(self) -> u32 {
+        self.0.slot()
+    }
+}
+
+impl<V> LinkStore<ValueSymbolKey, V> {
+    /// A Rust-only inspection, with no native checker link access. Diagnostic
+    /// probes and additional cache reads must not change comparison order.
+    pub(crate) fn peek(&self, id: SymbolId) -> Option<&V> {
+        self.try_get(ValueSymbolKey(id))
+    }
+
+    #[cfg(test)]
+    pub(crate) fn probe_entry(&mut self, id: SymbolId) -> &mut V
+    where
+        V: Default,
+    {
+        self.get_or_default(ValueSymbolKey(id))
+    }
+}
+
 type Page<V> = Box<[Option<V>]>;
 
 pub struct LinkStore<K: LinkKey, V> {

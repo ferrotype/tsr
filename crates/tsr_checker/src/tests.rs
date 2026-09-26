@@ -31,6 +31,106 @@ fn owner() -> (
 }
 
 #[test]
+fn value_link_misses_assign_ids_but_diagnostic_and_pointer_key_reads_do_not() {
+    // links.go: symbolArenaLinkStore.TryGet observes ast.GetSymbolId even
+    // when absent; core.LinkStore (used by typeAliasLinks) does not.
+    let (_counters, _generation, _identity, owner) = owner();
+    let mut operation = owner.operation().unwrap();
+    let state = operation.state_mut();
+    let symbol = state
+        .new_symbol(
+            symbol_flags::PROPERTY,
+            JsString::from_bytes(b"p".as_slice()),
+        )
+        .unwrap();
+    assert!(state.value_symbol_links.peek(symbol).is_none());
+    state.query.type_aliases.get_or_default(symbol);
+    assert_eq!(
+        tsr_ast::existing_runtime_symbol_id(&state.symbol(symbol).unwrap()),
+        0
+    );
+    let key = state.value_symbol_key(symbol).unwrap();
+    assert!(state.value_symbol_links.try_get(key).is_none());
+    let assigned = tsr_ast::existing_runtime_symbol_id(&state.symbol(symbol).unwrap());
+    assert_ne!(assigned, 0);
+    assert!(!state
+        .value_symbol_links
+        .has(state.value_symbol_key(symbol).unwrap()));
+    assert_eq!(
+        tsr_ast::existing_runtime_symbol_id(&state.symbol(symbol).unwrap()),
+        assigned
+    );
+}
+
+#[test]
+fn cloned_symbol_links_observe_the_new_symbol_before_the_source() {
+    // checker.go:createSymbolWithType gets result links before source links.
+    // Both symbols have the same name and no declarations, so compareSymbols
+    // must reflect link access order rather than arena allocation order.
+    let (_counters, _generation, _identity, owner) = owner();
+    let mut operation = owner.operation().unwrap();
+    let state = operation.state_mut();
+    let source = state
+        .new_symbol(
+            symbol_flags::PROPERTY,
+            JsString::from_bytes(b"p".as_slice()),
+        )
+        .unwrap();
+    let result = state
+        .create_symbol_with_type(source, state.builtins.number_type)
+        .unwrap();
+    assert_eq!(
+        state.compare_symbols(Some(source), Some(result)).unwrap(),
+        std::cmp::Ordering::Greater
+    );
+}
+
+#[test]
+fn empty_alias_parameters_fall_through_to_local_reference_parameters() {
+    // checker.go:getTypeParametersForTypeAndSymbol. This directly covers the
+    // internal helper branch; it does not claim a source-level alias witness.
+    let (_counters, _generation, _identity, owner) = owner();
+    let mut operation = owner.operation().unwrap();
+    let state = operation.state_mut();
+    let alias = state
+        .new_symbol(
+            symbol_flags::TYPE_ALIAS,
+            JsString::from_bytes(b"A".as_slice()),
+        )
+        .unwrap();
+    let outer = state.new_type_parameter(None).unwrap();
+    let local = state.new_type_parameter(None).unwrap();
+    let this = state.new_type_parameter(None).unwrap();
+    let target = state
+        .new_object_type(object_flags::INTERFACE | object_flags::REFERENCE, None)
+        .unwrap();
+    let data = state.types.interface_mut(target).unwrap();
+    data.reference.object.target = Some(target);
+    data.all_type_parameters = Some(vec![outer, local, this].into());
+    data.outer_type_parameter_count = 1;
+    for parameters in [None, Some(crate::TypeList::default())] {
+        state.query.type_aliases.get_or_default(alias).parameters = parameters;
+        assert_eq!(
+            &*state
+                .type_parameters_for_type_and_symbol(target, alias)
+                .unwrap(),
+            &[local]
+        );
+    }
+    state.query.type_aliases.get_or_default(alias).parameters = Some(vec![outer].into());
+    assert_eq!(
+        &*state
+            .type_parameters_for_type_and_symbol(target, alias)
+            .unwrap(),
+        &[outer]
+    );
+    assert!(state
+        .type_parameters_for_type_and_symbol(state.builtins.error_type, alias)
+        .unwrap()
+        .is_empty());
+}
+
+#[test]
 fn missing_indexed_property_without_a_program_remains_unresolved() {
     let (_counters, _generation, _identity, owner) = owner();
     let mut operation = owner.operation().unwrap();
@@ -247,10 +347,7 @@ fn pattern_literal_property_conflicts_reduce_the_intersection() {
             let property = state
                 .new_symbol(symbol_flags::PROPERTY, name.clone())
                 .unwrap();
-            state
-                .value_symbol_links
-                .get_or_default(property)
-                .resolved_type = Some(ty);
+            state.value_symbol_links.probe_entry(property).resolved_type = Some(ty);
             let mut table = tsr_ast::SymbolTable::default();
             table.insert(name, Some(property));
             let members = state.alloc_symbol_table(table);

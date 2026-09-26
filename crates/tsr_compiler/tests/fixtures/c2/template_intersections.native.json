@@ -1,0 +1,67 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "source_sha256": "e43e48d70f8f3b7281c3e2798c3728b9f383a73f48e73e96b9afcb2d6364e334",
+  "native_go": "go1.27.1",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--strict",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "template_intersections.ts"
+  ],
+  "exit_code": 2,
+  "diagnostics": [
+    {
+      "line": 5,
+      "column": 7,
+      "code": 2322,
+      "message": "Type '\"getX\"' is not assignable to type 'never'."
+    },
+    {
+      "line": 7,
+      "column": 7,
+      "code": 2322,
+      "message": "Type '\"getX\"' is not assignable to type 'never'."
+    },
+    {
+      "line": 12,
+      "column": 7,
+      "code": 2322,
+      "message": "Type '\"foo\"' is not assignable to type 'never'."
+    },
+    {
+      "line": 17,
+      "column": 7,
+      "code": 2322,
+      "message": "Type '\"foo\" & A & B' is not assignable to type 'never'."
+    },
+    {
+      "line": 19,
+      "column": 7,
+      "code": 2322,
+      "message": "Type 'B & \"foo\" & A' is not assignable to type 'never'."
+    },
+    {
+      "line": 22,
+      "column": 11,
+      "code": 2322,
+      "message": "Type '\"getX\" & `get${T}`' is not assignable to type 'never'."
+    },
+    {
+      "line": 23,
+      "column": 11,
+      "code": 2322,
+      "message": "Type '\"foo\" & Lowercase<T>' is not assignable to type 'never'."
+    },
+    {
+      "line": 29,
+      "column": 7,
+      "code": 2322,
+      "message": "Type 'any' is not assignable to type 'never'."
+    }
+  ]
+}

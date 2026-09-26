@@ -1,0 +1,43 @@
+[
+  {
+    "id": "signature_identity",
+    "files": {
+      "/main.ts": "declare let circular: <T extends T>() => void;\ndeclare let plain: <U>() => void;\ndeclare let bounded: <U extends string>() => void;\ndeclare let sameCircular: <V extends V>() => void;\ndeclare let later: string;\n"
+    },
+    "queries": [
+      "circular",
+      "plain",
+      "bounded",
+      "sameCircular"
+    ]
+  },
+  {
+    "id": "deprecated_types",
+    "files": {
+      "/main.ts": "/** @deprecated use Fresh */\ntype Old<T = string> = T;\n/** @deprecated use Fresh */\ninterface OldInterface { value: string }\ntype A = Old;\ntype B = Old<number>;\ntype C = OldInterface;\ntype D = import(\"./legacy\").Legacy;\ntype E = import(\"./legacy\").Generic<number>;\ntype Fresh = boolean;\ntype Control = Fresh;\ndeclare let later: string;\n",
+      "/legacy.ts": "/** @deprecated use Fresh */\nexport type Legacy = string;\n/** @deprecated use Fresh */\nexport type Generic<T> = T;\n"
+    },
+    "queries": []
+  },
+  {
+    "id": "mapped_property_cycle",
+    "files": {
+      "/main.ts": "type M = { [K in \"a\"]: string };\ndeclare let mapped: M;\ndeclare let later: string;\n"
+    },
+    "queries": []
+  },
+  {
+    "id": "infer_any_alias_constraint",
+    "files": {
+      "/main.ts": "type F<T extends string> = any;\ntype A<T> = T extends F<infer U> ? U : never;\ndeclare let later: A<number>;\n"
+    },
+    "queries": []
+  },
+  {
+    "id": "type_parameter_helpers",
+    "files": {
+      "/main.ts": "type Plain<P> = P;\ntype Erased<E> = any;\ntype Defaults<D = string> = D;\ntype Bound<B extends string> = B;\ntype Mapped<M> = { [K in keyof M]: M[K] };\ntype Inferred<I> = I extends infer R ? R : never;\nclass Outer<O> { item!: O; }\nnamespace Outer { export const tag = 0; }\ninterface Face<F> { value: F }\nfunction fun<U>(u: U) { return u; }\nconst arrow = <A>(x: A) => x;\nconst functionExpr = function<V>(x: V) { return x; };\ndeclare let plain: number;\nimport Alias = Outer;\ndeclare let instance: Outer<string>;\ndeclare let later: string;\n"
+    },
+    "queries": []
+  }
+]

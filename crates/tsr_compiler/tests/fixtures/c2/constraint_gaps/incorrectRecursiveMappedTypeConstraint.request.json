@@ -1,0 +1,46 @@
+{
+  "acceptance_tier": "executed",
+  "baseline_header": "tests/cases/compiler/incorrectRecursiveMappedTypeConstraint.ts",
+  "baseline_inputs": [
+    {
+      "content_hex": "2f2f202331373834370a66756e6374696f6e2073756d3c5420657874656e6473207b205b5020696e20545d3a206e756d626572207d2c204b20657874656e6473206b65796f6620543e286e3a206e756d6265722c20763a20542c206b3a204b29207b0a202020206e202b3d20765b6b5d3b0a7d0a",
+      "name_hex": "2f2e7372632f696e636f72726563745265637572736976654d617070656454797065436f6e73747261696e742e7473"
+    }
+  ],
+  "diagnostic_phases": [
+    "config",
+    "program",
+    "syntactic",
+    "semantic",
+    "global"
+  ],
+  "error_baseline_requested": true,
+  "error_inputs": [
+    {
+      "content_hex": "2f2f202331373834370a66756e6374696f6e2073756d3c5420657874656e6473207b205b5020696e20545d3a206e756d626572207d2c204b20657874656e6473206b65796f6620543e286e3a206e756d6265722c20763a20542c206b3a204b29207b0a202020206e202b3d20765b6b5d3b0a7d0a",
+      "name_hex": "2f2e7372632f696e636f72726563745265637572736976654d617070656454797065436f6e73747261696e742e7473"
+    }
+  ],
+  "id": "compiler/incorrectRecursiveMappedTypeConstraint.ts#configuration=0",
+  "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+      "/.src/incorrectRecursiveMappedTypeConstraint.ts": "2f2f202331373834370a66756e6374696f6e2073756d3c5420657874656e6473207b205b5020696e20545d3a206e756d626572207d2c204b20657874656e6473206b65796f6620543e286e3a206e756d6265722c20763a20542c206b3a204b29207b0a202020206e202b3d20765b6b5d3b0a7d0a"
+    },
+    "id": "compiler/incorrectRecursiveMappedTypeConstraint.ts#configuration=0",
+    "options": {
+      "newLine": 1,
+      "noErrorTruncation": true,
+      "skipDefaultLibCheck": true,
+      "target": 2
+    },
+    "roots": [
+      "/.src/incorrectRecursiveMappedTypeConstraint.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+  },
+  "public_type_strings": true,
+  "type_baseline_requested": true
+}

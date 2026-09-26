@@ -611,7 +611,7 @@ impl CheckerState {
                 _ => None,
             }
         } else {
-            self.module_specifier(node)?
+            tsr_ast::utilities_modules::get_external_module_name(self.ast(node)?, node)?
         };
         let Some(specifier) = specifier else {
             return Ok(None);

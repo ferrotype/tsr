@@ -158,6 +158,7 @@ impl<'scope> LocalBind<'scope, '_> {
             .get_slot(id.word.get())
             .expect("live scoped flow list")
     }
+    #[cfg_attr(feature = "creation-trace", track_caller)]
     pub fn new_symbol(&mut self, flags: u32, name: JsString) -> BindSymbol<'scope> {
         let id = self.symbols_mut().push(Symbol::new(flags, name));
         BindSymbol::from_slot(id.slot())

@@ -148,7 +148,7 @@ impl CheckerState {
             let targets = self.types.types_of(target)?.to_vec();
             let mut all_objects = true;
             for &part in &targets {
-                if self.types.flags(part)? & tf::OBJECT == 0 || self.is_generic_type(part)? {
+                if self.types.flags(part)? & tf::OBJECT == 0 || self.is_generic_mapped_type(part)? {
                     all_objects = false;
                     break;
                 }

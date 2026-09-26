@@ -67,6 +67,7 @@ struct SideTables {
     original: HashMap<NodeId, NodeId, tsr_arena::hash::FastState>,
     comment_ranges: HashMap<NodeId, tsr_core::TextRange, tsr_arena::hash::FastState>,
     leading_comments: HashMap<NodeId, Vec<SynthesizedComment>, tsr_arena::hash::FastState>,
+    trailing_comments: HashMap<NodeId, Vec<SynthesizedComment>, tsr_arena::hash::FastState>,
     auto_generate: HashMap<NodeId, AutoGenerateInfo, tsr_arena::hash::FastState>,
 }
 impl SideTables {
@@ -132,6 +133,7 @@ impl EmitContext {
         tables.original.retain(|&key, _| retained(key));
         tables.comment_ranges.retain(|&key, _| retained(key));
         tables.leading_comments.retain(|&key, _| retained(key));
+        tables.trailing_comments.retain(|&key, _| retained(key));
         tables.auto_generate.retain(|&key, _| retained(key));
         Ok(())
     }
@@ -153,6 +155,7 @@ impl EmitContext {
         let text_bytes = tables
             .leading_comments
             .values()
+            .chain(tables.trailing_comments.values())
             .flatten()
             .map(|comment| census.text(comment.text.backing_bytes()))
             .sum::<usize>()
@@ -170,9 +173,11 @@ impl EmitContext {
             + tables.original.allocation_size()
             + tables.comment_ranges.allocation_size()
             + tables.leading_comments.allocation_size()
+            + tables.trailing_comments.allocation_size()
             + tables
                 .leading_comments
                 .values()
+                .chain(tables.trailing_comments.values())
                 .map(|comments| comments.capacity() * size_of::<SynthesizedComment>())
                 .sum::<usize>()
             + tables.auto_generate.allocation_size()
@@ -184,6 +189,7 @@ impl EmitContext {
             + tables.original.len()
             + tables.comment_ranges.len()
             + tables.leading_comments.len()
+            + tables.trailing_comments.len()
             + tables.auto_generate.len()
     }
 
@@ -278,6 +284,37 @@ impl EmitContext {
     pub fn synthetic_leading_comments(&self, node: NodeId) -> Vec<SynthesizedComment> {
         self.tables()
             .leading_comments
+            .get(&node)
+            .cloned()
+            .unwrap_or_default()
+    }
+
+    // port: tsc/internal/printer/emitcontext.go:EmitContext.AddSyntheticTrailingComment
+    pub fn add_synthetic_trailing_comment(
+        &mut self,
+        node: NodeId,
+        kind: tsr_ast::SyntaxKind,
+        text: JsString,
+        has_trailing_new_line: bool,
+    ) -> NodeId {
+        self.tables()
+            .trailing_comments
+            .entry(node)
+            .or_default()
+            .push(SynthesizedComment {
+                kind,
+                loc: tsr_core::TextRange::new(-1, -1),
+                has_leading_new_line: false,
+                has_trailing_new_line,
+                text,
+            });
+        node
+    }
+
+    // port: tsc/internal/printer/emitcontext.go:EmitContext.GetSyntheticTrailingComments
+    pub fn synthetic_trailing_comments(&self, node: NodeId) -> Vec<SynthesizedComment> {
+        self.tables()
+            .trailing_comments
             .get(&node)
             .cloned()
             .unwrap_or_default()
@@ -487,7 +524,15 @@ mod tests {
             text.clone(),
             false,
         );
+        let before_trailing = emit.structural_bytes();
+        emit.add_synthetic_trailing_comment(
+            node,
+            tsr_ast::SyntaxKind::MultiLineCommentTrivia,
+            text.clone(),
+            false,
+        );
         let all = emit.structural_bytes();
+        assert!(all >= before_trailing + size_of::<SynthesizedComment>());
         let mut census = tsr_arena::StorageCensus::default();
         let text_bytes = census.text(text.backing_bytes());
         assert_eq!(emit.structural_bytes_with(&mut census), all - text_bytes);
@@ -598,6 +643,22 @@ mod retention_tests {
             JsString::from_bytes(b"keep".as_slice()),
             false,
         );
+        emit.add_synthetic_trailing_comment(
+            cloned,
+            tsr_ast::SyntaxKind::MultiLineCommentTrivia,
+            JsString::from_bytes(b"keep trailing".as_slice()),
+            false,
+        );
+        emit.add_synthetic_trailing_comment(
+            garbage,
+            tsr_ast::SyntaxKind::MultiLineCommentTrivia,
+            JsString::from_bytes(b"discard".as_slice()),
+            false,
+        );
+        // Native emitNode.copyFrom deliberately omits synthetic comments.
+        let comment_clone = ast.clone_identifier(cloned);
+        assert!(shared.synthetic_leading_comments(comment_clone).is_empty());
+        assert!(shared.synthetic_trailing_comments(comment_clone).is_empty());
         // A live key requires the complete original chain AND the generated-name target.
         for live in [vec![cloned], vec![cloned, generated]] {
             assert!(emit.retain_metadata(|id| live.contains(&id)).is_err());
@@ -610,6 +671,7 @@ mod retention_tests {
         emit.retain_metadata(|id| [source, generated, cloned].contains(&id))
             .unwrap();
         assert_eq!(shared.emit_flags(garbage), 0);
+        assert!(shared.synthetic_trailing_comments(garbage).is_empty());
         assert_eq!(shared.most_original(cloned), generated);
         assert_eq!(shared.node_for_generated_name(&ast, cloned), source);
         assert_eq!(
@@ -619,6 +681,12 @@ mod retention_tests {
         assert_eq!(
             shared.synthetic_leading_comments(cloned)[0].text.as_bytes(),
             b"keep"
+        );
+        assert_eq!(
+            shared.synthetic_trailing_comments(cloned)[0]
+                .text
+                .as_bytes(),
+            b"keep trailing"
         );
         emit.retain_metadata(|_| false).unwrap();
         assert_eq!(shared.metadata_entries(), 0);

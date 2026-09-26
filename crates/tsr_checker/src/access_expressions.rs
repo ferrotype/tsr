@@ -614,10 +614,7 @@ impl CheckerState {
         }
         let initial = self.add_type_optionality(ty, false, assume)?;
         let flow = self.flow_type_of_reference_with_container(node, ty, initial, None)?;
-        if assume
-            && !self.class_type_contains_undefined(ty)?
-            && self.class_type_contains_undefined(flow)?
-        {
+        if assume && !self.contains_undefined_type(ty)? && self.contains_undefined_type(flow)? {
             let property = required(property, "uninitialized property")?;
             let name = self.symbol_to_string(property)?;
             self.error_at(

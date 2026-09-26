@@ -54,9 +54,21 @@ impl NodeBuilder<'_> {
             if self.flags & tsr_nodebuilder::flags::USE_INSTANTIATION_EXPRESSIONS != 0 {
                 if let Some(list) = root_arguments {
                     if !self.ast.view().list(list)?.nodes().is_empty() {
-                        return Err(Error::Unsupported(
-                            "appendReferenceToType instantiation expression",
-                        ));
+                        let name =
+                            type_name.ok_or(Error::MissingLink("instantiated reference name"))?;
+                        let expression = self.create_access_expression(name)?;
+                        let mut expression = self
+                            .ast
+                            .new_expression_with_type_arguments(Some(expression), Some(list));
+                        for id in ids {
+                            expression = self.ast.new_property_access_expression(
+                                Some(expression),
+                                None,
+                                Some(id),
+                                0,
+                            );
+                        }
+                        return Ok(expression);
                     }
                 }
             }
@@ -68,9 +80,48 @@ impl NodeBuilder<'_> {
                 .ast
                 .update_type_reference_node(root, Some(type_name), arguments));
         }
-        Err(Error::Unsupported(
-            "appendReferenceToType access expression",
-        ))
+        let mut expression = self.create_access_expression(root)?;
+        for id in ids {
+            expression =
+                self.ast
+                    .new_property_access_expression(Some(expression), None, Some(id), 0);
+        }
+        Ok(expression)
+    }
+
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.createAccessExpression
+    fn create_access_expression(&mut self, node: NodeId) -> Result<NodeId, Error> {
+        let mut node = node;
+        let mut names = Vec::new();
+        while self.ast.view().node(node)?.kind() == K::QualifiedName {
+            let read = self.ast.view().node(node)?;
+            let data = read
+                .data_source()
+                .as_qualified_name()
+                .ok_or(tsr_arena::Error::InvalidGraph)?;
+            names.push(
+                data.right()
+                    .ok_or(Error::MissingLink("qualified access right"))?,
+            );
+            node = data
+                .left()
+                .ok_or(Error::MissingLink("qualified access left"))?;
+        }
+        if !matches!(
+            self.ast.view().node(node)?.kind().known(),
+            Some(K::Identifier | K::PropertyAccessExpression | K::ExpressionWithTypeArguments)
+        ) {
+            return Err(Error::MissingLink("unexpected access node kind"));
+        }
+        let mut expression = tsr_ast::deep_clone_node(&mut self.ast, Some(node))
+            .ok_or(tsr_arena::Error::InvalidGraph)?;
+        for name in names.into_iter().rev() {
+            let name = tsr_ast::deep_clone_node(&mut self.ast, Some(name));
+            expression = self
+                .ast
+                .new_property_access_expression(Some(expression), None, name, 0);
+        }
+        Ok(expression)
     }
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typeToTypeNode

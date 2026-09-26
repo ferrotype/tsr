@@ -79,7 +79,7 @@ impl NodeBuilder<'_> {
             if let Some(ty) = self
                 .checker
                 .value_symbol_links
-                .try_get(symbol)
+                .try_get(self.checker.value_symbol_key(symbol)?)
                 .and_then(|l| l.name_type)
             {
                 if self.checker.types.flags(ty)?
@@ -102,6 +102,24 @@ impl NodeBuilder<'_> {
             }
         }
         self.symbol_expression_with_meaning(symbol, self.enclosing, meaning)
+    }
+
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.symbolToName
+    pub(super) fn symbol_name_node(
+        &mut self,
+        symbol: SymbolId,
+        meaning: u32,
+        expects_identifier: bool,
+    ) -> Result<NodeId, Error> {
+        let chain = self.display_name_chain(symbol, self.enclosing, meaning)?;
+        if expects_identifier
+            && chain.len() != 1
+            && !self.encountered_error
+            && self.flags & tsr_nodebuilder::flags::ALLOW_QUALIFIED_NAME_IN_PLACE_OF_IDENTIFIER != 0
+        {
+            self.encountered_error = true;
+        }
+        self.entity_name_from_symbol_chain(&chain)
     }
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.createEntityNameFromSymbolChain
@@ -127,6 +145,7 @@ impl NodeBuilder<'_> {
             self.flags ^= tsr_nodebuilder::flags::IN_INITIAL_ENTITY_NAME;
         }
         let identifier = self.ast.new_identifier(name?);
+        self.id_to_symbol.insert(identifier, Some(symbol));
         self.emit
             .add_emit_flags(identifier, tsr_printer::emit_flags::NO_ASCII_ESCAPING);
         if prefix.is_empty() {
@@ -771,7 +790,7 @@ impl NodeBuilder<'_> {
         self.display_name_chain_with_module(symbol, enclosing, meaning, false)
     }
 
-    fn display_name_chain_with_module(
+    pub(super) fn display_name_chain_with_module(
         &mut self,
         symbol: SymbolId,
         enclosing: Option<NodeId>,
@@ -1234,30 +1253,111 @@ impl NodeBuilder<'_> {
         chain: &[SymbolId],
         index: usize,
     ) -> Result<Option<tsr_ast::NodeListId>, Error> {
+        self.checker.symbol_runtime_id(chain[index])?;
+        if !self.type_parameter_names.symbols.insert(chain[index]) {
+            return Ok(None);
+        }
         if self.flags & tsr_nodebuilder::flags::WRITE_TYPE_PARAMETERS_IN_QUALIFIED_NAME == 0
             || index + 1 >= chain.len()
         {
             return Ok(None);
         }
-        for declaration in self
-            .checker
-            .symbol_declarations(chain[index])?
-            .iter()
-            .flatten()
+        if let Some(arguments) = self.instantiated_qualified_type_argument_nodes(chain, index)? {
+            return Ok(Some(arguments));
+        }
+        let parameters = self.symbol_type_parameter_declarations(chain[index])?;
+        if parameters.is_empty() {
+            Ok(None)
+        } else {
+            self.list(parameters).map(Some)
+        }
+    }
+
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.lookupInstantiatedTypeArgumentNodes
+    fn instantiated_qualified_type_argument_nodes(
+        &mut self,
+        chain: &[SymbolId],
+        index: usize,
+    ) -> Result<Option<tsr_ast::NodeListId>, Error> {
+        if self.flags & tsr_nodebuilder::flags::WRITE_TYPE_PARAMETERS_IN_QUALIFIED_NAME == 0
+            || index + 1 >= chain.len()
+            || self.checker.symbol(chain[index + 1])?.check_flags()
+                & tsr_ast::check_flags::INSTANTIATED
+                == 0
         {
-            if self
+            return Ok(None);
+        }
+        let mut symbol = chain[index];
+        if self.checker.symbol(symbol)?.flags() & sf::ALIAS != 0
+            && !self
                 .checker
-                .ast(declaration)?
-                .node(declaration)?
-                .type_parameter_list()
-                .is_some()
-            {
-                return Err(Error::Unsupported(
-                    "lookupTypeParameterNodes: generic qualified type name",
-                ));
+                .can_get_type_parameters_of_class_or_interface(symbol)?
+        {
+            symbol = self.checker.resolve_alias(symbol)?;
+        }
+        if !self
+            .checker
+            .can_get_type_parameters_of_class_or_interface(symbol)?
+        {
+            return Ok(None);
+        }
+        let declaration = self
+            .checker
+            .class_or_interface_like_declaration(symbol)?
+            .ok_or(Error::MissingLink("qualified parameter declaration"))?;
+        let mut parameters = self
+            .checker
+            .get_outer_type_parameters(declaration, false)?
+            .to_vec();
+        parameters.extend(
+            self.checker
+                .get_local_type_parameters(symbol)?
+                .iter()
+                .copied(),
+        );
+        if let Some(mapper) = self
+            .checker
+            .value_symbol_links
+            .try_get(self.checker.value_symbol_key(chain[index + 1])?)
+            .and_then(|links| links.mapper)
+        {
+            for parameter in &mut parameters {
+                *parameter = self.checker.map_type_parameter(*parameter, mapper)?;
             }
         }
-        Ok(None)
+        if parameters.is_empty() {
+            Ok(None)
+        } else {
+            self.type_list(&parameters, false).map(Some)
+        }
+    }
+
+    #[cfg(feature = "recursion-probe")]
+    pub(crate) fn c2_qualified_parameter_contract(
+        &mut self,
+        chain: &[SymbolId],
+    ) -> Result<serde_json::Value, Error> {
+        use tsr_ast::FactoryMethods;
+        use tsr_printer::{EmitTextWriter, Printer, PrinterOptions, TextWriter};
+        let mut observations = Vec::new();
+        for _ in 0..2 {
+            let list = self.qualified_type_parameter_nodes(chain, 0)?;
+            let text = if let Some(list) = list {
+                let tuple = self.ast.new_tuple_type_node(Some(list));
+                let mut writer = TextWriter::new(b"", 0);
+                Printer::new(PrinterOptions::default(), &self.emit).write(
+                    self.ast.view(),
+                    tuple,
+                    None,
+                    &mut writer,
+                )?;
+                Some(String::from_utf8_lossy(writer.text()).into_owned())
+            } else {
+                None
+            };
+            observations.push(text);
+        }
+        Ok(serde_json::json!(observations))
     }
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.createAccessFromSymbolChain

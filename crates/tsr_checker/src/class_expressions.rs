@@ -222,7 +222,10 @@ impl CheckerState {
                 None => false,
             };
             if !self.in_parameter_initializer_before_function(node)? || explicit {
-                let signature = self.signature_from_declaration(container)?;
+                let signature = match self.signature_of_full_signature(container)? {
+                    Some(signature) => signature,
+                    None => self.signature_from_declaration(container)?,
+                };
                 let parameter = self.signatures.get(signature)?.this_parameter;
                 let mut ty = parameter
                     .map(|parameter| self.get_type_of_symbol(parameter))

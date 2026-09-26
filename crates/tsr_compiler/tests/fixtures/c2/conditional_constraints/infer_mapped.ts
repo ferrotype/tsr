@@ -1,0 +1,9 @@
+type ConditionalKey<T> = T extends { [P in infer U extends keyof T ? 1 : 0]: 1 } ? 1 : 0;
+type ConstrainedKey<T> = T extends { [P in infer U extends keyof T]: 1 } ? 1 : 0;
+type ConditionalName<T> = T extends { [P in keyof T as infer U extends P ? 1 : 0]: 1 } ? 1 : 0;
+type ConstrainedName<T> = T extends { [P in keyof T as infer U extends P]: 1 } ? 1 : 0;
+type Nested<T> = T extends { [P in infer U extends keyof T ? 1 : 0]: { [Q in infer V extends keyof T ? 1 : 0]: 1 } } ? 1 : 0;
+type First = ConditionalKey<{ 1: 1 }>;
+type Second = ConditionalKey<{ 0: 1 }>;
+type TrueCycle<T extends T> = T;
+const later: number = "still checked";

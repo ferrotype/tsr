@@ -25,6 +25,7 @@ impl Program {
     /// Source selection for semantic and suggestion diagnostics.
     // port: tsc/internal/compiler/program.go:Program.SkipTypeChecking
     // port: tsc/internal/compiler/program.go:Program.canIncludeBindAndCheckDiagnostics
+    // port: tsc/internal/compiler/program.go:Program.IsSourceFromProjectReference
     pub fn skip_type_checking(
         &self,
         file: &ProgramFile,

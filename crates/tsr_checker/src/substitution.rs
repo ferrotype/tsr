@@ -181,7 +181,7 @@ impl CheckerState {
                         if let Some(variable) = self.homomorphic_type_variable(mapped)? {
                             if let Some(constraint) = self.constraint_of_type_parameter(variable)? {
                                 let mut arrays = true;
-                                for part in self.types.types_of(constraint)?.to_vec() {
+                                for part in self.distributed_types(constraint)? {
                                     if !self.is_array_type(part)? && !self.is_tuple_type(part)? {
                                         arrays = false;
                                         break;

@@ -1,0 +1,26 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "command": [
+    "go",
+    "test",
+    "-mod=readonly",
+    "-trimpath",
+    "-overlay",
+    "/Users/cristian/git/ts-rust/target/phase2/c2-js-full-signature-native/overlay.json",
+    "./internal/checker",
+    "-run",
+    "^TestC2JSFullSignatures$",
+    "-count=1",
+    "-timeout=3m"
+  ],
+  "request_sha256": "74ae66abf41e1ef58ca0bb701e1f3ff5792445a5417296cb6364b8a3a52b6471",
+  "output_sha256": "26d8777ce298dc125e01ec6843780f5f89996271fb59d9d63b887ba1f2f6d426",
+  "observer_sources": {
+    "oracle_test.go": "8cc9ac6b4e441d6736151b2a59e233d23f66c8e0bd7986da18f2952d9d2da08e",
+    "regenerate.py": "48ef2c9684d2f6140af572b7e256384909a68c1cc46570eee5237390a0bf3a2f"
+  },
+  "replacements": {
+    "internal/checker/c2_js_full_signature_test.go": "8cc9ac6b4e441d6736151b2a59e233d23f66c8e0bd7986da18f2952d9d2da08e"
+  },
+  "scope": "Public diagnostics and declaration-name type queries; ES2015/CommonJS, allowJs/checkJs, noEmit, skipDefaultLibCheck. Four original corpus source sets and two narrowed alias schedules. No production Go changes."
+}

@@ -462,8 +462,7 @@ impl CheckerState {
         if let Some(erased) = sig.erased {
             return Ok(erased);
         }
-        let mapper =
-            self.new_type_mapper(&parameters, &vec![self.builtins.any_type; parameters.len()])?;
+        let mapper = self.new_array_to_single_type_mapper(&parameters, self.builtins.any_type)?;
         let erased = self.instantiate_signature_ex(signature, mapper, true)?;
         self.signatures.get_mut(signature)?.erased = Some(erased);
         Ok(erased)
@@ -738,7 +737,9 @@ impl CheckerState {
             } else {
                 element
             };
-            self.value_symbol_links.get_or_default(symbol).resolved_type = Some(ty);
+            self.value_symbol_links
+                .get_or_default(self.value_symbol_key(symbol)?)
+                .resolved_type = Some(ty);
             result.push(symbol);
         }
         Ok(result)

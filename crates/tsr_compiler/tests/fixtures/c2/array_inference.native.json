@@ -1,0 +1,49 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "source_sha256": "d1ddd57fc2fe8c19471d20ffe8b0455fe2f3ec240c2244014d2c67c6fa803910",
+  "native_go": "go1.27.1",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--strict",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "array_inference.ts"
+  ],
+  "exit_code": 2,
+  "diagnostics": [
+    {
+      "line": 4,
+      "column": 7,
+      "code": 2322,
+      "message": "Type 'number' is not assignable to type 'never'."
+    },
+    {
+      "line": 5,
+      "column": 7,
+      "code": 2322,
+      "message": "Type 'string' is not assignable to type 'never'."
+    },
+    {
+      "line": 6,
+      "column": 23,
+      "code": 2339,
+      "message": "Property 'toUpperCase' does not exist on type 'number'."
+    },
+    {
+      "line": 10,
+      "column": 7,
+      "code": 2322,
+      "message": "Type 'boolean' is not assignable to type 'never'."
+    },
+    {
+      "line": 14,
+      "column": 7,
+      "code": 2322,
+      "message": "Type '[(x: number) => number]' is not assignable to type 'never'."
+    }
+  ]
+}

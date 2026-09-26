@@ -144,25 +144,12 @@ impl CheckerState {
         )?;
         Ok(())
     }
-    fn skip_operator_outer(&self, mut node: NodeId) -> Result<NodeId, Error> {
-        loop {
-            let read = self.node(node)?;
-            if matches!(
-                read.kind().known(),
-                Some(
-                    K::ParenthesizedExpression
-                        | K::AsExpression
-                        | K::TypeAssertionExpression
-                        | K::NonNullExpression
-                        | K::SatisfiesExpression
-                        | K::PartiallyEmittedExpression
-                )
-            ) {
-                node = required(read.expression(), "outer operator expression")?;
-            } else {
-                return Ok(node);
-            }
-        }
+    fn skip_operator_outer(&self, node: NodeId) -> Result<NodeId, Error> {
+        Ok(tsr_ast::utilities::skip_outer_expressions(
+            self.ast(node)?,
+            node,
+            tsr_ast::utilities::outer_expression_kinds::ALL,
+        )?)
     }
     // port: tsc/internal/checker/checker.go:Checker.getSyntacticNullishnessSemantics
     fn syntactic_nullishness(&mut self, node: NodeId) -> Result<u8, Error> {

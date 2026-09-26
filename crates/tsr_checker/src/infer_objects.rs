@@ -260,7 +260,12 @@ impl CheckerState {
             return Ok(true);
         }
         if flags & tf::TYPE_PARAMETER != 0 {
-            let index = self.get_index_type(source, 0)?;
+            let flags = if self.bindings.pattern_for_type.contains_key(&source) {
+                crate::indexes::NO_INDEX_SIGNATURES
+            } else {
+                0
+            };
+            let index = self.get_index_type(source, flags)?;
             self.infer_with_priority(run, index, constraint, p::MAPPED_CONSTRAINT)?;
             if let Some(extended) = self.constraint_of_type_parameter(constraint)? {
                 if self.infer_to_mapped(run, source, target, extended)? {
@@ -272,7 +277,11 @@ impl CheckerState {
                 types.push(self.get_type_of_symbol(property)?);
             }
             for index in self.index_infos_of_type(source)? {
-                types.push(self.signatures.index_info(index)?.value_type);
+                types.push(if index == self.builtins.enum_number_index_info {
+                    self.builtins.never_type
+                } else {
+                    self.signatures.index_info(index)?.value_type
+                });
             }
             let source = self.get_union_type(&types)?;
             let target = self.mapped_template(target)?;
@@ -280,5 +289,317 @@ impl CheckerState {
             return Ok(true);
         }
         Ok(false)
+    }
+}
+
+#[cfg(test)]
+mod native_contract_tests {
+    use super::*;
+    use crate::{mapper::Mapper, CheckerOptions, CheckerOwner};
+    use serde_json::json;
+    use tsr_arena::{CheckerIdentity, Counters, Generation};
+    use tsr_ast::{FactoryMethods, JsString, RuntimeFactory};
+
+    #[test]
+    fn native_inference_mapper_contract() {
+        let expected: serde_json::Value = serde_json::from_slice(include_bytes!(
+            "../tests/fixtures/c2_inference_mapper/observations.json"
+        ))
+        .unwrap();
+        let expected = &expected["observation"];
+        let counters = Counters::new();
+        let generation = Generation::new(&counters);
+        let identity = CheckerIdentity::new(generation, &counters);
+        let owner = std::sync::Arc::new(
+            CheckerOwner::new(identity, &counters, CheckerOptions::default()).unwrap(),
+        );
+        let mut operation = owner.operation().unwrap();
+        let state = operation.state_mut();
+        // The native request uses noLib. Program initialization installs this
+        // sentinel when Array/ReadonlyArray declarations are absent.
+        state
+            .query
+            .global_types
+            .insert("Array", state.builtins.empty_generic_type);
+        state
+            .query
+            .global_types
+            .insert("ReadonlyArray", state.builtins.empty_generic_type);
+        let parameter = state.new_type_parameter(None).unwrap();
+        let this = state.new_type_parameter(None).unwrap();
+        state.types.type_parameter_mut(this).unwrap().is_this_type = true;
+        let string = state
+            .factory
+            .new_keyword_type_node(tsr_ast::SyntaxKind::StringKeyword.into());
+        let nodes = state.factory.alloc_nodes(vec![Some(string)]);
+        let arguments = state
+            .factory
+            .alloc_list(tsr_core::TextRange::new(-1, -1), nodes);
+        let node = state.factory.new_type_reference_node(None, Some(arguments));
+        let any = state.builtins.any_type;
+        let mappers = [
+            state.new_array_to_single_type_mapper(&[], any).unwrap(),
+            state
+                .new_array_to_single_type_mapper(&[parameter], any)
+                .unwrap(),
+            state.new_array_to_single_type_mapper(&[this], any).unwrap(),
+            state
+                .new_array_to_single_type_mapper(&[parameter, this], any)
+                .unwrap(),
+            state.new_type_mapper(&[parameter], &[any]).unwrap(),
+            state
+                .new_type_mapper(&[parameter, this], &[any, any])
+                .unwrap(),
+            state
+                .alloc_mapper(Mapper::DeferredArguments {
+                    node,
+                    sources: [this].as_slice().into(),
+                })
+                .unwrap(),
+        ];
+        let mut observed = Vec::new();
+        for &mapper in &mappers {
+            let mut mapped = Vec::new();
+            for ty in [parameter, this, state.builtins.string_type] {
+                let ty = state.map_type_parameter(ty, mapper).unwrap();
+                mapped.push(if ty == parameter {
+                    "parameter"
+                } else if ty == this {
+                    "this"
+                } else if ty == any {
+                    "any"
+                } else if ty == state.builtins.string_type {
+                    "string"
+                } else {
+                    panic!("unexpected mapped type")
+                });
+            }
+            let compare: Vec<_> = mappers
+                .iter()
+                .map(|&other| {
+                    match state
+                        .compare_type_mappers(Some(mapper), Some(other))
+                        .unwrap()
+                    {
+                        std::cmp::Ordering::Less => -1,
+                        std::cmp::Ordering::Equal => 0,
+                        std::cmp::Ordering::Greater => 1,
+                    }
+                })
+                .collect();
+            observed.push(json!({"mapped":mapped, "maps_this_only":state.mapper_maps_this_only(mapper).unwrap(), "compare":compare}));
+        }
+        assert_eq!(json!(observed), expected["mappers"]);
+
+        let mut observed = Vec::new();
+        for scenario in ["ordinary-index", "pattern-index", "enum-index"] {
+            let key = state.new_type_parameter(None).unwrap();
+            let value = state.new_type_parameter(None).unwrap();
+            let target = state.new_object_type(of::MAPPED, None).unwrap();
+            state.types.mapped_mut(target).unwrap().template_type = Some(value);
+            let mut members = tsr_ast::SymbolTable::default();
+            let index = if scenario == "enum-index" {
+                state.builtins.enum_number_index_info
+            } else {
+                let prop = state
+                    .new_symbol(sf::PROPERTY, JsString::from_bytes(b"x".as_slice()))
+                    .unwrap();
+                state.value_symbol_links.probe_entry(prop).resolved_type =
+                    Some(state.builtins.string_type);
+                members.insert(JsString::from_bytes(b"x".as_slice()), Some(prop));
+                state
+                    .signatures
+                    .new_index_info(
+                        state.builtins.string_type,
+                        state.builtins.string_type,
+                        false,
+                        None,
+                        None,
+                    )
+                    .unwrap()
+            };
+            let members = state.alloc_symbol_table(members);
+            let source = state
+                .new_anonymous_type(None, Some(members), &[], &[], &[index])
+                .unwrap();
+            if scenario == "pattern-index" {
+                state.bindings.pattern_for_type.insert(source, node);
+            }
+            let context = state.new_inference_context(&[key, value], None, 0).unwrap();
+            let mut run = InferenceRun {
+                context,
+                original_target: target,
+                priority: p::NONE,
+                inference_priority: p::MAX,
+                contravariant: false,
+                bivariant: false,
+                propagation: None,
+                visited: crate::types::Map::default(),
+                source_stack: Vec::new(),
+                target_stack: Vec::new(),
+                expanding: 0,
+            };
+            state
+                .infer_to_mapped(&mut run, source, target, key)
+                .unwrap();
+            let infos = state.inference_context(context).unwrap().inferences.clone();
+            let mut inferred = Vec::new();
+            for info in infos {
+                let ty = if !info.candidates.is_empty() {
+                    state
+                        .get_union_type_ex(
+                            &info.candidates,
+                            crate::UnionReduction::Subtype,
+                            None,
+                            None,
+                        )
+                        .unwrap()
+                } else if !info.contra_candidates.is_empty() {
+                    state
+                        .get_intersection_type(&info.contra_candidates)
+                        .unwrap()
+                } else {
+                    panic!("missing inference")
+                };
+                inferred.push(
+                    String::from_utf8(state.type_to_string(ty, 0).unwrap().as_bytes().to_vec())
+                        .unwrap(),
+                );
+            }
+            observed.push(json!({"id":scenario,"inferred":inferred}));
+        }
+        assert_eq!(json!(observed), expected["mapped_inference"]);
+
+        let u = state.new_type_parameter(None).unwrap();
+        let source = state
+            .create_tuple_type_ex(
+                &[parameter],
+                &[crate::TupleElementInfo {
+                    flags: ef::VARIADIC,
+                    labeled_declaration: None,
+                }],
+                false,
+            )
+            .unwrap();
+        let length = state
+            .new_symbol(sf::PROPERTY, JsString::from_bytes(b"length".as_slice()))
+            .unwrap();
+        state.value_symbol_links.probe_entry(length).resolved_type = Some(u);
+        let mut members = tsr_ast::SymbolTable::default();
+        members.insert(JsString::from_bytes(b"length".as_slice()), Some(length));
+        let members = state.alloc_symbol_table(members);
+        let object = state
+            .new_anonymous_type(None, Some(members), &[], &[], &[])
+            .unwrap();
+        state.types.get_mut(object).unwrap().object_flags |=
+            of::COULD_CONTAIN_TYPE_VARIABLES | of::COULD_CONTAIN_TYPE_VARIABLES_COMPUTED;
+        let target = state.get_intersection_type(&[source, object]).unwrap();
+        let context = state.new_inference_context(&[u], None, 0).unwrap();
+        state
+            .infer_types(context, source, target, p::NONE, false)
+            .unwrap();
+        let candidates = state.inference_context(context).unwrap().inferences[0]
+            .candidates
+            .clone();
+        let mut observed = json!({
+            "generic_tuple": state.is_generic_tuple_type(source).unwrap(),
+            "candidate_count": candidates.len()
+        });
+        if !candidates.is_empty() {
+            let inferred = state
+                .get_union_type_ex(&candidates, crate::UnionReduction::Subtype, None, None)
+                .unwrap();
+            observed["inferred"] = json!(String::from_utf8(
+                state
+                    .type_to_string(inferred, 0)
+                    .unwrap()
+                    .as_bytes()
+                    .to_vec()
+            )
+            .unwrap());
+        }
+        assert_eq!(observed, expected["tuple_intersection"]);
+
+        let signature = state
+            .signatures
+            .new_signature(
+                0,
+                None,
+                Some([parameter].as_slice().into()),
+                None,
+                None,
+                Some(parameter),
+                None,
+                0,
+            )
+            .unwrap();
+        state.permissive_instantiation(parameter).unwrap();
+        state.restrictive_instantiation(parameter).unwrap();
+        let mut observed = Vec::new();
+        for mapper in [
+            state.conditional.permissive_mapper.unwrap(),
+            state.conditional.restrictive_mapper.unwrap(),
+        ] {
+            let instantiated = state.instantiate_signature(signature, mapper).unwrap();
+            let read = state.signatures.get(instantiated).unwrap();
+            let parameters = read.type_parameters.as_deref().unwrap_or_default().len();
+            let cached = read.resolved_return_type.is_some();
+            let result = state.return_type_of_signature(instantiated).unwrap();
+            observed.push(
+                json!({"type_parameters":parameters,"return_cached_before":cached,
+                "return_is_wildcard": result == state.builtins.wildcard_type}),
+            );
+        }
+        assert_eq!(json!(observed), expected["generic_signatures"]);
+
+        let mut observed = Vec::new();
+        for (name, present) in [
+            ("NoDefault", false),
+            ("UnknownDefault", true),
+            ("CircularDefault", true),
+        ] {
+            let name_node = state
+                .factory
+                .new_identifier(JsString::from_bytes(b"T".as_slice()));
+            let default = present.then(|| {
+                if name == "UnknownDefault" {
+                    state
+                        .factory
+                        .new_keyword_type_node(tsr_ast::SyntaxKind::UnknownKeyword.into())
+                } else {
+                    state
+                        .factory
+                        .new_identifier(JsString::from_bytes(b"T".as_slice()))
+                }
+            });
+            let declaration = state.factory.new_type_parameter_declaration(
+                None,
+                Some(name_node),
+                None,
+                None,
+                default,
+            );
+            let symbol = state
+                .new_symbol(sf::TYPE_PARAMETER, JsString::from_bytes(b"T".as_slice()))
+                .unwrap();
+            let declarations = state.declarations.alloc_one(Some(declaration)).unwrap();
+            state.symbol_mut(symbol).unwrap().declarations = declarations;
+            let parameter = state.new_type_parameter(Some(symbol)).unwrap();
+            let before = state
+                .types
+                .type_parameter(parameter)
+                .unwrap()
+                .resolved_default_type
+                .is_some();
+            let syntactic = state.inference_parameter_has_default(parameter).unwrap();
+            let after = state
+                .types
+                .type_parameter(parameter)
+                .unwrap()
+                .resolved_default_type
+                .is_some();
+            observed.push(json!({"name":name,"syntactic":syntactic,"cached_before":before,"cached_after":after}));
+        }
+        assert_eq!(json!(observed), expected["defaults"]);
     }
 }

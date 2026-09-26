@@ -241,9 +241,8 @@
    "rust": "crates/tsr_checker/src/enums.rs:255"
   },
   "tsc/internal/checker/checker.go:Checker.getTypeParametersForTypeAndSymbol": {
-   "disposition": "equivalent",
-   "reason": "check_type_reference uses get_local_type_parameters of the resolved symbol after the error-type exit; the alias and interface branches agree with the pin",
-   "rust": "crates/tsr_checker/src/check_generics.rs:254"
+   "disposition": "mapped",
+   "reason": "Shared native fall-through helper is used by constraint checking and infer constraints."
   },
   "tsc/internal/checker/checker.go:Checker.getUniqAssociatedNamesFromTupleType": {
    "disposition": "equivalent",
@@ -749,16 +748,6 @@
    "disposition": "equivalent",
    "reason": "inlined in the indexed-access target case: chain lengths pick the shorter of the direct and constraint chains",
    "rust": "crates/tsr_checker/src/relater_structure.rs:380"
-  },
-  "tsc/internal/checker/relater.go:getRecursionIdentityFromTarget": {
-   "disposition": "equivalent",
-   "reason": "the identity choice is the body of recursion_identity",
-   "rust": "crates/tsr_checker/src/constraints.rs:79"
-  },
-  "tsc/internal/checker/relater.go:getRecursionIdentityTarget": {
-   "disposition": "equivalent",
-   "reason": "recursion_identity unwraps indexed access and mapped targets inline",
-   "rust": "crates/tsr_checker/src/constraints.rs:79"
   },
   "tsc/internal/checker/relater.go:isHyphenatedJsxName": {
    "disposition": "later",
@@ -1727,6 +1716,28 @@
    "tsc/internal/checker/types.go:VarianceFlags.String"
   ]
  },
+ "handoffs": [
+  {
+   "cases": [
+    "compiler/varianceMeasurement.ts#configuration=0",
+    "compiler/varianceRepeatedlyPropegatesWithUnreliableFlag.ts#configuration=0",
+    "compiler/circularVariance1.ts#configuration=0",
+    "compiler/circularVariance2.ts#configuration=0",
+    "compiler/classVarianceResolveCircularity1.ts#configuration=0",
+    "compiler/classVarianceResolveCircularity2.ts#configuration=0",
+    "compiler/varianceComputationNoCrash.ts#configuration=0"
+   ],
+   "functions": [
+    "tsc/internal/checker/relater.go:Checker.createMarkerType",
+    "tsc/internal/checker/relater.go:Checker.getAliasVariances",
+    "tsc/internal/checker/relater.go:Checker.getVariances",
+    "tsc/internal/checker/relater.go:Checker.getVariancesWorker"
+   ],
+   "id": "c2-variance-measurement",
+   "owner": "C2",
+   "reason": "The algorithms and their mappings are present. C2 must observe marker instantiation, cycle/restart behavior and Unmeasurable/Unreliable propagation over these generic families; C1 corpus/display equality does not independently certify the measurement state. varianceComputationNoCrash additionally requires the template-intersection operator B04."
+  }
+ ],
  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
  "scope": "C1 foundation function groups (docs/PHASE2-C1-plan.md, C1.1). A group lists pinned function ids; every member is disposed by a port marker (mapped) or by an entry in dispositions. checker.go and utilities.go groups are the functions the plan names; relater.go and types.go are complete files.",
  "version": 1

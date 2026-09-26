@@ -51,7 +51,8 @@ def method():
 def sources():
     """Every input the measurement depends on, so a report can be tied to exact source bytes."""
     result = {}
-    patterns = ("crates/**/*.rs", "crates/**/Cargo.toml", "Cargo.*", "rust-toolchain*", ".cargo/**/*",
+    patterns = ("crates/**/*", "Cargo.*", "rust-toolchain*", ".cargo/**/*", "tools/**/Cargo.toml",
+                "tools/s08/relater-prototype/**/*", "xtask/**/*", "tools/s03/**/*", "scripts/generate_locale_tables.py",
                 "tools/s08/p4/**/*", "tools/s08/p5/**/*", "tools/s08/p7/**/*", "tools/s08/oracle/**/*",
                 "tools/s07/program/*.rs", "tools/s07/config/host.rs",
                 "scripts/s08_checkerbench.py", "scripts/s08_census_runtime.py", "scripts/s08_measurement.py", "scripts/s08_e2_contract.py", "scripts/s08_p4.py", "scripts/s08_p5_corpus.py", "scripts/s08_manifest.py", "scripts/s07_acceptance.py", "scripts/s08_baselines.py", "scripts/s08_oracle.py",
@@ -61,7 +62,7 @@ def sources():
                 "data/s07/subset.json", "data/upstream.json", ".gitmodules", "data/s04/toolchains.toml")
     for pattern in patterns:
         for path in ROOT.glob(pattern):
-            if path.is_file() and "__pycache__" not in path.parts:
+            if path.is_file() and not ({"target", "__pycache__"} & set(path.relative_to(ROOT).parts)) and path.name != ".DS_Store":
                 result[str(path.relative_to(ROOT))] = digest(path.read_bytes())
     return result
 

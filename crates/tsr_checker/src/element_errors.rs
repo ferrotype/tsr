@@ -83,8 +83,8 @@ impl CheckerState {
         if !self.tuple_like_type(source)? {
             self.calls.contexts.push(crate::calls::ArgumentContext {
                 node,
-                ty: target,
-                inference: None,
+                ty: Some(target),
+                is_cache: false,
             });
             let result = self.check_expression_ex(node, 1 | 128);
             self.calls.contexts.pop();
@@ -163,8 +163,8 @@ impl CheckerState {
     ) -> Result<TypeId, Error> {
         self.calls.contexts.push(crate::calls::ArgumentContext {
             node,
-            ty: context,
-            inference: None,
+            ty: Some(context),
+            is_cache: false,
         });
         let previous = std::mem::replace(&mut self.expression_mode, 1);
         let result = self.check_expression_for_mutable_location(node);

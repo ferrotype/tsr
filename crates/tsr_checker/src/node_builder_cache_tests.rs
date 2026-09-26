@@ -69,7 +69,7 @@ fn cached_object_survives_rotation_without_retaining_repeat_output() {
             .unwrap();
         checker
             .value_symbol_links
-            .get_or_default(property)
+            .probe_entry(property)
             .resolved_type = Some(checker.builtins.number_type);
         let object_symbol = checker
             .new_symbol(
