@@ -243,6 +243,7 @@ impl CheckerState {
         )
     }
 
+    // port: tsc/internal/checker/checker.go:getAdjustedNodeForError
     pub(crate) fn adjusted_node_for_error(
         &self,
         node: Option<NodeId>,

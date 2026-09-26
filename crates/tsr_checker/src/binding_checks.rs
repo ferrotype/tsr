@@ -6,6 +6,7 @@ use tsr_ast::{node_flags as nf, SyntaxKind as K};
 use tsr_diagnostics as d;
 
 impl CheckerState {
+    // port: tsc/internal/checker/checker.go:Checker.checkBindingElement
     pub(crate) fn check_binding_element(&mut self, node: NodeId) -> Result<(), Error> {
         self.check_binding_element_grammar(node)?;
         self.check_binding_variable(node)

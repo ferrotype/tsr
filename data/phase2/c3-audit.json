@@ -2,24 +2,22 @@
  "checkpoint": "C3",
  "dispositions": {
   "tsc/internal/checker/checker.go:Checker.addDeferredDiagnostic": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (addDeferredDiagnostic).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/iteration.rs:1"
   },
   "tsc/internal/checker/checker.go:Checker.addDeprecatedSuggestionWithSignature": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (addDeprecatedSuggestionWithSignature).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/signature_jsdoc.rs:270"
   },
   "tsc/internal/checker/checker.go:Checker.addDuplicateDeclarationErrorsForSymbols": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
-  "tsc/internal/checker/checker.go:Checker.allTypesAssignableToKindEx": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (addDuplicateDeclarationErrorsForSymbols).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/merge.rs:376"
   },
   "tsc/internal/checker/checker.go:Checker.checkAndReportErrorForExportingPrimitiveType": {
    "disposition": "equivalent",
@@ -63,16 +61,6 @@
    "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
    "rust": "crates/tsr_checker/src/class_check.rs:98"
   },
-  "tsc/internal/checker/checker.go:Checker.checkBinaryExpression": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
-  "tsc/internal/checker/checker.go:Checker.checkBindingElement": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
   "tsc/internal/checker/checker.go:Checker.checkClassForStaticPropertyNameConflicts": {
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same check (checkClassForStaticPropertyNameConflicts).",
@@ -104,24 +92,22 @@
    "rust": "crates/tsr_checker/src/emit_checks.rs:290"
   },
   "tsc/internal/checker/checker.go:Checker.checkDeferredNode": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (checkDeferredNode).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/check_bodies.rs:1"
   },
   "tsc/internal/checker/checker.go:Checker.checkElementAccessChain": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
-  "tsc/internal/checker/checker.go:Checker.checkExpression": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (checkElementAccessChain).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/access_expressions.rs:28"
   },
   "tsc/internal/checker/checker.go:Checker.checkExpressionStatement": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (checkExpressionStatement).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/check.rs:310"
   },
   "tsc/internal/checker/checker.go:Checker.checkJSDocComment": {
    "disposition": "equivalent",
@@ -148,19 +134,22 @@
    "rust": "crates/tsr_checker/src/meta_properties.rs:1"
   },
   "tsc/internal/checker/checker.go:Checker.checkNonNullExpression": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "The pin's wrapper checks the operand and then applies checkNonNullType; Rust applies the non-null check to the checked operand at each access and operator site.",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/access_expressions.rs:36"
   },
   "tsc/internal/checker/checker.go:Checker.checkNullishCoalesceOperandLeft": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (checkNullishCoalesceOperandLeft).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/other_operators.rs:56"
   },
   "tsc/internal/checker/checker.go:Checker.checkParenthesizedExpression": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (checkParenthesizedExpression).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/query.rs:848"
   },
   "tsc/internal/checker/checker.go:Checker.checkPropertyAccessChain": {
    "disposition": "equivalent",
@@ -168,15 +157,11 @@
    "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
    "rust": "crates/tsr_checker/src/access_expressions.rs:28"
   },
-  "tsc/internal/checker/checker.go:Checker.checkSourceElement": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
   "tsc/internal/checker/checker.go:Checker.checkSourceElements": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "The pin's statement loop with its cancellation poll; the Rust checker iterates the source elements at this site (C6.5 adds the poll).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/check.rs:104"
   },
   "tsc/internal/checker/checker.go:Checker.checkThisType": {
    "disposition": "equivalent",
@@ -185,24 +170,28 @@
    "rust": "crates/tsr_checker/src/check.rs:290"
   },
   "tsc/internal/checker/checker.go:Checker.checkTypeOperator": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (checkTypeOperator).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/check.rs:281"
   },
   "tsc/internal/checker/checker.go:Checker.checkTypeQuery": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (checkTypeQuery).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/check.rs:189"
   },
   "tsc/internal/checker/checker.go:Checker.checkVariableStatement": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (checkVariableStatement).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/check.rs:193"
   },
   "tsc/internal/checker/checker.go:Checker.checkVoidExpression": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (checkVoidExpression).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/query.rs:900"
   },
   "tsc/internal/checker/checker.go:Checker.combineUnionOrIntersectionThisParam": {
    "disposition": "equivalent",
@@ -211,9 +200,10 @@
    "rust": "crates/tsr_checker/src/compound_signatures.rs:80"
   },
   "tsc/internal/checker/checker.go:Checker.createNameResolverForSuggestion": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "The pin builds a second name resolver for spelling suggestions at checker creation; Rust resolves suggestions through its ordinary resolver at the failed-resolution site.",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/name_errors.rs:2"
   },
   "tsc/internal/checker/checker.go:Checker.errorOnImplicitAnyModule": {
    "disposition": "equivalent",
@@ -222,19 +212,22 @@
    "rust": "crates/tsr_checker/src/external_resolution.rs:341"
   },
   "tsc/internal/checker/checker.go:Checker.errorOrSuggestion": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (errorOrSuggestion).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/variable_errors.rs:119"
   },
   "tsc/internal/checker/checker.go:Checker.errorSkippedOnNoEmit": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (errorSkippedOnNoEmit).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/emit_checks.rs:297"
   },
   "tsc/internal/checker/checker.go:Checker.extractTypesOfKind": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (extractTypesOfKind).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/flow_equality.rs:71"
   },
   "tsc/internal/checker/checker.go:Checker.getAnnotatedAccessorThisParameter": {
    "disposition": "equivalent",
@@ -260,19 +253,21 @@
    "rust": "crates/tsr_checker/src/indexes.rs:93"
   },
   "tsc/internal/checker/checker.go:Checker.getContextNode": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (getContextNode).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/call_arguments.rs:162"
   },
   "tsc/internal/checker/checker.go:Checker.getDefinitelyFalsyPartOfType": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "No caller in the pinned checker package; the Rust site named computes the same fact for its own callers.",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/binary.rs:54"
   },
   "tsc/internal/checker/checker.go:Checker.getDiagnostics": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "later",
+   "owner": "C5",
+   "reason": "the public GetDiagnostics and GetSuggestionDiagnostics entry points are the C5.2 API surface; the compiler reaches the per-file diagnostics through the operation"
   },
   "tsc/internal/checker/checker.go:Checker.getEmitSyntaxForModuleSpecifierExpression": {
    "disposition": "equivalent",
@@ -287,9 +282,10 @@
    "rust": "crates/tsr_checker/src/name_errors.rs:308"
   },
   "tsc/internal/checker/checker.go:Checker.getForInVariableSymbol": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (getForInVariableSymbol).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/access_expressions.rs:112"
   },
   "tsc/internal/checker/checker.go:Checker.getGlobalStrictFunctionType": {
    "disposition": "equivalent",
@@ -332,14 +328,16 @@
    "rust": "crates/tsr_checker/src/external_aliases.rs:82"
   },
   "tsc/internal/checker/checker.go:Checker.getSpreadIndices": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (getSpreadIndices).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/expression_context.rs:153"
   },
   "tsc/internal/checker/checker.go:Checker.getSuggestedBooleanOperator": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (getSuggestedBooleanOperator).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/arithmetic.rs:1"
   },
   "tsc/internal/checker/checker.go:Checker.getSuggestedSymbolForNonexistentProperty": {
    "disposition": "equivalent",
@@ -348,19 +346,22 @@
    "rust": "crates/tsr_checker/src/deferred_checks.rs:158"
   },
   "tsc/internal/checker/checker.go:Checker.getSuggestedSymbolForNonexistentSymbol": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (getSuggestedSymbolForNonexistentSymbol).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/name_errors.rs:2"
   },
   "tsc/internal/checker/checker.go:Checker.getSuggestionForSymbolNameLookup": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "No caller in the pinned checker package; the Rust site named computes the same fact for its own callers.",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/name_errors.rs:2"
   },
   "tsc/internal/checker/checker.go:Checker.getTargetOfBinaryExpression": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (getTargetOfBinaryExpression).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/module_aliases.rs:554"
   },
   "tsc/internal/checker/checker.go:Checker.getThisArgumentOfCall": {
    "disposition": "equivalent",
@@ -387,14 +388,16 @@
    "rust": "crates/tsr_checker/src/query.rs:425"
   },
   "tsc/internal/checker/checker.go:Checker.getTypeFromTypeOperatorNode": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (getTypeFromTypeOperatorNode).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/query.rs:620"
   },
   "tsc/internal/checker/checker.go:Checker.getTypeOfFirstParameterOfSignatureWithFallback": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (getTypeOfFirstParameterOfSignatureWithFallback).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/promises.rs:217"
   },
   "tsc/internal/checker/checker.go:Checker.getTypeOfVariableOrParameterOrProperty": {
    "disposition": "equivalent",
@@ -415,14 +418,16 @@
    "rust": "crates/tsr_checker/src/module_aliases.rs:17"
   },
   "tsc/internal/checker/checker.go:Checker.getTypePredicateParent": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (getTypePredicateParent).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/check_type_syntax.rs:63"
   },
   "tsc/internal/checker/checker.go:Checker.hasContextSensitiveReturnExpression": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (hasContextSensitiveReturnExpression).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/check_bodies.rs:325"
   },
   "tsc/internal/checker/checker.go:Checker.hasNumericPropertyNames": {
    "disposition": "equivalent",
@@ -431,9 +436,10 @@
    "rust": "crates/tsr_checker/src/access_expressions.rs:84"
   },
   "tsc/internal/checker/checker.go:Checker.hasParseDiagnostics": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (hasParseDiagnostics).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/check_statements.rs:6"
   },
   "tsc/internal/checker/checker.go:Checker.hasShadowedNamespace": {
    "disposition": "equivalent",
@@ -442,24 +448,28 @@
    "rust": "crates/tsr_checker/src/source_modules.rs:358"
   },
   "tsc/internal/checker/checker.go:Checker.invocationError": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (invocationError).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/calls.rs:426"
   },
   "tsc/internal/checker/checker.go:Checker.isAritySmaller": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "The contextual call signature's parameter-count test is computed inline at this site.",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/return_inference.rs:599"
   },
   "tsc/internal/checker/checker.go:Checker.isContextSensitiveFunctionLikeDeclaration": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (isContextSensitiveFunctionLikeDeclaration).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/check_bodies.rs:325"
   },
   "tsc/internal/checker/checker.go:Checker.isContextSensitiveFunctionOrObjectLiteralMethod": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (isContextSensitiveFunctionOrObjectLiteralMethod).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/class_context.rs:20"
   },
   "tsc/internal/checker/checker.go:Checker.isOptionalPropertyDeclaration": {
    "disposition": "equivalent",
@@ -492,19 +502,22 @@
    "rust": "crates/tsr_checker/src/class_check.rs:426"
   },
   "tsc/internal/checker/checker.go:Checker.isReadonlyTypeOperator": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (isReadonlyTypeOperator).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/arrays.rs:50"
   },
   "tsc/internal/checker/checker.go:Checker.isReferenceToSomeType": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (isReferenceToSomeType).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/iteration_protocol.rs:49"
   },
   "tsc/internal/checker/checker.go:Checker.isReferenceToType": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (isReferenceToType).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/iteration_protocol.rs:49"
   },
   "tsc/internal/checker/checker.go:Checker.isThisPropertyAndThisTyped": {
    "disposition": "equivalent",
@@ -512,25 +525,23 @@
    "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
    "rust": "crates/tsr_checker/src/access_symbols.rs:153"
   },
-  "tsc/internal/checker/checker.go:Checker.isTypeAssignableToKind": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
   "tsc/internal/checker/checker.go:Checker.isUncalledFunctionReference": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "The pin uses the uncalled-reference test to decide whether a deprecated function reference is reported; Rust folds that test into the deprecation check at its identifier and property-access callers.",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/signature_jsdoc.rs:290"
   },
   "tsc/internal/checker/checker.go:Checker.isUnwrappedReturnTypeUndefinedVoidOrAny": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (isUnwrappedReturnTypeUndefinedVoidOrAny).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/check_bodies.rs:963"
   },
   "tsc/internal/checker/checker.go:Checker.lookupOrIssueError": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "The pin deduplicates a duplicate-declaration diagnostic by looking it up before issuing it; the Rust duplicate-declaration error does the same lookup inline.",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/diagnostics.rs:266"
   },
   "tsc/internal/checker/checker.go:Checker.mapTypeWithAlias": {
    "disposition": "equivalent",
@@ -578,15 +589,10 @@
    "owner": "C4",
    "reason": "reached only through decorator metadata marking (C4.7); no caller in the pin outside that path"
   },
-  "tsc/internal/checker/checker.go:Checker.maybeTypeOfKind": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
   "tsc/internal/checker/checker.go:Checker.newParameter": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "later",
+   "owner": "C4",
+   "reason": "creates the synthetic parameter symbols of the decorator call signatures, decorator context types and their setter function types (C4.6)"
   },
   "tsc/internal/checker/checker.go:Checker.newProperty": {
    "disposition": "later",
@@ -606,14 +612,16 @@
    "rust": "crates/tsr_checker/src/emit_checks.rs:299"
   },
   "tsc/internal/checker/checker.go:Checker.removeDefinitelyFalsyTypes": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "The pin removes definitely-falsy constituents for `||` and `??` and keeps them for `&&`; the Rust binary operator code filters the same constituents from the left operand at this site's callers.",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/binary.rs:54"
   },
   "tsc/internal/checker/checker.go:Checker.reportCannotInvokePossiblyNullOrUndefinedError": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "No caller in the pinned checker package; the Rust site reports the same messages from the non-null invocation check.",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/expression_errors.rs:84"
   },
   "tsc/internal/checker/checker.go:Checker.reportNonExportedMember": {
    "disposition": "equivalent",
@@ -622,24 +630,28 @@
    "rust": "crates/tsr_checker/src/external_aliases.rs:693"
   },
   "tsc/internal/checker/checker.go:Checker.reportOperatorErrorUnless": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (reportOperatorErrorUnless).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/arithmetic.rs:58"
   },
   "tsc/internal/checker/checker.go:Checker.resolveErrorCall": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (resolveErrorCall).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/calls.rs:405"
   },
   "tsc/internal/checker/checker.go:Checker.shouldCheckErasableSyntax": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (shouldCheckErasableSyntax).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/parameter_checks.rs:92"
   },
   "tsc/internal/checker/checker.go:Checker.symbolHasNonMethodDeclaration": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (symbolHasNonMethodDeclaration).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/access_symbols.rs:126"
   },
   "tsc/internal/checker/checker.go:acceptsVoid": {
    "disposition": "equivalent",
@@ -654,14 +666,10 @@
    "rust": "crates/tsr_checker/src/init.rs:38"
   },
   "tsc/internal/checker/checker.go:createDiagnosticForNode": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
-  "tsc/internal/checker/checker.go:getAdjustedNodeForError": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (createDiagnosticForNode).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/check_statements.rs:159"
   },
   "tsc/internal/checker/checker.go:getEffectiveSetAccessorTypeAnnotationNode": {
    "disposition": "equivalent",
@@ -675,14 +683,16 @@
    "reason": "its only caller is markTypeNodeAsReferenced, decorator metadata (C4.7)"
   },
   "tsc/internal/checker/checker.go:getErrorNodeForCallNode": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (getErrorNodeForCallNode).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/call_arguments.rs:486"
   },
   "tsc/internal/checker/checker.go:getFirstDeclaration": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (getFirstDeclaration).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/merge.rs:69"
   },
   "tsc/internal/checker/checker.go:getFirstNonAmbientClassOrFunctionDeclaration": {
    "disposition": "equivalent",
@@ -691,9 +701,10 @@
    "rust": "crates/tsr_checker/src/source_modules.rs:40"
   },
   "tsc/internal/checker/checker.go:getIndexNodeForAccessExpression": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (getIndexNodeForAccessExpression).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/indexes.rs:921"
   },
   "tsc/internal/checker/checker.go:getThisParameterFromNodeContext": {
    "disposition": "equivalent",
@@ -708,14 +719,16 @@
    "rust": "crates/tsr_checker/src/source_alias_checks.rs:163"
   },
   "tsc/internal/checker/checker.go:hasCommonDomTypeName": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "No caller in the pinned checker package; the Rust site named computes the same fact for its own callers.",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/deferred_checks.rs:305"
   },
   "tsc/internal/checker/checker.go:hasRestParameter": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (hasRestParameter).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/source_signatures.rs:340"
   },
   "tsc/internal/checker/checker.go:isES2015OrLaterConstructorName": {
    "disposition": "equivalent",
@@ -742,14 +755,16 @@
    "rust": "crates/tsr_checker/src/class_check.rs:426"
   },
   "tsc/internal/checker/checker.go:isNotReplacableByMethod": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "No caller in the pinned checker package; the Rust site named computes the same fact for its own callers.",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/object_literals.rs:137"
   },
   "tsc/internal/checker/checker.go:isPrimitiveTypeName": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (isPrimitiveTypeName).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/name_errors.rs:320"
   },
   "tsc/internal/checker/checker.go:isPrototypeProperty": {
    "disposition": "equivalent",
@@ -758,14 +773,16 @@
    "rust": "crates/tsr_checker/src/class_overrides.rs:305"
   },
   "tsc/internal/checker/checker.go:isRestParameter": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (isRestParameter).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/source_signatures.rs:340"
   },
   "tsc/internal/checker/checker.go:isSpreadIntoCallOrNew": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (isSpreadIntoCallOrNew).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/array_literals.rs:77"
   },
   "tsc/internal/checker/checker.go:isThisless": {
    "disposition": "equivalent",
@@ -810,99 +827,118 @@
    "rust": "crates/tsr_checker/src/flow.rs:34"
   },
   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarArrowFunction": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (checkGrammarArrowFunction).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/grammar_lists.rs:77"
   },
   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarClassLikeDeclaration": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (checkGrammarClassLikeDeclaration).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/class_check.rs:21"
   },
   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarConstructorTypeAnnotation": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined in the constructor declaration check.",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/check_bodies.rs:284"
   },
   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarConstructorTypeParameters": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined in the constructor declaration check.",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/check_bodies.rs:277"
   },
   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarExportDeclaration": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (checkGrammarExportDeclaration).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/source_module_aliases.rs:29"
   },
   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarExpressionWithTypeArguments": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (checkGrammarExpressionWithTypeArguments).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/class_grammar.rs:36"
   },
   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarForAtLeastOneTypeArgument": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (checkGrammarForAtLeastOneTypeArgument).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/class_grammar.rs:37"
   },
   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarForInvalidExclamationToken": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (checkGrammarForInvalidExclamationToken).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/object_grammar.rs:126"
   },
   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarForInvalidQuestionMark": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (checkGrammarForInvalidQuestionMark).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/object_grammar.rs:121"
   },
   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarIndexSignature": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (checkGrammarIndexSignature).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/check_type_syntax.rs:342"
   },
   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarTopLevelElementForRequiredDeclareModifier": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (checkGrammarTopLevelElementForRequiredDeclareModifier).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/grammar_variables.rs:269"
   },
   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarTypeOnlyNamedImportsOrExports": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (checkGrammarTypeOnlyNamedImportsOrExports).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/source_imports.rs:51"
   },
   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarYieldExpression": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (checkGrammarYieldExpression).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/generators.rs:1"
   },
   "tsc/internal/checker/grammarchecks.go:Checker.doesAccessorHaveCorrectParameterCount": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (doesAccessorHaveCorrectParameterCount).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/class_properties.rs:44"
   },
   "tsc/internal/checker/grammarchecks.go:Checker.findFirstModifierExcept": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (findFirstModifierExcept).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/grammar_modifiers.rs:5"
   },
   "tsc/internal/checker/grammarchecks.go:Checker.reportObviousModifierErrors": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (reportObviousModifierErrors).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/grammar_modifiers.rs:5"
   },
   "tsc/internal/checker/grammarchecks.go:getIdentifierFromEntityNameExpression": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (getIdentifierFromEntityNameExpression).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/class_check.rs:196"
   },
   "tsc/internal/checker/grammarchecks.go:isInitializerBigIntLiteralExpression": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (isInitializerBigIntLiteralExpression).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/grammar_variables.rs:189"
   },
   "tsc/internal/checker/grammarchecks.go:isInitializerStringOrNumberLiteralExpression": {
-   "disposition": "gap",
-   "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (isInitializerStringOrNumberLiteralExpression).",
+   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
+   "rust": "crates/tsr_checker/src/grammar_variables.rs:186"
   },
   "tsc/internal/checker/utilities.go:Checker.callLikeExpressionMayHaveTypeArguments": {
    "disposition": "equivalent",

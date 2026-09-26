@@ -794,6 +794,7 @@ impl CheckerState {
         Ok(ty)
     }
 
+    // port: tsc/internal/checker/checker.go:Checker.checkExpression
     // port: tsc/internal/checker/checker.go:Checker.checkExpressionWorker
     pub(crate) fn check_expression(&mut self, node: NodeId) -> Result<TypeId, Error> {
         self.check_expression_ex(node, 0)
