@@ -348,14 +348,21 @@ impl CheckerState {
             }
         }
         if let Some(message) = message {
+            // See if this was possibly a projectReference redirect: the source
+            // resolved but the declaration output standing in for it is not
+            // in the program, so it has not been built.
             if let Some(resolved) = resolved.filter(|resolved| resolved.is_resolved()) {
-                if host
+                let output_dts = host
                     .get_project_reference_from_source(resolved.resolved_file_name.as_bytes())?
-                    .is_some()
-                {
-                    return Err(Error::Unsupported(
-                        "resolveExternalModule: project reference output",
-                    ));
+                    .map(|reference| reference.output_dts.clone())
+                    .filter(|output_dts| !output_dts.is_empty());
+                if let Some(output_dts) = output_dts {
+                    self.error_at(
+                        Some(error),
+                        d::Output_file_0_has_not_been_built_from_source_file_1,
+                        vec![output_dts, resolved.resolved_file_name.clone()],
+                    )?;
+                    return Ok(None);
                 }
             }
             if let Some(diagnostic) = diagnostic {
