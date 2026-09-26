@@ -1,5 +1,5 @@
 {
- "all_domains_match": 12457,
+ "all_domains_match": 12458,
  "buckets": [
   {
    "bucket": "unsupported: checkExpressionWorker",
@@ -302,12 +302,6 @@
    "variants": 1
   },
   {
-   "bucket": "failed: stack overflow",
-   "owner": "C2",
-   "representative": "compiler/infiniteConstraints2.ts#configuration=0",
-   "variants": 1
-  },
-  {
    "bucket": "failed: walker_error",
    "owner": "C2",
    "representative": "compiler/packageDeduplicationDuplicateGlobals.ts#configuration=0",
@@ -376,8 +370,8 @@
  ],
  "by_checkpoint": {
   "C2": {
-   "match": 2761,
-   "open": 193
+   "match": 2762,
+   "open": 192
   },
   "C3": {
    "match": 170,
@@ -395,26 +389,26 @@
   "display": {
    "different": 17,
    "disabled": 679,
-   "failed": 3,
-   "match": 12084,
+   "failed": 2,
+   "match": 12085,
    "unsupported": 649
   },
   "errors": {
    "different": 106,
-   "failed": 2,
-   "match": 12506,
+   "failed": 1,
+   "match": 12507,
    "unsupported": 818
   },
   "parent_pointers": {
-   "failed": 2,
-   "match": 13415,
+   "failed": 1,
+   "match": 13416,
    "unsupported": 15
   },
   "symbols": {
    "different": 2,
    "disabled": 679,
-   "failed": 3,
-   "match": 12099,
+   "failed": 2,
+   "match": 12100,
    "unsupported": 649
   },
   "trace": {
@@ -424,13 +418,13 @@
   "types": {
    "different": 38,
    "disabled": 679,
-   "failed": 3,
-   "match": 12063,
+   "failed": 2,
+   "match": 12064,
    "unsupported": 649
   },
   "union_ordering": {
-   "failed": 2,
-   "match": 13415,
+   "failed": 1,
+   "match": 13416,
    "unsupported": 15
   }
  },
@@ -519,7 +513,6 @@
    "different: display": 1,
    "different: types": 9,
    "emit order: native pre/post-emit sets differ": 3,
-   "failed: stack overflow": 1,
    "failed: walker_error": 1,
    "panic: tsr_ast::factory": 1,
    "unsupported: Expression_produces_a_union_type_that_is_too_complex_to_represent": 3,
@@ -541,21 +534,21 @@
    "unsupported: typeReferenceToTypeNode: applied outer arguments": 36
   },
   "family": {
-   "conditional_types": 66,
+   "conditional_types": 65,
    "content_mapper_execution": 15,
    "decorators": 331,
    "emitted_output_only": 182,
-   "explicit_type_parameters": 296,
+   "explicit_type_parameters": 295,
    "import_types": 11,
-   "indexed_access_types": 86,
-   "infer_types": 35,
+   "indexed_access_types": 85,
+   "infer_types": 34,
    "jsx": 436,
    "mapped_types": 73,
-   "nonempty_type_arguments": 264,
+   "nonempty_type_arguments": 263,
    "template_literal_types": 18
   },
   "first_code": {
-   "(none)": 869,
+   "(none)": 868,
    "1240": 2,
    "1241": 2,
    "1272": 1,
@@ -603,7 +596,7 @@
    "react-jsx": 38,
    "react-jsxdev": 19,
    "react-native": 2,
-   "unset": 548
+   "unset": 547
   },
   "module": {
    "commonjs": 306,
@@ -616,10 +609,10 @@
    "node20": 2,
    "nodenext": 8,
    "preserve": 7,
-   "unset": 541
+   "unset": 540
   },
   "strict": {
-   "False": 779,
+   "False": 778,
    "True": 196
   },
   "target": {
@@ -630,7 +623,7 @@
    "es2021": 1,
    "es2022": 55,
    "esnext": 118,
-   "unset": 32
+   "unset": 31
   }
  },
  "executed": 13432,
@@ -672,7 +665,7 @@
   "rows": 9367
  },
  "regressions": [],
- "rust_capture_sha256": "2422cc6e7e57a50808b6c073ff90978493f1cfbf010846040157537ee73f81d2",
+ "rust_capture_sha256": "d9fcb53b383c2dc64e773058c9f6bf7cbcb049345881e64b7c7219c3b8b80882",
  "rust_source_stable": true,
  "selection": {
   "cases": [],

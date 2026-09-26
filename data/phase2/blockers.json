@@ -1,7 +1,7 @@
 {
  "comparison": {
   "native_observation_sha256": "1b5356b425ad95a3e5e2a0bb29d42534e8d9d4a6159649f063f3317084a0e276",
-  "rust_capture_sha256": "2422cc6e7e57a50808b6c073ff90978493f1cfbf010846040157537ee73f81d2"
+  "rust_capture_sha256": "d9fcb53b383c2dc64e773058c9f6bf7cbcb049345881e64b7c7219c3b8b80882"
  },
  "declaration_audit": {
   "examples": {

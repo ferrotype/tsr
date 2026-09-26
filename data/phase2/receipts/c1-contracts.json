@@ -13,10 +13,10 @@
     "--locked"
    ],
    "exit_code": 0,
-   "stderr_sha256": "fe972f3bc7f5d75e139295a6e562550adf28ab1e15f972ac87f979e830a4f7ad",
-   "stderr_tail": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.14s\n     Running tests/c1_contracts.rs (target/debug/deps/c1_contracts-652135177e66c1b5)\n",
-   "stdout_sha256": "708be014d243061fe5ef48ca78ebeee31b0554688c3fa606a15a747a8a7aa223",
-   "stdout_tail": "\nrunning 7 tests\ntest a_repeated_query_returns_the_same_type_without_new_work ... ok\ntest lazy_resolution_reports_the_cycle_and_stays_usable ... ok\ntest a_failed_relation_commits_no_assumption_and_modes_keep_separate_caches ... ok\ntest semantic_limits_produce_the_pins_results ... ok\ntest two_checkers_merge_independently_over_one_program ... ok\ntest an_injected_panic_retires_the_generation_and_a_fresh_checker_succeeds ... ok\ntest deep_relations_grow_the_stack_and_keep_the_checker_usable ... ok\n\ntest result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.60s\n\n"
+   "stderr_sha256": "3bf688925d3bfae1d8197ff3bc4172ccdaa2a83673b5996279a814de3e808eff",
+   "stderr_tail": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.04s\n     Running tests/c1_contracts.rs (target/debug/deps/c1_contracts-652135177e66c1b5)\n",
+   "stdout_sha256": "c9f8fb224074fd5379e30a8ee4311e02c6792f4908e22ae6996f54eda7f9de5e",
+   "stdout_tail": "\nrunning 7 tests\ntest a_repeated_query_returns_the_same_type_without_new_work ... ok\ntest lazy_resolution_reports_the_cycle_and_stays_usable ... ok\ntest two_checkers_merge_independently_over_one_program ... ok\ntest an_injected_panic_retires_the_generation_and_a_fresh_checker_succeeds ... ok\ntest a_failed_relation_commits_no_assumption_and_modes_keep_separate_caches ... ok\ntest semantic_limits_produce_the_pins_results ... ok\ntest deep_relations_grow_the_stack_and_keep_the_checker_usable ... ok\n\ntest result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.57s\n\n"
   },
   {
    "command": [
@@ -32,10 +32,10 @@
     "--release"
    ],
    "exit_code": 0,
-   "stderr_sha256": "8a1ca955ac2c4299d52cab8a7f8282ce32aef701d05820f7ed396ca756f6f710",
-   "stderr_tail": "    Finished `release` profile [optimized] target(s) in 0.05s\n     Running tests/c1_contracts.rs (target/release/deps/c1_contracts-29ccf79bad7ed182)\n",
-   "stdout_sha256": "613ae1ced32d04a8322ce552338c657e1ad5a1ab399e473f9bf169305d04967b",
-   "stdout_tail": "\nrunning 7 tests\ntest an_injected_panic_retires_the_generation_and_a_fresh_checker_succeeds ... ok\ntest semantic_limits_produce_the_pins_results ... ok\ntest deep_relations_grow_the_stack_and_keep_the_checker_usable ... ok\ntest lazy_resolution_reports_the_cycle_and_stays_usable ... ok\ntest a_repeated_query_returns_the_same_type_without_new_work ... ok\ntest two_checkers_merge_independently_over_one_program ... ok\ntest a_failed_relation_commits_no_assumption_and_modes_keep_separate_caches ... ok\n\ntest result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s\n\n"
+   "stderr_sha256": "6c3c44cb555656ae6022a4825f35e54ef9e5469cdef69e8d05bca61e9b1234bd",
+   "stderr_tail": "    Finished `release` profile [optimized] target(s) in 0.03s\n     Running tests/c1_contracts.rs (target/release/deps/c1_contracts-29ccf79bad7ed182)\n",
+   "stdout_sha256": "54a07431fc77f28f6dcd2782d7f79e74e893c503e0cf87a2bec95bc139a32b3b",
+   "stdout_tail": "\nrunning 7 tests\ntest lazy_resolution_reports_the_cycle_and_stays_usable ... ok\ntest a_repeated_query_returns_the_same_type_without_new_work ... ok\ntest two_checkers_merge_independently_over_one_program ... ok\ntest an_injected_panic_retires_the_generation_and_a_fresh_checker_succeeds ... ok\ntest a_failed_relation_commits_no_assumption_and_modes_keep_separate_caches ... ok\ntest semantic_limits_produce_the_pins_results ... ok\ntest deep_relations_grow_the_stack_and_keep_the_checker_usable ... ok\n\ntest result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s\n\n"
   }
  ],
  "source_inputs": {
@@ -265,7 +265,7 @@
   "crates/tsr_checker/src/compare.rs": "4209d12626450fe8db741e0408bd9dce0d53c4353a582821348f414c0c405ccb",
   "crates/tsr_checker/src/compound_signatures.rs": "f8b426e22d4f6f3d252a9537f3fffaa2743a3edfaf51c331b09878fd72e66bc1",
   "crates/tsr_checker/src/conditional.rs": "3e990a9ed16c040a64f6f45616a66ce7a9907d3ca6637c76994beb0976ca0bad",
-  "crates/tsr_checker/src/constraints.rs": "99164352447e99669e53f9986794579cee70539d8a2f23eb6e6c56253113a7f5",
+  "crates/tsr_checker/src/constraints.rs": "5db1d198462aa35915fdbb6ad3ed0b1577130533ba8bdd790d631b618751a837",
   "crates/tsr_checker/src/construct.rs": "57648a6251584d29a377ea736007715ac7e98b38bfb17caaf5d5a2c1ca6ee16a",
   "crates/tsr_checker/src/constructor_checks.rs": "4642f131ec2d375308f6ff01b39ee74e7559ce2063972b3cbf3685e484bc8a4e",
   "crates/tsr_checker/src/declaration_checks.rs": "d0a9605478b629213c7ae68e6141dc8b69de29b5533f336b4dafa3e8857b1e1a",
@@ -430,7 +430,7 @@
   "crates/tsr_checker/src/source_module_aliases.rs": "eff2af8b24aee0819d346e8dcff0a942e5cff9071ab74b2d472f755980db5b82",
   "crates/tsr_checker/src/source_modules.rs": "040776ddd7727018c2ed922a7925c2499e05476cca0a0cf873c4ee51e11d4a2f",
   "crates/tsr_checker/src/source_signatures.rs": "026364d82825946a5093f9c79fe4a8a95b97a013649254f79890144bf686232b",
-  "crates/tsr_checker/src/state.rs": "aa22da31a42ce6347eb712df778365fdd5f23d657c5b8259b0263c4e17feb6b1",
+  "crates/tsr_checker/src/state.rs": "951af57c250bb058186ab2271b614a88cc1f491bf2371fa10f9861cdbff2ceef",
   "crates/tsr_checker/src/storage_families.rs": "1e79553cbfee07fa8fe9bfef0b19a395479c44a351840cff949c8c1ad787c9d2",
   "crates/tsr_checker/src/storage_pilot.rs": "2223fa2bfa5499bee2747a71e4f1409b2f08b0d2e8f0b28bdd970cb56511d8d8",
   "crates/tsr_checker/src/string_mapping.rs": "1a338e5078d212f521a6495ed477243f65abe1153da3bb8632118346be43b3de",
