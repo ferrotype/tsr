@@ -95,7 +95,7 @@ impl CheckerState {
     pub(crate) fn target_symbol(&self, symbol: SymbolId) -> Result<SymbolId, Error> {
         if self.symbol(symbol)?.check_flags() & cf::INSTANTIATED != 0 {
             self.value_symbol_links
-                .try_get(symbol)
+                .try_get(self.value_symbol_key(symbol)?)
                 .and_then(|l| l.target)
                 .ok_or(Error::MissingLink("instantiated target symbol"))
         } else {
@@ -142,7 +142,7 @@ impl CheckerState {
         if check & cf::SYNTHETIC_PROPERTY != 0 {
             if let Some(ty) = self
                 .value_symbol_links
-                .try_get(symbol)
+                .try_get(self.value_symbol_key(symbol)?)
                 .and_then(|l| l.write_type)
             {
                 return Ok(ty);
@@ -157,7 +157,7 @@ impl CheckerState {
                 let ty = if let Some(parts) = parts.filter(|parts| !parts.is_empty()) {
                     let containing = self
                         .value_symbol_links
-                        .try_get(symbol)
+                        .try_get(self.value_symbol_key(symbol)?)
                         .and_then(|l| l.containing_type)
                         .ok_or(Error::MissingLink("deferred write parent"))?;
                     if self.types.flags(containing)? & tf::UNION != 0 {
@@ -168,12 +168,14 @@ impl CheckerState {
                 } else {
                     self.get_type_of_symbol_with_deferred_type(symbol)?
                 };
-                self.value_symbol_links.get_or_default(symbol).write_type = Some(ty);
+                self.value_symbol_links
+                    .get_or_default(self.value_symbol_key(symbol)?)
+                    .write_type = Some(ty);
                 return Ok(ty);
             }
             return self
                 .value_symbol_links
-                .try_get(symbol)
+                .try_get(self.value_symbol_key(symbol)?)
                 .and_then(|l| l.resolved_type)
                 .ok_or(Error::MissingLink("synthetic write type"));
         }
@@ -185,7 +187,7 @@ impl CheckerState {
             if check & cf::INSTANTIATED != 0 {
                 let links = self
                     .value_symbol_links
-                    .try_get(symbol)
+                    .try_get(self.value_symbol_key(symbol)?)
                     .copied()
                     .ok_or(Error::MissingLink("accessor write links"))?;
                 if let Some(ty) = links.write_type {
@@ -197,7 +199,9 @@ impl CheckerState {
                         .ok_or(Error::MissingLink("accessor write target"))?,
                 )?;
                 let ty = self.instantiate_type(ty, links.mapper)?;
-                self.value_symbol_links.get_or_default(symbol).write_type = Some(ty);
+                self.value_symbol_links
+                    .get_or_default(self.value_symbol_key(symbol)?)
+                    .write_type = Some(ty);
                 return Ok(ty);
             }
             return self.write_type_of_accessors(symbol);

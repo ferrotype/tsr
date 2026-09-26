@@ -491,7 +491,7 @@ impl Started<'_> {
                         )?;
                         state
                             .value_symbol_links
-                            .get_or_default(property)
+                            .get_or_default(state.value_symbol_key(property)?)
                             .resolved_type = Some(t);
                         table.insert(member.name.clone(), Some(property));
                     }
@@ -709,7 +709,7 @@ impl Live {
                     if let Some(table) = interface.declared_members {
                         for (name, symbol) in state.tables.get(table)? {
                             let resolved = symbol
-                                .and_then(|s| state.value_symbol_links.try_get(s))
+                                .and_then(|s| state.value_symbol_links.peek(s))
                                 .and_then(|links| links.resolved_type)
                                 .map_or(0, TypeId::get);
                             members.push((hex(name), resolved));
@@ -783,7 +783,7 @@ impl Live {
                 let resolved = self
                     .state
                     .value_symbol_links
-                    .try_get(*symbol)
+                    .peek(*symbol)
                     .and_then(|links| links.resolved_type)
                     .map_or(0, TypeId::get);
                 Ok((name, resolved))

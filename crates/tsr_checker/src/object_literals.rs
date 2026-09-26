@@ -166,7 +166,9 @@ impl CheckerState {
                     text.clone(),
                     checks | if name_type.is_some() { cf::LATE } else { 0 },
                 )?;
-                self.value_symbol_links.get_or_default(prop).name_type = name_type;
+                self.value_symbol_links
+                    .get_or_default(self.value_symbol_key(prop)?)
+                    .name_type = name_type;
                 if destructuring && self.object_member_has_default(declaration)? {
                     self.symbol_mut(prop)?.flags |= sf::OPTIONAL;
                 } else if context_pattern {
@@ -200,7 +202,9 @@ impl CheckerState {
                 stored.declarations = declarations;
                 stored.parent = parent;
                 stored.value_declaration = value;
-                let links = self.value_symbol_links.get_or_default(prop);
+                let links = self
+                    .value_symbol_links
+                    .get_or_default(self.value_symbol_key(prop)?);
                 links.resolved_type = Some(ty);
                 links.target = Some(original);
                 member = Some(prop);

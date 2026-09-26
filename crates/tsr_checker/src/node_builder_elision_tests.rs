@@ -91,10 +91,7 @@ fn property_elision_matches_native_members_comments_and_length() {
                     JsString::from_bytes(vec![b'a' + i as u8]),
                 )
                 .unwrap();
-            checker
-                .value_symbol_links
-                .get_or_default(symbol)
-                .resolved_type = Some(number);
+            checker.value_symbol_links.probe_entry(symbol).resolved_type = Some(number);
             properties.push(symbol);
         }
         let mut calls = Vec::new();

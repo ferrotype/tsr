@@ -39,6 +39,14 @@ INVENTORY = ROOT / "data/go-functions.tsv"
 DISPOSITIONS = ("mapped", "equivalent", "missing_mapping", "gap", "later")
 OPEN = ("missing_mapping", "gap")
 CHECKPOINTS = ("C2", "C3", "C4", "C5", "C6", "C7", "Phase 3", "Phase 4", "Phase 5")
+
+
+def later_owners(checkpoint):
+    """Completed checkpoints do not consume incoming later-work dispositions."""
+    ordered = ("C1", *CHECKPOINTS)
+    return ordered[ordered.index(checkpoint) + 1:]
+
+
 MARKER = re.compile(r"^\s*(?://[/!]?)\s*port:\s*(\S+)")
 # Reviewed C1.1 denominator, independent of the editable dispositions. Changes
 # to group membership require reviewing these bindings as well as the JSON.
@@ -121,7 +129,7 @@ def problems(document, *, allow_open=False, root=ROOT, known=None, mapped=None,
     if required_handoffs is None:
         required_handoffs = REQUIRED_HANDOFFS if checkpoint == "C1" else {}
     complete_files = COMPLETE_FILES if checkpoint == "C1" else C2_COMPLETE_FILES
-    allowed_owners = tuple(owner for owner in ("C1", *CHECKPOINTS) if owner != checkpoint)
+    allowed_owners = later_owners(checkpoint)
     known = inventory() if known is None else known
     mapped = markers(root) if mapped is None else mapped
     found = []

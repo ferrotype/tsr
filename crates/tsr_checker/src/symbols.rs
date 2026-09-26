@@ -103,6 +103,13 @@ impl CheckerState {
         Ok(tsr_ast::runtime_symbol_id(&self.symbol(id)?))
     }
 
+    pub(crate) fn value_symbol_key(
+        &self,
+        id: SymbolId,
+    ) -> Result<crate::links::ValueSymbolKey, Error> {
+        Ok(crate::links::ValueSymbolKey::observe(id, &self.symbol(id)?))
+    }
+
     /// Allocates a member table owned by this checker.
     pub(crate) fn alloc_symbol_table(&mut self, table: SymbolTable) -> SymbolTableId {
         self.tables.alloc(table)

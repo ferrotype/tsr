@@ -79,7 +79,7 @@ impl NodeBuilder<'_> {
             if let Some(ty) = self
                 .checker
                 .value_symbol_links
-                .try_get(symbol)
+                .try_get(self.checker.value_symbol_key(symbol)?)
                 .and_then(|l| l.name_type)
             {
                 if self.checker.types.flags(ty)?
@@ -1318,7 +1318,7 @@ impl NodeBuilder<'_> {
         if let Some(mapper) = self
             .checker
             .value_symbol_links
-            .try_get(chain[index + 1])
+            .try_get(self.checker.value_symbol_key(chain[index + 1])?)
             .and_then(|links| links.mapper)
         {
             for parameter in &mut parameters {

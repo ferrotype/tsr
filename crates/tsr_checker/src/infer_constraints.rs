@@ -1,5 +1,5 @@
-use crate::{mapper::Mapper, object_flags as of, CheckerState, Error, TypeId};
-use tsr_ast::{symbol_flags as sf, SyntaxKind as K};
+use crate::{mapper::Mapper, CheckerState, Error, TypeId};
+use tsr_ast::SyntaxKind as K;
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getInferredTypeParameterConstraint
@@ -44,21 +44,7 @@ impl CheckerState {
                 let Some(symbol) = self.type_reference_symbol(parent, true)? else {
                     continue;
                 };
-                let parameters = if self.symbol(symbol)?.flags() & sf::TYPE_ALIAS != 0 {
-                    self.query
-                        .type_aliases
-                        .get_or_default(symbol)
-                        .parameters
-                        .clone()
-                        .unwrap_or_else(|| [].into())
-                } else if self.types.object_flags(referenced)? & of::REFERENCE != 0 {
-                    let interface = self.types.interface(self.types.target(referenced)?)?;
-                    interface.type_parameters()[interface.outer_type_parameter_count as usize..]
-                        .to_vec()
-                        .into()
-                } else {
-                    continue;
-                };
+                let parameters = self.type_parameters_for_type_and_symbol(referenced, symbol)?;
                 let arguments =
                     self.source_list(parent, self.node(parent)?.type_argument_list())?;
                 if let Some(index) = arguments

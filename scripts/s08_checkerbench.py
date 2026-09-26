@@ -62,7 +62,7 @@ def sources():
                 "data/s07/subset.json", "data/upstream.json", ".gitmodules", "data/s04/toolchains.toml")
     for pattern in patterns:
         for path in ROOT.glob(pattern):
-            if path.is_file() and not ({"target", "__pycache__"} & set(path.parts)) and path.name != ".DS_Store":
+            if path.is_file() and not ({"target", "__pycache__"} & set(path.relative_to(ROOT).parts)) and path.name != ".DS_Store":
                 result[str(path.relative_to(ROOT))] = digest(path.read_bytes())
     return result
 

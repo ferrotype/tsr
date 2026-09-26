@@ -615,7 +615,7 @@ impl CheckerState {
     ) -> Result<TypeId, Error> {
         let links = self
             .value_symbol_links
-            .try_get(symbol)
+            .try_get(self.value_symbol_key(symbol)?)
             .copied()
             .ok_or(Error::MissingLink("instantiated symbol links"))?;
         if let Some(ty) = links.resolved_type {
@@ -626,7 +626,9 @@ impl CheckerState {
             .ok_or(Error::MissingLink("instantiated symbol target"))?;
         let ty = self.get_type_of_symbol(target)?;
         let ty = self.instantiate_type(ty, links.mapper)?;
-        self.value_symbol_links.get_or_default(symbol).resolved_type = Some(ty);
+        self.value_symbol_links
+            .get_or_default(self.value_symbol_key(symbol)?)
+            .resolved_type = Some(ty);
         Ok(ty)
     }
 }

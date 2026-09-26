@@ -173,7 +173,7 @@ impl CheckerState {
         Ok(self.symbol(symbol)?.check_flags() & cf::MAPPED != 0
             && self
                 .value_symbol_links
-                .try_get(symbol)
+                .try_get(self.value_symbol_key(symbol)?)
                 .is_none_or(|links| links.resolved_type.is_none())
             && self
                 .resolution
@@ -250,7 +250,7 @@ impl CheckerState {
             let text = self.symbol(symbol)?.name_to_owned();
             let key = self
                 .value_symbol_links
-                .try_get(symbol)
+                .try_get(self.value_symbol_key(symbol)?)
                 .and_then(|links| links.name_type);
             return self.contextual_property_type_ex(context, text.as_bytes(), key);
         }

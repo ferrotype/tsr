@@ -7,6 +7,32 @@ use tsr_arena::NodeId;
 use tsr_ast::SyntaxKind as K;
 
 impl CheckerState {
+    // port: tsc/internal/checker/checker.go:Checker.getTypeParametersForTypeAndSymbol
+    pub(crate) fn type_parameters_for_type_and_symbol(
+        &mut self,
+        ty: TypeId,
+        symbol: tsr_arena::SymbolId,
+    ) -> Result<crate::TypeList, Error> {
+        if self.is_error_type(ty)? {
+            return Ok(crate::TypeList::default());
+        }
+        if self.symbol(symbol)?.flags() & tsr_ast::symbol_flags::TYPE_ALIAS != 0 {
+            if let Some(parameters) = &self.query.type_aliases.get_or_default(symbol).parameters {
+                if !parameters.is_empty() {
+                    return Ok(parameters.clone());
+                }
+            }
+        }
+        if self.types.object_flags(ty)? & crate::object_flags::REFERENCE != 0 {
+            let interface = self.types.interface(self.types.target(ty)?)?;
+            return Ok(interface.type_parameters()
+                [interface.outer_type_parameter_count as usize..]
+                .to_vec()
+                .into());
+        }
+        Ok(crate::TypeList::default())
+    }
+
     // port: tsc/internal/checker/checker.go:Checker.checkTypeParameters
     pub(crate) fn check_type_parameters(&mut self, node: NodeId) -> Result<(), Error> {
         let nodes = self.source_list(node, self.node(node)?.type_parameter_list())?;
@@ -260,25 +286,7 @@ impl CheckerState {
             .source_list(node, self.node(node)?.type_argument_list())?
             .is_empty()
         {
-            let mut parameters =
-                if self.symbol(symbol)?.flags() & tsr_ast::symbol_flags::TYPE_ALIAS != 0 {
-                    self.query
-                        .type_aliases
-                        .try_get(symbol)
-                        .and_then(|links| links.parameters.clone())
-                        .unwrap_or_default()
-                } else {
-                    crate::TypeList::default()
-                };
-            if parameters.is_empty()
-                && self.types.object_flags(ty)? & crate::object_flags::REFERENCE != 0
-            {
-                let interface = self.types.interface(self.types.target(ty)?)?;
-                parameters = interface.type_parameters()
-                    [interface.outer_type_parameter_count as usize..]
-                    .to_vec()
-                    .into();
-            }
+            let parameters = self.type_parameters_for_type_and_symbol(ty, symbol)?;
             if !parameters.is_empty() {
                 self.check_type_argument_constraints(node, &parameters)?;
             }

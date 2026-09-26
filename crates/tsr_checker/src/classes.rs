@@ -77,7 +77,7 @@ impl CheckerState {
     pub(crate) fn type_of_class(&mut self, symbol: SymbolId) -> Result<TypeId, Error> {
         if let Some(ty) = self
             .value_symbol_links
-            .try_get(symbol)
+            .try_get(self.value_symbol_key(symbol)?)
             .and_then(|links| links.resolved_type)
         {
             return Ok(ty);
@@ -89,7 +89,9 @@ impl CheckerState {
         } else {
             ty
         };
-        self.value_symbol_links.get_or_default(symbol).resolved_type = Some(result);
+        self.value_symbol_links
+            .get_or_default(self.value_symbol_key(symbol)?)
+            .resolved_type = Some(result);
         Ok(result)
     }
 

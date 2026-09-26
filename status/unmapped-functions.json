@@ -645,7 +645,6 @@
       "tsc/internal/checker/checker.go:Checker.getTypeOfVariableOrParameterOrProperty",
       "tsc/internal/checker/checker.go:Checker.getTypeOfVariableOrParameterOrPropertyWorker",
       "tsc/internal/checker/checker.go:Checker.getTypeOnlyDeclarationOfEntityName",
-      "tsc/internal/checker/checker.go:Checker.getTypeParametersForTypeAndSymbol",
       "tsc/internal/checker/checker.go:Checker.getTypeParametersForTypeReferenceOrImport",
       "tsc/internal/checker/checker.go:Checker.getTypePredicateParent",
       "tsc/internal/checker/checker.go:Checker.getUnionOrIntersectionType",

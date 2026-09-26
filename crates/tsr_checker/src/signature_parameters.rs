@@ -737,7 +737,9 @@ impl CheckerState {
             } else {
                 element
             };
-            self.value_symbol_links.get_or_default(symbol).resolved_type = Some(ty);
+            self.value_symbol_links
+                .get_or_default(self.value_symbol_key(symbol)?)
+                .resolved_type = Some(ty);
             result.push(symbol);
         }
         Ok(result)

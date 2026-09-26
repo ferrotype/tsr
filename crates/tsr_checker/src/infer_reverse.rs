@@ -253,8 +253,15 @@ impl CheckerState {
             let inferred =
                 self.new_symbol_ex(sf::PROPERTY | flags & optional_mask, name.clone(), checks)?;
             self.symbol_mut(inferred)?.declarations = declarations;
-            let name_type = self.value_symbol_links.get_or_default(property).name_type;
-            self.value_symbol_links.get_or_default(inferred).name_type = name_type;
+            // Go evaluates the Get on the assignment's left before the right.
+            let inferred_key = self.value_symbol_key(inferred)?;
+            let name_type = self
+                .value_symbol_links
+                .get_or_default(self.value_symbol_key(property)?)
+                .name_type;
+            self.value_symbol_links
+                .get_or_default(inferred_key)
+                .name_type = name_type;
             let value = self.get_type_of_symbol(property)?;
             let target = self.types.target(constraint)?;
             let (mapped, constraint) = if self.types.flags(target)? & tf::INDEXED_ACCESS != 0 {
@@ -322,7 +329,11 @@ impl CheckerState {
         &mut self,
         symbol: SymbolId,
     ) -> Result<TypeId, Error> {
-        if let Some(ty) = self.value_symbol_links.get_or_default(symbol).resolved_type {
+        if let Some(ty) = self
+            .value_symbol_links
+            .get_or_default(self.value_symbol_key(symbol)?)
+            .resolved_type
+        {
             return Ok(ty);
         }
         let (source, mapped, constraint) = self
@@ -336,7 +347,9 @@ impl CheckerState {
         let ty = self
             .infer_reverse_property(source, mapped, constraint)?
             .unwrap_or(self.builtins.unknown_type);
-        self.value_symbol_links.get_or_default(symbol).resolved_type = Some(ty);
+        self.value_symbol_links
+            .get_or_default(self.value_symbol_key(symbol)?)
+            .resolved_type = Some(ty);
         Ok(ty)
     }
 

@@ -447,7 +447,9 @@ impl CheckerState {
             } else {
                 ty
             };
-            self.value_symbol_links.get_or_default(symbol).resolved_type = Some(ty);
+            self.value_symbol_links
+                .get_or_default(self.value_symbol_key(symbol)?)
+                .resolved_type = Some(ty);
             params.push(symbol);
         }
         if extra_rest {
@@ -463,7 +465,9 @@ impl CheckerState {
             if shorter == right {
                 ty = self.instantiate_type(ty, mapper)?;
             }
-            self.value_symbol_links.get_or_default(symbol).resolved_type = Some(ty);
+            self.value_symbol_links
+                .get_or_default(self.value_symbol_key(symbol)?)
+                .resolved_type = Some(ty);
             params.push(symbol);
         }
         Ok(params)

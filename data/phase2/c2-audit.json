@@ -291,9 +291,8 @@
       "rust": "crates/tsr_checker/src/import_attributes.rs:277"
     },
     "tsc/internal/checker/checker.go:Checker.getTypeParametersForTypeAndSymbol": {
-      "disposition": "equivalent",
-      "reason": "check_type_reference_or_import rejects error types, then selects nonempty cached alias parameters, falling back to the referenced target interface local parameter slice after outer_type_parameter_count. The choice is the native helper inline.",
-      "rust": "crates/tsr_checker/src/check_generics.rs:268"
+      "disposition": "mapped",
+      "reason": "Shared native fall-through helper is used by constraint checking and infer constraints."
     },
     "tsc/internal/checker/checker.go:Checker.getTypeParametersForTypeReferenceOrImport": {
       "disposition": "equivalent",

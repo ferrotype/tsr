@@ -654,7 +654,7 @@ impl Operation<'_> {
         Ok(self
             .state()
             .value_symbol_links
-            .try_get(symbol)
+            .peek(symbol)
             .and_then(|links| links.name_type)
             .map(|ty| self.type_ref(ty)))
     }
@@ -828,9 +828,10 @@ impl Operation<'_> {
                 JsString::from_bytes(member.name),
                 check_flags,
             )?;
+            let key = self.state().value_symbol_key(property)?;
             self.state_mut()
                 .value_symbol_links
-                .get_or_default(property)
+                .get_or_default(key)
                 .resolved_type = Some(t);
             table.insert(JsString::from_bytes(member.name), Some(property));
         }
@@ -857,7 +858,7 @@ impl Operation<'_> {
             .map(|symbol| {
                 let resolved = state
                     .value_symbol_links
-                    .try_get(*symbol)
+                    .peek(*symbol)
                     .and_then(|links| links.resolved_type)
                     .map(|id| self.type_ref(id));
                 (*symbol, resolved)

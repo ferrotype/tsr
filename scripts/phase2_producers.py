@@ -137,7 +137,7 @@ def source_inputs(paths):
         for base in bases:
             files = [base] if base.is_file() else sorted(p for p in base.rglob("*") if p.is_file())
             for path in files:
-                if "target" in path.parts or "__pycache__" in path.parts or path.name == ".DS_Store":
+                if {"target", "__pycache__"} & set(path.relative_to(ROOT).parts) or path.name == ".DS_Store":
                     continue
                 found[str(path.relative_to(ROOT))] = digest(path.read_bytes())
     return found
@@ -369,7 +369,7 @@ def c1_metrics(comparison, claims, audit_ok, baseline, contracts_ok, regression_
     return checkpoint_metrics("C1", comparison, claims, audit_ok, baseline, contracts_ok, regression_parity, blockers)
 
 
-def measurement_identity(directory, comparison, rust):
+def measurement_identity(directory, comparison, rust, *, context=None):
     """Independently replay each executable; join complete production inputs."""
     import s08_checkerbench as benchmark
     directory, rust = Path(directory), Path(rust)
@@ -378,8 +378,12 @@ def measurement_identity(directory, comparison, rust):
     capture = strict_json_loads(capture_raw)
     build_raw = (directory / "build.json").read_bytes()
     build = strict_json_loads(build_raw)
-    corpus = strict_json_loads((rust / "capture.json").read_bytes())
-    replay = quietly(phase2_corpus.replay, rust)
+    if context is None:
+        corpus = strict_json_loads((rust / "capture.json").read_bytes())
+        replay = quietly(phase2_corpus.replay, rust)
+    else:
+        context.require_directories(context.native_directory, rust)
+        corpus, replay = context.metadata, context.replayed
     required = source_inputs(PRODUCTION_PATTERNS)
     if (result.get("smoke") or not result.get("source_stable")
             or result.get("pin") != comparison["pin"] or capture.get("pin") != comparison["pin"]
@@ -394,26 +398,38 @@ def measurement_identity(directory, comparison, rust):
         value = result.get("metrics", {}).get(name)
         if type(value) not in (int, float) or not math.isfinite(value) or value <= 0:
             raise ValueError("measurement did not establish " + name)
-    return {"version": 1, "pin": comparison["pin"], "directory": str(directory.resolve()),
+    return {"version": 1, "pin": comparison["pin"], "directory": measurement_location(directory),
             "capture_sha256": digest(capture_raw), "build_sha256": digest(build_raw),
             "corpus_capture_sha256": comparison["rust_capture_sha256"],
             "production_sources_sha256": digest(canonical(required))}
 
 
-def measurement_current(comparison, rust, path=None):
+def measurement_current(comparison, rust, path=None, *, context=None):
     path = Path(path) if path else CHECKPOINT_AUTHORITIES["C2"]["measurement"]
     if not path.is_file():
         return None
     record = strict_json_loads(path.read_bytes())
     if not isinstance(record, dict) or not isinstance(record.get("directory"), str):
         return False
-    return record == measurement_identity(record["directory"], comparison, rust)
+    directory = Path(record["directory"])
+    if directory.is_absolute() or ".." in directory.parts or not directory.parts:
+        return False
+    return record == measurement_identity(ROOT / directory, comparison, rust, context=context)
+
+
+def measurement_location(directory):
+    """A portable capture locator, separate from its authenticated identity."""
+    try:
+        return Path(directory).resolve().relative_to(ROOT.resolve()).as_posix()
+    except ValueError as error:
+        raise ValueError("measurement capture must be inside the checkout") from error
 
 
 def observe_measurement(directory, native, rust):
-    comparison = quietly(phase2_compare.report, native, rust, write=False)
+    context = quietly(phase2_compare.load_context, native, rust)
+    comparison = quietly(phase2_compare.report, native, rust, write=False, context=context)
     phase2_compare.validate_complete_rows(comparison)
-    record = measurement_identity(directory, comparison, rust)
+    record = measurement_identity(directory, comparison, rust, context=context)
     path = CHECKPOINT_AUTHORITIES["C2"]["measurement"]
     path.write_bytes(json.dumps(record, indent=1, sort_keys=True).encode() + b"\n")
     print(json.dumps({"receipt": str(path), "capture_sha256": record["capture_sha256"]}))
@@ -459,8 +475,8 @@ def checker(native=NATIVE, rust=RUST):
     if not metrics["native_verified"]:
         return {"metrics": metrics}
     try:
-        replayed = quietly(phase2_corpus.replay, rust)
-        capture = strict_json_loads((Path(rust) / "capture.json").read_bytes())
+        context = quietly(phase2_compare.load_context, native, rust)
+        replayed, capture = context.replayed, context.metadata
         _, current_requests, _ = quietly(phase2_corpus.requests, native)
         metrics["harness_valid"] = (not replayed["summary"]["partial"] and replayed["summary"]["harness_errors"] == 0
                                     and replayed["source_stable"]
@@ -475,7 +491,7 @@ def checker(native=NATIVE, rust=RUST):
         print("Rust capture is partial, stale or invalid; acceptance metrics withheld", file=sys.stderr)
         return {"metrics": metrics}
     try:
-        comparison = quietly(phase2_compare.report, native, rust, write=False)
+        comparison = quietly(phase2_compare.report, native, rust, write=False, context=context)
     except (OSError, ValueError, KeyError) as error:
         print("comparison unavailable: " + str(error), file=sys.stderr)
         return {"metrics": metrics}
@@ -505,33 +521,25 @@ def checker(native=NATIVE, rust=RUST):
         print("C1 metrics unavailable: " + str(error), file=sys.stderr)
         metrics["c1_complete"] = False
     register = None
+    authorities = CHECKPOINT_AUTHORITIES["C2"]
+    c2_claims, c2_audit, transfers, incoming = None, None, None, None
     try:
-        register = quietly(phase2_blockers.build, native, rust)
+        c2_claims, c2_audit, transfers, incoming = phase2_blockers.load_handoffs(
+            "C2", authorities["claims"], authorities["audit"], comparison, context)
+        register = quietly(phase2_blockers.build, native, rust, context=context, comparison=comparison,
+                           handoffs=transfers, incoming=incoming)
         committed = json.loads(phase2_blockers.REGISTER.read_bytes()) if phase2_blockers.REGISTER.exists() else None
         metrics["blockers_named"] = register == committed and phase2_blockers.complete(register, comparison)
     except (OSError, ValueError, KeyError, TypeError) as error:
         print("blocker register unavailable: " + str(error), file=sys.stderr)
     try:
-        authorities = CHECKPOINT_AUTHORITIES["C2"]
-        claims = strict_json_loads(authorities["claims"].read_bytes()) if authorities["claims"].is_file() else None
-        audit = phase2_audit.load(authorities["audit"]) if authorities["audit"].is_file() else None
-        audit_ok = phase2_audit.complete(audit) if audit is not None else None
+        if transfers is None:
+            raise ValueError("C2 handoff authority validation did not complete")
+        audit_ok = phase2_audit.complete(c2_audit) if c2_audit is not None else None
         baseline = phase2_compare.load_baseline(authorities["baseline"]) if authorities["baseline"].is_file() else None
-        transfers, incoming = {}, {}
-        if claims is not None and any(entry.get("status") in ("handed", "blocked") or "incoming" in entry
-                                     for entry in claims.get("rows", [])):
-            if audit is None or phase2_audit.problems(audit, allow_open=True):
-                raise ValueError("handoff ownership requires a valid reviewed C2 audit scope")
-            context = phase2_blockers.capture_context(rust, comparison)
-            transfers = phase2_blockers.validated_handoffs(
-                "C2", claims, comparison, context,
-                owned_functions=phase2_blockers.audit_owned_functions(audit, "C2"))
-            incoming = phase2_blockers.validated_handoffs(
-                "C2", claims, comparison, context, incoming=True,
-                owned_functions=phase2_blockers.audit_owned_functions(audit, "C2"))
-        measured = measurement_current(comparison, rust)
+        measured = measurement_current(comparison, rust, context=context)
         metrics.update(checkpoint_metrics(
-            "C2", comparison, claims, audit_ok, baseline, receipt_current("c2-contracts"),
+            "C2", comparison, c2_claims, audit_ok, baseline, receipt_current("c2-contracts"),
             metrics["regression_parity"], register, handoffs=transfers, measured_ok=measured,
             baseline_sha256=digest(authorities["baseline"].read_bytes()) if baseline is not None else None,
             prerequisites=metrics, incoming=incoming))

@@ -2,7 +2,7 @@
  "build_sha256": "b674789305f27abb574330858c73fc27c919e479758f9c2302fdcdb7443c6052",
  "capture_sha256": "45dc5c36847b76ee635896391a5317727e51b039c4380d5bdcf0a3d97a3947a0",
  "corpus_capture_sha256": "616e3f795dc1401f354af22c16b92ffb797a54df209e3c487f7de6bb6078fd84",
- "directory": "/Users/cristian/git/ts-rust/target/s08/c2-checkerbench-01",
+ "directory": "target/s08/c2-checkerbench-01",
  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
  "production_sources_sha256": "1a32386274cfd61cf06225f66d94553e2cb6bdedd7d02f93b7496a65db4c3314",
  "version": 1

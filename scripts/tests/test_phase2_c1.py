@@ -16,6 +16,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import phase2_audit as audit  # noqa: E402
 import phase2_compare as compare  # noqa: E402
 import phase2_producers as producers  # noqa: E402
+import phase2_blockers as blockers  # noqa: E402
 from phase2_fixtures import build_capture, load as load_fixture, CONTROL  # noqa: E402
 
 DOMAINS = compare.DOMAINS
@@ -184,6 +185,23 @@ class AuthenticatedCapture(unittest.TestCase):
         (self.directory / "comparison.json").write_text(json.dumps(original))
         with self.assertRaisesRegex(ValueError, "authenticated Rust capture replay"):
             compare.baseline(self.directory, self.directory / "baseline.json.gz", native_dir=self.directory)
+
+    def test_comparison_blockers_and_handoffs_share_one_authenticated_read(self):
+        with patch.object(compare.phase2_corpus, "replay", wraps=compare.phase2_corpus.replay) as replay:
+            context = compare.load_context(self.directory, self.directory)
+            comparison_ = compare.report(self.directory, self.directory, write=False, context=context)
+            register = blockers.build(self.directory, self.directory, context=context,
+                                      comparison=comparison_, handoffs={}, incoming={})
+            observed = blockers.capture_context(self.directory, comparison_, authenticated=context)
+            self.assertEqual(register["comparison"]["rust_capture_sha256"], comparison_["rust_capture_sha256"])
+            self.assertEqual(set(observed), {CONTROL})
+            replay.assert_called_once_with(self.directory)
+            with self.assertRaisesRegex(ValueError, "different directories"):
+                compare.report(self.directory, self.directory / "other", context=context)
+        # The context is invocation-local: a new invocation authenticates again.
+        (self.directory / "cases/00000/stdout").write_bytes(b"changed raw observation")
+        with self.assertRaisesRegex(ValueError, "raw case artifact changed"):
+            compare.load_context(self.directory, self.directory)
 
 
 class ExitMetrics(unittest.TestCase):

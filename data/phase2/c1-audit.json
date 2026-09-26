@@ -241,9 +241,8 @@
    "rust": "crates/tsr_checker/src/enums.rs:255"
   },
   "tsc/internal/checker/checker.go:Checker.getTypeParametersForTypeAndSymbol": {
-   "disposition": "equivalent",
-   "reason": "check_type_reference uses get_local_type_parameters of the resolved symbol after the error-type exit; the alias and interface branches agree with the pin",
-   "rust": "crates/tsr_checker/src/check_generics.rs:254"
+   "disposition": "mapped",
+   "reason": "Shared native fall-through helper is used by constraint checking and infer constraints."
   },
   "tsc/internal/checker/checker.go:Checker.getUniqAssociatedNamesFromTupleType": {
    "disposition": "equivalent",

@@ -852,7 +852,7 @@ impl NodeBuilder<'_> {
                     let mapper = self
                         .checker
                         .value_symbol_links
-                        .try_get(symbol)
+                        .try_get(self.checker.value_symbol_key(symbol)?)
                         .and_then(|links| links.mapper);
                     let mut nodes = Vec::new();
                     for kind in [K::GetAccessor, K::SetAccessor] {
@@ -905,7 +905,7 @@ impl NodeBuilder<'_> {
                     )?;
                     self.checker
                         .value_symbol_links
-                        .get_or_default(parameter)
+                        .get_or_default(self.checker.value_symbol_key(parameter)?)
                         .resolved_type = Some(write);
                     let setter = self.checker.signatures.new_signature(
                         0,

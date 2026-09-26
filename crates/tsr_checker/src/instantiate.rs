@@ -357,10 +357,9 @@ impl CheckerState {
     ) -> Result<SymbolId, Error> {
         // Go's valueSymbolLinks.Get assigns this lazy comparison identity even
         // when the symbol can be returned without instantiation.
-        self.symbol_runtime_id(symbol)?;
         let links = self
             .value_symbol_links
-            .try_get(symbol)
+            .try_get(self.value_symbol_key(symbol)?)
             .copied()
             .unwrap_or_default();
         if self.mapper_maps_this_only(mapper)? && self.is_thisless_symbol(symbol)? {
@@ -397,8 +396,9 @@ impl CheckerState {
         write.parent = parent;
         write.value_declaration = value_declaration;
         write.declarations = declarations;
-        self.symbol_runtime_id(result)?;
-        let result_links = self.value_symbol_links.get_or_default(result);
+        let result_links = self
+            .value_symbol_links
+            .get_or_default(self.value_symbol_key(result)?);
         result_links.target = Some(symbol);
         result_links.mapper = Some(mapper);
         result_links.name_type = links.name_type;

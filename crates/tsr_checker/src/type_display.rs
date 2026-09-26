@@ -379,10 +379,7 @@ mod tests {
         let ty = state
             .get_union_type(&[state.builtins.number_type, state.builtins.missing_type])
             .unwrap();
-        state
-            .value_symbol_links
-            .get_or_default(property)
-            .resolved_type = Some(ty);
+        state.value_symbol_links.probe_entry(property).resolved_type = Some(ty);
         let members = state.alloc_symbol_table(SymbolTable::from_iter([(
             JsString::from_bytes(b"field-name".as_slice()),
             Some(property),
@@ -516,10 +513,8 @@ mod tests {
                         JsString::from_bytes(name.as_bytes()),
                     )
                     .unwrap();
-                state
-                    .value_symbol_links
-                    .get_or_default(symbol)
-                    .resolved_type = Some(state.builtins.number_type);
+                state.value_symbol_links.probe_entry(symbol).resolved_type =
+                    Some(state.builtins.number_type);
                 properties.push(symbol);
             }
             let object = state.new_anonymous_type(None, None, &[], &[], &[]).unwrap();

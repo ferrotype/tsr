@@ -33,7 +33,7 @@ impl CheckerState {
         }
         let ty = self
             .value_symbol_links
-            .try_get(property)
+            .try_get(self.value_symbol_key(property)?)
             .and_then(|links| links.containing_type)
             .ok_or(Error::MissingLink("synthetic property containing type"))?;
         let name = self.symbol(property)?.name_to_owned();

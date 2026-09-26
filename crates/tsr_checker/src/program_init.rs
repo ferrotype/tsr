@@ -96,21 +96,21 @@ impl CheckerState {
         }
         self.add_undefined_to_globals()?;
         self.value_symbol_links
-            .get_or_default(self.builtins.undefined_symbol)
+            .get_or_default(self.value_symbol_key(self.builtins.undefined_symbol)?)
             .resolved_type = Some(self.builtins.undefined_widening_type);
         let arguments = self.get_global_type("IArguments", 0, true)?;
         self.value_symbol_links
-            .get_or_default(self.builtins.arguments_symbol)
+            .get_or_default(self.value_symbol_key(self.builtins.arguments_symbol)?)
             .resolved_type = Some(arguments);
         self.value_symbol_links
-            .get_or_default(self.builtins.unknown_symbol)
+            .get_or_default(self.value_symbol_key(self.builtins.unknown_symbol)?)
             .resolved_type = Some(self.builtins.error_type);
         let global_this = self.new_object_type(
             object_flags::ANONYMOUS,
             Some(self.builtins.global_this_symbol),
         )?;
         self.value_symbol_links
-            .get_or_default(self.builtins.global_this_symbol)
+            .get_or_default(self.value_symbol_key(self.builtins.global_this_symbol)?)
             .resolved_type = Some(global_this);
         for (name, arity) in [
             ("Array", 1),

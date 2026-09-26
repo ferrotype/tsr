@@ -68,7 +68,7 @@ pub(crate) struct CheckerState {
     pub(crate) signatures: SignatureStore,
     pub(crate) resolution: ResolutionStack,
     pub(crate) mapped_symbol_links: LinkStore<SymbolId, crate::mapped::MappedSymbolLinks>,
-    pub(crate) value_symbol_links: LinkStore<SymbolId, ValueSymbolLinks>,
+    pub(crate) value_symbol_links: LinkStore<crate::links::ValueSymbolKey, ValueSymbolLinks>,
     /// `Checker.factory`: the checker's own synthetic AST arena, distinct from
     /// the node builder's. Synthetic signature declarations and synthetic
     /// expressions live here and share the owner's lifetime (plan §4.3).

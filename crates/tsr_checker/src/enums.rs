@@ -241,13 +241,15 @@ impl CheckerState {
     pub(crate) fn type_of_enum_member(&mut self, symbol: SymbolId) -> Result<TypeId, Error> {
         if let Some(ty) = self
             .value_symbol_links
-            .try_get(symbol)
+            .try_get(self.value_symbol_key(symbol)?)
             .and_then(|links| links.resolved_type)
         {
             return Ok(ty);
         }
         let ty = self.declared_enum_member_type(symbol)?;
-        self.value_symbol_links.get_or_default(symbol).resolved_type = Some(ty);
+        self.value_symbol_links
+            .get_or_default(self.value_symbol_key(symbol)?)
+            .resolved_type = Some(ty);
         Ok(ty)
     }
 
@@ -255,13 +257,15 @@ impl CheckerState {
     pub(crate) fn type_of_enum(&mut self, symbol: SymbolId) -> Result<TypeId, Error> {
         if let Some(ty) = self
             .value_symbol_links
-            .try_get(symbol)
+            .try_get(self.value_symbol_key(symbol)?)
             .and_then(|links| links.resolved_type)
         {
             return Ok(ty);
         }
         let ty = self.new_object_type(of::ANONYMOUS, Some(symbol))?;
-        self.value_symbol_links.get_or_default(symbol).resolved_type = Some(ty);
+        self.value_symbol_links
+            .get_or_default(self.value_symbol_key(symbol)?)
+            .resolved_type = Some(ty);
         Ok(ty)
     }
 

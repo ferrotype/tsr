@@ -261,7 +261,7 @@ impl<'a> NodeBuilder<'a> {
                     if let Some(name_type) = self
                         .checker
                         .value_symbol_links
-                        .try_get(symbol)
+                        .try_get(self.checker.value_symbol_key(symbol)?)
                         .and_then(|links| links.name_type)
                     {
                         if self.checker.types.flags(name_type)?
@@ -324,7 +324,7 @@ impl<'a> NodeBuilder<'a> {
         let Some(name_type) = self
             .checker
             .value_symbol_links
-            .try_get(symbol)
+            .try_get(self.checker.value_symbol_key(symbol)?)
             .and_then(|links| links.name_type)
         else {
             return Ok(None);
@@ -1161,7 +1161,7 @@ impl<'a> NodeBuilder<'a> {
         let name_type = self
             .checker
             .value_symbol_links
-            .try_get(symbol)
+            .try_get(self.checker.value_symbol_key(symbol)?)
             .and_then(|links| links.name_type);
         let raw_name = read.name_to_owned();
         let enclosing = match read.value_declaration() {

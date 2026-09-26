@@ -107,7 +107,7 @@ impl CheckerState {
     pub(crate) fn type_of_accessors(&mut self, symbol: SymbolId) -> Result<TypeId, Error> {
         if let Some(ty) = self
             .value_symbol_links
-            .try_get(symbol)
+            .try_get(self.value_symbol_key(symbol)?)
             .and_then(|links| links.resolved_type)
         {
             return Ok(ty);
@@ -198,7 +198,7 @@ impl CheckerState {
         }
         Ok(*self
             .value_symbol_links
-            .get_or_default(symbol)
+            .get_or_default(self.value_symbol_key(symbol)?)
             .resolved_type
             .get_or_insert(ty))
     }
@@ -207,7 +207,7 @@ impl CheckerState {
     pub(crate) fn write_type_of_accessors(&mut self, symbol: SymbolId) -> Result<TypeId, Error> {
         if let Some(ty) = self
             .value_symbol_links
-            .try_get(symbol)
+            .try_get(self.value_symbol_key(symbol)?)
             .and_then(|links| links.write_type)
         {
             return Ok(ty);
@@ -238,7 +238,7 @@ impl CheckerState {
         }
         if let Some(ty) = self
             .value_symbol_links
-            .try_get(symbol)
+            .try_get(self.value_symbol_key(symbol)?)
             .and_then(|links| links.write_type)
         {
             return Ok(ty);
@@ -247,7 +247,9 @@ impl CheckerState {
             Some(ty) => ty,
             None => self.type_of_accessors(symbol)?,
         };
-        self.value_symbol_links.get_or_default(symbol).write_type = Some(ty);
+        self.value_symbol_links
+            .get_or_default(self.value_symbol_key(symbol)?)
+            .write_type = Some(ty);
         Ok(ty)
     }
 

@@ -28,7 +28,6 @@ import s08_p4 as p4  # noqa: E402
 from s08_oracle import ROOT, canonical, digest  # noqa: E402
 import phase2_compare  # noqa: E402
 import phase2_inventory  # noqa: E402
-import phase2_native  # noqa: E402
 import phase2_audit  # noqa: E402
 
 REGISTER = ROOT / "data/phase2/blockers.json"
@@ -66,9 +65,13 @@ def owner_of(operation, rows, ownership=None):
     return "/".join(sorted(checkpoints)) if len(checkpoints) > 1 else next(iter(checkpoints))
 
 
-def capture_context(directory, comparison):
+def capture_context(directory, comparison, *, authenticated=None):
     """Authenticate raw observations before using them to exempt any difference."""
-    replayed, requests, rows, _, _ = phase2_compare.load_rust(Path(directory))
+    if authenticated is None:
+        replayed, requests, rows, _, _ = phase2_compare.load_rust(Path(directory))
+    else:
+        authenticated.require_directories(authenticated.native_directory, directory)
+        replayed, requests, rows = authenticated.replayed, authenticated.requests, authenticated.rust_rows
     if (replayed["summary"]["partial"] or replayed["summary"]["harness_errors"]
             or not replayed["source_stable"]
             or replayed["capture_sha256"] != comparison["rust_capture_sha256"]):
@@ -79,6 +82,23 @@ def capture_context(directory, comparison):
         # comparator's fatal-domain digest (which deliberately omits location).
         "raw_observation_sha256": digest(canonical(row)),
     } for request, row in zip(requests, rows, strict=True)}
+
+
+def load_handoffs(checkpoint, claims_path, audit_path, comparison, authenticated):
+    """One authority-loading and validation path for metrics and blockers."""
+    claims = phase2_audit.load(claims_path) if claims_path.is_file() else None
+    audit = phase2_audit.load(audit_path) if audit_path.is_file() else None
+    has_transfers = claims and any(entry.get("status") in ("handed", "blocked") or "incoming" in entry
+                                  for entry in claims.get("rows", []))
+    outgoing, incoming = {}, {}
+    if has_transfers:
+        if audit is None or phase2_audit.problems(audit, allow_open=True):
+            raise ValueError(f"handoff ownership requires a valid reviewed {checkpoint} audit scope")
+        context = capture_context(authenticated.rust_directory, comparison, authenticated=authenticated)
+        owned = audit_owned_functions(audit, checkpoint)
+        outgoing = validated_handoffs(checkpoint, claims, comparison, context, owned_functions=owned)
+        incoming = validated_handoffs(checkpoint, claims, comparison, context, owned_functions=owned, incoming=True)
+    return claims, audit, outgoing, incoming
 
 
 def cause_domains(row, kind, operation):
@@ -116,7 +136,7 @@ def validated_handoffs(checkpoint, claims, comparison, context, *, root=ROOT, kn
             raise ValueError(f"handoff {vid} requires a trace-bound handoff object")
         owner, function = handoff.get("owner"), handoff.get("go")
         valid_owner = (owner == checkpoint and handoff.get("from") == owners.get(vid)
-                       and handoff.get("from") in TARGETS - {checkpoint}) if incoming else owner in TARGETS - {checkpoint}
+                       and handoff.get("from") in TARGETS - {checkpoint}) if incoming else owner in phase2_audit.later_owners(checkpoint)
         valid_function = function in owned_functions if incoming else function not in owned_functions
         if not valid_owner or function not in known or not valid_function:
             direction = "inside" if incoming else "outside"
@@ -229,33 +249,23 @@ def rust_declarations(row):
     return values, failure
 
 
-def build(native_dir, rust_dir, record=False, *, handoffs=None, incoming=None):
-    comparison = phase2_compare.report(native_dir, rust_dir, write=False)
+def build(native_dir, rust_dir, record=False, *, handoffs=None, incoming=None, context=None, comparison=None):
+    context = context or phase2_compare.load_context(native_dir, rust_dir)
+    context.require_directories(native_dir, rust_dir)
+    comparison = comparison or phase2_compare.report(native_dir, rust_dir, write=False, context=context)
     if comparison.get("partial", False):
         raise ValueError("the acceptance blocker register requires a full comparison, not an informational sample")
-    _, native_report, native_rows = phase2_native.load_capture(native_dir)
-    phase2_native.current(native_report)
-    if comparison["native_observation_sha256"] != native_report["observation_sha256"]:
-        raise ValueError("comparison was made against a different native capture")
+    native_report, native_rows = context.native_report, context.native_rows
+    if (comparison["native_observation_sha256"] != native_report["observation_sha256"]
+            or comparison["rust_capture_sha256"] != context.replayed["capture_sha256"]):
+        raise ValueError("comparison was made against a different capture")
     inventory = {row["id"]: row for row in phase2_inventory.executed()}
     native = {row["id"]: row for row in native_rows}
-    rust_requests = json.loads((Path(rust_dir) / "requests.json").read_bytes())
+    rust_requests = context.requests
     case_dir = {request["id"]: f"cases/{index:05d}" for index, request in enumerate(rust_requests)}
-    rust = {request["id"]: p4.read(Path(rust_dir) / case_dir[request["id"]] / "result.json")["row"]
-            for request in rust_requests}
+    rust = {request["id"]: row for request, row in zip(rust_requests, context.rust_rows, strict=True)}
     if handoffs is None:
-        claims = p4.read(CLAIMS) if CLAIMS.is_file() else None
-        audit = p4.read(AUDIT) if AUDIT.is_file() else {}
-        has_transfers = claims and any(entry.get("status") in ("handed", "blocked") or "incoming" in entry
-                                      for entry in claims.get("rows", []))
-        if has_transfers:
-            if not audit or phase2_audit.problems(audit, allow_open=True):
-                raise ValueError("handoff ownership requires a valid reviewed C2 audit scope")
-        context = capture_context(rust_dir, comparison) if has_transfers else {}
-        handoffs = validated_handoffs("C2", claims, comparison, context,
-                                     owned_functions=audit_owned_functions(audit, "C2")) if has_transfers else {}
-        incoming = validated_handoffs("C2", claims, comparison, context, incoming=True,
-                                     owned_functions=audit_owned_functions(audit, "C2")) if has_transfers else {}
+        _, _, handoffs, incoming = load_handoffs("C2", CLAIMS, AUDIT, comparison, context)
     groups = defaultdict(lambda: {"variants": [], "domains": Counter(), "evidence": [], "ownership": []})
     for row in comparison["rows"]:
         if "outcomes" not in row:

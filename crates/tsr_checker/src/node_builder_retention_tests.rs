@@ -46,7 +46,7 @@ fn object(checker: &mut CheckerState, name: &[u8], property_type: TypeId) -> Typ
         .unwrap();
     checker
         .value_symbol_links
-        .get_or_default(property)
+        .probe_entry(property)
         .resolved_type = Some(property_type);
     let symbol = checker
         .new_symbol(

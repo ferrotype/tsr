@@ -588,7 +588,7 @@ impl CheckerState {
     pub(crate) fn type_of_alias(&mut self, symbol: SymbolId) -> Result<TypeId, Error> {
         if let Some(ty) = self
             .value_symbol_links
-            .try_get(symbol)
+            .try_get(self.value_symbol_key(symbol)?)
             .and_then(|links| links.resolved_type)
         {
             return Ok(ty);
@@ -607,7 +607,7 @@ impl CheckerState {
             };
             if let Some(ty) = self
                 .value_symbol_links
-                .try_get(symbol)
+                .try_get(self.value_symbol_key(symbol)?)
                 .and_then(|links| links.resolved_type)
             {
                 return Ok(ty);
@@ -617,14 +617,18 @@ impl CheckerState {
             } else {
                 self.builtins.error_type
             };
-            self.value_symbol_links.get_or_default(symbol).resolved_type = Some(ty);
+            self.value_symbol_links
+                .get_or_default(self.value_symbol_key(symbol)?)
+                .resolved_type = Some(ty);
             Ok(ty)
         })();
         let complete = self.resolution.pop();
         let ty = result?;
         if !complete {
             self.report_symbol_circularity(export.unwrap_or(symbol))?;
-            let links = self.value_symbol_links.get_or_default(symbol);
+            let links = self
+                .value_symbol_links
+                .get_or_default(self.value_symbol_key(symbol)?);
             if links.resolved_type.is_none() {
                 links.resolved_type = Some(self.builtins.error_type);
             }

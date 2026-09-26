@@ -507,9 +507,8 @@ impl CheckerState {
                         JsString::from_bytes(i.to_string().into_bytes()),
                         readonly_flags,
                     )?;
-                    self.symbol_runtime_id(property)?;
                     self.value_symbol_links
-                        .get_or_default(property)
+                        .get_or_default(self.value_symbol_key(property)?)
                         .resolved_type = Some(type_parameter);
                     let name = self.symbol(property)?.name_to_owned();
                     members.insert(name, Some(property));
@@ -522,10 +521,10 @@ impl CheckerState {
             JsString::from_bytes(&b"length"[..]),
             readonly_flags,
         )?;
-        self.symbol_runtime_id(length_symbol)?;
+        let length_key = self.value_symbol_key(length_symbol)?;
         if combined_flags & element_flags::VARIABLE != 0 {
             self.value_symbol_links
-                .get_or_default(length_symbol)
+                .get_or_default(length_key)
                 .resolved_type = Some(self.builtins.number_type);
         } else {
             let mut literal_types = Vec::with_capacity(arity + 1 - min_length);
@@ -534,7 +533,7 @@ impl CheckerState {
             }
             let length = self.get_union_type(&literal_types)?;
             self.value_symbol_links
-                .get_or_default(length_symbol)
+                .get_or_default(length_key)
                 .resolved_type = Some(length);
         }
         members.insert(JsString::from_bytes(&b"length"[..]), Some(length_symbol));

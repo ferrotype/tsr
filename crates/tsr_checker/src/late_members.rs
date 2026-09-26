@@ -345,7 +345,9 @@ impl CheckerState {
                 }
                 target = self.new_symbol_ex(0, name, cf::LATE)?;
             }
-            self.value_symbol_links.get_or_default(target).name_type = Some(ty);
+            self.value_symbol_links
+                .get_or_default(self.value_symbol_key(target)?)
+                .name_type = Some(ty);
             self.add_late_declaration(target, raw, declaration)?;
             if self.symbol(target)?.parent().is_none() {
                 self.symbol_mut(target)?.parent = Some(parent);

@@ -245,7 +245,7 @@ impl CheckerState {
         }
         let mut ty = self
             .value_symbol_links
-            .try_get(symbol)
+            .try_get(self.value_symbol_key(symbol)?)
             .and_then(|links| links.name_type);
         if ty.is_none() {
             if name.as_bytes() == tsr_ast::internal_symbol_names::DEFAULT {

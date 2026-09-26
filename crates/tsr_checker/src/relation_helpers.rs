@@ -109,16 +109,17 @@ impl CheckerState {
         let declarations = read.declarations();
         let parent = read.parent();
         let declaration = read.value_declaration();
-        let name_type = self
-            .value_symbol_links
-            .try_get(source)
-            .and_then(|links| links.name_type);
         let symbol = self.new_symbol_ex(flags, name, check_flags)?;
         let record = self.symbol_mut(symbol)?;
         record.declarations = declarations;
         record.parent = parent;
         record.value_declaration = declaration;
-        let links = self.value_symbol_links.get_or_default(symbol);
+        let key = self.value_symbol_key(symbol)?;
+        let name_type = self
+            .value_symbol_links
+            .try_get(self.value_symbol_key(source)?)
+            .and_then(|links| links.name_type);
+        let links = self.value_symbol_links.get_or_default(key);
         links.resolved_type = ty;
         links.target = Some(source);
         links.name_type = name_type;

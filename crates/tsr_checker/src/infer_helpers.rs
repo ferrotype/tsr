@@ -16,7 +16,7 @@ impl CheckerState {
             };
             let property = self.new_symbol(tsr_ast::symbol_flags::PROPERTY, name.clone())?;
             self.value_symbol_links
-                .get_or_default(property)
+                .get_or_default(self.value_symbol_key(property)?)
                 .resolved_type = Some(self.builtins.any_type);
             if let Some(symbol) = self.types.get(part)?.symbol {
                 let declarations = self.symbol(symbol)?.declarations();

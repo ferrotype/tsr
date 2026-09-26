@@ -2,6 +2,7 @@
 import copy
 import fnmatch
 import json
+import shutil
 from pathlib import Path
 import subprocess
 import sys
@@ -143,7 +144,7 @@ class Handoffs(MetricsFixture, unittest.TestCase):
             self.validated()
 
     def test_unknown_function_own_function_owner_and_wrong_repro_reject(self):
-        for mutation in ({"owner": "C2"}, {"owner": "elsewhere"}, {"reproduce": ["tool", "--case", "other"]},
+        for mutation in ({"owner": "C1"}, {"owner": "C2"}, {"owner": "elsewhere"}, {"reproduce": ["tool", "--case", "other"]},
                          {"domains": ["errors", "errors"]}, {"trace": {"path": "../trace", "sha256": "b" * 64}}):
             saved = copy.deepcopy(self.handoff)
             self.handoff.update(mutation)
@@ -265,6 +266,7 @@ class Measurement(unittest.TestCase):
         self.report = {"smoke": None, "source_stable": True, "pin": "pin",
                        "metrics": {"elapsed_ratio": 1.2, "retained_bytes_ratio": 0.8, "type_footprint_ratio": 0.9}}
         self.addCleanup(patch.stopall)
+        patch.object(producers, "ROOT", self.root).start()
         self.replayed = patch.object(benchmark, "report", return_value=self.report).start()
         patch.object(producers, "source_inputs", return_value=self.required).start()
         patch.object(corpus, "replay", return_value={"summary": {"partial": False, "harness_errors": 0},
@@ -278,12 +280,27 @@ class Measurement(unittest.TestCase):
 
     def test_independent_binary_builds_join_by_complete_sources(self):
         identity = self.identity()
+        self.assertEqual(identity["directory"], "bench")
         self.assertEqual(identity["production_sources_sha256"], producers.digest(producers.canonical(self.required)))
         self.replayed.assert_called_once_with(self.bench)
         receipt = self.root / "measurement.json"; self.write(receipt, identity)
         self.assertTrue(producers.measurement_current(self.comparison, self.rust, receipt))
         identity["capture_sha256"] = "changed"; self.write(receipt, identity)
         self.assertFalse(producers.measurement_current(self.comparison, self.rust, receipt))
+
+    def test_receipt_survives_checkout_relocation_without_changing_identity(self):
+        identity = self.identity()
+        receipt = self.root / "measurement.json"
+        self.write(receipt, identity)
+        with tempfile.TemporaryDirectory() as name:
+            moved = Path(name) / "checkout"
+            shutil.copytree(self.root, moved)
+            with patch.object(producers, "ROOT", moved):
+                self.assertTrue(producers.measurement_current(self.comparison, moved / "rust", moved / "measurement.json"))
+            self.replayed.assert_called_with(moved / "bench")
+        for invalid in (str(self.bench.resolve()), "../bench", ""):
+            self.write(receipt, dict(identity, directory=invalid))
+            self.assertFalse(producers.measurement_current(self.comparison, self.rust, receipt))
 
     def test_missing_stale_and_smoke_measurements_do_not_pass(self):
         self.assertIsNone(producers.measurement_current(self.comparison, self.rust, self.root / "missing"))
@@ -314,6 +331,23 @@ class Measurement(unittest.TestCase):
 
 
 class Registration(unittest.TestCase):
+    def test_checkout_parent_does_not_empty_source_fingerprints(self):
+        with tempfile.TemporaryDirectory() as name:
+            root = Path(name) / "target" / "checkout"
+            source = root / "crates" / "demo" / "src" / "lib.rs"
+            source.parent.mkdir(parents=True)
+            source.write_text("pub fn first() {}\n")
+            ignored = root / "crates" / "demo" / "target" / "generated.rs"
+            ignored.parent.mkdir(parents=True)
+            ignored.write_text("build cache")
+            with patch.object(producers, "ROOT", root), patch.object(corpus, "ROOT", root), \
+                    patch.object(benchmark, "ROOT", root), patch.object(corpus.p4, "sources", return_value={}):
+                for read in (lambda: producers.source_inputs(["crates"]), corpus.sources, benchmark.sources):
+                    before = read()
+                    self.assertEqual(set(before), {"crates/demo/src/lib.rs"})
+                    source.write_text(source.read_text() + "// changed\n")
+                    self.assertNotEqual(read(), before)
+
     def test_recorded_handoff_traces_are_in_the_checker_fingerprint(self):
         spec = tomllib.loads((ROOT / "status/runs.toml").read_text())["checker"]
         claims = json.loads((ROOT / "data/phase2/c2-claims.json").read_text())
@@ -431,6 +465,14 @@ class Registration(unittest.TestCase):
 
 
 class AuditScope(unittest.TestCase):
+    def test_later_disposition_cannot_send_work_back_to_c1(self):
+        document = copy.deepcopy(self.document)
+        identity = next(iter(document["dispositions"]))
+        document["dispositions"][identity] = {
+            "disposition": "later", "owner": "C1", "reason": "backward ownership must not hide work"}
+        problems = audit.problems(document, allow_open=True, mapped=set())
+        self.assertTrue(any(identity in problem and "later needs an owner" in problem for problem in problems))
+
     def setUp(self):
         self.document = audit.load(ROOT / "data/phase2/c2-audit.json")
 

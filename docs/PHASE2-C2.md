@@ -479,3 +479,44 @@ Open C2 cases, regressions, execution failures and C2-owned blockers are all
 zero; the three validated C5 handoffs remain reported. `P2B-C2` is complete.
 Whole Phase 2 remains open for C3–C7; older checkpoint receipts retain their
 own source freshness rather than being relabeled as current.
+
+## PR #62 review follow-up
+
+The bounded review fixes preserve the preceding full captures as historical
+observations of their recorded source revision. They do not relabel those
+captures as evidence for these production changes.
+
+- The measurement receipt locates its capture relative to the checkout. Its
+  capture, build and production-source digests are unchanged by that locator
+  migration. Source filtering now excludes repository-relative build caches;
+  a checkout whose parent is named `target` no longer produces empty hashes.
+- Outgoing handoffs and `later` audit dispositions must name a later owner.
+  C2 cannot exempt a row by assigning it back to C1, whose claim accounting
+  does not consume such incoming transfers.
+- Value-symbol links require an observed key. This reproduces
+  `symbolArenaLinkStore.Get/TryGet/Has` assigning the lazy comparison ID even
+  on a miss. Go's other symbol stores use pointer keys and remain unchanged.
+  Rust-only snapshots, censuses and diagnostic inspection use passive reads.
+  Reverse mapping, spread construction and symbol cloning preserve the native
+  new-symbol-before-source access order; the compound-property clone also
+  retains the native transient-symbol guard. The mapped-property cycle check
+  uses the shared resolution predicate, including its native link reads.
+- Generic checking and inferred constraints now share
+  `getTypeParametersForTypeAndSymbol`: absent or empty alias parameters fall
+  through to the reference target's local parameters. Its direct test covers
+  that internal branch without claiming a reachable TypeScript counterexample.
+- The checker producer authenticates one run-local capture context and shares
+  it among comparison, blocker construction, handoff validation and measurement
+  joining. No context is loaded from recorded JSON or reused across producer
+  invocations. Blockers and metrics use one handoff-authority loader.
+
+Focused validation passed 74 checker unit tests, the 16 C2 contracts (including
+the frozen native creation-order observations), 129 Python tests with 118
+subtests, and checker Clippy with all targets/features and warnings denied.
+Each command was bounded below ten minutes. No corpus or benchmark was run.
+The C1 contract receipt was refreshed on these sources in 103 seconds: all
+seven contracts passed in both debug and release, and `receipt_current` is
+true. This refresh does not refresh the full correctness or measurement
+captures above.
+The relation-stack allocation optimization from review item 7 remains separate:
+its reentrant snapshot requirement has not changed.

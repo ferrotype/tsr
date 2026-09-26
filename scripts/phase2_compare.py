@@ -31,6 +31,7 @@ from __future__ import annotations
 
 import argparse
 from collections import Counter, defaultdict
+from dataclasses import dataclass
 import json
 from pathlib import Path
 import sys
@@ -285,6 +286,51 @@ def load_rust(directory):
     return replayed, requests, rows, harness, attributions
 
 
+@dataclass(frozen=True)
+class CaptureContext:
+    """Run-local authenticated inputs; never deserialize this from evidence.
+
+    Load once per producer invocation. Consumers share these exact observations
+    rather than rereading mutable files or repeating full artifact validation.
+    """
+    native_directory: Path
+    rust_directory: Path
+    native_report: dict
+    native_rows: list
+    replayed: dict
+    requests: list
+    rust_rows: list
+    harness: dict
+    attributions: dict
+    metadata: dict
+    inventory_rows: list
+
+    def require_directories(self, native, rust):
+        if (Path(native).resolve() != self.native_directory
+                or Path(rust).resolve() != self.rust_directory):
+            raise ValueError("capture context belongs to different directories")
+
+
+def load_context(native_dir, rust_dir):
+    native_dir, native_report, native_rows = phase2_native.load_capture(native_dir)
+    phase2_native.current(native_report)
+    replayed, requests, rust_rows, harness, attributions = load_rust(rust_dir)
+    all_inventory = phase2_inventory.executed()
+    if [r["id"] for r in all_inventory] != [r["id"] for r in native_rows]:
+        raise ValueError("native rows differ from the full executed inventory")
+    metadata = p4.read(Path(rust_dir) / "capture.json")
+    if (metadata["inventory_sha256"] != digest(phase2_inventory.INVENTORY.read_bytes())
+            or metadata["native"]["observation_sha256"] != native_report["observation_sha256"]):
+        raise ValueError("Rust capture belongs to a different inventory or native capture")
+    inventory_rows = phase2_corpus.select_rows(all_inventory, **replayed["selection"])
+    wanted = {row["id"] for row in inventory_rows}
+    native_rows = [row for row in native_rows if row["id"] in wanted]
+    if not ([r["id"] for r in inventory_rows] == [r["id"] for r in requests] == [r["id"] for r in rust_rows]):
+        raise ValueError("inventory, native and Rust rows are missing, extra or reordered")
+    return CaptureContext(Path(native_dir).resolve(), Path(rust_dir).resolve(), native_report, native_rows,
+                          replayed, requests, rust_rows, harness, attributions, metadata, inventory_rows)
+
+
 def domain_digest(native, rust, domain):
     if "fatal" in rust:
         return digest(canonical(rust["fatal"]))
@@ -427,25 +473,15 @@ def regressions_against(document, comparison):
     return regressions(document["rows"], comparison["rows"])
 
 
-def report(native_dir, rust_dir, previous=None, record=False, *, write=True):
-    native_dir, native_report, native_rows = phase2_native.load_capture(native_dir)
-    phase2_native.current(native_report)
-    replayed, requests, rust_rows, harness, attributions = load_rust(rust_dir)
+def report(native_dir, rust_dir, previous=None, record=False, *, write=True, context=None):
+    context = context or load_context(native_dir, rust_dir)
+    context.require_directories(native_dir, rust_dir)
+    native_report, native_rows = context.native_report, context.native_rows
+    replayed, rust_rows = context.replayed, context.rust_rows
+    harness, attributions, inventory_rows = context.harness, context.attributions, context.inventory_rows
     partial = replayed["summary"]["partial"]
     if record and partial:
         raise ValueError("a partial Rust run is informational and cannot be recorded as acceptance")
-    all_inventory = phase2_inventory.executed()
-    if [r["id"] for r in all_inventory] != [r["id"] for r in native_rows]:
-        raise ValueError("native rows differ from the full executed inventory")
-    metadata = p4.read(Path(rust_dir) / "capture.json")
-    if (metadata["inventory_sha256"] != digest(phase2_inventory.INVENTORY.read_bytes())
-            or metadata["native"]["observation_sha256"] != native_report["observation_sha256"]):
-        raise ValueError("Rust capture belongs to a different inventory or native capture")
-    inventory_rows = phase2_corpus.select_rows(all_inventory, **replayed["selection"])
-    wanted = {row["id"] for row in inventory_rows}
-    native_rows = [row for row in native_rows if row["id"] in wanted]
-    if not ([r["id"] for r in inventory_rows] == [r["id"] for r in requests] == [r["id"] for r in rust_rows]):
-        raise ValueError("inventory, native and Rust rows are missing, extra or reordered")
     earlier = strict_json_loads(Path(previous).read_bytes()) if previous else None
     rows, categories = [], {domain: Counter() for domain in DOMAINS}
     buckets = defaultdict(list)

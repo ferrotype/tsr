@@ -260,7 +260,9 @@ impl CheckerState {
         data_symbol.declarations = declarations;
         data_symbol.value_declaration = value_declaration;
         data_symbol.parent = parent;
-        self.value_symbol_links.get_or_default(symbol).resolved_type = Some(data.value_type);
+        self.value_symbol_links
+            .get_or_default(self.value_symbol_key(symbol)?)
+            .resolved_type = Some(data.value_type);
         self.signatures.index_info_mut(info)?.index_symbol = Some(symbol);
         Ok(Some(symbol))
     }

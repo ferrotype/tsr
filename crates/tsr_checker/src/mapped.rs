@@ -732,12 +732,13 @@ impl CheckerState {
                     if let Some(existing) = members.get(name.as_bytes()).copied().flatten() {
                         let previous_name = self
                             .value_symbol_links
-                            .get_or_default(existing)
+                            .get_or_default(self.value_symbol_key(existing)?)
                             .name_type
                             .ok_or(Error::MissingLink("mapped name link"))?;
                         let joined_name = self.get_union_type(&[previous_name, name_type])?;
-                        self.value_symbol_links.get_or_default(existing).name_type =
-                            Some(joined_name);
+                        self.value_symbol_links
+                            .get_or_default(self.value_symbol_key(existing)?)
+                            .name_type = Some(joined_name);
                         let previous_key = self
                             .mapped_symbol_links
                             .get_or_default(existing)
@@ -783,7 +784,9 @@ impl CheckerState {
                             } else {
                                 0
                             };
-                        let links = self.value_symbol_links.get_or_default(property);
+                        let links = self
+                            .value_symbol_links
+                            .get_or_default(self.value_symbol_key(property)?);
                         links.containing_type = Some(ty);
                         links.name_type = Some(name_type);
                         let mapped_links = self.mapped_symbol_links.get_or_default(property);
@@ -876,7 +879,7 @@ impl CheckerState {
     pub(crate) fn type_of_mapped_symbol(&mut self, symbol: SymbolId) -> Result<TypeId, Error> {
         let links = self
             .value_symbol_links
-            .try_get(symbol)
+            .try_get(self.value_symbol_key(symbol)?)
             .copied()
             .ok_or(Error::MissingLink("mapped value links"))?;
         if let Some(ty) = links.resolved_type {
@@ -885,19 +888,9 @@ impl CheckerState {
         let mapped = links
             .containing_type
             .ok_or(Error::MissingLink("mapped containing type"))?;
-        let link_store = &self.value_symbol_links;
-        if !self.resolution.push(
+        if !self.push_type_resolution(
             crate::TypeSystemEntity::Symbol(symbol),
             crate::TypeSystemPropertyName::Type,
-            |entry| {
-                let crate::TypeSystemEntity::Symbol(symbol) = entry.target else {
-                    return false;
-                };
-                entry.property_name == crate::TypeSystemPropertyName::Type
-                    && link_store
-                        .try_get(symbol)
-                        .is_some_and(|links| links.resolved_type.is_some())
-            },
         ) {
             self.types.mapped_mut(mapped)?.contains_error = true;
             return Ok(self.builtins.error_type);
@@ -929,7 +922,7 @@ impl CheckerState {
         let value = result?;
         if !complete {
             self.value_symbol_links
-                .get_or_default(symbol)
+                .get_or_default(self.value_symbol_key(symbol)?)
                 .resolved_type
                 .get_or_insert(self.builtins.error_type);
             let name = self.symbol_to_string(symbol)?;
@@ -942,7 +935,7 @@ impl CheckerState {
         }
         Ok(*self
             .value_symbol_links
-            .get_or_default(symbol)
+            .get_or_default(self.value_symbol_key(symbol)?)
             .resolved_type
             .get_or_insert(value))
     }

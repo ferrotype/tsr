@@ -15,7 +15,7 @@ impl Operation<'_> {
         if state.symbol(property)?.check_flags() & tsr_ast::check_flags::MAPPED == 0
             || state
                 .value_symbol_links
-                .try_get(property)
+                .peek(property)
                 .is_some_and(|links| links.resolved_type.is_some())
         {
             return Err(Error::MissingLink(

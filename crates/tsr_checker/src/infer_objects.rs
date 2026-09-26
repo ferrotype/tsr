@@ -404,7 +404,7 @@ mod native_contract_tests {
                 let prop = state
                     .new_symbol(sf::PROPERTY, JsString::from_bytes(b"x".as_slice()))
                     .unwrap();
-                state.value_symbol_links.get_or_default(prop).resolved_type =
+                state.value_symbol_links.probe_entry(prop).resolved_type =
                     Some(state.builtins.string_type);
                 members.insert(JsString::from_bytes(b"x".as_slice()), Some(prop));
                 state
@@ -484,10 +484,7 @@ mod native_contract_tests {
         let length = state
             .new_symbol(sf::PROPERTY, JsString::from_bytes(b"length".as_slice()))
             .unwrap();
-        state
-            .value_symbol_links
-            .get_or_default(length)
-            .resolved_type = Some(u);
+        state.value_symbol_links.probe_entry(length).resolved_type = Some(u);
         let mut members = tsr_ast::SymbolTable::default();
         members.insert(JsString::from_bytes(b"length".as_slice()), Some(length));
         let members = state.alloc_symbol_table(members);

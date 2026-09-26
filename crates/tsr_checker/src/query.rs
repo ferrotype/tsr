@@ -393,11 +393,17 @@ impl CheckerState {
                 .is_some_and(Option::is_some),
             (Property::Type, Symbol(symbol)) => self
                 .value_symbol_links
-                .try_get(symbol)
+                .try_get(
+                    self.value_symbol_key(symbol)
+                        .expect("resolution symbols belong to the checker"),
+                )
                 .is_some_and(|links| links.resolved_type.is_some()),
             (Property::WriteType, Symbol(symbol)) => self
                 .value_symbol_links
-                .try_get(symbol)
+                .try_get(
+                    self.value_symbol_key(symbol)
+                        .expect("resolution symbols belong to the checker"),
+                )
                 .is_some_and(|links| links.write_type.is_some()),
             (Property::InitializerIsUndefined, Node(node)) => {
                 self.emit_checks
@@ -1032,9 +1038,27 @@ impl CheckerState {
         if read.check_flags() & check_flags::REVERSE_MAPPED != 0 {
             return self.type_of_reverse_mapped_symbol(symbol);
         }
+        // Each native value-type dispatcher starts with valueSymbolLinks.Get.
+        // Preserve that first access before this Rust-only shared cache read,
+        // but do not assign IDs to non-value symbols that return errorType.
+        if read.flags()
+            & (sf::ACCESSOR
+                | sf::VARIABLE
+                | sf::PROPERTY
+                | sf::FUNCTION
+                | sf::METHOD
+                | sf::CLASS
+                | sf::ENUM
+                | sf::VALUE_MODULE
+                | sf::ENUM_MEMBER
+                | sf::ALIAS)
+            != 0
+        {
+            self.value_symbol_key(symbol)?;
+        }
         if let Some(ty) = self
             .value_symbol_links
-            .try_get(symbol)
+            .peek(symbol)
             .and_then(|links| links.resolved_type)
         {
             return Ok(ty);
@@ -1061,7 +1085,9 @@ impl CheckerState {
             let optional = read.flags() & sf::OPTIONAL != 0;
             let ty = self.new_object_type(of::ANONYMOUS, Some(symbol))?;
             let ty = self.add_type_optionality(ty, true, optional)?;
-            self.value_symbol_links.get_or_default(symbol).resolved_type = Some(ty);
+            self.value_symbol_links
+                .get_or_default(self.value_symbol_key(symbol)?)
+                .resolved_type = Some(ty);
             return Ok(ty);
         }
         if read.flags() & sf::ALIAS != 0 && read.flags() & (sf::VARIABLE | sf::PROPERTY) == 0 {
@@ -1088,7 +1114,9 @@ impl CheckerState {
                 } else {
                     self.builtins.empty_object_type
                 };
-                self.value_symbol_links.get_or_default(symbol).resolved_type = Some(ty);
+                self.value_symbol_links
+                    .get_or_default(self.value_symbol_key(symbol)?)
+                    .resolved_type = Some(ty);
                 return Ok(ty);
             }
         }
@@ -1142,12 +1170,14 @@ impl CheckerState {
         };
         if self
             .value_symbol_links
-            .get_or_default(symbol)
+            .get_or_default(self.value_symbol_key(symbol)?)
             .resolved_type
             .is_none()
             && !self.parameter_of_context_sensitive_signature(declaration)?
         {
-            self.value_symbol_links.get_or_default(symbol).resolved_type = Some(ty);
+            self.value_symbol_links
+                .get_or_default(self.value_symbol_key(symbol)?)
+                .resolved_type = Some(ty);
         }
         Ok(ty)
     }
