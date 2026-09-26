@@ -583,6 +583,7 @@ impl CheckerState {
                         }
                     }
                 }
+                // port: tsc/internal/checker/checker.go:Checker.hasContextSensitiveYieldExpression
                 if read.type_node().is_none() && self.body_function_flags(node)?.1 {
                     if let Some(body) = read.body() {
                         for yielded in self.yield_expressions(body)? {

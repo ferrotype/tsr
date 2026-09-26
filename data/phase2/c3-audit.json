@@ -196,11 +196,6 @@
    "item": "C3.7",
    "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
   },
-  "tsc/internal/checker/checker.go:Checker.combineIterationTypes": {
-   "disposition": "gap",
-   "item": "C3.3",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
   "tsc/internal/checker/checker.go:Checker.combineUnionOrIntersectionThisParam": {
    "disposition": "gap",
    "item": "C3.4",
@@ -234,11 +229,6 @@
   "tsc/internal/checker/checker.go:Checker.getAnnotatedAccessorThisParameter": {
    "disposition": "gap",
    "item": "C3.4",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
-  "tsc/internal/checker/checker.go:Checker.getBuiltinIteratorReturnType": {
-   "disposition": "gap",
-   "item": "C3.3",
    "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
   },
   "tsc/internal/checker/checker.go:Checker.getCannotResolveModuleNameErrorForSpecificModule": {
@@ -294,26 +284,6 @@
   "tsc/internal/checker/checker.go:Checker.getIsolatedModulesLikeFlagName": {
    "disposition": "gap",
    "item": "C3.5",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
-  "tsc/internal/checker/checker.go:Checker.getIterationTypeOfIterable": {
-   "disposition": "gap",
-   "item": "C3.3",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
-  "tsc/internal/checker/checker.go:Checker.getIterationTypeUnion": {
-   "disposition": "gap",
-   "item": "C3.3",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
-  "tsc/internal/checker/checker.go:Checker.getIterationTypesOfIterator": {
-   "disposition": "gap",
-   "item": "C3.3",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
-  "tsc/internal/checker/checker.go:Checker.getIterationTypesOfIteratorSlow": {
-   "disposition": "gap",
-   "item": "C3.3",
    "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
   },
   "tsc/internal/checker/checker.go:Checker.getMemberOverrideModifierStatus": {
@@ -441,11 +411,6 @@
    "item": "C3.7",
    "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
   },
-  "tsc/internal/checker/checker.go:Checker.hasContextSensitiveYieldExpression": {
-   "disposition": "gap",
-   "item": "C3.3",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
   "tsc/internal/checker/checker.go:Checker.hasNumericPropertyNames": {
    "disposition": "gap",
    "item": "C3.4",
@@ -521,11 +486,6 @@
    "item": "C3.7",
    "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
   },
-  "tsc/internal/checker/checker.go:Checker.isReturnIteratorResult": {
-   "disposition": "gap",
-   "item": "C3.3",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
   "tsc/internal/checker/checker.go:Checker.isThisPropertyAndThisTyped": {
    "disposition": "gap",
    "item": "C3.4",
@@ -544,11 +504,6 @@
   "tsc/internal/checker/checker.go:Checker.isUnwrappedReturnTypeUndefinedVoidOrAny": {
    "disposition": "gap",
    "item": "C3.7",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
-  "tsc/internal/checker/checker.go:Checker.isYieldIteratorResult": {
-   "disposition": "gap",
-   "item": "C3.3",
    "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
   },
   "tsc/internal/checker/checker.go:Checker.lookupOrIssueError": {
@@ -672,9 +627,10 @@
    "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
   },
   "tsc/internal/checker/checker.go:acceptsVoid": {
-   "disposition": "gap",
-   "item": "C3.3",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+   "disposition": "equivalent",
+   "reason": "acceptsVoid has no caller in the pinned checker package; the void-argument acceptance Rust implements is the optional-argument test at this site, and nothing else observes the predicate.",
+   "reviewed_from": "grep of the pinned internal/checker for callers (none); C3 source audit",
+   "rust": "crates/tsr_checker/src/call_arguments.rs:88"
   },
   "tsc/internal/checker/checker.go:countGlobalSymbols": {
    "disposition": "gap",
@@ -749,11 +705,6 @@
   "tsc/internal/checker/checker.go:isES2015OrLaterConstructorName": {
    "disposition": "gap",
    "item": "C3.4",
-   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
-  },
-  "tsc/internal/checker/checker.go:isES2015OrLaterIterable": {
-   "disposition": "gap",
-   "item": "C3.3",
    "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
   },
   "tsc/internal/checker/checker.go:isExportOrExportExpression": {
