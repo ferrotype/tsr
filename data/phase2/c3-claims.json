@@ -1,0 +1,895 @@
+{
+ "baseline_sha256": "f4e309c1a1e3b747045f6da097c17986a0d7f808158865d7de10944d6900b800",
+ "inventory_sha256": "c09721d36d361eb8646b2321ec3478da0fbdbf12253c086e7b1c34e966aea9b9",
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "rows": [
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "unsupported",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "unsupported"
+   },
+   "bucket": "unsupported: content-mapper execution",
+   "handoff": {
+    "blocker": {
+     "kind": "unsupported",
+     "operation": "content-mapper execution"
+    },
+    "capture_sha256": "616e3f795dc1401f354af22c16b92ffb797a54df209e3c487f7de6bb6078fd84",
+    "cause": "content-mapper execution: the native harness transforms the source through the content-mapper plugin before checking; the Rust loader refuses that operation (crates/tsr_compiler/src/loader.rs), so every compared domain of the row is withheld",
+    "domains": [
+     "display",
+     "errors",
+     "parent_pointers",
+     "symbols",
+     "types",
+     "union_ordering"
+    ],
+    "go": "tsc/internal/contentmapper/transform.go:TransformAndParse",
+    "owner": "Phase 5",
+    "raw_observation_sha256": "b9f6e9bf1615f583dd01772638728fd3eac4520e8b38ad32bc5f8bd3ce61d861",
+    "reproduce": [
+     "python3",
+     "scripts/phase2_corpus.py",
+     "run",
+     "--native",
+     "target/phase2/native",
+     "--output",
+     "<fresh-output>",
+     "--case",
+     "compiler/contentMapperAliasDiagnostic.ts#configuration=0"
+    ],
+    "request_sha256": "b8b4e7dba9e755fdbcd19da986daa094d6f75f425b01e88b849b384b4ab7d43c",
+    "trace": {
+     "path": "data/phase2/c3-content-mapper/trace.json",
+     "sha256": "64636d6f8762fae51d6c56eb2c446cf4f78facc6704f442df9fe712afcfe5811"
+    }
+   },
+   "id": "compiler/contentMapperAliasDiagnostic.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/contentMapperAliasDiagnostic.ts#configuration=0"
+   ],
+   "status": "blocked"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "unsupported",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "unsupported"
+   },
+   "bucket": "unsupported: content-mapper execution",
+   "handoff": {
+    "blocker": {
+     "kind": "unsupported",
+     "operation": "content-mapper execution"
+    },
+    "capture_sha256": "616e3f795dc1401f354af22c16b92ffb797a54df209e3c487f7de6bb6078fd84",
+    "cause": "content-mapper execution: the native harness transforms the source through the content-mapper plugin before checking; the Rust loader refuses that operation (crates/tsr_compiler/src/loader.rs), so every compared domain of the row is withheld",
+    "domains": [
+     "display",
+     "errors",
+     "parent_pointers",
+     "symbols",
+     "types",
+     "union_ordering"
+    ],
+    "go": "tsc/internal/contentmapper/transform.go:TransformAndParse",
+    "owner": "Phase 5",
+    "raw_observation_sha256": "7ea5e4931215a7e55694ef76a7731334b092bada8ddbee6635f0ebc04dfbf54c",
+    "reproduce": [
+     "python3",
+     "scripts/phase2_corpus.py",
+     "run",
+     "--native",
+     "target/phase2/native",
+     "--output",
+     "<fresh-output>",
+     "--case",
+     "compiler/contentMapperDeclarationEmit.ts#configuration=0"
+    ],
+    "request_sha256": "1343e11f2e42ea654a6b79b9d103b3d5f8462bc80d553274fcf4e16f8fd063bd",
+    "trace": {
+     "path": "data/phase2/c3-content-mapper/trace.json",
+     "sha256": "64636d6f8762fae51d6c56eb2c446cf4f78facc6704f442df9fe712afcfe5811"
+    }
+   },
+   "id": "compiler/contentMapperDeclarationEmit.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/contentMapperDeclarationEmit.ts#configuration=0"
+   ],
+   "status": "blocked"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "unsupported",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "unsupported"
+   },
+   "bucket": "unsupported: content-mapper execution",
+   "handoff": {
+    "blocker": {
+     "kind": "unsupported",
+     "operation": "content-mapper execution"
+    },
+    "capture_sha256": "616e3f795dc1401f354af22c16b92ffb797a54df209e3c487f7de6bb6078fd84",
+    "cause": "content-mapper execution: the native harness transforms the source through the content-mapper plugin before checking; the Rust loader refuses that operation (crates/tsr_compiler/src/loader.rs), so every compared domain of the row is withheld",
+    "domains": [
+     "display",
+     "errors",
+     "parent_pointers",
+     "symbols",
+     "types",
+     "union_ordering"
+    ],
+    "go": "tsc/internal/contentmapper/transform.go:TransformAndParse",
+    "owner": "Phase 5",
+    "raw_observation_sha256": "c4a1dea8d7f45ed250d47499ef9596f9dafed362163b2c04e6362a4370386109",
+    "reproduce": [
+     "python3",
+     "scripts/phase2_corpus.py",
+     "run",
+     "--native",
+     "target/phase2/native",
+     "--output",
+     "<fresh-output>",
+     "--case",
+     "compiler/contentMapperDeclarationEmitFailure.ts#configuration=0"
+    ],
+    "request_sha256": "0aedaace719f158cdb24fca63c03186ddf50a77bce4ff91dc47dc8720493c2ca",
+    "trace": {
+     "path": "data/phase2/c3-content-mapper/trace.json",
+     "sha256": "64636d6f8762fae51d6c56eb2c446cf4f78facc6704f442df9fe712afcfe5811"
+    }
+   },
+   "id": "compiler/contentMapperDeclarationEmitFailure.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/contentMapperDeclarationEmitFailure.ts#configuration=0"
+   ],
+   "status": "blocked"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "disabled",
+    "errors": "unsupported",
+    "parent_pointers": "unsupported",
+    "symbols": "disabled",
+    "trace": "disabled",
+    "types": "disabled",
+    "union_ordering": "unsupported"
+   },
+   "bucket": "unsupported: content-mapper execution",
+   "handoff": {
+    "blocker": {
+     "kind": "unsupported",
+     "operation": "content-mapper execution"
+    },
+    "capture_sha256": "616e3f795dc1401f354af22c16b92ffb797a54df209e3c487f7de6bb6078fd84",
+    "cause": "content-mapper execution: the native harness transforms the source through the content-mapper plugin before checking; the Rust loader refuses that operation (crates/tsr_compiler/src/loader.rs), so every compared domain of the row is withheld",
+    "domains": [
+     "errors",
+     "parent_pointers",
+     "union_ordering"
+    ],
+    "go": "tsc/internal/contentmapper/transform.go:TransformAndParse",
+    "owner": "Phase 5",
+    "raw_observation_sha256": "3ce355dabc0549a318228336ccb806628809f62f82660c9beba401099aac67de",
+    "reproduce": [
+     "python3",
+     "scripts/phase2_corpus.py",
+     "run",
+     "--native",
+     "target/phase2/native",
+     "--output",
+     "<fresh-output>",
+     "--case",
+     "compiler/contentMapperDiagnosticDirectives.ts#configuration=0"
+    ],
+    "request_sha256": "a58152812c6900d1d34c6ec65a87b893ac8c77046026b317e19be39c120d3a3c",
+    "trace": {
+     "path": "data/phase2/c3-content-mapper/trace.json",
+     "sha256": "64636d6f8762fae51d6c56eb2c446cf4f78facc6704f442df9fe712afcfe5811"
+    }
+   },
+   "id": "compiler/contentMapperDiagnosticDirectives.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/contentMapperDiagnosticDirectives.ts#configuration=0"
+   ],
+   "status": "blocked"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "unsupported",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "unsupported"
+   },
+   "bucket": "unsupported: content-mapper execution",
+   "handoff": {
+    "blocker": {
+     "kind": "unsupported",
+     "operation": "content-mapper execution"
+    },
+    "capture_sha256": "616e3f795dc1401f354af22c16b92ffb797a54df209e3c487f7de6bb6078fd84",
+    "cause": "content-mapper execution: the native harness transforms the source through the content-mapper plugin before checking; the Rust loader refuses that operation (crates/tsr_compiler/src/loader.rs), so every compared domain of the row is withheld",
+    "domains": [
+     "display",
+     "errors",
+     "parent_pointers",
+     "symbols",
+     "types",
+     "union_ordering"
+    ],
+    "go": "tsc/internal/contentmapper/transform.go:TransformAndParse",
+    "owner": "Phase 5",
+    "raw_observation_sha256": "dc22d87a34adb608dbfd9651225a586b2f446405135a56c2f22f4e251803fe9a",
+    "reproduce": [
+     "python3",
+     "scripts/phase2_corpus.py",
+     "run",
+     "--native",
+     "target/phase2/native",
+     "--output",
+     "<fresh-output>",
+     "--case",
+     "compiler/contentMapperDiagnostics.ts#configuration=0"
+    ],
+    "request_sha256": "a7f6cacbbce21980d6d11d6df626c1dc80c47fde28973d30cbb022c898ad14c5",
+    "trace": {
+     "path": "data/phase2/c3-content-mapper/trace.json",
+     "sha256": "64636d6f8762fae51d6c56eb2c446cf4f78facc6704f442df9fe712afcfe5811"
+    }
+   },
+   "id": "compiler/contentMapperDiagnostics.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/contentMapperDiagnostics.ts#configuration=0"
+   ],
+   "status": "blocked"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "disabled",
+    "errors": "unsupported",
+    "parent_pointers": "unsupported",
+    "symbols": "disabled",
+    "trace": "disabled",
+    "types": "disabled",
+    "union_ordering": "unsupported"
+   },
+   "bucket": "unsupported: content-mapper execution",
+   "handoff": {
+    "blocker": {
+     "kind": "unsupported",
+     "operation": "content-mapper execution"
+    },
+    "capture_sha256": "616e3f795dc1401f354af22c16b92ffb797a54df209e3c487f7de6bb6078fd84",
+    "cause": "content-mapper execution: the native harness transforms the source through the content-mapper plugin before checking; the Rust loader refuses that operation (crates/tsr_compiler/src/loader.rs), so every compared domain of the row is withheld",
+    "domains": [
+     "errors",
+     "parent_pointers",
+     "union_ordering"
+    ],
+    "go": "tsc/internal/contentmapper/transform.go:TransformAndParse",
+    "owner": "Phase 5",
+    "raw_observation_sha256": "8475982f7ac5efac3923649ee3bc69f769e022dae433d4803cf1cfbf39a0e423",
+    "reproduce": [
+     "python3",
+     "scripts/phase2_corpus.py",
+     "run",
+     "--native",
+     "target/phase2/native",
+     "--output",
+     "<fresh-output>",
+     "--case",
+     "compiler/contentMapperInvalidDiagnosticDirectives.ts#configuration=0"
+    ],
+    "request_sha256": "620608416955e277a12e6a622701b8477b8e35aa89e17b6417d38ea7ccac5c1c",
+    "trace": {
+     "path": "data/phase2/c3-content-mapper/trace.json",
+     "sha256": "64636d6f8762fae51d6c56eb2c446cf4f78facc6704f442df9fe712afcfe5811"
+    }
+   },
+   "id": "compiler/contentMapperInvalidDiagnosticDirectives.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/contentMapperInvalidDiagnosticDirectives.ts#configuration=0"
+   ],
+   "status": "blocked"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "disabled",
+    "errors": "unsupported",
+    "parent_pointers": "unsupported",
+    "symbols": "disabled",
+    "trace": "disabled",
+    "types": "disabled",
+    "union_ordering": "unsupported"
+   },
+   "bucket": "unsupported: content-mapper execution",
+   "handoff": {
+    "blocker": {
+     "kind": "unsupported",
+     "operation": "content-mapper execution"
+    },
+    "capture_sha256": "616e3f795dc1401f354af22c16b92ffb797a54df209e3c487f7de6bb6078fd84",
+    "cause": "content-mapper execution: the native harness transforms the source through the content-mapper plugin before checking; the Rust loader refuses that operation (crates/tsr_compiler/src/loader.rs), so every compared domain of the row is withheld",
+    "domains": [
+     "errors",
+     "parent_pointers",
+     "union_ordering"
+    ],
+    "go": "tsc/internal/contentmapper/transform.go:TransformAndParse",
+    "owner": "Phase 5",
+    "raw_observation_sha256": "b5a2885e912183e2aae7aa0acf1f5bb39cb8c0cf14c2541ca914f69ed8e918b6",
+    "reproduce": [
+     "python3",
+     "scripts/phase2_corpus.py",
+     "run",
+     "--native",
+     "target/phase2/native",
+     "--output",
+     "<fresh-output>",
+     "--case",
+     "compiler/contentMapperInvalidExtension.ts#configuration=0"
+    ],
+    "request_sha256": "2276a5fa9bf98dc4fbf5fba28714fe98362e17e7ed5dd70e0a5cdd034ff07b8c",
+    "trace": {
+     "path": "data/phase2/c3-content-mapper/trace.json",
+     "sha256": "64636d6f8762fae51d6c56eb2c446cf4f78facc6704f442df9fe712afcfe5811"
+    }
+   },
+   "id": "compiler/contentMapperInvalidExtension.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/contentMapperInvalidExtension.ts#configuration=0"
+   ],
+   "status": "blocked"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "disabled",
+    "errors": "unsupported",
+    "parent_pointers": "unsupported",
+    "symbols": "disabled",
+    "trace": "disabled",
+    "types": "disabled",
+    "union_ordering": "unsupported"
+   },
+   "bucket": "unsupported: content-mapper execution",
+   "handoff": {
+    "blocker": {
+     "kind": "unsupported",
+     "operation": "content-mapper execution"
+    },
+    "capture_sha256": "616e3f795dc1401f354af22c16b92ffb797a54df209e3c487f7de6bb6078fd84",
+    "cause": "content-mapper execution: the native harness transforms the source through the content-mapper plugin before checking; the Rust loader refuses that operation (crates/tsr_compiler/src/loader.rs), so every compared domain of the row is withheld",
+    "domains": [
+     "errors",
+     "parent_pointers",
+     "union_ordering"
+    ],
+    "go": "tsc/internal/contentmapper/transform.go:TransformAndParse",
+    "owner": "Phase 5",
+    "raw_observation_sha256": "0aa62340b26c4f324668b2bffdf3771edd8a5bb943ea4dc20370a904c302efe9",
+    "reproduce": [
+     "python3",
+     "scripts/phase2_corpus.py",
+     "run",
+     "--native",
+     "target/phase2/native",
+     "--output",
+     "<fresh-output>",
+     "--case",
+     "compiler/contentMapperPerFileExtension.ts#configuration=0"
+    ],
+    "request_sha256": "9199bc2f3e8e361273e0018d90e4d0b7b99ce78b1d2f5b41d9778f687a0396b8",
+    "trace": {
+     "path": "data/phase2/c3-content-mapper/trace.json",
+     "sha256": "64636d6f8762fae51d6c56eb2c446cf4f78facc6704f442df9fe712afcfe5811"
+    }
+   },
+   "id": "compiler/contentMapperPerFileExtension.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/contentMapperPerFileExtension.ts#configuration=0"
+   ],
+   "status": "blocked"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "unsupported",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "unsupported"
+   },
+   "bucket": "unsupported: content-mapper execution",
+   "handoff": {
+    "blocker": {
+     "kind": "unsupported",
+     "operation": "content-mapper execution"
+    },
+    "capture_sha256": "616e3f795dc1401f354af22c16b92ffb797a54df209e3c487f7de6bb6078fd84",
+    "cause": "content-mapper execution: the native harness transforms the source through the content-mapper plugin before checking; the Rust loader refuses that operation (crates/tsr_compiler/src/loader.rs), so every compared domain of the row is withheld",
+    "domains": [
+     "display",
+     "errors",
+     "parent_pointers",
+     "symbols",
+     "types",
+     "union_ordering"
+    ],
+    "go": "tsc/internal/contentmapper/transform.go:TransformAndParse",
+    "owner": "Phase 5",
+    "raw_observation_sha256": "00624d6e35c69b1a3f700d6ec38065b921e8d493883bbbb427212317f36462fe",
+    "reproduce": [
+     "python3",
+     "scripts/phase2_corpus.py",
+     "run",
+     "--native",
+     "target/phase2/native",
+     "--output",
+     "<fresh-output>",
+     "--case",
+     "compiler/contentMapperSupplementalDiagnostics.ts#configuration=0"
+    ],
+    "request_sha256": "38596021ae3329530284802e7dc8dfd191dc6dabaefa03080c3685c8e40da715",
+    "trace": {
+     "path": "data/phase2/c3-content-mapper/trace.json",
+     "sha256": "64636d6f8762fae51d6c56eb2c446cf4f78facc6704f442df9fe712afcfe5811"
+    }
+   },
+   "id": "compiler/contentMapperSupplementalDiagnostics.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/contentMapperSupplementalDiagnostics.ts#configuration=0"
+   ],
+   "status": "blocked"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "unsupported",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "unsupported"
+   },
+   "bucket": "unsupported: content-mapper execution",
+   "handoff": {
+    "blocker": {
+     "kind": "unsupported",
+     "operation": "content-mapper execution"
+    },
+    "capture_sha256": "616e3f795dc1401f354af22c16b92ffb797a54df209e3c487f7de6bb6078fd84",
+    "cause": "content-mapper execution: the native harness transforms the source through the content-mapper plugin before checking; the Rust loader refuses that operation (crates/tsr_compiler/src/loader.rs), so every compared domain of the row is withheld",
+    "domains": [
+     "display",
+     "errors",
+     "parent_pointers",
+     "symbols",
+     "types",
+     "union_ordering"
+    ],
+    "go": "tsc/internal/contentmapper/transform.go:TransformAndParse",
+    "owner": "Phase 5",
+    "raw_observation_sha256": "35235d35e8898cc8d79802e0ffa76108f9095060c68e2eb2aafa373dd75c3459",
+    "reproduce": [
+     "python3",
+     "scripts/phase2_corpus.py",
+     "run",
+     "--native",
+     "target/phase2/native",
+     "--output",
+     "<fresh-output>",
+     "--case",
+     "compiler/contentMapperSupplementalFileCollision.ts#configuration=0"
+    ],
+    "request_sha256": "aa4704472cd0366b69bae04dab92e770f99b9c6b0e6304a01c0094e455f0c582",
+    "trace": {
+     "path": "data/phase2/c3-content-mapper/trace.json",
+     "sha256": "64636d6f8762fae51d6c56eb2c446cf4f78facc6704f442df9fe712afcfe5811"
+    }
+   },
+   "id": "compiler/contentMapperSupplementalFileCollision.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/contentMapperSupplementalFileCollision.ts#configuration=0"
+   ],
+   "status": "blocked"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "unsupported",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "unsupported"
+   },
+   "bucket": "unsupported: content-mapper execution",
+   "handoff": {
+    "blocker": {
+     "kind": "unsupported",
+     "operation": "content-mapper execution"
+    },
+    "capture_sha256": "616e3f795dc1401f354af22c16b92ffb797a54df209e3c487f7de6bb6078fd84",
+    "cause": "content-mapper execution: the native harness transforms the source through the content-mapper plugin before checking; the Rust loader refuses that operation (crates/tsr_compiler/src/loader.rs), so every compared domain of the row is withheld",
+    "domains": [
+     "display",
+     "errors",
+     "parent_pointers",
+     "symbols",
+     "types",
+     "union_ordering"
+    ],
+    "go": "tsc/internal/contentmapper/transform.go:TransformAndParse",
+    "owner": "Phase 5",
+    "raw_observation_sha256": "543abd61f8dd58f0304bc5caa8b2c45bcec2fa61a6533fc13dae43feba149248",
+    "reproduce": [
+     "python3",
+     "scripts/phase2_corpus.py",
+     "run",
+     "--native",
+     "target/phase2/native",
+     "--output",
+     "<fresh-output>",
+     "--case",
+     "compiler/contentMapperSupplementalGlobals.ts#configuration=0"
+    ],
+    "request_sha256": "e5ff0c6a2eebec914862861188cfe9440406098bc626dc100dd45cce45a2a4d0",
+    "trace": {
+     "path": "data/phase2/c3-content-mapper/trace.json",
+     "sha256": "64636d6f8762fae51d6c56eb2c446cf4f78facc6704f442df9fe712afcfe5811"
+    }
+   },
+   "id": "compiler/contentMapperSupplementalGlobals.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/contentMapperSupplementalGlobals.ts#configuration=0"
+   ],
+   "status": "blocked"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "unsupported",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "unsupported"
+   },
+   "bucket": "unsupported: content-mapper execution",
+   "handoff": {
+    "blocker": {
+     "kind": "unsupported",
+     "operation": "content-mapper execution"
+    },
+    "capture_sha256": "616e3f795dc1401f354af22c16b92ffb797a54df209e3c487f7de6bb6078fd84",
+    "cause": "content-mapper execution: the native harness transforms the source through the content-mapper plugin before checking; the Rust loader refuses that operation (crates/tsr_compiler/src/loader.rs), so every compared domain of the row is withheld",
+    "domains": [
+     "display",
+     "errors",
+     "parent_pointers",
+     "symbols",
+     "types",
+     "union_ordering"
+    ],
+    "go": "tsc/internal/contentmapper/transform.go:TransformAndParse",
+    "owner": "Phase 5",
+    "raw_observation_sha256": "3a3508d454bf6663e6b5cb0c7e0bbaebb40d5304abd52111800c497ba5132ae1",
+    "reproduce": [
+     "python3",
+     "scripts/phase2_corpus.py",
+     "run",
+     "--native",
+     "target/phase2/native",
+     "--output",
+     "<fresh-output>",
+     "--case",
+     "compiler/contentMapperSupplementalModule.ts#configuration=0"
+    ],
+    "request_sha256": "eba1cf55d9a8a690035391b4b466b942c55321a9e947ffdbbcd1923448e6364b",
+    "trace": {
+     "path": "data/phase2/c3-content-mapper/trace.json",
+     "sha256": "64636d6f8762fae51d6c56eb2c446cf4f78facc6704f442df9fe712afcfe5811"
+    }
+   },
+   "id": "compiler/contentMapperSupplementalModule.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/contentMapperSupplementalModule.ts#configuration=0"
+   ],
+   "status": "blocked"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "unsupported",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "unsupported"
+   },
+   "bucket": "unsupported: content-mapper execution",
+   "handoff": {
+    "blocker": {
+     "kind": "unsupported",
+     "operation": "content-mapper execution"
+    },
+    "capture_sha256": "616e3f795dc1401f354af22c16b92ffb797a54df209e3c487f7de6bb6078fd84",
+    "cause": "content-mapper execution: the native harness transforms the source through the content-mapper plugin before checking; the Rust loader refuses that operation (crates/tsr_compiler/src/loader.rs), so every compared domain of the row is withheld",
+    "domains": [
+     "display",
+     "errors",
+     "parent_pointers",
+     "symbols",
+     "types",
+     "union_ordering"
+    ],
+    "go": "tsc/internal/contentmapper/transform.go:TransformAndParse",
+    "owner": "Phase 5",
+    "raw_observation_sha256": "53f5d73e23172b7c33c0f8941cbc790e8a75c0ec52fe15871439ecea150865bb",
+    "reproduce": [
+     "python3",
+     "scripts/phase2_corpus.py",
+     "run",
+     "--native",
+     "target/phase2/native",
+     "--output",
+     "<fresh-output>",
+     "--case",
+     "compiler/contentMapperSymlink.ts#configuration=0"
+    ],
+    "request_sha256": "84c062b191a9ba0a959e8c2bbdc07ce2175ae359d673a087beebe6668bb69e47",
+    "trace": {
+     "path": "data/phase2/c3-content-mapper/trace.json",
+     "sha256": "64636d6f8762fae51d6c56eb2c446cf4f78facc6704f442df9fe712afcfe5811"
+    }
+   },
+   "id": "compiler/contentMapperSymlink.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/contentMapperSymlink.ts#configuration=0"
+   ],
+   "status": "blocked"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "disabled",
+    "errors": "unsupported",
+    "parent_pointers": "unsupported",
+    "symbols": "disabled",
+    "trace": "disabled",
+    "types": "disabled",
+    "union_ordering": "unsupported"
+   },
+   "bucket": "unsupported: content-mapper execution",
+   "handoff": {
+    "blocker": {
+     "kind": "unsupported",
+     "operation": "content-mapper execution"
+    },
+    "capture_sha256": "616e3f795dc1401f354af22c16b92ffb797a54df209e3c487f7de6bb6078fd84",
+    "cause": "content-mapper execution: the native harness transforms the source through the content-mapper plugin before checking; the Rust loader refuses that operation (crates/tsr_compiler/src/loader.rs), so every compared domain of the row is withheld",
+    "domains": [
+     "errors",
+     "parent_pointers",
+     "union_ordering"
+    ],
+    "go": "tsc/internal/contentmapper/transform.go:TransformAndParse",
+    "owner": "Phase 5",
+    "raw_observation_sha256": "b6796a9a6b5ae0cf1f07f03e2962683f5b90a7f5348959584678ed56fdaafef2",
+    "reproduce": [
+     "python3",
+     "scripts/phase2_corpus.py",
+     "run",
+     "--native",
+     "target/phase2/native",
+     "--output",
+     "<fresh-output>",
+     "--case",
+     "compiler/contentMapperSynthesizedUnusedDiagnostics.ts#configuration=0"
+    ],
+    "request_sha256": "2f31897f7e2683d98457e7b9d9fe05ae8aa44fa4bf40be540c96afc023fa97d7",
+    "trace": {
+     "path": "data/phase2/c3-content-mapper/trace.json",
+     "sha256": "64636d6f8762fae51d6c56eb2c446cf4f78facc6704f442df9fe712afcfe5811"
+    }
+   },
+   "id": "compiler/contentMapperSynthesizedUnusedDiagnostics.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/contentMapperSynthesizedUnusedDiagnostics.ts#configuration=0"
+   ],
+   "status": "blocked"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "unsupported",
+    "errors": "unsupported",
+    "parent_pointers": "unsupported",
+    "symbols": "unsupported",
+    "trace": "disabled",
+    "types": "unsupported",
+    "union_ordering": "unsupported"
+   },
+   "bucket": "unsupported: content-mapper execution",
+   "handoff": {
+    "blocker": {
+     "kind": "unsupported",
+     "operation": "content-mapper execution"
+    },
+    "capture_sha256": "616e3f795dc1401f354af22c16b92ffb797a54df209e3c487f7de6bb6078fd84",
+    "cause": "content-mapper execution: the native harness transforms the source through the content-mapper plugin before checking; the Rust loader refuses that operation (crates/tsr_compiler/src/loader.rs), so every compared domain of the row is withheld",
+    "domains": [
+     "display",
+     "errors",
+     "parent_pointers",
+     "symbols",
+     "types",
+     "union_ordering"
+    ],
+    "go": "tsc/internal/contentmapper/transform.go:TransformAndParse",
+    "owner": "Phase 5",
+    "raw_observation_sha256": "bbd02a1e6977ce3782bd794990278a1ac32f5f824038e90d0e35adf0011af522",
+    "reproduce": [
+     "python3",
+     "scripts/phase2_corpus.py",
+     "run",
+     "--native",
+     "target/phase2/native",
+     "--output",
+     "<fresh-output>",
+     "--case",
+     "compiler/contentMapperTransform.ts#configuration=0"
+    ],
+    "request_sha256": "8d8280238d817323bf882ec890342630a0e3ac1f1a34b92a73ca0c9a15c856bb",
+    "trace": {
+     "path": "data/phase2/c3-content-mapper/trace.json",
+     "sha256": "64636d6f8762fae51d6c56eb2c446cf4f78facc6704f442df9fe712afcfe5811"
+    }
+   },
+   "id": "compiler/contentMapperTransform.ts#configuration=0",
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/contentMapperTransform.ts#configuration=0"
+   ],
+   "status": "blocked"
+  }
+ ],
+ "rust_capture_sha256": "616e3f795dc1401f354af22c16b92ffb797a54df209e3c487f7de6bb6078fd84",
+ "scope": "C3-start attribution worksheet over every C3-owned row open in the recorded C2 exit capture: the fifteen content-mapper rows, blocked by the Phase 5 content-mapper operation. Rows another checkpoint hands to C3 arrive under incoming after phase2_claims.py rebind; digests are rebound to the C3 exit capture. This file does not claim audit or C3 completion.",
+ "version": 1
+}
