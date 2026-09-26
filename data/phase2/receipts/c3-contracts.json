@@ -9,15 +9,15 @@
     "--features",
     "recursion-probe",
     "--test",
-    "c1_contracts",
+    "c3_contracts",
     "--locked"
    ],
    "exit_code": 0,
-   "stderr_sha256": "f21167eaec7626b974952433845f9565a7f7c380249fbb92e7701a921515a3b9",
-   "stderr_tail": "   Compiling tsr_compiler v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_compiler)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.01s\n     Running tests/c1_contracts.rs (target/debug/deps/c1_contracts-90c23e2ef29011a6)\n",
-   "stdout": "\nrunning 7 tests\ntest lazy_resolution_reports_the_cycle_and_stays_usable ... ok\ntest a_repeated_query_returns_the_same_type_without_new_work ... ok\ntest a_failed_relation_commits_no_assumption_and_modes_keep_separate_caches ... ok\ntest two_checkers_merge_independently_over_one_program ... ok\ntest an_injected_panic_retires_the_generation_and_a_fresh_checker_succeeds ... ok\ntest semantic_limits_produce_the_pins_results ... ok\ntest deep_relations_grow_the_stack_and_keep_the_checker_usable ... ok\n\ntest result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.56s\n\n",
-   "stdout_sha256": "2158d44a0d35aa303c9af0e84c755bfaa82abe1d6611b412b7b2d3c5767051b9",
-   "stdout_tail": "\nrunning 7 tests\ntest lazy_resolution_reports_the_cycle_and_stays_usable ... ok\ntest a_repeated_query_returns_the_same_type_without_new_work ... ok\ntest a_failed_relation_commits_no_assumption_and_modes_keep_separate_caches ... ok\ntest two_checkers_merge_independently_over_one_program ... ok\ntest an_injected_panic_retires_the_generation_and_a_fresh_checker_succeeds ... ok\ntest semantic_limits_produce_the_pins_results ... ok\ntest deep_relations_grow_the_stack_and_keep_the_checker_usable ... ok\n\ntest result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.56s\n\n"
+   "stderr_sha256": "d89e941e33ce076717989bde48a84a07107aee3552a09932eb22f71b7cdcaf8d",
+   "stderr_tail": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.14s\n     Running tests/c3_contracts.rs (target/debug/deps/c3_contracts-8752e34961aa6aec)\n",
+   "stdout": "\nrunning 34 tests\ntest changes::changes_async_non_promise_uses_the_ts_error ... ok\ntest alias_links_record_referenced_and_type_only_state ... ok\ntest changes::changes_mixed_module_exports_assignments ... ok\ntest changes::changes_overload_on_arrows ... ok\ntest changes::changes_constructor_functions_are_unsupported ... ok\ntest changes::changes_param_applies_to_one_function ... ok\ntest changes::changes_variadic_jsdoc_type_is_an_array ... ok\ntest changes::changes_asserts_on_the_declaring_variable ... ok\ntest changes::changes_type_assertion_prevents_narrowing ... ok\ntest changes::changes_template_inference_keeps_a_code_point ... ok\ntest changes::changes_this_property_annotation_creates_no_property ... ok\ntest changes::changes_conflicting_declarations_error_at_every_site ... ok\ntest changes::changes_class_tag_is_not_a_constructor ... ok\ntest changes::changes_jsdoc_values_are_not_types ... ok\ntest changes::changes_non_strict_js_cannot_omit_unknown_arguments ... ok\ntest changes::changes_arguments_does_not_imply_rest ... ok\ntest changes::changes_typedef_in_a_class_body_is_hoisted ... ok\ntest changes::changes_postfix_equals_makes_the_parameter_optional ... ok\ntest changes::changes_void_zero_expando_creates_a_property ... ok\ntest changes::contract_2_definite_assignment ... ok\ntest changes::options_exact_optional_property_types ... ok\ntest changes::options_no_fallthrough_cases_in_switch ... ok\ntest changes::changes_variadic_jsdoc_type_is_not_rest ... ok\ntest malformed_input_checks_to_completion_and_keeps_answering ... ok\ntest changes::options_isolated_modules ... ok\ntest changes::lookup_of_a_global_alias_resolves_its_target ... ok\ntest changes::options_verbatim_module_syntax ... ok\ntest changes::contract_5_class_checks ... ok\ntest changes::contract_3_evolving_arrays_and_discriminants ... ok\ntest changes::options_no_unchecked_indexed_access ... ok\ntest two_checkers_narrow_independently_and_retirement_is_isolated ... ok\ntest changes::contract_4_iteration_types_over_the_lib ... ok\ntest changes::options_use_unknown_in_catch_variables ... ok\ntest deep_flow_graph_checks_on_a_small_stack ... ok\n\ntest result: ok. 34 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.30s\n\n",
+   "stdout_sha256": "5d97fd045b5f54a8420db98e557d70e92c379f3e8e2a3f9d4a493479096b1538",
+   "stdout_tail": "t changes::changes_overload_on_arrows ... ok\ntest changes::changes_constructor_functions_are_unsupported ... ok\ntest changes::changes_param_applies_to_one_function ... ok\ntest changes::changes_variadic_jsdoc_type_is_an_array ... ok\ntest changes::changes_asserts_on_the_declaring_variable ... ok\ntest changes::changes_type_assertion_prevents_narrowing ... ok\ntest changes::changes_template_inference_keeps_a_code_point ... ok\ntest changes::changes_this_property_annotation_creates_no_property ... ok\ntest changes::changes_conflicting_declarations_error_at_every_site ... ok\ntest changes::changes_class_tag_is_not_a_constructor ... ok\ntest changes::changes_jsdoc_values_are_not_types ... ok\ntest changes::changes_non_strict_js_cannot_omit_unknown_arguments ... ok\ntest changes::changes_arguments_does_not_imply_rest ... ok\ntest changes::changes_typedef_in_a_class_body_is_hoisted ... ok\ntest changes::changes_postfix_equals_makes_the_parameter_optional ... ok\ntest changes::changes_void_zero_expando_creates_a_property ... ok\ntest changes::contract_2_definite_assignment ... ok\ntest changes::options_exact_optional_property_types ... ok\ntest changes::options_no_fallthrough_cases_in_switch ... ok\ntest changes::changes_variadic_jsdoc_type_is_not_rest ... ok\ntest malformed_input_checks_to_completion_and_keeps_answering ... ok\ntest changes::options_isolated_modules ... ok\ntest changes::lookup_of_a_global_alias_resolves_its_target ... ok\ntest changes::options_verbatim_module_syntax ... ok\ntest changes::contract_5_class_checks ... ok\ntest changes::contract_3_evolving_arrays_and_discriminants ... ok\ntest changes::options_no_unchecked_indexed_access ... ok\ntest two_checkers_narrow_independently_and_retirement_is_isolated ... ok\ntest changes::contract_4_iteration_types_over_the_lib ... ok\ntest changes::options_use_unknown_in_catch_variables ... ok\ntest deep_flow_graph_checks_on_a_small_stack ... ok\n\ntest result: ok. 34 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.30s\n\n"
   },
   {
    "command": [
@@ -28,16 +28,16 @@
     "--features",
     "recursion-probe",
     "--test",
-    "c1_contracts",
+    "c3_contracts",
     "--locked",
     "--release"
    ],
    "exit_code": 0,
-   "stderr_sha256": "c6e98893af3916a12533fd56a7de743e85fba413aa368e7a3035331babc2cda4",
-   "stderr_tail": "   Compiling tsr_compiler v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_compiler)\n    Finished `release` profile [optimized] target(s) in 51.79s\n     Running tests/c1_contracts.rs (target/release/deps/c1_contracts-ae6c4ff25070aaa4)\n",
-   "stdout": "\nrunning 7 tests\ntest a_repeated_query_returns_the_same_type_without_new_work ... ok\ntest lazy_resolution_reports_the_cycle_and_stays_usable ... ok\ntest two_checkers_merge_independently_over_one_program ... ok\ntest deep_relations_grow_the_stack_and_keep_the_checker_usable ... ok\ntest a_failed_relation_commits_no_assumption_and_modes_keep_separate_caches ... ok\ntest semantic_limits_produce_the_pins_results ... ok\ntest an_injected_panic_retires_the_generation_and_a_fresh_checker_succeeds ... ok\n\ntest result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s\n\n",
-   "stdout_sha256": "ae869fe1a6590d63da17d048abcb3ad934e1fdd7db38f61a808cff24f1de623f",
-   "stdout_tail": "\nrunning 7 tests\ntest a_repeated_query_returns_the_same_type_without_new_work ... ok\ntest lazy_resolution_reports_the_cycle_and_stays_usable ... ok\ntest two_checkers_merge_independently_over_one_program ... ok\ntest deep_relations_grow_the_stack_and_keep_the_checker_usable ... ok\ntest a_failed_relation_commits_no_assumption_and_modes_keep_separate_caches ... ok\ntest semantic_limits_produce_the_pins_results ... ok\ntest an_injected_panic_retires_the_generation_and_a_fresh_checker_succeeds ... ok\n\ntest result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s\n\n"
+   "stderr_sha256": "8b19d34abc5a3f61ee157a9addcc502580bd9fb63a1bb7ec16dc8e372e7d6f20",
+   "stderr_tail": "    Finished `release` profile [optimized] target(s) in 0.06s\n     Running tests/c3_contracts.rs (target/release/deps/c3_contracts-e40622767fb62689)\n",
+   "stdout": "\nrunning 34 tests\ntest changes::changes_asserts_on_the_declaring_variable ... ok\ntest changes::changes_conflicting_declarations_error_at_every_site ... ok\ntest changes::changes_constructor_functions_are_unsupported ... ok\ntest changes::changes_param_applies_to_one_function ... ok\ntest changes::changes_this_property_annotation_creates_no_property ... ok\ntest changes::changes_arguments_does_not_imply_rest ... ok\ntest changes::changes_template_inference_keeps_a_code_point ... ok\ntest changes::changes_jsdoc_values_are_not_types ... ok\ntest changes::changes_variadic_jsdoc_type_is_an_array ... ok\ntest changes::changes_class_tag_is_not_a_constructor ... ok\ntest changes::changes_type_assertion_prevents_narrowing ... ok\ntest changes::changes_postfix_equals_makes_the_parameter_optional ... ok\ntest alias_links_record_referenced_and_type_only_state ... ok\ntest changes::changes_typedef_in_a_class_body_is_hoisted ... ok\ntest changes::changes_overload_on_arrows ... ok\ntest changes::changes_async_non_promise_uses_the_ts_error ... ok\ntest changes::changes_mixed_module_exports_assignments ... ok\ntest changes::changes_non_strict_js_cannot_omit_unknown_arguments ... ok\ntest changes::options_exact_optional_property_types ... ok\ntest changes::options_isolated_modules ... ok\ntest changes::changes_void_zero_expando_creates_a_property ... ok\ntest changes::changes_variadic_jsdoc_type_is_not_rest ... ok\ntest changes::options_verbatim_module_syntax ... ok\ntest changes::contract_3_evolving_arrays_and_discriminants ... ok\ntest changes::options_use_unknown_in_catch_variables ... ok\ntest changes::options_no_unchecked_indexed_access ... ok\ntest changes::contract_4_iteration_types_over_the_lib ... ok\ntest changes::lookup_of_a_global_alias_resolves_its_target ... ok\ntest changes::contract_2_definite_assignment ... ok\ntest malformed_input_checks_to_completion_and_keeps_answering ... ok\ntest changes::options_no_fallthrough_cases_in_switch ... ok\ntest two_checkers_narrow_independently_and_retirement_is_isolated ... ok\ntest changes::contract_5_class_checks ... ok\ntest deep_flow_graph_checks_on_a_small_stack ... ok\n\ntest result: ok. 34 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.30s\n\n",
+   "stdout_sha256": "f21da15b35f3ed45bd675b939cf1f48f943bcc7d8ff872a9c50de35a994228c8",
+   "stdout_tail": "rted ... ok\ntest changes::changes_param_applies_to_one_function ... ok\ntest changes::changes_this_property_annotation_creates_no_property ... ok\ntest changes::changes_arguments_does_not_imply_rest ... ok\ntest changes::changes_template_inference_keeps_a_code_point ... ok\ntest changes::changes_jsdoc_values_are_not_types ... ok\ntest changes::changes_variadic_jsdoc_type_is_an_array ... ok\ntest changes::changes_class_tag_is_not_a_constructor ... ok\ntest changes::changes_type_assertion_prevents_narrowing ... ok\ntest changes::changes_postfix_equals_makes_the_parameter_optional ... ok\ntest alias_links_record_referenced_and_type_only_state ... ok\ntest changes::changes_typedef_in_a_class_body_is_hoisted ... ok\ntest changes::changes_overload_on_arrows ... ok\ntest changes::changes_async_non_promise_uses_the_ts_error ... ok\ntest changes::changes_mixed_module_exports_assignments ... ok\ntest changes::changes_non_strict_js_cannot_omit_unknown_arguments ... ok\ntest changes::options_exact_optional_property_types ... ok\ntest changes::options_isolated_modules ... ok\ntest changes::changes_void_zero_expando_creates_a_property ... ok\ntest changes::changes_variadic_jsdoc_type_is_not_rest ... ok\ntest changes::options_verbatim_module_syntax ... ok\ntest changes::contract_3_evolving_arrays_and_discriminants ... ok\ntest changes::options_use_unknown_in_catch_variables ... ok\ntest changes::options_no_unchecked_indexed_access ... ok\ntest changes::contract_4_iteration_types_over_the_lib ... ok\ntest changes::lookup_of_a_global_alias_resolves_its_target ... ok\ntest changes::contract_2_definite_assignment ... ok\ntest malformed_input_checks_to_completion_and_keeps_answering ... ok\ntest changes::options_no_fallthrough_cases_in_switch ... ok\ntest two_checkers_narrow_independently_and_retirement_is_isolated ... ok\ntest changes::contract_5_class_checks ... ok\ntest deep_flow_graph_checks_on_a_small_stack ... ok\n\ntest result: ok. 34 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.30s\n\n"
   }
  ],
  "source_inputs": {
@@ -1455,6 +1455,7 @@
   "tools/s10/corpus-adapter/Cargo.toml": "c24671fb843644efa698ccb9261c42d993a09b70bc15d434a6135e96c1e4a63f",
   "tools/s10/rust-consumer/Cargo.toml": "470bcd82c4143e709220e999f1d625a508047d2667a638ed4e6d1a735564cb09",
   "tools/s10/wasm-corpus/Cargo.toml": "1fabae0bd8da6efd5af867119347427fb4d4f5871cd938da1111658be3c5f895",
+  "upstream/tsc/testdata/tests/cases/compiler/binderBinaryExpressionStress.ts": "1715d4231c450cb9d7c3bf8933f9d54df4c19ce353b53f8ede69635082cb5e48",
   "xtask/Cargo.toml": "f0399b5ffe1287c3b6b06d9740a70a3a6ed9e3be8afdeec329fd6838fdf344f3",
   "xtask/src/evidence.rs": "3c74a1ec713609f75d3184954dad2fe364c6146ef975b821d7c4f2712c66b63b",
   "xtask/src/evidence_tests.rs": "feaa89475f4594526b8d886a0ef14f08db12a79309279d099ace690c42dc30b1",
@@ -1473,14 +1474,41 @@
  },
  "state": "observed",
  "tests": [
-  "a_failed_relation_commits_no_assumption_and_modes_keep_separate_caches",
-  "a_repeated_query_returns_the_same_type_without_new_work",
-  "an_injected_panic_retires_the_generation_and_a_fresh_checker_succeeds",
-  "deep_relations_grow_the_stack_and_keep_the_checker_usable",
-  "lazy_resolution_reports_the_cycle_and_stays_usable",
-  "semantic_limits_produce_the_pins_results",
-  "two_checkers_merge_independently_over_one_program"
+  "alias_links_record_referenced_and_type_only_state",
+  "changes::changes_arguments_does_not_imply_rest",
+  "changes::changes_asserts_on_the_declaring_variable",
+  "changes::changes_async_non_promise_uses_the_ts_error",
+  "changes::changes_class_tag_is_not_a_constructor",
+  "changes::changes_conflicting_declarations_error_at_every_site",
+  "changes::changes_constructor_functions_are_unsupported",
+  "changes::changes_jsdoc_values_are_not_types",
+  "changes::changes_mixed_module_exports_assignments",
+  "changes::changes_non_strict_js_cannot_omit_unknown_arguments",
+  "changes::changes_overload_on_arrows",
+  "changes::changes_param_applies_to_one_function",
+  "changes::changes_postfix_equals_makes_the_parameter_optional",
+  "changes::changes_template_inference_keeps_a_code_point",
+  "changes::changes_this_property_annotation_creates_no_property",
+  "changes::changes_type_assertion_prevents_narrowing",
+  "changes::changes_typedef_in_a_class_body_is_hoisted",
+  "changes::changes_variadic_jsdoc_type_is_an_array",
+  "changes::changes_variadic_jsdoc_type_is_not_rest",
+  "changes::changes_void_zero_expando_creates_a_property",
+  "changes::contract_2_definite_assignment",
+  "changes::contract_3_evolving_arrays_and_discriminants",
+  "changes::contract_4_iteration_types_over_the_lib",
+  "changes::contract_5_class_checks",
+  "changes::lookup_of_a_global_alias_resolves_its_target",
+  "changes::options_exact_optional_property_types",
+  "changes::options_isolated_modules",
+  "changes::options_no_fallthrough_cases_in_switch",
+  "changes::options_no_unchecked_indexed_access",
+  "changes::options_use_unknown_in_catch_variables",
+  "changes::options_verbatim_module_syntax",
+  "deep_flow_graph_checks_on_a_small_stack",
+  "malformed_input_checks_to_completion_and_keeps_answering",
+  "two_checkers_narrow_independently_and_retirement_is_isolated"
  ],
  "version": 2,
- "witness": "c1-contracts"
+ "witness": "c3-contracts"
 }
