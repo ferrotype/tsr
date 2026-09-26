@@ -297,6 +297,23 @@ def _c1_claim_metrics(comparison, claims, blockers=None):
     return metrics
 
 
+CHECKPOINTS = ("C2", "C3")
+
+
+def newest_checkpoint(loaded):
+    """The one checkpoint whose completion this run may compute: the latest with authorities."""
+    return max(loaded, key=CHECKPOINTS.index) if loaded else None
+
+
+def drop_historical_completion(metrics, checkpoint):
+    """A checkpoint's completion is a recorded historical fact (C3 plan, section 3):
+    `P2B-Cn` closes on the checker run recorded at that checkpoint's exit, and a later
+    run reports the checkpoint's accounting but never recomputes `_measured` or
+    `_complete` on its own capture."""
+    for suffix in ("_measured", "_complete"):
+        metrics.pop(checkpoint.lower() + suffix, None)
+
+
 def checkpoint_metrics(checkpoint, comparison, claims, audit_ok, baseline, contracts_ok, regression_parity,
                        blockers=None, *, handoffs=None, measured_ok=None, baseline_sha256=None,
                        prerequisites=None, inventory=None, incoming=None):
@@ -538,7 +555,7 @@ def checker(native=NATIVE, rust=RUST):
         metrics["c1_complete"] = False
     register = None
     loaded, all_transfers, all_incoming = {}, {}, {}
-    for checkpoint in ("C2", "C3"):
+    for checkpoint in CHECKPOINTS:
         authorities = CHECKPOINT_AUTHORITIES[checkpoint]
         try:
             claims, audit, transfers, incoming = phase2_blockers.load_handoffs(
@@ -559,7 +576,8 @@ def checker(native=NATIVE, rust=RUST):
         metrics["blockers_named"] = register == committed and phase2_blockers.complete(register, comparison)
     except (OSError, ValueError, KeyError, TypeError) as error:
         print("blocker register unavailable: " + str(error), file=sys.stderr)
-    for checkpoint in ("C2", "C3"):
+    current = newest_checkpoint(loaded)
+    for checkpoint in CHECKPOINTS:
         authorities = CHECKPOINT_AUTHORITIES[checkpoint]
         prefix = checkpoint.lower()
         try:
@@ -570,7 +588,7 @@ def checker(native=NATIVE, rust=RUST):
             baseline = (phase2_compare.load_baseline(authorities["baseline"])
                         if authorities["baseline"].is_file() else None)
             measured = (measurement_current(comparison, rust, context=context)
-                        if "measurement" in authorities else None)
+                        if "measurement" in authorities and checkpoint == current else None)
             metrics.update(checkpoint_metrics(
                 checkpoint, comparison, claims, audit_ok, baseline, receipt_current(prefix + "-contracts"),
                 metrics["regression_parity"], register, handoffs=transfers, measured_ok=measured,
@@ -579,6 +597,8 @@ def checker(native=NATIVE, rust=RUST):
         except (OSError, ValueError, KeyError, TypeError) as error:
             print(f"{checkpoint} metrics unavailable: " + str(error), file=sys.stderr)
             metrics[prefix + "_complete"] = False
+        if checkpoint != current:
+            drop_historical_completion(metrics, checkpoint)
     print("checker evidence: " + canonical({"native": report["observation_sha256"],
                                              "rust": comparison["rust_capture_sha256"]}).decode(), file=sys.stderr)
     return {"metrics": {k: v for k, v in metrics.items() if v is not None}}

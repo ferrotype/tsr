@@ -117,9 +117,20 @@ class Rebind(unittest.TestCase):
         self.assertEqual(claims["rows"][0]["handoff"]["capture_sha256"], "n" * 64)
         self.assertEqual(claims["rows"][0]["handoff"]["request_sha256"], "areq")
         self.assertEqual(claims["rows"][1]["handoff"]["capture_sha256"], "r" * 64)
-        self.assertEqual(claims["rust_capture_sha256"], "n" * 64)
+        # The file's own binding names the checkpoint's start capture and stays.
+        self.assertEqual(claims["rust_capture_sha256"], "r" * 64)
         with self.assertRaises(ValueError):
             claims_module.rebind(claims, current, "m" * 64, digests, root=Path("/"))
+
+
+class RecordedCompletion(unittest.TestCase):
+    def test_only_the_newest_checkpoint_computes_completion(self):
+        self.assertEqual(producers.newest_checkpoint({"C2": None, "C3": None}), "C3")
+        self.assertEqual(producers.newest_checkpoint({"C2": None}), "C2")
+        self.assertIsNone(producers.newest_checkpoint({}))
+        metrics = {"c2_open": 0, "c2_handoffs": 3, "c2_measured": False, "c2_complete": False, "c3_complete": True}
+        producers.drop_historical_completion(metrics, "C2")
+        self.assertEqual(metrics, {"c2_open": 0, "c2_handoffs": 3, "c3_complete": True})
 
 
 class Wiring(unittest.TestCase):

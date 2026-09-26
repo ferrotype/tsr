@@ -10,8 +10,10 @@ digests from the authenticated capture, checks that the row's currently unmet
 domains are still covered by the handoff's domains and that the trace artifact
 still has its recorded digest, and rewrites the capture bindings. A handoff
 that no longer holds is reported and left unchanged, so its row counts as open
-for its owner. The claims file's `rust_capture_sha256` follows the capture; the
-baseline binding does not move (the baseline is the checkpoint's start).
+for its owner. The claims file's own bindings (`rust_capture_sha256`,
+`baseline_sha256`, `inventory_sha256`) name the checkpoint's start capture and
+do not move: the producer checks them against the baseline, and only the
+handoffs follow the fresh capture.
 """
 from __future__ import annotations
 import argparse
@@ -64,7 +66,6 @@ def rebind(claims, comparison, capture_sha256, digests, *, root=ROOT):
             handoff["capture_sha256"] = capture_sha256
             handoff["request_sha256"] = current["request_sha256"]
             handoff["raw_observation_sha256"] = current["raw_observation_sha256"]
-    claims["rust_capture_sha256"] = capture_sha256
     return sorted(set(stale))
 
 
