@@ -674,7 +674,7 @@ impl CheckerState {
     }
     // port: tsc/internal/checker/flow.go:Checker.getPropertyNameForKnownSymbolName
     pub(crate) fn property_name_for_known_symbol(&mut self, name: &str) -> Result<JsString, Error> {
-        if let Some(symbol) = self.lookup_symbol(
+        if let Some(symbol) = self.lookup_symbol_resolving(
             self.builtins.globals,
             b"Symbol",
             tsr_ast::symbol_flags::VALUE,

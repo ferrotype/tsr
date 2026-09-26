@@ -130,7 +130,7 @@ impl CheckerState {
                     return Ok(None);
                 };
                 let exports = self.module_exports_of_symbol(symbol)?;
-                if let Some(property) = self.lookup_symbol(exports, text.as_bytes(), meaning)? {
+                if let Some(property) = self.lookup_symbol_resolving(exports, text.as_bytes(), meaning)? {
                     return Ok(Some(self.get_merged_symbol(property)));
                 }
                 let ty = self.get_declared_type_of_symbol(symbol)?;

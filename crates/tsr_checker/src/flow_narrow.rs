@@ -423,7 +423,7 @@ impl CheckerState {
             });
         }
         if assume {
-            if let Some(symbol) = self.lookup_symbol(
+            if let Some(symbol) = self.lookup_symbol_resolving(
                 self.builtins.globals,
                 b"Record",
                 tsr_ast::symbol_flags::TYPE_ALIAS,

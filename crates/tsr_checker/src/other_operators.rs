@@ -401,7 +401,7 @@ impl CheckerState {
             return Ok(false);
         }
         let global =
-            self.lookup_symbol(self.builtins.globals, b"NaN", tsr_ast::symbol_flags::VALUE)?;
+            self.lookup_symbol_resolving(self.builtins.globals, b"NaN", tsr_ast::symbol_flags::VALUE)?;
         Ok(global.is_some() && global == Some(self.resolved_value_symbol(node)?))
     }
     // port: tsc/internal/checker/utilities.go:isLiteralExpressionOfObject
