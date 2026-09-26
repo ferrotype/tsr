@@ -585,21 +585,45 @@ impl CheckerState {
                     vec![JsString::from_bytes(any_extension(name.as_bytes()))],
                 )?;
             } else if resolved.resolved_using_ts_extension && should_rewrite {
-                // Loading rejects project references, so the redirect comparison
-                // upstream performs here has nothing to compare.
+                // A rewritten import into another project is safe only when the
+                // projects' output directories keep the input directories'
+                // relative layout.
                 let target_name = target
                     .view()
                     .source_file()?
                     .parse_options()
                     .file_name
                     .clone();
-                if host
+                let redirect = host
                     .get_redirect_for_resolution(target_name.as_bytes())?
-                    .is_some()
-                {
-                    return Err(Error::Unsupported(
-                        "resolveExternalModule: rewrite across project references",
-                    ));
+                    .cloned();
+                if let Some(mut redirect) = redirect {
+                    let cwd = host.get_current_directory();
+                    let case_sensitive = host.use_case_sensitive_file_names();
+                    let own_root = host.common_source_directory()?.to_vec();
+                    let other_root = redirect.common_source_directory().to_vec();
+                    let root_dir_path =
+                        path::relative_from_directory(&own_root, &other_root, cwd, case_sensitive);
+                    let own_out = host.options().out_dir.clone();
+                    let own_out = if own_out.is_empty() {
+                        own_root.clone()
+                    } else {
+                        path::absolute(own_out.as_bytes(), cwd)
+                    };
+                    let other_out = if redirect.options.out_dir.is_empty() {
+                        other_root.clone()
+                    } else {
+                        path::absolute(redirect.options.out_dir.as_bytes(), cwd)
+                    };
+                    let out_dir_path =
+                        path::relative_from_directory(&own_out, &other_out, cwd, case_sensitive);
+                    if root_dir_path != out_dir_path {
+                        self.error_at(
+                            Some(error),
+                            d::This_import_path_is_unsafe_to_rewrite_because_it_resolves_to_another_project_and_the_relative_path_between_the_projects_output_files_is_not_the_same_as_the_relative_path_between_its_input_files,
+                            vec![],
+                        )?;
+                    }
                 }
             }
         }
