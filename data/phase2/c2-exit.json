@@ -1,0 +1,92 @@
+{
+ "all_domains_match": 12647,
+ "by_checkpoint": {
+  "C2": {
+   "match": 2951,
+   "open": 3
+  },
+  "C3": {
+   "match": 170,
+   "open": 15
+  },
+  "C4": {
+   "match": 159,
+   "open": 767
+  },
+  "regression": {
+   "match": 9367
+  }
+ },
+ "capture": "target/phase2/c2-exit-01",
+ "changed_observations": [],
+ "compare": [
+  "python3",
+  "scripts/phase2_compare.py",
+  "report",
+  "--native",
+  "target/phase2/native",
+  "--rust",
+  "<fresh-output>",
+  "--previous",
+  "target/phase2/c1-reviewed/comparison.json",
+  "--record"
+ ],
+ "comparison": {
+  "path": "data/phase2/c2-exit-comparison.json.gz",
+  "sha256": "0d492dc6ae0c727b9c80d485e80443edc7768810b4b6a828995cadda32f3c004"
+ },
+ "executed": 13432,
+ "harness_errors": 0,
+ "head": "35661af",
+ "inventory_sha256": "c09721d36d361eb8646b2321ec3478da0fbdbf12253c086e7b1c34e966aea9b9",
+ "native_observation_sha256": "1b5356b425ad95a3e5e2a0bb29d42534e8d9d4a6159649f063f3317084a0e276",
+ "partial": false,
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "regression_subset": {
+  "all_domains_match": 9367,
+  "by_domain": {
+   "display": {
+    "disabled": 198,
+    "match": 9169
+   },
+   "errors": {
+    "match": 9367
+   },
+   "parent_pointers": {
+    "match": 9367
+   },
+   "symbols": {
+    "disabled": 198,
+    "match": 9169
+   },
+   "trace": {
+    "disabled": 9219,
+    "match": 148
+   },
+   "types": {
+    "disabled": 198,
+    "match": 9169
+   },
+   "union_ordering": {
+    "match": 9367
+   }
+  },
+  "rows": 9367
+ },
+ "regressions": [],
+ "run": [
+  "python3",
+  "scripts/phase2_corpus.py",
+  "run",
+  "--native",
+  "target/phase2/native",
+  "--output",
+  "<fresh-output>",
+  "--jobs",
+  "4"
+ ],
+ "rust_capture_sha256": "616e3f795dc1401f354af22c16b92ffb797a54df209e3c487f7de6bb6078fd84",
+ "rust_source_stable": true,
+ "scope": "Full C2 correctness exit. Three exact errors-only JavaScript emit handoffs remain visible in the raw comparison and are traced in c2-emit-handoffs. This record does not supply or claim a performance measurement.",
+ "version": 1
+}

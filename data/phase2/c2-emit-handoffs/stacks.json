@@ -1,0 +1,3320 @@
+[
+  {
+    "id": "compiler/incorrectRecursiveMappedTypeConstraint.ts#configuration=0",
+    "phase": "PRE",
+    "site": "2313 current=[KindTypeParameter 36 42] decl=[KindMappedType 32 53]",
+    "frames": [
+      {
+        "function": "runtime/debug.Stack",
+        "source": "runtime/debug/stack.go:26"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.c2EmitStack",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/c2_emit_stack.go:15"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getResolvedBaseConstraint",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:27824"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getNextBaseConstraint",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:27949"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).computeBaseConstraint",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:27849"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getResolvedBaseConstraint",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:27818"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getBaseConstraintOfType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:27789"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkTypeParameter",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2656"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElementWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2312"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElement",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2287"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkMappedType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:3411"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElementWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2362"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElement",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2287"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkTypeParameter",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2652"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkTypeParameters",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:7170"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSignatureDeclaration",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2784"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkFunctionOrMethodDeclaration",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:3435"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkFunctionDeclaration",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:3428"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElementWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2364"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElement",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2287"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElements",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2277"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceFile",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2246"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getDiagnostics",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:14178"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).GetDiagnostics",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:14168"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).getBindAndCheckDiagnosticsWithChecker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:1469"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).getSemanticDiagnosticsWithChecker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:1453"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).collectCheckerDiagnosticsFromFiles.func1",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:703"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*checkerPool).forEachCheckerGroupDo.func1",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/checkerpool.go:483"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/core.(*singleThreadedWorkGroup).RunAndWait",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/core/workgroup.go:74"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*checkerPool).forEachCheckerGroupDo",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/checkerpool.go:488"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).collectCheckerDiagnosticsFromFiles",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:702"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).collectCheckerDiagnostics",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:684"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).GetSemanticDiagnostics",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:778"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil.compileFilesWithHost",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil/harnessutil.go:667"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil.CompileFilesEx",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil/harnessutil.go:256"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil.CompileFiles",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil/harnessutil.go:114"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testrunner.newCompilerTest",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testrunner/compiler_runner.go:329"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testrunner.TestPhase2Checker.func1",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testrunner/phase2_checker_test.go:189"
+      },
+      {
+        "function": "testing.tRunner",
+        "source": "testing/testing.go:2193"
+      },
+      {
+        "function": "created by testing.",
+        "source": "testing/testing.go:2258"
+      }
+    ]
+  },
+  {
+    "id": "compiler/incorrectRecursiveMappedTypeConstraint.ts#configuration=0",
+    "phase": "PRE",
+    "site": "2313 current=[KindTypeParameter 36 42] decl=[KindTypeReference 40 42]",
+    "frames": [
+      {
+        "function": "runtime/debug.Stack",
+        "source": "runtime/debug/stack.go:26"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.c2EmitStack",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/c2_emit_stack.go:15"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getResolvedBaseConstraint",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:27824"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getBaseConstraintOfType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:27789"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkTypeParameter",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2656"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElementWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2312"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElement",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2287"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkMappedType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:3411"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElementWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2362"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElement",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2287"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkTypeParameter",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2652"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkTypeParameters",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:7170"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSignatureDeclaration",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2784"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkFunctionOrMethodDeclaration",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:3435"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkFunctionDeclaration",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:3428"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElementWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2364"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElement",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2287"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElements",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2277"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceFile",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2246"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getDiagnostics",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:14178"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).GetDiagnostics",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:14168"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).getBindAndCheckDiagnosticsWithChecker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:1469"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).getSemanticDiagnosticsWithChecker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:1453"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).collectCheckerDiagnosticsFromFiles.func1",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:703"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*checkerPool).forEachCheckerGroupDo.func1",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/checkerpool.go:483"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/core.(*singleThreadedWorkGroup).RunAndWait",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/core/workgroup.go:74"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*checkerPool).forEachCheckerGroupDo",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/checkerpool.go:488"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).collectCheckerDiagnosticsFromFiles",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:702"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).collectCheckerDiagnostics",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:684"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).GetSemanticDiagnostics",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:778"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil.compileFilesWithHost",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil/harnessutil.go:667"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil.CompileFilesEx",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil/harnessutil.go:256"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil.CompileFiles",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil/harnessutil.go:114"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testrunner.newCompilerTest",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testrunner/compiler_runner.go:329"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testrunner.TestPhase2Checker.func1",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testrunner/phase2_checker_test.go:189"
+      },
+      {
+        "function": "testing.tRunner",
+        "source": "testing/testing.go:2193"
+      },
+      {
+        "function": "created by testing.",
+        "source": "testing/testing.go:2258"
+      }
+    ]
+  },
+  {
+    "id": "compiler/incorrectRecursiveMappedTypeConstraint.ts#configuration=0",
+    "phase": "EMIT",
+    "site": "2313 current=[KindIdentifier 107 109] decl=[KindTypeReference 40 42]",
+    "frames": [
+      {
+        "function": "runtime/debug.Stack",
+        "source": "runtime/debug/stack.go:26"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.c2EmitStack",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/c2_emit_stack.go:15"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getResolvedBaseConstraint",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:27824"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).hasNonCircularBaseConstraint",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:17367"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getConstraintOfTypeParameter",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:17360"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getConstraintTypeFromMappedType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23023"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromMappedTypeNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:24615"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNodeWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23230"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23150"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getConstraintFromTypeParameter",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:17384"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).computeBaseConstraint",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:27845"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getResolvedBaseConstraint",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:27818"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getBaseConstraintOfType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:27789"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getBaseConstraintOrType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:27780"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).isGenericTypeWithUnionConstraint",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:31875"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.someType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:26892"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getNarrowableTypeForReference",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:31854"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkIdentifier",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:11305"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkExpressionWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:7899"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkExpressionEx",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:7729"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkExpression",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:7719"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkNonNullExpression",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:7571"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkIndexedAccess",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:8302"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkExpressionWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:7936"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkExpressionEx",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:7729"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkExpressionCachedEx",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:7695"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkExpressionCached",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:7679"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).GetConstantValue",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/services.go:876"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*EmitResolver).GetConstantValue",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/emitresolver.go:1162"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/transformers/inliners.(*ConstEnumInliningTransformer).visit",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/transformers/inliners/constenum.go:40"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*NodeVisitor).VisitNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/visitor.go:51"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*NodeVisitor).visitNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/visitor.go:198"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*BinaryExpression).VisitEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast_generated.go:3755"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*Node).VisitEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast.go:209"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*NodeVisitor).VisitEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/visitor.go:191"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/transformers/inliners.(*ConstEnumInliningTransformer).visit",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/transformers/inliners/constenum.go:83"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*NodeVisitor).VisitNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/visitor.go:51"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*NodeVisitor).visitNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/visitor.go:198"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*ExpressionStatement).VisitEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast_generated.go:1592"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*Node).VisitEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast.go:209"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*NodeVisitor).VisitEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/visitor.go:191"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/transformers/inliners.(*ConstEnumInliningTransformer).visit",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/transformers/inliners/constenum.go:83"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*NodeVisitor).VisitSlice",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/visitor.go:148"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*NodeVisitor).VisitNodes",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/visitor.go:99"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*NodeVisitor).visitNodes",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/visitor.go:236"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*Block).VisitEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast_generated.go:1638"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*Node).VisitEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast.go:209"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*NodeVisitor).VisitEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/visitor.go:191"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/transformers/inliners.(*ConstEnumInliningTransformer).visit",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/transformers/inliners/constenum.go:83"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*NodeVisitor).VisitNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/visitor.go:51"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/printer.(*EmitContext).VisitFunctionBody",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/printer/emitcontext.go:945"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*NodeVisitor).visitFunctionBody",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/visitor.go:220"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*FunctionDeclaration).VisitEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast_generated.go:2032"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*Node).VisitEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast.go:209"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*NodeVisitor).VisitEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/visitor.go:191"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/transformers/inliners.(*ConstEnumInliningTransformer).visit",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/transformers/inliners/constenum.go:83"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*NodeVisitor).VisitSlice",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/visitor.go:148"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*NodeVisitor).VisitNodes",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/visitor.go:99"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/printer.(*EmitContext).VisitVariableEnvironment",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/printer/emitcontext.go:796"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*NodeVisitor).visitTopLevelStatements",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/visitor.go:255"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*SourceFile).VisitEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast.go:2785"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*Node).VisitEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast.go:209"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*NodeVisitor).VisitEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/visitor.go:191"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/transformers/inliners.(*ConstEnumInliningTransformer).visit",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/transformers/inliners/constenum.go:83"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*NodeVisitor).VisitNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/visitor.go:51"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*NodeVisitor).VisitSourceFile",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/visitor.go:36"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/transformers.(*Transformer).TransformSourceFile",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/transformers/transformer.go:40"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*emitter).runScriptTransformers",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/emitter.go:73"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*emitter).emitJSFile",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/emitter.go:200"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*emitter).emit",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/emitter.go:50"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).Emit.func2",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:1854"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/core.(*singleThreadedWorkGroup).RunAndWait",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/core/workgroup.go:74"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).Emit",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:1863"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil.compileFilesWithHost",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil/harnessutil.go:679"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil.CompileFilesEx",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil/harnessutil.go:256"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil.CompileFiles",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil/harnessutil.go:114"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testrunner.newCompilerTest",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testrunner/compiler_runner.go:329"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testrunner.TestPhase2Checker.func1",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testrunner/phase2_checker_test.go:189"
+      },
+      {
+        "function": "testing.tRunner",
+        "source": "testing/testing.go:2193"
+      },
+      {
+        "function": "created by testing.",
+        "source": "testing/testing.go:2258"
+      }
+    ]
+  },
+  {
+    "id": "compiler/incorrectRecursiveMappedTypeConstraint.ts#configuration=0",
+    "phase": "EMIT",
+    "site": "2313 current=[KindIdentifier 107 109] decl=[KindMappedType 32 53]",
+    "frames": [
+      {
+        "function": "runtime/debug.Stack",
+        "source": "runtime/debug/stack.go:26"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.c2EmitStack",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/c2_emit_stack.go:15"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getResolvedBaseConstraint",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:27824"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getBaseConstraintOfType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:27789"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getBaseConstraintOrType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:27780"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).isGenericTypeWithUnionConstraint",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:31875"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.someType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:26892"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getNarrowableTypeForReference",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:31854"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkIdentifier",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:11305"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkExpressionWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:7899"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkExpressionEx",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:7729"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkExpression",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:7719"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkNonNullExpression",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:7571"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkIndexedAccess",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:8302"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkExpressionWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:7936"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkExpressionEx",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:7729"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkExpressionCachedEx",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:7695"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkExpressionCached",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:7679"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).GetConstantValue",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/services.go:876"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*EmitResolver).GetConstantValue",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/emitresolver.go:1162"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/transformers/inliners.(*ConstEnumInliningTransformer).visit",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/transformers/inliners/constenum.go:40"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*NodeVisitor).VisitNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/visitor.go:51"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*NodeVisitor).visitNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/visitor.go:198"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*BinaryExpression).VisitEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast_generated.go:3755"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*Node).VisitEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast.go:209"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*NodeVisitor).VisitEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/visitor.go:191"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/transformers/inliners.(*ConstEnumInliningTransformer).visit",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/transformers/inliners/constenum.go:83"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*NodeVisitor).VisitNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/visitor.go:51"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*NodeVisitor).visitNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/visitor.go:198"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*ExpressionStatement).VisitEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast_generated.go:1592"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*Node).VisitEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast.go:209"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*NodeVisitor).VisitEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/visitor.go:191"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/transformers/inliners.(*ConstEnumInliningTransformer).visit",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/transformers/inliners/constenum.go:83"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*NodeVisitor).VisitSlice",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/visitor.go:148"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*NodeVisitor).VisitNodes",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/visitor.go:99"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*NodeVisitor).visitNodes",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/visitor.go:236"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*Block).VisitEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast_generated.go:1638"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*Node).VisitEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast.go:209"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*NodeVisitor).VisitEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/visitor.go:191"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/transformers/inliners.(*ConstEnumInliningTransformer).visit",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/transformers/inliners/constenum.go:83"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*NodeVisitor).VisitNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/visitor.go:51"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/printer.(*EmitContext).VisitFunctionBody",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/printer/emitcontext.go:945"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*NodeVisitor).visitFunctionBody",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/visitor.go:220"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*FunctionDeclaration).VisitEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast_generated.go:2032"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*Node).VisitEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast.go:209"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*NodeVisitor).VisitEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/visitor.go:191"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/transformers/inliners.(*ConstEnumInliningTransformer).visit",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/transformers/inliners/constenum.go:83"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*NodeVisitor).VisitSlice",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/visitor.go:148"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*NodeVisitor).VisitNodes",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/visitor.go:99"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/printer.(*EmitContext).VisitVariableEnvironment",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/printer/emitcontext.go:796"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*NodeVisitor).visitTopLevelStatements",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/visitor.go:255"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*SourceFile).VisitEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast.go:2785"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*Node).VisitEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast.go:209"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*NodeVisitor).VisitEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/visitor.go:191"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/transformers/inliners.(*ConstEnumInliningTransformer).visit",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/transformers/inliners/constenum.go:83"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*NodeVisitor).VisitNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/visitor.go:51"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*NodeVisitor).VisitSourceFile",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/visitor.go:36"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/transformers.(*Transformer).TransformSourceFile",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/transformers/transformer.go:40"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*emitter).runScriptTransformers",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/emitter.go:73"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*emitter).emitJSFile",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/emitter.go:200"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*emitter).emit",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/emitter.go:50"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).Emit.func2",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:1854"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/core.(*singleThreadedWorkGroup).RunAndWait",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/core/workgroup.go:74"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).Emit",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:1863"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil.compileFilesWithHost",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil/harnessutil.go:679"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil.CompileFilesEx",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil/harnessutil.go:256"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil.CompileFiles",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil/harnessutil.go:114"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testrunner.newCompilerTest",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testrunner/compiler_runner.go:329"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testrunner.TestPhase2Checker.func1",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testrunner/phase2_checker_test.go:189"
+      },
+      {
+        "function": "testing.tRunner",
+        "source": "testing/testing.go:2193"
+      },
+      {
+        "function": "created by testing.",
+        "source": "testing/testing.go:2258"
+      }
+    ]
+  },
+  {
+    "id": "compiler/typeParameterWithInvalidConstraintType.ts#configuration=0",
+    "phase": "PRE",
+    "site": "2313 current=[KindClassDeclaration 0 157] decl=[KindTypeReference 17 19]",
+    "frames": [
+      {
+        "function": "runtime/debug.Stack",
+        "source": "runtime/debug/stack.go:26"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.c2EmitStack",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/c2_emit_stack.go:15"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getResolvedBaseConstraint",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:27824"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getBaseConstraintOfType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:27789"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkTypeParameter",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2656"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkTypeParameters",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:7170"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkClassLikeDeclaration",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:4320"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkClassDeclaration",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:4311"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElementWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2402"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElement",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2287"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElements",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2277"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceFile",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2246"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getDiagnostics",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:14178"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).GetDiagnostics",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:14168"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).getBindAndCheckDiagnosticsWithChecker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:1469"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).getSemanticDiagnosticsWithChecker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:1453"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).collectCheckerDiagnosticsFromFiles.func1",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:703"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*checkerPool).forEachCheckerGroupDo.func1",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/checkerpool.go:483"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/core.(*singleThreadedWorkGroup).RunAndWait",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/core/workgroup.go:74"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*checkerPool).forEachCheckerGroupDo",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/checkerpool.go:488"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).collectCheckerDiagnosticsFromFiles",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:702"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).collectCheckerDiagnostics",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:684"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).GetSemanticDiagnostics",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:778"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil.compileFilesWithHost",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil/harnessutil.go:667"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil.CompileFilesEx",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil/harnessutil.go:256"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil.CompileFiles",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil/harnessutil.go:114"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testrunner.newCompilerTest",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testrunner/compiler_runner.go:329"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testrunner.TestPhase2Checker.func1",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testrunner/phase2_checker_test.go:189"
+      },
+      {
+        "function": "testing.tRunner",
+        "source": "testing/testing.go:2193"
+      },
+      {
+        "function": "created by testing.",
+        "source": "testing/testing.go:2258"
+      }
+    ]
+  },
+  {
+    "id": "compiler/typeParameterWithInvalidConstraintType.ts#configuration=0",
+    "phase": "EMIT",
+    "site": "2313 current=[KindIdentifier 69 71] decl=[KindTypeReference 17 19]",
+    "frames": [
+      {
+        "function": "runtime/debug.Stack",
+        "source": "runtime/debug/stack.go:26"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.c2EmitStack",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/c2_emit_stack.go:15"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getResolvedBaseConstraint",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:27824"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getBaseConstraintOfType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:27789"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getBaseConstraintOrType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:27780"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).isGenericTypeWithUnionConstraint",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:31875"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.someType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:26892"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getNarrowableTypeForReference",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:31854"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkIdentifier",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:11305"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkExpressionWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:7899"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkExpressionEx",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:7729"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkExpressionCachedEx",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:7695"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkExpressionCached",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:7679"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).markPropertyAliasReferenced",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:28793"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).markLinkedReferences",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:28672"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*EmitResolver).MarkLinkedReferencesRecursively.func1",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/emitresolver.go:824"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.visit",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast.go:33"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*CallExpression).ForEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast_generated.go:4285"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*Node).ForEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast_generated.go:8830"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*EmitResolver).MarkLinkedReferencesRecursively.func1",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/emitresolver.go:825"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.visit",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast.go:33"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*VariableDeclaration).ForEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast_generated.go:1729"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*Node).ForEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast_generated.go:8738"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*EmitResolver).MarkLinkedReferencesRecursively.func1",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/emitresolver.go:825"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.visitNodes",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast.go:40"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.visitNodeList",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast.go:49"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*VariableDeclarationList).ForEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast_generated.go:1774"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*Node).ForEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast_generated.go:8740"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*EmitResolver).MarkLinkedReferencesRecursively.func1",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/emitresolver.go:825"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.visit",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast.go:33"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*VariableStatement).ForEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast_generated.go:1679"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*Node).ForEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast_generated.go:8736"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*EmitResolver).MarkLinkedReferencesRecursively.func1",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/emitresolver.go:825"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.visitNodes",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast.go:40"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.visitNodeList",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast.go:49"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*Block).ForEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast_generated.go:1634"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*Node).ForEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast_generated.go:8734"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*EmitResolver).MarkLinkedReferencesRecursively.func1",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/emitresolver.go:825"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.visit",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast.go:33"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*MethodDeclaration).ForEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast_generated.go:3348"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*Node).ForEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast_generated.go:8800"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*EmitResolver).MarkLinkedReferencesRecursively.func1",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/emitresolver.go:825"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.visitNodes",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast.go:40"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.visitNodeList",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast.go:49"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*ClassDeclaration).ForEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast_generated.go:2079"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*Node).ForEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast_generated.go:8752"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*EmitResolver).MarkLinkedReferencesRecursively.func1",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/emitresolver.go:825"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.visitNodes",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast.go:40"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.visitNodeList",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast.go:49"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*SourceFile).ForEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast.go:2781"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*EmitResolver).MarkLinkedReferencesRecursively",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/emitresolver.go:828"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/transformers/tstransforms.(*ImportElisionTransformer).visit",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/transformers/tstransforms/importelision.go:29"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*NodeVisitor).VisitNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/visitor.go:51"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*NodeVisitor).VisitSourceFile",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/visitor.go:36"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/transformers.(*Transformer).TransformSourceFile",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/transformers/transformer.go:40"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*emitter).runScriptTransformers",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/emitter.go:73"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*emitter).emitJSFile",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/emitter.go:200"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*emitter).emit",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/emitter.go:50"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).Emit.func2",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:1854"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/core.(*singleThreadedWorkGroup).RunAndWait",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/core/workgroup.go:74"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).Emit",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:1863"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil.compileFilesWithHost",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil/harnessutil.go:679"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil.CompileFilesEx",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil/harnessutil.go:256"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil.CompileFiles",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil/harnessutil.go:114"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testrunner.newCompilerTest",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testrunner/compiler_runner.go:329"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testrunner.TestPhase2Checker.func1",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testrunner/phase2_checker_test.go:189"
+      },
+      {
+        "function": "testing.tRunner",
+        "source": "testing/testing.go:2193"
+      },
+      {
+        "function": "created by testing.",
+        "source": "testing/testing.go:2258"
+      }
+    ]
+  },
+  {
+    "id": "conformance/types/mapped/recursiveMappedTypes.ts#configuration=0",
+    "phase": "PRE",
+    "site": "2313 current=[KindTypeReference 79 87] decl=[KindTypeOperator 73 87]",
+    "frames": [
+      {
+        "function": "runtime/debug.Stack",
+        "source": "runtime/debug/stack.go:26"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.c2EmitStack",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/c2_emit_stack.go:15"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getResolvedBaseConstraint",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:27824"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).hasNonCircularBaseConstraint",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:17367"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getConstraintOfTypeParameter",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:17360"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getConstraintTypeFromMappedType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23023"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromMappedTypeNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:24615"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNodeWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23230"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23150"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getDeclaredTypeOfTypeAlias",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:24198"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).tryGetDeclaredTypeOfSymbol",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:24027"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getDeclaredTypeOfSymbol",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:24013"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeAliasReference",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23935"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeReferenceType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23496"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeReference",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23356"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNodeWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23199"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23150"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkTypeReferenceOrImport",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:3043"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkTypeReferenceNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:3038"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElementWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2330"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElement",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2287"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkTypeOperator",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:3325"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElementWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2348"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElement",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2287"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkTypeParameter",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2652"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElementWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2312"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElement",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2287"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkMappedType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:3411"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElementWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2362"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElement",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2287"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkTypeAliasDeclaration",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:7062"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElementWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2406"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElement",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2287"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElements",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2277"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceFile",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2246"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getDiagnostics",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:14178"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).GetDiagnostics",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:14168"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).getBindAndCheckDiagnosticsWithChecker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:1469"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).getSemanticDiagnosticsWithChecker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:1453"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).collectCheckerDiagnosticsFromFiles.func1",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:703"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*checkerPool).forEachCheckerGroupDo.func1",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/checkerpool.go:483"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/core.(*singleThreadedWorkGroup).RunAndWait",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/core/workgroup.go:74"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*checkerPool).forEachCheckerGroupDo",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/checkerpool.go:488"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).collectCheckerDiagnosticsFromFiles",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:702"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).collectCheckerDiagnostics",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:684"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).GetSemanticDiagnostics",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:778"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil.compileFilesWithHost",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil/harnessutil.go:667"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil.CompileFilesEx",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil/harnessutil.go:256"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil.CompileFiles",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil/harnessutil.go:114"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testrunner.newCompilerTest",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testrunner/compiler_runner.go:329"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testrunner.TestPhase2Checker.func1",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testrunner/phase2_checker_test.go:189"
+      },
+      {
+        "function": "testing.tRunner",
+        "source": "testing/testing.go:2193"
+      },
+      {
+        "function": "created by testing.",
+        "source": "testing/testing.go:2258"
+      }
+    ]
+  },
+  {
+    "id": "conformance/types/mapped/recursiveMappedTypes.ts#configuration=0",
+    "phase": "PRE",
+    "site": "2313 current=[KindTypeReference 137 146] decl=[KindTypeOperator 131 146]",
+    "frames": [
+      {
+        "function": "runtime/debug.Stack",
+        "source": "runtime/debug/stack.go:26"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.c2EmitStack",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/c2_emit_stack.go:15"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getResolvedBaseConstraint",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:27824"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).hasNonCircularBaseConstraint",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:17367"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getConstraintOfTypeParameter",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:17360"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getConstraintTypeFromMappedType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23023"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromMappedTypeNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:24615"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNodeWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23230"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23150"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getDeclaredTypeOfTypeAlias",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:24198"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).tryGetDeclaredTypeOfSymbol",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:24027"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getDeclaredTypeOfSymbol",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:24013"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeAliasReference",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23935"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeReferenceType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23496"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeReference",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23356"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNodeWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23199"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23150"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeOperatorNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23308"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNodeWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23224"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23150"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getConstraintFromTypeParameter",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:17384"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).computeBaseConstraint",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:27845"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getResolvedBaseConstraint",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:27818"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).hasNonCircularBaseConstraint",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:17367"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getConstraintOfTypeParameter",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:17360"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getConstraintTypeFromMappedType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23023"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromMappedTypeNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:24615"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNodeWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23230"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23150"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getDeclaredTypeOfTypeAlias",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:24198"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).tryGetDeclaredTypeOfSymbol",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:24027"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getDeclaredTypeOfSymbol",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:24013"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeAliasReference",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23935"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeReferenceType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23496"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeReference",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23356"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNodeWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23199"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23150"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkTypeReferenceOrImport",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:3043"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkTypeReferenceNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:3038"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElementWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2330"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElement",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2287"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkTypeOperator",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:3325"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElementWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2348"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElement",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2287"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkTypeParameter",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2652"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElementWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2312"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElement",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2287"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkMappedType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:3411"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElementWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2362"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElement",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2287"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkTypeAliasDeclaration",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:7062"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElementWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2406"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElement",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2287"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElements",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2277"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceFile",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2246"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getDiagnostics",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:14178"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).GetDiagnostics",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:14168"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).getBindAndCheckDiagnosticsWithChecker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:1469"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).getSemanticDiagnosticsWithChecker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:1453"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).collectCheckerDiagnosticsFromFiles.func1",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:703"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*checkerPool).forEachCheckerGroupDo.func1",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/checkerpool.go:483"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/core.(*singleThreadedWorkGroup).RunAndWait",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/core/workgroup.go:74"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*checkerPool).forEachCheckerGroupDo",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/checkerpool.go:488"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).collectCheckerDiagnosticsFromFiles",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:702"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).collectCheckerDiagnostics",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:684"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).GetSemanticDiagnostics",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:778"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil.compileFilesWithHost",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil/harnessutil.go:667"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil.CompileFilesEx",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil/harnessutil.go:256"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil.CompileFiles",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil/harnessutil.go:114"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testrunner.newCompilerTest",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testrunner/compiler_runner.go:329"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testrunner.TestPhase2Checker.func1",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testrunner/phase2_checker_test.go:189"
+      },
+      {
+        "function": "testing.tRunner",
+        "source": "testing/testing.go:2193"
+      },
+      {
+        "function": "created by testing.",
+        "source": "testing/testing.go:2258"
+      }
+    ]
+  },
+  {
+    "id": "conformance/types/mapped/recursiveMappedTypes.ts#configuration=0",
+    "phase": "PRE",
+    "site": "2313 current=[KindTypeReference 137 146] decl=[KindTypeOperator 191 206]",
+    "frames": [
+      {
+        "function": "runtime/debug.Stack",
+        "source": "runtime/debug/stack.go:26"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.c2EmitStack",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/c2_emit_stack.go:15"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getResolvedBaseConstraint",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:27824"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).hasNonCircularBaseConstraint",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:17367"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getConstraintOfTypeParameter",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:17360"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getConstraintTypeFromMappedType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23023"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromMappedTypeNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:24615"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNodeWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23230"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23150"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getDeclaredTypeOfTypeAlias",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:24198"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).tryGetDeclaredTypeOfSymbol",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:24027"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getDeclaredTypeOfSymbol",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:24013"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeAliasReference",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23935"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeReferenceType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23496"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeReference",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23356"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNodeWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23199"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23150"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkTypeReferenceOrImport",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:3043"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkTypeReferenceNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:3038"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElementWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2330"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElement",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2287"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkTypeOperator",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:3325"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElementWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2348"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElement",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2287"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkTypeParameter",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2652"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElementWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2312"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElement",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2287"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkMappedType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:3411"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElementWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2362"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElement",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2287"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkTypeAliasDeclaration",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:7062"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElementWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2406"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElement",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2287"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElements",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2277"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceFile",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2246"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getDiagnostics",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:14178"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).GetDiagnostics",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:14168"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).getBindAndCheckDiagnosticsWithChecker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:1469"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).getSemanticDiagnosticsWithChecker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:1453"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).collectCheckerDiagnosticsFromFiles.func1",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:703"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*checkerPool).forEachCheckerGroupDo.func1",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/checkerpool.go:483"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/core.(*singleThreadedWorkGroup).RunAndWait",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/core/workgroup.go:74"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*checkerPool).forEachCheckerGroupDo",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/checkerpool.go:488"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).collectCheckerDiagnosticsFromFiles",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:702"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).collectCheckerDiagnostics",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:684"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).GetSemanticDiagnostics",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:778"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil.compileFilesWithHost",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil/harnessutil.go:667"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil.CompileFilesEx",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil/harnessutil.go:256"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil.CompileFiles",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil/harnessutil.go:114"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testrunner.newCompilerTest",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testrunner/compiler_runner.go:329"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testrunner.TestPhase2Checker.func1",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testrunner/phase2_checker_test.go:189"
+      },
+      {
+        "function": "testing.tRunner",
+        "source": "testing/testing.go:2193"
+      },
+      {
+        "function": "created by testing.",
+        "source": "testing/testing.go:2258"
+      }
+    ]
+  },
+  {
+    "id": "conformance/types/mapped/recursiveMappedTypes.ts#configuration=0",
+    "phase": "PRE",
+    "site": "2615 current=[KindTypeReference 1620 1638] decl=<nil>",
+    "frames": [
+      {
+        "function": "runtime/debug.Stack",
+        "source": "runtime/debug/stack.go:26"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.c2EmitStack",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/c2_emit_stack.go:15"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeOfMappedSymbol",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:21332"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeOfSymbol",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:16801"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getPropertyTypeForIndexType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:27401"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getIndexedAccessTypeOrUndefined",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:27330"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getIndexedAccessTypeEx",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:27279"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).instantiateTypeWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:22611"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).instantiateTypeWithAlias",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:22478"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).instantiateType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:22443"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).instantiateMappedType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:22916"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getObjectTypeInstantiation",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:22722"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).instantiateTypeWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:22581"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).instantiateTypeWithAlias",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:22478"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeAliasInstantiation",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:24001"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeAliasReference",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23975"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeReferenceType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23496"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeReference",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23356"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNodeWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23199"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23150"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkTypeReferenceOrImport",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:3043"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkTypeReferenceNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:3038"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElementWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2330"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElement",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2287"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkVariableLikeDeclaration",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:5959"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkPropertyDeclaration",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2748"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkPropertySignature",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2762"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElementWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2318"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElement",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2287"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElements",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2277"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkInterfaceDeclaration",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:5112"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElementWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2404"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElement",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2287"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElements",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2277"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceFile",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2246"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getDiagnostics",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:14178"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).GetDiagnostics",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:14168"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).getBindAndCheckDiagnosticsWithChecker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:1469"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).getSemanticDiagnosticsWithChecker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:1453"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).collectCheckerDiagnosticsFromFiles.func1",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:703"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*checkerPool).forEachCheckerGroupDo.func1",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/checkerpool.go:483"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/core.(*singleThreadedWorkGroup).RunAndWait",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/core/workgroup.go:74"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*checkerPool).forEachCheckerGroupDo",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/checkerpool.go:488"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).collectCheckerDiagnosticsFromFiles",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:702"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).collectCheckerDiagnostics",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:684"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).GetSemanticDiagnostics",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:778"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil.compileFilesWithHost",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil/harnessutil.go:667"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil.CompileFilesEx",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil/harnessutil.go:256"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil.CompileFiles",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil/harnessutil.go:114"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testrunner.newCompilerTest",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testrunner/compiler_runner.go:329"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testrunner.TestPhase2Checker.func1",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testrunner/phase2_checker_test.go:189"
+      },
+      {
+        "function": "testing.tRunner",
+        "source": "testing/testing.go:2193"
+      },
+      {
+        "function": "created by testing.",
+        "source": "testing/testing.go:2258"
+      }
+    ]
+  },
+  {
+    "id": "conformance/types/mapped/recursiveMappedTypes.ts#configuration=0",
+    "phase": "EMIT",
+    "site": "2615 current=[KindIdentifier 1704 1706] decl=<nil>",
+    "frames": [
+      {
+        "function": "runtime/debug.Stack",
+        "source": "runtime/debug/stack.go:26"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.c2EmitStack",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/c2_emit_stack.go:15"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeOfMappedSymbol",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:21332"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeOfSymbol",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:16801"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getPropertyTypeForIndexType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:27401"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getIndexedAccessTypeOrUndefined",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:27330"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getIndexedAccessTypeEx",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:27279"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).instantiateTypeWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:22611"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).instantiateTypeWithAlias",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:22478"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).instantiateType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:22443"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).instantiateMappedType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:22916"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getObjectTypeInstantiation",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:22722"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).instantiateTypeWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:22581"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).instantiateTypeWithAlias",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:22478"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeAliasInstantiation",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:24001"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeAliasReference",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23975"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeReferenceType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23496"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeReference",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23356"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNodeWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23199"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23150"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getDeclaredTypeOfTypeAlias",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:24198"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).tryGetDeclaredTypeOfSymbol",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:24027"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getDeclaredTypeOfSymbol",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:24013"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeAliasReference",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23935"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeReferenceType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23496"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeReference",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23356"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNodeWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23199"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23150"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).tryGetTypeFromTypeNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23144"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeForVariableLikeDeclaration",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:16977"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getWidenedTypeForVariableLikeDeclaration",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:16948"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeOfVariableOrParameterOrPropertyWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:16910"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeOfVariableOrParameterOrProperty",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:16847"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeOfSymbol",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:16810"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getNarrowedTypeOfSymbol",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:13940"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkIdentifier",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:11256"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkExpressionWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:7899"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkExpressionEx",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:7729"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkExpressionCachedEx",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:7695"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkExpressionCached",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:7679"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).markPropertyAliasReferenced",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:28793"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).markLinkedReferences",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:28672"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*EmitResolver).MarkLinkedReferencesRecursively.func1",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/emitresolver.go:824"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.visit",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast.go:33"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*ExpressionStatement).ForEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast_generated.go:1588"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*Node).ForEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast_generated.go:8732"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*EmitResolver).MarkLinkedReferencesRecursively.func1",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/emitresolver.go:825"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.visitNodes",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast.go:40"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.visitNodeList",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast.go:49"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*SourceFile).ForEachChild",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/ast.go:2781"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*EmitResolver).MarkLinkedReferencesRecursively",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/emitresolver.go:828"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/transformers/tstransforms.(*ImportElisionTransformer).visit",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/transformers/tstransforms/importelision.go:29"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*NodeVisitor).VisitNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/visitor.go:51"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/ast.(*NodeVisitor).VisitSourceFile",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/ast/visitor.go:36"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/transformers.(*Transformer).TransformSourceFile",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/transformers/transformer.go:40"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*emitter).runScriptTransformers",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/emitter.go:73"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*emitter).emitJSFile",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/emitter.go:200"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*emitter).emit",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/emitter.go:50"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).Emit.func2",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:1854"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/core.(*singleThreadedWorkGroup).RunAndWait",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/core/workgroup.go:74"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).Emit",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:1863"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil.compileFilesWithHost",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil/harnessutil.go:679"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil.CompileFilesEx",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil/harnessutil.go:256"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil.CompileFiles",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil/harnessutil.go:114"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testrunner.newCompilerTest",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testrunner/compiler_runner.go:329"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testrunner.TestPhase2Checker.func1",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testrunner/phase2_checker_test.go:189"
+      },
+      {
+        "function": "testing.tRunner",
+        "source": "testing/testing.go:2193"
+      },
+      {
+        "function": "created by testing.",
+        "source": "testing/testing.go:2258"
+      }
+    ]
+  },
+  {
+    "id": "conformance/types/mapped/recursiveMappedTypes.ts#configuration=0",
+    "phase": "POST",
+    "site": "2313 current=[KindTypeReference 79 87] decl=[KindTypeOperator 73 87]",
+    "frames": [
+      {
+        "function": "runtime/debug.Stack",
+        "source": "runtime/debug/stack.go:26"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.c2EmitStack",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/c2_emit_stack.go:15"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getResolvedBaseConstraint",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:27824"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).hasNonCircularBaseConstraint",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:17367"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getConstraintOfTypeParameter",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:17360"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getConstraintTypeFromMappedType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23023"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromMappedTypeNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:24615"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNodeWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23230"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23150"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getDeclaredTypeOfTypeAlias",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:24198"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).tryGetDeclaredTypeOfSymbol",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:24027"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getDeclaredTypeOfSymbol",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:24013"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeAliasReference",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23935"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeReferenceType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23496"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeReference",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23356"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNodeWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23199"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23150"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkTypeReferenceOrImport",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:3043"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkTypeReferenceNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:3038"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElementWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2330"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElement",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2287"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkTypeOperator",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:3325"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElementWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2348"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElement",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2287"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkTypeParameter",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2652"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElementWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2312"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElement",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2287"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkMappedType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:3411"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElementWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2362"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElement",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2287"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkTypeAliasDeclaration",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:7062"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElementWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2406"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElement",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2287"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElements",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2277"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceFile",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2246"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getDiagnostics",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:14178"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).GetDiagnostics",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:14168"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).getBindAndCheckDiagnosticsWithChecker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:1469"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).getSemanticDiagnosticsWithChecker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:1453"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).collectCheckerDiagnosticsFromFiles.func1",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:703"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*checkerPool).forEachCheckerGroupDo.func1",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/checkerpool.go:483"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/core.(*singleThreadedWorkGroup).RunAndWait",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/core/workgroup.go:74"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*checkerPool).forEachCheckerGroupDo",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/checkerpool.go:488"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).collectCheckerDiagnosticsFromFiles",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:702"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).collectCheckerDiagnostics",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:684"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).GetSemanticDiagnostics",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:778"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil.compileFilesWithHost",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil/harnessutil.go:685"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil.CompileFilesEx",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil/harnessutil.go:256"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil.CompileFiles",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil/harnessutil.go:114"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testrunner.newCompilerTest",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testrunner/compiler_runner.go:329"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testrunner.TestPhase2Checker.func1",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testrunner/phase2_checker_test.go:189"
+      },
+      {
+        "function": "testing.tRunner",
+        "source": "testing/testing.go:2193"
+      },
+      {
+        "function": "created by testing.",
+        "source": "testing/testing.go:2258"
+      }
+    ]
+  },
+  {
+    "id": "conformance/types/mapped/recursiveMappedTypes.ts#configuration=0",
+    "phase": "POST",
+    "site": "2313 current=[KindTypeReference 137 146] decl=[KindTypeOperator 131 146]",
+    "frames": [
+      {
+        "function": "runtime/debug.Stack",
+        "source": "runtime/debug/stack.go:26"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.c2EmitStack",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/c2_emit_stack.go:15"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getResolvedBaseConstraint",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:27824"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).hasNonCircularBaseConstraint",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:17367"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getConstraintOfTypeParameter",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:17360"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getConstraintTypeFromMappedType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23023"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromMappedTypeNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:24615"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNodeWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23230"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23150"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getDeclaredTypeOfTypeAlias",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:24198"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).tryGetDeclaredTypeOfSymbol",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:24027"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getDeclaredTypeOfSymbol",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:24013"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeAliasReference",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23935"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeReferenceType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23496"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeReference",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23356"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNodeWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23199"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23150"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeOperatorNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23308"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNodeWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23224"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23150"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getConstraintFromTypeParameter",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:17384"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).computeBaseConstraint",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:27845"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getResolvedBaseConstraint",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:27818"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).hasNonCircularBaseConstraint",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:17367"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getConstraintOfTypeParameter",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:17360"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getConstraintTypeFromMappedType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23023"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromMappedTypeNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:24615"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNodeWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23230"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23150"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getDeclaredTypeOfTypeAlias",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:24198"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).tryGetDeclaredTypeOfSymbol",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:24027"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getDeclaredTypeOfSymbol",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:24013"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeAliasReference",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23935"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeReferenceType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23496"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeReference",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23356"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNodeWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23199"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23150"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkTypeReferenceOrImport",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:3043"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkTypeReferenceNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:3038"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElementWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2330"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElement",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2287"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkTypeOperator",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:3325"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElementWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2348"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElement",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2287"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkTypeParameter",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2652"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElementWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2312"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElement",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2287"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkMappedType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:3411"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElementWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2362"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElement",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2287"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkTypeAliasDeclaration",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:7062"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElementWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2406"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElement",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2287"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElements",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2277"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceFile",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2246"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getDiagnostics",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:14178"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).GetDiagnostics",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:14168"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).getBindAndCheckDiagnosticsWithChecker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:1469"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).getSemanticDiagnosticsWithChecker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:1453"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).collectCheckerDiagnosticsFromFiles.func1",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:703"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*checkerPool).forEachCheckerGroupDo.func1",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/checkerpool.go:483"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/core.(*singleThreadedWorkGroup).RunAndWait",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/core/workgroup.go:74"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*checkerPool).forEachCheckerGroupDo",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/checkerpool.go:488"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).collectCheckerDiagnosticsFromFiles",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:702"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).collectCheckerDiagnostics",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:684"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).GetSemanticDiagnostics",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:778"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil.compileFilesWithHost",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil/harnessutil.go:685"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil.CompileFilesEx",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil/harnessutil.go:256"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil.CompileFiles",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil/harnessutil.go:114"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testrunner.newCompilerTest",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testrunner/compiler_runner.go:329"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testrunner.TestPhase2Checker.func1",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testrunner/phase2_checker_test.go:189"
+      },
+      {
+        "function": "testing.tRunner",
+        "source": "testing/testing.go:2193"
+      },
+      {
+        "function": "created by testing.",
+        "source": "testing/testing.go:2258"
+      }
+    ]
+  },
+  {
+    "id": "conformance/types/mapped/recursiveMappedTypes.ts#configuration=0",
+    "phase": "POST",
+    "site": "2313 current=[KindTypeReference 137 146] decl=[KindTypeOperator 191 206]",
+    "frames": [
+      {
+        "function": "runtime/debug.Stack",
+        "source": "runtime/debug/stack.go:26"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.c2EmitStack",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/c2_emit_stack.go:15"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getResolvedBaseConstraint",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:27824"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).hasNonCircularBaseConstraint",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:17367"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getConstraintOfTypeParameter",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:17360"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getConstraintTypeFromMappedType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23023"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromMappedTypeNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:24615"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNodeWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23230"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23150"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getDeclaredTypeOfTypeAlias",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:24198"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).tryGetDeclaredTypeOfSymbol",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:24027"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getDeclaredTypeOfSymbol",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:24013"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeAliasReference",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23935"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeReferenceType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23496"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeReference",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23356"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNodeWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23199"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:23150"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkTypeReferenceOrImport",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:3043"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkTypeReferenceNode",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:3038"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElementWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2330"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElement",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2287"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkTypeOperator",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:3325"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElementWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2348"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElement",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2287"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkTypeParameter",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2652"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElementWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2312"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElement",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2287"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkMappedType",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:3411"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElementWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2362"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElement",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2287"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkTypeAliasDeclaration",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:7062"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElementWorker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2406"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElement",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2287"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceElements",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2277"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).checkSourceFile",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:2246"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getDiagnostics",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:14178"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).GetDiagnostics",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/checker/checker.go:14168"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).getBindAndCheckDiagnosticsWithChecker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:1469"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).getSemanticDiagnosticsWithChecker",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:1453"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).collectCheckerDiagnosticsFromFiles.func1",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:703"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*checkerPool).forEachCheckerGroupDo.func1",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/checkerpool.go:483"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/core.(*singleThreadedWorkGroup).RunAndWait",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/core/workgroup.go:74"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*checkerPool).forEachCheckerGroupDo",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/checkerpool.go:488"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).collectCheckerDiagnosticsFromFiles",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:702"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).collectCheckerDiagnostics",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:684"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/compiler.(*Program).GetSemanticDiagnostics",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/compiler/program.go:778"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil.compileFilesWithHost",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil/harnessutil.go:685"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil.CompileFilesEx",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil/harnessutil.go:256"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil.CompileFiles",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil/harnessutil.go:114"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testrunner.newCompilerTest",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testrunner/compiler_runner.go:329"
+      },
+      {
+        "function": "github.com/microsoft/TypeScript/tsc/internal/testrunner.TestPhase2Checker.func1",
+        "source": "github.com/microsoft/TypeScript/tsc/internal/testrunner/phase2_checker_test.go:189"
+      },
+      {
+        "function": "testing.tRunner",
+        "source": "testing/testing.go:2193"
+      },
+      {
+        "function": "created by testing.",
+        "source": "testing/testing.go:2258"
+      }
+    ]
+  }
+]

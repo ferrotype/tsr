@@ -1,0 +1,48 @@
+{
+ "artifacts": {
+  "contracts": {
+   "path": "data/phase2/receipts/c2-contracts.json",
+   "sha256": "ac91872a3ed281135a6df66419af327dca429185203979842620af7def27ab8f"
+  },
+  "obligations": {
+   "path": "target/s08/c2-exit-obligations-01/obligations/capture.json",
+   "sha256": "f51a928a1f9cbac462fd13fd6b5ecccf423726c817381afd637b2e2c5dab60a4"
+  },
+  "order_debug": {
+   "path": "target/phase2/order-trace/c2-exit-debug-capture-01/capture.json",
+   "sha256": "e94b06fed1975b369e0e0afd6ee1d163a5fcea461502f4d87faaa994f22b10ed"
+  },
+  "order_release": {
+   "path": "target/phase2/order-trace/c2-exit-release-capture-01/capture.json",
+   "sha256": "005134196c140c71dfc793195a8e31cdaefa87bf5a69f267023d32e3cbb1d8c7"
+  },
+  "relater_build": {
+   "path": "target/s08/c2-exit-relater-01/build.json",
+   "sha256": "4487b710f3a3fb2b61d1dce5f177fdac386ad81e2ae81cdcf31e1490cc489784"
+  },
+  "relater_parity": {
+   "path": "target/s08/c2-exit-relater-01/parity.json",
+   "sha256": "009a790e311119c0d7426934d9c7f4c9f1f605ad57ab90afc8fd4972146df0fd"
+  }
+ },
+ "head": "35661af",
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "results": {
+  "comparators": true,
+  "contracts_debug": 16,
+  "contracts_release": 16,
+  "ledger_validate": true,
+  "order_witnesses_debug": 4,
+  "order_witnesses_release": 4,
+  "phase2_python_subtests": 115,
+  "phase2_python_tests": 133,
+  "recursion_fixtures": true,
+  "relater_id_groups_matched": 105,
+  "relater_reference_groups_matched": 105,
+  "tracing_preserves_output": true,
+  "workspace_clippy_deny_warnings": true,
+  "workspace_fmt": true
+ },
+ "scope": "Required current-source correctness and diagnostic witnesses. Relater runs establish strict parity only; no relater timing or memory comparison is claimed. Raw captures are retained at the recorded paths.",
+ "version": 1
+}

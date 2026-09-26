@@ -389,3 +389,53 @@ using the native ancestor search.
 
 These are focused results. The final current-source full corpus and exit
 receipts below, when recorded, remain the acceptance authority.
+
+
+## Full correctness exit at `35661af`
+
+The fresh `target/phase2/c2-exit-01` run completed all 13,432 variants with
+unchanged sources, no timeout or execution failure, and no harness error.
+12,647 match every enabled domain. All 9,367 S08 regression variants remain
+full matches; no previously matching domain regressed against reviewed C1.
+The complete comparison is retained in `data/phase2/c2-exit-comparison.json.gz`.
+
+C2 has 2,951 fully matching rows and three errors-only differences. Native
+stacks prove that these three are caused by missing JavaScript emit callers:
+constant-enum inlining for `incorrectRecursiveMappedTypeConstraint`, and import
+elision for `typeParameterWithInvalidConstraintType` and `recursiveMappedTypes`.
+The native harness creates separate programs for pre- and post-emit diagnostics;
+the latter runs JavaScript transforms before semantic diagnostics. Rust matches
+the pre-emit results. The exact operations, 14 diagnostic-production stacks,
+retained pre/post output and reproducer are in
+[`c2-emit-handoffs`](../data/phase2/c2-emit-handoffs/README.md).
+
+The claims close 188 baseline-open rows and bind three C5 handoffs to the
+current request, full raw observation and capture hashes. These handoffs do
+not accept or erase the raw differences. The rebuilt blocker register has
+no remaining C2-owned entry. C3 has 15 open rows and C4 has 767.
+
+All 16 C2 contract tests pass in both debug and release. Their current-source
+receipt is `data/phase2/receipts/c2-contracts.json`. The 133 Phase 2 Python tests
+and 115 subtests pass; clippy with warnings denied passes for the four changed
+production crates and their targets/features. Remaining runtime/measurement
+receipts are recorded separately as they finish; this subsection does not
+claim `c2_complete` before those authorities exist.
+
+
+The remaining correctness witnesses have now passed on the same source bytes:
+E2 comparator/recursion obligations, all 105 production and 105 reference
+relater groups (including creation/cache state and structured diagnostics), and
+all four standalone creation-order witnesses in both debug and release.
+Ordinary, instrumented-but-disabled and enabled tracing preserve output.
+`data/phase2/c2-runtime.json` binds the retained artifacts. Workspace formatting
+and clippy with warnings denied pass, as do the final 133 Phase 2 Python tests
+and 115 subtests after recording the exit data.
+
+The checker producer now reports `c2_open = 0`, `c2_regressions = 0`,
+`c2_failures = 0`, `c2_blockers_open = 0`, `c2_handoffs = 3`,
+`c2_audit_complete = true` and `c2_contracts = true`. At this checkpoint,
+`c2_measured` and therefore `c2_complete` are still false until the required
+current-source checkerbench capture is verified and recorded. No performance
+threshold is changed or inferred from the correctness capture.
+
+Ledger validation also passes on this recorded correctness checkpoint.
