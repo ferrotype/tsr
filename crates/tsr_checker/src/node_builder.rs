@@ -22,6 +22,9 @@ use tsr_printer::{emit_flags, EmitContext};
 mod accessibility;
 #[path = "node_builder_emit.rs"]
 mod declaration_emit;
+#[cfg(test)]
+#[path = "node_builder_elision_tests.rs"]
+mod elision_tests;
 #[path = "node_builder_extra.rs"]
 mod extra;
 #[path = "node_builder_names.rs"]
@@ -422,14 +425,29 @@ impl<'a> NodeBuilder<'a> {
         self.truncating
     }
 
-    fn elision(&mut self, text: &[u8]) -> Result<NodeId, Error> {
-        if self.flags & nf::NO_TRUNCATION != 0 {
-            return Err(Error::Unsupported(
-                "node builder synthetic elision comments",
-            ));
+    fn elision(&mut self, remaining: Option<usize>) -> NodeId {
+        let no_truncation = self.flags & nf::NO_TRUNCATION != 0;
+        let text = match (remaining, no_truncation) {
+            (None, false) => JsString::from_bytes(b"...".as_slice()),
+            (None, true) => JsString::from_bytes(b"elided".as_slice()),
+            (Some(count), false) => {
+                JsString::from_bytes(format!("... {count} more ...").as_bytes())
+            }
+            (Some(count), true) => {
+                JsString::from_bytes(format!("... {count} more elided ...").as_bytes())
+            }
+        };
+        if no_truncation {
+            let node = self.ast.new_keyword_type_node(K::AnyKeyword.into());
+            return self.emit.add_synthetic_leading_comment(
+                node,
+                K::MultiLineCommentTrivia,
+                text,
+                false,
+            );
         }
-        let name = self.ast.new_identifier(JsString::from_bytes(text));
-        Ok(self.ast.new_type_reference_node(Some(name), None))
+        let name = self.ast.new_identifier(text);
+        self.ast.new_type_reference_node(Some(name), None)
     }
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.mapToTypeNodes
@@ -445,14 +463,13 @@ impl<'a> NodeBuilder<'a> {
         }
         if self.check_truncation() {
             if !bare {
-                let node = self.elision(b"...")?;
+                let node = self.elision(None);
                 return Ok(vec![node]);
             }
             if types.len() > 2 {
                 let first = self.type_node(types[0])?;
                 let last = self.type_node(types[types.len() - 1])?;
-                let elision =
-                    self.elision(format!("... {} more ...", types.len() - 2).as_bytes())?;
+                let elision = self.elision(Some(types.len() - 2));
                 return Ok(vec![first, elision, last]);
             }
         }
@@ -465,11 +482,7 @@ impl<'a> NodeBuilder<'a> {
         for (index, &ty) in types.iter().enumerate() {
             let display_index = index + 1;
             if self.check_truncation() && display_index + 2 < types.len().saturating_sub(1) {
-                nodes.push(
-                    self.elision(
-                        format!("... {} more ...", types.len() - display_index).as_bytes(),
-                    )?,
-                );
+                nodes.push(self.elision(Some(types.len() - display_index)));
                 nodes.push(self.type_node(types[types.len() - 1])?);
                 break;
             }
@@ -1009,21 +1022,10 @@ impl<'a> NodeBuilder<'a> {
             .new_property_signature_declaration(None, Some(name), None, None, None))
     }
 
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.createElidedInformationPlaceholder
     fn elided_type(&mut self) -> NodeId {
         self.approximate_length += 3;
-        if self.flags & nf::NO_TRUNCATION != 0 {
-            let node = self.ast.new_keyword_type_node(K::AnyKeyword.into());
-            return self.emit.add_synthetic_leading_comment(
-                node,
-                K::MultiLineCommentTrivia,
-                JsString::from_bytes(b"elided".as_slice()),
-                false,
-            );
-        }
-        let name = self
-            .ast
-            .new_identifier(JsString::from_bytes(b"...".as_slice()));
-        self.ast.new_type_reference_node(Some(name), None)
+        self.elision(None)
     }
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.createTypeNodesFromResolvedType

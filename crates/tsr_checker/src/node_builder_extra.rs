@@ -96,7 +96,7 @@ impl NodeBuilder<'_> {
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.conditionalTypeToTypeNode
     pub(super) fn conditional_type_node(&mut self, ty: TypeId) -> Result<NodeId, Error> {
         if self.check_truncation() {
-            return self.elision(b"...");
+            return Ok(self.elided_type());
         }
         let data = *self.checker.types.conditional(ty)?;
         let root = self.checker.conditional_root(data.root)?.clone();
@@ -184,8 +184,8 @@ impl NodeBuilder<'_> {
         self.infer_parameters = previous;
         let extends = extends?;
         let yes = self.checker.conditional_true_type(ty, false)?;
-        let no = self.checker.conditional_false_type(ty)?;
         let yes = self.type_node_or_circularity_elision(yes)?;
+        let no = self.checker.conditional_false_type(ty)?;
         let no = self.type_node_or_circularity_elision(no)?;
         Ok(self
             .ast
