@@ -495,11 +495,17 @@ impl CheckerState {
     ) -> Result<TypeId, Error> {
         let record = *self.types.get(ty)?;
         let deferred = record.object_flags & of::REFERENCE != 0;
+        let instantiation_expression = record.object_flags & of::INSTANTIATION_EXPRESSION_TYPE != 0;
         let declaration = if deferred {
             self.types
                 .type_reference(ty)?
                 .node
                 .ok_or(Error::MissingLink("deferred reference node"))?
+        } else if instantiation_expression {
+            self.types
+                .instantiation_expression(ty)?
+                .node
+                .ok_or(Error::MissingLink("instantiation expression node"))?
         } else {
             let symbol = record
                 .symbol
@@ -538,7 +544,7 @@ impl CheckerState {
             for &parameter in outer.iter() {
                 let mut referenced = has_alias_arguments;
                 if !referenced {
-                    if deferred {
+                    if deferred || instantiation_expression {
                         referenced =
                             self.type_parameter_possibly_referenced(parameter, declaration)?;
                     } else if let Some(symbol) = record.symbol {
@@ -633,6 +639,10 @@ impl CheckerState {
                     | of::INSTANTIATED,
                 target_record.symbol,
             )?;
+            if target_record.object_flags & of::INSTANTIATION_EXPRESSION_TYPE != 0 {
+                self.types.instantiation_expression_mut(result)?.node =
+                    self.types.instantiation_expression(target)?.node;
+            }
             self.types.get_mut(result)?.alias = alias;
             if let Some(alias) = self.types.alias_of(result)?.cloned() {
                 let propagating = self.get_propagating_flags_of_types(&alias.type_arguments, 0)?;
