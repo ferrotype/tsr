@@ -50,7 +50,7 @@ nothing.
 | Mapping state | `inference.go` 39 of 77 marked, `mapper.go` 9 of 36, `checker.go` 1,025 of 1,504 with 118 unmarked functions whose names fall in C2's areas; the ledger `rust` lists of `inference.go` and `mapper.go` are empty (`status = planned`) while the modules exist | the per-file audit input of C2.1; mapping gaps to separate from real gaps |
 | The C1 fixes that already touched C2 territory | distributive conditional constraints use `someType`; base constraints are computed over the simplified type; nested conditional constraints stop at 100 levels; a permissive-wildcard inference has no default; the canonical target signature; conditional-target and mapped-target relations never report | done; C2 does not redo them |
 | Limits already in place | `instantiate.rs`: depth 100 or 5,000,000 instantiations report `Type_instantiation_is_excessively_deep_and_possibly_infinite` at the current node; `constraints.rs`: the 100-level conditional constraint bound; `union_reduction.rs`: the union-size error at the pin's cross-product estimate | witnesses to add, not code to write |
-| ADR 0010 assets | the ported comparators (`CompareTypes`, `compareSymbols`, `compareNodes`, `CompareDiagnostics`); the S08 P3 comparator replay (`scripts/s08_p3_comparators.py`: 8 residual families, 7 union matrices, 77 exact permutations); the union-ordering sub-test over every interned union (C0.7) | the fixtures C2 retains; the sub-test the trace mode complements |
+| ADR 0010 assets | the ported comparators (`CompareTypes`, `compareSymbols`, `compareNodes`, `CompareDiagnostics`); the S08 P3 comparator replay (`scripts/s08_p3_comparators.py`, run by the E2 obligations: 8 residual families, 7 union matrices, 77 exact permutations); the union-ordering sub-test over every interned union (C0.7) | the fixtures C2 retains; the sub-test the trace mode complements |
 | Measurement producers | `[checkerbench]` (`scripts/s08_checkerbench.py`: elapsed time and the type footprint over the S08 workload on the quiet host), `[e5]`/`[e6]` (peak RSS) | the capture C2's exit records once, without a threshold |
 | Direct tests | `crates/tsr_compiler/tests/c1_contracts.rs` (7 contracts, feature `relation-probe`), `checker_semantics.rs`, `checker_display.rs`, `checker_dynamic_imports.rs`; 44 direct tests in `tsr_checker` | the homes C2.11 adds to |
 | Pin tracing | the harness overlay build (`phase2_native.build_oracle`) and one-row shard (`run_shard`) accept an instrumented `upstream/tsc` checkout; the `tsgo` CLI skips semantic diagnostics when global diagnostics exist, so noLib rows are traced through the harness | the attribution method of C2.1 (a `PrintStack` or `println` in the pin, one row, `go.stderr`) |
@@ -404,8 +404,9 @@ authority, and the counts are the marker state at the C1 head.
 
 - Exists: the instantiation depth and count limits, the conditional constraint
   bound and the union-size estimate (section 2); the ported comparators; the
-  S08 P3 comparator replay; the union-ordering sub-test. No creation-trace
-  mode exists in `crates/`, `scripts/` or `xtask/` (plan review finding 5).
+  S08 P3 comparator replay inside the E2 obligations; the union-ordering
+  sub-test. No creation-trace mode exists in `crates/`, `scripts/` or
+  `xtask/` (plan review finding 5, resolution 6).
 - Build, limits: a direct case per limit with the pin's exact diagnostic,
   node and result type, compared with a native observation of the same
   program (instantiation depth, instantiation count, conditional constraint
@@ -427,7 +428,8 @@ authority, and the counts are the marker state at the C1 head.
   requirement, which stands unless the owner amends ADR 0010 (decision 3).
 - Exit: the limit cases pass in debug and release; both residual cases have a
   program that creates them, a native trace, a Rust trace and an equal
-  observed ordering; `s08_p3_comparators.py` replays at 8 families, 7
+  observed ordering; the E2 obligations replay (`scripts/s08_e2.py
+  obligations`, which imports the P3 comparator) reports 8 families, 7
   matrices and 77 permutations.
 
 ### C2.11 Direct contracts
@@ -547,7 +549,7 @@ python3 scripts/phase2_blockers.py build --native target/phase2/native --rust ta
 python3 scripts/phase2_audit.py check --audit data/phase2/c2-audit.json
 cargo test -p tsr_compiler --features relation-probe,creation-trace --test c2_contracts --locked && cargo test -p tsr_compiler --features relation-probe,creation-trace --test c2_contracts --locked --release
 python3 scripts/phase2_producers.py observe --witness c2-contracts           # the receipt, with source binding
-python3 scripts/s08_p3_comparators.py replay                                   # 8 residual families, 7 matrices, 77 permutations
+python3 scripts/s08_e2.py obligations --output target/s08/e2-c2               # the P3 comparator replay: 8 residual families, 7 matrices, 77 permutations
 python3 scripts/s08_relater.py build  --output target/s08/relater-c2
 python3 scripts/s08_relater.py parity --output target/s08/relater-c2         # 105/105, all_cases_match true, both implementations
 python3 scripts/phase2_producers.py checker            # c2_open 0, c2_regressions 0, c2_failures 0, c2_blockers_open 0, c2_audit_complete, c2_contracts, c2_measured, c2_complete; c2_handoffs reported
@@ -559,8 +561,8 @@ cargo xtask validate && cargo xtask check P2B                                 # 
 `scripts/s08_checkerbench.py capture` on the quiet host, `cargo xtask run
 checker` and `cargo xtask status --record` are the owner's. `check P2B` cannot
 pass before C7 by construction; the C2 assertion is the `P2B-C2` line of its
-report and the metrics above. The exact `s08_p3_comparators.py` replay
-subcommand is taken from the script at C2.10, which retains its record.
+report and the metrics above. The E2 obligations replay runs against a
+scratch output; the recorded `e2` run stays the owner's.
 
 ## 8. Evidence reuse rules
 
