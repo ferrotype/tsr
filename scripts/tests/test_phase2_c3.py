@@ -97,26 +97,33 @@ class ExitMetrics(MetricsFixture, unittest.TestCase):
 
 class Rebind(unittest.TestCase):
     def test_rebind_rewrites_current_bindings_and_reports_uncovered_rows(self):
+        def handoff(domains, request, observation):
+            return {"domains": domains, "trace": {"path": "t", "sha256": None}, "capture_sha256": "r" * 64,
+                    "request_sha256": request, "raw_observation_sha256": observation}
         claims = {"version": 1, "rust_capture_sha256": "r" * 64, "rows": [
-            {"id": "a", "status": "blocked", "handoff": {"domains": ["errors"], "trace": {"path": "t", "sha256": None},
-                                                         "capture_sha256": "r" * 64, "request_sha256": "x", "raw_observation_sha256": "y"}},
-            {"id": "b", "status": "handed", "handoff": {"domains": ["types"], "trace": {"path": "t", "sha256": None},
-                                                        "capture_sha256": "r" * 64, "request_sha256": "x", "raw_observation_sha256": "y"}},
-            {"id": "c", "status": "closed", "commit": "abcdef1"}]}
-        current = comparison([row("a", errors="unsupported"), row("b", errors="different"), row("c")],
-                             rust_capture_sha256="n" * 64)
-        digests = {vid: {"request_sha256": vid + "req", "raw_observation_sha256": vid + "raw"} for vid in "abc"}
+            {"id": "a", "status": "blocked", "handoff": handoff(["errors"], "areq", "araw")},
+            {"id": "b", "status": "handed", "handoff": handoff(["types"], "breq", "braw")},
+            {"id": "c", "status": "closed", "commit": "abcdef1"},
+            {"id": "d", "status": "handed", "handoff": handoff(["errors"], "dreq", "old")}]}
+        current = comparison([row("a", errors="unsupported"), row("b", errors="different"), row("c"),
+                              row("d", errors="different")], rust_capture_sha256="n" * 64)
+        digests = {vid: {"request_sha256": vid + "req", "raw_observation_sha256": vid + "raw"} for vid in "abcd"}
         import tempfile
         with tempfile.TemporaryDirectory() as directory:
             trace = Path(directory) / "t"
             trace.write_bytes(b"trace")
-            for entry in claims["rows"][:2]:
-                entry["handoff"]["trace"]["sha256"] = blockers.digest(b"trace")
-            stale = claims_module.rebind(claims, current, "n" * 64, digests, root=Path(directory))
-        self.assertEqual(stale, ["b"])
+            for entry in claims["rows"]:
+                if "handoff" in entry:
+                    entry["handoff"]["trace"]["sha256"] = blockers.digest(b"trace")
+            result = claims_module.rebind(claims, current, "n" * 64, digests, root=Path(directory))
+        # a: unchanged observation, still covered: rebound. b: no longer covered.
+        # d: covered, but its observation changed: fresh attribution, no rebind.
+        self.assertEqual(result, {"stale": ["b"], "changed": ["d"]})
         self.assertEqual(claims["rows"][0]["handoff"]["capture_sha256"], "n" * 64)
-        self.assertEqual(claims["rows"][0]["handoff"]["request_sha256"], "areq")
+        self.assertEqual(claims["rows"][0]["handoff"]["raw_observation_sha256"], "araw")
         self.assertEqual(claims["rows"][1]["handoff"]["capture_sha256"], "r" * 64)
+        self.assertEqual(claims["rows"][3]["handoff"]["capture_sha256"], "r" * 64)
+        self.assertEqual(claims["rows"][3]["handoff"]["raw_observation_sha256"], "old")
         # The file's own binding names the checkpoint's start capture and stays.
         self.assertEqual(claims["rust_capture_sha256"], "r" * 64)
         with self.assertRaises(ValueError):
