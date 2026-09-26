@@ -637,6 +637,38 @@
    "bucket": "panic: tsr_ast::factory",
    "evidence": "2026-09-26 single captured-executable LLDB replay: declaration_diagnostics_with_checker -> transform_declarations -> module_declaration -> late_statements (statements.rs:113) -> Factory::node (factory.rs:122), WrongOwner. See docs/PHASE2-C1.md and data/phase2/c1-review/augmentation-stack.txt. Traced declaration-transform retention is C5, not an assumed node-builder or C1 relation defect.",
    "go": "tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.transformAndReplaceLatePaintedStatements",
+   "handoff": {
+    "capture_sha256": "b6b7ceb630ff3eb9f410284b76768482bf22a873786b81e39257f7fb0d6ab46a",
+    "domains": [
+     "display",
+     "errors",
+     "parent_pointers",
+     "symbols",
+     "types",
+     "union_ordering"
+    ],
+    "failure_site": "crates/tsr_ast/src/factory.rs:122",
+    "go": "tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.transformAndReplaceLatePaintedStatements",
+    "kind": "failed",
+    "owner": "C5",
+    "raw_observation_sha256": "34729700daa38e6d831a353ff5209d3361da9d5559d2c274e7a907141aeb3965",
+    "reproduce": [
+     "python3",
+     "scripts/phase2_corpus.py",
+     "run",
+     "--native",
+     "target/phase2/native",
+     "--output",
+     "<fresh-output>",
+     "--case",
+     "compiler/declarationEmitAugmentationUsesCorrectSourceFile.ts#configuration=0"
+    ],
+    "request_sha256": "735cde3174991477ad4df5a71d9ea1a70995249696a2e33a2a366a86fdd6fafe",
+    "trace": {
+     "path": "data/phase2/c1-review/augmentation-stack.txt",
+     "sha256": "3b1704e5ece91d2981a64fe8c3d23ed64ac7dd2cc230a54c7f7ea05642787907"
+    }
+   },
    "id": "compiler/declarationEmitAugmentationUsesCorrectSourceFile.ts#configuration=0",
    "mechanism": "Declaration-transform late visibility processing reads a declaration from another retained program source through the output builder, which initially retains only the emitted source. The failing factory access is in Transformer::late_statements, before the type/symbol walker.",
    "owner": "C5",

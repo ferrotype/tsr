@@ -37,6 +37,44 @@ worksheet is not a complete C2 function audit or an exit claim.
   rows. The full function audit grows with the implementation; an attributed
   small refusal fix can proceed before every unrelated row is understood.
 
+## Posted PR #62 review (head `61140fd`)
+
+Reviewed every finding against the scripts, current contract and pin:
+
+- The `result_recorded` mismatch and repeated capture move were valid at the
+  reviewed head. The C1 fixes already separate acceptance from optional
+  comparison history and preserve captures. `--previous --record` remains
+  supported; the reviewed full C1 record reports `result_recorded: true`.
+- Blocker handoffs must survive rebuilding. C2.12 now requires validated
+  per-variant/cause/domain ownership, stable operation identities rather than
+  B-numbers, and retention of mixed groups' unresolved C2 shares. This builder
+  change is scheduled work, not implemented by editing the register.
+- Failure accounting covers every C2 claim, including failures in AST/arena
+  code. Exemptions bind the full raw observation, failure site, request and
+  traced artifact. A changed failure or uncovered domain reopens the row.
+- The exit table now requires all seven applicable domains and the underlying
+  capture-integrity predicates. Declaration diagnostics belong to `errors`;
+  there is no separate declarations domain to exclude.
+- Receipts bind embedded assets as well as dependency sources, manifests,
+  configuration, lockfile and toolchain. This reuses the repaired C1 closure.
+  The variance handoff and fixed package-metadata row retain their established
+  owners. All three B09 rows are inventory-C2, with the emit cause owned by C5.
+- Creation tracing must observe actual fallback branches, actual birth
+  origins and natural semantic-ID assignment separately. Go symbol IDs are
+  lazy: requesting one for logging would change the result. Equal first
+  declarations also reach the symbol fallback. A separately fingerprinted
+  diagnostic overlay can instrument these sites without modifying the pin or
+  invalidating the canonical native capture. If canonical inputs do change,
+  fresh capture/verification and explicit contract equivalence are required.
+- Complexity witnesses name `removeSubtypes` and `checkCrossProductUnion`,
+  including their callers. The depth contract must prove the actual limit,
+  avoid identity shortcuts, compare native diagnostics/results, execute on a
+  grown stack and answer a later query in debug and release.
+
+The accepted comparator policy is unchanged. ADR 0010 only gains a factual
+clarification of the pinned fallback and lazy-ID behavior. No divergence or
+benchmark threshold was introduced.
+
 ## First implementation slice
 
 B04, `Checker.extractRedundantTemplateLiterals`, is independently attributed:
