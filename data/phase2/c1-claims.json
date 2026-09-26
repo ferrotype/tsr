@@ -1,0 +1,1253 @@
+{
+ "candidate_buckets": [
+  {
+   "bucket": "diagnostics: TS2322",
+   "variants": 73
+  },
+  {
+   "bucket": "different: types",
+   "variants": 24
+  },
+  {
+   "bucket": "failed: checker_error",
+   "variants": 13
+  },
+  {
+   "bucket": "diagnostics: TS2416",
+   "variants": 9
+  },
+  {
+   "bucket": "diagnostics: TS2430",
+   "variants": 9
+  },
+  {
+   "bucket": "diagnostics: TS2365",
+   "variants": 5
+  },
+  {
+   "bucket": "panic: tsr_checker::relater_tuples",
+   "variants": 3
+  },
+  {
+   "bucket": "diagnostics: TS2313",
+   "variants": 2
+  },
+  {
+   "bucket": "diagnostics: TS2314",
+   "variants": 2
+  },
+  {
+   "bucket": "diagnostics: TS2636",
+   "variants": 2
+  },
+  {
+   "bucket": "diagnostics: TS2741",
+   "variants": 1
+  },
+  {
+   "bucket": "different: display",
+   "variants": 1
+  },
+  {
+   "bucket": "failed: stack overflow",
+   "variants": 1
+  },
+  {
+   "bucket": "failed: walker_error",
+   "variants": 1
+  },
+  {
+   "bucket": "panic: tsr_checker::infer_tuples",
+   "variants": 1
+  }
+ ],
+ "foundation_modules": [
+  "relater",
+  "relater_compound",
+  "relater_conditional",
+  "relater_excess",
+  "relater_mapped",
+  "relater_properties",
+  "relater_signatures",
+  "relater_structure",
+  "relater_tuples",
+  "relater_variance",
+  "relation_errors",
+  "relation_error_target",
+  "relation_helpers",
+  "variance",
+  "compare",
+  "merge",
+  "members",
+  "signatures",
+  "compound_signatures",
+  "source_signatures",
+  "signature_parameters",
+  "indexes",
+  "late_members",
+  "late_indexes",
+  "arrays",
+  "infer_tuples",
+  "enums",
+  "enum_eval",
+  "construct",
+  "types",
+  "resolution",
+  "constraints",
+  "name_resolution",
+  "name_scopes",
+  "symbols",
+  "property_symbols"
+ ],
+ "not_c1": {
+  "C2": "TS2344/2339/2345 extras, TS2795 intrinsic keyword, recursive indexed-access simplification (TS2322 missing), conditional simplification and mapped extras (TS2322 extra), TS2773 (B18), the .types differences on conditional and instantiation-expression display",
+  "C3": "TS2558 on super calls with type arguments, TS2365 operand display (literal vs base type, evolving arrays), TS1539 bigint property names, TS2315 on JS export=",
+  "C5": "TS4023/4025/4031/4052/4058/4060/4076/4078/4081/4082/4033 declaration-emit accessibility, module specifier and constraint-node reuse in .types display, panic: tsr_ast::factory",
+  "summary": "C2-owned open rows the attribution returned to their owners"
+ },
+ "rows": [
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "compiler/assignmentStricterConstraints.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "compiler/chainedCallsWithTypeParameterConstrainedToOtherTypeParameter2.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2344",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "compiler/complexRecursiveCollections.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "compiler/conditionalTypeDoesntSpinForever.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "compiler/conditionalTypeVarianceBigArrayConstraintsPerformance.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "compiler/constructorReturningAPrimitive.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2345",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "compiler/genericCallbackInvokedInsideItsContainingFunction1.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2344",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "compiler/genericDefaultsErrors.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2416",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "compiler/genericPrototypeProperty3.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2416",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "compiler/genericSpecializations1.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2416",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "compiler/genericSpecializations2.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2345",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "compiler/genericUnboundedTypeParamAssignability.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2416",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "compiler/implementGenericWithMismatchedTypes.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "compiler/inDoesNotOperateOnPrimitiveTypes.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "compiler/inKeywordTypeguard.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "compiler/inKeywordTypeguard.ts#configuration=1",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26 structured diff matches the pin: the generic mapped target's key relation never reports (1a539f4)",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "compiler/inferenceOuterResultNotIncorrectlyInstantiatedWithInnerResult.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2416",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "compiler/mismatchedGenericArguments1.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2344",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "compiler/subclassThisTypeAssignable01.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2677",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "compiler/typeInferenceTypePredicate.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "compiler/typeParameterArgumentEquivalence.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "compiler/typeParameterArgumentEquivalence2.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "compiler/typeParameterArgumentEquivalence3.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "compiler/typeParameterArgumentEquivalence4.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "compiler/typeParameterArgumentEquivalence5.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "compiler/typeParameterAssignmentCompat1.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "compiler/typeParameterDiamond2.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "compiler/typeParameterDiamond3.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "compiler/typeParameterDiamond4.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "compiler/typeParameterHasSelfAsConstraint.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "compiler/typeParametersShouldNotBeEqual.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "compiler/typeParametersShouldNotBeEqual2.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2344",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "compiler/unmetTypeConstraintInImportCall.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2344",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "compiler/unmetTypeConstraintInJSDocImportCall.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/classes/constructorDeclarations/constructorParameters/constructorImplementationWithDefaultValues2.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/expressions/binaryOperators/inOperator/inOperatorWithValidOperands.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/expressions/binaryOperators/logicalOrOperator/logicalOrOperatorWithTypeParameters.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/expressions/commaOperator/commaOperatorOtherInvalidOperation.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2430",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/interfaces/interfaceDeclarations/interfaceWithMultipleBaseTypes.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26 structured diff matches the pin: matched after the C1.1 audit ports (0702c77)",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/types/conditional/conditionalTypes2.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/types/intersection/intersectionTypeInference.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2344",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/types/mapped/mappedTypeErrors.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2430",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/types/mapped/mappedTypesAndObjects.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/types/nonPrimitive/nonPrimitiveAndTypeVariables.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/types/nonPrimitive/nonPrimitiveInGeneric.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/types/primitives/enum/invalidEnumAssignments.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/types/primitives/undefined/invalidUndefinedValues.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/types/primitives/void/invalidAssignmentsToVoid.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/types/primitives/void/invalidVoidValues.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/types/typeRelationships/assignmentCompatibility/assignmentCompatWithCallSignatures3.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/types/typeRelationships/assignmentCompatibility/assignmentCompatWithCallSignatures4.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/types/typeRelationships/assignmentCompatibility/assignmentCompatWithCallSignatures5.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/types/typeRelationships/assignmentCompatibility/assignmentCompatWithCallSignatures6.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/types/typeRelationships/assignmentCompatibility/assignmentCompatWithConstructSignatures3.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/types/typeRelationships/assignmentCompatibility/assignmentCompatWithConstructSignatures4.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/types/typeRelationships/assignmentCompatibility/assignmentCompatWithConstructSignatures5.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/types/typeRelationships/assignmentCompatibility/assignmentCompatWithConstructSignatures6.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/types/typeRelationships/assignmentCompatibility/assignmentCompatWithGenericCallSignatures2.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/types/typeRelationships/assignmentCompatibility/assignmentCompatWithGenericCallSignaturesWithOptionalParameters.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2430",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/types/typeRelationships/assignmentCompatibility/callSignatureAssignabilityInInheritance3.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2430",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/types/typeRelationships/assignmentCompatibility/callSignatureAssignabilityInInheritance6.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2430",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/types/typeRelationships/assignmentCompatibility/constructSignatureAssignabilityInInheritance3.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2430",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/types/typeRelationships/assignmentCompatibility/constructSignatureAssignabilityInInheritance6.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/types/typeRelationships/assignmentCompatibility/genericCallWithObjectTypeArgsAndInitializers.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/types/typeRelationships/assignmentCompatibility/typeParameterAssignability.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/types/typeRelationships/assignmentCompatibility/typeParameterAssignability2.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/types/typeRelationships/assignmentCompatibility/unionTypesAssignability.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/types/typeRelationships/bestCommonType/bestCommonTypeOfConditionalExpressions.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2416",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/types/typeRelationships/subtypesAndSuperTypes/subtypesOfTypeParameter.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2416",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/types/typeRelationships/subtypesAndSuperTypes/subtypesOfTypeParameterWithConstraints.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2416",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/types/typeRelationships/subtypesAndSuperTypes/subtypesOfTypeParameterWithConstraints4.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2430",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/types/typeRelationships/subtypesAndSuperTypes/subtypingWithConstructSignatures6.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2430",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/types/typeRelationships/subtypesAndSuperTypes/subtypingWithGenericCallSignaturesWithOptionalParameters.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2430",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/types/typeRelationships/subtypesAndSuperTypes/subtypingWithGenericConstructSignaturesWithOptionalParameters.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/types/typeRelationships/subtypesAndSuperTypes/subtypingWithOptionalProperties.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2416",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/types/typeRelationships/subtypesAndSuperTypes/undefinedIsSubtypeOfEverything.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2769",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/types/typeRelationships/typeInference/unionAndIntersectionInference1.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/types/unknown/unknownType1.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "the related information 'This type parameter might need an extends {0} constraint' (TS2208) that reportErrorResults appends for an unconstrained type-parameter source is never produced; the Rust report_error_results has no counterpart for that block",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2313",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/checker.go:Checker.getResolvedBaseConstraint",
+   "id": "compiler/circularBaseTypes.ts#configuration=0",
+   "item": "C1.5",
+   "mechanism": "the related information 'Circularity originates in type at this location' (TS2751) on 'Type parameter has a circular constraint' is never attached; constraints.rs reports the error without the currentNode-relative related entry",
+   "status": "claimed"
+  },
+  {
+   "blocker": "B09",
+   "bucket": "emit order: native pre/post-emit sets differ",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; after the TS2751 fix (341f3a3) the structured set equals the native pre-emit set and the baseline is the post-emit set, which B09 withholds",
+   "go": "tsc/internal/checker/checker.go:Checker.getResolvedBaseConstraint",
+   "id": "compiler/incorrectRecursiveMappedTypeConstraint.ts#configuration=0",
+   "item": "C1.5",
+   "mechanism": "the related information 'Circularity originates in type at this location' (TS2751) on 'Type parameter has a circular constraint' is never attached; constraints.rs reports the error without the currentNode-relative related entry",
+   "status": "blocked"
+  },
+  {
+   "blocker": "B09",
+   "bucket": "emit order: native pre/post-emit sets differ",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; after the TS2751 fix (341f3a3) the structured set equals the native pre-emit set and the baseline is the post-emit set, which B09 withholds",
+   "go": "tsc/internal/checker/checker.go:Checker.getResolvedBaseConstraint",
+   "id": "compiler/typeParameterWithInvalidConstraintType.ts#configuration=0",
+   "item": "C1.5",
+   "mechanism": "the related information 'Circularity originates in type at this location' (TS2751) on 'Type parameter has a circular constraint' is never attached; constraints.rs reports the error without the currentNode-relative related entry",
+   "status": "blocked"
+  },
+  {
+   "bucket": "diagnostics: TS2314",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/checker.go:Checker.getTypeFromTypeAliasReference",
+   "id": "compiler/typeAliasDeclarationEmit.ts#configuration=0",
+   "item": "C1.3",
+   "mechanism": "'Generic type requires N type argument(s)' (TS2314) is reported with three arguments natively (name, minimum, count); references.rs check_reference_arity passes two",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2314",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/checker.go:Checker.getTypeFromTypeAliasReference",
+   "id": "conformance/jsdoc/typedefMultipleTypeParameters.ts#configuration=0",
+   "item": "C1.3",
+   "mechanism": "'Generic type requires N type argument(s)' (TS2314) is reported with three arguments natively (name, minimum, count); references.rs check_reference_arity passes two",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2352",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; the comparable carve-out (842bfaa) did not change this row: the assertion relates two intersections of an instantiation-expression alias (typeof Err<U>), so the cause is C2's instantiation-expression typing",
+   "go": "tsc/internal/checker/relater.go:Checker.checkTypeComparableTo",
+   "id": "compiler/aliasInstantiationExpressionGenericIntersectionNoCrash1.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "type assertions between type parameters, aliases or intersections do not report 'Conversion of type may be a mistake' (TS2352): the comparable relation answers true where the pin answers false",
+   "owner": "C2",
+   "status": "returned"
+  },
+  {
+   "bucket": "diagnostics: TS2352",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; the comparable carve-out (842bfaa) did not change this row: the assertion relates two intersections of an instantiation-expression alias (typeof Err<U>), so the cause is C2's instantiation-expression typing",
+   "go": "tsc/internal/checker/relater.go:Checker.checkTypeComparableTo",
+   "id": "compiler/aliasInstantiationExpressionGenericIntersectionNoCrash2.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "type assertions between type parameters, aliases or intersections do not report 'Conversion of type may be a mistake' (TS2352): the comparable relation answers true where the pin answers false",
+   "owner": "C2",
+   "status": "returned"
+  },
+  {
+   "bucket": "diagnostics: TS2352",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Checker.checkTypeComparableTo",
+   "id": "compiler/genericTypeAssertions6.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "type assertions between type parameters, aliases or intersections do not report 'Conversion of type may be a mistake' (TS2352): the comparable relation answers true where the pin answers false",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2352",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Checker.checkTypeComparableTo",
+   "id": "compiler/typeParameterComparableRelation.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "type assertions between type parameters, aliases or intersections do not report 'Conversion of type may be a mistake' (TS2352): the comparable relation answers true where the pin answers false",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2365",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Checker.isTypeComparableTo",
+   "id": "conformance/expressions/binaryOperators/comparisonOperator/comparisonOperatorWithNoRelationshipTypeParameter.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "comparison operators between unrelated type parameters report nothing (TS2365/TS2367 missing, 32 diagnostics absent in comparisonOperatorWithTypeParameter): the comparable relation over type parameters differs from the pin",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2365",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Checker.isTypeComparableTo",
+   "id": "conformance/expressions/binaryOperators/comparisonOperator/comparisonOperatorWithTypeParameter.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "comparison operators between unrelated type parameters report nothing (TS2365/TS2367 missing, 32 diagnostics absent in comparisonOperatorWithTypeParameter): the comparable relation over type parameters differs from the pin",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2741",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.isRelatedTo",
+   "id": "compiler/classExtendingAbstractClassWithMemberCalledTheSameAsItsOwnTypeParam.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "a class extending an abstract class whose member shares its type parameter's name is reported as missing that property (TS2741) where the pin relates the types",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2318",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26: traced with prints in the pin's harness (narrowTypeByInstanceof, getNarrowedTypeWorker, computeBaseConstraint) and the port's debug build; structured diff matches the pin after resolved_base_constraint computes over simplified_type",
+   "go": "tsc/internal/checker/checker.go:Checker.getResolvedBaseConstraint",
+   "id": "compiler/awaitedTypeNoLib.ts#configuration=0",
+   "item": "C1.5",
+   "mechanism": "the pin resolves a type's base constraint over its simplified type: the inner conditional `TResult extends PromiseLike<unknown> ? never : TResult` with the unresolved (any-like) PromiseLike simplifies to never, so NotPromise<TResult>'s base constraint is Thenable<unknown> and `result instanceof Thenable` keeps NotPromise<TResult> in the narrowed union; the port computed the constraint of the unsimplified conditional (nil), narrowed the union to Thenable<NotPromise<TResult>> and never reached the call-resolution error whose missing-await note performs the reporting Awaited lookup (TS2318) and the TS2345 chain",
+   "status": "claimed"
+  },
+  {
+   "bucket": "panic: tsr_checker::relater_tuples",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.isRelatedTo",
+   "id": "compiler/lambdaParameterWithTupleArgsHasCorrectAssignability.ts#configuration=0",
+   "item": "C1.4",
+   "mechanism": "relater_tuples.rs:130 indexes the target element infos at a position past the target arity when the source has more fixed elements than the target's rest position allows (index out of bounds, len 2 index 2)",
+   "status": "claimed"
+  },
+  {
+   "bucket": "panic: tsr_checker::relater_tuples",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.isRelatedTo",
+   "id": "conformance/types/tuple/restTupleElements1.ts#configuration=0",
+   "item": "C1.4",
+   "mechanism": "relater_tuples.rs:130 indexes the target element infos at a position past the target arity when the source has more fixed elements than the target's rest position allows (index out of bounds, len 2 index 2)",
+   "status": "claimed"
+  },
+  {
+   "bucket": "panic: tsr_checker::relater_tuples",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/relater.go:Relater.structuredTypeRelatedToWorker",
+   "id": "conformance/types/tuple/variadicTuples2.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "relater_tuples.rs:130 indexes the target element infos at a position past the target arity when the source has more fixed elements than the target's rest position allows (index out of bounds, len 2 index 2); after the arity fix the row differed by a TS2345 ([...T] not assignable to T): the single-element generic tuple rules of structuredTypeRelatedToWorker (isSingleElementGenericTupleType, isMutableArrayOrTuple) were missing",
+   "status": "claimed"
+  },
+  {
+   "bucket": "panic: tsr_checker::infer_tuples",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/checker.go:Checker.getNormalizedTupleType",
+   "id": "compiler/sliceTupleTypeOutOfBounds.ts#configuration=0",
+   "item": "C1.4",
+   "mechanism": "infer_tuples.rs:65 subtracts the target's fixed prefix and suffix from a shorter source tuple's length (attempt to subtract with overflow); tuple arity normalization is the foundation half of the inference site",
+   "status": "claimed"
+  },
+  {
+   "bucket": "failed: stack overflow",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26: the depth guard ported into compute_base_constraint; the row completes and its structured diagnostics match the pin (none)",
+   "go": "tsc/internal/checker/checker.go:Checker.computeBaseConstraint",
+   "id": "compiler/infiniteConstraints2.ts#configuration=0",
+   "item": "C1.5",
+   "mechanism": "computeBaseConstraint's conditional case stops exploring nested conditional constraints at 100 levels (conditionalConstraintDepth); the port had no such bound, so the unbounded chain of Prepend/Conv instantiations recursed through constraint_from_conditional until the stack overflowed",
+   "status": "claimed"
+  },
+  {
+   "bucket": "failed: checker_error",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26: the checker_error is closed by getDefaultFromTypeParameter's guard (the inference over a permissive wildcard has no default); the remaining difference is a TS4025 declaration-emit diagnostic, which is C5's",
+   "go": "tsc/internal/checker/checker.go:Checker.instantiateSignature",
+   "id": "compiler/declarationEmitExpandoArrowFunctionParameter.ts#configuration=0",
+   "item": "C1.3",
+   "mechanism": "after the empty-candidate fix (2c87ef7) the checker stops with 'unexpected Intrinsic type in type_parameter': signature_inference_candidates reads a type-parameter default from an inference whose type parameter is an intrinsic (trace: relater compare_signatures -> contextual_signature_instantiation -> inferred_type -> resolved_type_parameter_default); whether the instantiated signature carries non-parameters in type_parameters (C1.3) or the inference context does (C2) is not yet traced",
+   "owner": "C5",
+   "status": "returned"
+  },
+  {
+   "bucket": "failed: checker_error",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/checker.go:Checker.resolveSignature",
+   "id": "compiler/fillInMissingTypeArgsOnJSConstructCalls.ts#configuration=0",
+   "item": "C1.3",
+   "mechanism": "the checker stops with Error::MissingLink('failed signatures') (call_failure.rs:173) while merging an interface with non-generic type arguments, so diagnostics never complete",
+   "status": "claimed"
+  },
+  {
+   "bucket": "failed: checker_error",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26: closed by getDefaultFromTypeParameter's guard: an inference over a type that is not a type parameter (the wildcard of a permissive instantiation of a hoisted generic signature) has no default; structured diff matches the pin",
+   "go": "tsc/internal/checker/checker.go:Checker.instantiateSignature",
+   "id": "compiler/genericCallInferenceConditionalType1.ts#configuration=0",
+   "item": "C1.3",
+   "mechanism": "after the empty-candidate fix (2c87ef7) the checker stops with 'unexpected Intrinsic type in type_parameter': signature_inference_candidates reads a type-parameter default from an inference whose type parameter is an intrinsic (trace: relater compare_signatures -> contextual_signature_instantiation -> inferred_type -> resolved_type_parameter_default); whether the instantiated signature carries non-parameters in type_parameters (C1.3) or the inference context does (C2) is not yet traced",
+   "status": "claimed"
+  },
+  {
+   "bucket": "failed: checker_error",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26: closed by getDefaultFromTypeParameter's guard; structured diff matches the pin",
+   "go": "tsc/internal/checker/checker.go:Checker.instantiateSignature",
+   "id": "compiler/genericCallInferenceConditionalType2.ts#configuration=0",
+   "item": "C1.3",
+   "mechanism": "after the empty-candidate fix (2c87ef7) the checker stops with 'unexpected Intrinsic type in type_parameter': signature_inference_candidates reads a type-parameter default from an inference whose type parameter is an intrinsic (trace: relater compare_signatures -> contextual_signature_instantiation -> inferred_type -> resolved_type_parameter_default); whether the instantiated signature carries non-parameters in type_parameters (C1.3) or the inference context does (C2) is not yet traced",
+   "status": "claimed"
+  },
+  {
+   "bucket": "failed: checker_error",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26: closed by getDefaultFromTypeParameter's guard; structured diff matches the pin",
+   "go": "tsc/internal/checker/checker.go:Checker.instantiateSignature",
+   "id": "compiler/genericCallInferenceInConditionalTypes1.ts#configuration=0",
+   "item": "C1.3",
+   "mechanism": "after the empty-candidate fix (2c87ef7) the checker stops with 'unexpected Intrinsic type in type_parameter': signature_inference_candidates reads a type-parameter default from an inference whose type parameter is an intrinsic (trace: relater compare_signatures -> contextual_signature_instantiation -> inferred_type -> resolved_type_parameter_default); whether the instantiated signature carries non-parameters in type_parameters (C1.3) or the inference context does (C2) is not yet traced",
+   "status": "claimed"
+  },
+  {
+   "bucket": "failed: checker_error",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/checker.go:Checker.resolveSignature",
+   "id": "compiler/genericDefaultsJs.ts#configuration=0",
+   "item": "C1.3",
+   "mechanism": "the checker stops with Error::MissingLink('failed signatures') (call_failure.rs:173) while merging an interface with non-generic type arguments, so diagnostics never complete",
+   "status": "claimed"
+  },
+  {
+   "bucket": "failed: checker_error",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/checker.go:Checker.resolveSignature",
+   "id": "compiler/interfaceMergeWithNonGenericTypeArguments.ts#configuration=0",
+   "item": "C1.3",
+   "mechanism": "the checker stops with Error::MissingLink('failed signatures') (call_failure.rs:173) while merging an interface with non-generic type arguments, so diagnostics never complete",
+   "status": "claimed"
+  },
+  {
+   "bucket": "failed: checker_error",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/checker.go:Checker.resolveSignature",
+   "id": "compiler/jsNoImplicitAnyNoCascadingReferenceErrors.ts#configuration=0",
+   "item": "C1.3",
+   "mechanism": "the checker stops with Error::MissingLink('failed signatures') (call_failure.rs:173) while merging an interface with non-generic type arguments, so diagnostics never complete",
+   "status": "claimed"
+  },
+  {
+   "bucket": "failed: checker_error",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/checker.go:Checker.resolveSignature",
+   "id": "compiler/superCallInJSWithWrongBaseTypeArgumentCount1.ts#configuration=0",
+   "item": "C1.3",
+   "mechanism": "the checker stops with Error::MissingLink('failed signatures') (call_failure.rs:173) while merging an interface with non-generic type arguments, so diagnostics never complete",
+   "status": "claimed"
+  },
+  {
+   "bucket": "failed: checker_error",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/checker.go:Checker.resolveSignature",
+   "id": "compiler/superCallInJSWithWrongBaseTypeArgumentCount1.ts#configuration=1",
+   "item": "C1.3",
+   "mechanism": "the checker stops with Error::MissingLink('failed signatures') (call_failure.rs:173) while merging an interface with non-generic type arguments, so diagnostics never complete",
+   "status": "claimed"
+  },
+  {
+   "bucket": "failed: checker_error",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/checker.go:Checker.resolveSignature",
+   "id": "compiler/superCallInJSWithWrongBaseTypeArgumentCount2.ts#configuration=0",
+   "item": "C1.3",
+   "mechanism": "the checker stops with Error::MissingLink('failed signatures') (call_failure.rs:173) while merging an interface with non-generic type arguments, so diagnostics never complete",
+   "status": "claimed"
+  },
+  {
+   "bucket": "failed: checker_error",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/checker.go:Checker.resolveSignature",
+   "id": "compiler/superCallInJSWithWrongBaseTypeArgumentCount2.ts#configuration=1",
+   "item": "C1.3",
+   "mechanism": "the checker stops with Error::MissingLink('failed signatures') (call_failure.rs:173) while merging an interface with non-generic type arguments, so diagnostics never complete",
+   "status": "claimed"
+  },
+  {
+   "bucket": "failed: checker_error",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; traced: the InvalidGraph arena error is raised in iteration_types_fast (iteration_protocol.rs:53) while computing the contextual element type of an array literal (iteration_types_of_iterable <- contextual_element_type <- is_const_context), which is C3's iteration and contextual typing, not symbol merging",
+   "go": "tsc/internal/checker/checker.go:Checker.mergeSymbol",
+   "id": "compiler/thislessFunctionsNotContextSensitive1.ts#configuration=0",
+   "item": "C1.2",
+   "mechanism": "after 2c87ef7 the checker stops with the arena error 'lazy roots must belong to the current transaction' (tsr_arena lazy.rs publish), the same defect as packageDeduplicationDuplicateGlobals; trace pending",
+   "owner": "C3",
+   "status": "returned"
+  },
+  {
+   "bucket": "failed: walker_error",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25",
+   "go": "tsc/internal/checker/checker.go:Checker.mergeSymbol",
+   "id": "compiler/packageDeduplicationDuplicateGlobals.ts#configuration=0",
+   "item": "C1.2",
+   "mechanism": "the walk over duplicated globals of deduplicated packages fails with the arena error 'lazy roots must belong to the current transaction'; the merging site that keeps a lazy root across transactions is not yet traced",
+   "status": "candidate"
+  },
+  {
+   "bucket": "emit order: native pre/post-emit sets differ",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26: the checker path is the pin's: the pin's pre-emit diagnostics put TS2615 at the `Child<ListWidget>` type reference exactly like the port (pre_diagnostics pos 1621); the error baseline is the post-emit program's, where Program.Emit's import-elision transformer (EmitResolver.MarkLinkedReferencesRecursively -> markLinkedReferences -> checkExpressionCached(x)) resolves x's type before the semantic check, so the pin reports at `x` (1705); matching needs the harness's emit-before-check order, which is C5's (traced 2026-09-26 with a stack print in the pin's getTypeOfMappedSymbol)",
+   "go": "tsc/internal/checker/checker.go:Checker.getResolvedBaseConstraint",
+   "id": "conformance/types/mapped/recursiveMappedTypes.ts#configuration=0",
+   "item": "C1.5",
+   "mechanism": "TS2615 (circular reference) is reported at another node; mapped types are involved, so the trace decides between C1.5 and C2",
+   "owner": "C5",
+   "status": "returned"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26 structured diff matches the pin: conditional-target branch relations never report (1a539f4)",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "compiler/conditionalTypeAssignabilityWhenDeferred.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "same TS2322 diagnostics with a different elaboration chain or related entry; mapped, conditional and template-literal targets are involved, so each row needs its trace before it counts",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26 structured diff matches the pin: matched after the C1.1 audit ports (0702c77)",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "compiler/errorInfoForRelatedIndexTypesNoConstraintElaboration.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "same TS2322 diagnostics with a different elaboration chain or related entry; mapped, conditional and template-literal targets are involved, so each row needs its trace before it counts",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26 structured diff matches the pin: distributive conditional constraints use someType over the extends type (9b7e1e6)",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "compiler/flatArrayNoExcessiveStackDepth.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "same TS2322 diagnostics with a different elaboration chain or related entry; mapped, conditional and template-literal targets are involved, so each row needs its trace before it counts",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26 structured diff matches the pin: the generic mapped target's key relation never reports (1a539f4)",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "compiler/genericMappedTypeAsClause.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "same TS2322 diagnostics with a different elaboration chain or related entry; mapped, conditional and template-literal targets are involved, so each row needs its trace before it counts",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26 structured diff matches the pin: the generic mapped target's key relation never reports (1a539f4)",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "compiler/indexSignatureAndMappedType.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "same TS2322 diagnostics with a different elaboration chain or related entry; mapped, conditional and template-literal targets are involved, so each row needs its trace before it counts",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26 structured diff matches the pin: an unresolved constraint keeps its aliased error type (1a539f4)",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "compiler/objectLiteralExcessProperties.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "same TS2322 diagnostics with a different elaboration chain or related entry; mapped, conditional and template-literal targets are involved, so each row needs its trace before it counts",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26 structured diff matches the pin: conditional-target branch relations never report (1a539f4)",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "compiler/recursiveConditionalTypes.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "same TS2322 diagnostics with a different elaboration chain or related entry; mapped, conditional and template-literal targets are involved, so each row needs its trace before it counts",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26 structured diff matches the pin: the generic mapped target's key relation never reports (1a539f4)",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/types/keyof/keyofAndIndexedAccess2.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "same TS2322 diagnostics with a different elaboration chain or related entry; mapped, conditional and template-literal targets are involved, so each row needs its trace before it counts",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26 structured diff matches the pin: matched after the C1.1 audit ports (0702c77)",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/types/literal/stringMappingOverPatternLiterals.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "same TS2322 diagnostics with a different elaboration chain or related entry; mapped, conditional and template-literal targets are involved, so each row needs its trace before it counts",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26 structured diff matches the pin: matched after the C1.1 audit ports (0702c77)",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/types/literal/templateLiteralTypes5.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "same TS2322 diagnostics with a different elaboration chain or related entry; mapped, conditional and template-literal targets are involved, so each row needs its trace before it counts",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26 structured diff matches the pin: the failed mapped chain resets the error state (post-9b7e1e6)",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/types/mapped/mappedTypeAsClauseRelationships.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "same TS2322 diagnostics with a different elaboration chain or related entry; mapped, conditional and template-literal targets are involved, so each row needs its trace before it counts",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26 structured diff matches the pin: conditional-target branch relations never report (1a539f4)",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "compiler/exactOptionalPropertyTypesIdentical.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "structured diagnostics equal; the rendered .errors.txt or the pre/post-emit sets differ; the rendering diff decides the owner",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2322",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26 structured diff matches the pin: matched after the C1.1 audit ports (0702c77)",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "compiler/genericConditionalConstrainedToUnknownNotAssignableToConcreteObject.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "structured diagnostics equal; the rendered .errors.txt or the pre/post-emit sets differ; the rendering diff decides the owner",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2636",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26 structured diff matches the pin: matched after the C1.1 audit ports (0702c77)",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "compiler/varianceAnnotationValidation.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "structured diagnostics equal; the rendered .errors.txt or the pre/post-emit sets differ; the rendering diff decides the owner",
+   "status": "claimed"
+  },
+  {
+   "bucket": "diagnostics: TS2769",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; 2026-09-26 structured diff matches the pin: conditional-target branch relations never report (1a539f4)",
+   "go": "tsc/internal/checker/relater.go:Relater.reportErrorResults",
+   "id": "conformance/functions/strictBindCallApply1.ts#configuration=0",
+   "item": "C1.6",
+   "mechanism": "structured diagnostics equal; the rendered .errors.txt or the pre/post-emit sets differ; the rendering diff decides the owner",
+   "status": "claimed"
+  }
+ ],
+ "scope": "C1 claims causes inside rows another checkpoint owns (docs/PHASE2-C1-plan.md, section 3). A row counts only with status claimed, after its reproduction named a foundation function; candidate rows are the C0 buckets the plan lists and carry no metric weight. A row with status blocked names the blocker (data/phase2/blockers.json) that withholds its observation after the foundation cause is fixed; it carries no metric weight either. A row with status returned went back to its owner after its reproduction named a non-foundation cause; it carries no metric weight.",
+ "version": 1
+}

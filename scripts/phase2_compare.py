@@ -17,6 +17,15 @@ first observed cause; secondary dimensions (families, configuration, first
 differing diagnostic code, area) are counted, never used to invent a result.
 
     report --native DIR --rust DIR [--previous REPORT] [--record]
+    baseline --rust DIR [--output data/phase2/c1-baseline.json.gz]
+
+`report --previous` lists two things about an earlier row report: rows that
+stayed `different` with a changed observation (`changed_observations`) and
+domains that matched before and do not now (`regressions`). `baseline`
+retains a full row report as the authenticated C1-start baseline: it names
+the native observation, inventory and Rust capture it came from, so the
+producer can refuse a baseline taken against another contract and count
+match-to-non-match transitions over the whole denominator (C1 exit).
 """
 from __future__ import annotations
 
@@ -37,7 +46,9 @@ import phase2_inventory  # noqa: E402
 import phase2_native  # noqa: E402
 
 RECORD = ROOT / "data/phase2/first-comparison.json"
+BASELINE = ROOT / "data/phase2/c1-baseline.json.gz"
 DOMAINS = ("errors", "types", "symbols", "display", "trace", "union_ordering", "parent_pointers")
+MATCHED = ("match", "disabled")
 CATEGORIES = ("match", "different", "failed", "unsupported", "disabled", "unexecuted")
 TYPE_PULLS = ("GetTypeAtLocation", "TypeToTypeNode")
 SYMBOL_PULLS = ("GetSymbolAtLocation", "SymbolToStringEx")
@@ -290,6 +301,83 @@ def domain_digest(native, rust, domain):
     return digest(canonical(value.get(domain, value)))
 
 
+def changed_observations(before_rows, after_rows):
+    """Rows that stayed `different` in a domain while their observation changed."""
+    before = {row["id"]: row for row in before_rows}
+    changed = []
+    for row in after_rows:
+        old = before.get(row["id"])
+        if not old or "digests" not in row or "digests" not in old:
+            continue
+        for domain in DOMAINS:
+            if (old["outcomes"][domain] == row["outcomes"][domain] and row["outcomes"][domain] == "different"
+                    and old["digests"][domain] != row["digests"][domain]):
+                changed.append({"id": row["id"], "domain": domain})
+    return changed
+
+
+def regressions(before_rows, after_rows):
+    """Domains that were met before (match or native-disabled) and are not now.
+
+    A row absent from either report is not a regression; a row that stayed
+    open is reported by `changed_observations` instead. Category is compared,
+    not digest: a matching domain has nothing to drift.
+    """
+    before = {row["id"]: row for row in before_rows if "outcomes" in row}
+    found = []
+    for row in after_rows:
+        old = before.get(row["id"])
+        if not old or "outcomes" not in row:
+            continue
+        for domain in DOMAINS:
+            if old["outcomes"][domain] in MATCHED and row["outcomes"][domain] not in MATCHED:
+                found.append({"id": row["id"], "domain": domain, "before": old["outcomes"][domain],
+                              "after": row["outcomes"][domain]})
+    return found
+
+
+def baseline(rust_dir, output=BASELINE):
+    """Retain a full row report as the C1-start baseline, bound to its contract."""
+    import gzip
+    path = Path(rust_dir) / "comparison.json"
+    raw = path.read_bytes()
+    comparison = strict_json_loads(raw)
+    if comparison["partial"] or comparison["selection"] != phase2_corpus.selection():
+        raise ValueError("a partial or selected run cannot be the baseline")
+    if comparison["harness_errors"]:
+        raise ValueError("a run with harness errors cannot be the baseline")
+    document = {"version": 1, "pin": comparison["pin"],
+                "native_observation_sha256": comparison["native_observation_sha256"],
+                "inventory_sha256": comparison["inventory_sha256"],
+                "rust_capture_sha256": comparison["rust_capture_sha256"],
+                "rust_source_stable": comparison["rust_source_stable"],
+                "comparison_sha256": digest(raw), "executed": comparison["executed"],
+                "all_domains_match": comparison["all_domains_match"],
+                # A met domain has nothing to drift, so digests are kept only for
+                # rows with an open domain (changed_observations reads them).
+                "rows": [{"id": row["id"], "outcomes": row["outcomes"]}
+                         | ({"digests": row["digests"]} if any(o not in MATCHED for o in row["outcomes"].values()) else {})
+                         for row in comparison["rows"] if "outcomes" in row]}
+    Path(output).parent.mkdir(parents=True, exist_ok=True)
+    Path(output).write_bytes(gzip.compress(canonical(document) + b"\n", mtime=0))
+    print(json.dumps({"baseline": str(output), "rows": len(document["rows"]),
+                      "all_domains_match": document["all_domains_match"]}))
+    return document
+
+
+def load_baseline(path=BASELINE):
+    import gzip
+    return strict_json_loads(gzip.decompress(Path(path).read_bytes()))
+
+
+def regressions_against(document, comparison):
+    """Match-to-non-match transitions from a baseline to a comparison of the same contract."""
+    for key in ("native_observation_sha256", "inventory_sha256", "pin"):
+        if document[key] != comparison[key]:
+            raise ValueError(f"the baseline was taken against another contract ({key} differs)")
+    return regressions(document["rows"], comparison["rows"])
+
+
 def report(native_dir, rust_dir, previous=None, record=False):
     native_dir, native_report, native_rows = phase2_native.load_capture(native_dir)
     phase2_native.current(native_report)
@@ -341,17 +429,10 @@ def report(native_dir, rust_dir, previous=None, record=False):
             dimensions["first_code"][str(code) if code is not None else "(none)"] += 1
             dimensions["area"][bucket] += 1
         rows.append(entry)
-    changed = []
+    changed, regressed = [], []
     if earlier:
-        before = {row["id"]: row for row in earlier["rows"]}
-        for row in rows:
-            old = before.get(row["id"])
-            if not old or "digests" not in row or "digests" not in old:
-                continue
-            for domain in DOMAINS:
-                if (old["outcomes"][domain] == row["outcomes"][domain] and row["outcomes"][domain] == "different"
-                        and old["digests"][domain] != row["digests"][domain]):
-                    changed.append({"id": row["id"], "domain": domain})
+        changed = changed_observations(earlier["rows"], rows)
+        regressed = regressions(earlier["rows"], rows)
     regression = [row for row in rows if row.get("s08") == "acceptance" and "outcomes" in row]
     executed = [row for row in rows if "outcomes" in row]
     summary = {
@@ -377,6 +458,7 @@ def report(native_dir, rust_dir, previous=None, record=False):
                     for key, members in sorted(buckets.items(), key=lambda kv: (-len(kv[1]), kv[0]))],
         "dimensions": {name: dict(counter.most_common()) for name, counter in dimensions.items()},
         "changed_observations": changed,
+        "regressions": regressed,
         "previous": digest(Path(previous).read_bytes()) if previous else None,
     }
     full = dict(summary, rows=rows)
@@ -400,8 +482,14 @@ def main():
     sub.add_argument("--rust", type=Path, required=True)
     sub.add_argument("--previous", type=Path, help="an earlier comparison.json to diff row observations against")
     sub.add_argument("--record", action="store_true", help="write data/phase2/first-comparison.json")
+    base = commands.add_parser("baseline", help="retain a full row report as the C1-start baseline")
+    base.add_argument("--rust", type=Path, required=True)
+    base.add_argument("--output", type=Path, default=BASELINE)
     args = parser.parse_args()
-    report(args.native, args.rust, args.previous, args.record)
+    if args.command == "baseline":
+        baseline(args.rust, args.output)
+    else:
+        report(args.native, args.rust, args.previous, args.record)
 
 
 if __name__ == "__main__":

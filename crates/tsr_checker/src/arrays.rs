@@ -85,6 +85,36 @@ impl CheckerState {
             || self.query.global_types.get("ReadonlyArray") == Some(&target))
     }
 
+    // port: tsc/internal/checker/checker.go:Checker.isReadonlyArrayType
+    pub(crate) fn is_readonly_array_type(&self, ty: TypeId) -> Result<bool, Error> {
+        if self.types.get(ty)?.object_flags & of::REFERENCE == 0 {
+            return Ok(false);
+        }
+        Ok(self.query.global_types.get("ReadonlyArray") == Some(&self.types.target(ty)?))
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.isMutableArrayOrTuple
+    pub(crate) fn is_mutable_array_or_tuple(&self, ty: TypeId) -> Result<bool, Error> {
+        if self.is_array_type(ty)? {
+            return Ok(!self.is_readonly_array_type(ty)?);
+        }
+        if self.is_tuple_type(ty)? {
+            return Ok(!self.types.tuple(self.types.target(ty)?)?.readonly);
+        }
+        Ok(false)
+    }
+
+    // port: tsc/internal/checker/checker.go:isSingleElementGenericTupleType
+    pub(crate) fn is_single_element_generic_tuple_type(&self, ty: TypeId) -> Result<bool, Error> {
+        Ok(self.is_generic_tuple_type(ty)?
+            && self
+                .types
+                .tuple(self.types.target(ty)?)?
+                .element_infos
+                .len()
+                == 1)
+    }
+
     // port: tsc/internal/checker/checker.go:Checker.isArrayLikeType
     pub(crate) fn is_array_like_type(&mut self, ty: TypeId) -> Result<bool, Error> {
         if self.is_array_type(ty)? {
@@ -262,14 +292,23 @@ impl CheckerState {
         self.add_type_optionality(ty, true, info.flags & ef::OPTIONAL != 0)
     }
 
-    // port: tsc/internal/checker/checker.go:Checker.getElementTypes
-    pub(crate) fn element_types(&mut self, ty: TypeId) -> Result<TypeList, Error> {
-        let arguments = self.get_type_arguments(ty)?;
-        let arity = self
+    /// The target's type parameter count, without its `this` type. A reference
+    /// resolved through a `this` argument carries one more type argument than
+    /// the target has elements, so tuple arities never come from the argument
+    /// list.
+    // port: tsc/internal/checker/checker.go:Checker.getTypeReferenceArity
+    pub(crate) fn get_type_reference_arity(&self, ty: TypeId) -> Result<usize, Error> {
+        Ok(self
             .types
             .interface(self.types.target(ty)?)?
             .type_parameters()
-            .len();
+            .len())
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.getElementTypes
+    pub(crate) fn element_types(&mut self, ty: TypeId) -> Result<TypeList, Error> {
+        let arguments = self.get_type_arguments(ty)?;
+        let arity = self.get_type_reference_arity(ty)?;
         Ok(if arguments.len() == arity {
             arguments
         } else {
@@ -454,5 +493,25 @@ impl CheckerState {
                     .map(|info| info.value_type)
             })
             .transpose()
+    }
+}
+
+impl CheckerState {
+    // port: tsc/internal/checker/checker.go:Checker.isEmptyLiteralType
+    pub(crate) fn is_empty_literal_type(&self, ty: TypeId) -> bool {
+        if self.options.strict_null_checks {
+            ty == self.builtins.implicit_never_type
+        } else {
+            ty == self.builtins.undefined_widening_type
+        }
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.isEmptyArrayLiteralType
+    pub(crate) fn is_empty_array_literal_type(&mut self, ty: TypeId) -> Result<bool, Error> {
+        if !self.is_array_type(ty)? {
+            return Ok(false);
+        }
+        let element = self.get_type_arguments(ty)?[0];
+        Ok(self.is_empty_literal_type(element))
     }
 }

@@ -232,8 +232,91 @@ impl Relater<'_> {
                 }
             }
         }
-        if t & tf::INDEXED_ACCESS != 0 {
+        // For a generic type T and a type U that is assignable to T, [...U] is
+        // assignable to T, U is assignable to readonly [...T], and U is
+        // assignable to [...T] when U is constrained to a mutable array or tuple.
+        if self.checker.is_single_element_generic_tuple_type(source)?
+            && !self
+                .checker
+                .types
+                .tuple(self.checker.types.target(source)?)?
+                .readonly
+        {
+            let element = self.checker.get_type_arguments(source)?[0];
+            let result = self.related_with_errors(element, target, SOURCE, 0, false)?;
+            if result != tr::FALSE {
+                return Ok(result);
+            }
+        }
+        if self.checker.is_single_element_generic_tuple_type(target)? {
+            let readonly = self
+                .checker
+                .types
+                .tuple(self.checker.types.target(target)?)?
+                .readonly;
+            let mutable_source = if readonly {
+                true
+            } else {
+                let constraint = self.checker.base_constraint_or_type(source)?;
+                self.checker.is_mutable_array_or_tuple(constraint)?
+            };
+            if mutable_source {
+                let element = self.checker.get_type_arguments(target)?[0];
+                let result = self.related_with_errors(source, element, TARGET, 0, false)?;
+                if result != tr::FALSE {
+                    return Ok(result);
+                }
+            }
+        }
+        if t & tf::TYPE_PARAMETER != 0 {
+            // A source type { [P in Q]: X } is related to a target type T if
+            // keyof T is related to Q and X is related to T[Q].
+            if self.checker.types.object_flags(source)? & of::MAPPED != 0
+                && self.checker.mapped_name(source)?.is_none()
+            {
+                let keys = self.checker.get_index_type(target, 0)?;
+                let constraint = self.checker.mapped_constraint(source)?;
+                if self.related_with_errors(keys, constraint, BOTH, 0, false)? != tr::FALSE
+                    && self.checker.mapped_modifiers(source)? & crate::mapped::INCLUDE_OPTIONAL == 0
+                {
+                    let template = self.checker.mapped_template(source)?;
+                    let parameter = self.checker.mapped_parameter(source)?;
+                    let indexed = self
+                        .checker
+                        .get_indexed_access_type(target, parameter, 0, None, None)?;
+                    let report = self.report_errors;
+                    let result = self.related_with_errors(template, indexed, BOTH, 0, report)?;
+                    if result != tr::FALSE {
+                        return Ok(result);
+                    }
+                }
+            }
+            if self.kind == RelationKind::Comparable && s & tf::TYPE_PARAMETER != 0 {
+                // A carve-out in comparability: a type parameter compares to
+                // another only when one extends the other (comparability is
+                // mostly bidirectional).
+                if let Some(constraint) = self.checker.constraint_of_type_parameter(source)? {
+                    let parts = if self.checker.types.flags(constraint)? & tf::UNION != 0 {
+                        self.checker.types.types_of(constraint)?.to_vec()
+                    } else {
+                        vec![constraint]
+                    };
+                    let mut mentions_parameter = false;
+                    for part in parts {
+                        if self.checker.types.flags(part)? & tf::TYPE_PARAMETER != 0 {
+                            mentions_parameter = true;
+                            break;
+                        }
+                    }
+                    if mentions_parameter {
+                        return self.related_with_errors(constraint, target, SOURCE, 0, false);
+                    }
+                }
+                return Ok(tr::FALSE);
+            }
+        } else if t & tf::INDEXED_ACCESS != 0 {
             let target_data = *self.checker.types.indexed_access(target)?;
+            let mut original_chain = None;
             if s & tf::INDEXED_ACCESS != 0 {
                 let source_data = *self.checker.types.indexed_access(source)?;
                 let mut result = self.related(
@@ -252,6 +335,9 @@ impl Relater<'_> {
                 }
                 if result != tr::FALSE {
                     return Ok(result);
+                }
+                if self.report_errors && !self.errors.chain.is_empty() {
+                    original_chain = Some(self.errors.chain.clone());
                 }
             }
             let object = self
@@ -278,9 +364,23 @@ impl Relater<'_> {
                     .checker
                     .indexed_access_or_undefined(object, index, flags, None, None)?
                 {
+                    if self.report_errors && original_chain.is_some() {
+                        // create a new chain for the constraint error
+                        self.errors = saved.clone();
+                    }
                     let result = self.related(source, constraint, TARGET, intersection)?;
                     if result != tr::FALSE {
                         return Ok(result);
+                    }
+                    // prefer the shorter chain of the constraint comparison chain,
+                    // and the direct comparison chain
+                    if let Some(original) = original_chain {
+                        if self.report_errors
+                            && !self.errors.chain.is_empty()
+                            && original.len() <= self.errors.chain.len()
+                        {
+                            self.errors.chain = original;
+                        }
                     }
                 }
             }
@@ -340,7 +440,9 @@ impl Relater<'_> {
                 return Ok(result);
             }
         } else if t & tf::TEMPLATE_LITERAL != 0 {
-            return self.template_related(source, target);
+            if let Some(result) = self.template_related(source, target)? {
+                return Ok(result);
+            }
         } else if t & tf::STRING_MAPPING != 0 && s & tf::STRING_MAPPING == 0 {
             if self.checker.member_of_string_mapping(source, target)? {
                 return Ok(tr::TRUE);
@@ -352,6 +454,14 @@ impl Relater<'_> {
             if result != tr::FALSE {
                 return Ok(result);
             }
+            // The mapped comparison's chain is kept only for a structural
+            // success after a failed variance check; the error state resets.
+            variance.original_chain = if self.errors.chain.is_empty() {
+                None
+            } else {
+                Some(self.errors.chain.clone())
+            };
+            self.errors = saved.clone();
         }
         if s & tf::TYPE_VARIABLE != 0 {
             if s & tf::INDEXED_ACCESS == 0 || t & tf::INDEXED_ACCESS == 0 {
@@ -427,7 +537,7 @@ impl Relater<'_> {
             return Ok(tr::FALSE);
         }
         if s & tf::CONDITIONAL != 0 {
-            return self.conditional_source(source, target);
+            return self.conditional_source(source, target, &saved);
         }
         if s & tf::TEMPLATE_LITERAL != 0 && t & tf::OBJECT == 0 {
             if t & tf::TEMPLATE_LITERAL == 0 {
@@ -486,6 +596,12 @@ impl Relater<'_> {
             && !self.checker.variance.markers.contains(&source)
             && !self.checker.variance.markers.contains(&target)
         {
+            // When strictNullChecks is disabled, the element type of the empty
+            // array literal is undefinedWideningType, and an empty array literal
+            // wouldn't be assignable to a `never[]` without this check.
+            if self.checker.is_empty_array_literal_type(source)? {
+                return Ok(tr::TRUE);
+            }
             let variances = self
                 .checker
                 .variances_of(self.checker.types.target(source)?)?;

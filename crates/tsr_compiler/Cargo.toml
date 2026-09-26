@@ -20,6 +20,10 @@ relation-probe = ["tsr_checker/relation-probe"]
 s08-phase-timer = []
 s08-allocation = ["tsr_checker/storage-pilot"]
 
+[[test]]
+name = "c1_contracts"
+required-features = ["relation-probe"]
+
 [[example]]
 name = "p3_relations"
 required-features = ["relation-probe"]

@@ -353,6 +353,7 @@ impl CheckerState {
         }
     }
 
+    // port: tsc/internal/checker/relater.go:Checker.isOrHasGenericConditional
     fn call_target_has_conditional(&self, ty: TypeId) -> Result<bool, Error> {
         if self.types.flags(ty)? & tf::CONDITIONAL != 0 {
             return Ok(true);

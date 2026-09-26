@@ -156,9 +156,9 @@ impl CheckerState {
             }
         } else if let Some(node) = self.constraint_declaration(ty)? {
             let mut constraint = self.get_type_from_type_node(node)?;
-            if self.types.flags(constraint)? & tf::ANY != 0
-                && constraint != self.builtins.error_type
-            {
+            // An error type propagates so that downstream errors stay
+            // suppressed; an aliased error type (an unresolved name) counts.
+            if self.types.flags(constraint)? & tf::ANY != 0 && !self.is_error_type(constraint)? {
                 let parent = self.node(node)?.parent();
                 let grandparent = parent
                     .map(|parent| {
@@ -188,6 +188,7 @@ impl CheckerState {
         Ok(constraint)
     }
 
+    // port: tsc/internal/checker/checker.go:Checker.hasNonCircularBaseConstraint
     pub(crate) fn has_non_circular_base_constraint(&mut self, ty: TypeId) -> Result<bool, Error> {
         Ok(self.resolved_base_constraint(ty, &mut Vec::new())?
             != self.builtins.circular_constraint_type)
@@ -204,6 +205,11 @@ impl CheckerState {
             return Ok(None);
         }
         self.constraint_from_type_parameter(ty)
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.getBaseConstraintOrType
+    pub(crate) fn base_constraint_or_type(&mut self, ty: TypeId) -> Result<TypeId, Error> {
+        Ok(self.base_constraint_of_type(ty)?.unwrap_or(ty))
     }
 
     // port: tsc/internal/checker/checker.go:Checker.getBaseConstraintOfType
@@ -268,7 +274,12 @@ impl CheckerState {
                 return Ok(None);
             }
             stack.push(identity);
-            let result = self.compute_base_constraint(ty, stack);
+            // The pin computes over the simplified type: a conditional of the
+            // form `T extends U ? never : T` with an any-like extends type is
+            // `never` here, which decides the base constraint of a union that
+            // contains it.
+            let simplified = self.simplified_type(ty, false)?;
+            let result = self.compute_base_constraint(simplified, stack);
             stack.pop();
             result
         })();
@@ -278,11 +289,33 @@ impl CheckerState {
             if self.types.flags(ty)? & tf::TYPE_PARAMETER != 0 {
                 if let Some(node) = self.constraint_declaration(ty)? {
                     let name = self.type_to_string(ty, crate::type_format_flags::NONE)?;
-                    self.error_at(
+                    let index = self.error_at(
                         Some(node),
                         tsr_diagnostics::Type_parameter_0_has_a_circular_constraint,
                         vec![name],
                     )?;
+                    // The pin points at the type being checked when it is
+                    // neither inside nor around the constraint declaration.
+                    if let (Some(index), Some(current)) = (index, self.current_node) {
+                        let view = self.ast(node)?;
+                        let unrelated = !tsr_ast::utilities::is_node_descendant_of(
+                            view,
+                            Some(node),
+                            Some(current),
+                        )? && !tsr_ast::utilities::is_node_descendant_of(
+                            view,
+                            Some(current),
+                            Some(node),
+                        )?;
+                        if unrelated {
+                            let related = self.diagnostic_for_node(
+                                Some(current),
+                                tsr_diagnostics::Circularity_originates_in_type_at_this_location,
+                                vec![],
+                            )?;
+                            self.add_related_diagnostic(index, related)?;
+                        }
+                    }
                 }
             }
             constraint = self.builtins.circular_constraint_type;
@@ -400,8 +433,15 @@ impl CheckerState {
             return self.next_base_constraint(constraint, stack);
         }
         if flags & tf::CONDITIONAL != 0 {
-            let constraint = self.constraint_from_conditional(ty)?;
-            return self.next_base_constraint(constraint, stack);
+            // Nested conditional constraints stop at 100 levels, as in the pin;
+            // an unbounded chain of instantiations has no constraint.
+            if self.conditional_constraint_depth >= 100 {
+                return Ok(None);
+            }
+            self.conditional_constraint_depth += 1;
+            let constraint = self.constraint_from_conditional(ty);
+            self.conditional_constraint_depth -= 1;
+            return self.next_base_constraint(constraint?, stack);
         }
         if self.is_generic_tuple_type(ty)? {
             let original = self.element_types(ty)?;

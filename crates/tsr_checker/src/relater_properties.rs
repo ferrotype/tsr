@@ -161,6 +161,7 @@ impl Relater<'_> {
         self.properties_related_except(source, target, optional_only, intersection, &[])
     }
 
+    // port: tsc/internal/checker/relater.go:excludeProperties
     pub(crate) fn properties_related_except(
         &mut self,
         source: TypeId,
@@ -192,6 +193,7 @@ impl Relater<'_> {
             self.kind,
             RelationKind::Subtype | RelationKind::StrictSubtype
         ) && source_record.object_flags & of::OBJECT_LITERAL == 0
+            && !self.checker.is_empty_array_literal_type(source)?
             && !self.checker.is_tuple_type(source)?;
         let targets = self.checker.get_properties_of_type(target)?;
         // The missing-property pass precedes type comparisons in Go. Keep it

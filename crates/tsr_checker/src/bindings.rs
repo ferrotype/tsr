@@ -681,7 +681,7 @@ impl CheckerState {
                 self.builtins.unknown_type
             };
             let ty = self.check_declaration_initializer(element, 0, Some(context))?;
-            let ty = self.widen_type_inferred_from_initializer(element, ty)?;
+            let ty = self.widened_literal_type_for_initializer(element, ty)?;
             return self.add_type_optionality(ty, false, true);
         }
         if binding {

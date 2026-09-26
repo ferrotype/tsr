@@ -218,9 +218,11 @@ impl CheckerState {
                         && for_constraint
                         && self.types.flags(inferred_extends)? & tf::NEVER == 0
                     {
+                        // someType: a non-union extends type is its own only
+                        // constituent.
                         let source = self.permissive_instantiation(inferred_extends)?;
                         let target = self.permissive_instantiation(check)?;
-                        for part in self.types.types_of(source)?.to_vec() {
+                        for part in self.distributed_types(source)? {
                             if self.is_type_related_to(part, target, RelationKind::Assignable)? {
                                 possible = true;
                                 break;

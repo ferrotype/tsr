@@ -325,6 +325,7 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.resolveCallExpression
+    // port: tsc/internal/checker/checker.go:Checker.resolveSignature
     fn resolve_call_expression(&mut self, node: NodeId) -> Result<SignatureId, Error> {
         let read = self.node(node)?;
         if read.kind() == K::NewExpression {
@@ -680,6 +681,11 @@ impl CheckerState {
             self.check_source_element(argument)?;
         }
         let candidates = self.reorder_call_candidates(signatures, call_chain_flags)?;
+        if candidates.is_empty() {
+            // The pin returns the unknown signature here: every known program
+            // that reaches this point already has another error on this path.
+            return Ok(self.builtins.unknown_signature);
+        }
         let args = self.effective_call_arguments(node)?;
         let single_non_generic = candidates.len() == 1
             && self

@@ -202,45 +202,41 @@ impl CheckerState {
 
 impl Relater<'_> {
     // port: tsc/internal/checker/relater.go:Checker.isTypeMatchedByTemplateLiteralType
+    /// The target-template-literal case of `structuredTypeRelatedToWorker`:
+    /// a verdict when the pin returns from the case, `None` when it falls
+    /// through to the source-side cases (an unmatched source may still
+    /// relate through its constraint, and reports from there).
     pub(crate) fn template_related(
         &mut self,
         source: TypeId,
         target: TypeId,
-    ) -> Result<crate::Ternary, Error> {
-        if self.kind == RelationKind::Comparable
-            && self.checker.types.flags(source)? & tf::TEMPLATE_LITERAL != 0
-        {
-            let source = &self.checker.types.template_literal(source)?.texts;
-            let target = &self.checker.types.template_literal(target)?.texts;
-            let (s, t) = (source[0].as_bytes(), target[0].as_bytes());
-            let start = s.len().min(t.len());
-            if s[..start] != t[..start] {
-                return Ok(tr::FALSE);
-            }
-            let (s, t) = (
-                source[source.len() - 1].as_bytes(),
-                target[target.len() - 1].as_bytes(),
-            );
-            let end = s.len().min(t.len());
-            return Ok(if s[s.len() - end..] == t[t.len() - end..] {
-                tr::TRUE
-            } else {
-                tr::FALSE
-            });
-        }
+    ) -> Result<Option<crate::Ternary>, Error> {
         if self.checker.types.flags(source)? & tf::TEMPLATE_LITERAL != 0 {
+            if self.kind == RelationKind::Comparable {
+                let source = &self.checker.types.template_literal(source)?.texts;
+                let target = &self.checker.types.template_literal(target)?.texts;
+                let (s, t) = (source[0].as_bytes(), target[0].as_bytes());
+                let start = s.len().min(t.len());
+                if s[..start] != t[..start] {
+                    return Ok(Some(tr::FALSE));
+                }
+                let (s, t) = (
+                    source[source.len() - 1].as_bytes(),
+                    target[target.len() - 1].as_bytes(),
+                );
+                let end = s.len().min(t.len());
+                return Ok(Some(if s[s.len() - end..] == t[t.len() - end..] {
+                    tr::TRUE
+                } else {
+                    tr::FALSE
+                }));
+            }
             self.checker.report_unreliable_markers(source, false)?;
         }
-        Ok(
-            if self
-                .checker
-                .template_types_match(source, target, Some(self.frame))?
-            {
-                tr::TRUE
-            } else {
-                tr::FALSE
-            },
-        )
+        Ok(self
+            .checker
+            .template_types_match(source, target, Some(self.frame))?
+            .then_some(tr::TRUE))
     }
 }
 

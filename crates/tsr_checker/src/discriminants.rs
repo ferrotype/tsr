@@ -56,6 +56,7 @@ impl CheckerState {
         Ok(self.symbol(property)?.check_flags() & cf::IS_DISCRIMINANT != 0)
     }
 
+    // port: tsc/internal/checker/checker.go:Checker.getTypeOfPropertyOrIndexSignatureOfType
     pub(crate) fn property_or_index_type(
         &mut self,
         ty: TypeId,

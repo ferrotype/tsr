@@ -98,7 +98,9 @@ impl Relater<'_> {
         };
         let applicable = match filtered {
             Some(filtered) => self.checker.types.flags(filtered)? & tf::NEVER == 0,
-            None => self.related(target_keys, source_keys, BOTH, 0)? != tr::FALSE,
+            None => {
+                self.related_with_errors(target_keys, source_keys, BOTH, 0, false)? != tr::FALSE
+            }
         };
         if !applicable {
             return Ok(tr::FALSE);

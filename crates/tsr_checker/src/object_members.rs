@@ -98,6 +98,7 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.instantiateIndexInfo
+    // port: tsc/internal/checker/checker.go:Checker.instantiateIndexInfos
     fn instantiate_index_infos(
         &mut self,
         indexes: &[IndexInfoId],
@@ -199,23 +200,33 @@ impl CheckerState {
                 self.tables
                     .get_mut(members.expect("inherited table created above"))?
                     .reserve(inherited.len());
+                let table_id = members.expect("inherited table created above");
                 for property in inherited.iter().copied() {
                     // addInheritedMembers never inherits static private names.
                     if self.is_static_private_identifier_property(property)? {
                         continue;
                     }
-                    let CheckerState {
-                        program,
-                        symbols,
-                        tables,
-                        ..
-                    } = &mut *self;
-                    let name = split_symbol(program.as_ref(), symbols, property)?;
-                    let name = name.name_bytes();
-                    let mut table =
-                        tables.get_mut(members.expect("inherited table created above"))?;
-                    if table.get(name).flatten().is_none() {
-                        table.insert_bytes(name, Some(property));
+                    let name = {
+                        let CheckerState {
+                            program, symbols, ..
+                        } = &*self;
+                        split_symbol(program.as_ref(), symbols, property)?
+                            .name_bytes()
+                            .to_vec()
+                    };
+                    // A declared member keeps its place only when it is a value;
+                    // a type-only entry (a type parameter named like the
+                    // member) gives way to the inherited property, as the pin's
+                    // addInheritedMembers does.
+                    let existing = self.tables.get(table_id)?.get(&name).flatten();
+                    let keep = match existing {
+                        Some(symbol) => self.symbol(symbol)?.flags() & sf::VALUE != 0,
+                        None => false,
+                    };
+                    if !keep {
+                        self.tables
+                            .get_mut(table_id)?
+                            .insert_bytes(&name, Some(property));
                     }
                 }
                 // A class extending an `any` base records `any` as its base type;
@@ -328,6 +339,7 @@ impl CheckerState {
         self.set_structured_type_members(ty, members, &calls, &constructs, &indexes)
     }
 
+    // port: tsc/internal/checker/checker.go:Checker.getSignaturesOfType
     pub(crate) fn signatures_of_type(
         &mut self,
         ty: TypeId,

@@ -468,6 +468,52 @@ impl CheckerState {
         self.signatures.get_mut(signature)?.erased = Some(erased);
         Ok(erased)
     }
+
+    // port: tsc/internal/checker/checker.go:Checker.getCanonicalSignature
+    pub(crate) fn canonical_signature(
+        &mut self,
+        signature: SignatureId,
+    ) -> Result<SignatureId, Error> {
+        let sig = self.signatures.get(signature)?;
+        let Some(parameters) = sig
+            .type_parameters
+            .clone()
+            .filter(|parameters| !parameters.is_empty())
+        else {
+            return Ok(signature);
+        };
+        if let Some(canonical) = sig.canonical {
+            return Ok(canonical);
+        }
+        let canonical = self.create_canonical_signature(signature, &parameters)?;
+        self.signatures.get_mut(signature)?.canonical = Some(canonical);
+        Ok(canonical)
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.createCanonicalSignature
+    fn create_canonical_signature(
+        &mut self,
+        signature: SignatureId,
+        parameters: &[TypeId],
+    ) -> Result<SignatureId, Error> {
+        // An instantiation where each unconstrained type parameter is replaced
+        // with its original: generic methods of an instantiated class get fresh
+        // clones of their type parameters, and comparing those identities is
+        // wasted work.
+        let mut arguments = Vec::with_capacity(parameters.len());
+        for &parameter in parameters {
+            let target = self.types.type_parameter(parameter)?.target;
+            arguments.push(match target {
+                Some(target) if self.constraint_of_type_parameter(target)?.is_none() => target,
+                _ => parameter,
+            });
+        }
+        let javascript = match self.signatures.get(signature)?.declaration {
+            Some(node) => self.node(node)?.flags() & tsr_ast::node_flags::JAVA_SCRIPT_FILE != 0,
+            None => false,
+        };
+        self.signature_instantiation(signature, &arguments, javascript)
+    }
 }
 
 impl CheckerState {

@@ -398,6 +398,14 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.newTypeParameter
+    // port: tsc/internal/checker/checker.go:Checker.cloneTypeParameter
+    pub(crate) fn clone_type_parameter(&mut self, source: TypeId) -> Result<TypeId, Error> {
+        let symbol = self.types.get(source)?.symbol;
+        let result = self.new_type_parameter(symbol)?;
+        self.types.type_parameter_mut(result)?.target = Some(source);
+        Ok(result)
+    }
+
     pub(crate) fn new_type_parameter(&mut self, symbol: Option<SymbolId>) -> Result<TypeId, Error> {
         let t = self.types.new_type(
             type_flags::TYPE_PARAMETER,

@@ -558,15 +558,11 @@ impl CheckerState {
                                             )?;
                                             let non_evolving =
                                                 self.finalize_evolving_array(previous.ty)?;
+                                            // getNonNullableTypeIfNeeded: a type whose facts
+                                            // exclude null and undefined (an unconstrained
+                                            // type parameter included) stays as it is.
                                             return Ok(FlowType::complete(
-                                                if self.options.strict_null_checks {
-                                                    self.adjusted_type_with_facts(
-                                                        non_evolving,
-                                                        facts::NE_UNDEFINED_OR_NULL,
-                                                    )?
-                                                } else {
-                                                    non_evolving
-                                                },
+                                                self.non_nullable_type_if_needed(non_evolving)?,
                                             ));
                                         }
                                     }
