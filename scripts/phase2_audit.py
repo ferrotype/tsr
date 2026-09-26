@@ -84,6 +84,24 @@ C2_COMPLETE_FILES = {"C2.4 inference (inference.go)": "tsc/internal/checker/infe
 # binds already marked core operators from the modules named in C2.2--C2.9.
 # This guard cannot make any audit disposition complete.
 C2_OWNERSHIP = (337, "d689efb64d8edefc7b8e03f8769feab2628692f9dd094165979e7321e07e57b8")
+# C3.1 scope at the recorded C2 exit (bb29600): the complete flow.go and jsdoc.go
+# inventories plus the checker.go, grammarchecks.go and utilities.go functions of
+# the C3 areas that no C1 or C2 group or C2 ownership entry lists (JSX and
+# decorators are C4's; the exported API, services, node builder and emit
+# resolver are C5's). Generated from status/unmapped-functions.json.
+C3_REVIEWED_GROUPS = {
+    "C3.2 narrowing and flow (flow.go)": (130, "8a714694cb960bea3d8af77ccd1cd1fea3c237a6ee7325a69b89f04536204818"),
+    "C3.3 iteration, async and generators": (11, "1c05df5e1c15b1f402a3fa86174e34f9af6813be6d2d1e4000f3d059afc6b3e5"),
+    "C3.4 classes, this and members": (51, "8755a05d6d75c1fdf09b017b98401e86fbb201b3c3c0e9c04372b1b82c8c534d"),
+    "C3.5 namespaces, modules and aliases": (33, "2aae81b58f592a4ac63405e42725a6a0d3d74a15668b1e99c06d17affd477f65"),
+    "C3.6 JavaScript and JSDoc (jsdoc.go)": (4, "d0ca0e916e5e8adb952ac7323f60045d688b6ccf9822723d3f64f9f2aecfccd9"),
+    "C3.7 statements, expressions and grammar (grammarchecks.go share)": (136, "9a852a12aa9866f64b9b3557d263d1209184da0d4d4a27f406f3c88802a8b422"),
+    "C3.8 utilities (utilities.go share)": (143, "56cda335a5295c55602fbc240e65793810f50c688d5dc299cd223f0c04bcb3a9"),
+}
+C3_COMPLETE_FILES = {"C3.2 narrowing and flow (flow.go)": "tsc/internal/checker/flow.go:"}
+SCOPES = {"C1": (REVIEWED_GROUPS, COMPLETE_FILES, REQUIRED_HANDOFFS),
+          "C2": (C2_REVIEWED_GROUPS, C2_COMPLETE_FILES, {}),
+          "C3": (C3_REVIEWED_GROUPS, C3_COMPLETE_FILES, {})}
 
 
 def inventory():
@@ -122,13 +140,13 @@ def problems(document, *, allow_open=False, root=ROOT, known=None, mapped=None,
     if not isinstance(document, dict):
         return ["audit must be an object"]
     checkpoint = document.get("checkpoint", "C1")
-    if checkpoint not in ("C1", "C2"):
+    if checkpoint not in SCOPES:
         return ["unsupported audit checkpoint"]
+    scope_groups, complete_files, scope_handoffs = SCOPES[checkpoint]
     if reviewed is None:
-        reviewed = REVIEWED_GROUPS if checkpoint == "C1" else C2_REVIEWED_GROUPS
+        reviewed = scope_groups
     if required_handoffs is None:
-        required_handoffs = REQUIRED_HANDOFFS if checkpoint == "C1" else {}
-    complete_files = COMPLETE_FILES if checkpoint == "C1" else C2_COMPLETE_FILES
+        required_handoffs = scope_handoffs
     allowed_owners = later_owners(checkpoint)
     known = inventory() if known is None else known
     mapped = markers(root) if mapped is None else mapped

@@ -1,0 +1,2089 @@
+{
+ "checkpoint": "C3",
+ "dispositions": {
+  "tsc/internal/checker/checker.go:Checker.addDeferredDiagnostic": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.addDeprecatedSuggestionWithSignature": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.addDuplicateDeclarationErrorsForSymbols": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.allTypesAssignableToKindEx": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.checkAndReportErrorForExportingPrimitiveType": {
+   "disposition": "gap",
+   "item": "C3.5",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.checkAndReportErrorForExtendingInterface": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.checkAndReportErrorForUsingNamespaceAsTypeOrValue": {
+   "disposition": "gap",
+   "item": "C3.5",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.checkAndReportErrorForUsingTypeAsNamespace": {
+   "disposition": "gap",
+   "item": "C3.5",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.checkAndReportErrorForUsingTypeAsValue": {
+   "disposition": "gap",
+   "item": "C3.5",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.checkAndReportErrorForUsingValueAsType": {
+   "disposition": "gap",
+   "item": "C3.5",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.checkBaseTypeAccessibility": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.checkBinaryExpression": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.checkBindingElement": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.checkClassForStaticPropertyNameConflicts": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.checkClassNameCollisionWithObject": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.checkClassStaticBlockDeclaration": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.checkCollisionWithGlobalObjectInGeneratedCode": {
+   "disposition": "gap",
+   "item": "C3.5",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.checkCollisionWithRequireExportsInGeneratedCode": {
+   "disposition": "gap",
+   "item": "C3.5",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.checkDeferredNode": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.checkElementAccessChain": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.checkExpression": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.checkExpressionStatement": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.checkJSDocComment": {
+   "disposition": "gap",
+   "item": "C3.6",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.checkJSDocTypeIsInJsFile": {
+   "disposition": "gap",
+   "item": "C3.6",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.checkMemberForOverrideModifier": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.checkMetaPropertyKeyword": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.checkNonNullExpression": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.checkNullishCoalesceOperandLeft": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.checkParenthesizedExpression": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.checkPropertyAccessChain": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.checkPropertyAccessibility": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.checkPropertyAccessibilityEx": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.checkSourceElement": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.checkSourceElements": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.checkThisType": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.checkTypeOperator": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.checkTypeQuery": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.checkVariableStatement": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.checkVoidExpression": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.combineIterationTypes": {
+   "disposition": "gap",
+   "item": "C3.3",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.combineUnionOrIntersectionThisParam": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.createNameResolverForSuggestion": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.errorOnImplicitAnyModule": {
+   "disposition": "gap",
+   "item": "C3.5",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.errorOrSuggestion": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.errorSkippedOnNoEmit": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.extractTypesOfKind": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.getAnnotatedAccessorThisParameter": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.getBuiltinIteratorReturnType": {
+   "disposition": "gap",
+   "item": "C3.3",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.getCannotResolveModuleNameErrorForSpecificModule": {
+   "disposition": "gap",
+   "item": "C3.5",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.getClassElementPropertyKeyType": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.getConstituentProperty": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.getContextNode": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.getDefinitelyFalsyPartOfType": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.getDiagnostics": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.getEmitSyntaxForModuleSpecifierExpression": {
+   "disposition": "gap",
+   "item": "C3.5",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.getEntityNameForExtendingInterface": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.getForInVariableSymbol": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.getGlobalStrictFunctionType": {
+   "disposition": "gap",
+   "item": "C3.5",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.getIsolatedModulesLikeFlagName": {
+   "disposition": "gap",
+   "item": "C3.5",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.getIterationTypeOfIterable": {
+   "disposition": "gap",
+   "item": "C3.3",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.getIterationTypeUnion": {
+   "disposition": "gap",
+   "item": "C3.3",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.getIterationTypesOfIterator": {
+   "disposition": "gap",
+   "item": "C3.3",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.getIterationTypesOfIteratorSlow": {
+   "disposition": "gap",
+   "item": "C3.3",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.getMemberOverrideModifierStatus": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.getParentTypeOfClassElement": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.getPrivateIdentifierPropertyOfType": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.getPropertyNameFromBindingElement": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.getPropertyOfType": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.getPropertyOfVariable": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.getRequiresScopeChangeCache": {
+   "disposition": "gap",
+   "item": "C3.5",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.getSpreadIndices": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.getSuggestedBooleanOperator": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.getSuggestedSymbolForNonexistentProperty": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.getSuggestedSymbolForNonexistentSymbol": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.getSuggestionForSymbolNameLookup": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.getTargetOfBinaryExpression": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.getThisArgumentOfCall": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.getThisArgumentType": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.getThisContainer": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.getTypeFromThisTypeNode": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.getTypeFromTypeLiteralOrFunctionOrConstructorTypeNode": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.getTypeFromTypeOperatorNode": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.getTypeOfFirstParameterOfSignatureWithFallback": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.getTypeOfVariableOrParameterOrProperty": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.getTypeOfVariableOrParameterOrPropertyWorker": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.getTypeOnlyDeclarationOfEntityName": {
+   "disposition": "gap",
+   "item": "C3.5",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.getTypePredicateParent": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.hasContextSensitiveReturnExpression": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.hasContextSensitiveYieldExpression": {
+   "disposition": "gap",
+   "item": "C3.3",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.hasNumericPropertyNames": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.hasParseDiagnostics": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.hasShadowedNamespace": {
+   "disposition": "gap",
+   "item": "C3.5",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.invocationError": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.isAritySmaller": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.isContextSensitiveFunctionLikeDeclaration": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.isContextSensitiveFunctionOrObjectLiteralMethod": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.isOptionalPropertyDeclaration": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.isPropertyAbstractOrInterface": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.isPropertyDeclaredInAncestorClass": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.isPropertyInClassDerivedFrom": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.isPropertyWithoutInitializer": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.isReadonlyTypeOperator": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.isReferenceToSomeType": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.isReferenceToType": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.isReturnIteratorResult": {
+   "disposition": "gap",
+   "item": "C3.3",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.isThisPropertyAndThisTyped": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.isTypeAssignableToKind": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.isUncalledFunctionReference": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.isUnwrappedReturnTypeUndefinedVoidOrAny": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.isYieldIteratorResult": {
+   "disposition": "gap",
+   "item": "C3.3",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.lookupOrIssueError": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.mapTypeWithAlias": {
+   "disposition": "gap",
+   "item": "C3.5",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.markEntityNameOrEntityExpressionAsReference": {
+   "disposition": "gap",
+   "item": "C3.5",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.markExportAssignmentAliasReferenced": {
+   "disposition": "gap",
+   "item": "C3.5",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.markExportSpecifierAliasReferenced": {
+   "disposition": "gap",
+   "item": "C3.5",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.markIdentifierAliasReferenced": {
+   "disposition": "gap",
+   "item": "C3.5",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.markLinkedReferences": {
+   "disposition": "gap",
+   "item": "C3.5",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.markPropertyAliasReferenced": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.markSymbolOfAliasDeclarationIfTypeOnly": {
+   "disposition": "gap",
+   "item": "C3.5",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.markTypeNodeAsReferenced": {
+   "disposition": "gap",
+   "item": "C3.5",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.maybeTypeOfKind": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.newParameter": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.newProperty": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.recordPotentialCollisionWithReflectInGeneratedCode": {
+   "disposition": "gap",
+   "item": "C3.5",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.recordPotentialCollisionWithWeakMapSetInGeneratedCode": {
+   "disposition": "gap",
+   "item": "C3.5",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.removeDefinitelyFalsyTypes": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.reportCannotInvokePossiblyNullOrUndefinedError": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.reportNonExportedMember": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.reportOperatorErrorUnless": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.resolveErrorCall": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.setRequiresScopeChangeCache": {
+   "disposition": "gap",
+   "item": "C3.5",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.shouldCheckErasableSyntax": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.symbolHasNonMethodDeclaration": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:Checker.tryGetThisTypeAt": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:acceptsVoid": {
+   "disposition": "gap",
+   "item": "C3.3",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:countGlobalSymbols": {
+   "disposition": "gap",
+   "item": "C3.5",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:createDiagnosticForNode": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:getAdjustedNodeForError": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:getEffectiveSetAccessorTypeAnnotationNode": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:getEntityNameFromTypeNode": {
+   "disposition": "gap",
+   "item": "C3.5",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:getErrorNodeForCallNode": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:getFirstDeclaration": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:getFirstNonAmbientClassOrFunctionDeclaration": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:getIndexNodeForAccessExpression": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:getModuleSpecifierFromNode": {
+   "disposition": "gap",
+   "item": "C3.5",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:getThisParameterFromNodeContext": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:getVerbatimModuleSyntaxErrorMessage": {
+   "disposition": "gap",
+   "item": "C3.5",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:hasCommonDomTypeName": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:hasRestParameter": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:isES2015OrLaterConstructorName": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:isES2015OrLaterIterable": {
+   "disposition": "gap",
+   "item": "C3.3",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:isExportOrExportExpression": {
+   "disposition": "gap",
+   "item": "C3.5",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:isImmediatelyUsedInInitializerOfBlockScopedVariable": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:isInstancePropertyWithInitializerOrPrivateIdentifierProperty": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:isNotReplacableByMethod": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:isPrimitiveTypeName": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:isPrototypeProperty": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:isRestParameter": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:isSpreadIntoCallOrNew": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:isThisless": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:isThislessFunctionLikeDeclaration": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:resolutionExtensionIsTSOrJson": {
+   "disposition": "gap",
+   "item": "C3.5",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:shouldMarkIdentifierAliasReferenced": {
+   "disposition": "gap",
+   "item": "C3.5",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/checker.go:superCallIsRootLevelInConstructor": {
+   "disposition": "gap",
+   "item": "C3.4",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/flow.go:Checker.eachTypeContainedIn": {
+   "disposition": "gap",
+   "item": "C3.2",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/flow.go:Checker.getAssignedTypeOfArrayLiteralElement": {
+   "disposition": "gap",
+   "item": "C3.2",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/flow.go:Checker.getAssignedTypeOfBinaryExpression": {
+   "disposition": "gap",
+   "item": "C3.2",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/flow.go:Checker.getAssignedTypeOfPropertyAssignment": {
+   "disposition": "gap",
+   "item": "C3.2",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/flow.go:Checker.getAssignedTypeOfShorthandPropertyAssignment": {
+   "disposition": "gap",
+   "item": "C3.2",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/flow.go:Checker.getAssignedTypeOfSpreadExpression": {
+   "disposition": "gap",
+   "item": "C3.2",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/flow.go:Checker.getAssignmentReducedTypeWorker": {
+   "disposition": "gap",
+   "item": "C3.2",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/flow.go:Checker.getElementTypeOfEvolvingArrayType": {
+   "disposition": "gap",
+   "item": "C3.2",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/flow.go:Checker.getFlowState": {
+   "disposition": "gap",
+   "item": "C3.2",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/flow.go:Checker.getFlowTypeOfReference": {
+   "disposition": "gap",
+   "item": "C3.2",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/flow.go:Checker.getLiteralPropertyNameText": {
+   "disposition": "gap",
+   "item": "C3.2",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/flow.go:Checker.getTypeAtFlowAssignment": {
+   "disposition": "gap",
+   "item": "C3.2",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/flow.go:Checker.getTypeAtFlowBranchLabel": {
+   "disposition": "gap",
+   "item": "C3.2",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/flow.go:Checker.getTypeAtFlowCall": {
+   "disposition": "gap",
+   "item": "C3.2",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/flow.go:Checker.getTypeAtFlowCondition": {
+   "disposition": "gap",
+   "item": "C3.2",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/flow.go:Checker.isDeclarationWithExplicitTypeAnnotation": {
+   "disposition": "gap",
+   "item": "C3.2",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/flow.go:Checker.isExpandoPropertyFunctionWithReturnTypeAnnotation": {
+   "disposition": "gap",
+   "item": "C3.2",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/flow.go:Checker.isOrContainsMatchingReference": {
+   "disposition": "gap",
+   "item": "C3.2",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/flow.go:Checker.narrowTypeByBinaryExpression": {
+   "disposition": "gap",
+   "item": "C3.2",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/flow.go:Checker.narrowTypeByBooleanComparison": {
+   "disposition": "gap",
+   "item": "C3.2",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/flow.go:Checker.narrowTypeByOptionality": {
+   "disposition": "gap",
+   "item": "C3.2",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/flow.go:Checker.narrowTypeBySwitchOnDiscriminantProperty": {
+   "disposition": "gap",
+   "item": "C3.2",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/flow.go:Checker.narrowTypeBySwitchOptionalChainContainment": {
+   "disposition": "gap",
+   "item": "C3.2",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/flow.go:Checker.narrowTypeByTypeName": {
+   "disposition": "gap",
+   "item": "C3.2",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/flow.go:Checker.narrowTypeByTypeof": {
+   "disposition": "gap",
+   "item": "C3.2",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/flow.go:Checker.putFlowState": {
+   "disposition": "gap",
+   "item": "C3.2",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/flow.go:Checker.typeMaybeAssignableTo": {
+   "disposition": "gap",
+   "item": "C3.2",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/flow.go:FlowType.isNil": {
+   "disposition": "gap",
+   "item": "C3.2",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/flow.go:getBranchLabelAntecedents": {
+   "disposition": "gap",
+   "item": "C3.2",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/flow.go:getFlowNodeOfNode": {
+   "disposition": "gap",
+   "item": "C3.2",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/flow.go:isCoercibleUnderDoubleEquals": {
+   "disposition": "gap",
+   "item": "C3.2",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/flow.go:isEvolvingArrayTypeList": {
+   "disposition": "gap",
+   "item": "C3.2",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/flow.go:tryGetNameFromType": {
+   "disposition": "gap",
+   "item": "C3.2",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarArrowFunction": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarClassLikeDeclaration": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarConstructorTypeAnnotation": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarConstructorTypeParameters": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarExportDeclaration": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarExpressionWithTypeArguments": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarForAtLeastOneTypeArgument": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarForInvalidExclamationToken": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarForInvalidQuestionMark": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarIndexSignature": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarTopLevelElementForRequiredDeclareModifier": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarTypeOnlyNamedImportsOrExports": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarYieldExpression": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/grammarchecks.go:Checker.doesAccessorHaveCorrectParameterCount": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/grammarchecks.go:Checker.findFirstModifierExcept": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/grammarchecks.go:Checker.reportObviousModifierErrors": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/grammarchecks.go:getIdentifierFromEntityNameExpression": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/grammarchecks.go:isInitializerBigIntLiteralExpression": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/grammarchecks.go:isInitializerStringOrNumberLiteralExpression": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:Checker.callLikeExpressionMayHaveTypeArguments": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:Checker.checkNotCanceled": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:Checker.getPackagesMap": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:Checker.isCanceled": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:Checker.packageBundlesTypes": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:Checker.typesPackageExists": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:GetSetAccessorValueParameter": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:GetSingleVariableOfVariableStatement": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:IsExternalModuleSymbol": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:IsKnownSymbol": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:IsPrivateIdentifierSymbol": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:IsTypeAny": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:NewDiagnosticChainForNode": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:SkipAlias": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:canHaveFlowNode": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:canHaveLocals": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:createSymbolTable": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:declarationBelongsToPrivateAmbientMember": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:findInMap": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:getAliasDeclarationFromName": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:getBindingElementPropertyName": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:getContainingFunctionOrClassStaticBlock": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:getContainingQualifiedNameNode": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:getDeclarationsOfKind": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:getEnclosingContainer": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:getIndexSymbolFromSymbolTable": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:getMembersOfDeclaration": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:getNonRestParameterCount": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:getObjectTypeName": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:getSelectedModifierFlags": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:hasAsyncModifier": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:hasDotDotDotToken": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:hasExportAssignmentSymbol": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:hasOnlyExpressionInitializer": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:hasOverrideModifier": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:hasReadonlyModifier": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:hasType": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:introducesArgumentsExoticObject": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isAdditiveOperator": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isAdditiveOperatorOrHigher": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isAssignmentOperatorOrHigher": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isBinaryOperator": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isBitwiseOperator": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isBitwiseOperatorOrHigher": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isCallChain": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isCompoundLikeAssignment": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isConstTypeReference": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isConstTypeReferenceName": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isDeclarationReadonly": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isEmptyArrayLiteral": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isEmptyObjectLiteral": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isEqualityOperator": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isEqualityOperatorOrHigher": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isExclamationToken": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isExponentiationOperator": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isExportAssignmentExpressionName": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isImportTypeQualifierPart": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isInNameOfExpressionWithTypeArgumentsOrHeritageTypeReference": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isInfinityOrNaNString": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isJSDocOptionalParameter": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isJsxIntrinsicTagName": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isLogicalOperatorOrHigher": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isMultiplicativeOperator": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isMultiplicativeOperatorOrHigher": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isNodeDescendantOf": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isNonNullAccess": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isObjectLiteralType": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isObjectOrArrayLiteralType": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isOptionalDeclaration": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isRelationalOperator": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isRelationalOperatorOrHigher": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isRightSideOfAccessExpression": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isShiftOperator": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isShiftOperatorOrHigher": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isShorthandAmbientModule": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isShorthandAmbientModuleSymbol": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isSideEffectImport": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isSuperCall": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isThisTypeParameter": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isTypeAlias": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isTypeAssertion": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isTypeReferenceIdentifier": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isTypeUsableAsPropertyName": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isValidESSymbolDeclaration": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isValidNumberString": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:isVariableDeclarationInVariableStatement": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:minAndMax": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:nodeStartsNewLexicalEnvironment": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:orderedSet.add": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:orderedSet.contains": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:pseudoBigIntToString": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:symbolsToArray": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:tokenIsIdentifierOrKeyword": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:tokenIsIdentifierOrKeywordOrGreaterThan": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  },
+  "tsc/internal/checker/utilities.go:walkUpOuterExpressions": {
+   "disposition": "gap",
+   "item": "C3.7",
+   "reason": "C3.1 worksheet: not yet reviewed against the Rust modules"
+  }
+ },
+ "groups": {
+  "C3.2 narrowing and flow (flow.go)": [
+   "tsc/internal/checker/flow.go:Checker.addEvolvingArrayElementType",
+   "tsc/internal/checker/flow.go:Checker.computeExhaustiveSwitchStatement",
+   "tsc/internal/checker/flow.go:Checker.containsMatchingReference",
+   "tsc/internal/checker/flow.go:Checker.createFinalArrayType",
+   "tsc/internal/checker/flow.go:Checker.eachTypeContainedIn",
+   "tsc/internal/checker/flow.go:Checker.ensureAssignmentsMarked",
+   "tsc/internal/checker/flow.go:Checker.extendAssignmentPosition",
+   "tsc/internal/checker/flow.go:Checker.finalizeEvolvingArrayType",
+   "tsc/internal/checker/flow.go:Checker.getAccessedPropertyName",
+   "tsc/internal/checker/flow.go:Checker.getAssignedType",
+   "tsc/internal/checker/flow.go:Checker.getAssignedTypeOfArrayLiteralElement",
+   "tsc/internal/checker/flow.go:Checker.getAssignedTypeOfBinaryExpression",
+   "tsc/internal/checker/flow.go:Checker.getAssignedTypeOfPropertyAssignment",
+   "tsc/internal/checker/flow.go:Checker.getAssignedTypeOfShorthandPropertyAssignment",
+   "tsc/internal/checker/flow.go:Checker.getAssignedTypeOfSpreadExpression",
+   "tsc/internal/checker/flow.go:Checker.getAssignmentReducedType",
+   "tsc/internal/checker/flow.go:Checker.getAssignmentReducedTypeWorker",
+   "tsc/internal/checker/flow.go:Checker.getCandidateDiscriminantPropertyAccess",
+   "tsc/internal/checker/flow.go:Checker.getDestructuringPropertyName",
+   "tsc/internal/checker/flow.go:Checker.getDiscriminantPropertyAccess",
+   "tsc/internal/checker/flow.go:Checker.getEffectsSignature",
+   "tsc/internal/checker/flow.go:Checker.getElementTypeOfEvolvingArrayType",
+   "tsc/internal/checker/flow.go:Checker.getEvolvingArrayType",
+   "tsc/internal/checker/flow.go:Checker.getExplicitThisType",
+   "tsc/internal/checker/flow.go:Checker.getExplicitTypeOfSymbol",
+   "tsc/internal/checker/flow.go:Checker.getFinalArrayType",
+   "tsc/internal/checker/flow.go:Checker.getFlowReferenceKey",
+   "tsc/internal/checker/flow.go:Checker.getFlowState",
+   "tsc/internal/checker/flow.go:Checker.getFlowTypeInConstructor",
+   "tsc/internal/checker/flow.go:Checker.getFlowTypeInStaticBlocks",
+   "tsc/internal/checker/flow.go:Checker.getFlowTypeOfReference",
+   "tsc/internal/checker/flow.go:Checker.getFlowTypeOfReferenceEx",
+   "tsc/internal/checker/flow.go:Checker.getInitialOrAssignedType",
+   "tsc/internal/checker/flow.go:Checker.getInitialType",
+   "tsc/internal/checker/flow.go:Checker.getInitialTypeOfBindingElement",
+   "tsc/internal/checker/flow.go:Checker.getInitialTypeOfVariableDeclaration",
+   "tsc/internal/checker/flow.go:Checker.getInstanceType",
+   "tsc/internal/checker/flow.go:Checker.getLiteralPropertyNameText",
+   "tsc/internal/checker/flow.go:Checker.getNarrowedType",
+   "tsc/internal/checker/flow.go:Checker.getNarrowedTypeWorker",
+   "tsc/internal/checker/flow.go:Checker.getNotEqualFactsFromTypeofSwitch",
+   "tsc/internal/checker/flow.go:Checker.getPropertyNameForKnownSymbolName",
+   "tsc/internal/checker/flow.go:Checker.getReferenceCandidate",
+   "tsc/internal/checker/flow.go:Checker.getReferenceRoot",
+   "tsc/internal/checker/flow.go:Checker.getSwitchClauseTypeOfWitnesses",
+   "tsc/internal/checker/flow.go:Checker.getSwitchClauseTypes",
+   "tsc/internal/checker/flow.go:Checker.getSymbolHasInstanceMethodOfObjectType",
+   "tsc/internal/checker/flow.go:Checker.getTypeAtFlowArrayMutation",
+   "tsc/internal/checker/flow.go:Checker.getTypeAtFlowAssignment",
+   "tsc/internal/checker/flow.go:Checker.getTypeAtFlowBranchLabel",
+   "tsc/internal/checker/flow.go:Checker.getTypeAtFlowCall",
+   "tsc/internal/checker/flow.go:Checker.getTypeAtFlowCondition",
+   "tsc/internal/checker/flow.go:Checker.getTypeAtFlowLoopLabel",
+   "tsc/internal/checker/flow.go:Checker.getTypeAtFlowNode",
+   "tsc/internal/checker/flow.go:Checker.getTypeAtSwitchClause",
+   "tsc/internal/checker/flow.go:Checker.getTypeOfDestructuredArrayElement",
+   "tsc/internal/checker/flow.go:Checker.getTypeOfDestructuredProperty",
+   "tsc/internal/checker/flow.go:Checker.getTypeOfDestructuredSpreadExpression",
+   "tsc/internal/checker/flow.go:Checker.getTypeOfDottedName",
+   "tsc/internal/checker/flow.go:Checker.getTypeOfInitializer",
+   "tsc/internal/checker/flow.go:Checker.getTypeOfSwitchClause",
+   "tsc/internal/checker/flow.go:Checker.getTypePredicateArgument",
+   "tsc/internal/checker/flow.go:Checker.getTypeWithDefault",
+   "tsc/internal/checker/flow.go:Checker.getUnionOrEvolvingArrayType",
+   "tsc/internal/checker/flow.go:Checker.hasMatchingArgument",
+   "tsc/internal/checker/flow.go:Checker.hasParentWithAssignmentsMarked",
+   "tsc/internal/checker/flow.go:Checker.hasTypePredicateOrNeverReturnType",
+   "tsc/internal/checker/flow.go:Checker.includeUndefinedInIndexSignature",
+   "tsc/internal/checker/flow.go:Checker.isConstantReference",
+   "tsc/internal/checker/flow.go:Checker.isConstructedBy",
+   "tsc/internal/checker/flow.go:Checker.isDeclarationWithExplicitTypeAnnotation",
+   "tsc/internal/checker/flow.go:Checker.isDestructuringAssignmentTarget",
+   "tsc/internal/checker/flow.go:Checker.isEmptyArrayAssignment",
+   "tsc/internal/checker/flow.go:Checker.isEvolvingArrayOperationTarget",
+   "tsc/internal/checker/flow.go:Checker.isExhaustiveSwitchStatement",
+   "tsc/internal/checker/flow.go:Checker.isExpandoPropertyFunctionWithReturnTypeAnnotation",
+   "tsc/internal/checker/flow.go:Checker.isFalseExpression",
+   "tsc/internal/checker/flow.go:Checker.isMatchingConstructorReference",
+   "tsc/internal/checker/flow.go:Checker.isMatchingReference",
+   "tsc/internal/checker/flow.go:Checker.isOrContainsMatchingReference",
+   "tsc/internal/checker/flow.go:Checker.isPastLastAssignment",
+   "tsc/internal/checker/flow.go:Checker.isPostSuperFlowNode",
+   "tsc/internal/checker/flow.go:Checker.isPostSuperFlowNodeWorker",
+   "tsc/internal/checker/flow.go:Checker.isReachableFlowNode",
+   "tsc/internal/checker/flow.go:Checker.isReachableFlowNodeWorker",
+   "tsc/internal/checker/flow.go:Checker.isSymbolAssigned",
+   "tsc/internal/checker/flow.go:Checker.isSymbolAssignedDefinitely",
+   "tsc/internal/checker/flow.go:Checker.isTypePresencePossible",
+   "tsc/internal/checker/flow.go:Checker.markNodeAssignmentsWorker",
+   "tsc/internal/checker/flow.go:Checker.narrowType",
+   "tsc/internal/checker/flow.go:Checker.narrowTypeByAssertion",
+   "tsc/internal/checker/flow.go:Checker.narrowTypeByBinaryExpression",
+   "tsc/internal/checker/flow.go:Checker.narrowTypeByBooleanComparison",
+   "tsc/internal/checker/flow.go:Checker.narrowTypeByCallExpression",
+   "tsc/internal/checker/flow.go:Checker.narrowTypeByConstructor",
+   "tsc/internal/checker/flow.go:Checker.narrowTypeByDiscriminant",
+   "tsc/internal/checker/flow.go:Checker.narrowTypeByDiscriminantProperty",
+   "tsc/internal/checker/flow.go:Checker.narrowTypeByEquality",
+   "tsc/internal/checker/flow.go:Checker.narrowTypeByInKeyword",
+   "tsc/internal/checker/flow.go:Checker.narrowTypeByInstanceof",
+   "tsc/internal/checker/flow.go:Checker.narrowTypeByLiteralExpression",
+   "tsc/internal/checker/flow.go:Checker.narrowTypeByOptionalChainContainment",
+   "tsc/internal/checker/flow.go:Checker.narrowTypeByOptionality",
+   "tsc/internal/checker/flow.go:Checker.narrowTypeByPrivateIdentifierInInExpression",
+   "tsc/internal/checker/flow.go:Checker.narrowTypeBySwitchOnDiscriminant",
+   "tsc/internal/checker/flow.go:Checker.narrowTypeBySwitchOnDiscriminantProperty",
+   "tsc/internal/checker/flow.go:Checker.narrowTypeBySwitchOnTrue",
+   "tsc/internal/checker/flow.go:Checker.narrowTypeBySwitchOnTypeOf",
+   "tsc/internal/checker/flow.go:Checker.narrowTypeBySwitchOptionalChainContainment",
+   "tsc/internal/checker/flow.go:Checker.narrowTypeByTruthiness",
+   "tsc/internal/checker/flow.go:Checker.narrowTypeByTypeFacts",
+   "tsc/internal/checker/flow.go:Checker.narrowTypeByTypeName",
+   "tsc/internal/checker/flow.go:Checker.narrowTypeByTypePredicate",
+   "tsc/internal/checker/flow.go:Checker.narrowTypeByTypeof",
+   "tsc/internal/checker/flow.go:Checker.newFlowType",
+   "tsc/internal/checker/flow.go:Checker.optionalChainContainsReference",
+   "tsc/internal/checker/flow.go:Checker.putFlowState",
+   "tsc/internal/checker/flow.go:Checker.replacePrimitivesWithLiterals",
+   "tsc/internal/checker/flow.go:Checker.reportFlowControlError",
+   "tsc/internal/checker/flow.go:Checker.tryGetElementAccessExpressionName",
+   "tsc/internal/checker/flow.go:Checker.tryGetNameFromEntityNameExpression",
+   "tsc/internal/checker/flow.go:Checker.typeMaybeAssignableTo",
+   "tsc/internal/checker/flow.go:Checker.writeFlowCacheKey",
+   "tsc/internal/checker/flow.go:FlowType.isNil",
+   "tsc/internal/checker/flow.go:getBranchLabelAntecedents",
+   "tsc/internal/checker/flow.go:getCandidateVariableDeclarationInitializer",
+   "tsc/internal/checker/flow.go:getFlowNodeOfNode",
+   "tsc/internal/checker/flow.go:isCoercibleUnderDoubleEquals",
+   "tsc/internal/checker/flow.go:isEvolvingArrayTypeList",
+   "tsc/internal/checker/flow.go:tryGetNameFromType"
+  ],
+  "C3.3 iteration, async and generators": [
+   "tsc/internal/checker/checker.go:Checker.combineIterationTypes",
+   "tsc/internal/checker/checker.go:Checker.getBuiltinIteratorReturnType",
+   "tsc/internal/checker/checker.go:Checker.getIterationTypeOfIterable",
+   "tsc/internal/checker/checker.go:Checker.getIterationTypeUnion",
+   "tsc/internal/checker/checker.go:Checker.getIterationTypesOfIterator",
+   "tsc/internal/checker/checker.go:Checker.getIterationTypesOfIteratorSlow",
+   "tsc/internal/checker/checker.go:Checker.hasContextSensitiveYieldExpression",
+   "tsc/internal/checker/checker.go:Checker.isReturnIteratorResult",
+   "tsc/internal/checker/checker.go:Checker.isYieldIteratorResult",
+   "tsc/internal/checker/checker.go:acceptsVoid",
+   "tsc/internal/checker/checker.go:isES2015OrLaterIterable"
+  ],
+  "C3.4 classes, this and members": [
+   "tsc/internal/checker/checker.go:Checker.checkAndReportErrorForExtendingInterface",
+   "tsc/internal/checker/checker.go:Checker.checkBaseTypeAccessibility",
+   "tsc/internal/checker/checker.go:Checker.checkClassForStaticPropertyNameConflicts",
+   "tsc/internal/checker/checker.go:Checker.checkClassNameCollisionWithObject",
+   "tsc/internal/checker/checker.go:Checker.checkClassStaticBlockDeclaration",
+   "tsc/internal/checker/checker.go:Checker.checkMemberForOverrideModifier",
+   "tsc/internal/checker/checker.go:Checker.checkMetaPropertyKeyword",
+   "tsc/internal/checker/checker.go:Checker.checkPropertyAccessChain",
+   "tsc/internal/checker/checker.go:Checker.checkPropertyAccessibility",
+   "tsc/internal/checker/checker.go:Checker.checkPropertyAccessibilityEx",
+   "tsc/internal/checker/checker.go:Checker.checkThisType",
+   "tsc/internal/checker/checker.go:Checker.combineUnionOrIntersectionThisParam",
+   "tsc/internal/checker/checker.go:Checker.getAnnotatedAccessorThisParameter",
+   "tsc/internal/checker/checker.go:Checker.getClassElementPropertyKeyType",
+   "tsc/internal/checker/checker.go:Checker.getConstituentProperty",
+   "tsc/internal/checker/checker.go:Checker.getEntityNameForExtendingInterface",
+   "tsc/internal/checker/checker.go:Checker.getMemberOverrideModifierStatus",
+   "tsc/internal/checker/checker.go:Checker.getParentTypeOfClassElement",
+   "tsc/internal/checker/checker.go:Checker.getPrivateIdentifierPropertyOfType",
+   "tsc/internal/checker/checker.go:Checker.getPropertyNameFromBindingElement",
+   "tsc/internal/checker/checker.go:Checker.getPropertyOfType",
+   "tsc/internal/checker/checker.go:Checker.getPropertyOfVariable",
+   "tsc/internal/checker/checker.go:Checker.getSuggestedSymbolForNonexistentProperty",
+   "tsc/internal/checker/checker.go:Checker.getThisArgumentOfCall",
+   "tsc/internal/checker/checker.go:Checker.getThisArgumentType",
+   "tsc/internal/checker/checker.go:Checker.getThisContainer",
+   "tsc/internal/checker/checker.go:Checker.getTypeFromThisTypeNode",
+   "tsc/internal/checker/checker.go:Checker.getTypeFromTypeLiteralOrFunctionOrConstructorTypeNode",
+   "tsc/internal/checker/checker.go:Checker.getTypeOfVariableOrParameterOrProperty",
+   "tsc/internal/checker/checker.go:Checker.getTypeOfVariableOrParameterOrPropertyWorker",
+   "tsc/internal/checker/checker.go:Checker.hasNumericPropertyNames",
+   "tsc/internal/checker/checker.go:Checker.isOptionalPropertyDeclaration",
+   "tsc/internal/checker/checker.go:Checker.isPropertyAbstractOrInterface",
+   "tsc/internal/checker/checker.go:Checker.isPropertyDeclaredInAncestorClass",
+   "tsc/internal/checker/checker.go:Checker.isPropertyInClassDerivedFrom",
+   "tsc/internal/checker/checker.go:Checker.isPropertyWithoutInitializer",
+   "tsc/internal/checker/checker.go:Checker.isThisPropertyAndThisTyped",
+   "tsc/internal/checker/checker.go:Checker.markPropertyAliasReferenced",
+   "tsc/internal/checker/checker.go:Checker.newProperty",
+   "tsc/internal/checker/checker.go:Checker.reportNonExportedMember",
+   "tsc/internal/checker/checker.go:Checker.tryGetThisTypeAt",
+   "tsc/internal/checker/checker.go:getEffectiveSetAccessorTypeAnnotationNode",
+   "tsc/internal/checker/checker.go:getFirstNonAmbientClassOrFunctionDeclaration",
+   "tsc/internal/checker/checker.go:getThisParameterFromNodeContext",
+   "tsc/internal/checker/checker.go:isES2015OrLaterConstructorName",
+   "tsc/internal/checker/checker.go:isImmediatelyUsedInInitializerOfBlockScopedVariable",
+   "tsc/internal/checker/checker.go:isInstancePropertyWithInitializerOrPrivateIdentifierProperty",
+   "tsc/internal/checker/checker.go:isPrototypeProperty",
+   "tsc/internal/checker/checker.go:isThisless",
+   "tsc/internal/checker/checker.go:isThislessFunctionLikeDeclaration",
+   "tsc/internal/checker/checker.go:superCallIsRootLevelInConstructor"
+  ],
+  "C3.5 namespaces, modules and aliases": [
+   "tsc/internal/checker/checker.go:Checker.checkAndReportErrorForExportingPrimitiveType",
+   "tsc/internal/checker/checker.go:Checker.checkAndReportErrorForUsingNamespaceAsTypeOrValue",
+   "tsc/internal/checker/checker.go:Checker.checkAndReportErrorForUsingTypeAsNamespace",
+   "tsc/internal/checker/checker.go:Checker.checkAndReportErrorForUsingTypeAsValue",
+   "tsc/internal/checker/checker.go:Checker.checkAndReportErrorForUsingValueAsType",
+   "tsc/internal/checker/checker.go:Checker.checkCollisionWithGlobalObjectInGeneratedCode",
+   "tsc/internal/checker/checker.go:Checker.checkCollisionWithRequireExportsInGeneratedCode",
+   "tsc/internal/checker/checker.go:Checker.errorOnImplicitAnyModule",
+   "tsc/internal/checker/checker.go:Checker.getCannotResolveModuleNameErrorForSpecificModule",
+   "tsc/internal/checker/checker.go:Checker.getEmitSyntaxForModuleSpecifierExpression",
+   "tsc/internal/checker/checker.go:Checker.getGlobalStrictFunctionType",
+   "tsc/internal/checker/checker.go:Checker.getIsolatedModulesLikeFlagName",
+   "tsc/internal/checker/checker.go:Checker.getRequiresScopeChangeCache",
+   "tsc/internal/checker/checker.go:Checker.getTypeOnlyDeclarationOfEntityName",
+   "tsc/internal/checker/checker.go:Checker.hasShadowedNamespace",
+   "tsc/internal/checker/checker.go:Checker.mapTypeWithAlias",
+   "tsc/internal/checker/checker.go:Checker.markEntityNameOrEntityExpressionAsReference",
+   "tsc/internal/checker/checker.go:Checker.markExportAssignmentAliasReferenced",
+   "tsc/internal/checker/checker.go:Checker.markExportSpecifierAliasReferenced",
+   "tsc/internal/checker/checker.go:Checker.markIdentifierAliasReferenced",
+   "tsc/internal/checker/checker.go:Checker.markLinkedReferences",
+   "tsc/internal/checker/checker.go:Checker.markSymbolOfAliasDeclarationIfTypeOnly",
+   "tsc/internal/checker/checker.go:Checker.markTypeNodeAsReferenced",
+   "tsc/internal/checker/checker.go:Checker.recordPotentialCollisionWithReflectInGeneratedCode",
+   "tsc/internal/checker/checker.go:Checker.recordPotentialCollisionWithWeakMapSetInGeneratedCode",
+   "tsc/internal/checker/checker.go:Checker.setRequiresScopeChangeCache",
+   "tsc/internal/checker/checker.go:countGlobalSymbols",
+   "tsc/internal/checker/checker.go:getEntityNameFromTypeNode",
+   "tsc/internal/checker/checker.go:getModuleSpecifierFromNode",
+   "tsc/internal/checker/checker.go:getVerbatimModuleSyntaxErrorMessage",
+   "tsc/internal/checker/checker.go:isExportOrExportExpression",
+   "tsc/internal/checker/checker.go:resolutionExtensionIsTSOrJson",
+   "tsc/internal/checker/checker.go:shouldMarkIdentifierAliasReferenced"
+  ],
+  "C3.6 JavaScript and JSDoc (jsdoc.go)": [
+   "tsc/internal/checker/checker.go:Checker.checkJSDocComment",
+   "tsc/internal/checker/checker.go:Checker.checkJSDocTypeIsInJsFile",
+   "tsc/internal/checker/jsdoc.go:Checker.checkUnmatchedJSDocParameters",
+   "tsc/internal/checker/jsdoc.go:getAllJSDocTags"
+  ],
+  "C3.7 statements, expressions and grammar (grammarchecks.go share)": [
+   "tsc/internal/checker/checker.go:Checker.addDeferredDiagnostic",
+   "tsc/internal/checker/checker.go:Checker.addDeprecatedSuggestionWithSignature",
+   "tsc/internal/checker/checker.go:Checker.addDuplicateDeclarationErrorsForSymbols",
+   "tsc/internal/checker/checker.go:Checker.allTypesAssignableToKindEx",
+   "tsc/internal/checker/checker.go:Checker.checkBinaryExpression",
+   "tsc/internal/checker/checker.go:Checker.checkBindingElement",
+   "tsc/internal/checker/checker.go:Checker.checkDeferredNode",
+   "tsc/internal/checker/checker.go:Checker.checkElementAccessChain",
+   "tsc/internal/checker/checker.go:Checker.checkExpression",
+   "tsc/internal/checker/checker.go:Checker.checkExpressionStatement",
+   "tsc/internal/checker/checker.go:Checker.checkNonNullExpression",
+   "tsc/internal/checker/checker.go:Checker.checkNullishCoalesceOperandLeft",
+   "tsc/internal/checker/checker.go:Checker.checkParenthesizedExpression",
+   "tsc/internal/checker/checker.go:Checker.checkSourceElement",
+   "tsc/internal/checker/checker.go:Checker.checkSourceElements",
+   "tsc/internal/checker/checker.go:Checker.checkTypeOperator",
+   "tsc/internal/checker/checker.go:Checker.checkTypeQuery",
+   "tsc/internal/checker/checker.go:Checker.checkVariableStatement",
+   "tsc/internal/checker/checker.go:Checker.checkVoidExpression",
+   "tsc/internal/checker/checker.go:Checker.createNameResolverForSuggestion",
+   "tsc/internal/checker/checker.go:Checker.errorOrSuggestion",
+   "tsc/internal/checker/checker.go:Checker.errorSkippedOnNoEmit",
+   "tsc/internal/checker/checker.go:Checker.extractTypesOfKind",
+   "tsc/internal/checker/checker.go:Checker.getContextNode",
+   "tsc/internal/checker/checker.go:Checker.getDefinitelyFalsyPartOfType",
+   "tsc/internal/checker/checker.go:Checker.getDiagnostics",
+   "tsc/internal/checker/checker.go:Checker.getForInVariableSymbol",
+   "tsc/internal/checker/checker.go:Checker.getSpreadIndices",
+   "tsc/internal/checker/checker.go:Checker.getSuggestedBooleanOperator",
+   "tsc/internal/checker/checker.go:Checker.getSuggestedSymbolForNonexistentSymbol",
+   "tsc/internal/checker/checker.go:Checker.getSuggestionForSymbolNameLookup",
+   "tsc/internal/checker/checker.go:Checker.getTargetOfBinaryExpression",
+   "tsc/internal/checker/checker.go:Checker.getTypeFromTypeOperatorNode",
+   "tsc/internal/checker/checker.go:Checker.getTypeOfFirstParameterOfSignatureWithFallback",
+   "tsc/internal/checker/checker.go:Checker.getTypePredicateParent",
+   "tsc/internal/checker/checker.go:Checker.hasContextSensitiveReturnExpression",
+   "tsc/internal/checker/checker.go:Checker.hasParseDiagnostics",
+   "tsc/internal/checker/checker.go:Checker.invocationError",
+   "tsc/internal/checker/checker.go:Checker.isAritySmaller",
+   "tsc/internal/checker/checker.go:Checker.isContextSensitiveFunctionLikeDeclaration",
+   "tsc/internal/checker/checker.go:Checker.isContextSensitiveFunctionOrObjectLiteralMethod",
+   "tsc/internal/checker/checker.go:Checker.isReadonlyTypeOperator",
+   "tsc/internal/checker/checker.go:Checker.isReferenceToSomeType",
+   "tsc/internal/checker/checker.go:Checker.isReferenceToType",
+   "tsc/internal/checker/checker.go:Checker.isTypeAssignableToKind",
+   "tsc/internal/checker/checker.go:Checker.isUncalledFunctionReference",
+   "tsc/internal/checker/checker.go:Checker.isUnwrappedReturnTypeUndefinedVoidOrAny",
+   "tsc/internal/checker/checker.go:Checker.lookupOrIssueError",
+   "tsc/internal/checker/checker.go:Checker.maybeTypeOfKind",
+   "tsc/internal/checker/checker.go:Checker.newParameter",
+   "tsc/internal/checker/checker.go:Checker.removeDefinitelyFalsyTypes",
+   "tsc/internal/checker/checker.go:Checker.reportCannotInvokePossiblyNullOrUndefinedError",
+   "tsc/internal/checker/checker.go:Checker.reportOperatorErrorUnless",
+   "tsc/internal/checker/checker.go:Checker.resolveErrorCall",
+   "tsc/internal/checker/checker.go:Checker.shouldCheckErasableSyntax",
+   "tsc/internal/checker/checker.go:Checker.symbolHasNonMethodDeclaration",
+   "tsc/internal/checker/checker.go:createDiagnosticForNode",
+   "tsc/internal/checker/checker.go:getAdjustedNodeForError",
+   "tsc/internal/checker/checker.go:getErrorNodeForCallNode",
+   "tsc/internal/checker/checker.go:getFirstDeclaration",
+   "tsc/internal/checker/checker.go:getIndexNodeForAccessExpression",
+   "tsc/internal/checker/checker.go:hasCommonDomTypeName",
+   "tsc/internal/checker/checker.go:hasRestParameter",
+   "tsc/internal/checker/checker.go:isNotReplacableByMethod",
+   "tsc/internal/checker/checker.go:isPrimitiveTypeName",
+   "tsc/internal/checker/checker.go:isRestParameter",
+   "tsc/internal/checker/checker.go:isSpreadIntoCallOrNew",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkAmbientInitializer",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarAccessor",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarArrowFunction",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarAsyncModifier",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarAwaitOrAwaitUsing",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarBigIntLiteral",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarBindingElement",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarBreakOrContinueStatement",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarClassDeclarationHeritageClauses",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarClassLikeDeclaration",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarComputedPropertyName",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarConstructorTypeAnnotation",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarConstructorTypeParameters",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarExportDeclaration",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarExpressionWithTypeArguments",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarForAtLeastOneTypeArgument",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarForDisallowedBlockScopedVariableStatement",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarForDisallowedTrailingComma",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarForEsModuleMarkerInBindingName",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarForGenerator",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarForInOrForOfStatement",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarForInvalidDynamicName",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarForInvalidExclamationToken",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarForInvalidQuestionMark",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarForUseStrictSimpleParameterList",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarFunctionLikeDeclaration",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarHeritageClause",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarImportAttributeValues",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarImportAttributesType",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarImportClause",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarIndexSignature",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarIndexSignatureParameters",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarInterfaceDeclaration",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarMetaProperty",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarMethod",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarModifiers",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarModuleElementContext",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarNameInLetOrConstDeclarations",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarNumericLiteral",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarObjectLiteralExpression",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarParameterList",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarPrivateIdentifierExpression",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarProperty",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarRegularExpressionLiteral",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarSourceFile",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarStatementInAmbientContext",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarTopLevelElementForRequiredDeclareModifier",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarTopLevelElementsForRequiredDeclareModifier",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarTypeArguments",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarTypeOnlyNamedImportsOrExports",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarTypeOperatorNode",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarTypeParameterList",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarVariableDeclaration",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarVariableDeclarationList",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarYieldExpression",
+   "tsc/internal/checker/grammarchecks.go:Checker.containerAllowsBlockScopedVariable",
+   "tsc/internal/checker/grammarchecks.go:Checker.doesAccessorHaveCorrectParameterCount",
+   "tsc/internal/checker/grammarchecks.go:Checker.findFirstIllegalModifier",
+   "tsc/internal/checker/grammarchecks.go:Checker.findFirstModifierExcept",
+   "tsc/internal/checker/grammarchecks.go:Checker.grammarErrorAtPos",
+   "tsc/internal/checker/grammarchecks.go:Checker.grammarErrorOnFirstToken",
+   "tsc/internal/checker/grammarchecks.go:Checker.grammarErrorOnNode",
+   "tsc/internal/checker/grammarchecks.go:Checker.grammarErrorOnNodeSkippedOnNoEmit",
+   "tsc/internal/checker/grammarchecks.go:Checker.isInitializerSimpleLiteralEnumReference",
+   "tsc/internal/checker/grammarchecks.go:Checker.isNonBindableDynamicName",
+   "tsc/internal/checker/grammarchecks.go:Checker.reportObviousModifierErrors",
+   "tsc/internal/checker/grammarchecks.go:getIdentifierFromEntityNameExpression",
+   "tsc/internal/checker/grammarchecks.go:isInitializerBigIntLiteralExpression",
+   "tsc/internal/checker/grammarchecks.go:isInitializerStringOrNumberLiteralExpression"
+  ],
+  "C3.8 utilities (utilities.go share)": [
+   "tsc/internal/checker/utilities.go:Checker.callLikeExpressionMayHaveTypeArguments",
+   "tsc/internal/checker/utilities.go:Checker.checkNotCanceled",
+   "tsc/internal/checker/utilities.go:Checker.compareNodes",
+   "tsc/internal/checker/utilities.go:Checker.compareSymbolsWorker",
+   "tsc/internal/checker/utilities.go:Checker.getPackagesMap",
+   "tsc/internal/checker/utilities.go:Checker.isCanceled",
+   "tsc/internal/checker/utilities.go:Checker.isConstantVariable",
+   "tsc/internal/checker/utilities.go:Checker.isMutableLocalVariableDeclaration",
+   "tsc/internal/checker/utilities.go:Checker.isOptionalParameter",
+   "tsc/internal/checker/utilities.go:Checker.isParameterOrMutableLocalVariable",
+   "tsc/internal/checker/utilities.go:Checker.isUncheckedJSSuggestion",
+   "tsc/internal/checker/utilities.go:Checker.packageBundlesTypes",
+   "tsc/internal/checker/utilities.go:Checker.sortSymbols",
+   "tsc/internal/checker/utilities.go:Checker.typesPackageExists",
+   "tsc/internal/checker/utilities.go:CompareTypes",
+   "tsc/internal/checker/utilities.go:CreateModeMismatchDetails",
+   "tsc/internal/checker/utilities.go:CreateModuleNotFoundChain",
+   "tsc/internal/checker/utilities.go:GetSetAccessorValueParameter",
+   "tsc/internal/checker/utilities.go:GetSingleVariableOfVariableStatement",
+   "tsc/internal/checker/utilities.go:IsExternalModuleSymbol",
+   "tsc/internal/checker/utilities.go:IsInTypeQuery",
+   "tsc/internal/checker/utilities.go:IsKnownSymbol",
+   "tsc/internal/checker/utilities.go:IsPrivateIdentifierSymbol",
+   "tsc/internal/checker/utilities.go:IsTypeAny",
+   "tsc/internal/checker/utilities.go:NewDiagnosticChainForNode",
+   "tsc/internal/checker/utilities.go:NewDiagnosticForNode",
+   "tsc/internal/checker/utilities.go:SkipAlias",
+   "tsc/internal/checker/utilities.go:ValueToString",
+   "tsc/internal/checker/utilities.go:allDeclarationsInSameSourceFile",
+   "tsc/internal/checker/utilities.go:canHaveFlowNode",
+   "tsc/internal/checker/utilities.go:canHaveLocals",
+   "tsc/internal/checker/utilities.go:compareElementLabels",
+   "tsc/internal/checker/utilities.go:compareTupleTypes",
+   "tsc/internal/checker/utilities.go:compareTypeLists",
+   "tsc/internal/checker/utilities.go:compareTypeNames",
+   "tsc/internal/checker/utilities.go:containsNonMissingUndefinedType",
+   "tsc/internal/checker/utilities.go:createSymbolTable",
+   "tsc/internal/checker/utilities.go:declarationBelongsToPrivateAmbientMember",
+   "tsc/internal/checker/utilities.go:entityNameToString",
+   "tsc/internal/checker/utilities.go:expressionResultIsUnused",
+   "tsc/internal/checker/utilities.go:findInMap",
+   "tsc/internal/checker/utilities.go:forEachYieldExpression",
+   "tsc/internal/checker/utilities.go:getAliasDeclarationFromName",
+   "tsc/internal/checker/utilities.go:getAnyImportSyntax",
+   "tsc/internal/checker/utilities.go:getAssignmentTargetKind",
+   "tsc/internal/checker/utilities.go:getBindingElementPropertyName",
+   "tsc/internal/checker/utilities.go:getContainingClassExcludingClassDecorators",
+   "tsc/internal/checker/utilities.go:getContainingFunctionOrClassStaticBlock",
+   "tsc/internal/checker/utilities.go:getContainingObjectLiteral",
+   "tsc/internal/checker/utilities.go:getContainingQualifiedNameNode",
+   "tsc/internal/checker/utilities.go:getDeclarationModifierFlagsFromSymbol",
+   "tsc/internal/checker/utilities.go:getDeclarationModifierFlagsFromSymbolEx",
+   "tsc/internal/checker/utilities.go:getDeclarationsOfKind",
+   "tsc/internal/checker/utilities.go:getEnclosingContainer",
+   "tsc/internal/checker/utilities.go:getIndexSymbolFromSymbolTable",
+   "tsc/internal/checker/utilities.go:getMembersOfDeclaration",
+   "tsc/internal/checker/utilities.go:getNonRestParameterCount",
+   "tsc/internal/checker/utilities.go:getObjectTypeName",
+   "tsc/internal/checker/utilities.go:getSelectedModifierFlags",
+   "tsc/internal/checker/utilities.go:getSortOrderFlags",
+   "tsc/internal/checker/utilities.go:getSuperContainer",
+   "tsc/internal/checker/utilities.go:getTypeNameSymbol",
+   "tsc/internal/checker/utilities.go:hasAsyncModifier",
+   "tsc/internal/checker/utilities.go:hasDotDotDotToken",
+   "tsc/internal/checker/utilities.go:hasExportAssignmentSymbol",
+   "tsc/internal/checker/utilities.go:hasOnlyExpressionInitializer",
+   "tsc/internal/checker/utilities.go:hasOverrideModifier",
+   "tsc/internal/checker/utilities.go:hasReadonlyModifier",
+   "tsc/internal/checker/utilities.go:hasType",
+   "tsc/internal/checker/utilities.go:introducesArgumentsExoticObject",
+   "tsc/internal/checker/utilities.go:isAdditiveOperator",
+   "tsc/internal/checker/utilities.go:isAdditiveOperatorOrHigher",
+   "tsc/internal/checker/utilities.go:isAssignmentOperatorOrHigher",
+   "tsc/internal/checker/utilities.go:isBinaryOperator",
+   "tsc/internal/checker/utilities.go:isBitwiseOperator",
+   "tsc/internal/checker/utilities.go:isBitwiseOperatorOrHigher",
+   "tsc/internal/checker/utilities.go:isCallChain",
+   "tsc/internal/checker/utilities.go:isClassInstanceProperty",
+   "tsc/internal/checker/utilities.go:isCompoundLikeAssignment",
+   "tsc/internal/checker/utilities.go:isConstTypeReference",
+   "tsc/internal/checker/utilities.go:isConstTypeReferenceName",
+   "tsc/internal/checker/utilities.go:isDeclarationReadonly",
+   "tsc/internal/checker/utilities.go:isDeleteTarget",
+   "tsc/internal/checker/utilities.go:isEmptyArrayLiteral",
+   "tsc/internal/checker/utilities.go:isEmptyObjectLiteral",
+   "tsc/internal/checker/utilities.go:isEqualityOperator",
+   "tsc/internal/checker/utilities.go:isEqualityOperatorOrHigher",
+   "tsc/internal/checker/utilities.go:isExclamationToken",
+   "tsc/internal/checker/utilities.go:isExponentiationOperator",
+   "tsc/internal/checker/utilities.go:isExportAssignmentExpressionName",
+   "tsc/internal/checker/utilities.go:isImportTypeQualifierPart",
+   "tsc/internal/checker/utilities.go:isInAmbientOrTypeNode",
+   "tsc/internal/checker/utilities.go:isInCompoundLikeAssignment",
+   "tsc/internal/checker/utilities.go:isInNameOfExpressionWithTypeArgumentsOrHeritageTypeReference",
+   "tsc/internal/checker/utilities.go:isInRightSideOfImportOrExportAssignment",
+   "tsc/internal/checker/utilities.go:isInfinityOrNaNString",
+   "tsc/internal/checker/utilities.go:isJSDocOptionalParameter",
+   "tsc/internal/checker/utilities.go:isJsxIntrinsicTagName",
+   "tsc/internal/checker/utilities.go:isLateBoundName",
+   "tsc/internal/checker/utilities.go:isLiteralExpressionOfObject",
+   "tsc/internal/checker/utilities.go:isLogicalOperatorOrHigher",
+   "tsc/internal/checker/utilities.go:isMultiplicativeOperator",
+   "tsc/internal/checker/utilities.go:isMultiplicativeOperatorOrHigher",
+   "tsc/internal/checker/utilities.go:isNodeDescendantOf",
+   "tsc/internal/checker/utilities.go:isNonNullAccess",
+   "tsc/internal/checker/utilities.go:isObjectLiteralType",
+   "tsc/internal/checker/utilities.go:isObjectOrArrayLiteralType",
+   "tsc/internal/checker/utilities.go:isOptionalDeclaration",
+   "tsc/internal/checker/utilities.go:isPrivateWithinAmbient",
+   "tsc/internal/checker/utilities.go:isRelationalOperator",
+   "tsc/internal/checker/utilities.go:isRelationalOperatorOrHigher",
+   "tsc/internal/checker/utilities.go:isReservedMemberName",
+   "tsc/internal/checker/utilities.go:isRightSideOfAccessExpression",
+   "tsc/internal/checker/utilities.go:isShiftOperator",
+   "tsc/internal/checker/utilities.go:isShiftOperatorOrHigher",
+   "tsc/internal/checker/utilities.go:isShorthandAmbientModule",
+   "tsc/internal/checker/utilities.go:isShorthandAmbientModuleSymbol",
+   "tsc/internal/checker/utilities.go:isSideEffectImport",
+   "tsc/internal/checker/utilities.go:isStaticPrivateIdentifierProperty",
+   "tsc/internal/checker/utilities.go:isSuperCall",
+   "tsc/internal/checker/utilities.go:isThisInitializedDeclaration",
+   "tsc/internal/checker/utilities.go:isThisInitializedObjectBindingExpression",
+   "tsc/internal/checker/utilities.go:isThisProperty",
+   "tsc/internal/checker/utilities.go:isThisTypeParameter",
+   "tsc/internal/checker/utilities.go:isTopLevelInExternalModuleAugmentation",
+   "tsc/internal/checker/utilities.go:isTypeAlias",
+   "tsc/internal/checker/utilities.go:isTypeAssertion",
+   "tsc/internal/checker/utilities.go:isTypeReferenceIdentifier",
+   "tsc/internal/checker/utilities.go:isTypeUsableAsPropertyName",
+   "tsc/internal/checker/utilities.go:isValidESSymbolDeclaration",
+   "tsc/internal/checker/utilities.go:isValidNumberString",
+   "tsc/internal/checker/utilities.go:isVariableDeclarationInVariableStatement",
+   "tsc/internal/checker/utilities.go:minAndMax",
+   "tsc/internal/checker/utilities.go:nodeStartsNewLexicalEnvironment",
+   "tsc/internal/checker/utilities.go:orderedSet.add",
+   "tsc/internal/checker/utilities.go:orderedSet.contains",
+   "tsc/internal/checker/utilities.go:pseudoBigIntToString",
+   "tsc/internal/checker/utilities.go:rangeOfTypeParameters",
+   "tsc/internal/checker/utilities.go:symbolsToArray",
+   "tsc/internal/checker/utilities.go:tokenIsIdentifierOrKeyword",
+   "tsc/internal/checker/utilities.go:tokenIsIdentifierOrKeywordOrGreaterThan",
+   "tsc/internal/checker/utilities.go:tryGetPropertyAccessOrIdentifierToString",
+   "tsc/internal/checker/utilities.go:walkUpOuterExpressions"
+  ]
+ },
+ "handoffs": [],
+ "open_issues": [],
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "scope": "C3.1 scope at the recorded C2 exit (bb29600): the complete flow.go and jsdoc.go inventories; the checker.go, grammarchecks.go and utilities.go functions of the C3 areas that no C1 or C2 group or C2 ownership entry lists; JSX and decorator functions are C4's, the exported API, services, node builder and emit resolver are C5's. Group members were generated from status/unmapped-functions.json and the tracker inventory; a marker is the disposition for mapped members.",
+ "version": 1
+}
