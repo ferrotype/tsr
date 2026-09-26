@@ -400,8 +400,11 @@ impl CheckerState {
         if self.node(node)?.kind() != K::Identifier || self.node_text(node)?.as_bytes() != b"NaN" {
             return Ok(false);
         }
-        let global =
-            self.lookup_symbol_resolving(self.builtins.globals, b"NaN", tsr_ast::symbol_flags::VALUE)?;
+        let global = self.lookup_symbol_resolving(
+            self.builtins.globals,
+            b"NaN",
+            tsr_ast::symbol_flags::VALUE,
+        )?;
         Ok(global.is_some() && global == Some(self.resolved_value_symbol(node)?))
     }
     // port: tsc/internal/checker/utilities.go:isLiteralExpressionOfObject
