@@ -103,7 +103,7 @@ The buckets at the C1 head (`target/phase2/rust/comparison.json`, owner C2):
 | `diagnostics: TS2795` | 2 | `intrinsicKeyword` | invalid `intrinsic` alias names or arities (C2.7) |
 | `unsupported: node builder synthetic elision comments` (B13, B14) | 2, 2 | `nestedSpreadsAndWidening`, `hugeDeclarationOutputGetsTruncatedWithError` | node-builder output: re-own to C5 with the trace (decision 2) |
 | `unsupported: someSymbolTableInScope: reparsed module` (B15) | 2 | `jsDeclarationsImportAliasExposedWithinNamespace` | node-builder scope lookup over reparsed JS modules: re-own to C5 (decision 2) |
-| `diagnostics: TS18048`, `TS2536`, `TS7053`, `TS7006`, `TS1477` | 1 each | `specialIntersectionsInMappedTypes`, `unknownControlFlow`, `indexSignatures1`, `contextualTypeCaching`, `instantiationExpressionErrors` | mapped intersections, indexed access under narrowing, index-signature access, contextual type caching, instantiation-expression syntax (C2.6, C2.9, C2.3) |
+| `diagnostics: TS18048`, `TS2536`, `TS7053`, `TS7006`, `TS1477` | 1 each | `specialIntersectionsInMappedTypes`, `unknownControlFlow`, `indexSignatures1`, `contextualTypeCaching`, `instantiationExpressionErrors` | mapped intersections, indexed access under narrowing, index-signature access, contextual type caching, instantiation-expression row attribution (C2.6, C2.9, C2.3); the TS1477 label is only a comparison bucket, not evidence that this diagnostic is missing |
 | `diagnostics: TS1539`, `TS2315`, `TS2337`, `TS2349`, `TS2355` | 1 each | `bigintPropertyName`, `cjsExportGenericTypes`, `errorSuperCalls`, `jsDeclarationsFunctions`, `errorOnFunctionReturnType` | C1's attribution named C3 for these (bigint property names, JS `export=`, super-call placement, JS function typing): handoff candidates |
 | `diagnostics: TS4023`, `TS4031`, `TS4052`, `TS4076`, `TS4082`, `TS9010` | 1 each | `mappedTypeGenericInstantiationPreservesHomomorphism` and others | declaration-emit diagnostics: handoff candidates to C5 |
 | `unsupported: checkIfTypePredicateVariableIsDeclaredInBindingPattern` (B16) | 1 | `typeGuardFunctionErrors` | predicate parameters in binding patterns (C2.9) |
@@ -312,7 +312,12 @@ authority, and the counts are the marker state at the C1 head.
 - Build: the `different: types` bucket on `circularInstantiationExpression`
   and the instantiation-expression display of `.types`; the two `TS2352` rows
   C1 returned (the comparable relation over `typeof Err<U>` intersections);
-  `TS1477` (instantiation-expression syntax placement); B03: the node builder's
+  `instantiationExpressionErrors`: compare the complete error sets before
+  attributing the TS1477 bucket to syntax. The reviewed raw observations
+  already agree on both TS1477 diagnostics and their ranges; Rust instead
+  adds TS2869 through an incomplete outer-expression helper and declaration
+  accessibility errors (TS4025/TS4028/TS4031). Repair the helper; trace the
+  declaration cause before handing that share to C5. B03: the node builder's
   `typeReferenceToTypeNode` refuses references with applied outer type
   arguments (36 rows) at `node_builder_extra.rs`. `InterfaceData` already
   retains the outer-parameter count and parameter identities, while

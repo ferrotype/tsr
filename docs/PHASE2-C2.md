@@ -162,7 +162,8 @@ rows and controls. Every process completed, source inputs stayed stable, and
 there were no harness errors. Full-domain matches rose from 230 at C1 to 293;
 65 of the 91 targets now match completely. All 100 selected S08 regression
 rows still match. No matching domain regressed against C1 or the earlier B04
-sample, and no previously differing domain changed within either overlap.
+sample, and no observation changed in domains that remained `different` in either
+overlap.
 
 None of the targeted C2 refusal messages remains in this sample. This exposes
 one further failure in `recursiveConditionalCrash3`: public display fails
@@ -175,3 +176,91 @@ and compressed 385-row comparison are retained in
 [data/phase2/c2-refusals.json](../data/phase2/c2-refusals.json). As with B04,
 this is intermediate evidence. The reviewed C1 baseline and C2-start claims
 are preserved.
+
+## Alias keys, defaults and wrapper semantics
+
+The alias-instantiation cache now keys the supplied argument list and alias
+metadata before filling defaults. Intrinsic dispatch also sees the supplied
+argument count. Defaults are filled only on a miss, using the alias symbol's
+value declaration for JavaScript mode, exactly as the pin does. A JSDoc
+alias's source file alone does not establish that mode.
+
+The access-only native observer records six query sequences without assigning
+Go IDs or warming the cache. Both query orders show separate cache work for
+omitted and explicit defaults: cache-entry deltas `1, 1, 0, 0`, instantiation
+deltas `3, 3, 0, 0`, but equal returned type identities and displays. Dependent
+defaults have their own control. For a module-local defaulted `Uppercase`,
+the omitted form remains `intrinsic`; the explicit form maps the argument.
+The public difference includes a TS2322 only for the explicit form. Four
+focused Rust tests compare native work, equality matrices, display and
+diagnostic ranges, and verify that the observer is read-only and rejects a
+foreign checker. There is no production hot-path instrumentation.
+
+A separate missing branch in `fillMissingTypeArguments` converts defaults
+identical to `unknown` or the empty object to `any` in JavaScript implicit-any
+mode. The conversion occurs before instantiating dependent defaults. Four
+previously wrong conversions now match; fourteen native diagnostics cover
+explicit arguments, structural identity, dependent defaults and TypeScript
+controls. This is distinct from raw alias keying.
+
+The `instantiationExpressionErrors` bucket also needed attribution. Both
+TS1477 parser diagnostics and their ranges already match native. Its extra
+TS2869 came from a private outer-expression helper that omitted instantiation
+expressions. It now uses the shared `SkipOuterExpressions(OEKAll)` port.
+The native test retains ordinary never-nullish and always-nullish errors plus
+a later assignment diagnostic, while rejecting the five spurious errors on
+wrapped instantiation expressions. The row's declaration accessibility errors
+remain separate work; fixing TS2869 does not close the whole row.
+
+## Retained instantiation nodes and elision dependency
+
+Instantiation-expression types now use their retained syntax node when
+collecting outer type parameters, apply the pin's reference filter, and retain
+that node when instantiated again. Previously they used the original function
+symbol's declaration, losing the caller's generic scope. Fourteen native
+display observations cover inferred string/number calls, a generic wrapper,
+re-instantiated boolean arguments, repeated calls and explicit controls.
+
+The B08-dependent display failure was the pre-existing synthetic-elision
+refusal in the shared node builder. Type-list elision now creates the native
+`any` node and synthetic leading comment under `NoTruncation`; conditional
+elision uses the native placeholder length accounting. Ten access-only native
+branch cases compare output, length increments and comment metadata. The
+large corpus query now executes and a subsequent ordinary query still matches.
+
+Its full-byte display parity remains open: Go emits 790,211 bytes; Rust emits
+789,025. The first 788,929 bytes agree, then Rust reaches the approximate-length
+truncation budget earlier. Native SHA256 is
+`f401efcd5b97621a0019f1e9465d1228b8df7a18db17c442bd14fe9e333ded0c`;
+Rust SHA256 is
+`5d8999cfbf9e9c8d25ff5bece3478facce62ad8fa8ccf323fe1661ae611e1a90`.
+The integration test explicitly claims completion and recovery, while retaining
+the native hash; it does not assert or manufacture full parity. This shared
+display dependency does not transfer all B13 work from C5 to C2 or approve
+this remaining difference.
+
+The binding-pattern predicate search also uses an explicit depth-first stack
+instead of unbounded Rust recursion, retaining source order and the first
+matching-name diagnostic. Its native diagnostic inventory is unchanged.
+
+The final combined sample selects 393 distinct rows: the frozen 300 plus 99
+affected cases and controls. All processes complete with stable sources and
+no harness failures. Full-domain matches rise from 233 at C1 to 300; 72 of
+99 targets now match. All 100 sampled S08 regression cases remain matches.
+There are no matching-domain regressions against C1 or the preceding refusal
+batch. The sole changed observation in a domain that remains different removes
+only the extra TS2869 from `instantiationExpressionErrors`, with no added or
+changed diagnostic.
+
+`circularInstantiationExpression` and `defaultPropsEmptyCurlyBecomesAnyForJs`
+now match every enabled domain. The three selected `genericDefaults` controls
+retain their full matches.
+`recursiveConditionalCrash3` matches every domain except public display; the
+remaining difference is recorded above. The other 26 targeted open rows and
+the broader C2 audit/contracts are not closed by this partial sample.
+
+[data/phase2/c2-instantiation.json](../data/phase2/c2-instantiation.json) retains
+the exact selection, reproduction commands, comparison identities and all
+target outcomes; its linked compressed comparison contains all 393 rows.
+Focused tests and targeted clippy with warnings denied pass. No benchmark or
+full C2 acceptance capture is claimed.

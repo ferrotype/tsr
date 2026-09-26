@@ -163,29 +163,33 @@ impl CheckerState {
         predicate_node: NodeId,
         predicate_name: &tsr_ast::JsString,
     ) -> Result<bool, Error> {
-        for element in self.source_list(pattern, self.node(pattern)?.element_list())? {
-            let Some(name) = self.node(element)?.name() else {
-                continue;
-            };
-            if self.node(name)?.kind() == K::Identifier
-                && self.node_text(name)?.as_bytes() == predicate_name.as_bytes()
-            {
-                self.error_at(
-                    Some(predicate_node),
-                    tsr_diagnostics::A_type_predicate_cannot_reference_element_0_in_a_binding_pattern,
-                    vec![predicate_name.clone()],
-                )?;
-                return Ok(true);
-            }
-            if matches!(
-                self.node(name)?.kind().known(),
-                Some(K::ArrayBindingPattern | K::ObjectBindingPattern)
-            ) && self.check_type_predicate_variable_in_binding_pattern(
-                name,
-                predicate_node,
-                predicate_name,
-            )? {
-                return Ok(true);
+        // Preserve the pin's depth-first source order without consuming a Rust
+        // call frame for each nested binding pattern.
+        let mut pending = vec![pattern];
+        while let Some(node) = pending.pop() {
+            match self.node(node)?.kind().known() {
+                Some(K::Identifier) => {
+                    if self.node_text(node)?.as_bytes() == predicate_name.as_bytes() {
+                        self.error_at(
+                            Some(predicate_node),
+                            tsr_diagnostics::A_type_predicate_cannot_reference_element_0_in_a_binding_pattern,
+                            vec![predicate_name.clone()],
+                        )?;
+                        return Ok(true);
+                    }
+                }
+                Some(K::ArrayBindingPattern | K::ObjectBindingPattern) => {
+                    for element in self
+                        .source_list(node, self.node(node)?.element_list())?
+                        .into_iter()
+                        .rev()
+                    {
+                        if let Some(name) = self.node(element)?.name() {
+                            pending.push(name);
+                        }
+                    }
+                }
+                _ => {}
             }
         }
         Ok(false)
