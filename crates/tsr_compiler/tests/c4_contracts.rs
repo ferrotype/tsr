@@ -85,11 +85,17 @@ fn jsx_mode_matrix_matches_native() {
                 include_str!("fixtures/c4/jsx_pragmas.tsx"),
             )),
         );
+        let expected = json!({"factory": "h", "fragment_factory": "Frag",
+               "namespace": runtime.unwrap_or("/jsx_pragmas.tsx"), "implicit_import": runtime});
+        assert_eq!(link_state(&case), expected, "jsx_pragmas_{mode}");
+        // The resolver may ask before anything is checked: a fresh checker
+        // reads the pragmas itself (`getJsxFragmentFactoryEntity`).
+        let (_generation, fresh) = native::checker(&case.program);
+        let tag = native::first_jsx_tag(&case);
         assert_eq!(
-            link_state(&case),
-            json!({"factory": "h", "fragment_factory": "Frag",
-                   "namespace": runtime.unwrap_or("/jsx_pragmas.tsx"), "implicit_import": runtime}),
-            "jsx_pragmas_{mode}"
+            fresh.operation().unwrap().jsx_link_state(tag).unwrap(),
+            expected,
+            "jsx_pragmas_{mode}, unchecked"
         );
     }
 }
