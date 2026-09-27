@@ -37163,11 +37163,11 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_checker/src/external_resolution.rs",
-          "line": 1021
+          "line": 1075
         },
         {
           "file": "crates/tsr_checker/src/external_resolution.rs",
-          "line": 1022
+          "line": 1076
         },
         {
           "file": "crates/tsr_tspath/src/extension.rs",
@@ -37339,7 +37339,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_checker/src/external_resolution.rs",
-          "line": 1138
+          "line": 1192
         },
         {
           "file": "crates/tsr_tspath/src/extension.rs",
@@ -37678,11 +37678,11 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_checker/src/external_resolution.rs",
-          "line": 1125
+          "line": 1179
         },
         {
           "file": "crates/tsr_checker/src/node_builder_names.rs",
-          "line": 1562
+          "line": 1659
         },
         {
           "file": "crates/tsr_tspath/src/comparison.rs",
