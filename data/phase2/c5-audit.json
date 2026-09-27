@@ -1,0 +1,2432 @@
+{
+ "checkpoint": "C5",
+ "dispositions": {
+  "tsc/internal/checker/checker.go:Checker.GetAmbientModules": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.GetDiagnostics": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.GetEmitResolver": {
+   "disposition": "gap",
+   "item": "C5.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.GetGlobalDiagnostics": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.GetSuggestionDiagnostics": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.GetTypeOfSymbolAtLocation": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.IsDeprecatedDeclaration": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.IsNullableType": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.TryGetThisTypeAtEx": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.isValidPropertyAccessForCompletions": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:getNameFromIndexInfo": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/emitresolver.go:EmitResolver.CreateReturnTypeOfSignatureDeclaration": {
+   "disposition": "gap",
+   "item": "C5.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/emitresolver.go:EmitResolver.CreateTypeOfDeclaration": {
+   "disposition": "gap",
+   "item": "C5.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/emitresolver.go:EmitResolver.CreateTypeOfExpression": {
+   "disposition": "gap",
+   "item": "C5.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/emitresolver.go:EmitResolver.CreateTypeParametersOfSignatureDeclaration": {
+   "disposition": "gap",
+   "item": "C5.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/emitresolver.go:EmitResolver.GetConstantValue": {
+   "disposition": "gap",
+   "item": "C5.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/emitresolver.go:EmitResolver.GetEffectiveDeclarationFlags": {
+   "disposition": "gap",
+   "item": "C5.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/emitresolver.go:EmitResolver.GetEnumMemberValue": {
+   "disposition": "gap",
+   "item": "C5.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/emitresolver.go:EmitResolver.GetExternalModuleFileFromDeclaration": {
+   "disposition": "gap",
+   "item": "C5.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/emitresolver.go:EmitResolver.GetJsxFactoryEntity": {
+   "disposition": "gap",
+   "item": "C5.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/emitresolver.go:EmitResolver.GetJsxFragmentFactoryEntity": {
+   "disposition": "gap",
+   "item": "C5.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/emitresolver.go:EmitResolver.GetReferencedExportContainer": {
+   "disposition": "gap",
+   "item": "C5.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/emitresolver.go:EmitResolver.GetReferencedImportDeclaration": {
+   "disposition": "gap",
+   "item": "C5.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/emitresolver.go:EmitResolver.GetReferencedValueDeclaration": {
+   "disposition": "gap",
+   "item": "C5.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/emitresolver.go:EmitResolver.GetReferencedValueDeclarations": {
+   "disposition": "gap",
+   "item": "C5.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/emitresolver.go:EmitResolver.GetTypeReferenceSerializationKind": {
+   "disposition": "gap",
+   "item": "C5.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/emitresolver.go:EmitResolver.IsDeclarationVisible": {
+   "disposition": "gap",
+   "item": "C5.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/emitresolver.go:EmitResolver.IsEntityNameVisible": {
+   "disposition": "gap",
+   "item": "C5.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/emitresolver.go:EmitResolver.IsExpandoFunctionDeclaration": {
+   "disposition": "gap",
+   "item": "C5.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/emitresolver.go:EmitResolver.IsLateBound": {
+   "disposition": "gap",
+   "item": "C5.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/emitresolver.go:EmitResolver.IsNameResolvable": {
+   "disposition": "gap",
+   "item": "C5.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/emitresolver.go:EmitResolver.IsOptionalParameter": {
+   "disposition": "gap",
+   "item": "C5.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/emitresolver.go:EmitResolver.IsReferencedAliasDeclaration": {
+   "disposition": "gap",
+   "item": "C5.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/emitresolver.go:EmitResolver.IsSymbolAccessible": {
+   "disposition": "gap",
+   "item": "C5.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/emitresolver.go:EmitResolver.IsTopLevelValueImportEqualsWithEntityName": {
+   "disposition": "gap",
+   "item": "C5.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/emitresolver.go:EmitResolver.IsValueAliasDeclaration": {
+   "disposition": "gap",
+   "item": "C5.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/emitresolver.go:EmitResolver.MarkLinkedReferencesRecursively": {
+   "disposition": "gap",
+   "item": "C5.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/emitresolver.go:EmitResolver.RequiresAddingImplicitUndefined": {
+   "disposition": "gap",
+   "item": "C5.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/emitresolver.go:EmitResolver.RequiresAddingImplicitUndefinedUnsafe": {
+   "disposition": "gap",
+   "item": "C5.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/emitresolver.go:EmitResolver.SetReferencedImportDeclaration": {
+   "disposition": "gap",
+   "item": "C5.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/emitresolver.go:EmitResolver.TryJSTypeNodeToTypeNode": {
+   "disposition": "gap",
+   "item": "C5.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/emitresolver.go:EmitResolver.aliasMarkingVisitorWorker": {
+   "disposition": "gap",
+   "item": "C5.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/emitresolver.go:EmitResolver.declaredParameterTypeContainsUndefined": {
+   "disposition": "gap",
+   "item": "C5.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/emitresolver.go:EmitResolver.isAliasResolvedToValue": {
+   "disposition": "gap",
+   "item": "C5.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/emitresolver.go:EmitResolver.isOptionalParameter": {
+   "disposition": "gap",
+   "item": "C5.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/emitresolver.go:EmitResolver.isOptionalUninitializedParameterProperty": {
+   "disposition": "gap",
+   "item": "C5.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/emitresolver.go:EmitResolver.isRequiredInitializedParameter": {
+   "disposition": "gap",
+   "item": "C5.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/emitresolver.go:EmitResolver.isSymbolAccessible": {
+   "disposition": "gap",
+   "item": "C5.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/emitresolver.go:EmitResolver.isValueAliasDeclarationWorker": {
+   "disposition": "gap",
+   "item": "C5.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/emitresolver.go:EmitResolver.requiresAddingImplicitUndefinedWorker": {
+   "disposition": "gap",
+   "item": "C5.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/emitresolver.go:isConstEnumOrConstEnumOnlyModule": {
+   "disposition": "gap",
+   "item": "C5.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/emitresolver.go:newEmitResolver": {
+   "disposition": "gap",
+   "item": "C5.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/emitresolver.go:noopAddVisibleAlias": {
+   "disposition": "gap",
+   "item": "C5.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.CompareSymbols": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.FillMissingTypeArguments": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetAnyType": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetApparentType": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetArgumentsSymbol": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetBaseConstraintOfType": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetBaseConstructorTypeOfClass": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetBaseTypeOfLiteralType": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetBaseTypes": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetBigIntType": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetBooleanType": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetConstraintOfTypeParameter": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetContextualTypeForArgumentAtIndex": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetContextualTypeForObjectLiteralElement": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetDeclaredTypeOfSymbol": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetDefaultFromTypeParameter": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetESSymbolType": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetEffectiveDeclarationFlags": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetErrorType": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetExpandedParameters": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetFalseTypeOfConditionalType": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetFullyQualifiedName": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetGlobalSymbol": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetImmediateAliasedSymbol": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetIndexInfoOfType": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetIndexInfosOfType": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetIndexSignaturesAtLocation": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetJsxFragmentFactory": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetJsxNamespace": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetLocalTypeParametersOfClassOrInterfaceOrTypeAlias": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetMemberOverrideModifierStatus": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetMergedSymbol": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetMinTypeArgumentCount": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetNameTypeOfSymbol": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetNeverType": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetNonMissingTypeOfSymbol": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetNonPrimitiveType": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetNullType": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetNumberType": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetPropertiesOfType": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetPropertyOfType": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetReducedType": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetResolvedSignature": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetResolvedSymbol": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetRestTypeOfSignature": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetReturnTypeOfSignature": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetSignaturesOfType": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetStringType": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetSymbolFlags": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetTargetSymbol": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetTrueTypeOfConditionalType": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetTypeArguments": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetTypeFromTypeNode": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetTypeOfPropertyOfContextualType": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetTypeOfPropertyOfType": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetTypeOfSymbol": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetTypeOnlyAliasDeclaration": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetTypePredicateOfSignature": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetUndefinedSymbol": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetUndefinedType": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetUnionType": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetUnionTypeEx": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetUnknownSignature": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetUnknownSymbol": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetUnknownType": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetVoidType": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetWidenedLiteralType": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetWidenedType": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.HasEffectiveRestParameter": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.IsArrayLikeType": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.IsArrayType": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.IsContextSensitive": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.IsPropertyAccessible": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.IsReadonlySymbol": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.IsTypeAssignableTo": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.RemoveMissingOrUndefinedType": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.RequiresAddingImplicitUndefined": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.ResolveExternalModuleName": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.ResolveExternalModuleSymbol": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.ResolveName": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.TryFindAmbientModule": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.TypeHasCallOrConstructSignatures": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.TypePredicateToString": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:Checker.WasCanceled": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:GetDeclarationModifierFlagsFromSymbol": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:GetPropertyNameFromType": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:IsTupleType": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:IsTupleTypeTarget": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/exports.go:IsTypeUsableAsPropertyName": {
+   "disposition": "gap",
+   "item": "C5.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilder.go:Checker.getNodeBuilderEx": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilder.go:NewNodeBuilder": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilder.go:NewNodeBuilderEx": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilder.go:NodeBuilder.EmitContext": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilder.go:NodeBuilder.ExpandSymbolForHover": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilder.go:NodeBuilder.IndexInfoToIndexSignatureDeclaration": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilder.go:NodeBuilder.SerializeReturnTypeForSignature": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilder.go:NodeBuilder.SerializeTypeForDeclaration": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilder.go:NodeBuilder.SerializeTypeForExpression": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilder.go:NodeBuilder.SerializeTypeParametersForSignature": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilder.go:NodeBuilder.SignatureToSignatureDeclaration": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilder.go:NodeBuilder.SymbolToEntityName": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilder.go:NodeBuilder.SymbolToExpression": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilder.go:NodeBuilder.SymbolToNode": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilder.go:NodeBuilder.SymbolToParameterDeclaration": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilder.go:NodeBuilder.SymbolToTypeParameterDeclarations": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilder.go:NodeBuilder.TryJSTypeNodeToTypeNode": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilder.go:NodeBuilder.TypeParameterToDeclaration": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilder.go:NodeBuilder.TypePredicateToTypePredicateNode": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilder.go:NodeBuilder.exitContext": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilder.go:NodeBuilder.exitContextCheck": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilder.go:NodeBuilder.exitContextSlice": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilder.go:NodeBuilder.popContext": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilder.go:NodeBuilder.propagateVerbosityOut": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilder.go:simplifyClassDeclaration": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilder.go:simplifyModifiers": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilder_hover.go:NodeBuilderImpl.addClassModifiers": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilder_hover.go:NodeBuilderImpl.enumMemberInitializer": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilder_hover.go:NodeBuilderImpl.expandClassDecl": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilder_hover.go:NodeBuilderImpl.expandEnumDecl": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilder_hover.go:NodeBuilderImpl.expandInterfaceDecl": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilder_hover.go:NodeBuilderImpl.expandModuleDecl": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilder_hover.go:NodeBuilderImpl.expandSymbolForHover": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilder_hover.go:NodeBuilderImpl.filterInheritedProperties": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilder_hover.go:NodeBuilderImpl.hoverHeritageClauses": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilder_hover.go:NodeBuilderImpl.isNamespaceMember": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilder_hover.go:NodeBuilderImpl.serializeConstructors": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilder_hover.go:NodeBuilderImpl.serializeIndexSignaturesOfType": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilder_hover.go:NodeBuilderImpl.serializeNamespaceMember": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilder_hover.go:NodeBuilderImpl.serializePropertiesWithTruncation": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilder_hover.go:NodeBuilderImpl.serializeTypeAliasForNamespace": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilder_hover.go:isExpanding": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilder_hover.go:isHashPrivate": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilder_hover.go:typeElementsToClassElements": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.checkTruncationLengthIfExpanding": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.checkTypeExpandability": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.createAnonymousTypeNode": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.createExpressionWithTypeArguments": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.createPropertyNameNodeForIdentifierOrLiteral": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.existingTypeNodeIsNotReferenceOrIsReferenceWithCompatibleTypeArgumentCount": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.getPropertyNameNodeForSymbolFromNameType": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.getTypeParametersOfClassOrInterface": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.indexInfoToIndexSignatureDeclarationHelper": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.isActivelyExpanding": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.isExpandableType": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.isMappedTypeHomomorphic": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.isTypeOnStack": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.lookupExpressionChainTypeArgumentNodes": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.lookupSymbolChain": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.moduleSpecifierResolvesToSymbol": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.moduleSpecifierResultForSymbol": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.newIdentifier": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.newStringLiteral": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.newStringLiteralEx": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.saveRestoreFlags": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.serializeInferredReturnTypeForSignature": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.serializeTypeName": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.setCommentRange": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.shouldExpandType": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.shouldWriteTypeParametersInQualifiedName": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.sortByBestName": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.symbolToTypeParameterDeclarations": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.trackComputedName": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.tryGetResolvedSymbolFromTypeNode": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.tryGetThisParameterDeclaration": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typeNodeIsEquivalentToType": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typeParameterShadowsOtherTypeParameterInScope": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typePredicateToTypePredicateNode": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:TypeAlias.ToTypeReferenceNode": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:arrayIsHomogeneous": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:canUsePropertyAccess": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:classifyPropertyName": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:getEffectiveParameterDeclaration": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:getTopmostIndexedAccessType": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:hasTypeAnnotation": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:isIdentifierTypeReference": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:newNodeBuilderImpl": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:startsWithSingleOrDoubleQuote": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:startsWithSquareBracket": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderimpl.go:tryGetModuleSpecifierFromDeclarationWorker": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderscopes.go:NodeBuilderImpl.addSymbolTypeToContext": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodebuilderscopes.go:cloneNodeBuilderContext": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodecopy.go:NodeBuilderImpl.createRecoveryBoundary": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodecopy.go:NodeBuilderImpl.finalizeBoundary": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodecopy.go:NodeBuilderImpl.getEnclosingDeclarationIgnoringFakeScope": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodecopy.go:NodeBuilderImpl.getModuleSpecifierOverride": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodecopy.go:NodeBuilderImpl.reuseNode": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodecopy.go:NodeBuilderImpl.rewriteModuleSpecifier": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodecopy.go:NodeBuilderImpl.walkNodeForExpandability": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodecopy.go:getExistingNodeTreeVisitor": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodecopy.go:newWrappingTracker": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodecopy.go:recoveryBoundary.endRecoveryScope": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodecopy.go:recoveryBoundary.markError": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodecopy.go:recoveryBoundary.startRecoveryScope": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodecopy.go:wrappingTracker.PopErrorFallbackNode": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodecopy.go:wrappingTracker.PushErrorFallbackNode": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodecopy.go:wrappingTracker.ReportCyclicStructureError": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodecopy.go:wrappingTracker.ReportInaccessibleThisError": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodecopy.go:wrappingTracker.ReportInaccessibleUniqueSymbolError": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodecopy.go:wrappingTracker.ReportInferenceFallback": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodecopy.go:wrappingTracker.ReportLikelyUnsafeImportRequiredError": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodecopy.go:wrappingTracker.ReportNonSerializableProperty": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodecopy.go:wrappingTracker.ReportNonlocalAugmentation": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodecopy.go:wrappingTracker.ReportPrivateInBaseOfClassExpression": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodecopy.go:wrappingTracker.ReportTruncationError": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/nodecopy.go:wrappingTracker.TrackSymbol": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/printer.go:Checker.ExpandSymbolForHover": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/printer.go:Checker.SignatureToSignatureDeclaration": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/printer.go:Checker.SignatureToStringEx": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/printer.go:Checker.SymbolToString": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/printer.go:Checker.SymbolToStringEx": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/printer.go:Checker.TypeParameterToStringEx": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/printer.go:Checker.TypePredicateToTypePredicateNode": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/printer.go:Checker.TypeToString": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/printer.go:Checker.TypeToStringEx": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/printer.go:Checker.TypeToTypeNode": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/printer.go:Checker.TypeToTypeNodeEx": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/printer.go:Checker.signatureToString": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/printer.go:Checker.typePredicateToStringEx": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/printer.go:Checker.typeToString": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/printer.go:Checker.valueToString": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/printer.go:createPrinterWithDefaults": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/printer.go:createPrinterWithRemoveComments": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/printer.go:createPrinterWithRemoveCommentsNeverAsciiEscape": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/printer.go:createPrinterWithRemoveCommentsOmitTrailingSemicolon": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/printer.go:createPrinterWithRemoveCommentsOmitTrailingSemicolonNeverAsciiEscape": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/pseudotypenodebuilder.go:NodeBuilderImpl.pseudoParametersToNodeList": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.ForEachExportAndPropertyOfModule": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.GetAllPossiblePropertiesOfTypes": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.GetApparentProperties": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.GetCallSignatures": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.GetCandidateSignaturesForStringLiteralCompletions": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.GetConstantValue": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.GetConstructSignatures": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.GetContextualType": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.GetContextualTypeForArrayLiteralAtPosition": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.GetContextualTypeForJsxAttribute": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.GetElementTypeOfArrayType": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.GetExportSpecifierLocalTargetSymbol": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.GetExportSymbolOfSymbol": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.GetExportsAndPropertiesOfModule": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.GetExportsOfModule": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.GetFirstTypeArgumentFromKnownType": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.GetJsxIntrinsicTagNamesAt": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.GetMappedTypeSymbolOfProperty": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.GetNonOptionalType": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.GetNumberIndexType": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.GetPropertySymbolOfDestructuringAssignment": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.GetPropertySymbolsFromContextualType": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.GetReferencesToSymbolInFile": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.GetRootSymbols": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.GetShorthandAssignmentValueSymbol": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.GetSignatureFromDeclaration": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.GetStringIndexType": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.GetSymbolsInScope": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.GetSymbolsOfParameterPropertyDeclaration": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.GetTypeArgumentConstraint": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.GetTypeAtPosition": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.GetTypeParameterAtPosition": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.IsArgumentsSymbol": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.IsDeclarationUsed": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.IsLibSymbolForHoverVerbosity": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.IsLibTypeForHoverVerbosity": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.IsSymbolReferencedInFile": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.IsTypeInvalidDueToUnionDiscriminant": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.IsUndefinedSymbol": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.IsUnknownSymbol": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.IsValidPropertyAccess": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.IsValidPropertyAccessForCompletions": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.SkipAlias": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.TryGetMemberInModuleExports": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.TryGetMemberInModuleExportsAndProperties": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.getAugmentedPropertiesOfType": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.getExportsOfModuleAsArray": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.getImmediateRootSymbols": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.getLocalSymbolForExportSpecifier": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.getResolvedSignatureWorker": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.getSymbolsInScope": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.getTypeArgumentConstraint": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.getTypeOfAssignmentPattern": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.getTypeParameterConstraintForPositionAcrossSignatures": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.getUninstantiatedSignatures": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.isValidPropertyAccess": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.isValidPropertyAccessWithType": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.shouldTreatPropertiesOfExternalModuleAsExports": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.tryGetTarget": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:GetResolvedSignatureForSignatureHelp": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:getPossibleSymbolReferenceNodes": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:getPossibleSymbolReferencePositions": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:isExportSpecifierAlias": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:isKnownGenericTypeName": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:runWithInferenceBlockedFromSourceNode": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:runWithoutResolvedSignatureCaching": {
+   "disposition": "gap",
+   "item": "C5.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/symbolaccessibility.go:Checker.GetAccessibleSymbolChain": {
+   "disposition": "gap",
+   "item": "C5.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/symbolaccessibility.go:Checker.IsSymbolAccessible": {
+   "disposition": "gap",
+   "item": "C5.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/symbolaccessibility.go:Checker.IsSymbolAccessibleByFlags": {
+   "disposition": "gap",
+   "item": "C5.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/symbolaccessibility.go:Checker.getAccessibleSymbolChain": {
+   "disposition": "gap",
+   "item": "C5.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/symbolaccessibility.go:Checker.getClassExpressionNameTable": {
+   "disposition": "gap",
+   "item": "C5.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/symbolaccessibility.go:Checker.getExternalModuleContainer": {
+   "disposition": "gap",
+   "item": "C5.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/symbolaccessibility.go:Checker.getFileSymbolIfFileSymbolExportEqualsContainer": {
+   "disposition": "gap",
+   "item": "C5.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/symbolaccessibility.go:getQualifiedLeftMeaning": {
+   "disposition": "gap",
+   "item": "C5.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/symbolaccessibility.go:hasExternalModuleSymbol": {
+   "disposition": "gap",
+   "item": "C5.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/symbolaccessibility.go:hasNonGlobalAugmentationExternalModuleSymbol": {
+   "disposition": "gap",
+   "item": "C5.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/symbolaccessibility.go:isNamespaceReexportDeclaration": {
+   "disposition": "gap",
+   "item": "C5.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/symbolaccessibility.go:isPropertyOrMethodDeclarationSymbol": {
+   "disposition": "gap",
+   "item": "C5.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/symbolaccessibility.go:isUMDExportSymbol": {
+   "disposition": "gap",
+   "item": "C5.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/symbolaccessibility.go:symbolTableIDFromExports": {
+   "disposition": "gap",
+   "item": "C5.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/symbolaccessibility.go:symbolTableIDFromGlobals": {
+   "disposition": "gap",
+   "item": "C5.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/symbolaccessibility.go:symbolTableIDFromLocals": {
+   "disposition": "gap",
+   "item": "C5.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/symbolaccessibility.go:symbolTableIDFromMembers": {
+   "disposition": "gap",
+   "item": "C5.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/symbolaccessibility.go:symbolTableIDFromResolvedExports": {
+   "disposition": "gap",
+   "item": "C5.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/symboltracker.go:NewSymbolTrackerImpl": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/symboltracker.go:SymbolTrackerImpl.PopErrorFallbackNode": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/symboltracker.go:SymbolTrackerImpl.PushErrorFallbackNode": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/symboltracker.go:SymbolTrackerImpl.ReportCyclicStructureError": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/symboltracker.go:SymbolTrackerImpl.ReportInaccessibleThisError": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/symboltracker.go:SymbolTrackerImpl.ReportInaccessibleUniqueSymbolError": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/symboltracker.go:SymbolTrackerImpl.ReportInferenceFallback": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/symboltracker.go:SymbolTrackerImpl.ReportLikelyUnsafeImportRequiredError": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/symboltracker.go:SymbolTrackerImpl.ReportNonSerializableProperty": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/symboltracker.go:SymbolTrackerImpl.ReportNonlocalAugmentation": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/symboltracker.go:SymbolTrackerImpl.ReportPrivateInBaseOfClassExpression": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/symboltracker.go:SymbolTrackerImpl.ReportTruncationError": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/symboltracker.go:SymbolTrackerImpl.TrackSymbol": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/symboltracker.go:SymbolTrackerImpl.onDiagnosticReported": {
+   "disposition": "gap",
+   "item": "C5.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  }
+ },
+ "groups": {
+  "C5.6 emit resolver (emitresolver.go)": [
+   "tsc/internal/checker/emitresolver.go:EmitResolver.CreateLateBoundIndexSignatures",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.CreateLiteralConstValue",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.CreateReturnTypeOfSignatureDeclaration",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.CreateTypeOfDeclaration",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.CreateTypeOfExpression",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.CreateTypeParametersOfSignatureDeclaration",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.GetConstantValue",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.GetEffectiveDeclarationFlags",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.GetElementAccessExpressionName",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.GetEnumMemberValue",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.GetExternalModuleFileFromDeclaration",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.GetJsxFactoryEntity",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.GetJsxFragmentFactoryEntity",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.GetPropertiesOfContainerFunction",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.GetReferencedExportContainer",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.GetReferencedImportDeclaration",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.GetReferencedMemberValueDeclaration",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.GetReferencedValueDeclaration",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.GetReferencedValueDeclarationUnsafe",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.GetReferencedValueDeclarations",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.GetTypeReferenceSerializationKind",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.IsDeclarationVisible",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.IsDefinitelyReferenceToGlobalSymbolObject",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.IsEntityNameVisible",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.IsExpandoFunctionDeclaration",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.IsExpandoFunctionDeclarationUnsafe",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.IsImplementationOfOverload",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.IsImportRequiredByAugmentation",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.IsLateBound",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.IsLiteralConstDeclaration",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.IsNameResolvable",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.IsOptionalParameter",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.IsReferencedAliasDeclaration",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.IsSymbolAccessible",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.IsThisPropertyAssignmentDeclarationRedundant",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.IsTopLevelValueImportEqualsWithEntityName",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.IsValueAliasDeclaration",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.MarkLinkedReferencesRecursively",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.PrecalculateDeclarationEmitVisibility",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.RequiresAddingImplicitUndefined",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.RequiresAddingImplicitUndefinedUnsafe",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.SetReferencedImportDeclaration",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.TryJSTypeNodeToTypeNode",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.aliasMarkingVisitorWorker",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.declaredParameterTypeContainsUndefined",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.determineIfDeclarationIsVisible",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.getReferenceResolver",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.hasVisibleDeclarations",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.isAliasResolvedToValue",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.isDeclarationVisible",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.isEntityNameVisible",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.isOptionalParameter",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.isOptionalUninitializedParameterProperty",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.isRequiredInitializedParameter",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.isSymbolAccessible",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.isValueAliasDeclarationWorker",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.markLinkedAliases",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.requiresAddingImplicitUndefined",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.requiresAddingImplicitUndefinedWorker",
+   "tsc/internal/checker/emitresolver.go:getMeaningOfEntityNameReference",
+   "tsc/internal/checker/emitresolver.go:isCommonJSModuleExports",
+   "tsc/internal/checker/emitresolver.go:isConstEnumOrConstEnumOnlyModule",
+   "tsc/internal/checker/emitresolver.go:newEmitResolver",
+   "tsc/internal/checker/emitresolver.go:noopAddVisibleAlias"
+  ],
+  "C5.3 name accessibility (symbolaccessibility.go)": [
+   "tsc/internal/checker/symbolaccessibility.go:Checker.GetAccessibleSymbolChain",
+   "tsc/internal/checker/symbolaccessibility.go:Checker.IsAnySymbolAccessible",
+   "tsc/internal/checker/symbolaccessibility.go:Checker.IsSymbolAccessible",
+   "tsc/internal/checker/symbolaccessibility.go:Checker.IsSymbolAccessibleByFlags",
+   "tsc/internal/checker/symbolaccessibility.go:Checker.IsTypeSymbolAccessible",
+   "tsc/internal/checker/symbolaccessibility.go:Checker.IsValueSymbolAccessible",
+   "tsc/internal/checker/symbolaccessibility.go:Checker.canQualifySymbol",
+   "tsc/internal/checker/symbolaccessibility.go:Checker.compareSymbolChainsWorker",
+   "tsc/internal/checker/symbolaccessibility.go:Checker.getAccessibleSymbolChain",
+   "tsc/internal/checker/symbolaccessibility.go:Checker.getAccessibleSymbolChainEx",
+   "tsc/internal/checker/symbolaccessibility.go:Checker.getAccessibleSymbolChainFromSymbolTable",
+   "tsc/internal/checker/symbolaccessibility.go:Checker.getAliasForSymbolInContainer",
+   "tsc/internal/checker/symbolaccessibility.go:Checker.getAlternativeContainingModules",
+   "tsc/internal/checker/symbolaccessibility.go:Checker.getCandidateListForSymbol",
+   "tsc/internal/checker/symbolaccessibility.go:Checker.getClassExpressionNameTable",
+   "tsc/internal/checker/symbolaccessibility.go:Checker.getContainersOfSymbol",
+   "tsc/internal/checker/symbolaccessibility.go:Checker.getExternalModuleContainer",
+   "tsc/internal/checker/symbolaccessibility.go:Checker.getFileSymbolIfFileSymbolExportEqualsContainer",
+   "tsc/internal/checker/symbolaccessibility.go:Checker.getSymbolTableAliases",
+   "tsc/internal/checker/symbolaccessibility.go:Checker.getVariableDeclarationOfObjectLiteral",
+   "tsc/internal/checker/symbolaccessibility.go:Checker.getWithAlternativeContainers",
+   "tsc/internal/checker/symbolaccessibility.go:Checker.isAccessible",
+   "tsc/internal/checker/symbolaccessibility.go:Checker.isSymbolAccessibleWorker",
+   "tsc/internal/checker/symbolaccessibility.go:Checker.needsQualification",
+   "tsc/internal/checker/symbolaccessibility.go:Checker.someSymbolTableInScope",
+   "tsc/internal/checker/symbolaccessibility.go:Checker.trySymbolTable",
+   "tsc/internal/checker/symbolaccessibility.go:getQualifiedLeftMeaning",
+   "tsc/internal/checker/symbolaccessibility.go:hasExternalModuleSymbol",
+   "tsc/internal/checker/symbolaccessibility.go:hasNonGlobalAugmentationExternalModuleSymbol",
+   "tsc/internal/checker/symbolaccessibility.go:isNamespaceReexportDeclaration",
+   "tsc/internal/checker/symbolaccessibility.go:isPropertyOrMethodDeclarationSymbol",
+   "tsc/internal/checker/symbolaccessibility.go:isUMDExportSymbol",
+   "tsc/internal/checker/symbolaccessibility.go:symbolTableIDFromExports",
+   "tsc/internal/checker/symbolaccessibility.go:symbolTableIDFromGlobals",
+   "tsc/internal/checker/symbolaccessibility.go:symbolTableIDFromLocals",
+   "tsc/internal/checker/symbolaccessibility.go:symbolTableIDFromMembers",
+   "tsc/internal/checker/symbolaccessibility.go:symbolTableIDFromResolvedExports"
+  ],
+  "C5.4 node builder entry points (nodebuilder.go)": [
+   "tsc/internal/checker/nodebuilder.go:Checker.getNodeBuilder",
+   "tsc/internal/checker/nodebuilder.go:Checker.getNodeBuilderEx",
+   "tsc/internal/checker/nodebuilder.go:NewNodeBuilder",
+   "tsc/internal/checker/nodebuilder.go:NewNodeBuilderEx",
+   "tsc/internal/checker/nodebuilder.go:NodeBuilder.EmitContext",
+   "tsc/internal/checker/nodebuilder.go:NodeBuilder.ExpandSymbolForHover",
+   "tsc/internal/checker/nodebuilder.go:NodeBuilder.IndexInfoToIndexSignatureDeclaration",
+   "tsc/internal/checker/nodebuilder.go:NodeBuilder.SerializeReturnTypeForSignature",
+   "tsc/internal/checker/nodebuilder.go:NodeBuilder.SerializeTypeForDeclaration",
+   "tsc/internal/checker/nodebuilder.go:NodeBuilder.SerializeTypeForExpression",
+   "tsc/internal/checker/nodebuilder.go:NodeBuilder.SerializeTypeParametersForSignature",
+   "tsc/internal/checker/nodebuilder.go:NodeBuilder.SignatureToSignatureDeclaration",
+   "tsc/internal/checker/nodebuilder.go:NodeBuilder.SymbolToEntityName",
+   "tsc/internal/checker/nodebuilder.go:NodeBuilder.SymbolToExpression",
+   "tsc/internal/checker/nodebuilder.go:NodeBuilder.SymbolToNode",
+   "tsc/internal/checker/nodebuilder.go:NodeBuilder.SymbolToParameterDeclaration",
+   "tsc/internal/checker/nodebuilder.go:NodeBuilder.SymbolToTypeParameterDeclarations",
+   "tsc/internal/checker/nodebuilder.go:NodeBuilder.TryJSTypeNodeToTypeNode",
+   "tsc/internal/checker/nodebuilder.go:NodeBuilder.TypeParameterToDeclaration",
+   "tsc/internal/checker/nodebuilder.go:NodeBuilder.TypePredicateToTypePredicateNode",
+   "tsc/internal/checker/nodebuilder.go:NodeBuilder.TypeToTypeNode",
+   "tsc/internal/checker/nodebuilder.go:NodeBuilder.enterContext",
+   "tsc/internal/checker/nodebuilder.go:NodeBuilder.exitContext",
+   "tsc/internal/checker/nodebuilder.go:NodeBuilder.exitContextCheck",
+   "tsc/internal/checker/nodebuilder.go:NodeBuilder.exitContextSlice",
+   "tsc/internal/checker/nodebuilder.go:NodeBuilder.popContext",
+   "tsc/internal/checker/nodebuilder.go:NodeBuilder.propagateVerbosityOut",
+   "tsc/internal/checker/nodebuilder.go:simplifyClassDeclaration",
+   "tsc/internal/checker/nodebuilder.go:simplifyModifiers"
+  ],
+  "C5.4 node builder (nodebuilderimpl.go)": [
+   "tsc/internal/checker/nodebuilderimpl.go:Checker.getExpandedParameters",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.addPropertyToElementList",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.appendReferenceToType",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.canReuseExistingJSTypeNode",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.checkTruncationLength",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.checkTruncationLengthIfExpanding",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.checkTypeExpandability",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.cloneBindingName",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.conditionalTypeToTypeNode",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.createAccessExpression",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.createAccessFromSymbolChain",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.createAnonymousTypeNode",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.createAnonymousTypeNodeEx",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.createElidedInformationPlaceholder",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.createEntityNameFromSymbolChain",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.createExpressionFromSymbolChain",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.createExpressionWithTypeArguments",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.createImportAttributesForModuleSpecifier",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.createMappedTypeNodeFromType",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.createPropertyNameNodeForIdentifierOrLiteral",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.createTypeNodeFromObjectType",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.createTypeNodesFromResolvedType",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.existingTypeNodeIsNotReferenceOrIsReferenceWithCompatibleTypeArgumentCount",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.getNameOfSymbolAsWritten",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.getNameOfSymbolFromNameType",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.getParentSymbolOfTypeParameter",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.getPropertyNameNodeForSymbol",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.getPropertyNameNodeForSymbolFromNameType",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.getResolvedTypeWithoutAbstractConstructSignatures",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.getSpecifierForModuleSymbol",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.getSymbolChain",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.getTypeFromTypeNode",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.getTypeParametersOfClassOrInterface",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.indexInfoToIndexSignatureDeclarationHelper",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.indexInfoToObjectComputedNamesOrSignatureDeclaration",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.isActivelyExpanding",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.isExpandableType",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.isHomomorphicMappedTypeWithNonHomomorphicInstantiation",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.isMappedTypeHomomorphic",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.isSingleQuotedStringNamed",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.isStringNamed",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.isTriviallySerializableComputedName",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.isTypeOnStack",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.lookupExpressionChainTypeArgumentNodes",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.lookupInstantiatedTypeArgumentNodes",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.lookupSymbolChain",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.lookupSymbolChainWorker",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.lookupTypeParameterNodes",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.mapToTypeNodes",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.moduleSpecifierResolvesToSymbol",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.moduleSpecifierResultForSymbol",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.newIdentifier",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.newStringLiteral",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.newStringLiteralEx",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.parameterToParameterDeclarationName",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.saveRestoreFlags",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.serializeInferredReturnTypeForSignature",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.serializeReturnTypeForSignature",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.serializeTypeForDeclaration",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.serializeTypeForExpression",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.serializeTypeName",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.setCommentRange",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.setTextRange",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.shouldEmitTypeOfSymbol",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.shouldExpandType",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.shouldUsePlaceholderForProperty",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.shouldWriteTypeOfFunctionSymbol",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.shouldWriteTypeParametersInQualifiedName",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.signatureToSignatureDeclarationHelper",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.sortByBestName",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.symbolToEntityNameNode",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.symbolToExpression",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.symbolToName",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.symbolToNode",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.symbolToParameterDeclaration",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.symbolToTypeNode",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.symbolToTypeParameterDeclarations",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.trackComputedName",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.tryGetResolvedSymbolFromTypeNode",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.tryGetThisParameterDeclaration",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.tryReuseExistingNonParameterTypeNode",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typeNodeIsEquivalentToType",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typeParameterShadowsOtherTypeParameterInScope",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typeParameterToDeclaration",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typeParameterToDeclarationWithConstraint",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typeParameterToName",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typeParametersToTypeParameterDeclarations",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typePredicateToTypePredicateNode",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typePredicateToTypePredicateNodeHelper",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typeReferenceToTypeNode",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typeToTypeNode",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typeToTypeNodeHelperWithPossibleReusableTypeNode",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typeToTypeNodeOrCircularityElision",
+   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.visitAndTransformType",
+   "tsc/internal/checker/nodebuilderimpl.go:TryGetModuleSpecifierFromDeclaration",
+   "tsc/internal/checker/nodebuilderimpl.go:TypeAlias.ToTypeReferenceNode",
+   "tsc/internal/checker/nodebuilderimpl.go:arrayIsHomogeneous",
+   "tsc/internal/checker/nodebuilderimpl.go:canHaveModuleSpecifier",
+   "tsc/internal/checker/nodebuilderimpl.go:canUsePropertyAccess",
+   "tsc/internal/checker/nodebuilderimpl.go:classifyPropertyName",
+   "tsc/internal/checker/nodebuilderimpl.go:getAccessStack",
+   "tsc/internal/checker/nodebuilderimpl.go:getEffectiveParameterDeclaration",
+   "tsc/internal/checker/nodebuilderimpl.go:getTopmostIndexedAccessType",
+   "tsc/internal/checker/nodebuilderimpl.go:getTypeAliasForTypeLiteral",
+   "tsc/internal/checker/nodebuilderimpl.go:hasTypeAnnotation",
+   "tsc/internal/checker/nodebuilderimpl.go:isClassInstanceSide",
+   "tsc/internal/checker/nodebuilderimpl.go:isDefaultBindingContext",
+   "tsc/internal/checker/nodebuilderimpl.go:isIdentifierTypeReference",
+   "tsc/internal/checker/nodebuilderimpl.go:newNodeBuilderImpl",
+   "tsc/internal/checker/nodebuilderimpl.go:startsWithSingleOrDoubleQuote",
+   "tsc/internal/checker/nodebuilderimpl.go:startsWithSquareBracket",
+   "tsc/internal/checker/nodebuilderimpl.go:tryGetModuleSpecifierFromDeclarationWorker",
+   "tsc/internal/checker/nodebuilderimpl.go:typesAreSameReference"
+  ],
+  "C5.4 node builder scopes (nodebuilderscopes.go)": [
+   "tsc/internal/checker/nodebuilderscopes.go:NodeBuilderImpl.addSymbolTypeToContext",
+   "tsc/internal/checker/nodebuilderscopes.go:NodeBuilderImpl.enterNewScope",
+   "tsc/internal/checker/nodebuilderscopes.go:NodeBuilderImpl.enterSignatureScope",
+   "tsc/internal/checker/nodebuilderscopes.go:cloneNodeBuilderContext"
+  ],
+  "C5.4 node reuse and recovery (nodecopy.go)": [
+   "tsc/internal/checker/nodecopy.go:NodeBuilderImpl.createRecoveryBoundary",
+   "tsc/internal/checker/nodecopy.go:NodeBuilderImpl.finalizeBoundary",
+   "tsc/internal/checker/nodecopy.go:NodeBuilderImpl.getEnclosingDeclarationIgnoringFakeScope",
+   "tsc/internal/checker/nodecopy.go:NodeBuilderImpl.getModuleSpecifierOverride",
+   "tsc/internal/checker/nodecopy.go:NodeBuilderImpl.reuseName",
+   "tsc/internal/checker/nodecopy.go:NodeBuilderImpl.reuseNode",
+   "tsc/internal/checker/nodecopy.go:NodeBuilderImpl.reuseTypeNode",
+   "tsc/internal/checker/nodecopy.go:NodeBuilderImpl.rewriteModuleSpecifier",
+   "tsc/internal/checker/nodecopy.go:NodeBuilderImpl.tryJSTypeNodeToTypeNode",
+   "tsc/internal/checker/nodecopy.go:NodeBuilderImpl.tryReuseExistingNodeHelper",
+   "tsc/internal/checker/nodecopy.go:NodeBuilderImpl.walkNodeForExpandability",
+   "tsc/internal/checker/nodecopy.go:getExistingNodeTreeVisitor",
+   "tsc/internal/checker/nodecopy.go:newWrappingTracker",
+   "tsc/internal/checker/nodecopy.go:recoveryBoundary.endRecoveryScope",
+   "tsc/internal/checker/nodecopy.go:recoveryBoundary.markError",
+   "tsc/internal/checker/nodecopy.go:recoveryBoundary.startRecoveryScope",
+   "tsc/internal/checker/nodecopy.go:wrappingTracker.PopErrorFallbackNode",
+   "tsc/internal/checker/nodecopy.go:wrappingTracker.PushErrorFallbackNode",
+   "tsc/internal/checker/nodecopy.go:wrappingTracker.ReportCyclicStructureError",
+   "tsc/internal/checker/nodecopy.go:wrappingTracker.ReportInaccessibleThisError",
+   "tsc/internal/checker/nodecopy.go:wrappingTracker.ReportInaccessibleUniqueSymbolError",
+   "tsc/internal/checker/nodecopy.go:wrappingTracker.ReportInferenceFallback",
+   "tsc/internal/checker/nodecopy.go:wrappingTracker.ReportLikelyUnsafeImportRequiredError",
+   "tsc/internal/checker/nodecopy.go:wrappingTracker.ReportNonSerializableProperty",
+   "tsc/internal/checker/nodecopy.go:wrappingTracker.ReportNonlocalAugmentation",
+   "tsc/internal/checker/nodecopy.go:wrappingTracker.ReportPrivateInBaseOfClassExpression",
+   "tsc/internal/checker/nodecopy.go:wrappingTracker.ReportTruncationError",
+   "tsc/internal/checker/nodecopy.go:wrappingTracker.TrackSymbol"
+  ],
+  "C5.4 symbol tracker (symboltracker.go)": [
+   "tsc/internal/checker/symboltracker.go:NewSymbolTrackerImpl",
+   "tsc/internal/checker/symboltracker.go:SymbolTrackerImpl.PopErrorFallbackNode",
+   "tsc/internal/checker/symboltracker.go:SymbolTrackerImpl.PushErrorFallbackNode",
+   "tsc/internal/checker/symboltracker.go:SymbolTrackerImpl.ReportCyclicStructureError",
+   "tsc/internal/checker/symboltracker.go:SymbolTrackerImpl.ReportInaccessibleThisError",
+   "tsc/internal/checker/symboltracker.go:SymbolTrackerImpl.ReportInaccessibleUniqueSymbolError",
+   "tsc/internal/checker/symboltracker.go:SymbolTrackerImpl.ReportInferenceFallback",
+   "tsc/internal/checker/symboltracker.go:SymbolTrackerImpl.ReportLikelyUnsafeImportRequiredError",
+   "tsc/internal/checker/symboltracker.go:SymbolTrackerImpl.ReportNonSerializableProperty",
+   "tsc/internal/checker/symboltracker.go:SymbolTrackerImpl.ReportNonlocalAugmentation",
+   "tsc/internal/checker/symboltracker.go:SymbolTrackerImpl.ReportPrivateInBaseOfClassExpression",
+   "tsc/internal/checker/symboltracker.go:SymbolTrackerImpl.ReportTruncationError",
+   "tsc/internal/checker/symboltracker.go:SymbolTrackerImpl.TrackSymbol",
+   "tsc/internal/checker/symboltracker.go:SymbolTrackerImpl.onDiagnosticReported"
+  ],
+  "C5.4 printer entry points (printer.go)": [
+   "tsc/internal/checker/printer.go:Checker.ExpandSymbolForHover",
+   "tsc/internal/checker/printer.go:Checker.SignatureToSignatureDeclaration",
+   "tsc/internal/checker/printer.go:Checker.SignatureToStringEx",
+   "tsc/internal/checker/printer.go:Checker.SymbolToString",
+   "tsc/internal/checker/printer.go:Checker.SymbolToStringEx",
+   "tsc/internal/checker/printer.go:Checker.TypeParameterToStringEx",
+   "tsc/internal/checker/printer.go:Checker.TypePredicateToTypePredicateNode",
+   "tsc/internal/checker/printer.go:Checker.TypeToString",
+   "tsc/internal/checker/printer.go:Checker.TypeToStringEx",
+   "tsc/internal/checker/printer.go:Checker.TypeToTypeNode",
+   "tsc/internal/checker/printer.go:Checker.TypeToTypeNodeEx",
+   "tsc/internal/checker/printer.go:Checker.formatUnionTypes",
+   "tsc/internal/checker/printer.go:Checker.signatureToString",
+   "tsc/internal/checker/printer.go:Checker.signatureToStringEx",
+   "tsc/internal/checker/printer.go:Checker.symbolToString",
+   "tsc/internal/checker/printer.go:Checker.symbolToStringEx",
+   "tsc/internal/checker/printer.go:Checker.typePredicateToString",
+   "tsc/internal/checker/printer.go:Checker.typePredicateToStringEx",
+   "tsc/internal/checker/printer.go:Checker.typeToString",
+   "tsc/internal/checker/printer.go:Checker.typeToStringEx",
+   "tsc/internal/checker/printer.go:Checker.valueToString",
+   "tsc/internal/checker/printer.go:createPrinterWithDefaults",
+   "tsc/internal/checker/printer.go:createPrinterWithRemoveComments",
+   "tsc/internal/checker/printer.go:createPrinterWithRemoveCommentsNeverAsciiEscape",
+   "tsc/internal/checker/printer.go:createPrinterWithRemoveCommentsOmitTrailingSemicolon",
+   "tsc/internal/checker/printer.go:createPrinterWithRemoveCommentsOmitTrailingSemicolonNeverAsciiEscape",
+   "tsc/internal/checker/printer.go:toNodeBuilderFlags"
+  ],
+  "C5.4 pseudo type nodes (pseudotypenodebuilder.go)": [
+   "tsc/internal/checker/pseudotypenodebuilder.go:NodeBuilderImpl.pseudoParameterToNode",
+   "tsc/internal/checker/pseudotypenodebuilder.go:NodeBuilderImpl.pseudoParametersEquivalentToParameters",
+   "tsc/internal/checker/pseudotypenodebuilder.go:NodeBuilderImpl.pseudoParametersToNodeList",
+   "tsc/internal/checker/pseudotypenodebuilder.go:NodeBuilderImpl.pseudoReturnTypeMatchesPredicate",
+   "tsc/internal/checker/pseudotypenodebuilder.go:NodeBuilderImpl.pseudoTypeEquivalentToType",
+   "tsc/internal/checker/pseudotypenodebuilder.go:NodeBuilderImpl.pseudoTypeToNode",
+   "tsc/internal/checker/pseudotypenodebuilder.go:NodeBuilderImpl.pseudoTypeToNodeWithCheckerFallback",
+   "tsc/internal/checker/pseudotypenodebuilder.go:NodeBuilderImpl.pseudoTypeToType",
+   "tsc/internal/checker/pseudotypenodebuilder.go:isStructuralPseudoType"
+  ],
+  "C5.5 hover expansion (nodebuilder_hover.go)": [
+   "tsc/internal/checker/nodebuilder_hover.go:NodeBuilderImpl.addClassModifiers",
+   "tsc/internal/checker/nodebuilder_hover.go:NodeBuilderImpl.enumMemberInitializer",
+   "tsc/internal/checker/nodebuilder_hover.go:NodeBuilderImpl.expandClassDecl",
+   "tsc/internal/checker/nodebuilder_hover.go:NodeBuilderImpl.expandEnumDecl",
+   "tsc/internal/checker/nodebuilder_hover.go:NodeBuilderImpl.expandInterfaceDecl",
+   "tsc/internal/checker/nodebuilder_hover.go:NodeBuilderImpl.expandModuleDecl",
+   "tsc/internal/checker/nodebuilder_hover.go:NodeBuilderImpl.expandSymbolForHover",
+   "tsc/internal/checker/nodebuilder_hover.go:NodeBuilderImpl.filterInheritedProperties",
+   "tsc/internal/checker/nodebuilder_hover.go:NodeBuilderImpl.hoverHeritageClauses",
+   "tsc/internal/checker/nodebuilder_hover.go:NodeBuilderImpl.isNamespaceMember",
+   "tsc/internal/checker/nodebuilder_hover.go:NodeBuilderImpl.serializeConstructors",
+   "tsc/internal/checker/nodebuilder_hover.go:NodeBuilderImpl.serializeIndexSignaturesOfType",
+   "tsc/internal/checker/nodebuilder_hover.go:NodeBuilderImpl.serializeNamespaceMember",
+   "tsc/internal/checker/nodebuilder_hover.go:NodeBuilderImpl.serializePropertiesWithTruncation",
+   "tsc/internal/checker/nodebuilder_hover.go:NodeBuilderImpl.serializeTypeAliasForNamespace",
+   "tsc/internal/checker/nodebuilder_hover.go:isExpanding",
+   "tsc/internal/checker/nodebuilder_hover.go:isHashPrivate",
+   "tsc/internal/checker/nodebuilder_hover.go:typeElementsToClassElements"
+  ],
+  "C5.5 services (services.go)": [
+   "tsc/internal/checker/services.go:Checker.ForEachExportAndPropertyOfModule",
+   "tsc/internal/checker/services.go:Checker.GetAllPossiblePropertiesOfTypes",
+   "tsc/internal/checker/services.go:Checker.GetApparentProperties",
+   "tsc/internal/checker/services.go:Checker.GetCallSignatures",
+   "tsc/internal/checker/services.go:Checker.GetCandidateSignaturesForStringLiteralCompletions",
+   "tsc/internal/checker/services.go:Checker.GetConstantValue",
+   "tsc/internal/checker/services.go:Checker.GetConstructSignatures",
+   "tsc/internal/checker/services.go:Checker.GetContextualType",
+   "tsc/internal/checker/services.go:Checker.GetContextualTypeForArrayLiteralAtPosition",
+   "tsc/internal/checker/services.go:Checker.GetContextualTypeForJsxAttribute",
+   "tsc/internal/checker/services.go:Checker.GetElementTypeOfArrayType",
+   "tsc/internal/checker/services.go:Checker.GetExportSpecifierLocalTargetSymbol",
+   "tsc/internal/checker/services.go:Checker.GetExportSymbolOfSymbol",
+   "tsc/internal/checker/services.go:Checker.GetExportsAndPropertiesOfModule",
+   "tsc/internal/checker/services.go:Checker.GetExportsOfModule",
+   "tsc/internal/checker/services.go:Checker.GetFirstTypeArgumentFromKnownType",
+   "tsc/internal/checker/services.go:Checker.GetJsxIntrinsicTagNamesAt",
+   "tsc/internal/checker/services.go:Checker.GetMappedTypeSymbolOfProperty",
+   "tsc/internal/checker/services.go:Checker.GetNonOptionalType",
+   "tsc/internal/checker/services.go:Checker.GetNumberIndexType",
+   "tsc/internal/checker/services.go:Checker.GetPropertySymbolOfDestructuringAssignment",
+   "tsc/internal/checker/services.go:Checker.GetPropertySymbolsFromContextualType",
+   "tsc/internal/checker/services.go:Checker.GetReferencesToSymbolInFile",
+   "tsc/internal/checker/services.go:Checker.GetRootSymbols",
+   "tsc/internal/checker/services.go:Checker.GetShorthandAssignmentValueSymbol",
+   "tsc/internal/checker/services.go:Checker.GetSignatureFromDeclaration",
+   "tsc/internal/checker/services.go:Checker.GetStringIndexType",
+   "tsc/internal/checker/services.go:Checker.GetSymbolsInScope",
+   "tsc/internal/checker/services.go:Checker.GetSymbolsOfParameterPropertyDeclaration",
+   "tsc/internal/checker/services.go:Checker.GetTypeArgumentConstraint",
+   "tsc/internal/checker/services.go:Checker.GetTypeAtPosition",
+   "tsc/internal/checker/services.go:Checker.GetTypeParameterAtPosition",
+   "tsc/internal/checker/services.go:Checker.IsArgumentsSymbol",
+   "tsc/internal/checker/services.go:Checker.IsDeclarationUsed",
+   "tsc/internal/checker/services.go:Checker.IsLibSymbolForHoverVerbosity",
+   "tsc/internal/checker/services.go:Checker.IsLibTypeForHoverVerbosity",
+   "tsc/internal/checker/services.go:Checker.IsSymbolReferencedInFile",
+   "tsc/internal/checker/services.go:Checker.IsTypeInvalidDueToUnionDiscriminant",
+   "tsc/internal/checker/services.go:Checker.IsUndefinedSymbol",
+   "tsc/internal/checker/services.go:Checker.IsUnknownSymbol",
+   "tsc/internal/checker/services.go:Checker.IsValidPropertyAccess",
+   "tsc/internal/checker/services.go:Checker.IsValidPropertyAccessForCompletions",
+   "tsc/internal/checker/services.go:Checker.SkipAlias",
+   "tsc/internal/checker/services.go:Checker.TryGetMemberInModuleExports",
+   "tsc/internal/checker/services.go:Checker.TryGetMemberInModuleExportsAndProperties",
+   "tsc/internal/checker/services.go:Checker.getAugmentedPropertiesOfType",
+   "tsc/internal/checker/services.go:Checker.getExportsOfModuleAsArray",
+   "tsc/internal/checker/services.go:Checker.getImmediateRootSymbols",
+   "tsc/internal/checker/services.go:Checker.getLocalSymbolForExportSpecifier",
+   "tsc/internal/checker/services.go:Checker.getResolvedSignatureWorker",
+   "tsc/internal/checker/services.go:Checker.getSymbolsInScope",
+   "tsc/internal/checker/services.go:Checker.getTypeArgumentConstraint",
+   "tsc/internal/checker/services.go:Checker.getTypeOfAssignmentPattern",
+   "tsc/internal/checker/services.go:Checker.getTypeParameterConstraintForPositionAcrossSignatures",
+   "tsc/internal/checker/services.go:Checker.getUninstantiatedSignatures",
+   "tsc/internal/checker/services.go:Checker.isValidPropertyAccess",
+   "tsc/internal/checker/services.go:Checker.isValidPropertyAccessWithType",
+   "tsc/internal/checker/services.go:Checker.shouldTreatPropertiesOfExternalModuleAsExports",
+   "tsc/internal/checker/services.go:Checker.tryGetTarget",
+   "tsc/internal/checker/services.go:GetResolvedSignatureForSignatureHelp",
+   "tsc/internal/checker/services.go:getPossibleSymbolReferenceNodes",
+   "tsc/internal/checker/services.go:getPossibleSymbolReferencePositions",
+   "tsc/internal/checker/services.go:isExportSpecifierAlias",
+   "tsc/internal/checker/services.go:isKnownGenericTypeName",
+   "tsc/internal/checker/services.go:runWithInferenceBlockedFromSourceNode",
+   "tsc/internal/checker/services.go:runWithoutResolvedSignatureCaching"
+  ],
+  "C5.2 public query surface (exports.go)": [
+   "tsc/internal/checker/exports.go:Checker.CompareSymbols",
+   "tsc/internal/checker/exports.go:Checker.FillMissingTypeArguments",
+   "tsc/internal/checker/exports.go:Checker.GetAnyType",
+   "tsc/internal/checker/exports.go:Checker.GetApparentType",
+   "tsc/internal/checker/exports.go:Checker.GetArgumentsSymbol",
+   "tsc/internal/checker/exports.go:Checker.GetBaseConstraintOfType",
+   "tsc/internal/checker/exports.go:Checker.GetBaseConstructorTypeOfClass",
+   "tsc/internal/checker/exports.go:Checker.GetBaseTypeOfLiteralType",
+   "tsc/internal/checker/exports.go:Checker.GetBaseTypes",
+   "tsc/internal/checker/exports.go:Checker.GetBigIntType",
+   "tsc/internal/checker/exports.go:Checker.GetBooleanType",
+   "tsc/internal/checker/exports.go:Checker.GetConstraintOfTypeParameter",
+   "tsc/internal/checker/exports.go:Checker.GetContextualTypeForArgumentAtIndex",
+   "tsc/internal/checker/exports.go:Checker.GetContextualTypeForObjectLiteralElement",
+   "tsc/internal/checker/exports.go:Checker.GetDeclaredTypeOfSymbol",
+   "tsc/internal/checker/exports.go:Checker.GetDefaultFromTypeParameter",
+   "tsc/internal/checker/exports.go:Checker.GetESSymbolType",
+   "tsc/internal/checker/exports.go:Checker.GetEffectiveDeclarationFlags",
+   "tsc/internal/checker/exports.go:Checker.GetErrorType",
+   "tsc/internal/checker/exports.go:Checker.GetExpandedParameters",
+   "tsc/internal/checker/exports.go:Checker.GetFalseTypeOfConditionalType",
+   "tsc/internal/checker/exports.go:Checker.GetFullyQualifiedName",
+   "tsc/internal/checker/exports.go:Checker.GetGlobalSymbol",
+   "tsc/internal/checker/exports.go:Checker.GetImmediateAliasedSymbol",
+   "tsc/internal/checker/exports.go:Checker.GetIndexInfoOfType",
+   "tsc/internal/checker/exports.go:Checker.GetIndexInfosOfType",
+   "tsc/internal/checker/exports.go:Checker.GetIndexSignaturesAtLocation",
+   "tsc/internal/checker/exports.go:Checker.GetJsxFragmentFactory",
+   "tsc/internal/checker/exports.go:Checker.GetJsxNamespace",
+   "tsc/internal/checker/exports.go:Checker.GetLocalTypeParametersOfClassOrInterfaceOrTypeAlias",
+   "tsc/internal/checker/exports.go:Checker.GetMemberOverrideModifierStatus",
+   "tsc/internal/checker/exports.go:Checker.GetMergedSymbol",
+   "tsc/internal/checker/exports.go:Checker.GetMinTypeArgumentCount",
+   "tsc/internal/checker/exports.go:Checker.GetNameTypeOfSymbol",
+   "tsc/internal/checker/exports.go:Checker.GetNeverType",
+   "tsc/internal/checker/exports.go:Checker.GetNonMissingTypeOfSymbol",
+   "tsc/internal/checker/exports.go:Checker.GetNonPrimitiveType",
+   "tsc/internal/checker/exports.go:Checker.GetNullType",
+   "tsc/internal/checker/exports.go:Checker.GetNumberType",
+   "tsc/internal/checker/exports.go:Checker.GetPropertiesOfType",
+   "tsc/internal/checker/exports.go:Checker.GetPropertyOfType",
+   "tsc/internal/checker/exports.go:Checker.GetReducedType",
+   "tsc/internal/checker/exports.go:Checker.GetResolvedSignature",
+   "tsc/internal/checker/exports.go:Checker.GetResolvedSymbol",
+   "tsc/internal/checker/exports.go:Checker.GetRestTypeOfSignature",
+   "tsc/internal/checker/exports.go:Checker.GetReturnTypeOfSignature",
+   "tsc/internal/checker/exports.go:Checker.GetSignaturesOfType",
+   "tsc/internal/checker/exports.go:Checker.GetStringType",
+   "tsc/internal/checker/exports.go:Checker.GetSymbolFlags",
+   "tsc/internal/checker/exports.go:Checker.GetTargetSymbol",
+   "tsc/internal/checker/exports.go:Checker.GetTrueTypeOfConditionalType",
+   "tsc/internal/checker/exports.go:Checker.GetTypeArguments",
+   "tsc/internal/checker/exports.go:Checker.GetTypeFromTypeNode",
+   "tsc/internal/checker/exports.go:Checker.GetTypeOfPropertyOfContextualType",
+   "tsc/internal/checker/exports.go:Checker.GetTypeOfPropertyOfType",
+   "tsc/internal/checker/exports.go:Checker.GetTypeOfSymbol",
+   "tsc/internal/checker/exports.go:Checker.GetTypeOnlyAliasDeclaration",
+   "tsc/internal/checker/exports.go:Checker.GetTypePredicateOfSignature",
+   "tsc/internal/checker/exports.go:Checker.GetUndefinedSymbol",
+   "tsc/internal/checker/exports.go:Checker.GetUndefinedType",
+   "tsc/internal/checker/exports.go:Checker.GetUnionType",
+   "tsc/internal/checker/exports.go:Checker.GetUnionTypeEx",
+   "tsc/internal/checker/exports.go:Checker.GetUnknownSignature",
+   "tsc/internal/checker/exports.go:Checker.GetUnknownSymbol",
+   "tsc/internal/checker/exports.go:Checker.GetUnknownType",
+   "tsc/internal/checker/exports.go:Checker.GetVoidType",
+   "tsc/internal/checker/exports.go:Checker.GetWidenedLiteralType",
+   "tsc/internal/checker/exports.go:Checker.GetWidenedType",
+   "tsc/internal/checker/exports.go:Checker.HasEffectiveRestParameter",
+   "tsc/internal/checker/exports.go:Checker.IsArrayLikeType",
+   "tsc/internal/checker/exports.go:Checker.IsArrayType",
+   "tsc/internal/checker/exports.go:Checker.IsContextSensitive",
+   "tsc/internal/checker/exports.go:Checker.IsPropertyAccessible",
+   "tsc/internal/checker/exports.go:Checker.IsReadonlySymbol",
+   "tsc/internal/checker/exports.go:Checker.IsTypeAssignableTo",
+   "tsc/internal/checker/exports.go:Checker.RemoveMissingOrUndefinedType",
+   "tsc/internal/checker/exports.go:Checker.RequiresAddingImplicitUndefined",
+   "tsc/internal/checker/exports.go:Checker.ResolveExternalModuleName",
+   "tsc/internal/checker/exports.go:Checker.ResolveExternalModuleSymbol",
+   "tsc/internal/checker/exports.go:Checker.ResolveName",
+   "tsc/internal/checker/exports.go:Checker.TryFindAmbientModule",
+   "tsc/internal/checker/exports.go:Checker.TypeHasCallOrConstructSignatures",
+   "tsc/internal/checker/exports.go:Checker.TypePredicateToString",
+   "tsc/internal/checker/exports.go:Checker.WasCanceled",
+   "tsc/internal/checker/exports.go:GetDeclarationModifierFlagsFromSymbol",
+   "tsc/internal/checker/exports.go:GetPropertyNameFromType",
+   "tsc/internal/checker/exports.go:IsTupleType",
+   "tsc/internal/checker/exports.go:IsTupleTypeTarget",
+   "tsc/internal/checker/exports.go:IsTypeUsableAsPropertyName"
+  ],
+  "C5 checker entries (checker.go API surface)": [
+   "tsc/internal/checker/checker.go:Checker.GetAmbientModules",
+   "tsc/internal/checker/checker.go:Checker.GetDiagnostics",
+   "tsc/internal/checker/checker.go:Checker.GetEmitResolver",
+   "tsc/internal/checker/checker.go:Checker.GetGlobalDiagnostics",
+   "tsc/internal/checker/checker.go:Checker.GetSuggestionDiagnostics",
+   "tsc/internal/checker/checker.go:Checker.GetTypeOfSymbolAtLocation",
+   "tsc/internal/checker/checker.go:Checker.IsDeprecatedDeclaration",
+   "tsc/internal/checker/checker.go:Checker.IsNullableType",
+   "tsc/internal/checker/checker.go:Checker.TryGetThisTypeAtEx",
+   "tsc/internal/checker/checker.go:Checker.isValidPropertyAccessForCompletions",
+   "tsc/internal/checker/checker.go:getNameFromIndexInfo"
+  ]
+ },
+ "handoffs": [],
+ "open_issues": [],
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "scope": "C5 audit over the complete emitresolver.go, symbolaccessibility.go, node builder, node copy, symbol tracker, printer, pseudo type node, hover, services and exports inventories, and the unmarked exported checker.go API entries no earlier audit disposes (docs/PHASE2-C5-plan.md, C5.1). Open gaps name the item that closes them.",
+ "version": 1
+}

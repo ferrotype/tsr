@@ -94,7 +94,7 @@ class Wiring(unittest.TestCase):
             self.assertIn(str(path.relative_to(ROOT)), spec["inputs"])
         self.assertIn("data/phase2/receipts/c4-contracts.json", spec["inputs"])
         self.assertIn("C4", blockers.CHECKPOINT_CLAIMS)
-        self.assertEqual(producers.CHECKPOINTS[-1], "C4")
+        self.assertIn("C4", producers.CHECKPOINTS)
         self.assertIn("c4-contracts", producers.WITNESSES)
         document = audit.load(ROOT / "data/phase2/c4-audit.json")
         self.assertEqual(document["checkpoint"], "C4")

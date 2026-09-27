@@ -96,6 +96,11 @@ CHECKPOINT_AUTHORITIES = {
     # C4 has no measurement obligation (docs/PHASE2-C4-plan.md section 1).
     "C4": {name: ROOT / f"data/phase2/c4-{name}{'.json.gz' if name == 'baseline' else '.json'}"
            for name in ("claims", "audit", "baseline")},
+    # C5 has no measurement obligation; its services replay is a completion
+    # input (docs/PHASE2-C5-plan.md, sections 1 and C5.9).
+    "C5": {**{name: ROOT / f"data/phase2/c5-{name}{'.json.gz' if name == 'baseline' else '.json'}"
+              for name in ("claims", "audit", "baseline")},
+           "services": ROOT / "data/phase2/services-replay.json"},
 }
 WITNESSES = {
     "c1-contracts": {
@@ -137,6 +142,13 @@ WITNESSES["c3-contracts"] = {
     # The fixtures and their pinned native observations are contract inputs.
     "sources": [*WITNESSES["c1-contracts"]["sources"], "crates/tsr_compiler/tests/fixtures/c3",
                 "upstream/tsc/testdata/tests/cases/compiler/binderBinaryExpressionStress.ts"],
+}
+WITNESSES["c5-contracts"] = {
+    "commands": [["cargo", "test", "-p", "tsr_compiler", "--features", "recursion-probe",
+                  "--test", "c5_contracts", "--locked", *release] for release in ([], ["--release"])],
+    "test_source": "crates/tsr_compiler/tests/c5_contracts.rs", "minimum_tests": 9,
+    "test_modules": {},
+    "sources": [*WITNESSES["c1-contracts"]["sources"], "crates/tsr_compiler/tests/fixtures/c5"],
 }
 WITNESSES["c4-contracts"] = {
     "commands": [["cargo", "test", "-p", "tsr_compiler", "--features", "recursion-probe",
@@ -308,7 +320,7 @@ def _c1_claim_metrics(comparison, claims, blockers=None):
     return metrics
 
 
-CHECKPOINTS = ("C2", "C3", "C4")
+CHECKPOINTS = ("C2", "C3", "C4", "C5")
 
 
 def newest_checkpoint(loaded):
@@ -320,14 +332,14 @@ def drop_historical_completion(metrics, checkpoint):
     """A checkpoint's completion is a recorded historical fact (C3 plan, section 3):
     `P2B-Cn` closes on the checker run recorded at that checkpoint's exit, and a later
     run reports the checkpoint's accounting but never recomputes `_measured` or
-    `_complete` on its own capture."""
-    for suffix in ("_measured", "_complete"):
+    `_complete` on its own capture; nor, for C5, its services replay."""
+    for suffix in ("_measured", "_services", "_complete"):
         metrics.pop(checkpoint.lower() + suffix, None)
 
 
 def checkpoint_metrics(checkpoint, comparison, claims, audit_ok, baseline, contracts_ok, regression_parity,
                        blockers=None, *, handoffs=None, measured_ok=None, baseline_sha256=None,
-                       prerequisites=None, inventory=None, incoming=None):
+                       prerequisites=None, inventory=None, incoming=None, services_ok=None):
     """Shared exit accounting; a status label alone never exempts a current row."""
     phase2_compare.validate_complete_rows(comparison)
     prefix = checkpoint.lower()
@@ -399,6 +411,11 @@ def checkpoint_metrics(checkpoint, comparison, claims, audit_ok, baseline, contr
     if "measurement" in CHECKPOINT_AUTHORITIES.get(checkpoint, {}):
         metrics[prefix + "_measured"] = measured_ok is True
         booleans.append("measured")
+    # A checkpoint with a services authority (C5) completes only on a current
+    # replay record in which every operation is replayed or approved.
+    if "services" in CHECKPOINT_AUTHORITIES.get(checkpoint, {}):
+        metrics[prefix + "_services"] = services_ok is True
+        booleans.append("services")
     evidence_ok = checkpoint == "C1" or (prerequisites is not None and all(
         prerequisites.get(name) is True for name in ("inventory_frozen", "native_verified", "harness_valid",
                                                     "result_recorded", "blockers_named")))
@@ -492,10 +509,18 @@ def ratio(rows, domain, *, exclude_disabled=False):
     return sum(row["outcomes"][domain] in MATCHED for row in selected) / len(selected)
 
 
+def services_current(manifest, comparison, *, context=None):
+    """C5.5: the recorded fourslash reference verifies and the replay record is current."""
+    if not Path(manifest).is_file():
+        return False
+    import phase2_services
+    return phase2_services.current(manifest, comparison, context=context)
+
+
 def checker(native=NATIVE, rust=RUST):
     metrics = {"inventory_frozen": False, "native_verified": False, "harness_valid": False,
                "result_recorded": False, "blockers_named": False, "c1_complete": False, "c2_complete": False,
-               "c3_complete": False, "c4_complete": False}
+               "c3_complete": False, "c4_complete": False, "c5_complete": False}
     try:
         document = phase2_inventory.read()
         metrics["inventory_frozen"] = (phase2_inventory.INVENTORY.read_bytes()
@@ -600,11 +625,13 @@ def checker(native=NATIVE, rust=RUST):
                         if authorities["baseline"].is_file() else None)
             measured = (measurement_current(comparison, rust, context=context)
                         if "measurement" in authorities and checkpoint == current else None)
+            services = (services_current(authorities["services"], comparison, context=context)
+                        if "services" in authorities and checkpoint == current else None)
             metrics.update(checkpoint_metrics(
                 checkpoint, comparison, claims, audit_ok, baseline, receipt_current(prefix + "-contracts"),
                 metrics["regression_parity"], register, handoffs=transfers, measured_ok=measured,
                 baseline_sha256=digest(authorities["baseline"].read_bytes()) if baseline is not None else None,
-                prerequisites=metrics, incoming=incoming))
+                prerequisites=metrics, incoming=incoming, services_ok=services))
         except (OSError, ValueError, KeyError, TypeError) as error:
             print(f"{checkpoint} metrics unavailable: " + str(error), file=sys.stderr)
             metrics[prefix + "_complete"] = False

@@ -2975,7 +2975,7 @@
    "bucket": "emit order: native pre/post-emit sets differ",
    "go": "tsc/internal/transformers/inliners/constenum.go:ConstEnumInliningTransformer.visit",
    "handoff": {
-    "capture_sha256": "116dcbe7dc29e434e59c3de78d1d8e6ed285ce174eef8d0327036a5d0b8cd2a1",
+    "capture_sha256": "928ef3dcbfbe5185cbba3ac022d9d4ee742b16337671db5a0d3ff52961688d98",
     "cause": "JavaScript constant-enum inlining asks GetConstantValue about v[k] before semantic checking, first resolving the circular constraints at v and attaching TS2751.",
     "domains": [
      "errors"
@@ -5099,7 +5099,7 @@
    "bucket": "emit order: native pre/post-emit sets differ",
    "go": "tsc/internal/transformers/tstransforms/importelision.go:ImportElisionTransformer.visit",
    "handoff": {
-    "capture_sha256": "116dcbe7dc29e434e59c3de78d1d8e6ed285ce174eef8d0327036a5d0b8cd2a1",
+    "capture_sha256": "928ef3dcbfbe5185cbba3ac022d9d4ee742b16337671db5a0d3ff52961688d98",
     "cause": "JavaScript import elision marks linked references, checking the property receiver before semantic checking; this changes the first circular-constraint or mapped-property diagnostic location.",
     "domains": [
      "errors"
@@ -7174,7 +7174,7 @@
    "bucket": "emit order: native pre/post-emit sets differ",
    "go": "tsc/internal/transformers/tstransforms/importelision.go:ImportElisionTransformer.visit",
    "handoff": {
-    "capture_sha256": "116dcbe7dc29e434e59c3de78d1d8e6ed285ce174eef8d0327036a5d0b8cd2a1",
+    "capture_sha256": "928ef3dcbfbe5185cbba3ac022d9d4ee742b16337671db5a0d3ff52961688d98",
     "cause": "JavaScript import elision marks linked references, checking the property receiver before semantic checking; this changes the first circular-constraint or mapped-property diagnostic location.",
     "domains": [
      "errors"

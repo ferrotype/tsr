@@ -1,0 +1,190 @@
+{
+ "baseline_sha256": "fe6a3a46b566f895df3d6656f12de5583de04d8cfc1b84462b53d815e6d34782",
+ "inventory_sha256": "c09721d36d361eb8646b2321ec3478da0fbdbf12253c086e7b1c34e966aea9b9",
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "rows": [
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "emit order: native pre/post-emit sets differ",
+   "handed_by": {
+    "checkpoint": "C2",
+    "go": "tsc/internal/transformers/inliners/constenum.go:ConstEnumInliningTransformer.visit"
+   },
+   "id": "compiler/incorrectRecursiveMappedTypeConstraint.ts#configuration=0",
+   "incoming": {
+    "blocker": {
+     "kind": "emit_order",
+     "operation": "post-emit diagnostic order"
+    },
+    "capture_sha256": "928ef3dcbfbe5185cbba3ac022d9d4ee742b16337671db5a0d3ff52961688d98",
+    "cause": "JavaScript constant-enum inlining asks GetConstantValue about v[k] before semantic checking, first resolving the circular constraints at v and attaching TS2751.",
+    "domains": [
+     "errors"
+    ],
+    "from": "C2",
+    "go": "tsc/internal/checker/emitresolver.go:EmitResolver.GetConstantValue",
+    "owner": "C5",
+    "raw_observation_sha256": "d3f5939c9cb304469f61cc7964ec1e6e32eaecbaae768cb3385db0fc0a4cad82",
+    "reproduce": [
+     "python3",
+     "scripts/phase2_corpus.py",
+     "run",
+     "--native",
+     "target/phase2/native",
+     "--output",
+     "<fresh-output>",
+     "--case",
+     "compiler/incorrectRecursiveMappedTypeConstraint.ts#configuration=0"
+    ],
+    "request_sha256": "63e40392b21bdc79f58ea06efe888fff6e9842854b2b3cf1213fd66a4721c684",
+    "trace": {
+     "path": "data/phase2/c2-emit-handoffs/stacks.json",
+     "sha256": "400258c2041e7572e119b6b0d76732d207fa4d677105e289f2d25b8f87bc706d"
+    }
+   },
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/incorrectRecursiveMappedTypeConstraint.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "emit order: native pre/post-emit sets differ",
+   "handed_by": {
+    "checkpoint": "C2",
+    "go": "tsc/internal/transformers/tstransforms/importelision.go:ImportElisionTransformer.visit"
+   },
+   "id": "compiler/typeParameterWithInvalidConstraintType.ts#configuration=0",
+   "incoming": {
+    "blocker": {
+     "kind": "emit_order",
+     "operation": "post-emit diagnostic order"
+    },
+    "capture_sha256": "928ef3dcbfbe5185cbba3ac022d9d4ee742b16337671db5a0d3ff52961688d98",
+    "cause": "JavaScript import elision marks linked references, checking the property receiver before semantic checking; this changes the first circular-constraint or mapped-property diagnostic location.",
+    "domains": [
+     "errors"
+    ],
+    "from": "C2",
+    "go": "tsc/internal/checker/emitresolver.go:EmitResolver.MarkLinkedReferencesRecursively",
+    "owner": "C5",
+    "raw_observation_sha256": "7627be7c403df2afccecb6d28ab0966fb2b939fe51525784d7108aa971e84815",
+    "reproduce": [
+     "python3",
+     "scripts/phase2_corpus.py",
+     "run",
+     "--native",
+     "target/phase2/native",
+     "--output",
+     "<fresh-output>",
+     "--case",
+     "compiler/typeParameterWithInvalidConstraintType.ts#configuration=0"
+    ],
+    "request_sha256": "bd395918c32a707fb675783c719c35e1e5d715b021353fedb05e961d45106ad6",
+    "trace": {
+     "path": "data/phase2/c2-emit-handoffs/stacks.json",
+     "sha256": "400258c2041e7572e119b6b0d76732d207fa4d677105e289f2d25b8f87bc706d"
+    }
+   },
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "compiler/typeParameterWithInvalidConstraintType.ts#configuration=0"
+   ],
+   "status": "open"
+  },
+  {
+   "baseline_outcomes": {
+    "display": "match",
+    "errors": "different",
+    "parent_pointers": "match",
+    "symbols": "match",
+    "trace": "disabled",
+    "types": "match",
+    "union_ordering": "match"
+   },
+   "bucket": "emit order: native pre/post-emit sets differ",
+   "handed_by": {
+    "checkpoint": "C2",
+    "go": "tsc/internal/transformers/tstransforms/importelision.go:ImportElisionTransformer.visit"
+   },
+   "id": "conformance/types/mapped/recursiveMappedTypes.ts#configuration=0",
+   "incoming": {
+    "blocker": {
+     "kind": "emit_order",
+     "operation": "post-emit diagnostic order"
+    },
+    "capture_sha256": "928ef3dcbfbe5185cbba3ac022d9d4ee742b16337671db5a0d3ff52961688d98",
+    "cause": "JavaScript import elision marks linked references, checking the property receiver before semantic checking; this changes the first circular-constraint or mapped-property diagnostic location.",
+    "domains": [
+     "errors"
+    ],
+    "from": "C2",
+    "go": "tsc/internal/checker/emitresolver.go:EmitResolver.MarkLinkedReferencesRecursively",
+    "owner": "C5",
+    "raw_observation_sha256": "49b21342059e3db092d2bcc5e40537e5d2d0c04408f71aa1ed2605340af224eb",
+    "reproduce": [
+     "python3",
+     "scripts/phase2_corpus.py",
+     "run",
+     "--native",
+     "target/phase2/native",
+     "--output",
+     "<fresh-output>",
+     "--case",
+     "conformance/types/mapped/recursiveMappedTypes.ts#configuration=0"
+    ],
+    "request_sha256": "9428c81478addd989feda1603c4bdbe1fc7930bbe590c364a7a24659386fe523",
+    "trace": {
+     "path": "data/phase2/c2-emit-handoffs/stacks.json",
+     "sha256": "400258c2041e7572e119b6b0d76732d207fa4d677105e289f2d25b8f87bc706d"
+    }
+   },
+   "reproduce": [
+    "python3",
+    "scripts/phase2_corpus.py",
+    "run",
+    "--native",
+    "target/phase2/native",
+    "--output",
+    "<fresh-output>",
+    "--case",
+    "conformance/types/mapped/recursiveMappedTypes.ts#configuration=0"
+   ],
+   "status": "open"
+  }
+ ],
+ "rust_capture_sha256": "928ef3dcbfbe5185cbba3ac022d9d4ee742b16337671db5a0d3ff52961688d98",
+ "scope": "C5-start worksheet (target/phase2/rust-c5-start, equal to the recorded C4 exit on every row). C5 owns no inventory rows: its rows are the three emit-order rows C2 handed to C5, each incoming with the C2 trace and the C5 resolver function its first transform reaches. The five declaration-audit rows match in every comparison domain and are tracked in the C5 record, not here. This file does not claim audit or C5 completion.",
+ "version": 1
+}

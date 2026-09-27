@@ -105,10 +105,29 @@ C4_REVIEWED_GROUPS = {
     "C4.6-C4.7 decorators and metadata": (47, "8c3d1ce5c8ae1acd5483a5603b8b83e35afa14d6d6c5d683998789e86a0428d7"),
 }
 C4_COMPLETE_FILES = {"C4.2-C4.5 JSX (jsx.go)": "tsc/internal/checker/jsx.go:"}
+C5_REVIEWED_GROUPS = {
+    "C5.6 emit resolver (emitresolver.go)": (64, "c226fbc63e72ec1e1706dec39f6bab38ed08ef731aa6ce0aa7aa9900df7fed10"),
+    "C5.3 name accessibility (symbolaccessibility.go)": (37, "72c01eba7dbe5e3e826b87267074af10f2024889f734268267757251c7cb1aaa"),
+    "C5.4 node builder entry points (nodebuilder.go)": (29, "714a1af6f3af8e1080334d7fb011c8cfb0816d739a88cb93dfb001cc082eccb1"),
+    "C5.4 node builder (nodebuilderimpl.go)": (113, "ef912a047b70f50e51acaf9265e2b4fa0ca3e265ad59942cd81352668cc4995c"),
+    "C5.4 node builder scopes (nodebuilderscopes.go)": (4, "7da83b8ff5fae84071b44af3f9d19956dc7e0a8c1a6c6ab0706315417314fe8a"),
+    "C5.4 node reuse and recovery (nodecopy.go)": (28, "2e7de8b635ac6858f9c0ea7b665c093ee071be1e3354192d5f857dcf348203f4"),
+    "C5.4 symbol tracker (symboltracker.go)": (14, "77fe669302de167beb41780e1546f1c261ad556737f503e295d364dc5969fa04"),
+    "C5.4 printer entry points (printer.go)": (27, "30bb882347848752bc77b1bcd18cc46e2c8139d79adfda952e76bf1c10fa5d52"),
+    "C5.4 pseudo type nodes (pseudotypenodebuilder.go)": (9, "02303962badf1a5679fa5c98ef672e786aff3ebb1f37b33c18f71351c7df01f5"),
+    "C5.5 hover expansion (nodebuilder_hover.go)": (18, "db2cbed7c51c21e5f8795ac56667834d68fc2db606441570a507b225239cc98d"),
+    "C5.5 services (services.go)": (66, "c97624de2644a05b1ad31464aba0886a3d7e75682717660e22b9749c2384dd94"),
+    "C5.2 public query surface (exports.go)": (89, "2049428b080279123da441506fe69f60ea1e1691db8059c5313b210d85ee94ab"),
+    "C5 checker entries (checker.go API surface)": (11, "39ebad5e044902b5660f0bf7d3484f681b12d7f5c9106521f6e77cba8b30950e"),
+}
+# Every file group of the C5 scope covers its complete pinned file.
+C5_COMPLETE_FILES = {group: "tsc/internal/checker/" + group.rsplit("(", 1)[1].rstrip(")") + ":"
+                     for group in C5_REVIEWED_GROUPS if group.endswith(".go)")}
 SCOPES = {"C1": (REVIEWED_GROUPS, COMPLETE_FILES, REQUIRED_HANDOFFS),
           "C2": (C2_REVIEWED_GROUPS, C2_COMPLETE_FILES, {}),
           "C3": (C3_REVIEWED_GROUPS, C3_COMPLETE_FILES, {}),
-          "C4": (C4_REVIEWED_GROUPS, C4_COMPLETE_FILES, {})}
+          "C4": (C4_REVIEWED_GROUPS, C4_COMPLETE_FILES, {}),
+          "C5": (C5_REVIEWED_GROUPS, C5_COMPLETE_FILES, {})}
 
 
 def inventory():
