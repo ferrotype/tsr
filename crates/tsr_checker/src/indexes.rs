@@ -188,7 +188,7 @@ impl CheckerState {
         let indexes = self.index_infos_of_type(ty)?;
         let mut types = Vec::new();
         for property in properties {
-            types.push(self.literal_type_from_property(property, include)?);
+            types.push(self.literal_type_from_property(property, include, false)?);
         }
         for index in indexes {
             let key = self.signatures.index_info(index)?.key_type;
@@ -232,21 +232,20 @@ impl CheckerState {
         &mut self,
         symbol: tsr_arena::SymbolId,
         include: crate::TypeFlags,
+        include_non_public: bool,
     ) -> Result<TypeId, Error> {
         let symbol = self.get_merged_symbol(symbol);
+        if !include_non_public
+            && self.property_modifiers(symbol)? & mf::NON_PUBLIC_ACCESSIBILITY_MODIFIER != 0
+        {
+            return Ok(self.builtins.never_type);
+        }
         let read = self.symbol(symbol)?;
         let name = read.name_to_owned();
-        if let Some(declaration) = read.value_declaration() {
-            let view = self.ast(declaration)?;
-            if view.node(declaration)?.modifier_flags(view)? & mf::NON_PUBLIC_ACCESSIBILITY_MODIFIER
-                != 0
-            {
-                return Ok(self.builtins.never_type);
-            }
-        }
+        let late_bound = self.late_bound_symbol(symbol)?;
         let mut ty = self
             .value_symbol_links
-            .try_get(self.value_symbol_key(symbol)?)
+            .try_get(self.value_symbol_key(late_bound)?)
             .and_then(|links| links.name_type);
         if ty.is_none() {
             if name.as_bytes() == tsr_ast::internal_symbol_names::DEFAULT {

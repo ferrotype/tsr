@@ -366,10 +366,16 @@ impl CheckerState {
             return Ok(symbol);
         }
         if let Some(ty) = links.resolved_type {
-            if !self.could_contain_type_variables(ty)?
-                && self.symbol(symbol)?.flags() & sf::SET_ACCESSOR == 0
-            {
-                return Ok(symbol);
+            if !self.could_contain_type_variables(ty)? {
+                if self.symbol(symbol)?.flags() & sf::SET_ACCESSOR == 0 {
+                    return Ok(symbol);
+                }
+                // If we're a setter, check writeType.
+                if let Some(write) = links.write_type {
+                    if !self.could_contain_type_variables(write)? {
+                        return Ok(symbol);
+                    }
+                }
             }
         }
         let (symbol, mapper) = if self.symbol(symbol)?.check_flags() & cf::INSTANTIATED != 0 {

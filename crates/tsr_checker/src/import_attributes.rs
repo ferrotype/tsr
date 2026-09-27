@@ -79,11 +79,12 @@ impl CheckerState {
             let value = data.value().ok_or(tsr_arena::Error::InvalidGraph)?;
             let name = self.node_text(name)?.into_js_string();
             let member = self.new_symbol(sf::PROPERTY, name.clone())?;
+            // The pin observes the link, assigning the symbol's id, before it
+            // checks the attribute value.
+            let key = self.value_symbol_key(member)?;
             let ty = self.check_expression_cached(value)?;
             let ty = self.get_regular_type_of_literal_type(ty)?;
-            self.value_symbol_links
-                .get_or_default(self.value_symbol_key(member)?)
-                .resolved_type = Some(ty);
+            self.value_symbol_links.get_or_default(key).resolved_type = Some(ty);
             members.insert(name, Some(member));
         }
         let members = self.alloc_symbol_table(members);

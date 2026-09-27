@@ -27,8 +27,11 @@ impl CheckerState {
             let symbol = self
                 .get_symbol_of_declaration(property)?
                 .ok_or(Error::MissingLink("elaborated property symbol"))?;
-            let name_type =
-                self.literal_type_from_property(symbol, tf::STRING_OR_NUMBER_LITERAL_OR_UNIQUE)?;
+            let name_type = self.literal_type_from_property(
+                symbol,
+                tf::STRING_OR_NUMBER_LITERAL_OR_UNIQUE,
+                false,
+            )?;
             if self.types.flags(name_type)? & tf::NEVER != 0 {
                 continue;
             }

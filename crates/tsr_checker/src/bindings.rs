@@ -141,10 +141,11 @@ impl CheckerState {
                 .index_property_name(literal)?
                 .ok_or(Error::MissingLink("padded property text"))?;
             let symbol = self.new_symbol(sf::PROPERTY | sf::OPTIONAL, name.clone())?;
+            // The pin observes the link, assigning the symbol's id, before it
+            // computes the element type.
+            let key = self.value_symbol_key(symbol)?;
             let ty = self.type_from_binding_element(element, false, false)?;
-            self.value_symbol_links
-                .get_or_default(self.value_symbol_key(symbol)?)
-                .resolved_type = Some(ty);
+            self.value_symbol_links.get_or_default(key).resolved_type = Some(ty);
             members.insert(name, Some(symbol));
         }
         let record = *self.types.get(ty)?;
@@ -577,10 +578,11 @@ impl CheckerState {
                 sf::PROPERTY | if optional { sf::OPTIONAL } else { 0 },
                 name.clone(),
             )?;
+            // The pin observes the link, assigning the symbol's id, before it
+            // computes the element type.
+            let key = self.value_symbol_key(symbol)?;
             let ty = self.type_from_binding_element(element, include_pattern, report)?;
-            self.value_symbol_links
-                .get_or_default(self.value_symbol_key(symbol)?)
-                .resolved_type = Some(ty);
+            self.value_symbol_links.get_or_default(key).resolved_type = Some(ty);
             members.insert(name, Some(symbol));
         }
         let members = self.alloc_symbol_table(members);

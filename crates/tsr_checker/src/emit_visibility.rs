@@ -255,6 +255,8 @@ impl CheckerState {
         };
         let mut visited = crate::types::Set::default();
         while let Some(current) = symbol {
+            // The pin's visited set is keyed by symbol id.
+            self.symbol_runtime_id(current)?;
             if !visited.insert(current) {
                 break;
             }

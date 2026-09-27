@@ -14,12 +14,19 @@ impl CheckerState {
         &mut self,
         symbol: SymbolId,
     ) -> Result<(), Error> {
-        if !self.query.function_symbols_checked.insert(symbol) {
+        // Only check the symbol once. The pin keeps the flag on the value
+        // links, whose access assigns the symbol's id.
+        let key = self.value_symbol_key(symbol)?;
+        let links = self.value_symbol_links.get_or_default(key);
+        if links.function_or_constructor_checked {
             return Ok(());
         }
+        links.function_or_constructor_checked = true;
         let result = self.check_function_or_constructor_symbol_worker(symbol);
         if result.is_err() {
-            self.query.function_symbols_checked.remove(&symbol);
+            self.value_symbol_links
+                .get_or_default(key)
+                .function_or_constructor_checked = false;
         }
         result
     }
