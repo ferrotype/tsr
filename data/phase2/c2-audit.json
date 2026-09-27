@@ -21,7 +21,7 @@
       "disposition": "equivalent",
       "reason": "When a context-sensitive body has no contextual signature, initializes its this parameter first, then each ordinary parameter with no contextual type.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/check_bodies.rs:434"
+      "rust": "crates/tsr_checker/src/check_bodies.rs:435"
     },
     "tsc/internal/checker/checker.go:Checker.checkCollisionWithGlobalPromiseInGeneratedCode": {
       "disposition": "equivalent",
@@ -132,9 +132,8 @@
       "rust": "crates/tsr_checker/src/expression_context.rs:160"
     },
     "tsc/internal/checker/checker.go:Checker.getContextualTypeForDecorator": {
-      "disposition": "later",
-      "owner": "C4",
-      "reason": "Decorator call signature construction and contextual typing are owned by C4 (PHASE2-plan.md checkpoint 5 and C2 dependency table). Rust returns named Unsupported for this parent kind until that implementation. Ordinary call/template argument contextual typing is completed in C2."
+      "disposition": "mapped",
+      "reason": "Ported at C4 (C4.6), the later owner this audit named; the port marker names it."
     },
     "tsc/internal/checker/checker.go:Checker.getContextualTypeForInitializerExpression": {
       "disposition": "equivalent",
@@ -189,7 +188,7 @@
     "tsc/internal/checker/checker.go:Checker.getFalseTypeFromConditionalType": {
       "disposition": "equivalent",
       "reason": "conditional_false_type memoizes the root false node instantiated under the conditional mapper, returning the cached TypeId on later reads.",
-      "rust": "crates/tsr_checker/src/conditional.rs:582"
+      "rust": "crates/tsr_checker/src/conditional.rs:597"
     },
     "tsc/internal/checker/checker.go:Checker.getIndexType": {
       "disposition": "equivalent",
@@ -214,7 +213,7 @@
     "tsc/internal/checker/checker.go:Checker.getInferredTrueTypeFromConditionalType": {
       "disposition": "equivalent",
       "reason": "conditional_true_type(inferred=true) uses combined_mapper when present, otherwise the ordinary cached true type, and stores the separate inferred_true_type cache.",
-      "rust": "crates/tsr_checker/src/conditional.rs:545"
+      "rust": "crates/tsr_checker/src/conditional.rs:560"
     },
     "tsc/internal/checker/checker.go:Checker.getLongestCandidateIndex": {
       "disposition": "equivalent",
@@ -224,7 +223,7 @@
     },
     "tsc/internal/checker/checker.go:Checker.getOuterTypeParametersOfClassOrInterface": {
       "disposition": "equivalent",
-      "reason": "declared_interface_type selects the class value declaration or first interface declaration, then obtains outer parameters with include_this=false before local parameters. This is the native class/interface declaration selection and outer-parameter call inline. Its getOuterTypeParameters dependency now includes contextual signature parameters for context-sensitive function/arrow/object methods before syntactic fallback, matching checker.go:24119\u201324124; c2_constraint_gaps::contextual_outer_parameters preserves the exact native generic conditional results.",
+      "reason": "declared_interface_type selects the class value declaration or first interface declaration, then obtains outer parameters with include_this=false before local parameters. This is the native class/interface declaration selection and outer-parameter call inline. Its getOuterTypeParameters dependency now includes contextual signature parameters for context-sensitive function/arrow/object methods before syntactic fallback, matching checker.go:24119–24124; c2_constraint_gaps::contextual_outer_parameters preserves the exact native generic conditional results.",
       "rust": "crates/tsr_checker/src/references.rs:18"
     },
     "tsc/internal/checker/checker.go:Checker.getReturnTypeOfSingleNonGenericSignature": {
@@ -253,7 +252,7 @@
     "tsc/internal/checker/checker.go:Checker.getSuggestedImportSource": {
       "disposition": "equivalent",
       "reason": "check_resolved_ts_extension strips the recognized TS/declaration extension and, for non-Node ESM or ESNext usage, appends mts/mjs, cts/cjs, or ts/js according to allow_importing_ts_extensions; non-ESM leaves the extension stripped.",
-      "rust": "crates/tsr_checker/src/external_resolution.rs:502"
+      "rust": "crates/tsr_checker/src/external_resolution.rs:528"
     },
     "tsc/internal/checker/checker.go:Checker.getSymbolOfPartOfRightHandSideOfImportEquals": {
       "disposition": "equivalent",
@@ -268,12 +267,12 @@
     "tsc/internal/checker/checker.go:Checker.getTrueTypeFromConditionalType": {
       "disposition": "equivalent",
       "reason": "conditional_true_type(inferred=false) memoizes the root true node instantiated under the ordinary conditional mapper.",
-      "rust": "crates/tsr_checker/src/conditional.rs:545"
+      "rust": "crates/tsr_checker/src/conditional.rs:560"
     },
     "tsc/internal/checker/checker.go:Checker.getTypeArgumentsForAliasSymbol": {
       "disposition": "equivalent",
       "reason": "alias_for_type_node rejects a missing alias symbol and otherwise stores get_local_type_parameters(symbol) as the alias arguments, matching the native optional-symbol wrapper.",
-      "rust": "crates/tsr_checker/src/query.rs:687"
+      "rust": "crates/tsr_checker/src/query.rs:697"
     },
     "tsc/internal/checker/checker.go:Checker.getTypeArgumentsFromNode": {
       "disposition": "equivalent",
@@ -341,13 +340,13 @@
     "tsc/internal/checker/checker.go:Checker.hasCorrectTypeArgumentArity": {
       "disposition": "equivalent",
       "reason": "Overload candidate selection admits an absent type-argument list or a count between min_type_argument_count and the signature parameter count, exactly the native predicate.",
-      "rust": "crates/tsr_checker/src/calls.rs:788"
+      "rust": "crates/tsr_checker/src/calls.rs:820"
     },
     "tsc/internal/checker/checker.go:Checker.inferSignatureInstantiationForOverloadFailure": {
       "disposition": "equivalent",
       "reason": "Creates a new inference context with JS AnyDefault when appropriate, infers with SkipContextSensitive|SkipGenericFunctions, and its overload_failure_candidate caller creates the selected signature instantiation.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/call_arguments.rs:270"
+      "rust": "crates/tsr_checker/src/call_arguments.rs:338"
     },
     "tsc/internal/checker/checker.go:Checker.instantiateMappedArrayType": {
       "disposition": "equivalent",
@@ -382,7 +381,7 @@
       "disposition": "equivalent",
       "reason": "The skip-generic path checks nonempty type parameters and an OBJECT return with at least one call signature, exactly the native isFunctionType predicate, before marking a skipped inference pass.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/calls.rs:443"
+      "rust": "crates/tsr_checker/src/calls.rs:455"
     },
     "tsc/internal/checker/checker.go:Checker.isGenericObjectType": {
       "disposition": "equivalent",
@@ -463,13 +462,13 @@
       "disposition": "equivalent",
       "reason": "The contextual argument closure saves its result before popping the Vec entry, so both Ok and Err paths remove the top context; cached object/array contexts use the same push/run/pop discipline.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/call_arguments.rs:190"
+      "rust": "crates/tsr_checker/src/call_arguments.rs:238"
     },
     "tsc/internal/checker/checker.go:Checker.popInferenceContext": {
       "disposition": "equivalent",
       "reason": "Inference contexts are a separate LIFO Vec; the result is captured before pop on both successful and failed expression checks.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/call_arguments.rs:189"
+      "rust": "crates/tsr_checker/src/call_arguments.rs:237"
     },
     "tsc/internal/checker/checker.go:Checker.pushCachedContextualType": {
       "disposition": "mapped"
@@ -478,13 +477,13 @@
       "disposition": "equivalent",
       "reason": "Explicit argument contexts store node, optional type, is_cache=false and inference identity. Cached contexts use the same record with is_cache=true, preserving cached-absent vs absent-entry semantics.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/call_arguments.rs:166"
+      "rust": "crates/tsr_checker/src/call_arguments.rs:212"
     },
     "tsc/internal/checker/checker.go:Checker.pushInferenceContext": {
       "disposition": "equivalent",
       "reason": "Pushes the node and optional inference context as a separate scope before expression evaluation; getInferenceContext scans these scopes from inner to outer.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/call_arguments.rs:172"
+      "rust": "crates/tsr_checker/src/call_arguments.rs:220"
     },
     "tsc/internal/checker/checker.go:Checker.reportInvalidImportEqualsExportMember": {
       "disposition": "equivalent",
@@ -513,7 +512,7 @@
       "disposition": "equivalent",
       "reason": "Key writes argument identities, optional alias identity/arguments, and the for-constraint discriminator in native order.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/conditional.rs:382"
+      "rust": "crates/tsr_checker/src/conditional.rs:397"
     },
     "tsc/internal/checker/checker.go:getIndexedAccessKey": {
       "disposition": "equivalent",
@@ -619,12 +618,12 @@
     "tsc/internal/checker/inference.go:Checker.getInferredTypes": {
       "disposition": "equivalent",
       "reason": "The call inference result loops through context parameter indices in order, calling inferred_type for every element. Contextual signature instantiation repeats the same ordered collection; no candidate is skipped.",
-      "rust": "crates/tsr_checker/src/call_arguments.rs:437"
+      "rust": "crates/tsr_checker/src/call_arguments.rs:508"
     },
     "tsc/internal/checker/inference.go:Checker.getMapperFromContext": {
       "disposition": "equivalent",
       "reason": "Option mapping returns the context fixing mapper when present and None for an absent context; both return-inference paths use this same conditional extraction.",
-      "rust": "crates/tsr_checker/src/call_arguments.rs:338"
+      "rust": "crates/tsr_checker/src/call_arguments.rs:409"
     },
     "tsc/internal/checker/inference.go:Checker.getSingleCommonSupertype": {
       "disposition": "equivalent",
@@ -759,7 +758,7 @@
     "tsc/internal/checker/inference.go:hasInferenceCandidatesOrDefault": {
       "disposition": "equivalent",
       "reason": "The signature-context predicate combines either candidate list with syntactic default presence. It no longer resolves a default or fills the lazy default cache; the native fixture checks absent, unknown and circular defaults.",
-      "rust": "crates/tsr_checker/src/call_arguments.rs:209"
+      "rust": "crates/tsr_checker/src/call_arguments.rs:277"
     },
     "tsc/internal/checker/inference.go:hasOverlappingInferences": {
       "disposition": "equivalent",
@@ -1546,7 +1545,7 @@
       "crates/tsr_checker/src/union_reduction.rs",
       "crates/tsr_checker/src/variance.rs"
     ],
-    "scope": "Ownership guard only, not function-audit completion: exact pinned port IDs in the production modules named in plan C2.2--C2.9, plus the separately bound C2.1 group functions. A function cannot be handed outside C2 merely because it was already marked and absent from C2.1\u2019s unmarked checker list."
+    "scope": "Ownership guard only, not function-audit completion: exact pinned port IDs in the production modules named in plan C2.2--C2.9, plus the separately bound C2.1 group functions. A function cannot be handed outside C2 merely because it was already marked and absent from C2.1’s unmarked checker list."
   },
   "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
   "scope": "C2.1 explicit scope at C1 head c583254: all 77 inference.go and 36 mapper.go functions, plus 118 checker.go identities named by the plan. Parentheticals expand to both functions. The eleven getContextualTypeFor* entries are those unmarked at c583254; isGenericTupleType names the package-level function (the Checker method was already marked). Separate script bindings fix the complete group inventory. Current markers dispose mapped functions; C1 equivalents carry their review provenance; every other source review stays open.",
