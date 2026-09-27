@@ -75,9 +75,8 @@
       "rust": "crates/tsr_checker/src/relater_excess.rs:47"
     },
     "tsc/internal/checker/checker.go:Checker.getApplicableIndexInfos": {
-      "disposition": "equivalent",
-      "reason": "The index-constraint and property-constraint loops filter index_infos_of_type with applicable_index_type(key,info.key_type) before processing each result, matching the native filtered index-info list at its consumers.",
-      "rust": "crates/tsr_checker/src/check_indexes.rs:82"
+      "disposition": "mapped",
+      "reason": "Ported with a marker at C5.2 (exports.rs) for GetIndexSignaturesAtLocation."
     },
     "tsc/internal/checker/checker.go:Checker.getAwaitedTypeOfPromiseEx": {
       "disposition": "equivalent",
@@ -166,9 +165,8 @@
       "rust": "crates/tsr_checker/src/expression_context.rs:71"
     },
     "tsc/internal/checker/checker.go:Checker.getDefaultFromTypeParameter": {
-      "disposition": "equivalent",
-      "reason": "The default selection explicitly returns no default for non-type-parameters, then filters both no_constraint_type and circular_constraint_type after lazy default resolution; other parameter-only callers apply the same two-sentinel filter.",
-      "rust": "crates/tsr_checker/src/infer_candidates.rs:73"
+      "disposition": "mapped",
+      "reason": "Ported with a marker at C5.2 (exports.rs); the inference site keeps its inline selection."
     },
     "tsc/internal/checker/checker.go:Checker.getDefaultTypeArgumentType": {
       "disposition": "equivalent",

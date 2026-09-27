@@ -100,6 +100,7 @@ mod emit_scopes;
 mod emit_visibility;
 mod enum_eval;
 mod enums;
+mod exports;
 mod expression_context;
 mod expression_errors;
 mod expressions;
@@ -259,6 +260,7 @@ pub mod storage_families;
 pub mod storage_pilot;
 
 pub use emit_resolver_js::TypeReferenceSerializationKind;
+pub use exports::{IndexInfoParts, IndexInfoRef, TypePredicateParts, TypePredicateRef};
 pub use flags::*;
 #[cfg(feature = "relation-probe")]
 pub use handles::{LiteralShape, SignatureShape};

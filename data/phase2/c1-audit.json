@@ -61,9 +61,8 @@
    "rust": "crates/tsr_checker/src/indexes.rs:585"
   },
   "tsc/internal/checker/checker.go:Checker.getApplicableIndexInfos": {
-   "disposition": "equivalent",
-   "reason": "callers filter index infos with applicable_index_type",
-   "rust": "crates/tsr_checker/src/indexes.rs:563"
+   "disposition": "mapped",
+   "reason": "Ported with a marker at C5.2 (exports.rs) for GetIndexSignaturesAtLocation."
   },
   "tsc/internal/checker/checker.go:Checker.getArrayOrTupleTargetType": {
    "disposition": "equivalent",
@@ -373,9 +372,8 @@
    "rust": "crates/tsr_checker/src/query.rs:340"
   },
   "tsc/internal/checker/checker.go:Checker.typeHasCallOrConstructSignatures": {
-   "disposition": "equivalent",
-   "reason": "resolve_type_members' signatures non-empty at the call sites",
-   "rust": "crates/tsr_checker/src/object_members.rs:15"
+   "disposition": "mapped",
+   "reason": "Ported with a marker at C5.2 (exports.rs), the public TypeHasCallOrConstructSignatures."
   },
   "tsc/internal/checker/checker.go:findIndexInfo": {
    "disposition": "equivalent",
@@ -393,9 +391,8 @@
    "rust": "crates/tsr_checker/src/types.rs:167"
   },
   "tsc/internal/checker/checker.go:getNameFromIndexInfo": {
-   "disposition": "later",
-   "owner": "C5",
-   "reason": "index parameter names are node-builder output"
+   "disposition": "mapped",
+   "reason": "Ported with a marker at C5.2 (exports.rs); the builder site keeps its inline copy until C5.4."
   },
   "tsc/internal/checker/checker.go:getNumberLiteralValue": {
    "disposition": "equivalent",

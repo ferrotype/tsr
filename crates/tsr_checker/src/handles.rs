@@ -429,7 +429,7 @@ impl Operation<'_> {
         })
     }
 
-    fn check_symbol_ref(&self, symbol: SymbolRef) -> Result<SymbolId, Error> {
+    pub(crate) fn check_symbol_ref(&self, symbol: SymbolRef) -> Result<SymbolId, Error> {
         self.lease().validate_identity(symbol.owner)?;
         self.state().symbol(symbol.id)?;
         Ok(symbol.id)
@@ -463,6 +463,7 @@ impl Operation<'_> {
         Ok(self.state().types.intrinsic(ty)?.name.clone())
     }
 
+    // port: tsc/internal/checker/exports.go:Checker.GetDeclaredTypeOfSymbol
     pub fn get_declared_type_of_symbol(&mut self, symbol: SymbolRef) -> Result<TypeRef, Error> {
         let symbol = self.check_symbol_ref(symbol)?;
         let ty = self.state_mut().get_declared_type_of_symbol(symbol)?;
@@ -493,6 +494,7 @@ impl Operation<'_> {
             .collect())
     }
 
+    // port: tsc/internal/checker/exports.go:Checker.GetTypeOfSymbol
     pub fn get_type_of_symbol(&mut self, symbol: SymbolRef) -> Result<TypeRef, Error> {
         let symbol = self.check_symbol_ref(symbol)?;
         let ty = self.state_mut().get_type_of_symbol(symbol)?;
@@ -579,18 +581,18 @@ impl Operation<'_> {
             .collect())
     }
 
-    fn checker(&self) -> ArenaId {
+    pub(crate) fn checker(&self) -> ArenaId {
         self.owner().identity().id()
     }
 
-    fn type_ref(&self, id: TypeId) -> TypeRef {
+    pub(crate) fn type_ref(&self, id: TypeId) -> TypeRef {
         TypeRef {
             owner: self.checker(),
             id,
         }
     }
 
-    fn signature_ref(&self, id: SignatureId) -> SignatureRef {
+    pub(crate) fn signature_ref(&self, id: SignatureId) -> SignatureRef {
         SignatureRef {
             owner: self.checker(),
             id,
@@ -606,17 +608,17 @@ impl Operation<'_> {
 
     /// Validates a type ref against this operation: exact checker, live
     /// generation, published slot.
-    fn check_type(&self, t: TypeRef) -> Result<TypeId, Error> {
+    pub(crate) fn check_type(&self, t: TypeRef) -> Result<TypeId, Error> {
         self.lease().validate_identity(t.owner)?;
         self.state().types.get(t.id)?;
         Ok(t.id)
     }
 
-    fn check_types(&self, types: &[TypeRef]) -> Result<Vec<TypeId>, Error> {
+    pub(crate) fn check_types(&self, types: &[TypeRef]) -> Result<Vec<TypeId>, Error> {
         types.iter().map(|t| self.check_type(*t)).collect()
     }
 
-    fn check_signature(&self, s: SignatureRef) -> Result<SignatureId, Error> {
+    pub(crate) fn check_signature(&self, s: SignatureRef) -> Result<SignatureId, Error> {
         self.lease().validate_identity(s.owner)?;
         self.state().signatures.get(s.id)?;
         Ok(s.id)
@@ -1240,11 +1242,6 @@ impl Operation<'_> {
             crate::LiteralValue::ComputedEnum => LiteralShape::Unknown,
         };
         Ok((value, state.is_fresh_literal_type(id)?))
-    }
-
-    pub fn is_readonly_symbol(&mut self, symbol: SymbolRef) -> Result<bool, Error> {
-        let symbol = self.check_symbol_ref(symbol)?;
-        self.state_mut().is_readonly_symbol(symbol)
     }
 
     /// The alias symbol a type displays through, if any.

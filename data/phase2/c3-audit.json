@@ -297,9 +297,8 @@
    "rust": "crates/tsr_checker/src/source_alias_checks.rs:163"
   },
   "tsc/internal/checker/checker.go:Checker.getMemberOverrideModifierStatus": {
-   "disposition": "later",
-   "owner": "C5",
-   "reason": "its only caller is the public GetMemberOverrideModifierStatus of the API surface (C5.2); the override checks compute the status inline (class_overrides.rs)"
+   "disposition": "mapped",
+   "reason": "Ported with a marker at C5.2 (exports.rs) over the status-returning override worker."
   },
   "tsc/internal/checker/checker.go:Checker.getParentTypeOfClassElement": {
    "disposition": "mapped",
@@ -1321,9 +1320,8 @@
    "rust": "crates/tsr_checker/src/flow.rs:510"
   },
   "tsc/internal/checker/utilities.go:isRightSideOfAccessExpression": {
-   "disposition": "later",
-   "owner": "C5",
-   "reason": "its only caller is the public GetTypeOfSymbolAtLocation (C5.2)"
+   "disposition": "mapped",
+   "reason": "Ported with a marker at C5.2 (exports.rs) for GetTypeOfSymbolAtLocation; the inline tests remain."
   },
   "tsc/internal/checker/utilities.go:isShiftOperator": {
    "disposition": "equivalent",
@@ -1386,10 +1384,8 @@
    "rust": "crates/tsr_checker/src/name_errors.rs:197"
   },
   "tsc/internal/checker/utilities.go:isTypeUsableAsPropertyName": {
-   "disposition": "equivalent",
-   "reason": "The pin's flag test (string, number or unique-symbol literal) is inlined at this override-check site and at the mapped-type, contextual-assignment and narrowing callers, each testing the same flag mask.",
-   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/class_overrides.rs:30"
+   "disposition": "mapped",
+   "reason": "Ported with a marker at C5.2 (exports.rs), the public IsTypeUsableAsPropertyName; the inline tests remain."
   },
   "tsc/internal/checker/utilities.go:isValidESSymbolDeclaration": {
    "disposition": "equivalent",

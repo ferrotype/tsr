@@ -123,7 +123,10 @@ impl CheckerState {
         self.add_type_optionality(ty, false, optional)
     }
 
-    fn rest_parameter_type(&mut self, signature: SignatureId) -> Result<Option<TypeId>, Error> {
+    pub(crate) fn rest_parameter_type(
+        &mut self,
+        signature: SignatureId,
+    ) -> Result<Option<TypeId>, Error> {
         let sig = self.signatures.get(signature)?;
         if sig.flags & sg::HAS_REST_PARAMETER == 0 {
             return Ok(None);
@@ -667,26 +670,70 @@ impl CheckerState {
 }
 
 impl CheckerState {
-    // port: tsc/internal/checker/nodebuilderimpl.go:Checker.getExpandedParameters
-    // The display caller requests skipUnionExpanding=true. It expands one
-    // concrete tuple, leaving a union rest type as one parameter.
+    /// The display caller's form: `skipUnionExpanding` leaves a union rest
+    /// type as one parameter, so there is one list.
     pub(crate) fn expanded_signature_parameters(
         &mut self,
         signature: SignatureId,
     ) -> Result<Vec<SymbolId>, Error> {
-        use tsr_ast::{check_flags as cf, symbol_flags as sf, JsString};
+        let mut lists = self.expanded_parameters(signature, true)?;
+        Ok(lists.swap_remove(0))
+    }
+
+    // port: tsc/internal/checker/nodebuilderimpl.go:Checker.getExpandedParameters
+    /// The signature's parameter lists with a tuple rest parameter expanded
+    /// into its members, one list per tuple of a union rest type unless
+    /// `skip_union_expanding`.
+    pub(crate) fn expanded_parameters(
+        &mut self,
+        signature: SignatureId,
+        skip_union_expanding: bool,
+    ) -> Result<Vec<Vec<SymbolId>>, Error> {
         let sig = self.signatures.get(signature)?;
         let parameters = sig.parameters.clone().unwrap_or_else(|| [].into());
-        if sig.flags & sg::HAS_REST_PARAMETER == 0 {
-            return Ok(parameters.to_vec());
+        if sig.flags & sg::HAS_REST_PARAMETER != 0 {
+            let rest = *parameters
+                .last()
+                .ok_or(Error::MissingLink("signature rest parameter"))?;
+            let ty = self.get_type_of_symbol(rest)?;
+            if self.is_tuple_type(ty)? {
+                return Ok(vec![self.expand_parameters_with_tuple_members(
+                    &parameters,
+                    ty,
+                    rest,
+                )?]);
+            }
+            if !skip_union_expanding && self.types.flags(ty)? & crate::type_flags::UNION != 0 {
+                let members = self.types.types_of(ty)?.to_vec();
+                let mut tuples = true;
+                for &member in &members {
+                    tuples &= self.is_tuple_type(member)?;
+                }
+                if tuples {
+                    let mut lists = Vec::with_capacity(members.len());
+                    for member in members {
+                        lists.push(self.expand_parameters_with_tuple_members(
+                            &parameters,
+                            member,
+                            rest,
+                        )?);
+                    }
+                    return Ok(lists);
+                }
+            }
         }
-        let rest = *parameters
-            .last()
-            .ok_or(Error::MissingLink("signature rest parameter"))?;
-        let ty = self.get_type_of_symbol(rest)?;
-        if !self.is_tuple_type(ty)? {
-            return Ok(parameters.to_vec());
-        }
+        Ok(vec![parameters.to_vec()])
+    }
+
+    /// `expandSignatureParametersWithTupleMembers`: the leading parameters and
+    /// one fresh symbol per member of the tuple `ty`, labelled uniquely.
+    fn expand_parameters_with_tuple_members(
+        &mut self,
+        parameters: &[SymbolId],
+        ty: TypeId,
+        rest: SymbolId,
+    ) -> Result<Vec<SymbolId>, Error> {
+        use tsr_ast::{check_flags as cf, symbol_flags as sf, JsString};
         let elements = self.get_type_arguments(ty)?;
         let infos = self
             .types
