@@ -17,23 +17,39 @@ head = subprocess.check_output(["git", "-C", str(ROOT / "upstream/tsc"), "rev-pa
 if head != pin:
     sys.exit(f"upstream/tsc is at {head}, not the pin {pin}")
 sha = lambda b: hashlib.sha256(b).hexdigest()
-LINE = re.compile(r"^(?P<file>[^(]+)\((?P<line>\d+),(?P<col>\d+)\): error TS(?P<code>\d+): (?P<message>.*)$")
+LINE = re.compile(r"^(?:(?P<file>[^(]+)\((?P<line>\d+),(?P<col>\d+)\): )?error TS(?P<code>\d+): (?P<message>.*)$")
 manifest = json.loads((FIX / "fixtures.json").read_text())
 for name, flags in manifest.items():
     command = ["tsc", "--noEmit", "--target", "esnext", "--ignoreConfig", "--pretty", "false", *flags, name]
     run = subprocess.run([str(TSGO), *command[1:]], cwd=FIX, capture_output=True, text=True)
     text = run.stdout
-    diagnostics, current = [], None
+    diagnostics, current, unparsed = [], None, []
     for line in text.split("\n"):
         m = LINE.match(line)
         if m:
-            current = {"line": int(m["line"]), "column": int(m["col"]), "code": int(m["code"]), "message": m["message"]}
+            # A global diagnostic has no file position: line and column are null.
+            current = {"line": int(m["line"]) if m["line"] else None, "column": int(m["col"]) if m["col"] else None,
+                       "code": int(m["code"]), "message": m["message"]}
             diagnostics.append(current)
         elif current is not None and line.startswith("  "):
             current["message"] += "\n" + line
+        elif line.strip():
+            unparsed.append(line)
+    # Only a clean run is an expectation: nothing on stderr, every output line
+    # parsed, and an exit code that agrees with the diagnostics (0 without,
+    # 2 with). A crash or an unparsed error never becomes an empty expectation.
+    problems = []
+    if run.stderr:
+        problems.append("stderr: " + run.stderr.strip()[:800])
+    if unparsed:
+        problems.append("unparsed output: " + " | ".join(unparsed)[:800])
+    if run.returncode not in (0, 2) or (run.returncode == 0) != (not diagnostics):
+        problems.append(f"exit code {run.returncode} with {len(diagnostics)} diagnostics")
+    if problems:
+        sys.exit(f"{name}: " + "; ".join(problems))
     (FIX / (name + ".native.txt")).write_text(text)
     record = {"pin": pin, "source_sha256": sha((FIX / name).read_bytes()), "native_executable_sha256": sha(TSGO.read_bytes()),
               "native_command": command, "native_output_sha256": sha(text.encode()), "exit_code": run.returncode,
-              "diagnostics": diagnostics}
+              "native_stderr": run.stderr, "diagnostics": diagnostics}
     (FIX / (name + ".native.json")).write_text(json.dumps(record, indent=2) + "\n")
     print(f"{name}: {len(diagnostics)} diagnostics, exit {run.returncode}")

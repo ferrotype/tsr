@@ -138,6 +138,7 @@
     "--strict"
   ],
   "lookup_alias_globals.ts": [
-    "--strict"
+    "--strict",
+    "--noLib"
   ]
 }
