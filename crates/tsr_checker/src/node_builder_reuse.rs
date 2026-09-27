@@ -185,6 +185,7 @@ impl NodeBuilder<'_> {
         let ty = self.checker.instantiate_type(original, self.mapper)?;
         Ok((!no_mapped_types || original == ty).then_some(ty))
     }
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.tryGetResolvedSymbolFromTypeNode
     fn reused_symbol_from_type_node(&mut self, node: NodeId) -> Result<Option<SymbolId>, Error> {
         if self.checker.node(node)?.parent().is_none() {
             return Ok(None);
@@ -199,6 +200,7 @@ impl NodeBuilder<'_> {
             .flatten())
     }
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.canReuseExistingJSTypeNode
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.existingTypeNodeIsNotReferenceOrIsReferenceWithCompatibleTypeArgumentCount
     pub(super) fn can_reuse_existing_js_type_node(
         &mut self,
         node: NodeId,
@@ -697,6 +699,7 @@ impl NodeBuilder<'_> {
             && tsr_ast::is_declaration(&view.node(parent)?)
             && view.node(parent)?.name() == Some(node))
     }
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.trackComputedName
     pub(super) fn reuse_track_computed_name(&mut self, node: NodeId) -> Result<(), Error> {
         let first = tsr_ast::utilities_middle::get_first_identifier(self.checker.ast(node)?, node)?;
         let text = self.checker.node_text(first)?.into_js_string();
@@ -924,6 +927,7 @@ impl NodeBuilder<'_> {
 }
 
 impl NodeBuilder<'_> {
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.serializeTypeName
     fn reuse_serialize_type_name(
         &mut self,
         name: NodeId,

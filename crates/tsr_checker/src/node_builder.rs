@@ -49,6 +49,9 @@ pub(crate) struct NodeBuilder<'a> {
     pub(crate) emit: EmitContext,
     pub(crate) flags: tsr_nodebuilder::Flags,
     pub(crate) enclosing: Option<NodeId>,
+    /// The source file of the request's enclosing declaration, fixed when the
+    /// request starts (`NodeBuilderContext.enclosingFile`).
+    enclosing_file: Option<NodeId>,
     pub(crate) mapper: Option<crate::MapperId>,
     pub(crate) suppress_inference_fallback: bool,
     pub(crate) encountered_error: bool,
@@ -95,6 +98,7 @@ impl<'a> NodeBuilder<'a> {
             self.retain_source_node(node)?;
         }
         self.enclosing = enclosing;
+        self.enclosing_file = self.source_file_of(enclosing)?;
         self.flags = flags;
         self.internal_flags = internal_flags;
         self.mapper = None;
@@ -123,6 +127,7 @@ impl<'a> NodeBuilder<'a> {
         Ok(())
     }
 
+    // port: tsc/internal/checker/nodebuilderimpl.go:newNodeBuilderImpl
     pub(crate) fn new(checker: &'a mut CheckerState, flags: tsr_nodebuilder::Flags) -> Self {
         Self::with_emit(checker, flags, EmitContext::new())
     }
@@ -143,6 +148,7 @@ impl<'a> NodeBuilder<'a> {
             emit,
             flags,
             enclosing: None,
+            enclosing_file: None,
             mapper: None,
             suppress_inference_fallback: false,
             encountered_error: false,
@@ -195,6 +201,14 @@ impl<'a> NodeBuilder<'a> {
         std::mem::swap(&mut builder.ast, output);
         std::mem::swap(&mut builder.emit, emit);
         builder.enclosing = Some(enclosing);
+        builder.enclosing_file = match builder.source_file_of(Some(enclosing)) {
+            Ok(file) => file,
+            Err(error) => {
+                std::mem::swap(&mut builder.ast, output);
+                std::mem::swap(&mut builder.emit, emit);
+                return Err(error);
+            }
+        };
         builder.internal_flags = internal_flags;
         builder.tracker = Some(tracker);
         let result = action(&mut builder);
@@ -424,6 +438,7 @@ impl<'a> NodeBuilder<'a> {
         self.ast.new_keyword_type_node(kind.into())
     }
 
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.newStringLiteral
     fn string_literal(&mut self, text: JsString) -> NodeId {
         let flags = if self.flags & nf::USE_SINGLE_QUOTES_FOR_STRING_LITERAL_TYPE != 0 {
             token_flags::SINGLE_QUOTE
@@ -441,6 +456,36 @@ impl<'a> NodeBuilder<'a> {
         };
         self.track_symbol(symbol, sf::TYPE)?;
         self.symbol_type_node_from_chain(symbol, sf::TYPE, arguments)
+    }
+
+    fn source_file_of(&self, node: Option<NodeId>) -> Result<Option<NodeId>, Error> {
+        let Some(node) = node else {
+            return Ok(None);
+        };
+        Ok(tsr_ast::utilities::get_source_file_of_node(
+            self.checker.ast(node)?,
+            Some(node),
+        )?)
+    }
+
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.setCommentRange
+    /// Declaration emit keeps the comments of a declaration in the file it
+    /// emits: the node takes the declaration's comment range.
+    pub(crate) fn copy_comment_range(
+        &mut self,
+        node: NodeId,
+        range: Option<NodeId>,
+    ) -> Result<(), Error> {
+        let Some(range) = range else {
+            return Ok(());
+        };
+        if self.enclosing_file.is_some()
+            && self.enclosing_file == self.source_file_of(Some(range))?
+        {
+            let text_range = self.checker.node(range)?.range();
+            self.emit.set_comment_range(node, text_range);
+        }
+        Ok(())
     }
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.checkTruncationLength
@@ -534,6 +579,7 @@ impl<'a> NodeBuilder<'a> {
         }
         if may_have_name_collisions && !seen_names.is_empty() {
             let saved = self.flags;
+            let saved_depth = self.depth;
             self.flags |= nf::USE_FULLY_QUALIFIED_TYPE;
             let result: Result<(), Error> = (|| {
                 let mut names: Vec<JsString> = Vec::new();
@@ -565,6 +611,7 @@ impl<'a> NodeBuilder<'a> {
                 Ok(())
             })();
             self.flags = saved;
+            self.depth = saved_depth;
             result?;
         }
         Ok(nodes)
@@ -1056,6 +1103,7 @@ impl<'a> NodeBuilder<'a> {
             return self.type_node(intersection);
         }
         let saved_flags = self.flags;
+        let saved_depth = self.depth;
         self.flags |= nf::IN_OBJECT_TYPE_LITERAL;
         let result = (|| {
             let reverse = self.checker.types.object_flags(ty)? & of::REVERSE_MAPPED != 0;
@@ -1075,6 +1123,7 @@ impl<'a> NodeBuilder<'a> {
             Ok(node)
         })();
         self.flags = saved_flags;
+        self.depth = saved_depth;
         result
     }
 
@@ -1207,13 +1256,16 @@ impl<'a> NodeBuilder<'a> {
         } else {
             None
         };
-        Ok(self.ast.new_property_signature_declaration(
+        let signature = self.ast.new_property_signature_declaration(
             modifiers,
             Some(property_name),
             question,
             Some(type_node),
             None,
-        ))
+        );
+        let value = self.checker.symbol(symbol)?.value_declaration();
+        self.copy_comment_range(signature, value)?;
+        Ok(signature)
     }
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.getPropertyNameNodeForSymbol
@@ -1229,12 +1281,48 @@ impl<'a> NodeBuilder<'a> {
             }
         }
         let is_method = read.flags() & sf::METHOD != 0;
-        let name_type = self
+        let raw_name = read.name_to_owned();
+        let (string_named, single_quote) = self.property_name_style(symbol)?;
+        if let Some(node) =
+            self.property_name_from_name_type(symbol, single_quote, string_named, is_method)?
+        {
+            return Ok(node);
+        }
+        // Symbol ids are unstable: `__#nnn@name` becomes `__#private@name`.
+        let mut name = raw_name;
+        let private_prefix = [tsr_ast::INTERNAL_SYMBOL_NAME_PREFIX, b"#".as_slice()].concat();
+        if let Some(rest) = name.as_bytes().strip_prefix(private_prefix.as_slice()) {
+            let digits = rest.iter().take_while(|b| b.is_ascii_digit()).count();
+            name = JsString::from_bytes([b"__#private".as_slice(), &rest[digits..]].concat());
+        }
+        Ok(self.property_name_for_identifier_or_literal(
+            name,
+            single_quote,
+            string_named,
+            is_method,
+        ))
+    }
+
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.getPropertyNameNodeForSymbolFromNameType
+    /// The name of a property with a computed name type: an accessible enum
+    /// member or a unique symbol as a computed name, a literal as its text.
+    fn property_name_from_name_type(
+        &mut self,
+        symbol: SymbolId,
+        single_quote: bool,
+        string_named: bool,
+        is_method: bool,
+    ) -> Result<Option<NodeId>, Error> {
+        let Some(name_type) = self
             .checker
             .value_symbol_links
             .try_get(self.checker.value_symbol_key(symbol)?)
-            .and_then(|links| links.name_type);
-        let raw_name = read.name_to_owned();
+            .and_then(|links| links.name_type)
+        else {
+            return Ok(None);
+        };
+        let read = self.checker.symbol(symbol)?;
+        // The pin's context switches to the property's declaration here.
         let enclosing = match read.value_declaration() {
             Some(declaration) => Some(declaration),
             None => self
@@ -1245,104 +1333,98 @@ impl<'a> NodeBuilder<'a> {
                 .next()
                 .or(self.enclosing),
         };
-        if let Some(ty) = name_type {
-            if self.checker.types.flags(ty)? & tf::ENUM_LITERAL != 0 {
-                if let Some(context) = self.enclosing {
-                    let member = self
-                        .checker
-                        .types
-                        .get(ty)?
-                        .symbol
-                        .ok_or(Error::MissingLink("enum name symbol"))?;
-                    let enum_symbol = self.checker.symbol(member)?.parent().unwrap_or(member);
-                    let accessible = self.checker.emit_symbol_accessible(
-                        Some(enum_symbol),
-                        Some(context),
-                        sf::VALUE,
-                        false,
-                        false,
-                    )?;
-                    if accessible.accessibility
-                        == tsr_printer::emit_resolver::SymbolAccessibility::Accessible
-                    {
-                        let expression = self.symbol_expression(member, Some(context))?;
-                        return Ok(self.ast.new_computed_property_name(Some(expression)));
-                    }
-                }
-            }
-            if self.checker.types.flags(ty)? & tf::UNIQUE_ES_SYMBOL != 0 {
-                let symbol = self
+        let flags = self.checker.types.flags(name_type)?;
+        if flags & tf::ENUM_LITERAL != 0 {
+            if let Some(context) = self.enclosing {
+                let member = self
                     .checker
                     .types
-                    .get(ty)?
+                    .get(name_type)?
                     .symbol
-                    .ok_or(Error::MissingLink("unique name symbol"))?;
-                let expression = self.symbol_expression(symbol, enclosing)?;
-                return Ok(self.ast.new_computed_property_name(Some(expression)));
+                    .ok_or(Error::MissingLink("enum name symbol"))?;
+                let enum_symbol = self.checker.symbol(member)?.parent().unwrap_or(member);
+                let accessible = self.checker.emit_symbol_accessible(
+                    Some(enum_symbol),
+                    Some(context),
+                    sf::VALUE,
+                    false,
+                    false,
+                )?;
+                if accessible.accessibility
+                    == tsr_printer::emit_resolver::SymbolAccessibility::Accessible
+                {
+                    let expression = self.symbol_expression(member, Some(context))?;
+                    return Ok(Some(self.ast.new_computed_property_name(Some(expression))));
+                }
             }
         }
-        let name = match name_type {
-            Some(ty) => self
+        if flags & tf::STRING_OR_NUMBER_LITERAL != 0 {
+            let name = self
                 .checker
-                .index_property_name(ty)?
-                .unwrap_or(raw_name.clone()),
-            None => raw_name,
-        };
-        let (string_named, single_quote) = self.property_name_style(symbol)?;
-        if name
-            .as_bytes()
-            .starts_with(tsr_ast::INTERNAL_SYMBOL_NAME_PREFIX)
-        {
-            return Err(Error::Unsupported(
-                "getPropertyNameNodeForSymbol: late/private name",
-            ));
-        }
-        let is_identifier =
-            tsr_scanner::is_identifier_text(name.as_bytes(), LanguageVariant::STANDARD);
-        let is_numeric_name = tsr_jsnum::from_string(name.as_bytes())
-            .to_string()
-            .as_bytes()
-            == name.as_bytes();
-        let property_name =
-            if name_type.is_some() && !is_identifier && (string_named || !is_numeric_name) {
-                // A string-named or non-numeric literal name type is always a string literal.
-                self.ast.new_string_literal(
-                    name.clone(),
+                .index_property_name(name_type)?
+                .ok_or(Error::MissingLink("literal name type"))?;
+            let is_identifier =
+                tsr_scanner::is_identifier_text(name.as_bytes(), LanguageVariant::STANDARD);
+            let numeric = crate::indexes::numeric_name(name.as_bytes()).is_some();
+            if !is_identifier && (string_named || !numeric) {
+                return Ok(Some(self.ast.new_string_literal(
+                    name,
                     if single_quote {
                         token_flags::SINGLE_QUOTE
                     } else {
                         0
                     },
-                )
-            } else if is_identifier && !(is_method && name.as_bytes() == b"new") {
-                self.ast.new_identifier(name.clone())
-            } else if name_type.is_some() && is_numeric_name && name.as_bytes().starts_with(b"-") {
+                )));
+            }
+            if numeric && name.as_bytes().first() == Some(&b'-') {
                 let number = self
                     .ast
                     .new_numeric_literal(JsString::from_bytes(&name.as_bytes()[1..]), 0);
                 let negative = self
                     .ast
                     .new_prefix_unary_expression(K::MinusToken.into(), Some(number));
-                self.ast.new_computed_property_name(Some(negative))
-            } else if !string_named
-                && tsr_jsnum::from_string(name.as_bytes())
-                    .to_string()
-                    .as_bytes()
-                    == name.as_bytes()
-                && tsr_jsnum::from_string(name.as_bytes()).value() >= 0.0
-            {
-                self.ast.new_numeric_literal(name.clone(), 0)
-            } else {
-                self.ast.new_string_literal(
-                    name.clone(),
-                    if single_quote {
-                        token_flags::SINGLE_QUOTE
-                    } else {
-                        0
-                    },
-                )
-            };
-        Ok(property_name)
+                return Ok(Some(self.ast.new_computed_property_name(Some(negative))));
+            }
+            return Ok(Some(self.property_name_for_identifier_or_literal(
+                name,
+                single_quote,
+                string_named,
+                is_method,
+            )));
+        }
+        if flags & tf::UNIQUE_ES_SYMBOL != 0 {
+            let unique = self
+                .checker
+                .types
+                .get(name_type)?
+                .symbol
+                .ok_or(Error::MissingLink("unique name symbol"))?;
+            let expression = self.symbol_expression(unique, enclosing)?;
+            return Ok(Some(self.ast.new_computed_property_name(Some(expression))));
+        }
+        Ok(None)
+    }
+
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.createPropertyNameNodeForIdentifierOrLiteral
+    fn property_name_for_identifier_or_literal(
+        &mut self,
+        name: JsString,
+        single_quote: bool,
+        string_named: bool,
+        is_method: bool,
+    ) -> NodeId {
+        match classify_property_name(&name, string_named, is_method) {
+            PropertyNameKind::Identifier => self.ast.new_identifier(name),
+            PropertyNameKind::NumericLiteral => self.ast.new_numeric_literal(name, 0),
+            PropertyNameKind::StringLiteral => self.ast.new_string_literal(
+                name,
+                if single_quote {
+                    token_flags::SINGLE_QUOTE
+                } else {
+                    0
+                },
+            ),
+        }
     }
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.shouldUsePlaceholderForProperty
@@ -1455,3 +1537,31 @@ impl<'a> NodeBuilder<'a> {
 #[cfg(all(test, not(any(miri, target_family = "wasm"))))]
 #[path = "node_builder_stack_tests.rs"]
 mod stack_tests;
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum PropertyNameKind {
+    Identifier,
+    NumericLiteral,
+    StringLiteral,
+}
+
+// port: tsc/internal/checker/nodebuilderimpl.go:classifyPropertyName
+fn classify_property_name(
+    name: &JsString,
+    string_named: bool,
+    is_method: bool,
+) -> PropertyNameKind {
+    if is_method && name.as_bytes() == b"new" {
+        return PropertyNameKind::StringLiteral;
+    }
+    if tsr_scanner::is_identifier_text(name.as_bytes(), LanguageVariant::STANDARD) {
+        return PropertyNameKind::Identifier;
+    }
+    if !string_named
+        && crate::indexes::numeric_name(name.as_bytes()).is_some_and(|value| value >= 0.0)
+    {
+        PropertyNameKind::NumericLiteral
+    } else {
+        PropertyNameKind::StringLiteral
+    }
+}

@@ -164,6 +164,7 @@ impl NodeBuilder<'_> {
     }
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typeParametersToTypeParameterDeclarations
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.symbolToTypeParameterDeclarations
     pub(crate) fn symbol_type_parameter_declarations(
         &mut self,
         symbol: SymbolId,

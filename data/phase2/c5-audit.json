@@ -18,9 +18,10 @@
    "reason": "Not yet ported; the item that closes it is named."
   },
   "tsc/internal/checker/nodebuilder.go:NodeBuilder.popContext": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "There is no context stack: each public request prepares the builder's whole per-request state (prepare_context), so restoring the previous context has nothing to restore.",
+   "reviewed_from": "pinned body and its callers; C5.4 source audit",
+   "rust": "crates/tsr_checker/src/node_builder.rs:91"
   },
   "tsc/internal/checker/nodebuilder.go:simplifyClassDeclaration": {
    "disposition": "gap",
@@ -122,210 +123,137 @@
    "item": "C5.5",
    "reason": "Not yet ported; the item that closes it is named."
   },
-  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.createExpressionWithTypeArguments": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.createPropertyNameNodeForIdentifierOrLiteral": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.existingTypeNodeIsNotReferenceOrIsReferenceWithCompatibleTypeArgumentCount": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.getPropertyNameNodeForSymbolFromNameType": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.getTypeParametersOfClassOrInterface": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.indexInfoToIndexSignatureDeclarationHelper": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "Inlined in lookupInstantiatedTypeArgumentNodes' port, its only caller: the outer type parameters of the class-or-interface declaration, then its local ones.",
+   "reviewed_from": "pinned body and its callers; C5.4 source audit",
+   "rust": "crates/tsr_checker/src/node_builder_names.rs:1394"
   },
   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.isMappedTypeHomomorphic": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.lookupExpressionChainTypeArgumentNodes": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "Inlined at its only caller, isHomomorphicMappedTypeWithNonHomomorphicInstantiation's port: a mapped type is homomorphic when it has a homomorphic type variable.",
+   "reviewed_from": "pinned body and its callers; C5.4 source audit",
+   "rust": "crates/tsr_checker/src/node_builder_extra.rs:982"
   },
   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.lookupSymbolChain": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "Each caller tracks the symbol at the context's enclosing declaration, then takes lookupSymbolChainWorker's chain (display_name_chain), as lookupSymbolChain does.",
+   "reviewed_from": "pinned body and its callers; C5.4 source audit",
+   "rust": "crates/tsr_checker/src/node_builder_names.rs:213"
   },
   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.moduleSpecifierResolvesToSymbol": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "Inlined in the import type specifier: the specifier resolves, with the original import's attributes, from the enclosing declaration to the module's merged symbol.",
+   "reviewed_from": "pinned body and its callers; C5.4 source audit",
+   "rust": "crates/tsr_checker/src/node_builder_imports.rs:105"
   },
   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.moduleSpecifierResultForSymbol": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "The original import's attributes type is kept only when the specifier resolves to the module with it, reapplied on every request including specifier-cache hits.",
+   "reviewed_from": "pinned body and its callers; C5.4 source audit",
+   "rust": "crates/tsr_checker/src/node_builder_imports.rs:97"
   },
   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.newIdentifier": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.newStringLiteral": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "Every Rust site the pin creates an identifier with a symbol for records it in id_to_symbol; the pin's nil-symbol entries read as absent entries do.",
+   "reviewed_from": "pinned body and its callers; C5.4 source audit",
+   "rust": "crates/tsr_checker/src/node_builder_names.rs:149"
   },
   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.newStringLiteralEx": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "Its only explicit-quote caller builds the literal inline with the single-quote flag of the written name; other callers use newStringLiteral's port (string_literal).",
+   "reviewed_from": "pinned body and its callers; C5.4 source audit",
+   "rust": "crates/tsr_checker/src/node_builder_names.rs:1064"
   },
   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.saveRestoreFlags": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "Each pinned caller saves and restores the flags and the expansion depth around its region; the Rust sites do so inline.",
+   "reviewed_from": "pinned body and its callers; C5.4 source audit",
+   "rust": "crates/tsr_checker/src/node_builder_serialize.rs:106"
   },
   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.serializeInferredReturnTypeForSignature": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.serializeTypeName": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.setCommentRange": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.shouldWriteTypeParametersInQualifiedName": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "Inlined in serializeReturnTypeForSignature's port: with inference fallback reports suppressed, the signature's predicate instantiated by the context mapper, or else its return type.",
+   "reviewed_from": "pinned body and its callers; C5.4 source audit",
+   "rust": "crates/tsr_checker/src/node_builder_serialize.rs:372"
   },
   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.sortByBestName": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.symbolToTypeParameterDeclarations": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.trackComputedName": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.tryGetResolvedSymbolFromTypeNode": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "Inlined as the parent specifiers' stable sort: relative specifiers first, then by path component count.",
+   "reviewed_from": "pinned body and its callers; C5.4 source audit",
+   "rust": "crates/tsr_checker/src/node_builder_names.rs:906"
   },
   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.tryGetThisParameterDeclaration": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "Inlined in signatureToSignatureDeclarationHelper's port: the signature's this parameter as a parameter declaration; the pin's JSDoc this-tag branch is commented out.",
+   "reviewed_from": "pinned body and its callers; C5.4 source audit",
+   "rust": "crates/tsr_checker/src/node_builder_extra.rs:492"
   },
   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typeNodeIsEquivalentToType": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "Inlined in tryReuseExistingNonParameterTypeNode's port: the annotation's type is the type, or the host has a question token and the type without undefined is it.",
+   "reviewed_from": "pinned body and its callers; C5.4 source audit",
+   "rust": "crates/tsr_checker/src/node_builder_reuse.rs:271"
   },
   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typeParameterShadowsOtherTypeParameterInScope": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typePredicateToTypePredicateNode": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "Inlined in typeParameterToName's port: the name resolves at the enclosing declaration to a different type parameter.",
+   "reviewed_from": "pinned body and its callers; C5.4 source audit",
+   "rust": "crates/tsr_checker/src/node_builder_scopes.rs:297"
   },
   "tsc/internal/checker/nodebuilderimpl.go:TypeAlias.ToTypeReferenceNode": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "Inlined at its only caller, the any-with-alias case of typeToTypeNode: the alias symbol's raw entity name with its type arguments.",
+   "reviewed_from": "pinned body and its callers; C5.4 source audit",
+   "rust": "crates/tsr_checker/src/node_builder.rs:666"
   },
   "tsc/internal/checker/nodebuilderimpl.go:arrayIsHomogeneous": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/nodebuilderimpl.go:canUsePropertyAccess": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/nodebuilderimpl.go:classifyPropertyName": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "Inlined in mapToTypeNodes' port, its only caller: every seen name of a group compared with the first.",
+   "reviewed_from": "pinned body and its callers; C5.4 source audit",
+   "rust": "crates/tsr_checker/src/node_builder.rs:597"
   },
   "tsc/internal/checker/nodebuilderimpl.go:getEffectiveParameterDeclaration": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "Inlined in symbolToParameterDeclaration's port: the parameter's value declaration, a parameter or its JSDoc parameter tag.",
+   "reviewed_from": "pinned body and its callers; C5.4 source audit",
+   "rust": "crates/tsr_checker/src/node_builder_extra.rs:416"
   },
   "tsc/internal/checker/nodebuilderimpl.go:getTopmostIndexedAccessType": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "Inlined in createAccessFromSymbolChain's port: the object side is followed to the outermost indexed access.",
+   "reviewed_from": "pinned body and its callers; C5.4 source audit",
+   "rust": "crates/tsr_checker/src/node_builder_names.rs:1281"
   },
   "tsc/internal/checker/nodebuilderimpl.go:hasTypeAnnotation": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "The annotated declaration search of serializeTypeForDeclaration's port tests for a type annotation that is not a type alias's definition.",
+   "reviewed_from": "pinned body and its callers; C5.4 source audit",
+   "rust": "crates/tsr_checker/src/node_builder_serialize.rs:23"
   },
   "tsc/internal/checker/nodebuilderimpl.go:isIdentifierTypeReference": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/nodebuilderimpl.go:newNodeBuilderImpl": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/nodebuilderimpl.go:startsWithSingleOrDoubleQuote": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/nodebuilderimpl.go:startsWithSquareBracket": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "Inlined in mapToTypeNodes' port: a type reference whose type name is an identifier records a seen name.",
+   "reviewed_from": "pinned body and its callers; C5.4 source audit",
+   "rust": "crates/tsr_checker/src/node_builder.rs:554"
   },
   "tsc/internal/checker/nodebuilderimpl.go:tryGetModuleSpecifierFromDeclarationWorker": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "Inlined in TryGetModuleSpecifierFromDeclaration's port: the module specifier of an import, import-equals, export, JSDoc import or require declaration.",
+   "reviewed_from": "pinned body and its callers; C5.4 source audit",
+   "rust": "crates/tsr_checker/src/node_builder_imports.rs:125"
   },
   "tsc/internal/checker/nodebuilderscopes.go:NodeBuilderImpl.addSymbolTypeToContext": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "Each caller inserts the symbol's type into enclosing_symbol_types and restores the previous entry, or removes it, when its region ends.",
+   "reviewed_from": "pinned body and its callers; C5.4 source audit",
+   "rust": "crates/tsr_checker/src/node_builder_serialize.rs:158"
   },
   "tsc/internal/checker/nodebuilderscopes.go:cloneNodeBuilderContext": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "A serialization scope snapshots the copy-on-write type parameter names, texts, counters and symbol list and restores them on exit, as the pin's EnterScope restores do.",
+   "reviewed_from": "pinned body and its callers; C5.4 source audit",
+   "rust": "crates/tsr_checker/src/node_builder_scopes.rs:23"
   },
   "tsc/internal/checker/nodecopy.go:NodeBuilderImpl.createRecoveryBoundary": {
    "disposition": "equivalent",
@@ -435,64 +363,76 @@
    "reason": "Not yet ported; the item that closes it is named."
   },
   "tsc/internal/checker/printer.go:Checker.SignatureToSignatureDeclaration": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "The checker-level entry creates a builder and asks it; in Rust the caller asks the builder it holds (Operation::node_builder), which owns the returned syntax.",
+   "reviewed_from": "pinned body and its callers; C5.4 source audit",
+   "rust": "crates/tsr_checker/src/handles_display.rs:240"
   },
   "tsc/internal/checker/printer.go:Checker.TypePredicateToTypePredicateNode": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "The checker-level entry creates a builder and asks it; in Rust the caller asks the builder it holds, which owns the returned syntax.",
+   "reviewed_from": "pinned body and its callers; C5.4 source audit",
+   "rust": "crates/tsr_checker/src/handles_display.rs:331"
   },
   "tsc/internal/checker/printer.go:Checker.TypeToTypeNode": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "The checker-level entry creates a builder with the identifier map and asks it; in Rust the caller asks the builder it holds, whose id_to_symbol is that map.",
+   "reviewed_from": "pinned body and its callers; C5.4 source audit",
+   "rust": "crates/tsr_checker/src/handles_display.rs:168"
   },
   "tsc/internal/checker/printer.go:Checker.TypeToTypeNodeEx": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "TypeToTypeNode with internal flags; the builder's type_to_type_node takes them.",
+   "reviewed_from": "pinned body and its callers; C5.4 source audit",
+   "rust": "crates/tsr_checker/src/handles_display.rs:168"
   },
   "tsc/internal/checker/printer.go:Checker.typeToString": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "typeToStringEx with TypeToString's default flags; callers pass DEFAULT_FLAGS with their enclosing declaration.",
+   "reviewed_from": "pinned body and its callers; C5.4 source audit",
+   "rust": "crates/tsr_checker/src/type_display.rs:118"
   },
   "tsc/internal/checker/printer.go:Checker.valueToString": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "The checker method forwards to ValueToString, ported for enum values; the display of other literal values goes through the literal type nodes.",
+   "reviewed_from": "pinned body and its callers; C5.4 source audit",
+   "rust": "crates/tsr_checker/src/enums.rs:22"
   },
   "tsc/internal/checker/printer.go:createPrinterWithDefaults": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "The printer with default options is the one typeToStringEx uses for the unresolved type (remove_comments false).",
+   "reviewed_from": "pinned body and its callers; C5.4 source audit",
+   "rust": "crates/tsr_checker/src/type_display.rs:168"
   },
   "tsc/internal/checker/printer.go:createPrinterWithRemoveComments": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "PrinterOptions with remove_comments, at typePredicateToStringEx, TypeParameterToStringEx and typeToStringEx.",
+   "reviewed_from": "pinned body and its callers; C5.4 source audit",
+   "rust": "crates/tsr_checker/src/type_display.rs:298"
   },
   "tsc/internal/checker/printer.go:createPrinterWithRemoveCommentsNeverAsciiEscape": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "No pinned caller uses this printer; symbolToStringEx's source-file branch takes the omit-trailing-semicolon variant with never_ascii_escape.",
+   "reviewed_from": "pinned body and its callers; C5.4 source audit",
+   "rust": "crates/tsr_checker/src/type_display.rs:98"
   },
   "tsc/internal/checker/printer.go:createPrinterWithRemoveCommentsOmitTrailingSemicolon": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "PrinterOptions with remove_comments and omit_trailing_semicolon, at symbolToStringEx outside a source file.",
+   "reviewed_from": "pinned body and its callers; C5.4 source audit",
+   "rust": "crates/tsr_checker/src/type_display.rs:97"
   },
   "tsc/internal/checker/printer.go:createPrinterWithRemoveCommentsOmitTrailingSemicolonNeverAsciiEscape": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "PrinterOptions with remove_comments, omit_trailing_semicolon and never_ascii_escape, at signatureToStringEx and symbolToStringEx in a source file.",
+   "reviewed_from": "pinned body and its callers; C5.4 source audit",
+   "rust": "crates/tsr_checker/src/type_display.rs:249"
   },
   "tsc/internal/checker/pseudotypenodebuilder.go:NodeBuilderImpl.pseudoParametersToNodeList": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "Inlined in the pseudo signature serialization: one parameter node per pseudo parameter, as a node list.",
+   "reviewed_from": "pinned body and its callers; C5.4 source audit",
+   "rust": "crates/tsr_checker/src/node_builder_pseudo_output.rs:381"
   },
   "tsc/internal/checker/services.go:Checker.ForEachExportAndPropertyOfModule": {
    "disposition": "gap",

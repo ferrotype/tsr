@@ -84,12 +84,14 @@ impl NodeBuilder<'_> {
             Some(self.type_list(arguments, false)?)
         };
         let flags = self.flags;
+        let depth = self.depth;
         self.flags |= nf::FORBID_INDEXED_ACCESS_SYMBOL_REFERENCES;
         let result = (|| {
             self.track_symbol(symbol, sf::TYPE)?;
             self.symbol_type_node_from_chain(symbol, sf::TYPE, arguments)
         })();
         self.flags = flags;
+        self.depth = depth;
         result
     }
 
@@ -372,6 +374,7 @@ impl NodeBuilder<'_> {
         constraint: Option<NodeId>,
     ) -> Result<NodeId, Error> {
         let flags = self.flags;
+        let depth = self.depth;
         self.flags &= !nf::WRITE_TYPE_PARAMETERS_IN_QUALIFIED_NAME;
         let result = (|| {
             let modifier_flags = self.checker.type_parameter_modifiers(ty)?;
@@ -399,6 +402,7 @@ impl NodeBuilder<'_> {
             ))
         })();
         self.flags = flags;
+        self.depth = depth;
         result
     }
 
@@ -480,6 +484,7 @@ impl NodeBuilder<'_> {
         // Parameters do not inherit suppression of the enclosing signature's
         // top-level `any` return type.
         let flags = self.flags;
+        let depth = self.depth;
         self.flags &= !nf::SUPPRESS_ANY_RETURN_TYPE;
         let parameters = (|| {
             let mut parameters = Vec::new();
@@ -510,6 +515,7 @@ impl NodeBuilder<'_> {
             self.list(parameters)
         })();
         self.flags = flags;
+        self.depth = depth;
         let parameters = parameters?;
         let mut return_type = self.serialize_signature_return(signature, true)?;
         if return_type.is_none() && matches!(kind, K::FunctionType | K::ConstructorType) {
@@ -698,6 +704,7 @@ impl NodeBuilder<'_> {
         self.index_signature_node_with_type(index, None)
     }
 
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.indexInfoToIndexSignatureDeclarationHelper
     pub(super) fn index_signature_node_with_type(
         &mut self,
         index: IndexInfoId,
@@ -742,6 +749,7 @@ impl NodeBuilder<'_> {
     }
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typePredicateToTypePredicateNodeHelper
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typePredicateToTypePredicateNode
     pub(crate) fn predicate_node(
         &mut self,
         predicate: crate::TypePredicateId,
@@ -871,7 +879,9 @@ impl NodeBuilder<'_> {
                                     self.checker.instantiate_signature(signature, mapper)?;
                             }
                             let name = self.property_name_node(symbol)?;
-                            nodes.push(self.signature_node(signature, kind, Some(name), None)?);
+                            let node = self.signature_node(signature, kind, Some(name), None)?;
+                            self.copy_comment_range(node, Some(declaration))?;
+                            nodes.push(node);
                         }
                     }
                     return Ok(nodes);
@@ -919,6 +929,7 @@ impl NodeBuilder<'_> {
                     )?;
                     let name = self.property_name_node(symbol)?;
                     let getter = self.signature_node(getter, K::GetAccessor, Some(name), None)?;
+                    self.copy_comment_range(getter, property)?;
                     let name = self.property_name_node(symbol)?;
                     let setter = self.signature_node(setter, K::SetAccessor, Some(name), None)?;
                     return Ok(vec![getter, setter]);
@@ -945,12 +956,14 @@ impl NodeBuilder<'_> {
                 let name = self.property_name_node(symbol)?;
                 let question = (flags & sf::OPTIONAL != 0)
                     .then(|| self.ast.new_token(K::QuestionToken.into()));
-                nodes.push(self.signature_node(
-                    signature,
-                    K::MethodSignature,
-                    Some(name),
-                    question,
-                )?);
+                let method =
+                    self.signature_node(signature, K::MethodSignature, Some(name), question)?;
+                let declaration = match self.checker.signatures.get(signature)?.declaration {
+                    Some(declaration) => Some(declaration),
+                    None => self.checker.symbol(symbol)?.value_declaration(),
+                };
+                self.copy_comment_range(method, declaration)?;
+                nodes.push(method);
             }
             if !nodes.is_empty() || flags & sf::OPTIONAL == 0 {
                 return Ok(nodes);

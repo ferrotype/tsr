@@ -103,6 +103,7 @@ impl NodeBuilder<'_> {
             }
         }
         let saved_flags = self.flags;
+        let saved_depth = self.depth;
         let result = (|| {
             if self.checker.types.flags(ty)? & tf::UNIQUE_ES_SYMBOL != 0
                 && self.checker.types.get(ty)?.symbol == symbol
@@ -263,6 +264,7 @@ impl NodeBuilder<'_> {
             result
         })();
         self.flags = saved_flags;
+        self.depth = saved_depth;
         result
     }
 
@@ -284,6 +286,7 @@ impl NodeBuilder<'_> {
         try_reuse: bool,
     ) -> Result<Option<NodeId>, Error> {
         let flags = self.flags;
+        let depth = self.depth;
         let suppress_any = flags & nf::SUPPRESS_ANY_RETURN_TYPE != 0;
         if suppress_any {
             self.flags &= !nf::SUPPRESS_ANY_RETURN_TYPE;
@@ -383,6 +386,7 @@ impl NodeBuilder<'_> {
             result.map(Some)
         })();
         self.flags = flags;
+        self.depth = depth;
         result
     }
 
