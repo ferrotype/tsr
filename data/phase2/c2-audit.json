@@ -292,9 +292,8 @@
       "reason": "Shared native fall-through helper is used by constraint checking and infer constraints."
     },
     "tsc/internal/checker/checker.go:Checker.getTypeParametersForTypeReferenceOrImport": {
-      "disposition": "equivalent",
-      "reason": "The common reference/import checker resolves the type, rejects error types, requires the cached resolved symbol and applies the native alias/reference target parameter selection before checking constraints. Both source callers now share this exact path.",
-      "rust": "crates/tsr_checker/src/check_generics.rs:251"
+      "disposition": "mapped",
+      "reason": "Ported at C5 (C5.5): GetTypeArgumentConstraint needs it as a function; the reference/import check keeps its inlined use."
     },
     "tsc/internal/checker/checker.go:Checker.getUniqueLiteralTypeForTypeParameter": {
       "disposition": "equivalent",
@@ -676,14 +675,12 @@
       "rust": "crates/tsr_checker/src/infer_types.rs:352"
     },
     "tsc/internal/checker/inference.go:Checker.isFromInferenceBlockedSource": {
-      "disposition": "later",
-      "owner": "Phase 5",
-      "reason": "The native skipDirectInferenceNodes set is populated only by services.go signature-help inference (line 339) and cleared at line 351; compilation has no writer. Port its set, declaration predicate and inference filters together with language-service editing support in Phase 5; do not claim this behavior from compilation parity."
+      "disposition": "mapped",
+      "reason": "Ported at C5 (C5.5), the later owner this audit named; the port marker names it."
     },
     "tsc/internal/checker/inference.go:Checker.isSkipDirectInferenceNode": {
-      "disposition": "later",
-      "owner": "Phase 5",
-      "reason": "The native skipDirectInferenceNodes set is populated only by services.go signature-help inference (line 339) and cleared at line 351; compilation has no writer. Port its set, declaration predicate and inference filters together with language-service editing support in Phase 5; do not claim this behavior from compilation parity."
+      "disposition": "mapped",
+      "reason": "Ported at C5 (C5.5) with isFromInferenceBlockedSource; the port marker names it."
     },
     "tsc/internal/checker/inference.go:Checker.isTypeParameterAtTopLevelInReturnType": {
       "disposition": "equivalent",

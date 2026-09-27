@@ -927,6 +927,7 @@ dependencies = [
  "stacker",
  "tsr_arena",
  "tsr_ast",
+ "tsr_astnav",
  "tsr_binder",
  "tsr_core",
  "tsr_diagnostics",

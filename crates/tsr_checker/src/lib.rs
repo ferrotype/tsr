@@ -216,6 +216,7 @@ mod relation_errors;
 mod relation_helpers;
 mod resolution;
 mod return_inference;
+mod services;
 mod signature_identity;
 mod signature_jsdoc;
 mod signature_parameters;

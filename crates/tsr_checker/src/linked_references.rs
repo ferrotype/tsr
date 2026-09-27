@@ -648,7 +648,6 @@ fn is_internal_module_import_equals_declaration(
 }
 
 // port: tsc/internal/checker/emitresolver.go:isConstEnumOrConstEnumOnlyModule
-// port: tsc/internal/checker/utilities.go:isConstEnumSymbol
 pub(crate) fn is_const_enum_or_const_enum_only_module(flags: tsr_ast::SymbolFlags) -> bool {
     flags & sf::CONST_ENUM != 0 || flags & sf::CONST_ENUM_ONLY_MODULE != 0
 }

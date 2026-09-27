@@ -450,7 +450,10 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.getDeclaredTypeOfTypeAlias
-    fn get_declared_type_of_type_alias(&mut self, symbol: SymbolId) -> Result<TypeId, Error> {
+    pub(crate) fn get_declared_type_of_type_alias(
+        &mut self,
+        symbol: SymbolId,
+    ) -> Result<TypeId, Error> {
         if let Some(Some(ty)) = self.query.declared_types.try_get(symbol) {
             return Ok(*ty);
         }

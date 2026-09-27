@@ -65,18 +65,21 @@ impl Operation<'_> {
         Ok(predicate.id)
     }
 
-    fn symbol_refs(&self, symbols: &[SymbolId]) -> Result<Vec<SymbolRef>, Error> {
+    pub(crate) fn symbol_refs(&self, symbols: &[SymbolId]) -> Result<Vec<SymbolRef>, Error> {
         symbols
             .iter()
             .map(|&symbol| self.symbol_ref(symbol))
             .collect()
     }
 
-    fn optional_symbol(&self, symbol: Option<SymbolId>) -> Result<Option<SymbolRef>, Error> {
+    pub(crate) fn optional_symbol(
+        &self,
+        symbol: Option<SymbolId>,
+    ) -> Result<Option<SymbolRef>, Error> {
         symbol.map(|symbol| self.symbol_ref(symbol)).transpose()
     }
 
-    fn type_refs(&self, types: &[TypeId]) -> Vec<TypeRef> {
+    pub(crate) fn type_refs(&self, types: &[TypeId]) -> Vec<TypeRef> {
         types.iter().map(|&ty| self.type_ref(ty)).collect()
     }
 
@@ -927,6 +930,7 @@ impl Operation<'_> {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.isValidPropertyAccessForCompletions
+    // port: tsc/internal/checker/services.go:Checker.IsValidPropertyAccessForCompletions
     pub fn is_valid_property_access_for_completions(
         &mut self,
         node: NodeId,

@@ -26,6 +26,7 @@ hashbrown = { version = "=0.17.1", default-features = false }
 serde_json = { version = "1", optional = true }
 tsr_arena = { version = "0.1.0", path = "../tsr_arena" }
 tsr_ast = { version = "0.1.0", path = "../tsr_ast" }
+tsr_astnav = { version = "0.1.0", path = "../tsr_astnav" }
 tsr_binder = { version = "0.1.0", path = "../tsr_binder" }
 tsr_core = { version = "0.1.0", path = "../tsr_core" }
 tsr_diagnostics = { version = "0.1.0", path = "../tsr_diagnostics" }

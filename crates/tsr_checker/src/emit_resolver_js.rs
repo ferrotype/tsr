@@ -409,7 +409,10 @@ impl CheckerState {
     }
 
     /// `getEnumMemberValue(node).Value` for an enum member.
-    fn enum_member_constant(&mut self, member: NodeId) -> Result<Option<ConstantValue>, Error> {
+    pub(crate) fn enum_member_constant(
+        &mut self,
+        member: NodeId,
+    ) -> Result<Option<ConstantValue>, Error> {
         let parent = required(self.node(member)?.parent(), "enum member parent")?;
         self.compute_enum_member_values(parent)?;
         Ok(self.enums.values.try_get(member).and_then(|value| {

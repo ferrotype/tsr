@@ -114,7 +114,7 @@ impl CheckerState {
 
     /// `Node.Text()` of a JSX tag or attribute name: an identifier's text, or
     /// `namespace:name`.
-    fn jsx_name_text(&self, node: NodeId) -> Result<JsString, Error> {
+    pub(crate) fn jsx_name_text(&self, node: NodeId) -> Result<JsString, Error> {
         let read = self.node(node)?;
         if read.kind() == K::JsxNamespacedName {
             let data = read

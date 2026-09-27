@@ -119,7 +119,7 @@ impl CheckerState {
         Ok(source)
     }
     // port: tsc/internal/checker/checker.go:Checker.checkObjectLiteralDestructuringPropertyAssignment
-    fn check_object_assignment_property(
+    pub(crate) fn check_object_assignment_property(
         &mut self,
         property: NodeId,
         source: TypeId,
@@ -127,7 +127,7 @@ impl CheckerState {
         index: usize,
         list: Option<tsr_ast::NodeListId>,
         right_is_this: bool,
-    ) -> Result<(), Error> {
+    ) -> Result<Option<TypeId>, Error> {
         let read = self.node(property)?;
         match read.kind().known() {
             Some(K::PropertyAssignment | K::ShorthandPropertyAssignment) => {
@@ -169,7 +169,9 @@ impl CheckerState {
                     };
                 let element = self.get_indexed_access_type(source, key, flags, Some(name), None)?;
                 let flow = self.flow_type_of_destructuring(property, element)?;
-                self.check_destructuring_assignment(target, flow, 0, false)?;
+                return self
+                    .check_destructuring_assignment(target, flow, 0, false)
+                    .map(Some);
             }
             Some(K::SpreadAssignment) => {
                 let target = required(read.expression(), "assignment object rest")?;
@@ -179,7 +181,7 @@ impl CheckerState {
                         d::A_rest_element_must_be_last_in_a_destructuring_pattern,
                         vec![],
                     )?;
-                    return Ok(());
+                    return Ok(None);
                 }
                 if self.program()?.host.options().emit_script_target()
                     < tsr_core::ScriptTarget::ES2018
@@ -201,13 +203,15 @@ impl CheckerState {
                         d::A_rest_parameter_or_binding_pattern_may_not_have_a_trailing_comma,
                     )?;
                 }
-                self.check_destructuring_assignment(target, rest, 0, false)?;
+                return self
+                    .check_destructuring_assignment(target, rest, 0, false)
+                    .map(Some);
             }
             _ => {
                 self.error_at(Some(property), d::Property_assignment_expected, vec![])?;
             }
         }
-        Ok(())
+        Ok(None)
     }
     // port: tsc/internal/checker/checker.go:Checker.checkArrayLiteralAssignment
     fn check_array_assignment(
@@ -270,7 +274,7 @@ impl CheckerState {
         clippy::too_many_arguments,
         reason = "Parameters preserve the upstream operation and its independently selected checking modes"
     )]
-    fn check_array_assignment_element(
+    pub(crate) fn check_array_assignment_element(
         &mut self,
         element: NodeId,
         source: TypeId,
@@ -279,10 +283,10 @@ impl CheckerState {
         mode: u32,
         elements: &[NodeId],
         list: Option<tsr_ast::NodeListId>,
-    ) -> Result<(), Error> {
+    ) -> Result<Option<TypeId>, Error> {
         let read = self.node(element)?;
         if read.kind() == K::OmittedExpression {
-            return Ok(());
+            return Ok(None);
         }
         if read.kind() != K::SpreadElement {
             let key = self.get_number_literal_type(tsr_jsnum::Number::new(index as f64))?;
@@ -298,7 +302,9 @@ impl CheckerState {
                 }
                 element_type = self.flow_type_of_destructuring(element, element_type)?;
             }
-            self.check_destructuring_assignment(element, element_type, mode, false)?;
+            return self
+                .check_destructuring_assignment(element, element_type, mode, false)
+                .map(Some);
         } else if index + 1 < elements.len() {
             self.error_at(
                 Some(element),
@@ -344,10 +350,12 @@ impl CheckerState {
                 } else {
                     self.create_array_type(element_type, false)?
                 };
-                self.check_destructuring_assignment(target, rest, mode, false)?;
+                return self
+                    .check_destructuring_assignment(target, rest, mode, false)
+                    .map(Some);
             }
         }
-        Ok(())
+        Ok(None)
     }
     // port: tsc/internal/checker/checker.go:Checker.checkReferenceAssignment
     fn check_reference_assignment(

@@ -62,7 +62,6 @@ impl NodeBuilder<'_> {
     }
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.checkTruncationLengthIfExpanding
-    #[allow(dead_code, reason = "the hover builder (C5.5) is its caller")]
     pub(crate) fn check_truncation_if_expanding(&mut self) -> bool {
         if self.max_expansion_depth >= 0 && self.check_truncation() {
             self.expansion_truncated = true;

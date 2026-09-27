@@ -30,6 +30,8 @@ mod expansion;
 pub use expansion::VerbosityContext;
 #[path = "node_builder_extra.rs"]
 mod extra;
+#[path = "node_builder_hover.rs"]
+mod hover;
 #[path = "node_builder_names.rs"]
 pub(crate) mod names;
 #[path = "node_builder_pseudo.rs"]
@@ -1181,11 +1183,15 @@ impl<'a> NodeBuilder<'a> {
             let placeholder = self.elided_type();
             members.extend(self.object_index_nodes(index, reverse.then_some(placeholder))?);
         }
-        for (index, &property) in properties.iter().enumerate() {
+        let mut display_index = 0;
+        for &property in properties {
+            if self.is_expanding() && self.checker.symbol(property)?.flags() & sf::PROTOTYPE != 0 {
+                continue;
+            }
+            display_index += 1;
             if !self.class_expansion_property(property)? {
                 continue;
             }
-            let display_index = index + 1;
             if self.check_truncation() && display_index + 2 < properties.len().saturating_sub(1) {
                 let remaining = properties.len() - display_index;
                 if self.flags & nf::NO_TRUNCATION != 0 {
@@ -1300,6 +1306,7 @@ impl<'a> NodeBuilder<'a> {
             single_quote,
             string_named,
             is_method,
+            symbol,
         ))
     }
 
@@ -1390,6 +1397,7 @@ impl<'a> NodeBuilder<'a> {
                 single_quote,
                 string_named,
                 is_method,
+                symbol,
             )));
         }
         if flags & tf::UNIQUE_ES_SYMBOL != 0 {
@@ -1412,9 +1420,15 @@ impl<'a> NodeBuilder<'a> {
         single_quote: bool,
         string_named: bool,
         is_method: bool,
+        symbol: SymbolId,
     ) -> NodeId {
         match classify_property_name(&name, string_named, is_method) {
-            PropertyNameKind::Identifier => self.ast.new_identifier(name),
+            PropertyNameKind::Identifier => {
+                // `newIdentifier(name, symbol)` records the symbol it names.
+                let identifier = self.ast.new_identifier(name);
+                self.id_to_symbol.insert(identifier, Some(symbol));
+                identifier
+            }
             PropertyNameKind::NumericLiteral => self.ast.new_numeric_literal(name, 0),
             PropertyNameKind::StringLiteral => self.ast.new_string_literal(
                 name,

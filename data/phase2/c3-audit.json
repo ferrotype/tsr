@@ -1119,9 +1119,8 @@
    "rust": "crates/tsr_checker/src/node_builder_reuse.rs:1050"
   },
   "tsc/internal/checker/utilities.go:introducesArgumentsExoticObject": {
-   "disposition": "later",
-   "owner": "C5",
-   "reason": "its only caller is getSymbolsInScope (C5.5)"
+   "disposition": "mapped",
+   "reason": "Ported at C5 (C5.5), the later owner this audit named; the port marker names it."
   },
   "tsc/internal/checker/utilities.go:isAdditiveOperator": {
    "disposition": "equivalent",
@@ -1436,9 +1435,8 @@
    "rust": "crates/tsr_checker/src/node_builder.rs:563"
   },
   "tsc/internal/checker/utilities.go:symbolsToArray": {
-   "disposition": "later",
-   "owner": "C5",
-   "reason": "callers are getSymbolsInScope and the exports services (C5.5)"
+   "disposition": "mapped",
+   "reason": "Ported at C5 (C5.5), the later owner this audit named; the port marker names it."
   },
   "tsc/internal/checker/utilities.go:tokenIsIdentifierOrKeyword": {
    "disposition": "equivalent",

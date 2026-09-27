@@ -242,7 +242,9 @@ impl CheckerState {
         }
         if flags & tf::INDEX != 0 {
             if let Some(index) = self.inference_index(run, self.types.target(constraint)?)? {
-                if !self.inference_context(run.context)?.inferences[index].fixed {
+                if !self.inference_context(run.context)?.inferences[index].fixed
+                    && !self.is_from_inference_blocked_source(source)?
+                {
                     if let Some(inferred) =
                         self.infer_homomorphic_type(source, target, constraint)?
                     {
